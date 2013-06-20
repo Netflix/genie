@@ -48,10 +48,10 @@ project(':genie-client') {
 
     // we are doing this to include genie-common classes in client's javadocs
     sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
-    	
-	dependencies {
-		compile 'commons-configuration:commons-configuration:1.8'
-	}
+
+    dependencies {
+        compile 'commons-configuration:commons-configuration:1.8'
+    }
 }
 
 project(':genie-server') {
@@ -98,10 +98,10 @@ project(':genie-server') {
 }
    
 project(':genie-web') {
-	apply plugin: 'war'
-	
-	dependencies {
+    apply plugin: 'war'
+    
+    dependencies {
         compile 'com.netflix.karyon:karyon-admin-web:1.0.16'
-		compile project(':genie-server')
-	}
+        compile project(':genie-server')
+    }
 }
