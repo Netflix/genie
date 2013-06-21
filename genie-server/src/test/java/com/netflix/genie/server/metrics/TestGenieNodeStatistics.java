@@ -18,6 +18,8 @@
 
 package com.netflix.genie.server.metrics;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.junit.Assert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -46,6 +48,7 @@ public class TestGenieNodeStatistics {
     @Test
     public void test2xxCounter() {
         // incr 2xx count twice
+        stats.setGenie2xxCount(new AtomicLong(0));
         stats.incrGenie2xxCount();
         stats.incrGenie2xxCount();
         System.out.println("Received: " + stats.getGenie2xxCount().longValue());
@@ -58,6 +61,7 @@ public class TestGenieNodeStatistics {
     @Test
     public void test4xxCounter() {
         // incr 4xx count 4 times
+        stats.setGenie4xxCount(new AtomicLong(0));
         stats.incrGenie4xxCount();
         stats.incrGenie4xxCount();
         stats.incrGenie4xxCount();
@@ -72,6 +76,7 @@ public class TestGenieNodeStatistics {
     @Test
     public void test5xxCounter() {
         // incr 5xx count 5 times
+        stats.setGenie5xxCount(new AtomicLong(0));
         stats.incrGenie5xxCount();
         stats.incrGenie5xxCount();
         stats.incrGenie5xxCount();
@@ -87,6 +92,7 @@ public class TestGenieNodeStatistics {
     @Test
     public void testJobSubCounter() {
         // incr job submissions once
+        stats.setGenieJobSubmissions(new AtomicLong(0));
         stats.incrGenieJobSubmissions();
         Assert.assertEquals(stats.getGenieJobSubmissions().longValue(), 1L);
     }
@@ -97,6 +103,7 @@ public class TestGenieNodeStatistics {
     @Test
     public void testFailedJobCounter() {
         // incr failed jobs once
+        stats.setGenieFailedJobs(new AtomicLong(0));
         stats.incrGenieFailedJobs();
         Assert.assertEquals(stats.getGenieFailedJobs().longValue(), 1L);
     }
@@ -107,6 +114,7 @@ public class TestGenieNodeStatistics {
     @Test
     public void testKilledJobCounter() {
         // incr killed jobs twice
+        stats.setGenieKilledJobs(new AtomicLong(0));
         stats.incrGenieKilledJobs();
         stats.incrGenieKilledJobs();
         Assert.assertEquals(stats.getGenieKilledJobs().longValue(), 2L);
@@ -118,6 +126,7 @@ public class TestGenieNodeStatistics {
     @Test
     public void testSuccessJobCounter() {
         // incr successful jobs thrice
+        stats.setGenieSuccessfulJobs(new AtomicLong(0));
         stats.incrGenieSuccessfulJobs();
         stats.incrGenieSuccessfulJobs();
         stats.incrGenieSuccessfulJobs();

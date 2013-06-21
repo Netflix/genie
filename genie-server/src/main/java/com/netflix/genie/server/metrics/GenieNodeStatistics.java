@@ -310,6 +310,79 @@ public final class GenieNodeStatistics {
         genieKilledJobs.incrementAndGet();
     }
 
+
+    /**
+     * A setter method for 2xx count.
+     *
+     * @param genie2xxCount long value to set
+     */
+    public void setGenie2xxCount(AtomicLong genie2xxCount) {
+        this.genie2xxCount = genie2xxCount;
+    }
+
+    /**
+     * A setter method for 4xx count.
+     *
+     * @param genie4xxCount long value to set
+     */
+    public void setGenie4xxCount(AtomicLong genie4xxCount) {
+        this.genie4xxCount = genie4xxCount;
+    }
+
+    /**
+     * A setter method for 5xx count.
+     *
+     * @param genie5xxCount long value to set
+     */
+    public void setGenie5xxCount(AtomicLong genie5xxCount) {
+        this.genie5xxCount = genie5xxCount;
+    }
+
+    /**
+     * A setter method for job submissions.
+     *
+     * @param genieJobSubmissions long value to set
+     */
+    public void setGenieJobSubmissions(AtomicLong genieJobSubmissions) {
+        this.genieJobSubmissions = genieJobSubmissions;
+    }
+
+    /**
+     * A setter method for successful jobs.
+     *
+     * @param genieSuccessfulJobs long value to set
+     */
+    public void setGenieSuccessfulJobs(AtomicLong genieSuccessfulJobs) {
+        this.genieSuccessfulJobs = genieSuccessfulJobs;
+    }
+
+    /**
+     * A setter method for forwarded jobs.
+     *
+     * @param genieForwardedJobs long value to set
+     */
+    public void setGenieForwardedJobs(AtomicLong genieForwardedJobs) {
+        this.genieForwardedJobs = genieForwardedJobs;
+    }
+
+    /**
+     * A setter method for failed jobs.
+     *
+     * @param genieFailedJobs long value to set
+     */
+    public void setGenieFailedJobs(AtomicLong genieFailedJobs) {
+        this.genieFailedJobs = genieFailedJobs;
+    }
+
+    /**
+     * A setter method for killed jobs.
+     *
+     * @param genieKilledJobs long value to set
+     */
+    public void setGenieKilledJobs(AtomicLong genieKilledJobs) {
+        this.genieKilledJobs = genieKilledJobs;
+    }
+
     /**
      * Shut down cleanly.
      */
