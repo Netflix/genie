@@ -40,6 +40,9 @@ Thumbs.db
 ################
 .gradle
 
+# Derby files
+*-db
+
 # Build output directies
 /target
 */target
