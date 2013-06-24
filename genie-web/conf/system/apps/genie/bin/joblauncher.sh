@@ -74,7 +74,7 @@ function executeHadoop {
     echo "Copying Hadoop config files..." 
     cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
     checkError 204
-    copyFiles "$S3_HADOOP_CONF_FILES" "$CURRENT_JOB_CONF_DIR"
+    copyFiles "$S3_HADOOP_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"
     checkError 204
 
     echo "Executing CMD: $CMD $@"
@@ -88,13 +88,13 @@ function executeHive {
     echo "Copying Hadoop config files..."
     cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
     checkError 204
-    copyFiles "$S3_HADOOP_CONF_FILES" "$CURRENT_JOB_CONF_DIR"/
+    copyFiles "$S3_HADOOP_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
     checkError 204
 
     echo "Copying Hive config files..."
     cp $HIVE_HOME/conf/* $CURRENT_JOB_CONF_DIR/
     checkError 205
-    copyFiles "$S3_HIVE_CONF_FILES" "$CURRENT_JOB_CONF_DIR"/
+    copyFiles "$S3_HIVE_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
     checkError 205
 
     # create a tmp dir for java.io.tmpdir
@@ -113,11 +113,11 @@ function executePig {
     echo "Copying Hadoop config files..."
     cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
     checkError 204
-    copyFiles "$S3_HADOOP_CONF_FILES" "$CURRENT_JOB_CONF_DIR"/
+    copyFiles "$S3_HADOOP_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
     checkError 204
 
     echo "Copying Pig config files..."
-    copyFiles "$S3_PIG_CONF_FILES" "$CURRENT_JOB_CONF_DIR"/
+    copyFiles "$S3_PIG_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
     checkError 209
 
     # create and set java.io.tmpdir for pig
@@ -163,12 +163,14 @@ function archiveToS3 {
     
     # find the files to copy
     SOURCE=`find . -maxdepth 2 -type f | grep -v conf`
+    TARBALL="logs.tar.gz"
+    tar -czf $TARBALL $SOURCE 
     
     # create a directory first
     $HADOOP_HOME/bin/hadoop fs $HADOOP_S3CP_OPTS -mkdir $S3_PREFIX
 
     # copy over the logs to S3
-    copyFiles "$SOURCE" "$S3_PREFIX"
+    copyFiles "file://$PWD/$TARBALL" "$S3_PREFIX"
     
     # if it fails, just move on
     if [ "$?" -ne 0 ]; then
@@ -210,7 +212,7 @@ echo "Copying job dependency files: $JOB_FILE_DEPENDENCIES"
 # only copy file dependencies if they exist 
 if [ "$CURRENT_JOB_FILE_DEPENDENCIES" != "" ]
 then
-    copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "$CURRENT_JOB_WORKING_DIR"
+    copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "file://$CURRENT_JOB_WORKING_DIR"
     checkError 203
 fi
 
