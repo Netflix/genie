@@ -164,13 +164,13 @@ function archiveToS3 {
     # find the files to copy
     SOURCE=`find . -maxdepth 2 -type f | grep -v conf`
     TARBALL="logs.tar.gz"
-    tar -czvf $TARBALL $SOURCE 
+    tar -czf $TARBALL $SOURCE 
     
     # create a directory first
     $HADOOP_HOME/bin/hadoop fs $HADOOP_S3CP_OPTS -mkdir $S3_PREFIX
 
     # copy over the logs to S3
-    copyFiles "file://$TARBALL" "$S3_PREFIX"
+    copyFiles "file://$PWD/$TARBALL" "$S3_PREFIX"
     
     # if it fails, just move on
     if [ "$?" -ne 0 ]; then
