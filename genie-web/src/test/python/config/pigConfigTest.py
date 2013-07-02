@@ -248,5 +248,6 @@ class PigConfigTestCase(unittest.TestCase):
 if __name__ == "__main__":
    print "Running unit tests:\n"
    suite = unittest.makeSuite(PigConfigTestCase, 'test')
+   unittest.installHandler()
    unittest.main()
 

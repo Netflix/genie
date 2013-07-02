@@ -373,6 +373,7 @@ class ClusterConfigTestCase(unittest.TestCase):
 if __name__ == "__main__":
    print "Running unit tests:\n"
    suite = unittest.makeSuite(ClusterConfigTestCase, 'test')
+   unittest.installHandler()
    unittest.main()
 
 
