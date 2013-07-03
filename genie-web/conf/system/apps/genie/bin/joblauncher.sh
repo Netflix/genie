@@ -22,8 +22,8 @@ trap "{ archiveToS3; echo 'Job killed'; exit 211;}" SIGINT SIGTERM
 
 function checkError {
     if [ "$?" -ne 0 ]; then
-	archiveToS3
-	exit $1
+        archiveToS3
+        exit $1
     fi
 }
 
@@ -166,6 +166,12 @@ function archiveToS3 {
     TARBALL="logs.tar.gz"
     tar -czf $TARBALL $SOURCE 
     
+    # if it fails to create tarball, just move on
+    if [ "$?" -ne 0 ]; then
+        echo "Failed to archive logs to tarball - but moving on"
+        return
+    fi
+        
     # create a directory first
     $HADOOP_HOME/bin/hadoop fs $HADOOP_S3CP_OPTS -mkdir $S3_PREFIX
 

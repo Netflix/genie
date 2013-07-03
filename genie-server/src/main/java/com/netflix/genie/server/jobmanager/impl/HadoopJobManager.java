@@ -179,7 +179,7 @@ public class HadoopJobManager implements JobManager {
             ji.setProcessHandle(pid);
 
             // set off monitor thread for the job
-            JobMonitor jobMonitorThread = new JobMonitor(ji, proc);
+            JobMonitor jobMonitorThread = new JobMonitor(ji, cWorkingDir, proc);
             jobMonitorThread.start();
             ji.setJobStatus(JobStatus.RUNNING, "Job is running");
         } catch (IOException e) {

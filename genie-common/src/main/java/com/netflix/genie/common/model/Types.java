@@ -375,7 +375,7 @@ public class Types {
                     "Failed to create dir for pig client log");
             statusMap.put(S3_ARCHIVE_FAILURE.code(),
                     "Failed to archive job logs to S3");
-            statusMap.put(JOB_KILLED.code(), "Job killed on user request");
+            statusMap.put(JOB_KILLED.code(), "Job killed after it exceeded system limits");
             statusMap.put(ZOMBIE_JOB.code(), "Job has been marked as a zombie");
         }
 
