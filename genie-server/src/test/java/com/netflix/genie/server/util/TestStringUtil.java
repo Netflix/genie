@@ -40,6 +40,8 @@ public class TestStringUtil {
      */
     @Test
     public void testSplitCmdLine() throws Exception {
+        System.out.println("Testing command-line splitting:\n");
+
         System.out.println("Testing for single quotes");
         input = "-f ch_survey_response_f.pig -p vhs_window_start_date=20120912 "
                 + "-p survey_date=20120919 -p now_epoch_ts=1348125009 "
@@ -68,18 +70,14 @@ public class TestStringUtil {
         Assert.assertEquals(output.length, 4);
 
         System.out.println("Testing for commas in arguments");
-        input = "jar buzzsearchagg.jar searchevents "
-                + "search2click_agg "
+        input = "jar searchagg.jar searchevents "
+                + "some_agg "
                 + "20120916 20120918 "
-                + "US,CA,GB,GG,IM,JE,IE,SV,BB,BO,SX,MF,NI,AG,CW,AR,JM,MX,AN,DM,LC,GF,PY,VE,BR "
+                + "US,CA,GB "
                 + "20 false false";
         output = StringUtil.splitCmdLine(input);
         Assert.assertEquals(output.length, 10);
-
-        System.out.println("Testing for quoted strings in arguments");
-        input = "jar buzzsearchagg.jar \"foo bar\" \"\"";
-        output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 4);
+        System.out.println();
     }
 
     /**
@@ -87,6 +85,8 @@ public class TestStringUtil {
      */
     @Test
     public void testTrim() {
+        System.out.println("Testing version trimming:\n");
+
         input = "0.8.1.3.2";
         System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
@@ -116,5 +116,6 @@ public class TestStringUtil {
         System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
         Assert.assertEquals(version, null);
+        System.out.println();
     }
 }
