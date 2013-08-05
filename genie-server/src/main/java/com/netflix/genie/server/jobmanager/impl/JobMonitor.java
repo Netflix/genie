@@ -89,7 +89,7 @@ public class JobMonitor extends Thread {
         this.proc = proc;
         this.pm = new PersistenceManager<JobInfoElement>();
         this.maxStdoutSize = ConfigurationManager.getConfigInstance()
-                .getLong("netflix.genie.job.max.stdout.size");
+                .getLong("netflix.genie.job.max.stdout.size", null);
     }
 
     /**
