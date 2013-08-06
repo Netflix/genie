@@ -19,8 +19,8 @@ Builds
 
 Genie builds are hosted on CloudBees as follows:
 
-* [Master](https://netflixoss.ci.cloudbees.com/job/genie-master/).
-* [Pull Requests](https://netflixoss.ci.cloudbees.com/job/genie-pull-requests/).
+* [Master](https://netflixoss.ci.cloudbees.com/job/genie-master/)
+* [Pull Requests](https://netflixoss.ci.cloudbees.com/job/genie-pull-requests/)
 
 
 Support
