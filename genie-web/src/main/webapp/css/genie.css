@@ -1,0 +1,207 @@
+/*
+ *
+ *  Copyright 2013 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+
+body{
+    font-family:"Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+    font-size:12px;
+    padding-top: 60px;
+}
+
+p, h1, form, button{
+    border:0;
+    margin:0;
+    padding:0;
+}
+
+.spacer{
+    clear:both; height:1px;
+}
+
+
+/* ----------- My Form ----------- */
+h1 {
+    font-size:16px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+h3 {
+    font-size:14px;
+}
+
+.genie{
+    margin:0 auto;
+    width:540px;
+    padding:14px;
+}
+
+/* ----------- stylized ----------- */
+#stylized{
+    border:solid 2px red;
+    background:#fbecec;
+}
+#stylized h1 {
+    font-size:14px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+#stylized p{
+    font-size:11px;
+    color:#666666;
+    margin-bottom:20px;
+    border-bottom:solid 1px red;
+    padding-bottom:10px;
+}
+#stylized label{
+    display:block;
+    font-weight:bold;
+    text-align:right;
+    width:200px;
+    float:left;
+}
+#stylized .small{
+    color:#666666;
+    display:block;
+    font-size:11px;
+    font-weight:normal;
+    text-align:right;
+    width:200px;
+}
+#stylized input{
+    float:left;
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px red;
+    width:200px;
+    margin:2px 0 20px 10px;
+}
+#stylized button{
+    clear:both;
+    margin-left:150px;
+    width:125px;
+    height:31px;
+    background:#666666 url(img/button.png) no-repeat;
+    text-align:center;
+    line-height:31px;
+    color:#FFFFFF;
+    font-size:11px;
+    font-weight:bold;
+}
+#stylized .footer{
+    color:#666666;
+    display:block;
+    font-size:11px;
+    font-weight:normal;
+    text-align:center;
+}
+
+/* ---- table style -- */
+table.results {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 0px;
+	border-color: #999999;
+	border-collapse: collapse;
+}
+table.results th {
+	background:#b5cfd2;
+	border-width: 0px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #999999;
+}
+table.results td {
+	background:#fbecec;
+	border-width: 0px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #999999;
+}
+
+label,
+input,
+button,
+select,
+textarea {
+    font-size: 1em;
+}
+
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+    font-size: 1em;
+}
+
+.job-search-results,
+.cluster-search-results {
+    padding-bottom: 50px;
+}
+
+.job-info {
+    border: 1px solid #cccccc;
+    padding: 5px 10px 100px 10px;
+    border-width: 1px;
+    border-color: lightgrey;
+    margin-bottom: 15px;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+}
+
+.job-info h4,h5 {
+    margin-bottom: 0px;
+}
+
+.text-normal {
+    color: black;
+}
+
+.cluster-info {
+    border: 1px solid #cccccc;
+    padding: 5px 10px 100px 10px;
+    border-width: 1px;
+    border-color: lightgrey;
+    margin-bottom: 15px;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+}
+
+.cluster-info h4,h5 {
+    margin-bottom: 0px;
+}
+
+.affix {
+    padding: 15px;
+    background-color: white;
+}
