@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.server.services.ExecutionServiceFactory;
 
 /**
  * Utility class to return appropriate hostnames and S3 locations.
@@ -54,9 +53,9 @@ public final class NetUtil {
      */
     public static String getArchiveURI(String jobID) {
         logger.debug("called for jobID: " + jobID);
-        String s3ArchiveLocation = ExecutionServiceFactory.getJobEnv().get(
-                "S3_ARCHIVE_LOCATION");
-        if (s3ArchiveLocation != null) {
+        String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
+                .getString("netflix.genie.server.s3.archive.location");
+        if ((s3ArchiveLocation != null) && (!s3ArchiveLocation.isEmpty())) {
             return s3ArchiveLocation + "/" + jobID;
         } else {
             return null;
