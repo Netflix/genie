@@ -17,8 +17,11 @@ Check out our slides from the [2013 Hadoop Summit](http://www.slideshare.net/kri
 Builds
 ------
 
-[Master](https://netflixoss.ci.cloudbees.com/job/genie-master/)
-[Pull Requests](https://netflixoss.ci.cloudbees.com/job/genie-pull-requests/)
+Genie builds are hosted on CloudBees as follows:
+
+* [Master](https://netflixoss.ci.cloudbees.com/job/genie-master/).
+* [Pull Requests](https://netflixoss.ci.cloudbees.com/job/genie-pull-requests/).
+
 
 Support
 -------
