@@ -14,11 +14,20 @@ Slides
 
 Check out our slides from the [2013 Hadoop Summit](http://www.slideshare.net/krishflix/genie-hadoop-platform-as-a-service-at-netflix).
 
+Builds
+------
+
+[Master](https://netflixoss.ci.cloudbees.com/job/genie-master/)
+[Pull Requests](https://netflixoss.ci.cloudbees.com/job/genie-pull-requests/)
+
 Support
 -------
 
 Please use the [Genie Google Group](https://groups.google.com/d/forum/genie-hadoop) for
 general questions and discussion.
+
+You can request bug fixes and new features on the 
+[Issues](https://github.com/Netflix/genie/issues) page.
 
 
 
