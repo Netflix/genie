@@ -39,7 +39,6 @@ import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import com.netflix.genie.server.services.ConfigServiceFactory;
-import com.netflix.genie.server.services.ExecutionServiceFactory;
 import com.netflix.genie.server.util.StringUtil;
 
 /**
@@ -220,10 +219,15 @@ public class HadoopJobManager implements JobManager {
         if (processId > 0) {
             logger.info("Attempting to kill the process " + processId);
             try {
+                String genieHome = ConfigurationManager.getConfigInstance()
+                        .getString("netflix.genie.server.sys.home");
+                if ((genieHome == null) || genieHome.isEmpty()) {
+                    String msg = "Property netflix.genie.server.sys.home is not set correctly";
+                    logger.error(msg);
+                    throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                }
                 Runtime.getRuntime().exec(
-                        ExecutionServiceFactory.getJobEnv().get(
-                                "XS_SYSTEM_HOME")
-                                + File.separator + "jobkill.sh " + processId);
+                        genieHome + File.separator + "jobkill.sh " + processId);
             } catch (Exception e) {
                 String msg = "Failed to kill the job";
                 logger.error(msg, e);
@@ -280,11 +284,11 @@ public class HadoopJobManager implements JobManager {
                 + ConfigurationManager.getConfigInstance().getString(
                         "netflix.environment");
 
-        // construct command-line args
-        this.args = initArgs(ji);
-
         // construct the environment variables
         this.env = initEnv(ji);
+
+        // construct command-line args
+        this.args = initArgs(ji);
 
         // save/init args, environment and jobinfo
         this.ji = ji;
@@ -323,9 +327,11 @@ public class HadoopJobManager implements JobManager {
             hArgs = new String[cmdArgs.length + genieArgs.length + 2];
         }
 
+        // get the location where genie scripts are installed
+        String genieHome = env.get("XS_SYSTEM_HOME");
+
         // first two args are the joblauncher and job type
-        hArgs[0] = ExecutionServiceFactory.getJobEnv().get("XS_SYSTEM_HOME")
-                + File.separator + "joblauncher.sh";
+        hArgs[0] = genieHome + File.separator + "joblauncher.sh";
         hArgs[1] = ji.getJobType().toLowerCase();
 
         // incorporate the genieArgs into the command-line for each case
@@ -393,9 +399,22 @@ public class HadoopJobManager implements JobManager {
                 ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server.hadoop.s3cp.opts", ""));
 
-        // get the system environment
-        Map<String, String> sysEnv = ExecutionServiceFactory.getJobEnv();
-        hEnv.putAll(sysEnv);
+        // set the java home
+        String javaHome = ConfigurationManager.getConfigInstance().
+                getString("netflix.genie.server.java.home");
+        if ((javaHome != null) && (!javaHome.isEmpty())) {
+            hEnv.put("JAVA_HOME", javaHome);
+        }
+
+        // set the genie home
+        String genieHome = ConfigurationManager.getConfigInstance()
+                .getString("netflix.genie.server.sys.home");
+        if ((genieHome == null) || genieHome.isEmpty()) {
+            String msg = "Property netflix.genie.server.sys.home is not set correctly";
+            logger.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+        }
+        hEnv.put("XS_SYSTEM_HOME", genieHome);
 
         // if the cluster version is provided, overwrite the HADOOP_HOME
         // environment variable
@@ -427,6 +446,36 @@ public class HadoopJobManager implements JobManager {
             logger.info("Overriding HADOOP_HOME from cluster config to: "
                     + hadoopHome);
             hEnv.put("HADOOP_HOME", hadoopHome);
+        } else {
+            // set the default hadoop home
+            String hadoopHome = ConfigurationManager.getConfigInstance().
+                    getString("netflix.genie.server.hadoop.home");
+            if ((hadoopHome == null) || (!new File(hadoopHome).exists())) {
+                String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
+                logger.error(msg);
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            }
+            hEnv.put("HADOOP_HOME", hadoopHome);
+        }
+
+        // set the base working directory
+        String baseUserWorkingDir = ConfigurationManager.getConfigInstance().
+                getString("netflix.genie.server.user.working.dir");
+        if ((baseUserWorkingDir == null) || (baseUserWorkingDir.isEmpty())) {
+            String msg = "Property netflix.genie.server.user.working.dir is not set";
+            logger.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+        } else {
+            hEnv.put("BASE_USER_WORKING_DIR", baseUserWorkingDir);
+        }
+
+        // set the archive location
+        String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
+                .getString("netflix.genie.server.s3.archive.location");
+        if ((s3ArchiveLocation != null) && (!s3ArchiveLocation.isEmpty())) {
+            hEnv.put("S3_ARCHIVE_LOCATION", s3ArchiveLocation);
         }
 
         return hEnv;

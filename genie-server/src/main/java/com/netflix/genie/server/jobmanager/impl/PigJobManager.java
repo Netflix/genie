@@ -141,6 +141,17 @@ public class PigJobManager extends HadoopJobManager {
             logger.info("Overriding PIG_HOME from cluster config to: "
                     + pigHome);
             hEnv.put("PIG_HOME", pigHome);
+        } else {
+            // set the default pig home
+            String pigHome = ConfigurationManager.getConfigInstance().
+                    getString("netflix.genie.server.pig.home");
+            if ((pigHome == null) || (!new File(pigHome).exists())) {
+                String msg = "Property netflix.genie.server.pig.home is not set correctly";
+                logger.error(msg);
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            }
+            hEnv.put("PIG_HOME", pigHome);
         }
 
         // add the pigOverrideUrl, if provided

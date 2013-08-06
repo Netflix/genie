@@ -159,6 +159,17 @@ public class HiveJobManager extends HadoopJobManager {
             logger.info("Overriding HIVE_HOME from cluster config to: "
                     + hiveHome);
             hEnv.put("HIVE_HOME", hiveHome);
+        } else {
+            // set the default hive home
+            String hiveHome = ConfigurationManager.getConfigInstance().
+                    getString("netflix.genie.server.hive.home");
+            if ((hiveHome == null) || (!new File(hiveHome).exists())) {
+                String msg = "Property netflix.genie.server.hive.home is not set correctly";
+                logger.error(msg);
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            }
+            hEnv.put("HIVE_HOME", hiveHome);
         }
 
         return hEnv;
