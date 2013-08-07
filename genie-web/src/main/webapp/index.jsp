@@ -19,7 +19,7 @@
 <html>
 <head>
 <title>Genie</title>
-<link rel="stylesheet" type="text/css" href="genie.css" />
+<link rel="stylesheet" type="text/css" href="./css/genie.css" />
 </head>
 
 <body>
@@ -29,7 +29,7 @@
 <table class="results">
 <tr>
 <td>
-<img src="GenieLogo.png" alt="Genie" height=210>
+<img src="./img/GenieLogo.png" alt="Genie" height=210>
 </td>
 
 <td>
