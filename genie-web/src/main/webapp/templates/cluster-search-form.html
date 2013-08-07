@@ -1,0 +1,100 @@
+<form class="form-horizontal" id="clusterSearchForm">
+    <div class="control-group">
+        <label class="control-label">Name:</label>
+        <div class="controls">
+            <input type="text" name="name" class="input-large">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Status:</label>
+        <div class="controls">
+            <select name="status">
+                <option></option>
+                <option>UP</option>
+                <option>OUT_OF_SERVICE</option>
+                <option>TERMINATED</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">adHoc:</label>
+        <div class="controls">
+            <select name="adHoc">
+                <option></option>
+                <option>True</option>
+                <option>False</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">SLA:</label>
+        <div class="controls">
+            <select name="sla">
+                <option></option>
+                <option>True</option>
+                <option>False</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Bonus:</label>
+        <div class="controls">
+            <select name="bonus">
+                <option></option>
+                <option>True</option>
+                <option>False</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Prod:</label>
+        <div class="controls">
+            <select name="prod">
+                <option></option>
+                <option>True</option>
+                <option>False</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Test:</label>
+        <div class="controls">
+            <select name="test">
+                <option></option>
+                <option>True</option>
+                <option>False</option>
+           </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Unit Test:</label>
+        <div class="controls">
+            <select name="unitTest">
+                <option></option>
+                <option>True</option>
+                <option>False</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Has Stats:</label>
+        <div class="controls">
+            <select name="hasStats">
+                <option></option>
+                <option>True</option>
+                <option>False</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Number of jobs (1-100):</label>
+        <div class="controls">
+            <input type="text" name="limit" class="input-mini" maxlength=3 value="32">
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <button data-bind="click: Cluster.update" type="button" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</form>

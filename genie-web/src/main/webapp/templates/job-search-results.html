@@ -1,0 +1,31 @@
+<div data-bind="foreach: $root.Job.searchResults" class="job-search-results">
+    <div class="job-info">
+        <h4>
+            <a data-bind="text: $data.jobNameFormatted, attr: {href: $data.outputURI}" target="_blank"></a>
+            <span data-bind="text: $data.status, css: statusClass" class="label pull-right"></span>
+        </h4>
+        <div class="span12">
+            <div class="row">
+                <div class="span1"><strong>Type:</strong></div>
+                <div class="span3" data-bind="text: $data.jobType"></div>
+                <div class="span1"><strong>User:</strong></div>
+                <div class="span3" data-bind="text: $data.userName"></div>
+                <div class="span1"><strong>Logs:</strong></div>
+                <div class="span3">
+                    <a data-bind="attr: {href: $data.outputURI()+'/stderr.log'}" target="_blank">stderr.log</a> |
+                    <a data-bind="attr: {href: $data.outputURI()+'/stdout.log'}" target="_blank">stdout.log</a>
+                </div>
+            </div>
+        </div>
+        <div class="span12">
+            <div class="row">
+                <div class="span1"><strong>Start:</strong></div>
+                <div class="span3" data-bind="text: $data.startTimeFormatted"></div>
+                <div class="span1"><strong>Finish:</strong></div>
+                <div class="span3" data-bind="text: $data.finishTimeFormatted"></div>
+                <div class="span1"><strong>Update:</strong></div>
+                <div class="span3" data-bind="text: $data.updateTimeFormatted"></div>
+            </div>
+        </div>
+    </div>
+</div>

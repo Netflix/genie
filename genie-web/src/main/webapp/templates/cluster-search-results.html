@@ -1,0 +1,19 @@
+<div data-bind="foreach: Cluster.searchResults" class="cluster-search-results">
+    <div class="cluster-info">
+        <h4>
+            <a data-bind="text: $data.name" target="_blank"></a>
+            <span data-bind="text: $data.status, css: statusClass" class="label pull-right"></span>
+        </h4>
+        <div class="span12">
+            <div class="row">
+                <div class="span1"><strong>Created:</strong></div>
+                <div class="span3" data-bind="text: $data.createTimeFormatted"></div>
+                <div class="span1"><strong>User:</strong></div>
+                <div class="span3" data-bind="text: $data.user"></div>
+            </div>
+        </div>
+        <div>
+            BLAH
+        </div>
+    </div>
+</div>
