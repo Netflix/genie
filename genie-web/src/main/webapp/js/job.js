@@ -5,8 +5,7 @@ define([
     'knockout.mapping',
     'pager',
     'loadKoTemplate!../templates/job-search-form.html',
-    'loadKoTemplate!../templates/job-search-results.html',
-    'loadKoTemplate!../templates/job-search-results-g.html'
+    'loadKoTemplate!../templates/job-search-results.html'
 ], function($, _, ko, mapping, pager) {
     ko.mapping = mapping;
 
@@ -99,15 +98,23 @@ define([
             $.ajax({
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  './genie/v0/jobs',
-                data: {limit: 100000, status: 'RUNNING'}
+                url:  'genie/v0/jobs',
+                data: {limit: 64, status: 'RUNNING'}
             }).done(function(data) {
-                _.each(data.jobs.jobInfo, function(jobObj, index) {
-                    if (!(jobObj.jobType in jobCount)) {
-                        jobCount[jobObj.jobType] = 0;
+                // check to see if jobInfo is an array
+                if (data.jobs.jobInfo instanceof Array) {
+                    _.each(data.jobs.jobInfo, function(jobObj, index) {
+                        if (!(jobObj.jobType in jobCount)) {
+                            jobCount[jobObj.jobType] = 0;
+                        }
+                        jobCount[jobObj.jobType] += 1;
+                    });
+                } else {
+                    if (!(data.jobs.jobInfo.jobType in jobCount)) {
+                        jobCount[data.jobs.jobInfo.jobType] = 0;
                     }
-                    jobCount[jobObj.jobType] += 1;
-                });
+                    jobCount[data.jobs.jobInfo.jobType] += 1;
+                }
                 _.each(jobCount, function(count, type) {
                     self.runningJobs.push({type: type, count: count});
                 });
@@ -128,18 +135,26 @@ define([
             $.ajax({
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  './genie/v0/jobs',
+                url:  'genie/v0/jobs',
                 data: {limit: limit, userName: userName, jobType: jobType, status: status, jobID: jobID, jobName: jobName}
             }).done(function(data) {
-                _.each(data.jobs.jobInfo, function(jobObj, index) {
-                    if (! jobObj.jobName) {
-                        jobObj.jobName = 'undefined';
+                // check to see if jobInfo is an array
+                if (data.jobs.jobInfo instanceof Array) {
+                    _.each(data.jobs.jobInfo, function(jobObj, index) {
+                        if (! jobObj.jobName) {
+                            jobObj.jobName = 'undefined';
+                        }
+                        self.searchResults.push(new Job(jobObj));
+                    });
+                } else {
+                    if (! data.jobs.jobInfo.jobName) {
+                        data.jobs.jobInfo.jobName = 'undefined';
                     }
-                    self.searchResults.push(new Job(jobObj));
-                });
+                    self.searchResults.push(new Job(data.jobs.jobInfo));                
+                }
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 if (jqXHR.responseText = '{"errorMsg":"No jobs found for specified criteria"}') {
-                    console.log('NO JOBS FOUND!');
+                    console.log('No jobs found!');
                 } else {
                     console.log(jqXHR);
                 }

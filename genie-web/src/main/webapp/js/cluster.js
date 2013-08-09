@@ -15,7 +15,6 @@ define([
         self.bonus            = ko.observable();
         self.createTime       = ko.observable();
         self.hadoopVersion    = ko.observable();
-        self.hasStats         = ko.observable();
         self.id               = ko.observable();
         self.jobFlowId        = ko.observable();
         self.name             = ko.observable();
@@ -44,13 +43,19 @@ define([
             return '';
         }, self);
 
+        self.updateTimeFormatted = ko.computed(function() {
+            if (self.updateTime() > 0) {
+                var myDate = new Date(parseInt(self.updateTime()));
+                return myDate.toUTCString();
+            }
+            return '';
+        }, self);
+        
         self.statusClass = ko.computed(function() {
             if (self.status().toUpperCase() === 'UP') {
-                //return 'text-success';
                 return 'label-success';
             }
             else if (self.status().toUpperCase() === 'OUT_OF_SERVICE') {
-                //return 'text-error';
                 return 'label-warning';
             }
             return '';
@@ -68,13 +73,18 @@ define([
             $.ajax({
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  './genie/v0/config/cluster',
-                data: {limit: 100000, status: 'UP'}
+                url:  'genie/v0/config/cluster',
+                data: {limit: 32, status: 'UP'}
             }).done(function(data) {
-                _.each(data.clusterConfigs.clusterConfig, function(clusterObj, index) {
-                    self.runningClusters.push(clusterObj.name);
-                });
-                self.runningClusters(self.runningClusters().sort());
+                // check to see if clusterConfig is array
+                if (data.clusterConfigs.clusterConfig instanceof Array) {
+                    _.each(data.clusterConfigs.clusterConfig, function(clusterObj, index) {
+                        self.runningClusters.push(clusterObj);
+                    });
+                } else {
+                    self.runningClusters.push(data.clusterConfigs.clusterConfig);
+                }
+                // self.runningClusters(self.runningClusters().sort());
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR);
             });
@@ -91,20 +101,24 @@ define([
             var prod     = _.where(formArray, {'name': 'prod'})[0].value;
             var test     = _.where(formArray, {'name': 'test'})[0].value;
             var unitTest = _.where(formArray, {'name': 'unitTest'})[0].value;
-            var hasStats = _.where(formArray, {'name': 'hasStats'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
             $.ajax({
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  './genie/v0/config/cluster',
-                data: {limit: limit, name: name, status: status, adHoc: adHoc, sla: sla, bonus: bonus, prod: prod, test: test, unitTest: unitTest, hasStats: hasStats}
+                url:  'genie/v0/config/cluster',
+                data: {limit: limit, name: name, status: status, adHoc: adHoc, sla: sla, bonus: bonus, prod: prod, test: test, unitTest: unitTest}
             }).done(function(data) {
-                _.each(data.clusterConfigs.clusterConfig, function(clusterObj, index) {
-                    self.searchResults.push(new Cluster(clusterObj));
-                });
+                // check to see if clusterConfig is array
+                if (data.clusterConfigs.clusterConfig instanceof Array) {
+                    _.each(data.clusterConfigs.clusterConfig, function(clusterObj, index) {
+                        self.searchResults.push(new Cluster(clusterObj));
+                    });
+                } else {
+                    self.searchResults.push(new Cluster(data.clusterConfigs.clusterConfig));
+                }
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                if (jqXHR.responseText = '{"errorMsg":"No jobs found for specified criteria"}') {
-                    console.log('NO CLUSTERS FOUND!');
+                if (jqXHR.responseText = '{"errorMsg":"No clusters found"}') {
+                    console.log('No clusters found!');
                 } else {
                     console.log(jqXHR);
                 }

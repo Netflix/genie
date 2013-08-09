@@ -201,6 +201,14 @@ input[type="color"],
     margin-bottom: 0px;
 }
 
+.container {
+  width: 1000px;
+}
+
+.span12 {
+  width: 1000px;
+}
+
 .affix {
     padding: 15px;
     background-color: white;

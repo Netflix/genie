@@ -48,11 +48,6 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
-                    <!--<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>-->
                     <a class="brand" href="#">Genie</a>
                     <ul class="nav" role="navigation">
                         <li data-bind="css: {active: $__page__.find('jobs').isVisible}"><a href="#jobs">Search Jobs</a></li>
@@ -62,18 +57,23 @@
             </div>
         </div>
 
-        <div data-spy="affix">
-            <div data-bind="page: {id: 'jobs', beforeHide: function(page) {$root.Job.searchResults([]);}}">
-                <div data-bind="template: {name: 'job-search-form-html'}"></div>
-            </div>
-            <div data-bind="page: {id: 'clusters', beforeHide: function(page) { $root.Cluster.searchResults([]);}}">
-                <div data-bind="template: {name: 'cluster-search-form-html'}"></div>
+        <div data-spy="fluid" class="container">
+            <div class="span6">
+	            <div data-bind="page: {id: 'jobs', beforeHide: function(page) {$root.Job.searchResults([]);}}">
+	                <div data-bind="template: {name: 'job-search-form-html'}"></div>
+	            </div>
+	            <div data-bind="page: {id: 'clusters', beforeHide: function(page) { $root.Cluster.searchResults([]);}}">
+	                <div data-bind="template: {name: 'cluster-search-form-html'}"></div>
+	            </div>
             </div>
         </div>
         <div class="container">
             <div data-bind="page: {id: 'start', beforeShow: function(page) { $root.Job.startup(); $root.Cluster.startup(); }}">
                 <div class="span12">
                     <div class="row">
+                        <div class="span3">
+                            <img src="img/GenieLogo.png" alt="Genie">
+                        </div>
                         <div class="span5">
                             <h4>Running jobs:</h4>
                             <table class="table table-condensed">
@@ -83,7 +83,8 @@
                                 <tbody data-bind="foreach: $root.Job.runningJobs">
                                     <tr>
                                         <td data-bind="text: $data.type"></td>
-                                        <td data-bind="text: $data.count"></td>
+                                        <td data-bind="text: $data.count">
+                                        </td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
@@ -98,13 +99,15 @@
                         <div class="span5">
                             <h4>Running clusters:</h4>
                             <ul data-bind="foreach: $root.Cluster.runningClusters">
-                                <li data-bind="text: $data"></li>
+                                <li>
+                                    <a data-bind="text: $data.name, attr: {href: 'genie/v0/config/cluster/'+$data.id}" target="_blank"></a>
+                                </li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            <div data-bind="template: {name: 'job-search-results-g-html'}"></div>
+            <div data-bind="template: {name: 'job-search-results-html'}"></div>
             <div data-bind="template: {name: 'cluster-search-results-html'}"></div>
         </div> <!-- /container -->
     </body>
