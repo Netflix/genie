@@ -1,17 +1,37 @@
-<div data-bind="foreach: Cluster.searchResults" class="cluster-search-results">
+<div data-bind="foreach: $root.Cluster.searchResults" class="cluster-search-results">
     <div class="cluster-info">
-        <h4>
-            <a data-bind="text: $data.name, attr: {href: 'genie/v0/config/cluster/'+$data.id()}" target="_blank"></a>
+        <h3>
+            Cluster Name: <a data-bind="text: $data.name, attr: {href: 'genie/v0/config/cluster/'+$data.id()}" target="_blank"></a>
             <span data-bind="text: $data.status, css: statusClass" class="label pull-right"></span>
-        </h4>
+        </h3>
         <div class="span12">
             <div class="row">
                 <div class="span1"><strong>ID:</strong></div>
                 <div class="span3" data-bind="text: $data.id"></div>
                 <div class="span1"><strong>User:</strong></div>
                 <div class="span3" data-bind="text: $data.user"></div>
-                <div class="span1"><strong>Hadoop Version:</strong></div>
+                <div class="span1"><strong>Version:</strong></div>
                 <div class="span3" data-bind="text: $data.hadoopVersion"></div>
+            </div>
+        </div>
+        <div class="span12">
+            <div class="row">
+                <div class="span1"><strong>Ad Hoc:</strong></div>
+                <div class="span3" data-bind="text: $data.adHoc"></div>
+                <div class="span1"><strong>SLA:</strong></div>
+                <div class="span3" data-bind="text: $data.sla"></div>
+                <div class="span1"><strong>Bonus:</strong></div>
+                <div class="span3" data-bind="text: $data.bonus"></div>
+            </div>
+        </div>
+        <div class="span12">
+            <div class="row">
+                <div class="span1"><strong>Prod:</strong></div>
+                <div class="span3" data-bind="text: $data.prod"></div>
+                <div class="span1"><strong>Test:</strong></div>
+                <div class="span3" data-bind="text: $data.test"></div>
+                <div class="span1"><strong>Dev:</strong></div>
+                <div class="span3" data-bind="text: $data.unitTest"></div>
             </div>
         </div>
         <div class="span12">

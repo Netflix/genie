@@ -67,24 +67,36 @@ define([
         var self = this.Cluster;
         self.searchResults   = ko.observableArray();
         self.runningClusters = ko.observableArray();
-
+        self.runningClusterCount = ko.computed(function() {
+            return _.reduce(self.runningClusters(), function(sum, obj, index) { return sum + obj.count; }, 0);
+        }, self);
+        
         self.startup = function() {
             self.runningClusters([]);
+            var clusterCount = {};
             $.ajax({
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v0/config/cluster',
-                data: {limit: 32, status: 'UP'}
+                url:  'genie/v0/config/cluster?status=UP&status=OUT_OF_SERVICE',
             }).done(function(data) {
                 // check to see if clusterConfig is array
                 if (data.clusterConfigs.clusterConfig instanceof Array) {
                     _.each(data.clusterConfigs.clusterConfig, function(clusterObj, index) {
-                        self.runningClusters.push(clusterObj);
+                        if (!(clusterObj.status in clusterCount)) {
+                            clusterCount[clusterObj.status] = 0;
+                        }
+                        clusterCount[clusterObj.status] += 1;
                     });
                 } else {
-                    self.runningClusters.push(data.clusterConfigs.clusterConfig);
+                    var clusterObj = data.clusterConfigs.clusterConfig;
+                    if (!(clusterObj.status in clusterCount)) {
+                        clusterCount[clusterObj.status] = 0;
+                    }
+                    clusterCount[clusterObj.status] += 1                    
                 }
-                // self.runningClusters(self.runningClusters().sort());
+                _.each(clusterCount, function(count, status) {
+                    self.runningClusters.push({status: status, count: count});
+                });
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR);
             });

@@ -48,7 +48,7 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
-                    <a class="brand" href="#">Genie</a>
+                    <a class="brand" href="#">GENIE</a>
                     <ul class="nav" role="navigation">
                         <li data-bind="css: {active: $__page__.find('jobs').isVisible}"><a href="#jobs">Search Jobs</a></li>
                         <li data-bind="css: {active: $__page__.find('clusters').isVisible}"><a href="#clusters">Search Clusters</a></li>
@@ -95,14 +95,26 @@
                                 </tfoot>
                             </table>
                         </div>
-                        <div class="span2"></div>
                         <div class="span5">
                             <h4>Running clusters:</h4>
-                            <ul data-bind="foreach: $root.Cluster.runningClusters">
-                                <li>
-                                    <a data-bind="text: $data.name, attr: {href: 'genie/v0/config/cluster/'+$data.id}" target="_blank"></a>
-                                </li>
-                            </ul>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr><th>Status</th><th>Count</th></tr>
+                                </thead>
+                                <tbody data-bind="foreach: $root.Cluster.runningClusters">
+                                    <tr>
+                                        <td data-bind="text: $data.status"></td>
+                                        <td data-bind="text: $data.count">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td><strong>Total</strong></td>
+                                        <td data-bind="text: $root.Cluster.runningClusterCount"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
