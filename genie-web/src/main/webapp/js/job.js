@@ -86,6 +86,7 @@ define([
     var JobViewModel = function() {
         this.Job = {};
         var self = this.Job;
+        self.status = ko.observable('hidden');
         self.searchResults = ko.observableArray();
         self.runningJobs   = ko.observableArray();
         self.runningJobCount = ko.computed(function() {
@@ -153,6 +154,7 @@ define([
                     self.searchResults.push(new Job(data.jobs.jobInfo));                
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
+                self.status('visible');
                 if (jqXHR.responseText = '{"errorMsg":"No jobs found for specified criteria"}') {
                     console.log('No jobs found!');
                 } else {

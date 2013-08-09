@@ -5,6 +5,7 @@ define(['jquery', 'knockout', 'knockout.mapping', 'pager', 'underscore', 'job', 
             var self = this;
             Job.call(self);
             Cluster.call(self);
+            self.page = ko.observable("index");
         };
 
         var viewModel = new appViewModel();
@@ -13,5 +14,11 @@ define(['jquery', 'knockout', 'knockout.mapping', 'pager', 'underscore', 'job', 
         pager.extendWithPage(viewModel);
         ko.applyBindings(viewModel);
         pager.start();
+        
+         $(window).on('hashchange', function(e) {
+            viewModel.page(window.location.hash);
+            viewModel.Job.status('hidden');
+            viewModel.Cluster.status('hidden');
+        });
     });
 });

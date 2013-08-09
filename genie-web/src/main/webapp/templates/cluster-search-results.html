@@ -1,3 +1,7 @@
+<div data-bind="visible: $root.Cluster.status()==='visible' && $root.Cluster.searchResults().length===0 && $root.page()==='#clusters'" 
+    class="no-results">
+    <h3>No clusters found!</h3>
+</div>
 <div data-bind="foreach: $root.Cluster.searchResults" class="cluster-search-results">
     <div class="cluster-info">
         <h3>

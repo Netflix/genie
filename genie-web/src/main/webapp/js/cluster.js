@@ -65,6 +65,7 @@ define([
     var ClusterViewModel = function() {
         this.Cluster = {};
         var self = this.Cluster;
+        self.status = ko.observable('hidden');
         self.searchResults   = ko.observableArray();
         self.runningClusters = ko.observableArray();
         self.runningClusterCount = ko.computed(function() {
@@ -129,6 +130,7 @@ define([
                     self.searchResults.push(new Cluster(data.clusterConfigs.clusterConfig));
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
+                self.status('visible');
                 if (jqXHR.responseText = '{"errorMsg":"No clusters found"}') {
                     console.log('No clusters found!');
                 } else {
