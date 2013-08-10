@@ -5,16 +5,25 @@
 <div data-bind="foreach: $root.Cluster.searchResults" class="cluster-search-results">
     <div class="cluster-info">
         <h3>
-            Cluster Name: <a data-bind="text: $data.name, attr: {href: 'genie/v0/config/cluster/'+$data.id()}" target="_blank"></a>
             <span data-bind="text: $data.status, css: statusClass" class="label pull-right"></span>
         </h3>
         <div class="span12">
             <div class="row">
-                <div class="span1"><strong>ID:</strong></div>
-                <div class="span3" data-bind="text: $data.idFormatted"></div>
+                <div class="span2"><strong>Cluster ID:</strong></div> 
+                <div class="span6"><a data-bind="text: $data.id, attr: {href: 'genie/v0/config/cluster/'+$data.id()}" target="_blank"></a></div>
+            </div>
+        </div>
+        <div class="span12">
+            <div class="row">
+                <div class="span2"><strong>Cluster Name: </strong></div>
+                <div class="span6" data-bind="text: $data.name"></div>
+            </div>
+        </div>
+        <div class="span12">
+            <div class="row">
                 <div class="span1"><strong>User:</strong></div>
                 <div class="span3" data-bind="text: $data.user"></div>
-                <div class="span1"><strong>Version:</strong></div>
+                <div class="span3"><strong>Hadoop Version:</strong></div>
                 <div class="span3" data-bind="text: $data.hadoopVersion"></div>
             </div>
         </div>

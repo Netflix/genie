@@ -169,7 +169,7 @@ input[type="color"],
 
 .job-info {
     border: 1px solid #cccccc;
-    padding: 5px 10px 100px 10px;
+    padding: 5px 10px 130px 10px;
     border-width: 1px;
     border-color: lightgrey;
     margin-bottom: 15px;
@@ -188,7 +188,7 @@ input[type="color"],
 
 .cluster-info {
     border: 1px solid #cccccc;
-    padding: 5px 10px 100px 10px;
+    padding: 5px 10px 150px 10px;
     border-width: 1px;
     border-color: lightgrey;
     margin-bottom: 15px;
