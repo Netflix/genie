@@ -35,6 +35,14 @@ define([
 
         ko.mapping.fromJS(json, {}, self);
 
+        self.idFormatted = ko.computed(function() {
+            var idLength = self.id() ? self.id().length : -1;
+            if (idLength > 30) {
+                return self.id().substring(0,20) + '...' + self.id().substring(idLength-10);
+            }
+            return self.id();
+        }, self);
+        
         self.createTimeFormatted = ko.computed(function() {
             if (self.createTime() > 0) {
                 var myDate = new Date(parseInt(self.createTime()));

@@ -40,8 +40,8 @@ define([
 
         self.jobNameFormatted = ko.computed(function() {
             var nameLength = self.jobName() ? self.jobName().length : -1;
-            if (nameLength > 70) {
-                return self.jobName().substring(0,60) + '.....' + self.jobName().substring(nameLength-10);
+            if (nameLength > 30) {
+                return self.jobName().substring(0,20) + '...' + self.jobName().substring(nameLength-10);
             }
             return self.jobName();
         }, self);
