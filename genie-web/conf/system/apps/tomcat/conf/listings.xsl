@@ -21,7 +21,7 @@
       </style>
     </head>
     <body>
-      <h4><img src="/nf_logo.png" alt="Netflix" border="0"/></h4>
+      <h4><img src="/img/nf_logo.png" alt="Netflix" border="0"/></h4>
       <h3>Genie Job Results: <xsl:value-of select="@directory"/></h3>
       <hr/>
       <table cellspacing="0"
