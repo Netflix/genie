@@ -237,8 +237,10 @@ public class JobMonitor extends Thread {
                     stats.incrGenieSuccessfulJobs();
                 }
 
-                // set the archive location
-                ji.setArchiveLocation(NetUtil.getArchiveURI(ji.getJobID()));
+                // set the archive location - if needed
+                if (!ji.getDisableLogArchival()) {
+                    ji.setArchiveLocation(NetUtil.getArchiveURI(ji.getJobID()));
+                }
 
                 // update the job status
                 pm.updateEntity(ji);

@@ -211,6 +211,11 @@ public class JobInfoElement implements Serializable {
     private boolean forwarded;
 
     /**
+     * Whether to disable archive logs or not - default is false.
+     */
+    private boolean disableLogArchival;
+
+    /**
      * Get the cluster name where this job is run.
      *
      * @return cluster name
@@ -841,5 +846,23 @@ public class JobInfoElement implements Serializable {
      */
     public void setForwarded(boolean forwarded) {
         this.forwarded = forwarded;
+    }
+
+    /**
+     * Whether to disable log archival for this job or not - defaults to false.
+     *
+     * @return false if logs are to be archived, true otherwise
+     */
+    public boolean getDisableLogArchival() {
+        return disableLogArchival;
+    }
+
+    /**
+     * Set parameter to disable log archival.
+     *
+     * @param archiveLogs if true logs are archived, else not archived
+     */
+    public void setDisableLogArchival(boolean disableLogArchival) {
+        this.disableLogArchival = disableLogArchival;
     }
 }

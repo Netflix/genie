@@ -472,10 +472,13 @@ public class HadoopJobManager implements JobManager {
         }
 
         // set the archive location
-        String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
-                .getString("netflix.genie.server.s3.archive.location");
-        if ((s3ArchiveLocation != null) && (!s3ArchiveLocation.isEmpty())) {
-            hEnv.put("S3_ARCHIVE_LOCATION", s3ArchiveLocation);
+        // unless user has explicitly requested for it to be disabled
+        if (!ji.getDisableLogArchival()) {
+            String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
+                    .getString("netflix.genie.server.s3.archive.location");
+            if ((s3ArchiveLocation != null) && (!s3ArchiveLocation.isEmpty())) {
+                hEnv.put("S3_ARCHIVE_LOCATION", s3ArchiveLocation);
+            }
         }
 
         return hEnv;

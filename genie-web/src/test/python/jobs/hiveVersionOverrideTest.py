@@ -47,6 +47,7 @@ def testJsonSubmitjob():
             "schedule": "adHoc",
             "hiveVersion": "0.8.1.7",
             "cmdArgs": "-f hive.q",
+            "disableLogArchival": "true",
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hive.q"
         }
     }
