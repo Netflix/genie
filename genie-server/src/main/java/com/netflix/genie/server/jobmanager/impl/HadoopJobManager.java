@@ -502,8 +502,9 @@ public class HadoopJobManager implements JobManager {
         String clusterId = ji.getClusterId();
         String clusterName = ji.getClusterName();
         String schedule = null;
-        // only use the schedule if both cluster id and cluster name are null
-        if ((clusterId == null) && (clusterName == null)) {
+        // only use the schedule if both cluster id and cluster name are null or empty
+        if (((clusterId == null) || clusterId.isEmpty()) &&
+                ((clusterName == null) || clusterName.isEmpty())) {
             schedule = ji.getSchedule();
         }
 
