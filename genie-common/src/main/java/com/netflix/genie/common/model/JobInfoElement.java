@@ -860,7 +860,7 @@ public class JobInfoElement implements Serializable {
     /**
      * Set parameter to disable log archival.
      *
-     * @param archiveLogs if true logs are archived, else not archived
+     * @param disableLogArchival if true logs are archived, else not archived
      */
     public void setDisableLogArchival(boolean disableLogArchival) {
         this.disableLogArchival = disableLogArchival;
