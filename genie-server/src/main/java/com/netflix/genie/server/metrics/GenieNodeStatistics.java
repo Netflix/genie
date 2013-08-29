@@ -18,12 +18,12 @@
 
 package com.netflix.genie.server.metrics;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.servo.annotations.DataSourceType;
 import com.netflix.servo.annotations.Monitor;
 import com.netflix.servo.monitor.Monitors;
@@ -40,6 +40,8 @@ public final class GenieNodeStatistics {
 
     // static instance for singleton class
     private static volatile GenieNodeStatistics instance;
+
+    private JobCountMonitor jobCountMonitor;
 
     @Monitor(name = "2xx_Count", type = DataSourceType.COUNTER)
     private AtomicLong genie2xxCount = new AtomicLong(0);
@@ -65,82 +67,28 @@ public final class GenieNodeStatistics {
     @Monitor(name = "Killed_Jobs", type = DataSourceType.COUNTER)
     private AtomicLong genieKilledJobs = new AtomicLong(0);
 
-    /**
-     * Get number of jobs running on this instance.
-     *
-     * @return number of running jobs
-     * @throws CloudServiceException
-     *             if there is any error
-     */
     @Monitor(name = "Running_Jobs", type = DataSourceType.GAUGE)
-    public int getNumInstanceJobs() throws CloudServiceException {
-        logger.debug("called");
-        return JobCountManager.getNumInstanceJobs();
-    }
+    private AtomicInteger genieRunningJobs = new AtomicInteger(0);
 
-    /**
-     * Get number of running jobs on this instance running for > 15 mins.
-     *
-     * @return number of running jobs with runtime > 15 mins
-     * @throws CloudServiceException
-     *             if there is any error
-     */
     @Monitor(name = "Running_Jobs_0_15m", type = DataSourceType.GAUGE)
-    public int getNumInstanceJobs15Mins() throws CloudServiceException {
-        logger.debug("called");
-        long time = System.currentTimeMillis();
-        return JobCountManager.getNumInstanceJobs(time - 15 * 60 * 1000, null);
-    }
+    private AtomicInteger genieRunningJobs0To15m = new AtomicInteger(0);
 
-    /**
-     * Get number of running jobs with 15m < runtime < 2 hours.
-     *
-     * @return Number of running jobs with 15m < runtime < 2 hours
-     * @throws CloudServiceException
-     *             if there is any error
-     */
     @Monitor(name = "Running_Jobs_15m_2h", type = DataSourceType.GAUGE)
-    public int getNumInstanceJobs2Hrs() throws CloudServiceException {
-        logger.debug("called");
-        long time = System.currentTimeMillis();
-        return JobCountManager.getNumInstanceJobs(time - 2 * 60 * 60 * 1000,
-                time - 15 * 60 * 1000);
-    }
+    private AtomicInteger genieRunningJobs15mTo2h = new AtomicInteger(0);
 
-    /**
-     * Get number of running jobs with 2h < runtime < 8 hours.
-     *
-     * @return Number of running jobs with 2h < runtime < 8 hours
-     * @throws CloudServiceException
-     *             if there is any error
-     */
     @Monitor(name = "Running_Jobs_2h_8h", type = DataSourceType.GAUGE)
-    public int getNumInstanceJobs8Hrs() throws CloudServiceException {
-        logger.debug("called");
-        long time = System.currentTimeMillis();
-        return JobCountManager.getNumInstanceJobs(time - 8 * 60 * 60 * 1000,
-                time - 2 * 60 * 60 * 1000);
-    }
+    private AtomicInteger genieRunningJobs2hTo8h = new AtomicInteger(0);
 
-    /**
-     * Get number of running jobs with runtime > 8h.
-     *
-     * @return Number of running jobs with runtime > 8h
-     * @throws CloudServiceException
-     *             if there is any error
-     */
     @Monitor(name = "Running_Jobs_8h_plus", type = DataSourceType.GAUGE)
-    public int getNumInstanceJobs8HrsPlus() throws CloudServiceException {
-        logger.debug("called");
-        long time = System.currentTimeMillis();
-        return JobCountManager.getNumInstanceJobs(null, time - 8 * 60 * 60
-                * 1000);
-    }
+    private AtomicInteger genieRunningJobs8hPlus = new AtomicInteger(0);
 
     /**
      * Private constructor for singleton.
      */
     private GenieNodeStatistics() {
+        jobCountMonitor = new JobCountMonitor(this);
+        jobCountMonitor.setDaemon(true);
+        jobCountMonitor.start();
     }
 
     /**
@@ -384,10 +332,104 @@ public final class GenieNodeStatistics {
     }
 
     /**
+     * Get number of running jobs on this instance.
+     *
+     * @return number of running jobs on this instance
+     */
+    public AtomicInteger getGenieRunningJobs() {
+        return genieRunningJobs;
+    }
+
+    /**
+     * Set number of running jobs on this instance.
+     *
+     * @param genieRunningJobs number of running jobs on this instance
+     */
+    public void setGenieRunningJobs(int genieRunningJobs) {
+        this.genieRunningJobs.set(genieRunningJobs);
+    }
+
+    /**
+     * Get number of running jobs with runtime less than 15 mins.
+     *
+     * @return number of running jobs with runtime less than 15 mins
+     */
+    public AtomicInteger getGenieRunningJobs0To15m() {
+        return genieRunningJobs0To15m;
+    }
+
+    /**
+     * Set the number of running jobs with runtime less than 15 mins.
+     *
+     * @param genieRunningJobs0To15m number of running jobs with runtime less than 15 mins
+     */
+    public void setGenieRunningJobs0To15m(int genieRunningJobs0To15m) {
+        this.genieRunningJobs0To15m.set(genieRunningJobs0To15m);
+    }
+
+    /**
+     * Get the number of running jobs with runtime between 15 mins and 2 hours.
+     *
+     * @return number of running jobs with runtime between 15 mins and 2 hours
+     */
+    public AtomicInteger getGenieRunningJobs15mTo2h() {
+        return genieRunningJobs15mTo2h;
+    }
+
+    /**
+     * Set the number of running jobs with runtime between 15 mins and 2 hours.
+     *
+     * @param genieRunningJobs15mTo2h number of running jobs with runtime between
+     *          15 mins and 2 hours
+     */
+    public void setGenieRunningJobs15mTo2h(int genieRunningJobs15mTo2h) {
+        this.genieRunningJobs15mTo2h.set(genieRunningJobs15mTo2h);
+    }
+
+    /**
+     * Get the number of running jobs with runtime between 2 to 8 hours.
+     *
+     * @return number of running jobs with runtime between 2 to 8 hours.
+     */
+    public AtomicInteger getGenieRunningJobs2hTo8h() {
+        return genieRunningJobs2hTo8h;
+    }
+
+    /**
+     * Set the number of running jobs with runtime between 2 to 8 hours.
+     *
+     * @param genieRunningJobs2hTo8h number of running jobs with runtime
+     *          between 2 to 8 hours.
+     */
+    public void setGenieRunningJobs2hTo8h(int genieRunningJobs2hTo8h) {
+        this.genieRunningJobs2hTo8h.set(genieRunningJobs2hTo8h);
+    }
+
+    /**
+     * Get the number of running jobs with runtime greater than 8 hours.
+     *
+     * @return number of running jobs with runtime greater than 8 hours
+     */
+    public AtomicInteger getGenieRunningJobs8hPlus() {
+        return genieRunningJobs8hPlus;
+    }
+
+    /**
+     * Set the number of running jobs with runtime greater than 8 hours.
+     *
+     * @param genieRunningJobs8hPlus number of running jobs with runtime
+     *          greater than 8 hours
+     */
+    public void setGenieRunningJobs8hPlus(int genieRunningJobs8hPlus) {
+        this.genieRunningJobs8hPlus.set(genieRunningJobs8hPlus);
+    }
+
+    /**
      * Shut down cleanly.
      */
     public void shutdown() {
         logger.info("Shutting down Servo monitor");
         Monitors.unregisterObject(this);
+        jobCountMonitor.setStop(true);
     }
 }
