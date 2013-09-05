@@ -156,7 +156,7 @@ public class TestGenieNodeStatistics {
         stats.setGenieRunningJobs(5);
         Assert.assertEquals(stats.getGenieRunningJobs().intValue(), 5);
         // sleep for a while - number of running jobs should be same as what we started with
-        Thread.sleep(15000);
+        Thread.sleep(30000);
         Assert.assertEquals(numRunningJobs, stats.getGenieRunningJobs().intValue());
     }
 
