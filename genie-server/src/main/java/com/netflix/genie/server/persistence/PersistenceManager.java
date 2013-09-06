@@ -70,16 +70,14 @@ public class PersistenceManager<T> {
      * Default constructor, which initializes connection pool if needed.
      */
     public PersistenceManager() {
-        if (entityManagerFactory == null) {
-            init();
-        }
+        init();
     }
 
     /**
      * Initializes the connection pool based on configuration - must be called
      * prior to use.
      */
-    public static synchronized void init() {
+    private static synchronized void init() {
         if ((entityManagerFactory == null) || (!entityManagerFactory.isOpen())) {
             String persistenceUnitName = "genie";
             logger.info("Initializing PersistenceManager: "

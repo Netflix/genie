@@ -54,7 +54,7 @@ public final class JobCountManager {
     /**
      * Use this method to initialize prior to use.
      */
-    public static synchronized void init() {
+    private static synchronized void init() {
         logger.info("called");
         if (pm == null) {
             pm = new PersistenceManager<JobInfoElement>();

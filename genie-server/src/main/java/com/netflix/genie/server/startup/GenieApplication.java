@@ -51,20 +51,14 @@ public class GenieApplication {
     public void initialize() throws Exception {
         logger.info("called");
 
-        // initialize the persistence manager, so the connection pool is set up
-        PersistenceManager.init();
-        logger.info("PersistenceManager has been initialized");
-
-        // now initialize the job count manager, which needs the PersistenceManager to be initialized
-        JobCountManager.init();
         // hack to ensure that a DB connection is made correctly for the first time
         // work-around for: https://issues.apache.org/jira/browse/OPENJPA-2139
         JobCountManager.getNumInstanceJobs();
         logger.info("JobCountManager has been initialized successfully");
 
-        // for the epic plugin, initialize it explicitly
-        GenieNodeStatistics.init();
-        logger.info("Custom epic metrics have been registered");
+        // register the servo metrics
+        GenieNodeStatistics.register();
+        logger.info("Custom servo metrics have been registered");
 
         // initialize and start the job janitor
         janitor = new JobJanitor();

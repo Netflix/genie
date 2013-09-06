@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.netflix.genie.common.model.JobInfoElement;
@@ -34,15 +33,6 @@ import com.netflix.genie.server.util.NetUtil;
  * @author skrishnan
  */
 public class TestJobCountManager {
-
-    /**
-     * Initialize persistence and job count managers before test.
-     */
-    @BeforeClass
-    public static void init() {
-        PersistenceManager.init();
-        JobCountManager.init();
-    }
 
     /**
      * Test getting number of running jobs on one instance.

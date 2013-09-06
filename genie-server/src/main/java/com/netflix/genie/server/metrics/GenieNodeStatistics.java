@@ -92,9 +92,9 @@ public final class GenieNodeStatistics {
     }
 
     /**
-     * Register static instance with epic.
+     * Register static instance with servo.
      */
-    public static void init() {
+    public static void register() {
         logger.debug("called");
         logger.info("Registering Servo Monitor");
         Monitors.registerObject(getInstance());
