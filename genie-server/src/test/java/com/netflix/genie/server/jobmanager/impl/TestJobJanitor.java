@@ -41,7 +41,6 @@ public class TestJobJanitor {
     @Test
     public void testJobJanitor() throws Exception {
         // create two old jobs
-        PersistenceManager.init();
         PersistenceManager<JobInfoElement> pm = new PersistenceManager<JobInfoElement>();
         JobInfoElement one = new JobInfoElement();
         one.setJobName("UPDATE_TEST");

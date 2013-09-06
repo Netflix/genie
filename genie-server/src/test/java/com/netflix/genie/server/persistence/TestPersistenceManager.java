@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.netflix.genie.common.model.JobInfoElement;
@@ -34,14 +33,6 @@ import com.netflix.genie.common.model.Types.JobStatus;
  * @author skrishnan
  */
 public class TestPersistenceManager {
-
-    /**
-     * Initialize manager before any tests.
-     */
-    @BeforeClass
-    public static void init() {
-        PersistenceManager.init();
-    }
 
     /**
      * Test entity create and get after create.
