@@ -43,6 +43,7 @@ public class TestGenieNodeStatistics {
      */
     @BeforeClass
     public static void init() {
+        GenieNodeStatistics.register();
         stats = GenieNodeStatistics.getInstance();
     }
 
