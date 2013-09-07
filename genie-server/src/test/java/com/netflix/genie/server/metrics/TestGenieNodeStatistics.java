@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.server.persistence.PersistenceManager;
 
 /**
  * Test case for GenieNodeStatistics.
@@ -164,5 +165,6 @@ public class TestGenieNodeStatistics {
     public static void shutdown() {
         // shut down cleanly
         stats.shutdown();
+        PersistenceManager.shutdown();
     }
 }

@@ -60,5 +60,8 @@ public class TestJobJanitor {
         int numRows = janitor.markZombies();
         System.out.println("Number of rows marked as zombies: " + numRows);
         Assert.assertEquals(numRows >= 2, true);
+
+        // shut down cleanly
+        PersistenceManager.shutdown();
     }
 }
