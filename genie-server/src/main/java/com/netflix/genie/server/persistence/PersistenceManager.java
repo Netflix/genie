@@ -67,24 +67,9 @@ public class PersistenceManager<T> {
     public static final int MAX_PAGE_SIZE = 1024;
 
     /**
-     * Default constructor, which initializes connection pool if needed.
+     * Default constructor.
      */
     public PersistenceManager() {
-        init();
-    }
-
-    /**
-     * Initializes the connection pool based on configuration - must be called
-     * prior to use.
-     */
-    private static synchronized void init() {
-        if ((entityManagerFactory == null) || (!entityManagerFactory.isOpen())) {
-            String persistenceUnitName = "genie";
-            logger.info("Initializing PersistenceManager: "
-                    + persistenceUnitName);
-            entityManagerFactory = Persistence
-                    .createEntityManagerFactory(persistenceUnitName);
-        }
     }
 
     /**
@@ -317,6 +302,13 @@ public class PersistenceManager<T> {
      */
     private EntityManager createEntityManager() {
         synchronized (PersistenceManager.class) {
+            if ((entityManagerFactory == null) || (!entityManagerFactory.isOpen())) {
+                String persistenceUnitName = "genie";
+                logger.info("Initializing PersistenceManager: "
+                        + persistenceUnitName);
+                entityManagerFactory = Persistence
+                        .createEntityManagerFactory(persistenceUnitName);
+            }
             return entityManagerFactory.createEntityManager();
         }
     }
