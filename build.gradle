@@ -3,15 +3,15 @@ ext.githubProjectName = rootProject.name // Change if github project name is not
 
 buildscript {
     repositories {
-        mavenLocal()
         mavenCentral() // maven { url 'http://jcenter.bintray.com' }
     }
-    apply from: file('gradle/buildscript.gradle'), to: buildscript 
+    apply from: file('gradle/buildscript.gradle'), to: buildscript
 }
 
 allprojects {
-    repositories { 
+    repositories {
         mavenCentral() // maven { url: 'http://jcenter.bintray.com' }
+        mavenLocal()
     }
 }
 
@@ -56,52 +56,71 @@ project(':genie-client') {
 
 project(':genie-server') {
     apply plugin: 'java'
-    
+
     // we are doing this rather than a dependency since we 
     // must perform build-time enhancement for OpenJPA
     sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
-    
+
     dependencies {
         compile 'com.netflix.archaius:archaius-core:0.5.8'
         compile 'commons-collections:commons-collections:3.2.1'
         compile 'com.google.inject.extensions:guice-servlet:3.0'
         compile 'com.sun.jersey.contribs:jersey-guice:1.9.1'
         compile 'com.netflix.servo:servo-core:0.4.34'
-        compile 'com.netflix.karyon:karyon-extensions:1.0.16'
-                
+        compile 'com.netflix.karyon:karyon-extensions:1.0.22'
+
         runtime 'org.apache.derby:derby:10.2.2.0'
         runtime 'mysql:mysql-connector-java:5.1.16'
         runtime 'com.mchange:c3p0:0.9.2'
         runtime 'com.mchange:mchange-commons-java:0.2.3.3'
 
-        provided 'javax.servlet:servlet-api:2.5'        
+        provided 'javax.servlet:servlet-api:2.5'
     }
-    
+
     task enhance << {
 	    ant.taskdef(
 	        name      : 'openjpaenhancer',
 	        classpath : project.runtimeClasspath.asPath,
 	        classname : 'org.apache.openjpa.ant.PCEnhancerTask'
 	    )
-	
+
 	    ant.openjpaenhancer(
 	        classpath : project.runtimeClasspath.asPath)
 	}
-    
+
     jar {
     	it.dependsOn enhance
     }
-    
+
     test {
     	it.dependsOn enhance
     }
 }
-   
+
 project(':genie-web') {
     apply plugin: 'war'
-    
+
     dependencies {
-        compile 'com.netflix.karyon:karyon-admin-web:1.0.16'
+        compile 'com.netflix.karyon:karyon-admin-web:1.0.22'
         compile project(':genie-server')
+    }
+}
+
+project(':genie-web-int-tests') {
+    apply plugin: 'java'
+
+    dependencies {
+        compile project(':genie-web')
+
+        testCompile 'com.netflix.karyon:karyon-extensions-testsuite:1.0.22'
+        testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.1.0.Final'
+        testCompile 'org.jboss.shrinkwrap:shrinkwrap-impl-base:1.1.2'
+        testCompile 'org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven:2.0.0'
+        testRuntime 'org.jboss.arquillian.container:arquillian-tomcat-embedded-7:1.0.0.CR5'
+        testRuntime 'org.apache.tomcat.embed:tomcat-embed-core:7.0.42'
+        testRuntime 'org.apache.tomcat.embed:tomcat-embed-logging-juli:7.0.42'
+        testRuntime ('org.apache.tomcat.embed:tomcat-embed-jasper:7.0.42') {
+            exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+        }
     }
 }
