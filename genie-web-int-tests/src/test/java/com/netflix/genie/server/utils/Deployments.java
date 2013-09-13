@@ -39,10 +39,11 @@ public final class Deployments {
     }
 
     /**
-     * Creates tbe test deployment.
+     * Creates the test deployment.
      *
      * @return the test deployment
      */
+    @SuppressWarnings("rawtypes")
     public static Archive createDeployment() {
 
         WebArchive archive = ShrinkWrap.create(ZipImporter.class, "genie-web.war")

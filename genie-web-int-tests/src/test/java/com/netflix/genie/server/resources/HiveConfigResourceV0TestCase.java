@@ -46,6 +46,7 @@ public class HiveConfigResourceV0TestCase {
      *
      * @return the test deployment
      */
+    @SuppressWarnings("rawtypes")
     @Deployment
     public static Archive createTestArchive() {
 
