@@ -50,6 +50,10 @@ h3 {
     padding:14px;
 }
 
+.search-form .control-label {
+    text-align: left;
+}
+
 /* ----------- stylized ----------- */
 #stylized{
     border:solid 2px red;
@@ -162,6 +166,10 @@ input[type="color"],
     font-size: 1em;
 }
 
+td > select {
+    margin-bottom: 0px;
+}
+
 .job-search-results,
 .cluster-search-results {
     padding-bottom: 50px;
@@ -201,8 +209,16 @@ input[type="color"],
     margin-bottom: 0px;
 }
 
+.container,
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+    width: 96%;
+}
+
 .container {
-  width: 1000px;
+    margin-right: 2%;
+    margin-left: 2%;
 }
 
 .span12 {

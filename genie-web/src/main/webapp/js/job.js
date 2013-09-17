@@ -86,9 +86,10 @@ define([
     var JobViewModel = function() {
         this.Job = {};
         var self = this.Job;
-        self.status = ko.observable('hidden');
+        self.status = ko.observable('');
         self.searchResults = ko.observableArray();
-        self.runningJobs   = ko.observableArray();
+        self.searchDateTime = ko.observable();
+        self.runningJobs = ko.observableArray();
         self.runningJobCount = ko.computed(function() {
             return _.reduce(self.runningJobs(), function(sum, obj, index) { return sum + obj.count; }, 0);
         }, self);
@@ -119,13 +120,14 @@ define([
                 _.each(jobCount, function(count, type) {
                     self.runningJobs.push({type: type, count: count});
                 });
-            }).fail(function(jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
             });
         };
 
-        self.update = function() {
+        self.search = function() {
+            var d = new Date();
             self.searchResults([]);
+            self.status('');
+            self.searchDateTime(d.toLocaleString());
             var formArray = $('#jobSearchForm').serializeArray();
             var userName = _.where(formArray, {'name': 'userName'})[0].value;
             var jobType  = _.where(formArray, {'name': 'jobType'})[0].value;
@@ -134,11 +136,13 @@ define([
             var jobName  = _.where(formArray, {'name': 'jobName'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
             $.ajax({
+                global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v0/jobs',
                 data: {limit: limit, userName: userName, jobType: jobType, status: status, jobID: jobID, jobName: jobName}
             }).done(function(data) {
+                self.status('has results');
                 // check to see if jobInfo is an array
                 if (data.jobs.jobInfo instanceof Array) {
                     _.each(data.jobs.jobInfo, function(jobObj, index) {
@@ -154,17 +158,11 @@ define([
                     self.searchResults.push(new Job(data.jobs.jobInfo));                
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                self.status('visible');
-                if (jqXHR.responseText = '{"errorMsg":"No jobs found for specified criteria"}') {
-                    console.log('No jobs found!');
-                } else {
-                    console.log(jqXHR);
-                }
+                console.log(jqXHR, textStatus, errorThrown);
+                self.status('no results');
             });
         };
     };
 
     return JobViewModel;
 });
-
-
