@@ -1,4 +1,5 @@
-<form class="form-horizontal" id="jobSearchForm">
+<h3>Search Jobs</h3>
+<form class="form-horizontal search-form" id="jobSearchForm" data-bind="submit: Job.search">
     <div class="control-group">
         <label class="control-label">Username:</label>
         <div class="controls">
@@ -48,7 +49,7 @@
     </div>
     <div class="control-group">
         <div class="controls">
-            <button data-bind="click: Job.update" type="button" class="btn btn-primary">Search</button>
+            <button data-bind="click: Job.search" type="submit" class="btn btn-primary">Search</button>
         </div>
     </div>
 </form>

@@ -1,0 +1,49 @@
+<div class="span12">
+    <div class="row">
+        <div class="span3">
+            <img src="img/GenieLogo.png" alt="Genie">
+        </div>
+        <div class="span5">
+            <h4>Running jobs:</h4>
+            <table class="table table-condensed">
+                <thead>
+                    <tr><th>Type</th><th>Count</th></tr>
+                </thead>
+                <tbody data-bind="foreach: $root.Job.runningJobs">
+                    <tr>
+                        <td data-bind="text: $data.type"></td>
+                        <td data-bind="text: $data.count">
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td data-bind="text: $root.Job.runningJobCount"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="span5">
+            <h4>Running clusters:</h4>
+            <table class="table table-condensed">
+                <thead>
+                    <tr><th>Status</th><th>Count</th></tr>
+                </thead>
+                <tbody data-bind="foreach: $root.Cluster.runningClusters">
+                    <tr>
+                        <td data-bind="text: $data.status"></td>
+                        <td data-bind="text: $data.count">
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td data-bind="text: $root.Cluster.runningClusterCount"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

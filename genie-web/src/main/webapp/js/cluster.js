@@ -5,16 +5,19 @@ define([
     'knockout.mapping',
     'pager',
     'loadKoTemplate!../templates/cluster-search-form.html',
-    'loadKoTemplate!../templates/cluster-search-results.html'
+    'loadKoTemplate!../templates/cluster-search-results.html',
+    'loadKoTemplate!../templates/cluster-details.html'
 ], function($, _, ko, mapping, pager) {
     ko.mapping = mapping;
 
     function Cluster(json) {
         var self = this;
+        self.objStatus        = ko.observable('ready');
         self.adHoc            = ko.observable();
         self.bonus            = ko.observable();
         self.createTime       = ko.observable();
         self.hadoopVersion    = ko.observable();
+        self.hasStats         = ko.observable();
         self.id               = ko.observable();
         self.jobFlowId        = ko.observable();
         self.name             = ko.observable();
@@ -34,6 +37,7 @@ define([
         self.user             = ko.observable();
 
         ko.mapping.fromJS(json, {}, self);
+        self.originalStatus = self.status();
 
         self.idFormatted = ko.computed(function() {
             var idLength = self.id() ? self.id().length : -1;
@@ -58,23 +62,41 @@ define([
             }
             return '';
         }, self);
-        
+
         self.statusClass = ko.computed(function() {
-            if (self.status().toUpperCase() === 'UP') {
+            if (self.status() && self.status().toUpperCase() === 'UP') {
                 return 'label-success';
             }
-            else if (self.status().toUpperCase() === 'OUT_OF_SERVICE') {
+            else if (self.status() && self.status().toUpperCase() === 'OUT_OF_SERVICE') {
                 return 'label-warning';
             }
             return '';
         }, self);
+
+        self.updateStatus = function() {
+            self.objStatus('updating');
+            $.ajax({
+                type: 'PUT',
+                headers: {'content-type':'application/json', 'Accept':'application/json'},
+                url: 'genie/v0/config/cluster/'+self.id(),
+                data: JSON.stringify({clusterConfig: {user: self.user(), status: self.status()}})
+            }).done(function(data) {
+                self.objStatus('ready');
+                location.reload(true);
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                self.objStatus('ready');
+                self.status(self.originalStatus);
+            });
+        };
     };
 
     var ClusterViewModel = function() {
         this.Cluster = {};
         var self = this.Cluster;
-        self.status = ko.observable('hidden');
-        self.searchResults   = ko.observableArray();
+        self.status = ko.observable('');
+        self.current = ko.observable(new Cluster());
+        self.searchResults = ko.observableArray();
+        self.searchDateTime = ko.observable();
         self.runningClusters = ko.observableArray();
         self.runningClusterCount = ko.computed(function() {
             return _.reduce(self.runningClusters(), function(sum, obj, index) { return sum + obj.count; }, 0);
@@ -106,13 +128,14 @@ define([
                 _.each(clusterCount, function(count, status) {
                     self.runningClusters.push({status: status, count: count});
                 });
-            }).fail(function(jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
             });
         };
 
-        self.update = function() {
+        self.search = function() {
+            var d = new Date();
             self.searchResults([]);
+            self.status('');
+            self.searchDateTime(d.toLocaleString());
             var formArray = $('#clusterSearchForm').serializeArray();
             var name     = _.where(formArray, {'name': 'name'})[0].value;
             var status   = _.where(formArray, {'name': 'status'})[0].value;
@@ -124,11 +147,13 @@ define([
             var unitTest = _.where(formArray, {'name': 'unitTest'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
             $.ajax({
+                global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v0/config/cluster',
                 data: {limit: limit, name: name, status: status, adHoc: adHoc, sla: sla, bonus: bonus, prod: prod, test: test, unitTest: unitTest}
             }).done(function(data) {
+                self.status('has results');
                 // check to see if clusterConfig is array
                 if (data.clusterConfigs.clusterConfig instanceof Array) {
                     _.each(data.clusterConfigs.clusterConfig, function(clusterObj, index) {
@@ -138,17 +163,27 @@ define([
                     self.searchResults.push(new Cluster(data.clusterConfigs.clusterConfig));
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                self.status('visible');
-                if (jqXHR.responseText = '{"errorMsg":"No clusters found"}') {
-                    console.log('No clusters found!');
-                } else {
-                    console.log(jqXHR);
-                }
+                console.log(jqXHR, textStatus, errorThrown);
+                self.status('no results');
             });
         };
+
+        self.update = function(page) {
+            if (page) {
+                var clusterId = page.page.currentId;
+                $.ajax({
+                    type: 'GET',
+                    headers: {'Accept':'application/json'},
+                    url:  'genie/v0/config/cluster/'+clusterId
+                }).done(function(data) {
+                    self.current(new Cluster(data.clusterConfigs.clusterConfig));
+                });
+            } else {
+                self.current(new Cluster());
+            }
+        };
+
     };
 
     return ClusterViewModel;
 });
-
-
