@@ -1,6 +1,7 @@
-<div data-bind="visible: $root.Job.status()==='visible' && $root.Job.searchResults().length===0 && $root.page()==='#jobs'" 
-    class="no-results">
-    <h3>No jobs found!</h3>
+<div data-bind="visible: ($root.Job.status()!=='') && $root.page()==='#job/search'" class="search-results-counter">
+    <h3><span data-bind="text: $root.Job.searchResults().length"></span> results (<span data-bind="text: $root.Job.searchDateTime()"></span>).</h3>
+</div>
+<div>
 </div>
 <div data-bind="foreach: $root.Job.searchResults" class="job-search-results">
     <div class="job-info">

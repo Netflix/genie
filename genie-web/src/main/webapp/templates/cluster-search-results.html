@@ -1,6 +1,5 @@
-<div data-bind="visible: $root.Cluster.status()==='visible' && $root.Cluster.searchResults().length===0 && $root.page()==='#clusters'" 
-    class="no-results">
-    <h3>No clusters found!</h3>
+<div data-bind="visible: $root.Cluster.status()!=='' && $root.page()==='#cluster/search'" class="search-results-counter">
+    <h3><span data-bind="text: $root.Cluster.searchResults().length"></span> results (<span data-bind="text: $root.Cluster.searchDateTime()"></span>).</h3>
 </div>
 <div data-bind="foreach: $root.Cluster.searchResults" class="cluster-search-results">
     <div class="cluster-info">
@@ -10,7 +9,7 @@
         <div class="span12">
             <div class="row">
                 <div class="span2"><strong>Cluster ID:</strong></div> 
-                <div class="span6"><a data-bind="text: $data.id, attr: {href: 'genie/v0/config/cluster/'+$data.id()}" target="_blank"></a></div>
+                <div class="span6"><a data-bind="text: $data.id, page-href: '/cluster/details/'+$data.id()"></a></div>
             </div>
         </div>
         <div class="span12">
@@ -29,31 +28,35 @@
         </div>
         <div class="span12">
             <div class="row">
-                <div class="span1"><strong>Ad Hoc:</strong></div>
-                <div class="span3" data-bind="text: $data.adHoc"></div>
-                <div class="span1"><strong>SLA:</strong></div>
-                <div class="span3" data-bind="text: $data.sla"></div>
-                <div class="span1"><strong>Bonus:</strong></div>
-                <div class="span3" data-bind="text: $data.bonus"></div>
-            </div>
-        </div>
-        <div class="span12">
-            <div class="row">
-                <div class="span1"><strong>Prod:</strong></div>
-                <div class="span3" data-bind="text: $data.prod"></div>
-                <div class="span1"><strong>Test:</strong></div>
-                <div class="span3" data-bind="text: $data.test"></div>
-                <div class="span1"><strong>Dev:</strong></div>
-                <div class="span3" data-bind="text: $data.unitTest"></div>
-            </div>
-        </div>
-        <div class="span12">
-            <div class="row">
                 <div class="span1"><strong>Created:</strong></div>
                 <div class="span3" data-bind="text: $data.createTimeFormatted"></div>
                 <div class="span1"><strong>Updated:</strong></div>
                 <div class="span3" data-bind="text: $data.updateTimeFormatted"></div>
+                <div class="span1"><strong>Details:</strong></div>
+                <div class="span3"><a data-bind="attr: {href: 'genie/v0/config/cluster/'+$data.id()}" target="_blank">XML</a></div>
             </div>
+        </div>
+        <div class="span12">
+            <form>
+                <label class="checkbox inline">
+                    <input type="checkbox" data-bind="checked: adHoc()==='true'" disabled> adHoc
+                </label>
+                <label class="checkbox inline">
+                    <input type="checkbox" data-bind="checked: bonus()==='true'" disabled> bonus
+                </label>
+                <label class="checkbox inline">
+                    <input type="checkbox" data-bind="checked: prod()==='true'" disabled> prod
+                </label>
+                <label class="checkbox inline">
+                    <input type="checkbox" data-bind="checked: sla()==='true'" disabled> sla
+                </label>
+                <label class="checkbox inline">
+                    <input type="checkbox" data-bind="checked: test()==='true'" disabled> test
+                </label>
+                <label class="checkbox inline">
+                    <input type="checkbox" data-bind="checked: unitTest()==='true'" disabled> unitTest
+                </label>
+            </form>
         </div>
     </div>
 </div>

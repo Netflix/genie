@@ -50,77 +50,39 @@
                 <div class="container">
                     <a class="brand" href="#">GENIE</a>
                     <ul class="nav" role="navigation">
-                        <li data-bind="css: {active: $__page__.find('jobs').isVisible}"><a href="#jobs">Search Jobs</a></li>
-                        <li data-bind="css: {active: $__page__.find('clusters').isVisible}"><a href="#clusters">Search Clusters</a></li>
+                        <li data-bind="css: {active: $__page__.find('job').isVisible}"><a href="#job/search">Search Jobs</a></li>
+                        <li data-bind="css: {active: $__page__.find('cluster').isVisible}"><a href="#cluster/search">Search Clusters</a></li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <div data-spy="fluid" class="container">
-            <div class="span6">
-	            <div data-bind="page: {id: 'jobs', beforeHide: function(page) {$root.Job.searchResults([]);}}">
-	                <div data-bind="template: {name: 'job-search-form-html'}"></div>
-	            </div>
-	            <div data-bind="page: {id: 'clusters', beforeHide: function(page) { $root.Cluster.searchResults([]);}}">
-	                <div data-bind="template: {name: 'cluster-search-form-html'}"></div>
-	            </div>
-            </div>
-        </div>
         <div class="container">
             <div data-bind="page: {id: 'start', beforeShow: function(page) { $root.Job.startup(); $root.Cluster.startup(); }}">
-                <div class="span12">
-                    <div class="row">
-                        <div class="span3">
-                            <img src="img/GenieLogo.png" alt="Genie">
-                        </div>
-                        <div class="span5">
-                            <h4>Running jobs:</h4>
-                            <table class="table table-condensed">
-                                <thead>
-                                    <tr><th>Type</th><th>Count</th></tr>
-                                </thead>
-                                <tbody data-bind="foreach: $root.Job.runningJobs">
-                                    <tr>
-                                        <td data-bind="text: $data.type"></td>
-                                        <td data-bind="text: $data.count">
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td><strong>Total</strong></td>
-                                        <td data-bind="text: $root.Job.runningJobCount"></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                        <div class="span5">
-                            <h4>Running clusters:</h4>
-                            <table class="table table-condensed">
-                                <thead>
-                                    <tr><th>Status</th><th>Count</th></tr>
-                                </thead>
-                                <tbody data-bind="foreach: $root.Cluster.runningClusters">
-                                    <tr>
-                                        <td data-bind="text: $data.status"></td>
-                                        <td data-bind="text: $data.count">
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td><strong>Total</strong></td>
-                                        <td data-bind="text: $root.Cluster.runningClusterCount"></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
+                <div data-bind="template: {name: 'front-page-html'}"></div>
+            </div>
+            <div data-bind="page: {id: 'job'}">
+                <div data-bind="page: {id: 'search', afterHide: $root.scrollTop}">
+	                <div data-bind="template: {name: 'job-search-form-html'}"></div>
+                    <div data-bind="template: {name: 'job-search-results-html'}"></div>
+                </div>
+                <div data-bind="page: {id: 'details', afterHide: $root.scrollTop}">
                 </div>
             </div>
-            <div data-bind="template: {name: 'job-search-results-html'}"></div>
-            <div data-bind="template: {name: 'cluster-search-results-html'}"></div>
+            <div data-bind="page: {id: 'cluster'}">
+                <div data-bind="page: {id: 'search', afterHide: $root.scrollTop}">
+	                <div data-bind="template: {name: 'cluster-search-form-html'}"></div>
+                    <div data-bind="template: {name: 'cluster-search-results-html'}"></div>
+                </div>
+                <div data-bind="page: {id: 'details', beforeShow: function(page) { $root.Cluster.update(); $root.scrollTop(); }, afterHide: $root.scrollTop}">
+                    <div data-bind="page: {id: '?', beforeShow: $root.Cluster.update, afterHide: function(page) { $root.Cluster.update(); $root.scrollTop(); }}">
+                        <div data-bind="template: {name: 'cluster-details-html', data: $root.Cluster.current}"></div>
+                    </div>
+                </div>
+                <div data-bind="page: {id: 'register', afterHide: $root.scrollTop}">
+                    <div data-bind="template: {name: 'cluster-register-form-html'}"></div>
+                </div>
+            </div>
         </div> <!-- /container -->
     </body>
 </html>

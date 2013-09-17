@@ -1,4 +1,5 @@
-<form class="form-horizontal" id="clusterSearchForm">
+<h3>Search Clusters</h3>
+<form class="form-horizontal search-form" id="clusterSearchForm" data-bind="submit: Cluster.search">
     <div class="control-group">
         <label class="control-label">Name:</label>
         <div class="controls">
@@ -84,7 +85,7 @@
     </div>
     <div class="control-group">
         <div class="controls">
-            <button data-bind="click: Cluster.update" type="button" class="btn btn-primary">Search</button>
+            <button data-bind="click: Cluster.search" type="submit" class="btn btn-primary">Search</button>
         </div>
     </div>
 </form>
