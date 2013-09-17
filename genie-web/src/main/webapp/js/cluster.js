@@ -106,6 +106,7 @@ define([
             self.runningClusters([]);
             var clusterCount = {};
             $.ajax({
+                global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v0/config/cluster?status=UP&status=OUT_OF_SERVICE',

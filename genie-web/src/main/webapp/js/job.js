@@ -98,6 +98,7 @@ define([
             self.runningJobs([]);
             var jobCount = {};
             $.ajax({
+                global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v0/jobs',
