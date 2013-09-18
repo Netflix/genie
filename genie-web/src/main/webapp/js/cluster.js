@@ -32,6 +32,8 @@ define([
         self.test             = ko.observable();
         self.testHiveConfigId = ko.observable();
         self.testPigConfigId  = ko.observable();
+        self.unitTestHiveConfigId = ko.observable();
+        self.unitTestPigConfigId  = ko.observable();
         self.unitTest         = ko.observable();
         self.updateTime       = ko.observable();
         self.user             = ko.observable();

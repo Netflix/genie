@@ -43,6 +43,38 @@
             <td data-bind="text: hadoopVersion"></td>
         </tr>
         <tr>
+            <td><strong>Schedule</strong></td>
+            <td>
+                <form>
+                    <label class="checkbox">
+                        <input type="checkbox" data-bind="checked: adHoc()==='true'" disabled> adHoc
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" data-bind="checked: sla()==='true'" disabled> sla
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" data-bind="checked: bonus()==='true'" disabled> bonus
+                    </label>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Configurations</strong></td>
+            <td>
+                <form>
+                    <label class="checkbox">
+                        <input type="checkbox" data-bind="checked: prod()==='true'" disabled> prod
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" data-bind="checked: test()==='true'" disabled> test
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" data-bind="checked: unitTest()==='true'" disabled> unitTest
+                    </label>
+                </form>
+            </td>
+        </tr>
+        <tr>
             <td><strong>Prod Hive Config Id</strong></td>
             <td data-bind="text: prodHiveConfigId"></td>
         </tr>
@@ -59,6 +91,14 @@
             <td data-bind="text: testPigConfigId"></td>
         </tr>
         <tr>
+            <td><strong>Dev Hive Config Id</strong></td>
+            <td data-bind="text: unitTestHiveConfigId"></td>
+        </tr>
+        <tr>
+            <td><strong>Dev Pig Config Id</strong></td>
+            <td data-bind="text: unitTestPigConfigId"></td>
+        </tr>
+        <tr>
             <td><strong>S3 Core Site Xml</strong></td>
             <td data-bind="text: s3CoreSiteXml"></td>
         </tr>
@@ -73,31 +113,6 @@
         <tr>
             <td><strong>Has Stats</strong></td>
             <td data-bind="text: hasStats"></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <form>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: adHoc()==='true'" disabled> adHoc
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: bonus()==='true'" disabled> bonus
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: prod()==='true'" disabled> prod
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: sla()==='true'" disabled> sla
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: test()==='true'" disabled> test
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: unitTest()==='true'" disabled> unitTest
-                    </label>
-                </form>
-            </td>
         </tr>
     </table>
 </div>
