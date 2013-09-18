@@ -26,6 +26,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +117,13 @@ public class JobInfoElement implements Serializable {
      */
     @Lob
     private String fileDependencies;
+
+    /**
+     * Set of file dependencies, sent as MIME attachments.
+     * This is not persisted in the DB for space reasons.
+     */
+    @Transient
+    private FileAttachment[] attachments;
 
     /**
      * Location of logs being archived to s3.
@@ -580,6 +588,25 @@ public class JobInfoElement implements Serializable {
      */
     public void setFileDependencies(String fileDependencies) {
         this.fileDependencies = fileDependencies;
+    }
+
+
+    /**
+     * Get the set of attachments for this job.
+     *
+     * @return the set of attachments for this job
+     */
+    public FileAttachment[] getAttachments() {
+        return attachments;
+    }
+
+    /**
+     * Set the attachments for this job.
+     *
+     * @param attachments the attachments for this job
+     */
+    public void setAttachments(FileAttachment[] attachments) {
+        this.attachments = attachments;
     }
 
     /**

@@ -19,11 +19,14 @@
 package com.netflix.genie.server.jobmanager.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.activation.DataHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
@@ -161,6 +165,24 @@ public class HadoopJobManager implements JobManager {
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
         pb.directory(userJobDir);
+
+        // copy over the attachments if they exist
+        if ((ji.getAttachments() != null) && (ji.getAttachments().length > 0)) {
+            for (int i = 0; i < ji.getAttachments().length; i++) {
+                FileAttachment attachment = ji.getAttachments()[i];
+                try {
+                    FileOutputStream output = new FileOutputStream(cWorkingDir + File.separator + attachment.getName());
+                    DataHandler inputHandler = attachment.getData();
+                    inputHandler.writeTo(output);
+                    output.close();
+                } catch (Exception e) {
+                    String msg = "Unable to copy attachment correctly: " + attachment.getName();
+                    logger.error(msg);
+                    throw new CloudServiceException(
+                            HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                }
+            }
+        }
 
         // set environment variables for the process
         Map<String, String> penv = pb.environment();
