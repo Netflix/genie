@@ -20,6 +20,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.importer.ZipImporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Assert;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -76,6 +77,7 @@ public final class Deployments {
             }
         });
 
+        Assert.assertEquals("Unable to resolve war file for integration tests", 1, war.length);
         return war[0];
     }
 }
