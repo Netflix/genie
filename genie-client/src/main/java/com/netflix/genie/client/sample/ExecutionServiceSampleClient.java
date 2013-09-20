@@ -93,6 +93,7 @@ public final class ExecutionServiceSampleClient {
         FileAttachment[] attachments = new FileAttachment[1];
         attachments[0] = new FileAttachment();
         attachments[0].setName("hive.q");
+        // Ensure that file exists, because the FileDataSource constructor doesn't
         attachments[0].setData(new DataHandler(new FileDataSource(query.getAbsolutePath())));
         jobInfo.setAttachments(attachments);
         jobInfo.setCmdArgs("-f hive.q");
