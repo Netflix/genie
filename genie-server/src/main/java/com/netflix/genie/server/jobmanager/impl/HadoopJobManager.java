@@ -190,7 +190,7 @@ public class HadoopJobManager implements JobManager {
                     DataHandler inputHandler = attachment.getData();
                     inputHandler.writeTo(output);
                     output.close();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     String msg = "Unable to copy attachment correctly: " + attachment.getName();
                     logger.error(msg);
                     throw new CloudServiceException(

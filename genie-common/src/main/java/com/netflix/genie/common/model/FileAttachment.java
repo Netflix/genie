@@ -18,6 +18,8 @@
 
 package com.netflix.genie.common.model;
 
+import java.io.Serializable;
+
 import javax.activation.DataHandler;
 
 /**
@@ -26,7 +28,9 @@ import javax.activation.DataHandler;
  * @author skrishnan
  *
  */
-public class FileAttachment {
+public class FileAttachment implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Name of the file.

@@ -20,6 +20,7 @@ package com.netflix.genie.common.model;
 
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
@@ -597,7 +598,11 @@ public class JobInfoElement implements Serializable {
      * @return the set of attachments for this job
      */
     public FileAttachment[] getAttachments() {
-        return attachments;
+        if (attachments == null) {
+            return null;
+        } else {
+            return Arrays.copyOf(attachments, attachments.length);
+        }
     }
 
     /**
@@ -606,7 +611,12 @@ public class JobInfoElement implements Serializable {
      * @param attachments the attachments for this job
      */
     public void setAttachments(FileAttachment[] attachments) {
-        this.attachments = attachments;
+        if (attachments == null) {
+            this.attachments = null;
+        } else {
+            this.attachments = Arrays.copyOf(attachments,
+                    attachments.length);
+        }
     }
 
     /**
