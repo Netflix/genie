@@ -170,6 +170,21 @@ public class HadoopJobManager implements JobManager {
         if ((ji.getAttachments() != null) && (ji.getAttachments().length > 0)) {
             for (int i = 0; i < ji.getAttachments().length; i++) {
                 FileAttachment attachment = ji.getAttachments()[i];
+                // basic error checking
+                if ((attachment.getName() == null) || (attachment.getName().isEmpty())) {
+                    String msg = "File attachment is missing required parameter name";
+                    logger.error(msg);
+                    throw new CloudServiceException(
+                            HttpURLConnection.HTTP_BAD_REQUEST, msg);
+                }
+                if (attachment.getData() == null) {
+                    String msg = "File attachment is missing required parameter data";
+                    logger.error(msg);
+                    throw new CloudServiceException(
+                            HttpURLConnection.HTTP_BAD_REQUEST, msg);
+                }
+                // good to go - copy attachments
+                // not checking for 0-byte attachments - assuming they are legitimate
                 try {
                     FileOutputStream output = new FileOutputStream(cWorkingDir + File.separator + attachment.getName());
                     DataHandler inputHandler = attachment.getData();
