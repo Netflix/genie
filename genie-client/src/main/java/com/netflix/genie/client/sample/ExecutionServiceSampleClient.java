@@ -18,9 +18,16 @@
 
 package com.netflix.genie.client.sample;
 
+import java.io.File;
+import java.io.PrintWriter;
+
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
 import com.netflix.genie.common.messages.JobStatusResponse;
+import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types.Configuration;
 import com.netflix.genie.common.model.Types.JobStatus;
@@ -78,7 +85,18 @@ public final class ExecutionServiceSampleClient {
         jobInfo.setDescription("This is a test");
         jobInfo.setConfiguration(Configuration.TEST.name());
         jobInfo.setSchedule(Schedule.ADHOC.name());
-        jobInfo.setCmdArgs("-e \"select count(*) from counters where dateint=20120430 and hour=10\"");
+        // send the query as an attachment
+        File query = File.createTempFile("hive", ".q");
+        PrintWriter pw = new PrintWriter(query);
+        pw.println("select count(*) from counters where dateint=20120430 and hour=10;");
+        pw.close();
+        FileAttachment[] attachments = new FileAttachment[1];
+        attachments[0] = new FileAttachment();
+        attachments[0].setName("hive.q");
+        // Ensure that file exists, because the FileDataSource constructor doesn't
+        attachments[0].setData(new DataHandler(new FileDataSource(query.getAbsolutePath())));
+        jobInfo.setAttachments(attachments);
+        jobInfo.setCmdArgs("-f hive.q");
         jobInfo = client.submitJob(jobInfo);
 
         String jobID = jobInfo.getJobID();
