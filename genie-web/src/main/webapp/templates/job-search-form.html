@@ -49,7 +49,7 @@
     </div>
     <div class="control-group">
         <div class="controls">
-            <button data-bind="click: Job.search" type="submit" class="btn btn-primary">Search</button>
+            <button data-bind="click: Job.search, disable: Job.status()==='searching'" type="submit" class="btn btn-primary">Search</button>
         </div>
     </div>
 </form>

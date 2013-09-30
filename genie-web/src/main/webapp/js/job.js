@@ -127,7 +127,7 @@ define([
         self.search = function() {
             var d = new Date();
             self.searchResults([]);
-            self.status('');
+            self.status('searching');
             self.searchDateTime(d.toLocaleString());
             var formArray = $('#jobSearchForm').serializeArray();
             var userName = _.where(formArray, {'name': 'userName'})[0].value;
@@ -143,7 +143,8 @@ define([
                 url:  'genie/v0/jobs',
                 data: {limit: limit, userName: userName, jobType: jobType, status: status, jobID: jobID, jobName: jobName}
             }).done(function(data) {
-                self.status('has results');
+                self.searchResults([]);
+                self.status('results');
                 // check to see if jobInfo is an array
                 if (data.jobs.jobInfo instanceof Array) {
                     _.each(data.jobs.jobInfo, function(jobObj, index) {
@@ -160,7 +161,7 @@ define([
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR, textStatus, errorThrown);
-                self.status('no results');
+                self.status('results');
             });
         };
     };

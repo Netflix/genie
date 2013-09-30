@@ -1,4 +1,4 @@
-<div data-bind="visible: ($root.Job.status()!=='') && $root.page()==='#job/search'" class="search-results-counter">
+<div data-bind="visible: $root.Job.status()==='results' && $root.page()==='#job/search'" class="search-results-counter">
     <h3><span data-bind="text: $root.Job.searchResults().length"></span> results (<span data-bind="text: $root.Job.searchDateTime()"></span>).</h3>
 </div>
 <div>

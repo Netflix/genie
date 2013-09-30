@@ -137,7 +137,7 @@ define([
         self.search = function() {
             var d = new Date();
             self.searchResults([]);
-            self.status('');
+            self.status('searching');
             self.searchDateTime(d.toLocaleString());
             var formArray = $('#clusterSearchForm').serializeArray();
             var name     = _.where(formArray, {'name': 'name'})[0].value;
@@ -156,7 +156,8 @@ define([
                 url:  'genie/v0/config/cluster',
                 data: {limit: limit, name: name, status: status, adHoc: adHoc, sla: sla, bonus: bonus, prod: prod, test: test, unitTest: unitTest}
             }).done(function(data) {
-                self.status('has results');
+                self.searchResults([]);
+                self.status('results');
                 // check to see if clusterConfig is array
                 if (data.clusterConfigs.clusterConfig instanceof Array) {
                     _.each(data.clusterConfigs.clusterConfig, function(clusterObj, index) {
@@ -167,7 +168,7 @@ define([
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR, textStatus, errorThrown);
-                self.status('no results');
+                self.status('results');
             });
         };
 
