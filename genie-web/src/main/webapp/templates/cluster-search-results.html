@@ -1,4 +1,4 @@
-<div data-bind="visible: $root.Cluster.status()!=='' && $root.page()==='#cluster/search'" class="search-results-counter">
+<div data-bind="visible: $root.Cluster.status()==='results' && $root.page()==='#cluster/search'" class="search-results-counter">
     <h3><span data-bind="text: $root.Cluster.searchResults().length"></span> results (<span data-bind="text: $root.Cluster.searchDateTime()"></span>).</h3>
 </div>
 <div data-bind="foreach: $root.Cluster.searchResults" class="cluster-search-results">
