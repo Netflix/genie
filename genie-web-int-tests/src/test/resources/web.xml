@@ -34,6 +34,6 @@
     </filter-mapping>
 
     <listener>
-        <listener-class>com.netflix.kayron.server.test.KayronTestGuiceContextListener</listener-class>
+        <listener-class>com.netflix.karyon.server.test.KaryonTestGuiceContextListener</listener-class>
     </listener>
 </web-app>
