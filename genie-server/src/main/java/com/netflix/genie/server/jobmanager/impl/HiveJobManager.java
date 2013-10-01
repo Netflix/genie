@@ -66,7 +66,12 @@ public class HiveJobManager extends HadoopJobManager {
      */
     @Override
     protected String[] getGenieCmdArgs() {
-        return new String[] {"-hiveconf", genieJobIDProp, "-hiveconf", netflixEnvProp};
+        if (lipstickUuidProp == null) {
+            return new String[] {"-hiveconf", genieJobIDProp, "-hiveconf", netflixEnvProp};
+        } else {
+            return new String[] {"-hiveconf", genieJobIDProp, "-hiveconf", netflixEnvProp,
+                    "-hiveconf", lipstickUuidProp};
+        }
     }
 
     /**
