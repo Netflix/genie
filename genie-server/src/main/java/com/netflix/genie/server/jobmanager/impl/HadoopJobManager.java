@@ -95,6 +95,11 @@ public class HadoopJobManager implements JobManager {
     protected String netflixEnvProp;
 
     /**
+     * The value for the Lipstick job ID, if needed.
+     */
+    protected String lipstickUuidProp;
+
+    /**
      * The job info for this job, which is persisted to the database.
      */
     protected JobInfoElement ji;
@@ -316,10 +321,18 @@ public class HadoopJobManager implements JobManager {
         logger.info("called");
 
         genieJobIDProp = GENIE_JOB_ID + "=" + ji.getJobID();
-        netflixEnvProp = NFLX_ENV
-                + "="
+        netflixEnvProp = NFLX_ENV + "="
                 + ConfigurationManager.getConfigInstance().getString(
                         "netflix.environment");
+
+        String lipstickUuidPropName = ConfigurationManager.getConfigInstance().
+                getString("netflix.genie.server.lipstick.uuid.prop.name", "lipstick.uuid.prop.name");
+
+        // set the lipstick job ID, if needed
+        if (ConfigurationManager.getConfigInstance().getBoolean(
+                        "netflix.genie.server.lipstick.enable", false)) {
+            lipstickUuidProp = lipstickUuidPropName + "=" + GENIE_JOB_ID;
+        }
 
         // construct the environment variables
         this.env = initEnv(ji);
@@ -337,7 +350,11 @@ public class HadoopJobManager implements JobManager {
      * @return -D style params including genie job id and netflix environment
      */
     protected String[] getGenieCmdArgs() {
-        return new String[] {"-D", genieJobIDProp, "-D", netflixEnvProp};
+        if (lipstickUuidProp == null) {
+            return new String[] {"-D", genieJobIDProp, "-D", netflixEnvProp};
+        } else {
+            return new String[] {"-D", genieJobIDProp, "-D", netflixEnvProp, "-D", lipstickUuidProp};
+        }
     }
 
     /**
