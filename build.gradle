@@ -68,6 +68,7 @@ project(':genie-server') {
         compile 'com.sun.jersey.contribs:jersey-guice:1.9.1'
         compile 'com.netflix.servo:servo-core:0.4.34'
         compile 'com.netflix.karyon:karyon-extensions:1.0.22'
+        compile 'commons-httpclient:commons-httpclient:3.1'
 
         runtime 'org.apache.derby:derby:10.2.2.0'
         runtime 'mysql:mysql-connector-java:5.1.16'
