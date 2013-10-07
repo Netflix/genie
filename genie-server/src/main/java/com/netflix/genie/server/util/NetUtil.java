@@ -18,8 +18,13 @@
 
 package com.netflix.genie.server.util;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +39,16 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  */
 public final class NetUtil {
 
-    private static String publicHostName;
-    private static String localHostName;
+    private static String cloudHostName;
+    private static String dcHostName;
 
     private static Logger logger = LoggerFactory.getLogger(NetUtil.class);
+
+    // the instance meta-data uri's for public and private host/ip's
+    private static final String PUBLIC_HOSTNAME_URI =
+            "http://169.254.169.254/latest/meta-data/public-hostname";
+    private static final String LOCAL_IPV4_URI =
+            "http://169.254.169.254/latest/meta-data/local-ipv4";
 
     private NetUtil() {
         // never called
@@ -63,10 +74,10 @@ public final class NetUtil {
     }
 
     /**
-     * Return either the public or local dns name, depending on the datacenter.
+     * Return either the cloud or dc host name, depending on the datacenter.
      * If the property netflix.genie.server.host is set, that value will always be returned.
-     * If the property is not set, then the environment variable EC2_PUBLIC_HOSTNAME will
-     * be used in the cloud, or InetAddress.getLocalHost() will be used in the DC.
+     * If the property is not set, then the instance metadata will be used in the cloud,
+     * or InetAddress.getLocalHost() will be used in the DC.
      *
      * @return host name
      */
@@ -84,9 +95,9 @@ public final class NetUtil {
         String dc = ConfigurationManager.getConfigInstance().getString(
                 "netflix.datacenter");
         if ((dc != null) && dc.equals("cloud")) {
-            hostName = getPublicHostName();
+            hostName = getCloudHostName();
         } else {
-            hostName = getLocalHostName();
+            hostName = getDCHostName();
         }
 
         if ((hostName == null) || (hostName.isEmpty())) {
@@ -99,31 +110,67 @@ public final class NetUtil {
         return hostName;
     }
 
-    private static String getPublicHostName() throws CloudServiceException {
+    private static String getCloudHostName() throws CloudServiceException {
         logger.debug("called");
 
-        if ((publicHostName != null) && (!publicHostName.isEmpty())) {
-            return publicHostName;
+        if ((cloudHostName != null) && (!cloudHostName.isEmpty())) {
+            return cloudHostName;
         }
 
-        // gets the ec2 public hostname
-        publicHostName = System.getenv("EC2_PUBLIC_HOSTNAME");
-        logger.debug("publicHostName=" + publicHostName);
+        // gets the ec2 public hostname, if available
+        try {
+            cloudHostName = httpGet(PUBLIC_HOSTNAME_URI);
+        } catch (IOException ioe) {
+            String msg = "Unable to get public hostname from instance metadata";
+            logger.error(msg, ioe);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg, ioe);
+        }
+        if ((cloudHostName == null) || (cloudHostName.isEmpty())) {
+            try {
+                cloudHostName = httpGet(LOCAL_IPV4_URI);
+            } catch (IOException ioe) {
+                String msg = "Unable to get local IP from instance metadata";
+                logger.error(msg, ioe);
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg, ioe);
+            }
+        }
+        logger.info("cloudHostName=" + cloudHostName);
 
-        return publicHostName;
+        return cloudHostName;
     }
 
-    private static String getLocalHostName() throws CloudServiceException {
+    /**
+     * Returns the response from an HTTP GET call if it succeeds, null otherwise.
+     *
+     * @param uri The URI to execute the HTTP GET on
+     * @return response from an HTTP GET call if it succeeds, null otherwise
+     * @throws IOException if there was an error with the HTTP request
+     */
+    private static String httpGet(String uri) throws IOException {
+        String response = null;
+        HttpClient client = new HttpClient();
+        HttpMethod method = new GetMethod(uri);
+        client.executeMethod(method);
+        int status = method.getStatusCode();
+        if (status == HttpURLConnection.HTTP_OK) {
+            response = method.getResponseBodyAsString();
+        }
+        return response;
+    }
+
+    private static String getDCHostName() throws CloudServiceException {
         logger.debug("called");
 
-        if ((localHostName != null) && (!localHostName.isEmpty())) {
-            return localHostName;
+        if ((dcHostName != null) && (!dcHostName.isEmpty())) {
+            return dcHostName;
         }
 
         try {
             // gets the local instance hostname
             InetAddress addr = InetAddress.getLocalHost();
-            localHostName = addr.getCanonicalHostName();
+            dcHostName = addr.getCanonicalHostName();
         } catch (Exception e) {
             String msg = "Unable to get the hostname";
             logger.error(msg, e);
@@ -131,6 +178,6 @@ public final class NetUtil {
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
 
-        return localHostName;
+        return dcHostName;
     }
 }
