@@ -44,7 +44,9 @@ public final class NetUtil {
 
     private static Logger logger = LoggerFactory.getLogger(NetUtil.class);
 
-    // the instance meta-data uri's for public and private host/ip's
+    // The instance meta-data uri's for public and private host/ip's
+    // More info about EC2's instance metadata API is here:
+    // http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
     private static final String PUBLIC_HOSTNAME_URI =
             "http://169.254.169.254/latest/meta-data/public-hostname";
     private static final String LOCAL_IPV4_URI =
