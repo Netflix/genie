@@ -34,7 +34,7 @@ def populateTestHive():
         <s3HiveSiteXml>file:///PATH/TO/TEST-HIVE-SITE.XML</s3HiveSiteXml>
         <user>testuser</user>
         <status>ACTIVE</status>
-        <hiveVersion>0.8.1</hiveVersion>
+        <hiveVersion>0.11</hiveVersion>
       </hiveConfig>
     </request>
     '''
@@ -50,7 +50,7 @@ def populateProdHive():
         <s3HiveSiteXml>file:///PATH/TO/PROD-HIVE-SITE.XML</s3HiveSiteXml>
         <user>testuser</user>
         <status>ACTIVE</status>
-        <hiveVersion>0.8.1</hiveVersion>
+        <hiveVersion>0.11</hiveVersion>
       </hiveConfig>
     </request>
     '''
@@ -66,7 +66,7 @@ def populateTestPig():
         <s3PigProperties>file:///PATH/TO/TEST-PIG.PROPERTIES</s3PigProperties>
         <user>testuser</user>
         <status>ACTIVE</status>
-        <pigVersion>0.9.2</pigVersion>
+        <pigVersion>0.11</pigVersion>
       </pigConfig>
     </request>
     '''
@@ -82,7 +82,7 @@ def populateProdPig():
         <s3PigProperties>file:///PATH/TO/PROD-PIG.PROPERTIES</s3PigProperties>
         <user>testuser</user>
         <status>ACTIVE</status>
-        <pigVersion>0.9.2</pigVersion>
+        <pigVersion>0.11</pigVersion>
       </pigConfig>
     </request>
     '''
