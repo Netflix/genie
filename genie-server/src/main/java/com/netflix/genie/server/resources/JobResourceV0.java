@@ -180,12 +180,14 @@ public class JobResourceV0 {
             @QueryParam("userName") String userName,
             @QueryParam("jobType") String jobType,
             @QueryParam("status") String status,
+            @QueryParam("clusterName") String clusterName,
+            @QueryParam("clusterId") String clusterId,
             @QueryParam("limit") @DefaultValue("1024") int limit,
             @QueryParam("page") @DefaultValue("0") int page) {
         logger.info("called");
         JobInfoResponse response = null;
-        response = xs.getJobs(jobID, jobName, userName, jobType, status, limit,
-                page);
+        response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId,
+                limit, page);
         return ResponseUtil.createResponse(response);
     }
 

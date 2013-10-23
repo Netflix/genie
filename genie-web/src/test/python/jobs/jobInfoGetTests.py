@@ -52,7 +52,8 @@ class JobInfoGetTestCase(unittest.TestCase):
                 "jobName": "HIVE_TEST", 
                 "schedule": "adHoc",
                 "configuration": "test",
-                "clusterName": "DOES_NOT_EXIST",
+                "clusterName": "MY_CLUSTER_NAME",
+                "clusterId": "MY_CLUSTER_ID",
                 "cmdArgs": "-e THIS IS GOING TO FAIL",
                 "userName": "''' + user + '''"
             }
@@ -105,6 +106,20 @@ class JobInfoGetTestCase(unittest.TestCase):
         print response.code
         assert response.code == 200, "can't get elements by type"
 
+    def testGetJobByClusterName(self):
+        print "HTTP GET - for clusterName MY_CLUSTER_NAME: "
+        params = '?clusterName=MY_CLUSTER_NAME&limit=3'
+        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        print response.code
+        assert response.code == 200, "can't get elements by type"
+
+    def testGetJobByClusterId(self):
+        print "HTTP GET - for clusterId MY_CLUSTER_ID: "
+        params = '?clusterId=MY_CLUSTER_ID&limit=3'
+        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        print response.code
+        assert response.code == 200, "can't get elements by type"
+
     def testGetForFakeUser(self):
         print "HTTP GET - test for user DUMMY: "
         params = '?userName=does_not_exist'
@@ -137,6 +152,28 @@ class JobInfoGetTestCase(unittest.TestCase):
         except urllib2.HTTPError, e:
             print e.read()
             assert e.code == 400, "received unexpected unsuccessful response"
+
+    def testGetForFakeClusterName(self):
+        print "HTTP GET - test for clusterName DUMMY: "
+        params = '?clusterName=DUMMY&limit=3'
+        try:
+            response = restclient.get(serviceUrl=serviceUrl, params=params)
+            print response.read()
+            assert False, "received unexpected successful response"
+        except urllib2.HTTPError, e:
+            print e.read()
+            assert e.code == 404, "received unexpected unsuccessful response"
+
+    def testGetForFakeClusterId(self):
+        print "HTTP GET - test for clusterId DUMMY: "
+        params = '?clusterId=DUMMY&limit=3'
+        try:
+            response = restclient.get(serviceUrl=serviceUrl, params=params)
+            print response.read()
+            assert False, "received unexpected successful response"
+        except urllib2.HTTPError, e:
+            print e.read()
+            assert e.code == 404, "received unexpected unsuccessful response"
            
 # driver method for all tests                
 if __name__ == "__main__":    
