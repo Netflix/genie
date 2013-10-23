@@ -38,7 +38,7 @@ def testJsonSubmitjob():
     # write out a temporary file with our query/dependencies
     query = tempfile.NamedTemporaryFile(delete=False)
     name = query.name
-    query.write("select count(*) from dual;")
+    query.write("show tables;")
     query.close()
     
     # read it back in as base64 encoded binary

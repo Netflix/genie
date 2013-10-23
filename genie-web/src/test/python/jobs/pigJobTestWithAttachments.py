@@ -19,41 +19,63 @@
 import sys
 sys.path.append('../utils')
 
-import uuid
 import time
 import eureka
 import jobs
 
+import os
+import tempfile
+import base64
+
+# the S3 prefix where the tests are located
+GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
+
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/jobs'
 
-jobID = str(uuid.uuid4())
-   
-def testXmlSubmitjob():
-    print "Running testXmlSubmitjob"
+def testJsonSubmitjob():
+    print "Running testJsonSubmitjob "
+    # write out a temporary file with our query/dependencies
+    query = tempfile.NamedTemporaryFile(delete=False)
+    name = query.name
+    query.write("fs -copyFromLocal pig.q pig.q; cmd = load 'pig.q'; dump cmd;")
+    query.close()
+    
+    # read it back in as base64 encoded binary
+    query = open(name, "rb")
+    contents = base64.b64encode(query.read())
+    print contents
+    query.close()
+    os.unlink(name)
+    
     payload = '''
-    <request>
-      <jobInfo>
-        <jobID>''' + jobID + '''</jobID>
-        <jobName>HADOOP-FS-CLIENT-TEST</jobName>
-        <userName>genietest</userName>
-        <groupName>hadoop</groupName>
-        <userAgent>laptop</userAgent>
-        <jobType>hadoop</jobType>
-        <schedule>adHoc</schedule>
-        <cmdArgs>fs -ls /</cmdArgs>
-      </jobInfo>
-    </request>
+    {  
+        "jobInfo":
+        {
+            "jobName": "HIVE-JOB-TEST",
+            "description": "This is a test", 
+            "userName" : "genietest", 
+            "groupName" : "hadoop", 
+            "jobType": "pig", 
+            "configuration": "prod",
+            "schedule": "adHoc",
+            "cmdArgs": "-f pig.q",
+            "attachments": {
+                "data": "''' + contents + '''",
+                "name": "pig.q"
+            }
+        }
+    }
     '''
     print payload
-    return jobs.submitJob(serviceUrl, payload, 'application/xml')
-            
+    print "\n"
+    return jobs.submitJob(serviceUrl, payload)
+        
 # driver method for all tests                
 if __name__ == "__main__":
    print "Running unit tests:\n"
-   testXmlSubmitjob()
+   jobID = testJsonSubmitjob()
    print "\n"
-
    while True:
        print jobs.getJobInfo(serviceUrl, jobID)
        print "\n"
@@ -62,10 +84,9 @@ if __name__ == "__main__":
        print "\n"
 
        if (status != 'RUNNING') and (status != 'INIT'):
+           print "Final status: ", status
            print "Job has terminated - exiting"
            break
-       
+              
        time.sleep(5)
-
-
 
