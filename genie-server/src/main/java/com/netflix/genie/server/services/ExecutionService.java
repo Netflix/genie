@@ -79,12 +79,16 @@ public interface ExecutionService {
      *            type of job - possible types Type.JobType
      * @param status
      *            status of job - possible types Type.JobStatus
+     * @param clusterName
+     *            name of cluster for job
+     * @param clusterId
+     *            id of cluster for job
      * @param limit
      *            max number of jobs to return
      * @param page
      *            page number for job
      * @return successful response, or one with HTTP error code
      */
-    JobInfoResponse getJobs(String jobID, String jobName, String userName,
-            String jobType, String status, Integer limit, Integer page);
+    JobInfoResponse getJobs(String jobID, String jobName, String userName, String jobType,
+            String status, String clusterName, String clusterId, Integer limit, Integer page);
 }

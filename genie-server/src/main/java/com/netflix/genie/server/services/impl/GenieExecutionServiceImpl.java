@@ -274,9 +274,8 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
     /** {@inheritDoc} */
     @Override
-    public JobInfoResponse getJobs(String jobID, String jobName,
-            String userName, String jobType, String status, Integer limit,
-            Integer page) {
+    public JobInfoResponse getJobs(String jobID, String jobName, String userName, String jobType,
+            String status, String clusterName, String clusterId, Integer limit, Integer page) {
         logger.info("called");
 
         JobInfoResponse response;
@@ -314,6 +313,14 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                             "Unknown job status: " + status);
                 }
                 String query = "status='" + status.toUpperCase() + "'";
+                criteria.append(query);
+            }
+            if ((clusterName != null) && (!clusterName.isEmpty())) {
+                String query = "clusterName='" + clusterName + "'";
+                criteria.append(query);
+            }
+            if ((clusterId != null) && (!clusterId.isEmpty())) {
+                String query = "clusterId='" + clusterId + "'";
                 criteria.append(query);
             }
         } catch (CloudServiceException e) {
