@@ -79,7 +79,8 @@ def populateCluster():
        
 # driver method for populating configs on master node of EMR   
 if __name__ == "__main__":
-    
+
+   print "Registering EMR cluster\n"    
    print "################################"
    print "Adding config for prodhive:\n"
    populateProdHive()
