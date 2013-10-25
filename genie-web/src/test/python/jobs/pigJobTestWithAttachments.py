@@ -38,7 +38,8 @@ def testJsonSubmitjob():
     # write out a temporary file with our query/dependencies
     query = tempfile.NamedTemporaryFile(delete=False)
     name = query.name
-    query.write("fs -rm genie_pig_test.q; fs -copyFromLocal genie_pig_test.q genie_pig_test.q; cmd = load 'genie_pig_test.q'; dump cmd;")
+    queryFile = 'pig-' + str(time.time()) + '.q'
+    query.write("fs -copyFromLocal %s %s; cmd = load '%s'; dump cmd;" % (queryFile, queryFile, queryFile))
     query.close()
     
     # read it back in as base64 encoded binary
@@ -59,10 +60,10 @@ def testJsonSubmitjob():
             "jobType": "pig", 
             "configuration": "prod",
             "schedule": "adHoc",
-            "cmdArgs": "-f genie_pig_test.q",
+            "cmdArgs": "-f ''' + queryFile + '''",
             "attachments": {
                 "data": "''' + contents + '''",
-                "name": "genie_pig_test.q"
+                "name": "''' + queryFile + '''"
             }
         }
     }
