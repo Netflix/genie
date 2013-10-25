@@ -31,7 +31,7 @@ def populateProdHive():
       <hiveConfig>
         <name>prodhive</name>
         <type>PROD</type>
-        <s3HiveSiteXml>file:///home/hadoop/.versions/hive-0.8.1/conf/hive-site.xml</s3HiveSiteXml>
+        <s3HiveSiteXml>file:///home/hadoop/.versions/hive-0.11.0/conf/hive-site.xml</s3HiveSiteXml>
         <user>produser</user>
         <status>ACTIVE</status>
         <hiveVersion>0.11</hiveVersion>
@@ -47,7 +47,7 @@ def populateProdPig():
       <pigConfig>
         <name>prodpig</name>
         <type>PROD</type>
-        <s3PigProperties>file:///home/hadoop/.versions/pig-0.9.2/conf/pig.properties</s3PigProperties>
+        <s3PigProperties>file:///home/hadoop/.versions/pig-0.11.1/conf/pig.properties</s3PigProperties>
         <user>produser</user>
         <status>ACTIVE</status>
         <pigVersion>0.11</pigVersion>
