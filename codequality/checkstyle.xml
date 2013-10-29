@@ -91,8 +91,12 @@
           <property name="ignorePattern" value="\$File.*\$"/>
           <property name="severity" value="info"/>
         </module>
-        <module name="MethodLength"/>
-        <module name="ParameterNumber"/>
+        <module name="MethodLength">
+          <property name="max" value="200"/>
+        </module>
+        <module name="ParameterNumber">
+          <property name="max" value="15"/>
+        </module>
 
 
         <!-- Checks for whitespace                               -->
