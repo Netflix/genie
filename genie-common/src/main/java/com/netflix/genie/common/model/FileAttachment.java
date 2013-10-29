@@ -40,7 +40,7 @@ public class FileAttachment implements Serializable {
     /**
      * The data for the attachment.
      */
-    private DataHandler data;
+    private transient DataHandler data;
 
     /**
      * Get the name of the file for this attachment.
