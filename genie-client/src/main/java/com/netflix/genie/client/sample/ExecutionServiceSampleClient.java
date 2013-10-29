@@ -87,7 +87,7 @@ public final class ExecutionServiceSampleClient {
         jobInfo.setSchedule(Schedule.ADHOC.name());
         // send the query as an attachment
         File query = File.createTempFile("hive", ".q");
-        PrintWriter pw = new PrintWriter(query);
+        PrintWriter pw = new PrintWriter(query, "UTF-8");
         pw.println("select count(*) from counters where dateint=20120430 and hour=10;");
         pw.close();
         FileAttachment[] attachments = new FileAttachment[1];
