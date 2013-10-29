@@ -31,7 +31,14 @@ class EurekaClient(object):
         if self._eurekaUrl is None or len(self._eurekaUrl) == 0:
             self._eurekaUrl = os.getenv('EUREKA_URL')
 
-    def _getInstances(self, appName='genie', status='UP'):
+    # If appName is not set, then use NETFLIX_APP env, and finally default to 'genie'
+    def _getInstances(self, appName=None, status='UP'):
+        # if appName is not set, try to infer it from the environment - else default to 'genie'
+        if appName is None or len(appName) == 0:
+            appName = os.getenv("NETFLIX_APP")
+        if appName is None or len(appName) == 0:
+            appName = 'genie'
+        
         # ensure that we can find Eureka
         if self._eurekaUrl is None or len(self._eurekaUrl) == 0:
             raise RuntimeError("EUREKA_URL is not provided via env or constructor")
@@ -73,14 +80,14 @@ class EurekaClient(object):
     
     # If the SERVICE_BASE_URL environment variable is set, return it - e.g. http://localhost:7001
     # Else use Eureka to find an instance that is UP   
-    def getServiceBaseUrl(self, appName='genie'):
+    def getServiceBaseUrl(self, appName=None):
         service_url = os.getenv('SERVICE_BASE_URL')
         if service_url is not None and len(service_url) != 0:
             print "Returning SERVICE_BASE_URL provided by environment variable:", service_url
             print
             return service_url
         else:
-            print "Getting UP " + appName + " instance from Eureka"
+            print "Getting UP instance from Eureka: " + self._eurekaUrl
             print
         
         instancesUp = self._getInstances(appName, status='UP')
@@ -92,7 +99,7 @@ class EurekaClient(object):
         return service_url
 
     # Use Eureka to find instances that are OUT_OF_SERVICE
-    def getOOSInstances(self, appName='genie'):
+    def getOOSInstances(self, appName=None):
         return self._getInstances(appName, status='OUT_OF_SERVICE')
 
 if __name__ == "__main__":
@@ -101,10 +108,6 @@ if __name__ == "__main__":
     
     print "Getting base URL for Genie Service from Eureka:"
     print client.getServiceBaseUrl()
-    print
-    
-    print "Getting base URL for Event Service from Eureka:"
-    print client.getServiceBaseUrl("dsees")
     print
     
     print "Getting list of all Genie OOS instances"
