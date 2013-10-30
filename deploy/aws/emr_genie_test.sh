@@ -18,12 +18,16 @@
 #
 ##
 
-# On Master
-
-# ensure that HDFS is writable by all users (e.g. genietest)
-hadoop fs -chmod -R 777 /
-
-# Register EMR cluster
+# Set up some environment variables for testing
 export SERVICE_BASE_URL=http://localhost:7001
-cd $HOME/genie/genie-web/src/test/python/utils
-python populateEMRConfigs.py
+export GENIE_TEST_PREFIX=file:///home/hadoop
+
+cd $HOME/genie/genie-web/src/test/python/jobs
+
+# Test some jobs
+
+python hadoopFSTest.py
+
+python hiveJobTestWithAttachments.py
+
+python pigJobTestWithAttachments.py
