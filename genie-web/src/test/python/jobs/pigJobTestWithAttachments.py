@@ -38,7 +38,8 @@ def testJsonSubmitjob():
     # write out a temporary file with our query/dependencies
     query = tempfile.NamedTemporaryFile(delete=False)
     name = query.name
-    query.write("show tables;")
+    queryFile = 'pig-' + str(time.time()) + '.q'
+    query.write("fs -copyFromLocal %s %s; cmd = load '%s'; dump cmd;" % (queryFile, queryFile, queryFile))
     query.close()
     
     # read it back in as base64 encoded binary
@@ -52,17 +53,17 @@ def testJsonSubmitjob():
     {  
         "jobInfo":
         {
-            "jobName": "HIVE-JOB-TEST",
+            "jobName": "PIG-JOB-TEST",
             "description": "This is a test", 
             "userName" : "genietest", 
             "groupName" : "hadoop", 
-            "jobType": "hive", 
+            "jobType": "pig", 
             "configuration": "prod",
             "schedule": "adHoc",
-            "cmdArgs": "-f hive.q",
+            "cmdArgs": "-f ''' + queryFile + '''",
             "attachments": {
                 "data": "''' + contents + '''",
-                "name": "hive.q"
+                "name": "''' + queryFile + '''"
             }
         }
     }
