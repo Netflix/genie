@@ -53,7 +53,7 @@ def testJsonSubmitjob():
     {  
         "jobInfo":
         {
-            "jobName": "HIVE-JOB-TEST",
+            "jobName": "PIG-JOB-TEST",
             "description": "This is a test", 
             "userName" : "genietest", 
             "groupName" : "hadoop", 
