@@ -519,6 +519,12 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             throws CloudServiceException {
         logger.debug("called");
 
+        if (jobInfo == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Missing jobInfo object");
+        }
+
         // check if userName is valid
         validateNameValuePair("userName", jobInfo.getUserName());
 
