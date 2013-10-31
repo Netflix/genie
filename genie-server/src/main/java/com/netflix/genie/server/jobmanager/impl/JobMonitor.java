@@ -19,8 +19,18 @@
 package com.netflix.genie.server.jobmanager.impl;
 
 import java.io.File;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.activation.*;
+
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +44,7 @@ import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.util.NetUtil;
+
 
 /**
  * The monitor thread that gets launched for each job.
@@ -69,6 +80,9 @@ public class JobMonitor extends Thread {
 
     // whether this job has been terminated by the monitor thread
     private boolean terminated = false;
+    
+    // Config Instance to get all properties
+	private AbstractConfiguration config;
 
     /**
      * Initialize this monitor thread with the process for the running job.
@@ -82,14 +96,14 @@ public class JobMonitor extends Thread {
      */
     public JobMonitor(JobInfoElement ji, String workingDir, Process proc) {
         this.ji = ji;
+        this.config = ConfigurationManager.getConfigInstance();
         this.workingDir = workingDir;
         if (this.workingDir != null) {
             stdOutFile = new File(this.workingDir + File.separator + "stdout.log");
         }
         this.proc = proc;
         this.pm = new PersistenceManager<JobInfoElement>();
-        this.maxStdoutSize = ConfigurationManager.getConfigInstance()
-                .getLong("netflix.genie.job.max.stdout.size", null);
+        this.maxStdoutSize = config.getLong("netflix.genie.job.max.stdout.size", null);
     }
 
     /**
@@ -212,7 +226,7 @@ public class JobMonitor extends Thread {
 
             JobInfoElement dbJI = pm.getEntity(ji.getJobID(),
                     JobInfoElement.class);
-
+            
             // only update status if not KILLED
             if ((dbJI.getStatus() != null)
                     && !dbJI.getStatus().equalsIgnoreCase("KILLED")) {
@@ -245,19 +259,95 @@ public class JobMonitor extends Thread {
                 // update the job status
                 pm.updateEntity(ji);
                 rwl.writeLock().unlock();
-                return;
+                //return;
             } else {
                 // if job status is killed, the kill thread will update status
                 logger.debug("Job has been killed - will not update DB: "
                         + ji.getJobID());
                 rwl.writeLock().unlock();
-                return;
+                //return;
             }
+            
+            // check if email sending is enabled and send email
+            if (config.getBoolean("netflix.genie.server.mail.enable", false) == false) {
+        		logger.info("Email Sending is disabled");
+        	} else {
+        		logger.info("Sending Job Completion Email to user");
+        		if (sendEmail() != 0) {       			
+                    // Failed to send email. Just log it and move on
+                    logger.warn ("Failed to Send Email.Will not fail job.");
+                }
+        	}          
+            
         } finally {
             // ensure that we always unlock
             if (rwl.writeLock().isHeldByCurrentThread()) {
                 rwl.writeLock().unlock();
             }
         }
+    }
+
+    /**
+     * Check the properties file to figure out if an email
+     * needs to be sent at the end of the job. If yes, get 
+     * mail properties and try and send email about Job Status.
+     * @return 0 for success, -1 for failure
+     */
+    private int sendEmail() {
+    	logger.info("Sending Email about Job Completion status");
+  	
+    	// Recipient's email ID 
+    	String emailTo = ji.getUserEmail();
+    	
+    	// Check if user email address is null
+    	if (emailTo == null) {
+    		logger.info("User Email address Null. Cannot send email");
+    		return -1;
+    	} else {
+    		logger.info("User Email Address: " + emailTo);
+    	}
+
+    	// Sender's email ID 
+    	String fromEmail = config.getString("netflix.genie.server.mail.smpt.from", "geniehost@netflix.com");
+    	logger.info("From email address to use to send email: " + fromEmail);
+    	
+    	// Set the smtp server hostname. Use localhost as default
+    	String smtpHost = config.getString("netflix.genie.server.mail.smtp.host", "localhost");
+    	logger.debug("Email Smtp Server: " + smtpHost);
+
+    	// Get system properties
+    	Properties properties = System.getProperties();
+
+    	// Setup mail server
+    	properties.setProperty("mail.smtp.host", smtpHost);
+
+    	// Get the default Session object.
+    	Session session = Session.getDefaultInstance(properties);
+
+    	try {
+    		// Create a default MimeMessage object.
+    		MimeMessage message = new MimeMessage(session);
+
+    		// Set From: header field of the header.
+    		message.setFrom(new InternetAddress(fromEmail));
+
+    		// Set To: header field of the header.
+    		message.addRecipient(Message.RecipientType.TO,
+    				new InternetAddress(emailTo));
+
+    		// Set Subject: header field
+    		message.setSubject("Genie Job " + ji.getJobName() + " completed with Status: " + ji.getStatus());
+
+    		// Now set the actual message
+    		message.setText("Your Job Failed. Did you really expect it to succeed?");
+
+    		// Send message
+    		Transport.send(message);
+    		logger.debug("Sent email message successfully....");
+    	} catch (MessagingException mex) {
+    		mex.printStackTrace();
+    		return -1;
+    	}
+    	return 0;
     }
 }
