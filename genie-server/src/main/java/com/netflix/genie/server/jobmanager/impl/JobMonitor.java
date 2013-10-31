@@ -22,8 +22,10 @@ import java.io.File;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -321,8 +323,33 @@ public class JobMonitor extends Thread {
     	// Setup mail server
     	properties.setProperty("mail.smtp.host", smtpHost);
 
+    	// check whether authentication should be turned on
+    	Authenticator auth = null;
+    	Boolean enableAuth = config.getBoolean("netflix.genie.server.mail.smtp.auth", false);
+    
+    	if (enableAuth) {
+    		logger.debug("Email Authentication Enabled");
+    		
+    		properties.put("mail.smtp.starttls.enable", enableAuth);
+    		properties.put("mail.smtp.auth", "true");
+    		properties.put("mail.smtp.starttls.enable", "true");
+    		 		
+    		String userName = config.getString("netflix.genie.server.mail.smtp.user");
+    		String password = config.getString("netflix.genie.server.mail.smtp.password");
+
+    		if ((userName == null) || (password == null)) {
+    			logger.error("Authentication is Enabled and Username/password for SMTP server is null");
+    			return -1;
+    		}
+    		logger.debug("Construction Authenticator Object with Username" + userName  + " and password " + password);
+    		auth = new SMTPAuthenticator(userName,
+    				password);
+    	} else {
+    		logger.debug("Email Authentication Not Enabled");
+    	}
+        
     	// Get the default Session object.
-    	Session session = Session.getDefaultInstance(properties);
+    	Session session = Session.getDefaultInstance(properties,auth);
 
     	try {
     		// Create a default MimeMessage object.
@@ -339,7 +366,14 @@ public class JobMonitor extends Thread {
     		message.setSubject("Genie Job " + ji.getJobName() + " completed with Status: " + ji.getStatus());
 
     		// Now set the actual message
-    		message.setText("Your Job Failed. Did you really expect it to succeed?");
+    		String body = "Your Genie Job is complete\n\n" +
+                    "Job ID: " + ji.getJobID() + "\n" +
+                    "Job Name: " + ji.getJobName() + "\n" +
+                    "Status: " + ji.getStatus() + "\n" +
+                    "Status Message: " + ji.getStatusMsg() + "\n" +
+                    "Output Base URL: " + ji.getOutputURI() + "\n";
+    		
+    		message.setText(body);
 
     		// Send message
     		Transport.send(message);
@@ -349,5 +383,25 @@ public class JobMonitor extends Thread {
     		return -1;
     	}
     	return 0;
+    }
+    
+    private class SMTPAuthenticator extends Authenticator {
+    	private String username;
+    	private String password;
+
+    	/**
+    	 * Default constructor
+    	 */
+    	SMTPAuthenticator(String username, String password) {
+    		this.username = username;
+    		this.password = password;
+    	}
+
+    	/**
+    	 * Return a PasswordAuthentication object based on username/password
+    	 */
+    	public PasswordAuthentication getPasswordAuthentication() {
+    		return new PasswordAuthentication(username, password);
+    	}
     }
 }
