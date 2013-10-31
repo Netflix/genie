@@ -34,6 +34,20 @@ user = os.getenv("USER")
 
 class JobSubmitErrorTestCase(unittest.TestCase):
 
+    def testMissingJobInfo(self):     
+        print "HTTP POST: missing job info: "
+        payload = '''
+        {
+        }
+        '''
+        try:
+            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            print response.read()
+            assert False, "received unexpected successful response"
+        except urllib2.HTTPError, e:
+            print e.read()
+            assert e.code == 400, "received unexpected unsuccessful response"
+
     def testMissingUserName(self):    
         print "HTTP POST: missing user name: "
         payload = '''
