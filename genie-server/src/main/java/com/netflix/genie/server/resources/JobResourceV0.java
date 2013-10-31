@@ -116,9 +116,9 @@ public class JobResourceV0 {
 
         // set the clientHost, if it is not overridden already
         JobInfoElement jobInfo = request.getJobInfo();
-        if ((jobInfo != null) &&
-                ((jobInfo.getClientHost() == null) ||
-                        jobInfo.getClientHost().isEmpty())) {
+        if ((jobInfo != null)
+                && ((jobInfo.getClientHost() == null)
+                        || jobInfo.getClientHost().isEmpty())) {
             jobInfo.setClientHost(clientHost);
         }
 
