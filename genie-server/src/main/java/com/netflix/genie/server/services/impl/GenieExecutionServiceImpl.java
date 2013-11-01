@@ -417,8 +417,28 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             return response;
         }
 
-        // auto-redirect to the right instance if killURI points to a different
-        // node
+        // check if it is done already
+        if (jInfo.getStatus().equalsIgnoreCase("SUCCEEDED")
+                || jInfo.getStatus().equalsIgnoreCase("KILLED")
+                || jInfo.getStatus().equalsIgnoreCase("FAILED")) {
+            // job already exited, return status to user
+            response = new JobStatusResponse();
+            response.setStatus(jInfo.getStatus());
+            response.setMessage("Job " + jobId + " is already done");
+            return response;
+        } else if (jInfo.getStatus().equalsIgnoreCase("INIT")
+                || (jInfo.getProcessHandle() == -1)) {
+            // can't kill a job if it is still initializing
+            String msg = "Unable to kill job as it is still initializing: " + jobId;
+            logger.error(msg);
+            response = new JobStatusResponse(new CloudServiceException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg));
+            return response;
+        }
+
+        // if we get here, job is still running - and can be killed
+
+        // redirect to the right node if killURI points to a different node
         String killURI = jInfo.getKillURI();
         if (killURI == null) {
             String msg = "Failed to get killURI for jobID: " + jobId;
@@ -442,29 +462,8 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             return response;
         }
 
-        // if we get here, killURI == localURI and job should be killed in this
-        // process
+        // if we get here, killURI == localURI, and job should be killed here
         logger.debug("killing job on same instance: " + jobId);
-        if (jInfo.getProcessHandle() == -1) {
-            // job was never launched due to an error
-            response = new JobStatusResponse();
-            response.setStatus(jInfo.getStatus());
-            response.setMessage("Job " + jobId + " has already failed");
-            return response;
-        }
-
-        // check if it has been killed already
-        if (jInfo.getStatus().equalsIgnoreCase("SUCCEEDED")
-                || jInfo.getStatus().equalsIgnoreCase("KILLED")
-                || jInfo.getStatus().equalsIgnoreCase("FAILED")) {
-            // job already exited, return success to user
-            response = new JobStatusResponse();
-            response.setStatus(jInfo.getStatus());
-            response.setMessage("Job " + jobId + " is already done");
-            return response;
-        }
-
-        // do the actual kill
         try {
             JobManagerFactory.getJobManager(jInfo.getJobType()).kill(jInfo);
         } catch (Exception e) {
@@ -518,6 +517,14 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     private void validateJobParams(JobInfoElement jobInfo)
             throws CloudServiceException {
         logger.debug("called");
+
+        if (jobInfo == null) {
+            String msg = "Missing jobInfo object";
+            logger.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    msg);
+        }
 
         // check if userName is valid
         validateNameValuePair("userName", jobInfo.getUserName());

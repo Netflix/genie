@@ -115,9 +115,11 @@ public class JobResourceV0 {
         logger.info("called from: " + clientHost);
 
         // set the clientHost, if it is not overridden already
-        if ((request.getJobInfo().getClientHost() == null)
-                || (request.getJobInfo().getClientHost().isEmpty())) {
-            request.getJobInfo().setClientHost(clientHost);
+        JobInfoElement jobInfo = request.getJobInfo();
+        if ((jobInfo != null)
+                && ((jobInfo.getClientHost() == null)
+                        || jobInfo.getClientHost().isEmpty())) {
+            jobInfo.setClientHost(clientHost);
         }
 
         JobInfoResponse response = xs.submitJob(request);

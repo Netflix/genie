@@ -25,7 +25,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.server.persistence.PersistenceManager;
 
@@ -139,24 +138,15 @@ public class TestGenieNodeStatistics {
     }
 
     /**
-     * Test the counter and daemon thread that sets running job.
+     * Test the counter that sets running job.
      *
      * @throws InterruptedException
      * @throws CloudServiceException
      */
     @Test
     public void testRunningJobs() throws InterruptedException, CloudServiceException {
-        // get number of running jobs before we get started
-        int numRunningJobs = JobCountManager.getNumInstanceJobs();
         stats.setGenieRunningJobs(0);
         Assert.assertEquals(stats.getGenieRunningJobs().intValue(), 0);
-        ConfigurationManager.getConfigInstance().setProperty("netflix.genie.server.metrics.sleep.ms",
-                 new Long(2000));
-        stats.setGenieRunningJobs(5);
-        Assert.assertEquals(stats.getGenieRunningJobs().intValue(), 5);
-        // sleep for a while - number of running jobs should be same as what we started with
-        Thread.sleep(30000);
-        Assert.assertEquals(numRunningJobs, stats.getGenieRunningJobs().intValue());
     }
 
     /**

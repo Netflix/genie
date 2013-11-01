@@ -40,7 +40,6 @@ def testXmlSubmitjob():
         <groupName>hadoop</groupName>
         <userAgent>laptop</userAgent>
         <jobType>hadoop</jobType>
-        <configuration>prod</configuration>
         <schedule>adHoc</schedule>
         <cmdArgs>fs -ls /</cmdArgs>
       </jobInfo>
