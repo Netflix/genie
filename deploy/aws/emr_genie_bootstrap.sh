@@ -26,9 +26,11 @@ cd $HOME; wget http://mirror.sdunix.com/apache/tomcat/tomcat-6/v6.0.37/bin/apach
 tar zxvf apache-tomcat-6.0.37.tar.gz
 
 # Change port to 7001 to work out of the box
-sed -i -e "s#8080#7001#g"  /home/hadoop/apache-tomcat-6.0.37/conf/server.xml
+perl -p -i.bak -ne "s#8080#7001#g" /home/hadoop/apache-tomcat-6.0.37/conf/server.xml
     
-# TODO: update /home/hadoop/apache-tomcat-6.0.37/conf/web.xml to enable directory browsing
+# update /home/hadoop/apache-tomcat-6.0.37/conf/web.xml to enable directory browsing
+perl -0777 -p -i.bak -ne 's#(<param-name>listings</param-name>\s*<param-value>)false(</param-value>)#\1true\2#;' \
+    /home/hadoop/apache-tomcat-6.0.37/conf/web.xml
 
 # Set up Genie specific properties
 export CATALINA_HOME=/home/hadoop/apache-tomcat-6.0.37
