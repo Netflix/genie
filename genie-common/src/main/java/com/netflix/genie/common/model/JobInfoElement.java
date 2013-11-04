@@ -228,6 +228,7 @@ public class JobInfoElement implements Serializable {
      * Email address of the user where he expects an email.
      * This is sent once the genie job completes.
      */
+    @Lob
     private String userEmail;
 
     /**

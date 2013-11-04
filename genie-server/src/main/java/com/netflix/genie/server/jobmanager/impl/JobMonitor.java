@@ -215,6 +215,8 @@ public class JobMonitor extends Thread {
      */
     @Override
     public void run() {
+        GenieNodeStatistics stats = GenieNodeStatistics.getInstance();
+
         // wait for process to complete
         int exitCode = waitForExit();
         ji.setExitCode(exitCode);
@@ -231,7 +233,7 @@ public class JobMonitor extends Thread {
             // only update status if not KILLED
             if ((dbJI.getStatus() != null)
                     && !dbJI.getStatus().equalsIgnoreCase("KILLED")) {
-                GenieNodeStatistics stats = GenieNodeStatistics.getInstance();
+
                 if (exitCode != SubprocessStatus.SUCCESS.code()) {
                     // all other failures except s3 log archival failure
                     logger.error("Failed to execute job, exit code: "
@@ -260,30 +262,33 @@ public class JobMonitor extends Thread {
                 // update the job status
                 pm.updateEntity(ji);
                 rwl.writeLock().unlock();
-                //return;
             } else {
                 // if job status is killed, the kill thread will update status
                 logger.debug("Job has been killed - will not update DB: "
                         + ji.getJobID());
                 rwl.writeLock().unlock();
-                //return;
             }
-
-            // check if email sending is enabled and send email
-            if (config.getBoolean("netflix.genie.server.mail.enable", false)) {
-                logger.info("Sending Job Completion Email to user");
-                if (sendEmail() != 0) {
-                    // Failed to send email. Just log it and move on
-                    logger.warn("Failed to Send Email.Will not fail job.");
-                }
-            } else {
-                logger.info("Email Sending is disabled");
-            }
-
         } finally {
             // ensure that we always unlock
             if (rwl.writeLock().isHeldByCurrentThread()) {
                 rwl.writeLock().unlock();
+            }
+        }
+
+        // Check if user email address is specified. If so
+        // send an email to user about job completion.
+        String emailTo = ji.getUserEmail();
+
+        if (emailTo != null) {
+            logger.info("User email address: " + emailTo);
+
+            if (sendEmail(emailTo)) {
+                // Email sent successfully. Update success email counter
+                stats.incrSuccessfulEmailCount();
+            } else {
+                // Failed to send email. Update email failed counter
+                logger.warn("Failed to send email.");
+                stats.incrFailedEmailCount();
             }
         }
     }
@@ -294,33 +299,26 @@ public class JobMonitor extends Thread {
      * mail properties and try and send email about Job Status.
      * @return 0 for success, -1 for failure
      */
-    private int sendEmail() {
+    private boolean sendEmail(String emailTo) {
         logger.debug("called");
 
-        // Recipient's email ID
-        String emailTo = ji.getUserEmail();
-
-        // Check if user email address is null
-        if (emailTo == null) {
-            logger.info("User Email address Null. Cannot send email");
-            return -1;
-        } else {
-            logger.info("User Email Address: "
-                                 + emailTo);
+        if (!config.getBoolean("netflix.genie.server.mail.enable", false)) {
+            logger.warn("Email is disabled but user has specified an email address.");
+            return false;
         }
 
         // Sender's email ID
-        String fromEmail = config.getString("netflix.genie.server.mail.smpt.from", "geniehost@netflix.com");
+        String fromEmail = config.getString("netflix.genie.server.mail.smpt.from", "no-reply-genie@geniehost.com");
         logger.info("From email address to use to send email: "
                  + fromEmail);
 
         // Set the smtp server hostname. Use localhost as default
         String smtpHost = config.getString("netflix.genie.server.mail.smtp.host", "localhost");
-        logger.debug("Email Smtp Server: "
+        logger.debug("Email smtp server: "
                          + smtpHost);
 
         // Get system properties
-        Properties properties = System.getProperties();
+        Properties properties = new Properties();
 
         // Setup mail server
         properties.setProperty("mail.smtp.host", smtpHost);
@@ -338,17 +336,17 @@ public class JobMonitor extends Thread {
             String password = config.getString("netflix.genie.server.mail.smtp.password");
 
             if ((userName == null) || (password == null)) {
-                logger.error("Authentication is Enabled and Username/password for SMTP server is null");
-                return -1;
+                logger.error("Authentication is enabled and username/password for smtp server is null");
+                return false;
             }
-            logger.debug("Construction Authenticator Object with Username"
+            logger.debug("Constructing authenticator object with username"
                         + userName
                         + " and password "
                         + password);
             auth = new SMTPAuthenticator(userName,
                     password);
         } else {
-            logger.debug("Email Authentication Not Enabled");
+            logger.debug("Email authentication not enabled.");
         }
 
         // Get the default Session object.
@@ -393,12 +391,12 @@ public class JobMonitor extends Thread {
 
             // Send message
             Transport.send(message);
-            logger.debug("Sent email message successfully....");
+            logger.info("Sent email message successfully....");
+            return true;
         } catch (MessagingException mex) {
-            mex.printStackTrace();
-            return -1;
+            logger.error("Got exception while sending email", mex);
+            return false;
         }
-        return 0;
     }
 
     private class SMTPAuthenticator extends Authenticator {
