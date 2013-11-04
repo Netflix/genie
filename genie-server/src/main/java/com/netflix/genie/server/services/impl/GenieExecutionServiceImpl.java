@@ -489,7 +489,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             // this thread will simply overwrite it - final state will be KILLED
             rwl.writeLock().lock();
             jInfo.setUpdateTime(System.currentTimeMillis());
-            jInfo.setArchiveLocation(NetUtil.getArchiveURI(jobId));
+            if (!jInfo.getDisableLogArchival()) {
+                jInfo.setArchiveLocation(NetUtil.getArchiveURI(jobId));
+            }
             pm.updateEntity(jInfo);
             rwl.writeLock().unlock();
         } catch (Exception e) {
