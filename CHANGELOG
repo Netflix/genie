@@ -1,36 +1,35 @@
-0.22-SNAPSHOT
--------------
+0.22
+----
 Enhancements:
-https://github.com/Netflix/genie/issues/17
-https://github.com/Netflix/genie/issues/18
-https://github.com/Netflix/genie/issues/21
-https://github.com/Netflix/genie/issues/25
-https://github.com/Netflix/genie/issues/27
-https://github.com/Netflix/genie/issues/28
-https://github.com/Netflix/genie/issues/29
-https://github.com/Netflix/genie/issues/32
-https://github.com/Netflix/genie/issues/34
-https://github.com/Netflix/genie/issues/37
-https://github.com/Netflix/genie/issues/38
-https://github.com/Netflix/genie/issues/3
+* Email notifications for jobs: https://github.com/Netflix/genie/issues/3
+* Bootstrap action for EMR: https://github.com/Netflix/genie/issues/9
+* Parameter to disable log archiving: https://github.com/Netflix/genie/issues/17
+* Arquillian-based integration tests: https://github.com/Netflix/genie/issues/18
+* Caching for Servo metrics: https://github.com/Netflix/genie/issues/21
+* Refactor of persistence and metrics classes: https://github.com/Netflix/genie/issues/25
+* Updating cluster status from Genie web console: https://github.com/Netflix/genie/issues/27
+* Specifying file dependencies as attachments: https://github.com/Netflix/genie/issues/28
+* REST API to filter jobs by cluster name and ID: https://github.com/Netflix/genie/issues/29
+* Lipstick integration: https://github.com/Netflix/genie/issues/32
+* Better host name resolution on AWS: https://github.com/Netflix/genie/issues/34
+* Optimizing kills for finished jobs: https://github.com/Netflix/genie/issues/37
+* More Generic Eureka support for Python client: https://github.com/Netflix/genie/issues/38
 
 Bug fixes:
-https://github.com/Netflix/genie/issues/20
-https://github.com/Netflix/genie/issues/40
-https://github.com/Netflix/genie/issues/43
+* Scheduling bug when clusterName/ID are empty strings: https://github.com/Netflix/genie/issues/20
+* NPE when clients send null jobInfo during job submission: https://github.com/Netflix/genie/issues/40
+* Client connection leak: https://github.com/Netflix/genie/issues/43
 
 0.21
 ----
 Enhancements:
-
-https://github.com/Netflix/genie/issues/8
-https://github.com/Netflix/genie/issues/14
+* Optional limits for stdout/stderr: https://github.com/Netflix/genie/issues/8
+* Updated Genie web console: https://github.com/Netflix/genie/issues/14
 
 Bug fixes:
-
-https://github.com/Netflix/genie/issues/5
-https://github.com/Netflix/genie/issues/11
-https://github.com/Netflix/genie/issues/12
+* File dependency copy failure: https://github.com/Netflix/genie/issues/5
+* Hadoop job failure if Hive/Pig properties aren't set: https://github.com/Netflix/genie/issues/11
+* NoSuchElementException if netflix.genie.job.max.stdout.size is not set: https://github.com/Netflix/genie/issues/12
 
 0.20
 ----
