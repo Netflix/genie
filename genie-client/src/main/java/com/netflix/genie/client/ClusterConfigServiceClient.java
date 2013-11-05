@@ -111,10 +111,10 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         ClusterConfigRequest request = new ClusterConfigRequest();
         request.setClusterConfig(clusterConfigElement);
 
-        ClusterConfigResponse hcr = executeRequest(Verb.POST, BASE_REST_URI,
+        ClusterConfigResponse ccr = executeRequest(Verb.POST, BASE_REST_URI,
                 null, null, request, ClusterConfigResponse.class);
 
-        if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
+        if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
             logger.error(msg);
             throw new CloudServiceException(
@@ -122,7 +122,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         // return the first (only) cluster config
-        return hcr.getClusterConfigs()[0];
+        return ccr.getClusterConfigs()[0];
     }
 
     /**
@@ -153,10 +153,10 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         ClusterConfigRequest request = new ClusterConfigRequest();
         request.setClusterConfig(clusterConfigElement);
 
-        ClusterConfigResponse hcr = executeRequest(Verb.PUT, BASE_REST_URI,
+        ClusterConfigResponse ccr = executeRequest(Verb.PUT, BASE_REST_URI,
                 clusterConfigId, null, request, ClusterConfigResponse.class);
 
-        if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
+        if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
             logger.error(msg);
             throw new CloudServiceException(
@@ -164,7 +164,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         // return the first (only) cluster config
-        return hcr.getClusterConfigs()[0];
+        return ccr.getClusterConfigs()[0];
     }
 
     /**
@@ -181,10 +181,10 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
                     "Missing required parameter: clusterConfigId");
         }
 
-        ClusterConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
+        ClusterConfigResponse ccr = executeRequest(Verb.GET, BASE_REST_URI,
                 clusterConfigId, null, null, ClusterConfigResponse.class);
 
-        if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
+        if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
             logger.error(msg);
             throw new CloudServiceException(
@@ -192,7 +192,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         // return the first (only) cluster config
-        return hcr.getClusterConfigs()[0];
+        return ccr.getClusterConfigs()[0];
     }
 
     /**
@@ -208,12 +208,12 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      */
     public ClusterConfigElement[] getClusterConfigs(
             MultivaluedMap<String, String> params) throws CloudServiceException {
-        ClusterConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
+        ClusterConfigResponse ccr = executeRequest(Verb.GET, BASE_REST_URI,
                 null, params, null, ClusterConfigResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
-        if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
+        if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
             logger.error(msg);
             throw new CloudServiceException(
@@ -221,7 +221,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         // if we get here, there are non-zero cluster config elements - return all
-        return hcr.getClusterConfigs();
+        return ccr.getClusterConfigs();
     }
 
     /**
@@ -240,10 +240,10 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
                     msg);
         }
 
-        ClusterConfigResponse hcr = executeRequest(Verb.DELETE, BASE_REST_URI,
+        ClusterConfigResponse ccr = executeRequest(Verb.DELETE, BASE_REST_URI,
                 clusterConfigId, null, null, ClusterConfigResponse.class);
 
-        if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
+        if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
             logger.error(msg);
             throw new CloudServiceException(
@@ -251,6 +251,6 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         // return the first (only) cluster config
-        return hcr.getClusterConfigs()[0];
+        return ccr.getClusterConfigs()[0];
     }
 }
