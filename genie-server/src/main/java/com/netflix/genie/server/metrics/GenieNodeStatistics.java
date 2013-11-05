@@ -209,7 +209,7 @@ public final class GenieNodeStatistics {
         logger.debug("called");
         successEmailCount.incrementAndGet();
     }
-    
+
     /**
      * Get number of  email that failed to be sent from this instance.
      *
