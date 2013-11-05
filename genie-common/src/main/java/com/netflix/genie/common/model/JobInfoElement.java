@@ -225,6 +225,13 @@ public class JobInfoElement implements Serializable {
     private boolean disableLogArchival;
 
     /**
+     * Email address of the user where he expects an email.
+     * This is sent once the genie job completes.
+     */
+    @Lob
+    private String userEmail;
+
+    /**
      * Get the cluster name where this job is run.
      *
      * @return cluster name
@@ -901,5 +908,24 @@ public class JobInfoElement implements Serializable {
      */
     public void setDisableLogArchival(boolean disableLogArchival) {
         this.disableLogArchival = disableLogArchival;
+    }
+
+    /**
+     * Get user email address set for the job.
+     *
+     * @return user email address
+     */
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    /**
+     * Set user Email address for the job.
+     *
+     * @param userEmail
+     *            user email address
+     */
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

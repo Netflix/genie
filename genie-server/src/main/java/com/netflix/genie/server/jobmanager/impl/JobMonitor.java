@@ -19,8 +19,19 @@
 package com.netflix.genie.server.jobmanager.impl;
 
 import java.io.File;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +45,7 @@ import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.util.NetUtil;
+
 
 /**
  * The monitor thread that gets launched for each job.
@@ -70,6 +82,9 @@ public class JobMonitor extends Thread {
     // whether this job has been terminated by the monitor thread
     private boolean terminated = false;
 
+    // Config Instance to get all properties
+    private AbstractConfiguration config;
+
     /**
      * Initialize this monitor thread with the process for the running job.
      *
@@ -82,14 +97,14 @@ public class JobMonitor extends Thread {
      */
     public JobMonitor(JobInfoElement ji, String workingDir, Process proc) {
         this.ji = ji;
+        this.config = ConfigurationManager.getConfigInstance();
         this.workingDir = workingDir;
         if (this.workingDir != null) {
             stdOutFile = new File(this.workingDir + File.separator + "stdout.log");
         }
         this.proc = proc;
         this.pm = new PersistenceManager<JobInfoElement>();
-        this.maxStdoutSize = ConfigurationManager.getConfigInstance()
-                .getLong("netflix.genie.job.max.stdout.size", null);
+        this.maxStdoutSize = config.getLong("netflix.genie.job.max.stdout.size", null);
     }
 
     /**
@@ -200,6 +215,8 @@ public class JobMonitor extends Thread {
      */
     @Override
     public void run() {
+        GenieNodeStatistics stats = GenieNodeStatistics.getInstance();
+
         // wait for process to complete
         int exitCode = waitForExit();
         ji.setExitCode(exitCode);
@@ -216,7 +233,7 @@ public class JobMonitor extends Thread {
             // only update status if not KILLED
             if ((dbJI.getStatus() != null)
                     && !dbJI.getStatus().equalsIgnoreCase("KILLED")) {
-                GenieNodeStatistics stats = GenieNodeStatistics.getInstance();
+
                 if (exitCode != SubprocessStatus.SUCCESS.code()) {
                     // all other failures except s3 log archival failure
                     logger.error("Failed to execute job, exit code: "
@@ -245,19 +262,160 @@ public class JobMonitor extends Thread {
                 // update the job status
                 pm.updateEntity(ji);
                 rwl.writeLock().unlock();
-                return;
             } else {
                 // if job status is killed, the kill thread will update status
                 logger.debug("Job has been killed - will not update DB: "
                         + ji.getJobID());
                 rwl.writeLock().unlock();
-                return;
             }
         } finally {
             // ensure that we always unlock
             if (rwl.writeLock().isHeldByCurrentThread()) {
                 rwl.writeLock().unlock();
             }
+        }
+
+        // Check if user email address is specified. If so
+        // send an email to user about job completion.
+        String emailTo = ji.getUserEmail();
+
+        if (emailTo != null) {
+            logger.info("User email address: " + emailTo);
+
+            if (sendEmail(emailTo)) {
+                // Email sent successfully. Update success email counter
+                stats.incrSuccessfulEmailCount();
+            } else {
+                // Failed to send email. Update email failed counter
+                logger.warn("Failed to send email.");
+                stats.incrFailedEmailCount();
+            }
+        }
+    }
+
+    /**
+     * Check the properties file to figure out if an email
+     * needs to be sent at the end of the job. If yes, get
+     * mail properties and try and send email about Job Status.
+     * @return 0 for success, -1 for failure
+     */
+    private boolean sendEmail(String emailTo) {
+        logger.debug("called");
+
+        if (!config.getBoolean("netflix.genie.server.mail.enable", false)) {
+            logger.warn("Email is disabled but user has specified an email address.");
+            return false;
+        }
+
+        // Sender's email ID
+        String fromEmail = config.getString("netflix.genie.server.mail.smpt.from", "no-reply-genie@geniehost.com");
+        logger.info("From email address to use to send email: "
+                 + fromEmail);
+
+        // Set the smtp server hostname. Use localhost as default
+        String smtpHost = config.getString("netflix.genie.server.mail.smtp.host", "localhost");
+        logger.debug("Email smtp server: "
+                         + smtpHost);
+
+        // Get system properties
+        Properties properties = new Properties();
+
+        // Setup mail server
+        properties.setProperty("mail.smtp.host", smtpHost);
+
+        // check whether authentication should be turned on
+        Authenticator auth = null;
+
+        if (config.getBoolean("netflix.genie.server.mail.smtp.auth", false)) {
+            logger.debug("Email Authentication Enabled");
+
+            properties.put("mail.smtp.starttls.enable", "true");
+            properties.put("mail.smtp.auth", "true");
+
+            String userName = config.getString("netflix.genie.server.mail.smtp.user");
+            String password = config.getString("netflix.genie.server.mail.smtp.password");
+
+            if ((userName == null) || (password == null)) {
+                logger.error("Authentication is enabled and username/password for smtp server is null");
+                return false;
+            }
+            logger.debug("Constructing authenticator object with username"
+                        + userName
+                        + " and password "
+                        + password);
+            auth = new SMTPAuthenticator(userName,
+                    password);
+        } else {
+            logger.debug("Email authentication not enabled.");
+        }
+
+        // Get the default Session object.
+        Session session = Session.getDefaultInstance(properties, auth);
+
+        try {
+            // Create a default MimeMessage object.
+            MimeMessage message = new MimeMessage(session);
+
+            // Set From: header field of the header.
+            message.setFrom(new InternetAddress(fromEmail));
+
+            // Set To: header field of the header.
+            message.addRecipient(Message.RecipientType.TO,
+                    new InternetAddress(emailTo));
+
+            // Set Subject: header field
+            message.setSubject("Genie Job "
+                         + ji.getJobName()
+                         + " completed with Status: "
+                         + ji.getStatus());
+
+            // Now set the actual message
+            String body = "Your Genie Job is complete\n\n"
+                         + "Job ID: "
+                         + ji.getJobID()
+                         + "\n"
+                         + "Job Name: "
+                         + ji.getJobName()
+                         + "\n"
+                         + "Status: "
+                         + ji.getStatus()
+                         + "\n"
+                         + "Status Message: "
+                         + ji.getStatusMsg()
+                         + "\n"
+                         + "Output Base URL: "
+                         + ji.getOutputURI()
+                         + "\n";
+
+            message.setText(body);
+
+            // Send message
+            Transport.send(message);
+            logger.info("Sent email message successfully....");
+            return true;
+        } catch (MessagingException mex) {
+            logger.error("Got exception while sending email", mex);
+            return false;
+        }
+    }
+
+    private class SMTPAuthenticator extends Authenticator {
+        private String username;
+        private String password;
+
+        /**
+         * Default constructor.
+         */
+        SMTPAuthenticator(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        /**
+         * Return a PasswordAuthentication object based on username/password.
+         */
+        public PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(username, password);
         }
     }
 }
