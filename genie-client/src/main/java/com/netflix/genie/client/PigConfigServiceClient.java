@@ -32,7 +32,6 @@ import com.netflix.genie.common.model.PigConfigElement;
 import com.netflix.genie.common.model.Types;
 
 import com.netflix.niws.client.http.HttpClientRequest.Verb;
-import com.netflix.niws.client.http.HttpClientResponse;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -60,18 +59,6 @@ public final class PigConfigServiceClient extends BaseGenieClient {
      */
     private PigConfigServiceClient() throws IOException {
         super();
-    }
-
-    /**
-     * Converts a response to a PigConfigResponse object.
-     *
-     * @param response
-     *            generic response from REST service
-     * @return extracted pig config response
-     */
-    private PigConfigResponse responseToPigConfig(HttpClientResponse response)
-            throws CloudServiceException {
-        return extractEntityFromClientResponse(response, PigConfigResponse.class);
     }
 
     /**
@@ -123,9 +110,8 @@ public final class PigConfigServiceClient extends BaseGenieClient {
         PigConfigRequest request = new PigConfigRequest();
         request.setPigConfig(pigConfigElement);
 
-        HttpClientResponse response = executeRequest(Verb.POST, BASE_REST_URI,
-                null, null, request);
-        PigConfigResponse hcr = responseToPigConfig(response);
+        PigConfigResponse hcr = executeRequest(Verb.POST, BASE_REST_URI,
+                null, null, request, PigConfigResponse.class);
 
         if ((hcr.getPigConfigs() == null) || (hcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";
@@ -166,9 +152,8 @@ public final class PigConfigServiceClient extends BaseGenieClient {
         PigConfigRequest request = new PigConfigRequest();
         request.setPigConfig(pigConfigElement);
 
-        HttpClientResponse response = executeRequest(Verb.PUT, BASE_REST_URI,
-                pigConfigId, null, request);
-        PigConfigResponse hcr = responseToPigConfig(response);
+        PigConfigResponse hcr = executeRequest(Verb.PUT, BASE_REST_URI,
+                pigConfigId, null, request, PigConfigResponse.class);
 
         if ((hcr.getPigConfigs() == null) || (hcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";
@@ -195,9 +180,8 @@ public final class PigConfigServiceClient extends BaseGenieClient {
                     "Missing required parameter: pigConfigId");
         }
 
-        HttpClientResponse response = executeRequest(Verb.GET, BASE_REST_URI,
-                pigConfigId, null, null);
-        PigConfigResponse hcr = responseToPigConfig(response);
+        PigConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
+                pigConfigId, null, null, PigConfigResponse.class);
 
         if ((hcr.getPigConfigs() == null) || (hcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";
@@ -223,9 +207,8 @@ public final class PigConfigServiceClient extends BaseGenieClient {
      */
     public PigConfigElement[] getPigConfigs(
             MultivaluedMap<String, String> params) throws CloudServiceException {
-        HttpClientResponse response = executeRequest(Verb.GET, BASE_REST_URI,
-                null, params, null);
-        PigConfigResponse hcr = responseToPigConfig(response);
+        PigConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
+                null, params, null, PigConfigResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
@@ -256,9 +239,8 @@ public final class PigConfigServiceClient extends BaseGenieClient {
                     msg);
         }
 
-        HttpClientResponse response = executeRequest(Verb.DELETE, BASE_REST_URI,
-                pigConfigId, null, null);
-        PigConfigResponse hcr = responseToPigConfig(response);
+        PigConfigResponse hcr = executeRequest(Verb.DELETE, BASE_REST_URI,
+                pigConfigId, null, null, PigConfigResponse.class);
 
         if ((hcr.getPigConfigs() == null) || (hcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";

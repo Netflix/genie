@@ -31,7 +31,6 @@ import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.model.ClusterConfigElement;
 
 import com.netflix.niws.client.http.HttpClientRequest.Verb;
-import com.netflix.niws.client.http.HttpClientResponse;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -59,18 +58,6 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      */
     private ClusterConfigServiceClient() throws IOException {
         super();
-    }
-
-    /**
-     * Converts a response to a ClusterConfigResponse object.
-     *
-     * @param response
-     *            generic response from REST service
-     * @return extracted cluster config response
-     */
-    private ClusterConfigResponse responseToClusterConfig(HttpClientResponse response)
-            throws CloudServiceException {
-        return extractEntityFromClientResponse(response, ClusterConfigResponse.class);
     }
 
     /**
@@ -124,9 +111,8 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         ClusterConfigRequest request = new ClusterConfigRequest();
         request.setClusterConfig(clusterConfigElement);
 
-        HttpClientResponse response = executeRequest(Verb.POST, BASE_REST_URI,
-                null, null, request);
-        ClusterConfigResponse hcr = responseToClusterConfig(response);
+        ClusterConfigResponse hcr = executeRequest(Verb.POST, BASE_REST_URI,
+                null, null, request, ClusterConfigResponse.class);
 
         if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
@@ -167,9 +153,8 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         ClusterConfigRequest request = new ClusterConfigRequest();
         request.setClusterConfig(clusterConfigElement);
 
-        HttpClientResponse response = executeRequest(Verb.PUT, BASE_REST_URI,
-                clusterConfigId, null, request);
-        ClusterConfigResponse hcr = responseToClusterConfig(response);
+        ClusterConfigResponse hcr = executeRequest(Verb.PUT, BASE_REST_URI,
+                clusterConfigId, null, request, ClusterConfigResponse.class);
 
         if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
@@ -196,9 +181,8 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
                     "Missing required parameter: clusterConfigId");
         }
 
-        HttpClientResponse response = executeRequest(Verb.GET, BASE_REST_URI,
-                clusterConfigId, null, null);
-        ClusterConfigResponse hcr = responseToClusterConfig(response);
+        ClusterConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
+                clusterConfigId, null, null, ClusterConfigResponse.class);
 
         if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
@@ -224,9 +208,8 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      */
     public ClusterConfigElement[] getClusterConfigs(
             MultivaluedMap<String, String> params) throws CloudServiceException {
-        HttpClientResponse response = executeRequest(Verb.GET, BASE_REST_URI,
-                null, params, null);
-        ClusterConfigResponse hcr = responseToClusterConfig(response);
+        ClusterConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
+                null, params, null, ClusterConfigResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
@@ -257,9 +240,8 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
                     msg);
         }
 
-        HttpClientResponse response = executeRequest(Verb.DELETE, BASE_REST_URI,
-                clusterConfigId, null, null);
-        ClusterConfigResponse hcr = responseToClusterConfig(response);
+        ClusterConfigResponse hcr = executeRequest(Verb.DELETE, BASE_REST_URI,
+                clusterConfigId, null, null, ClusterConfigResponse.class);
 
         if ((hcr.getClusterConfigs() == null) || (hcr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";

@@ -32,7 +32,6 @@ import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
 
 import com.netflix.niws.client.http.HttpClientRequest.Verb;
-import com.netflix.niws.client.http.HttpClientResponse;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -60,31 +59,6 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      */
     private ExecutionServiceClient() throws IOException {
         super();
-    }
-
-    /**
-     * Converts a response to a JobInfoResponse object.
-     *
-     * @param response
-     *            generic response from REST service
-     * @return extracted jobInfo response
-     */
-    private JobInfoResponse responseToJobInfo(HttpClientResponse response)
-            throws CloudServiceException {
-        return extractEntityFromClientResponse(response, JobInfoResponse.class);
-    }
-
-    /**
-     * Converts a response to a JobStatusResponse object.
-     *
-     * @param response
-     *            generic response from REST service
-     * @return extracted job status response
-     */
-    private JobStatusResponse responseToJobStatus(HttpClientResponse response)
-            throws CloudServiceException {
-        return extractEntityFromClientResponse(response,
-                JobStatusResponse.class);
     }
 
     /**
@@ -169,9 +143,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         JobInfoRequest request = new JobInfoRequest();
         request.setJobInfo(jobInfo);
 
-        HttpClientResponse response = executeRequest(Verb.POST, BASE_REST_URI,
-                null, null, request);
-        JobInfoResponse ji = responseToJobInfo(response);
+        JobInfoResponse ji = executeRequest(Verb.POST, BASE_REST_URI,
+                null, null, request, JobInfoResponse.class);
 
         if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
             String msg = "Unable to parse job info from response";
@@ -198,9 +171,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                     "Missing required parameter: jobID");
         }
 
-        HttpClientResponse response = executeRequest(Verb.GET, BASE_REST_URI,
-                jobID, null, null);
-        JobInfoResponse ji = responseToJobInfo(response);
+        JobInfoResponse ji = executeRequest(Verb.GET, BASE_REST_URI,
+                jobID, null, null, JobInfoResponse.class);
 
         if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
             String msg = "Unable to parse job info from response";
@@ -226,9 +198,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      */
     public JobInfoElement[] getJobs(MultivaluedMap<String, String> params)
             throws CloudServiceException {
-        HttpClientResponse response = executeRequest(Verb.GET, BASE_REST_URI, null,
-                params, null);
-        JobInfoResponse ji = responseToJobInfo(response);
+        JobInfoResponse ji = executeRequest(Verb.GET, BASE_REST_URI, null,
+                params, null, JobInfoResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
@@ -328,9 +299,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
 
         // this assumes that the service will forward the delete to the right
         // instance
-        HttpClientResponse response = executeRequest(Verb.DELETE, BASE_REST_URI,
-                jobID, null, null);
-        JobStatusResponse js = responseToJobStatus(response);
+        JobStatusResponse js = executeRequest(Verb.DELETE, BASE_REST_URI,
+                jobID, null, null, JobStatusResponse.class);
         // return the response
         return js;
     }

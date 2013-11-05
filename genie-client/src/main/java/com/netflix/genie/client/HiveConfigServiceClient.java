@@ -32,7 +32,6 @@ import com.netflix.genie.common.model.HiveConfigElement;
 import com.netflix.genie.common.model.Types;
 
 import com.netflix.niws.client.http.HttpClientRequest.Verb;
-import com.netflix.niws.client.http.HttpClientResponse;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -60,18 +59,6 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
      */
     private HiveConfigServiceClient() throws IOException {
         super();
-    }
-
-    /**
-     * Converts a response to a HiveConfigResponse object.
-     *
-     * @param response
-     *            generic response from REST service
-     * @return extracted hive config response
-     */
-    private HiveConfigResponse responseToHiveConfig(HttpClientResponse response)
-            throws CloudServiceException {
-        return extractEntityFromClientResponse(response, HiveConfigResponse.class);
     }
 
     /**
@@ -123,9 +110,8 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
         HiveConfigRequest request = new HiveConfigRequest();
         request.setHiveConfig(hiveConfigElement);
 
-        HttpClientResponse response = executeRequest(Verb.POST, BASE_REST_URI,
-                null, null, request);
-        HiveConfigResponse hcr = responseToHiveConfig(response);
+        HiveConfigResponse hcr = executeRequest(Verb.POST, BASE_REST_URI,
+                null, null, request, HiveConfigResponse.class);
 
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
@@ -166,9 +152,8 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
         HiveConfigRequest request = new HiveConfigRequest();
         request.setHiveConfig(hiveConfigElement);
 
-        HttpClientResponse response = executeRequest(Verb.PUT, BASE_REST_URI,
-                hiveConfigId, null, request);
-        HiveConfigResponse hcr = responseToHiveConfig(response);
+        HiveConfigResponse hcr = executeRequest(Verb.PUT, BASE_REST_URI,
+                hiveConfigId, null, request, HiveConfigResponse.class);
 
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
@@ -195,9 +180,8 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
                     "Missing required parameter: hiveConfigId");
         }
 
-        HttpClientResponse response = executeRequest(Verb.GET, BASE_REST_URI,
-                hiveConfigId, null, null);
-        HiveConfigResponse hcr = responseToHiveConfig(response);
+        HiveConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
+                hiveConfigId, null, null, HiveConfigResponse.class);
 
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
@@ -223,9 +207,8 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
      */
     public HiveConfigElement[] getHiveConfigs(
             MultivaluedMap<String, String> params) throws CloudServiceException {
-        HttpClientResponse response = executeRequest(Verb.GET, BASE_REST_URI,
-                null, params, null);
-        HiveConfigResponse hcr = responseToHiveConfig(response);
+        HiveConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
+                null, params, null, HiveConfigResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
@@ -256,9 +239,8 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
                     msg);
         }
 
-        HttpClientResponse response = executeRequest(Verb.DELETE, BASE_REST_URI,
-                hiveConfigId, null, null);
-        HiveConfigResponse hcr = responseToHiveConfig(response);
+        HiveConfigResponse hcr = executeRequest(Verb.DELETE, BASE_REST_URI,
+                hiveConfigId, null, null, HiveConfigResponse.class);
 
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
