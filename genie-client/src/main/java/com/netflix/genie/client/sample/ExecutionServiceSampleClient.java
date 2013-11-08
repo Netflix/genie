@@ -59,7 +59,7 @@ public final class ExecutionServiceSampleClient {
 
         System.out.println("Initializing list of Genie servers");
         ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
-                "ec2-54-226-120-107.compute-1.amazonaws.com:7001");
+                "localhost:7001");
 
         System.out.println("Initializing ExecutionServiceClient");
         ExecutionServiceClient client = ExecutionServiceClient.getInstance();
