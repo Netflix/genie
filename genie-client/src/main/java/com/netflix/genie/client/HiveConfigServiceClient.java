@@ -31,9 +31,9 @@ import com.netflix.genie.common.messages.HiveConfigResponse;
 import com.netflix.genie.common.model.HiveConfigElement;
 import com.netflix.genie.common.model.Types;
 
-import com.netflix.niws.client.http.HttpClientRequest.Verb;
+import com.netflix.client.http.HttpRequest.Verb;
 
-import javax.ws.rs.core.MultivaluedMap;
+import com.google.common.collect.Multimap;
 
 /**
  * Singleton class, which acts as the client library for the Hive Config
@@ -206,7 +206,7 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public HiveConfigElement[] getHiveConfigs(
-            MultivaluedMap<String, String> params) throws CloudServiceException {
+            Multimap<String, String> params) throws CloudServiceException {
         HiveConfigResponse hcr = executeRequest(Verb.GET, BASE_REST_URI,
                 null, params, null, HiveConfigResponse.class);
 

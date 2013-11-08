@@ -18,11 +18,12 @@
 
 package com.netflix.genie.client.sample;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.HiveConfigServiceClient;
 import com.netflix.genie.common.model.HiveConfigElement;
 import com.netflix.genie.common.model.Types;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
@@ -67,9 +68,9 @@ public final class HiveConfigServiceSampleClient {
         System.out.println("Hive config created with id: " + id);
 
         System.out.println("Getting hiveConfigs using specified filter criteria");
-        MultivaluedMapImpl params = new MultivaluedMapImpl();
-        params.add("name", name);
-        params.add("limit", 3);
+        Multimap<String, String> params = ArrayListMultimap.create();
+        params.put("name", name);
+        params.put("limit", "3");
         HiveConfigElement[] responses = client.getHiveConfigs(params);
         for (HiveConfigElement hce : responses) {
             System.out.println("Hive Configs: {id, status, updateTime} - {"

@@ -30,9 +30,9 @@ import com.netflix.genie.common.messages.ClusterConfigRequest;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.model.ClusterConfigElement;
 
-import com.netflix.niws.client.http.HttpClientRequest.Verb;
+import com.netflix.client.http.HttpRequest.Verb;
 
-import javax.ws.rs.core.MultivaluedMap;
+import com.google.common.collect.Multimap;
 
 /**
  * Singleton class, which acts as the client library for the Cluster Config
@@ -207,7 +207,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public ClusterConfigElement[] getClusterConfigs(
-            MultivaluedMap<String, String> params) throws CloudServiceException {
+            Multimap<String, String> params) throws CloudServiceException {
         ClusterConfigResponse ccr = executeRequest(Verb.GET, BASE_REST_URI,
                 null, params, null, ClusterConfigResponse.class);
 

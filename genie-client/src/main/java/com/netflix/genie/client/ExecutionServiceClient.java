@@ -31,9 +31,9 @@ import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
 
-import com.netflix.niws.client.http.HttpClientRequest.Verb;
+import com.netflix.client.http.HttpRequest.Verb;
 
-import javax.ws.rs.core.MultivaluedMap;
+import com.google.common.collect.Multimap;
 
 /**
  * Singleton class, which acts as the client library for the Genie Execution
@@ -196,7 +196,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @return array of jobInfos that match the filter
      * @throws CloudServiceException
      */
-    public JobInfoElement[] getJobs(MultivaluedMap<String, String> params)
+    public JobInfoElement[] getJobs(Multimap<String, String> params)
             throws CloudServiceException {
         JobInfoResponse ji = executeRequest(Verb.GET, BASE_REST_URI, null,
                 params, null, JobInfoResponse.class);

@@ -46,7 +46,7 @@ import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.services.HiveConfigService;
 import com.netflix.genie.server.services.PigConfigService;
-import com.netflix.niws.client.http.HttpClientRequest.Verb;
+import com.netflix.client.http.HttpRequest.Verb;
 
 /**
  * OpenJPA based implementation of the ClusterConfigService.

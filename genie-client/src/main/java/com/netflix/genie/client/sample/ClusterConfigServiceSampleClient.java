@@ -18,13 +18,14 @@
 
 package com.netflix.genie.client.sample;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ClusterConfigServiceClient;
 import com.netflix.genie.client.HiveConfigServiceClient;
 import com.netflix.genie.common.model.ClusterConfigElement;
 import com.netflix.genie.common.model.HiveConfigElement;
 import com.netflix.genie.common.model.Types;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
@@ -87,11 +88,11 @@ public final class ClusterConfigServiceSampleClient {
         System.out.println("Cluster config created with id: " + id);
 
         System.out.println("Getting clusterConfigs using specified filter criteria");
-        MultivaluedMapImpl params = new MultivaluedMapImpl();
-        params.add("name", name);
-        params.add("adHoc", "false");
-        params.add("test", "true");
-        params.add("limit", 3);
+        Multimap<String, String> params = ArrayListMultimap.create();
+        params.put("name", name);
+        params.put("adHoc", "false");
+        params.put("test", "true");
+        params.put("limit", "3");
         ClusterConfigElement[] responses = client.getClusterConfigs(params);
         for (ClusterConfigElement hce : responses) {
             System.out.println("Cluster Configs: {id, status, updateTime} - {"
