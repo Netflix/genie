@@ -24,6 +24,8 @@ import java.io.PrintWriter;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
 import com.netflix.genie.common.messages.JobStatusResponse;
@@ -33,8 +35,6 @@ import com.netflix.genie.common.model.Types.Configuration;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.JobType;
 import com.netflix.genie.common.model.Types.Schedule;
-
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
@@ -66,11 +66,11 @@ public final class ExecutionServiceSampleClient {
 
         String userName = "genietest";
         System.out.println("Getting jobInfos using specified filter criteria");
-        MultivaluedMapImpl params = new MultivaluedMapImpl();
-        params.add("userName", userName);
-        params.add("jobType", JobType.HIVE.name());
-        params.add("status", JobStatus.FAILED.name());
-        params.add("limit", 3);
+        Multimap<String, String> params = ArrayListMultimap.create();
+        params.put("userName", userName);
+        params.put("jobType", JobType.HIVE.name());
+        params.put("status", JobStatus.FAILED.name());
+        params.put("limit", "3");
         JobInfoElement[] responses = client.getJobs(params);
         for (JobInfoElement ji : responses) {
             System.out.println("Job Info: {id, status, finishTime} - {"

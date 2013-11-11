@@ -31,9 +31,9 @@ import com.netflix.genie.common.messages.PigConfigResponse;
 import com.netflix.genie.common.model.PigConfigElement;
 import com.netflix.genie.common.model.Types;
 
-import com.netflix.niws.client.http.HttpClientRequest.Verb;
+import com.netflix.client.http.HttpRequest.Verb;
 
-import javax.ws.rs.core.MultivaluedMap;
+import com.google.common.collect.Multimap;
 
 /**
  * Singleton class, which acts as the client library for the Pig Config
@@ -206,7 +206,7 @@ public final class PigConfigServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public PigConfigElement[] getPigConfigs(
-            MultivaluedMap<String, String> params) throws CloudServiceException {
+            Multimap<String, String> params) throws CloudServiceException {
         PigConfigResponse pcr = executeRequest(Verb.GET, BASE_REST_URI,
                 null, params, null, PigConfigResponse.class);
 

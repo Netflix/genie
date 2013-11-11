@@ -36,7 +36,7 @@ import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.PigConfigService;
-import com.netflix.niws.client.http.HttpClientRequest.Verb;
+import com.netflix.client.http.HttpRequest.Verb;
 
 /**
  * OpenJPA based implementation of the PigConfigService.

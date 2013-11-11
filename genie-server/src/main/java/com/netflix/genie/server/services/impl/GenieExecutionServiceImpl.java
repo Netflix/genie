@@ -50,11 +50,11 @@ import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.NetUtil;
-import com.netflix.niws.client.http.HttpClientRequest;
-import com.netflix.niws.client.http.HttpClientRequest.Verb;
-import com.netflix.niws.client.http.HttpClientResponse;
+
+import com.netflix.client.http.HttpRequest;
+import com.netflix.client.http.HttpRequest.Verb;
+import com.netflix.client.http.HttpResponse;
 import com.netflix.niws.client.http.RestClient;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * Implementation of the Genie Execution Service API that uses a local job
@@ -647,17 +647,14 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     private <T extends BaseResponse> T executeRequest(Verb method,
             String restURI, BaseRequest request, Class<T> responseClass)
             throws CloudServiceException {
-        HttpClientResponse clientResponse = null;
+        HttpResponse clientResponse = null;
         T response;
         try {
-            MultivaluedMapImpl headers = new MultivaluedMapImpl();
-            headers.add("Accept", "application/json");
-
             RestClient genieClient = (RestClient) ClientFactory
                     .getNamedClient("genie");
-            HttpClientRequest req = HttpClientRequest.newBuilder()
-                    .setVerb(method).setHeaders(headers)
-                    .setUri(new URI(restURI)).setEntity(request).build();
+            HttpRequest req = HttpRequest.newBuilder()
+                    .verb(method).header("Accept", "application/json")
+                    .uri(new URI(restURI)).entity(request).build();
             clientResponse = genieClient.execute(req);
             if (clientResponse != null) {
                 int status = clientResponse.getStatus();
@@ -681,8 +678,8 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         } finally {
             if (clientResponse != null) {
-                clientResponse.releaseResources(); // this is really really
-                                                   // important
+                // this is really really important
+                clientResponse.close();
             }
         }
     }
