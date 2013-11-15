@@ -163,10 +163,10 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             // construct query
             ClauseBuilder criteria = new ClauseBuilder(ClauseBuilder.AND);
             if ((id != null) && (!id.isEmpty())) {
-                criteria.append("id = '" + id + "'");
+                criteria.append("id like '" + id + "'");
             }
             if ((name != null) && (!name.isEmpty())) {
-                criteria.append("name = '" + name + "'");
+                criteria.append("name like '" + name + "'");
             }
             if ((jobType != null) && (Types.JobType.parse(jobType) == null)) {
                 ccr = new ClusterConfigResponse(new CloudServiceException(

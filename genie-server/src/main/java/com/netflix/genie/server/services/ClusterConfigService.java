@@ -45,9 +45,9 @@ public interface ClusterConfigService {
      * Get the cluster config by various params.
      *
      * @param id
-     *            unique id for cluster
+     *            unique id for cluster (can be a pattern)
      * @param name
-     *            name of cluster
+     *            name of cluster (can be a pattern)
      * @param config
      *            configuration supported
      * @param schedule

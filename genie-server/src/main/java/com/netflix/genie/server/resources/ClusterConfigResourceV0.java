@@ -107,14 +107,14 @@ public class ClusterConfigResourceV0 {
     }
 
     /**
-     * Get cluster config based on user params If empty strings are passed for
+     * Get cluster config based on user params. If empty strings are passed for
      * prod, test, unitTest, adHoc, sla, bonus and hasStats, they are treated as
      * nulls (not false).
      *
      * @param id
-     *            unique id for cluster
+     *            unique id for cluster (can be a pattern)
      * @param name
-     *            cluster name
+     *            cluster name (can be a pattern)
      * @param prod
      *            if cluster supports prod jobs
      * @param test

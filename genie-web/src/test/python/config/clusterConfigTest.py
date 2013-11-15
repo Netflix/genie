@@ -32,7 +32,9 @@ hiveServiceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/config/h
 
 # use a global id for all tests
 id='unittest_clusterconfig_id'
+id_pattern='%clusterconfig%'
 name='unittest_clusterconfig_name'
+name_prefix='unittest%'
 
 hive_id='unittest_hiveconfig_id'
 hive_name='unittest_hiveconfig_name'
@@ -115,6 +117,13 @@ class ClusterConfigTestCase(unittest.TestCase):
         response = restclient.get(serviceUrl=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get element by id: " + id
+
+    def testGetByIdPattern(self):
+        print "HTTP GET: getting elements by id"
+        params = '?id=' + id_pattern
+        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        print response.code
+        assert response.code == 200, "can't get element by id: " + id
         
     def testGetByName(self):
         print "HTTP GET: getting elements by name"        
@@ -123,6 +132,13 @@ class ClusterConfigTestCase(unittest.TestCase):
         print response.code
         assert response.code == 200, "can't get element by name: " + name
 
+    def testGetByClusterPrefix(self):
+        print "HTTP GET: getting elements by name"        
+        params = '?name=' + name_prefix
+        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        print response.code
+        assert response.code == 200, "can't get element by name: " + name
+        
     def testGetByUpdateTime(self):
         print "HTTP GET: getting elements by update time"
         minUpdateTime = 0
