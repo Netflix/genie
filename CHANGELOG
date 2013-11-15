@@ -1,6 +1,7 @@
 0.23-SNAPSHOT
 -------------
 * Upgraded ribbon client: https://github.com/Netflix/genie/issues/45
+* Patterns for cluster name/id searches: https://github.com/Netflix/genie/issues/46
 
 0.22
 ----
