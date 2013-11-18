@@ -350,7 +350,7 @@ public class JobMonitor extends Thread {
         }
 
         // Get the default Session object.
-        Session session = Session.getDefaultInstance(properties, auth);
+        Session session = Session.getInstance(properties, auth);
 
         try {
             // Create a default MimeMessage object.
