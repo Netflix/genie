@@ -135,13 +135,15 @@ define([
             var status   = _.where(formArray, {'name': 'status'})[0].value;
             var jobID    = _.where(formArray, {'name': 'jobID'})[0].value;
             var jobName  = _.where(formArray, {'name': 'jobName'})[0].value;
+            var clusterName  = _.where(formArray, {'name': 'clusterName'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
             $.ajax({
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v0/jobs',
-                data: {limit: limit, userName: userName, jobType: jobType, status: status, jobID: jobID, jobName: jobName}
+                data: {limit: limit, userName: userName, jobType: jobType, status: status, 
+                    jobID: jobID, jobName: jobName, clusterName:clusterName}
             }).done(function(data) {
                 self.searchResults([]);
                 self.status('results');
