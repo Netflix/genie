@@ -1,6 +1,6 @@
 0.24-SNAPSHOT
 -------------
-* Job search using cluster name for Genie console: https://github.com/Netflix/genie/issues/51
+* Job search using cluster name and ID for web console: https://github.com/Netflix/genie/issues/51
 
 
 0.23
