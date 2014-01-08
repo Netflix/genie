@@ -29,8 +29,8 @@ from eureka import EurekaClient
 if __name__ == "__main__":
     upHosts = []
     try:
-        instanceUP = EurekaClient().getUPInstances()
-        for i in instanceUP:
+        instancesUP = EurekaClient().getUPInstances()
+        for i in instancesUP:
             upHosts.append(i['hostName'])
     except AssertionError, e:
         print e
@@ -59,7 +59,7 @@ if __name__ == "__main__":
         jobInfo = [jobInfo]
     
     upJobs=0
-    oosJobs=0
+    nonUpJobs=0
     env = os.getenv('GENIE_PRINT_ALL_JOBS')
     printAllJobs = True
     if env is not None and env.lower() == 'false':
@@ -71,12 +71,12 @@ if __name__ == "__main__":
             if printAllJobs:
                 print "Job on UP instance: ", j['killURI']
         else:
-            oosJobs += 1
-            print "Job on OOS instance: ", j['killURI']
+            nonUpJobs += 1
+            print "Job on non-UP instance: ", j['killURI']
     print
             
-    print "Number of jobs running on OOS/DOWN instances:", oosJobs
     print "Number of jobs running on UP instances:", upJobs
+    print "Number of jobs running on non-UP instances:", nonUpJobs
     
 
     
