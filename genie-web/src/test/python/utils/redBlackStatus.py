@@ -27,11 +27,11 @@ import pprint
 from eureka import EurekaClient
 
 if __name__ == "__main__":
-    oosHosts = []
+    upHosts = []
     try:
-        instancesOOS = EurekaClient().getOOSInstances()
-        for i in instancesOOS:
-            oosHosts.append(i['hostName'])
+        instanceUP = EurekaClient().getUPInstances()
+        for i in instanceUP:
+            upHosts.append(i['hostName'])
     except AssertionError, e:
         print e
         print
@@ -66,16 +66,16 @@ if __name__ == "__main__":
         printAllJobs = False       
     for j in jobInfo:
         host = j['outputURI'].split("/")[2].split(":")[0]
-        if host in oosHosts:
-            oosJobs += 1
-            print "Job on OOS instance: ", j['killURI']
-        else:
+        if host in upHosts:
             upJobs += 1
             if printAllJobs:
                 print "Job on UP instance: ", j['killURI']
+        else:
+            oosJobs += 1
+            print "Job on OOS instance: ", j['killURI']
     print
             
-    print "Number of jobs running on OOS instances:", oosJobs
+    print "Number of jobs running on OOS/DOWN instances:", oosJobs
     print "Number of jobs running on UP instances:", upJobs
     
 
