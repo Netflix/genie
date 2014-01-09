@@ -102,6 +102,10 @@ class EurekaClient(object):
     def getOOSInstances(self, appName=None):
         return self._getInstances(appName, status='OUT_OF_SERVICE')
 
+    # Use Eureka to find instances that are UP
+    def getUPInstances(self, appName=None):
+        return self._getInstances(appName, status='UP')
+
 if __name__ == "__main__":
     
     client = EurekaClient()

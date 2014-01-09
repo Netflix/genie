@@ -1,7 +1,8 @@
 0.24-SNAPSHOT
 -------------
+Enhancements:
 * Job search using cluster name and ID for web console: https://github.com/Netflix/genie/issues/51
-
+* Getting rid of jersey-bundle dependency: https://github.com/Netflix/genie/issues/52
 
 0.23
 ----
