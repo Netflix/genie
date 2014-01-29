@@ -83,7 +83,7 @@ public class ClusterConfigElement implements Serializable {
 
     @Basic
     private String s3YarnSiteXml;
-    
+
     @Basic
     private String prodHiveConfigId;
 
@@ -344,7 +344,7 @@ public class ClusterConfigElement implements Serializable {
     public String getS3YarnSiteXml() {
         return s3YarnSiteXml;
     }
-    
+
     /**
      * Set location of yarn-site.xml for this cluster.
      *
@@ -354,7 +354,7 @@ public class ClusterConfigElement implements Serializable {
     public void setS3YarnSiteXml(String s3YarnSiteXml) {
         this.s3YarnSiteXml = s3YarnSiteXml;
     }
-    
+
     /**
      * Get user who last updated this cluster config.
      *
@@ -363,7 +363,7 @@ public class ClusterConfigElement implements Serializable {
     public String getUser() {
         return user;
     }
-    
+
     /**
      * Set user name to update this cluster config.
      *
@@ -654,20 +654,20 @@ public class ClusterConfigElement implements Serializable {
         if (s3CoreSiteXml != null) {
             csv.append(s3CoreSiteXml);
         }
-        
+
         if (s3MapredSiteXml != null) {
-        	csv.append(",");
-        	csv.append(s3MapredSiteXml);
+            csv.append(",");
+            csv.append(s3MapredSiteXml);
         }
-        
+
         if (s3HdfsSiteXml != null) {
-        	csv.append(",");
-        	csv.append(s3HdfsSiteXml);
+            csv.append(",");
+            csv.append(s3HdfsSiteXml);
         }
-        
+
         if (s3YarnSiteXml != null) {
-        	csv.append(",");
-        	csv.append(s3YarnSiteXml);
+            csv.append(",");
+            csv.append(s3YarnSiteXml);
         }
 
         return csv.toString();
