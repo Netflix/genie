@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * Representation of the state of the cluster config object.
  *
  * @author skrishnan
+ * @author amsharma
  */
 @Entity
 @Table(schema = "genie")
@@ -80,6 +81,9 @@ public class ClusterConfigElement implements Serializable {
     @Basic
     private String s3HdfsSiteXml;
 
+    @Basic
+    private String s3YarnSiteXml;
+    
     @Basic
     private String prodHiveConfigId;
 
@@ -333,6 +337,25 @@ public class ClusterConfigElement implements Serializable {
     }
 
     /**
+     * Get location of yarn-site.xml for this cluster.
+     *
+     * @return s3YarnSiteXml s3 (or hdfs) location
+     */
+    public String getS3YarnSiteXml() {
+        return s3YarnSiteXml;
+    }
+    
+    /**
+     * Set location of yarn-site.xml for this cluster.
+     *
+     * @param s3YarnSiteXml
+     *            s3 (or hdfs) location
+     */
+    public void setS3YarnSiteXml(String s3YarnSiteXml) {
+        this.s3YarnSiteXml = s3YarnSiteXml;
+    }
+    
+    /**
      * Get user who last updated this cluster config.
      *
      * @return user
@@ -340,7 +363,7 @@ public class ClusterConfigElement implements Serializable {
     public String getUser() {
         return user;
     }
-
+    
     /**
      * Set user name to update this cluster config.
      *
@@ -631,15 +654,20 @@ public class ClusterConfigElement implements Serializable {
         if (s3CoreSiteXml != null) {
             csv.append(s3CoreSiteXml);
         }
-        csv.append(",");
-
+        
         if (s3MapredSiteXml != null) {
-            csv.append(s3MapredSiteXml);
+        	csv.append(",");
+        	csv.append(s3MapredSiteXml);
         }
-        csv.append(",");
-
+        
         if (s3HdfsSiteXml != null) {
-            csv.append(s3HdfsSiteXml);
+        	csv.append(",");
+        	csv.append(s3HdfsSiteXml);
+        }
+        
+        if (s3YarnSiteXml != null) {
+        	csv.append(",");
+        	csv.append(s3YarnSiteXml);
         }
 
         return csv.toString();

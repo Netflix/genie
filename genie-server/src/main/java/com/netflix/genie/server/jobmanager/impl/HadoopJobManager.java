@@ -474,6 +474,7 @@ public class HadoopJobManager implements JobManager {
         // environment variable
         if (cluster.getHadoopVersion() != null) {
             String hadoopVersion = cluster.getHadoopVersion();
+            logger.debug("Hadoop Version of the cluster: "+ hadoopVersion);
 
             // try exact version first
             String hadoopHome = ConfigurationManager.getConfigInstance()

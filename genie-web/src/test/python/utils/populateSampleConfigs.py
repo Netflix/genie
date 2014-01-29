@@ -102,6 +102,7 @@ def populateCluster():
         <s3MapredSiteXml>file:///PATH/TO/MAPRED-SITE.XML</s3MapredSiteXml>
         <s3CoreSiteXml>file:///PATH/TO/CORE-SITE.XML</s3CoreSiteXml>
         <s3HdfsSiteXml>file:///PATH/TO/HDFS-SITE.XML</s3HdfsSiteXml>
+        <s3YarnSiteXml>file:///PATH/TO/YARN-SITE.XML</s3YarnSiteXml>
         <user>testuser</user>
         <testHiveConfigId>hiveconf-testhive-sample</testHiveConfigId>
         <prodHiveConfigId>hiveconf-prodhive-sample</prodHiveConfigId>
