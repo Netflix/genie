@@ -27,6 +27,7 @@ define([
         self.s3CoreSiteXml    = ko.observable();
         self.s3HdfsSiteXml    = ko.observable();
         self.s3MapredSiteXml  = ko.observable();
+        self.s3YarnSiteXml    = ko.observable();
         self.sla              = ko.observable();
         self.status           = ko.observable();
         self.test             = ko.observable();

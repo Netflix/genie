@@ -38,7 +38,8 @@ public class TestClusterConfigElement {
         cc.setS3CoreSiteXml("core");
         cc.setS3MapredSiteXml("mapred");
         cc.setS3HdfsSiteXml("hdfs");
-        Assert.assertEquals(cc.getS3SiteXmlsAsCsv(), "core,mapred,hdfs");
+        cc.setS3YarnSiteXml("yarn");
+        Assert.assertEquals(cc.getS3SiteXmlsAsCsv(), "core,mapred,hdfs,yarn");
     }
 
     /**
