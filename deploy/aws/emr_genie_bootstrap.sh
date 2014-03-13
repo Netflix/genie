@@ -24,7 +24,7 @@ set -e
 TOMCAT_VERSION=6.0.39
 
 # Install Tomcat
-cd $HOME; wget http://mirror.sdunix.com/apache/tomcat/tomcat-6/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
+cd $HOME; wget http://archive.apache.org/dist/tomcat/tomcat-6/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 tar zxvf apache-tomcat-${TOMCAT_VERSION}.tar.gz
 
 # Change port to 7001 to work out of the box
