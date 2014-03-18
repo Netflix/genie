@@ -34,7 +34,7 @@ GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/command'
 
 lst = json.dumps(['sla','adhoc'])
-apps = json.dumps(['app-0ed5de13-db47-497e-8b0a-1e8e6a75ab3e'])
+apps = json.dumps(['app-0ed5de13-db47-497e-8b0a-1e8e6a75ab3e','app-84985702-3ea6-453b-81b4-7df5eca7d6f0'])
 print apps
 print lst
 

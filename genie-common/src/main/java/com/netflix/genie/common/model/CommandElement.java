@@ -2,6 +2,7 @@ package com.netflix.genie.common.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -10,6 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +63,26 @@ public class CommandElement implements Serializable {
     @ElementCollection
     private ArrayList<String> configs;
 
+    @XmlElement
+    public ArrayList<String> getAppids() {
+        //return appids;
+        if(this.applications != null) {
+            appids = new ArrayList<String>();
+            Iterator<ApplicationElement> it = this.applications.iterator();
+            while(it.hasNext()){
+                appids.add(((ApplicationElement)it.next()).getId());
+            }
+        }
+        return appids;
+    }
+
+    public void setAppids(ArrayList<String> appids) {
+        this.appids = appids;
+    }
+
+    @Transient
+    private ArrayList<String> appids;
+    
     /**
      * Set of applications that can run this command - foreign key in database.
      */
@@ -135,12 +159,24 @@ public class CommandElement implements Serializable {
         this.configs = configs;
     }
 
+    @XmlTransient
     public ArrayList<ApplicationElement> getApplications() {
         return applications;
     }
 
     public void setApplications(ArrayList<ApplicationElement> applications) {
         this.applications = applications;
+    }
+    
+    public void setApplications() {
+        ArrayList<ApplicationElement> appList = new ArrayList<ApplicationElement>();
+        Iterator<String> it = this.appids.iterator();
+        while(it.hasNext()) {
+            ApplicationElement ae = new ApplicationElement();
+            ae.setId((String)it.next());
+            appList.add(ae);
+        }
+        this.applications = appList;
     }
 
     public String getUser() {
