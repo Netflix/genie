@@ -5,9 +5,14 @@ import java.util.ArrayList;
 
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+
+import org.codehaus.jackson.annotate.JsonUnwrapped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +39,7 @@ public class ApplicationElement implements Serializable {
 
     /**
      * Name of this application - e.g. MR, Tez, Jafar.
-     */
+     */ 
     @Basic
     private String name;
 
@@ -47,11 +52,13 @@ public class ApplicationElement implements Serializable {
     /**
      * Reference to all the config (xml's) needed for this application.
      */
+    @ElementCollection
     private ArrayList<String> configs;
 
     /**
      * Set of jars required for this application.
      */
+    @ElementCollection
     private ArrayList<String> jars;
 
     /**
@@ -110,6 +117,9 @@ public class ApplicationElement implements Serializable {
         this.configs = configs;
     }
 
+    //@XmlElementWrapper(name="jarlist")
+    //@XmlElement(name="jar")
+    //@XmlElement
     public ArrayList<String> getJars() {
         return jars;
     }
