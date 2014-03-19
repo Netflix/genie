@@ -85,7 +85,7 @@ public class ClusterResponse extends BaseResponse {
      */
     @XmlElementWrapper(name = "clusters")
     @XmlElement(name = "cluster")
-    public ClusterElement[] getClusterConfigs() {
+    public ClusterElement[] getClusters() {
         if (clusters == null) {
             return null;
         } else {
@@ -99,7 +99,7 @@ public class ClusterResponse extends BaseResponse {
      * @param inClusterConfigs
      *            array of cluster config elements for this response
      */
-    public void setClusterConfigs(ClusterElement[] inClusterConfigs) {
+    public void setClusters(ClusterElement[] inClusterConfigs) {
         if (inClusterConfigs == null) {
             this.clusters = null;
         } else {

@@ -26,7 +26,7 @@ import com.netflix.genie.common.model.ClusterElement;
 /**
  * Represents request to the Cluster REST resource.
  *
- * @author skrishnan
+ * @author amsharma
  */
 @XmlRootElement(name = "request")
 public class ClusterRequest extends BaseRequest {
@@ -47,7 +47,7 @@ public class ClusterRequest extends BaseRequest {
      * @return cluster config element
      */
     @XmlElement(name = "cluster")
-    public ClusterElement getClusterConfig() {
+    public ClusterElement getCluster() {
         return cluster;
     }
 
@@ -57,7 +57,7 @@ public class ClusterRequest extends BaseRequest {
      * @param cluster
      *            cluster config element to set
      */
-    public void setClusterConfig(ClusterElement cluster) {
+    public void setCluster(ClusterElement cluster) {
         this.cluster = cluster;
     }
 }

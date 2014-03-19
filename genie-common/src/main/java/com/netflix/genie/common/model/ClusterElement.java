@@ -2,6 +2,7 @@ package com.netflix.genie.common.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -10,6 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +62,25 @@ public class ClusterElement implements Serializable {
      */
     @ElementCollection
     private ArrayList<String> configs;
+    
+    @Transient
+    private ArrayList<String> cmds;
+
+    @XmlElement
+    public ArrayList<String> getCmds() {
+        if(this.commands != null) {
+            cmds = new ArrayList<String>();
+            Iterator<CommandElement> it = this.commands.iterator();
+            while(it.hasNext()){
+                cmds.add(((CommandElement)it.next()).getId());
+            }
+        }
+        return cmds;
+    }
+
+    public void setCmds(ArrayList<String> cmds) {
+        this.cmds = cmds;
+    }
 
     /**
      * Set of commands supported on this cluster - e.g. prodhive, testhive, etc.
@@ -129,6 +152,7 @@ public class ClusterElement implements Serializable {
         this.configs = configs;
     }
 
+    @XmlTransient
     public ArrayList<CommandElement> getCommands() {
         return commands;
     }

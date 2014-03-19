@@ -1,5 +1,6 @@
 package com.netflix.genie.server.resources;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import com.netflix.genie.common.messages.ClusterRequest;
 import com.netflix.genie.common.messages.ClusterResponse;
 import com.netflix.genie.common.model.ApplicationElement;
 import com.netflix.genie.common.model.ClusterElement;
+import com.netflix.genie.common.model.CommandElement;
 import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
@@ -48,14 +50,14 @@ public class ClusterConfigResourceV1 {
      * @author amsharma
      */
     @Provider
-    public static class ApplicationJAXBContextResolver extends JAXBContextResolver {
+    public static class ClusterJAXBContextResolver extends JAXBContextResolver {
         /**
          * Constructor - initialize the resolver for the types that
          * this resource cares about.
          *
          * @throws Exception if there is any error in initialization
          */
-        public ApplicationJAXBContextResolver() throws Exception {
+        public ClusterJAXBContextResolver() throws Exception {
             super(new Class[]{ClusterElement.class,
                     ClusterRequest.class,
                     ClusterResponse.class});
@@ -86,14 +88,25 @@ public class ClusterConfigResourceV1 {
         logger.info("called to create new cluster");
         //ClusterConfigResponse ccr = ccs.createClusterConfig(request);
         
-        logger.debug("Received request:" + request.getClusterConfig().getId());
-        ClusterResponse ar = new ClusterResponse();
+        logger.debug("Received request:" + request.getCluster().getId());
+        ClusterResponse cr = new ClusterResponse();
         
         PersistenceManager<ClusterElement> pm = new PersistenceManager<ClusterElement>();
-        ClusterElement ae = request.getClusterConfig();
-        pm.createEntity(ae);
+        PersistenceManager<CommandElement> pmc = new PersistenceManager<CommandElement>();
         
-        return ResponseUtil.createResponse(ar);
+        ClusterElement cle = request.getCluster();
+        
+        ArrayList<CommandElement> cmdList = new ArrayList<CommandElement>();
+        Iterator<String> it = cle.getCmds().iterator();
+        while(it.hasNext()) {
+            
+            CommandElement ce = (CommandElement)pmc.getEntity((String)it.next(), CommandElement.class);
+            cmdList.add(ce);
+        }
+        
+        cle.setCommands(cmdList); 
+        pm.createEntity(cle);
+        return ResponseUtil.createResponse(cr);
     }
     
     @GET
@@ -136,7 +149,7 @@ public class ClusterConfigResourceV1 {
             logger.debug(c.toString());
             i++;
         } 
-        response.setClusterConfigs(apps);
+        response.setClusters(apps);
         return ResponseUtil.createResponse(response);
     }  
 }
