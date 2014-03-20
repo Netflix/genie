@@ -21,19 +21,21 @@
 set -x
 set -e
 
+TOMCAT_VERSION=6.0.39
+
 # Install Tomcat
-cd $HOME; wget http://mirror.sdunix.com/apache/tomcat/tomcat-6/v6.0.37/bin/apache-tomcat-6.0.37.tar.gz
-tar zxvf apache-tomcat-6.0.37.tar.gz
+cd $HOME; wget http://archive.apache.org/dist/tomcat/tomcat-6/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
+tar zxvf apache-tomcat-${TOMCAT_VERSION}.tar.gz
 
 # Change port to 7001 to work out of the box
-perl -p -i.bak -ne "s#8080#7001#g" /home/hadoop/apache-tomcat-6.0.37/conf/server.xml
+perl -p -i.bak -ne "s#8080#7001#g" /home/hadoop/apache-tomcat-${TOMCAT_VERSION}/conf/server.xml
     
-# update /home/hadoop/apache-tomcat-6.0.37/conf/web.xml to enable directory browsing
+# update /home/hadoop/apache-tomcat-${TOMCAT_VERSION}/conf/web.xml to enable directory browsing
 perl -0777 -p -i.bak -ne 's#(<param-name>listings</param-name>\s*<param-value>)false(</param-value>)#\1true\2#;' \
-    /home/hadoop/apache-tomcat-6.0.37/conf/web.xml
+    /home/hadoop/apache-tomcat-${TOMCAT_VERSION}/conf/web.xml
 
 # Set up Genie specific properties
-export CATALINA_HOME=/home/hadoop/apache-tomcat-6.0.37
+export CATALINA_HOME=/home/hadoop/apache-tomcat-${TOMCAT_VERSION}
 export CATALINA_OPTS="-Darchaius.deployment.applicationId=genie -Dnetflix.datacenter=cloud"
 
 # Set up directories needed
