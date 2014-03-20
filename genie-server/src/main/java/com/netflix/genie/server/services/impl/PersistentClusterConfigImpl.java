@@ -31,11 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ClusterConfigRequest;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
+import com.netflix.genie.common.messages.ClusterConfigRequestOld;
+import com.netflix.genie.common.messages.ClusterConfigResponseOld;
 import com.netflix.genie.common.messages.HiveConfigResponse;
 import com.netflix.genie.common.messages.PigConfigResponse;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.ClusterConfigElementOld;
 import com.netflix.genie.common.model.HiveConfigElement;
 import com.netflix.genie.common.model.PigConfigElement;
 import com.netflix.genie.common.model.Types;
@@ -58,7 +58,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
     private static Logger logger = LoggerFactory
             .getLogger(PersistentClusterConfigImpl.class);
 
-    private PersistenceManager<ClusterConfigElement> pm;
+    private PersistenceManager<ClusterConfigElementOld> pm;
     private HiveConfigService hcs;
     private PigConfigService pcs;
 
@@ -69,23 +69,23 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      */
     public PersistentClusterConfigImpl() throws CloudServiceException {
         // instantiate PersistenceManager
-        pm = new PersistenceManager<ClusterConfigElement>();
+        pm = new PersistenceManager<ClusterConfigElementOld>();
         hcs = ConfigServiceFactory.getHiveConfigImpl();
         pcs = ConfigServiceFactory.getPigConfigImpl();
     }
 
     /** {@inheritDoc} */
     @Override
-    public ClusterConfigResponse getClusterConfig(String id) {
+    public ClusterConfigResponseOld getClusterConfig(String id) {
         logger.info("called");
 
-        ClusterConfigResponse ccr;
-        ClusterConfigElement cce;
+        ClusterConfigResponseOld ccr;
+        ClusterConfigElementOld cce;
         try {
-            cce = pm.getEntity(id, ClusterConfigElement.class);
+            cce = pm.getEntity(id, ClusterConfigElementOld.class);
         } catch (Exception e) {
             logger.error("Failed to get cluster config: ", e);
-            ccr = new ClusterConfigResponse(new CloudServiceException(
+            ccr = new ClusterConfigResponseOld(new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
             return ccr;
         }
@@ -93,12 +93,12 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         if (cce == null) {
             String msg = "Cluster config not found: " + id;
             logger.error(msg);
-            ccr = new ClusterConfigResponse(new CloudServiceException(
+            ccr = new ClusterConfigResponseOld(new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND, msg));
             return ccr;
         } else {
-            ccr = new ClusterConfigResponse();
-            ccr.setClusterConfigs(new ClusterConfigElement[] {cce});
+            ccr = new ClusterConfigResponseOld();
+            ccr.setClusterConfigs(new ClusterConfigElementOld[] {cce});
             ccr.setMessage("Returning cluster config for: " + id);
             return ccr;
         }
@@ -106,7 +106,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
     /** {@inheritDoc} */
     @Override
-    public ClusterConfigResponse getClusterConfig(String id, String name,
+    public ClusterConfigResponseOld getClusterConfig(String id, String name,
             Types.Configuration config, Types.Schedule schedule,
             Types.JobType jobType, Types.ClusterStatus status) {
         logger.info("called");
@@ -146,18 +146,18 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
     /** {@inheritDoc} */
     @Override
-    public ClusterConfigResponse getClusterConfig(String id, String name,
+    public ClusterConfigResponseOld getClusterConfig(String id, String name,
             Boolean prod, Boolean test, Boolean unitTest, Boolean adHoc,
             Boolean sla, Boolean bonus, String jobType, List<String> status,
             Boolean hasStats, Long minUpdateTime, Long maxUpdateTime,
             Integer limit, Integer page) {
         logger.info("called");
 
-        ClusterConfigResponse ccr = null;
+        ClusterConfigResponseOld ccr = null;
         try {
             logger.info("GENIE: Returning configs for specified params");
 
-            ccr = new ClusterConfigResponse();
+            ccr = new ClusterConfigResponseOld();
             Object[] results;
 
             // construct query
@@ -169,7 +169,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 criteria.append("name like '" + name + "'");
             }
             if ((jobType != null) && (Types.JobType.parse(jobType) == null)) {
-                ccr = new ClusterConfigResponse(new CloudServiceException(
+                ccr = new ClusterConfigResponseOld(new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST, "Job type: "
                                 + jobType + " can only be HADOOP, HIVE or PIG"));
                 logger.error(ccr.getErrorMsg());
@@ -264,7 +264,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                         continue;
                     }
                     if (Types.ClusterStatus.parse(next) == null) {
-                        ccr = new ClusterConfigResponse(
+                        ccr = new ClusterConfigResponseOld(
                                 new CloudServiceException(
                                         HttpURLConnection.HTTP_BAD_REQUEST,
                                         "Cluster status: " + next
@@ -289,7 +289,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             results = pm.query(builder);
 
             if (results.length == 0) {
-                ccr = new ClusterConfigResponse(new CloudServiceException(
+                ccr = new ClusterConfigResponseOld(new CloudServiceException(
                         HttpURLConnection.HTTP_NOT_FOUND,
                         "No clusterConfigs found for input parameters"));
                 logger.error(ccr.getErrorMsg());
@@ -298,16 +298,16 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 ccr.setMessage("Returning clusterConfigs for input parameters");
             }
 
-            ClusterConfigElement[] elements = new ClusterConfigElement[results.length];
+            ClusterConfigElementOld[] elements = new ClusterConfigElementOld[results.length];
             for (int i = 0; i < elements.length; i++) {
-                elements[i] = (ClusterConfigElement) results[i];
+                elements[i] = (ClusterConfigElementOld) results[i];
             }
             ccr.setClusterConfigs(elements);
 
             return ccr;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            ccr = new ClusterConfigResponse(new CloudServiceException(
+            ccr = new ClusterConfigResponseOld(new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR,
                     "Received exception: " + e.getMessage()));
             return ccr;
@@ -317,29 +317,29 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
     /** {@inheritDoc} */
     @Override
-    public ClusterConfigResponse createClusterConfig(
-            ClusterConfigRequest request) {
+    public ClusterConfigResponseOld createClusterConfig(
+            ClusterConfigRequestOld request) {
         logger.info("called");
         return createUpdateConfig(request, Verb.POST);
     }
 
     /** {@inheritDoc} */
     @Override
-    public ClusterConfigResponse updateClusterConfig(
-            ClusterConfigRequest request) {
+    public ClusterConfigResponseOld updateClusterConfig(
+            ClusterConfigRequestOld request) {
         logger.info("called");
         return createUpdateConfig(request, Verb.PUT);
     }
 
     /** {@inheritDoc} */
     @Override
-    public ClusterConfigResponse deleteClusterConfig(String id) {
+    public ClusterConfigResponseOld deleteClusterConfig(String id) {
         logger.info("called");
-        ClusterConfigResponse ccr = null;
+        ClusterConfigResponseOld ccr = null;
 
         if (id == null) {
             // basic error checking
-            ccr = new ClusterConfigResponse(new CloudServiceException(
+            ccr = new ClusterConfigResponseOld(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing required parameter: id"));
             logger.error(ccr.getErrorMsg());
@@ -347,26 +347,26 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             // do some filtering
             logger.info("GENIE: Deleting clusterConfig for id: " + id);
             try {
-                ClusterConfigElement element = pm.deleteEntity(id,
-                        ClusterConfigElement.class);
+                ClusterConfigElementOld element = pm.deleteEntity(id,
+                        ClusterConfigElementOld.class);
                 if (element == null) {
                     // element doesn't exist
-                    ccr = new ClusterConfigResponse(new CloudServiceException(
+                    ccr = new ClusterConfigResponseOld(new CloudServiceException(
                             HttpURLConnection.HTTP_NOT_FOUND,
                             "No clusterConfig exists for id: " + id));
                     logger.error(ccr.getErrorMsg());
                 } else {
                     // all good - create a response
-                    ccr = new ClusterConfigResponse();
+                    ccr = new ClusterConfigResponseOld();
                     ccr.setMessage("Successfully deleted clusterConfig for id: "
                             + id);
-                    ClusterConfigElement[] elements = new ClusterConfigElement[] {element};
+                    ClusterConfigElementOld[] elements = new ClusterConfigElementOld[] {element};
                     ccr.setClusterConfigs(elements);
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 // send the exception back
-                ccr = new ClusterConfigResponse(new CloudServiceException(
+                ccr = new ClusterConfigResponseOld(new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR,
                         "Received exception: " + e.getMessage()));
             }
@@ -379,14 +379,14 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      * Common private method called by the create and update Can use either
      * method to create/update resource.
      */
-    private ClusterConfigResponse createUpdateConfig(
-            ClusterConfigRequest request, Verb method) {
+    private ClusterConfigResponseOld createUpdateConfig(
+            ClusterConfigRequestOld request, Verb method) {
         logger.debug("called");
-        ClusterConfigResponse ccr = null;
-        ClusterConfigElement clusterConfigElement = request.getClusterConfig();
+        ClusterConfigResponseOld ccr = null;
+        ClusterConfigElementOld clusterConfigElement = request.getClusterConfig();
         // ensure that the element is not null
         if (clusterConfigElement == null) {
-            ccr = new ClusterConfigResponse(new CloudServiceException(
+            ccr = new ClusterConfigResponseOld(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing clusterConfig object"));
             logger.error(ccr.getErrorMsg());
@@ -401,7 +401,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 id = UUID.randomUUID().toString();
                 clusterConfigElement.setId(id);
             } else {
-                ccr = new ClusterConfigResponse(new CloudServiceException(
+                ccr = new ClusterConfigResponseOld(new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST,
                         "Missing required parameter for PUT: id"));
                 logger.error(ccr.getErrorMsg());
@@ -411,7 +411,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
         // more error checking
         if (clusterConfigElement.getUser() == null) {
-            ccr = new ClusterConfigResponse(
+            ccr = new ClusterConfigResponseOld(
                     new CloudServiceException(
                             HttpURLConnection.HTTP_BAD_REQUEST,
                             "Missing parameter 'user' for creating/updating clusterConfig"));
@@ -422,7 +422,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         // ensure that the status object is valid
         String status = clusterConfigElement.getStatus();
         if ((status != null) && (Types.ClusterStatus.parse(status) == null)) {
-            ccr = new ClusterConfigResponse(
+            ccr = new ClusterConfigResponseOld(
                     new CloudServiceException(
                             HttpURLConnection.HTTP_BAD_REQUEST,
                             "Cluster status can only be UP, OUT_OF_SERVICE or TERMINATED"));
@@ -434,7 +434,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         try {
             validateChildren(clusterConfigElement);
         } catch (CloudServiceException cse) {
-            ccr = new ClusterConfigResponse(cse);
+            ccr = new ClusterConfigResponseOld(cse);
             logger.error(ccr.getErrorMsg(), cse);
             return ccr;
         }
@@ -450,7 +450,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             try {
                 initAndValidateNewElement(clusterConfigElement);
             } catch (CloudServiceException e) {
-                ccr = new ClusterConfigResponse(e);
+                ccr = new ClusterConfigResponseOld(e);
                 logger.error(ccr.getErrorMsg(), e);
                 return ccr;
             }
@@ -460,23 +460,23 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 pm.createEntity(clusterConfigElement);
 
                 // create a response
-                ccr = new ClusterConfigResponse();
+                ccr = new ClusterConfigResponseOld();
                 ccr.setMessage("Successfully created clusterConfig for id: "
                         + id);
-                ccr.setClusterConfigs(new ClusterConfigElement[] {clusterConfigElement});
+                ccr.setClusterConfigs(new ClusterConfigElementOld[] {clusterConfigElement});
                 return ccr;
             } catch (RollbackException e) {
                 logger.error(e.getMessage(), e);
                 if (e.getCause() instanceof EntityExistsException) {
                     // most likely entity already exists - return useful message
-                    ccr = new ClusterConfigResponse(new CloudServiceException(
+                    ccr = new ClusterConfigResponseOld(new CloudServiceException(
                             HttpURLConnection.HTTP_CONFLICT,
                             "ClusterConfig already exists for id: " + id
                                     + ", use PUT to update config"));
                     return ccr;
                 } else {
                     // unknown exception - send it back
-                    ccr = new ClusterConfigResponse(new CloudServiceException(
+                    ccr = new ClusterConfigResponseOld(new CloudServiceException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
                             "Received exception: " + e.getCause()));
                     logger.error(ccr.getErrorMsg());
@@ -488,14 +488,14 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             logger.info("GENIE: updating config for id: " + id);
 
             try {
-                ClusterConfigElement old = pm.getEntity(id,
-                        ClusterConfigElement.class);
+                ClusterConfigElementOld old = pm.getEntity(id,
+                        ClusterConfigElementOld.class);
                 // check if this is a create or an update
                 if (old == null) {
                     try {
                         initAndValidateNewElement(clusterConfigElement);
                     } catch (CloudServiceException e) {
-                        ccr = new ClusterConfigResponse(e);
+                        ccr = new ClusterConfigResponseOld(e);
                         logger.error(ccr.getErrorMsg(), e);
                         return ccr;
                     }
@@ -503,15 +503,15 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 clusterConfigElement = pm.updateEntity(clusterConfigElement);
 
                 // all good - create a response
-                ccr = new ClusterConfigResponse();
+                ccr = new ClusterConfigResponseOld();
                 ccr.setMessage("Successfully updated clusterConfig for id: "
                         + id);
-                ccr.setClusterConfigs(new ClusterConfigElement[] {clusterConfigElement});
+                ccr.setClusterConfigs(new ClusterConfigElementOld[] {clusterConfigElement});
                 return ccr;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 // send the exception back
-                ccr = new ClusterConfigResponse(new CloudServiceException(
+                ccr = new ClusterConfigResponseOld(new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR,
                         "Received exception: " + e.getCause()));
                 return ccr;
@@ -524,7 +524,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      * initialize, and set creation time.
      */
     private void initAndValidateNewElement(
-            ClusterConfigElement clusterConfigElement)
+            ClusterConfigElementOld clusterConfigElement)
             throws CloudServiceException {
         if ((clusterConfigElement.getS3CoreSiteXml() == null)
                 || (clusterConfigElement.getS3HdfsSiteXml() == null)
@@ -569,7 +569,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      *            the cluster config element to validate
      * @throws CloudServiceException
      */
-    private void validateChildren(ClusterConfigElement clusterConfigElement)
+    private void validateChildren(ClusterConfigElementOld clusterConfigElement)
             throws CloudServiceException {
         if (clusterConfigElement.getProdHiveConfigId() != null) {
             String hiveConfigId = clusterConfigElement.getProdHiveConfigId();

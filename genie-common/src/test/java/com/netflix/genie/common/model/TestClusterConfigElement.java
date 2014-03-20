@@ -28,7 +28,7 @@ import org.junit.Test;
  */
 public class TestClusterConfigElement {
 
-    private ClusterConfigElement cc = new ClusterConfigElement();;
+    private ClusterConfigElementOld cc = new ClusterConfigElementOld();;
 
     /**
      * Tests csv generation from the *-site.xml's for the cluster.

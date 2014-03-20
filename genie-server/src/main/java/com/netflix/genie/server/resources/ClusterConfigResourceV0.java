@@ -37,9 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ClusterConfigRequest;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.messages.ClusterConfigRequestOld;
+import com.netflix.genie.common.messages.ClusterConfigResponseOld;
+import com.netflix.genie.common.model.ClusterConfigElementOld;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;
@@ -75,9 +75,9 @@ public class ClusterConfigResourceV0 {
          * @throws Exception if there is any error in initialization
          */
         public ClusterJAXBContextResolver() throws Exception {
-            super(new Class[]{ClusterConfigElement.class,
-                    ClusterConfigRequest.class,
-                    ClusterConfigResponse.class});
+            super(new Class[]{ClusterConfigElementOld.class,
+                    ClusterConfigRequestOld.class,
+                    ClusterConfigResponseOld.class});
         }
     }
 
@@ -102,7 +102,7 @@ public class ClusterConfigResourceV0 {
     @Path("/{id}")
     public Response getClusterConfig(@PathParam("id") String id) {
         logger.info("called with id: " + id);
-        ClusterConfigResponse ccr = ccs.getClusterConfig(id);
+        ClusterConfigResponseOld ccr = ccs.getClusterConfig(id);
         return ResponseUtil.createResponse(ccr);
     }
 
@@ -160,7 +160,7 @@ public class ClusterConfigResourceV0 {
             @QueryParam("page") @DefaultValue("0") int page) {
         logger.info("called");
         // treat empty string values for booleans as nulls, not false
-        ClusterConfigResponse ccr = ccs
+        ClusterConfigResponseOld ccr = ccs
                 .getClusterConfig(
                         id,
                         name,
@@ -194,9 +194,9 @@ public class ClusterConfigResourceV0 {
     @POST
     @Path("/")
     @Consumes({ "application/xml", "application/json" })
-    public Response createClusterConfig(ClusterConfigRequest request) {
+    public Response createClusterConfig(ClusterConfigRequestOld request) {
         logger.info("called to create new cluster");
-        ClusterConfigResponse ccr = ccs.createClusterConfig(request);
+        ClusterConfigResponseOld ccr = ccs.createClusterConfig(request);
         return ResponseUtil.createResponse(ccr);
     }
 
@@ -213,16 +213,16 @@ public class ClusterConfigResourceV0 {
     @Path("/{id}")
     @Consumes({ "application/xml", "application/json" })
     public Response updateClusterConfig(@PathParam("id") String id,
-            ClusterConfigRequest request) {
+            ClusterConfigRequestOld request) {
         logger.info("called to create/update cluster");
 
-        ClusterConfigElement clusterConfig = request.getClusterConfig();
+        ClusterConfigElementOld clusterConfig = request.getClusterConfig();
         if (clusterConfig != null) {
             // include "id" in the request
             clusterConfig.setId(id);
         }
 
-        ClusterConfigResponse ccr = ccs.updateClusterConfig(request);
+        ClusterConfigResponseOld ccr = ccs.updateClusterConfig(request);
         return ResponseUtil.createResponse(ccr);
     }
 
@@ -251,7 +251,7 @@ public class ClusterConfigResourceV0 {
     @Path("/{id}")
     public Response deleteClusterConfig(@PathParam("id") String id) {
         logger.info("delete called for id: " + id);
-        ClusterConfigResponse ccr = ccs.deleteClusterConfig(id);
+        ClusterConfigResponseOld ccr = ccs.deleteClusterConfig(id);
         return ResponseUtil.createResponse(ccr);
     }
 }

@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.ClusterConfigElementOld;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 
 /**
@@ -41,9 +41,9 @@ public class TestClusterLoadBalancerImpl {
      */
     @Test
     public void testValidCluster() throws Exception {
-        ClusterConfigElement cce = new ClusterConfigElement();
+        ClusterConfigElementOld cce = new ClusterConfigElementOld();
         ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
-        Assert.assertNotNull(clb.selectCluster(new ClusterConfigElement[] {
+        Assert.assertNotNull(clb.selectCluster(new ClusterConfigElementOld[] {
                 cce, cce, cce }));
     }
 
@@ -55,7 +55,7 @@ public class TestClusterLoadBalancerImpl {
     public void testInvalidCluster() {
         ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
         try {
-            clb.selectCluster(new ClusterConfigElement[] {});
+            clb.selectCluster(new ClusterConfigElementOld[] {});
         } catch (CloudServiceException cse) {
             Assert.assertEquals(cse.getErrorCode(),
                     HttpURLConnection.HTTP_PAYMENT_REQUIRED);

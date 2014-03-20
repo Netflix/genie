@@ -20,8 +20,8 @@ package com.netflix.genie.server.services;
 
 import java.util.List;
 
-import com.netflix.genie.common.messages.ClusterConfigRequest;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
+import com.netflix.genie.common.messages.ClusterConfigRequestOld;
+import com.netflix.genie.common.messages.ClusterConfigResponseOld;
 import com.netflix.genie.common.model.Types;
 
 /**
@@ -39,7 +39,7 @@ public interface ClusterConfigService {
      *            unique id of cluster config to return
      * @return successful response, or one with HTTP error code
      */
-    ClusterConfigResponse getClusterConfig(String id);
+    ClusterConfigResponseOld getClusterConfig(String id);
 
     /**
      * Get the cluster config by various params.
@@ -58,7 +58,7 @@ public interface ClusterConfigService {
      *            status for cluster
      * @return successful response, or one with HTTP error code
      */
-    ClusterConfigResponse getClusterConfig(String id, String name,
+    ClusterConfigResponseOld getClusterConfig(String id, String name,
             Types.Configuration config, Types.Schedule schedule,
             Types.JobType jobType, Types.ClusterStatus status);
 
@@ -95,7 +95,7 @@ public interface ClusterConfigService {
      *            page number
      * @return successful response, or one with HTTP error code
      */
-    ClusterConfigResponse getClusterConfig(String id, String name,
+    ClusterConfigResponseOld getClusterConfig(String id, String name,
             Boolean prod, Boolean test, Boolean unitTest, Boolean adHoc,
             Boolean sla, Boolean bonus, String jobType, List<String> status,
             Boolean hasStats, Long minUpdateTime, Long maxUpdateTime,
@@ -107,7 +107,7 @@ public interface ClusterConfigService {
      * @param request
      * @return successful response, or one with HTTP error code
      */
-    ClusterConfigResponse createClusterConfig(ClusterConfigRequest request);
+    ClusterConfigResponseOld createClusterConfig(ClusterConfigRequestOld request);
 
     /**
      * Update/insert cluster config.
@@ -116,7 +116,7 @@ public interface ClusterConfigService {
      *            enscapsulates cluster config to upsert, must contain valid id
      * @return successful response, or one with HTTP error code
      */
-    ClusterConfigResponse updateClusterConfig(ClusterConfigRequest request);
+    ClusterConfigResponseOld updateClusterConfig(ClusterConfigRequestOld request);
 
     /**
      * Delete a cluster config by id.
@@ -125,5 +125,5 @@ public interface ClusterConfigService {
      *            unique id for cluster to delete
      * @return successful response, or one with HTTP error code
      */
-    ClusterConfigResponse deleteClusterConfig(String id);
+    ClusterConfigResponseOld deleteClusterConfig(String id);
 }

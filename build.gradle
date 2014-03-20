@@ -17,10 +17,10 @@ allprojects {
 
 apply from: file('gradle/convention.gradle')
 apply from: file('gradle/maven.gradle')
-apply from: file('gradle/check.gradle')
-apply from: file('gradle/license.gradle')
-apply from: file('gradle/release.gradle')
-apply plugin: 'eclipse'
+//apply from: file('gradle/check.gradle')
+//apply from: file('gradle/license.gradle')
+//apply from: file('gradle/release.gradle')
+//apply plugin: 'eclipse'
 
 subprojects {
     group = "com.netflix.${githubProjectName}" // set to organization of project
@@ -42,16 +42,16 @@ project(':genie-common') {
     apply plugin: 'java'
 }
 
-project(':genie-client') {
-    apply plugin: 'java'
+//project(':genie-client') {
+  //  apply plugin: 'java'
 
     // we are doing this to include genie-common classes in client's javadocs
-    sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
+    //sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
 
-    dependencies {
-        compile 'commons-configuration:commons-configuration:1.8'
-    }
-}
+    //dependencies {
+      //  compile 'commons-configuration:commons-configuration:1.8'
+   // }
+//}
 
 project(':genie-server') {
     apply plugin: 'java'
@@ -69,6 +69,7 @@ project(':genie-server') {
         compile 'com.netflix.karyon:karyon-extensions:1.0.22'
         compile 'commons-httpclient:commons-httpclient:3.1'
         compile 'javax.mail:mail:1.4.1'
+        compile 'com.googlecode.json-simple:json-simple:1.1'
 
         runtime 'org.apache.derby:derby:10.2.2.0'
         runtime 'mysql:mysql-connector-java:5.1.16'
@@ -93,9 +94,9 @@ project(':genie-server') {
     	it.dependsOn enhance
     }
 
-    test {
-    	it.dependsOn enhance
-    }
+    //test {
+    //	it.dependsOn enhance
+    //}
 }
 
 project(':genie-web') {
@@ -105,28 +106,5 @@ project(':genie-web') {
         compile 'com.netflix.karyon:karyon-admin-web:1.0.22'
         compile 'com.sun.jersey:jersey-servlet:1.11'
         compile project(':genie-server')
-    }
-}
-
-project(':genie-web-int-tests') {
-    apply plugin: 'java'
-
-    // dummy test - since integration tests are run by build task
-    task test(overwrite:true) 
-    
-    dependencies {
-        compile project(':genie-web')
-
-        testCompile 'com.sun.jersey:jersey-servlet:1.11'
-        testCompile 'com.netflix.karyon:karyon-extensions-testsuite:1.0.22'
-        testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.1.0.Final'
-        testCompile 'org.jboss.shrinkwrap:shrinkwrap-impl-base:1.1.2'
-        testCompile 'org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven:2.0.0'
-        testRuntime 'org.jboss.arquillian.container:arquillian-tomcat-embedded-7:1.0.0.CR5'
-        testRuntime 'org.apache.tomcat.embed:tomcat-embed-core:7.0.42'
-        testRuntime 'org.apache.tomcat.embed:tomcat-embed-logging-juli:7.0.42'
-        testRuntime ('org.apache.tomcat.embed:tomcat-embed-jasper:7.0.42') {
-            exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
-        }
     }
 }

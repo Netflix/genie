@@ -33,8 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.messages.ClusterConfigResponseOld;
+import com.netflix.genie.common.model.ClusterConfigElementOld;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
@@ -63,7 +63,7 @@ public class HadoopJobManager implements JobManager {
     /**
      * Reference to the cluster config element to run the job on.
      */
-    protected ClusterConfigElement cluster;
+    protected ClusterConfigElementOld cluster;
     /**
      * Reference to the cluster load balancer implementation.
      */
@@ -549,11 +549,11 @@ public class HadoopJobManager implements JobManager {
      * @throws CloudServiceException
      *             if there is any error finding a cluster for this job
      */
-    protected ClusterConfigElement getClusterConfig(JobInfoElement ji)
+    protected ClusterConfigElementOld getClusterConfig(JobInfoElement ji)
             throws CloudServiceException {
         logger.info("called");
 
-        ClusterConfigResponse ccr;
+        ClusterConfigResponseOld ccr;
         String clusterId = ji.getClusterId();
         String clusterName = ji.getClusterName();
         String schedule = null;
