@@ -20,12 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.CommandRequest;
-import com.netflix.genie.common.messages.CommandResponse;
-import com.netflix.genie.common.messages.ClusterConfigRequest;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ApplicationElement;
-import com.netflix.genie.common.model.CommandElement;
+import com.netflix.genie.common.messages.CommandConfigRequest;
+import com.netflix.genie.common.messages.CommandConfigResponse;
+import com.netflix.genie.common.messages.ClusterConfigRequestOld;
+import com.netflix.genie.common.messages.ClusterConfigResponseOld;
+import com.netflix.genie.common.model.ApplicationConfigElement;
+import com.netflix.genie.common.model.CommandConfigElement;
 import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
@@ -57,9 +57,9 @@ public class CommandConfigResourceV1 {
          * @throws Exception if there is any error in initialization
          */
         public CommandJAXBContextResolver() throws Exception {
-            super(new Class[]{CommandElement.class,
-                    CommandRequest.class,
-                    CommandResponse.class});
+            super(new Class[]{CommandConfigElement.class,
+                    CommandConfigRequest.class,
+                    CommandConfigResponse.class});
         }
     }
     
@@ -83,23 +83,23 @@ public class CommandConfigResourceV1 {
     @POST
     @Path("/")
     @Consumes({ "application/xml", "application/json" })
-    public Response createCommandConfig(CommandRequest request) {
+    public Response createCommandConfig(CommandConfigRequest request) {
         logger.info("called to create new cluster");
-        //ClusterConfigResponse ccr = ccs.createClusterConfig(request);
+        //ClusterConfigResponseOld ccr = ccs.createClusterConfig(request);
         
         logger.debug("Received request:" + request.getCommand().getId());
-        CommandResponse ar = new CommandResponse();
+        CommandConfigResponse ar = new CommandConfigResponse();
         
-        PersistenceManager<CommandElement> pm = new PersistenceManager<CommandElement>();
-        PersistenceManager<ApplicationElement> pma = new PersistenceManager<ApplicationElement>();
+        PersistenceManager<CommandConfigElement> pm = new PersistenceManager<CommandConfigElement>();
+        PersistenceManager<ApplicationConfigElement> pma = new PersistenceManager<ApplicationConfigElement>();
         
-        CommandElement ce = request.getCommand();
+        CommandConfigElement ce = request.getCommand();
         //ae.setApplications();
         
-        ArrayList<ApplicationElement> appList = new ArrayList<ApplicationElement>();
+        ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
         Iterator<String> it = ce.getAppids().iterator();
         while(it.hasNext()) {
-            ApplicationElement ae = (ApplicationElement)pma.getEntity((String)it.next(), ApplicationElement.class);
+            ApplicationConfigElement ae = (ApplicationConfigElement)pma.getEntity((String)it.next(), ApplicationConfigElement.class);
             appList.add(ae);
         }
         ce.setApplications(appList);
@@ -111,17 +111,17 @@ public class CommandConfigResourceV1 {
     @GET
     @Path("/")
     public Response getApplicationConfig () {
-        String table = CommandElement.class.getName();
+        String table = CommandConfigElement.class.getName();
         
-        CommandResponse response = new CommandResponse();
-      /*  PersistenceManager<ApplicationElement> pm = new PersistenceManager<ApplicationElement>();
+        CommandConfigResponse response = new CommandConfigResponse();
+      /*  PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
         QueryBuilder builder = new QueryBuilder().table(table);
         Object[] results = pm.query(builder);
         
         if (results.length != 0) {
-            ApplicationElement[] apps = new ApplicationElement[results.length];
+            ApplicationConfigElement[] apps = new ApplicationConfigElement[results.length];
             for (int i = 0; i < results.length; i++) {
-                apps[i] = (ApplicationElement) results[i];
+                apps[i] = (ApplicationConfigElement) results[i];
                 logger.debug("Results Array" + apps[i].getId());
                 logger.debug("Jars is"+ apps[i].getJars());  
             }
@@ -134,14 +134,14 @@ public class CommandConfigResourceV1 {
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie");
         EntityManager em = factory.createEntityManager();
         
-        Query q = em.createQuery("select  x from CommandElement x");
-        List<CommandElement> results = (List<CommandElement>) q.getResultList();
+        Query q = em.createQuery("select  x from CommandConfigElement x");
+        List<CommandConfigElement> results = (List<CommandConfigElement>) q.getResultList();
         
-        Iterator<CommandElement> it = results.iterator();
-        CommandElement[] apps = new CommandElement[10];
+        Iterator<CommandConfigElement> it = results.iterator();
+        CommandConfigElement[] apps = new CommandConfigElement[10];
         int i =0;
         while(it.hasNext()) {
-            CommandElement c = (CommandElement)it.next();
+            CommandConfigElement c = (CommandConfigElement)it.next();
             apps[i] = c;
             logger.debug(c.getId());
             //logger.debug(c.getJars().toString());

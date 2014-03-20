@@ -20,13 +20,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ApplicationRequest;
-import com.netflix.genie.common.messages.ApplicationResponse;
-import com.netflix.genie.common.messages.ClusterRequest;
-import com.netflix.genie.common.messages.ClusterResponse;
-import com.netflix.genie.common.model.ApplicationElement;
-import com.netflix.genie.common.model.ClusterElement;
-import com.netflix.genie.common.model.CommandElement;
+import com.netflix.genie.common.messages.ApplicationConfigRequest;
+import com.netflix.genie.common.messages.ApplicationConfigResponse;
+import com.netflix.genie.common.messages.ClusterConfigRequest;
+import com.netflix.genie.common.messages.ClusterConfigResponse;
+import com.netflix.genie.common.model.ApplicationConfigElement;
+import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.CommandConfigElement;
 import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
@@ -58,9 +58,9 @@ public class ClusterConfigResourceV1 {
          * @throws Exception if there is any error in initialization
          */
         public ClusterJAXBContextResolver() throws Exception {
-            super(new Class[]{ClusterElement.class,
-                    ClusterRequest.class,
-                    ClusterResponse.class});
+            super(new Class[]{ClusterConfigElement.class,
+                    ClusterConfigRequest.class,
+                    ClusterConfigResponse.class});
         }
     }
     
@@ -84,23 +84,23 @@ public class ClusterConfigResourceV1 {
     @POST
     @Path("/")
     @Consumes({ "application/xml", "application/json" })
-    public Response createClusterConfig(ClusterRequest request) {
+    public Response createClusterConfig(ClusterConfigRequest request) {
         logger.info("called to create new cluster");
-        //ClusterConfigResponse ccr = ccs.createClusterConfig(request);
+        //ClusterConfigResponseOld ccr = ccs.createClusterConfig(request);
         
         logger.debug("Received request:" + request.getCluster().getId());
-        ClusterResponse cr = new ClusterResponse();
+        ClusterConfigResponse cr = new ClusterConfigResponse();
         
-        PersistenceManager<ClusterElement> pm = new PersistenceManager<ClusterElement>();
-        PersistenceManager<CommandElement> pmc = new PersistenceManager<CommandElement>();
+        PersistenceManager<ClusterConfigElement> pm = new PersistenceManager<ClusterConfigElement>();
+        PersistenceManager<CommandConfigElement> pmc = new PersistenceManager<CommandConfigElement>();
         
-        ClusterElement cle = request.getCluster();
+        ClusterConfigElement cle = request.getCluster();
         
-        ArrayList<CommandElement> cmdList = new ArrayList<CommandElement>();
+        ArrayList<CommandConfigElement> cmdList = new ArrayList<CommandConfigElement>();
         Iterator<String> it = cle.getCmds().iterator();
         while(it.hasNext()) {
             
-            CommandElement ce = (CommandElement)pmc.getEntity((String)it.next(), CommandElement.class);
+            CommandConfigElement ce = (CommandConfigElement)pmc.getEntity((String)it.next(), CommandConfigElement.class);
             cmdList.add(ce);
         }
         
@@ -112,17 +112,17 @@ public class ClusterConfigResourceV1 {
     @GET
     @Path("/")
     public Response getClusterConfig () {
-        String table = ClusterElement.class.getName();
+        String table = ClusterConfigElement.class.getName();
         
-        ClusterResponse response = new ClusterResponse();
-      /*  PersistenceManager<ApplicationElement> pm = new PersistenceManager<ApplicationElement>();
+        ClusterConfigResponse response = new ClusterConfigResponse();
+      /*  PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
         QueryBuilder builder = new QueryBuilder().table(table);
         Object[] results = pm.query(builder);
         
         if (results.length != 0) {
-            ApplicationElement[] apps = new ApplicationElement[results.length];
+            ApplicationConfigElement[] apps = new ApplicationConfigElement[results.length];
             for (int i = 0; i < results.length; i++) {
-                apps[i] = (ApplicationElement) results[i];
+                apps[i] = (ApplicationConfigElement) results[i];
                 logger.debug("Results Array" + apps[i].getId());
                 logger.debug("Jars is"+ apps[i].getJars());  
             }
@@ -135,14 +135,14 @@ public class ClusterConfigResourceV1 {
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie");
         EntityManager em = factory.createEntityManager();
         
-        Query q = em.createQuery("select  x from ClusterElement x");
-        List<ClusterElement> results = (List<ClusterElement>) q.getResultList();
+        Query q = em.createQuery("select  x from ClusterConfigElement x");
+        List<ClusterConfigElement> results = (List<ClusterConfigElement>) q.getResultList();
         
-        Iterator<ClusterElement> it = results.iterator();
-        ClusterElement[] apps = new ClusterElement[10];
+        Iterator<ClusterConfigElement> it = results.iterator();
+        ClusterConfigElement[] apps = new ClusterConfigElement[10];
         int i =0;
         while(it.hasNext()) {
-            ClusterElement c = (ClusterElement)it.next();
+            ClusterConfigElement c = (ClusterConfigElement)it.next();
             apps[i] = c;
             logger.debug(c.getId());
             //logger.debug(c.toString());

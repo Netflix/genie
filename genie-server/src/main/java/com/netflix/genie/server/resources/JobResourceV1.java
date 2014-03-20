@@ -100,7 +100,7 @@ public class JobResourceV1 {
                         || jobInfo.getClientHost().isEmpty())) {
             jobInfo.setClientHost(clientHost);
             // TODO: Has to be a better way of doing it
-            jobInfo.setClusterCriteriaString(jobInfo.getClusterCriteriaList());
+          //  jobInfo.setClusterCriteriaString(jobInfo.getClusterCriteriaList());
         }
         
         if (jobInfo != null) {
