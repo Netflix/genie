@@ -27,6 +27,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  * Factory class to instantiate implementation of the various services.
  *
  * @author skrishnan
+ * @author amsharma
  */
 public final class ConfigServiceFactory extends BaseServiceFactory {
 
@@ -44,6 +45,9 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
 
     // handle to the ClusterLoadBalancer
     private static volatile ClusterLoadBalancer clusterLoadBalancer;
+    
+    // handle to the ApplicationConfigService
+    private static volatile ApplicationConfigService applicationConfigService;
 
     // never called
     private ConfigServiceFactory() {
@@ -147,5 +151,30 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
 
         // return generated or cached impl
         return clusterLoadBalancer;
+    }
+    
+    /**
+     * Get the singleton application config service impl.
+     *
+     * @return singleton application config service impl
+     * @throws CloudServiceException
+     */
+    public static ApplicationConfigService getApplicationConfigImpl()
+            throws CloudServiceException {
+        logger.info("called");
+
+        // instantiate the impl if it hasn't been already
+        if (applicationConfigService == null) {
+            synchronized (ConfigServiceFactory.class) {
+                // double-checked locking
+                if (applicationConfigService == null) {
+                    applicationConfigService = (ApplicationConfigService)
+                            instantiateFromProperty("netflix.genie.server.applicationConfigImpl");
+                }
+            }
+        }
+
+        // return generated or cached impl
+        return applicationConfigService;
     }
 }

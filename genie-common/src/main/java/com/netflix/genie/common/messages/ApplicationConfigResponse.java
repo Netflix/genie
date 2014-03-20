@@ -20,48 +20,46 @@ package com.netflix.genie.common.messages;
 
 import java.util.Arrays;
 
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import com.netflix.genie.common.model.ClusterElement;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.ApplicationConfigElement;
 
 /**
- * Represents response from the Cluster REST resource.
+ * Represents response from the Application Config REST resource.
  *
- * @author skrishnan
+ * @author amsharma
  */
 @XmlRootElement(name = "response")
-public class ClusterResponse extends BaseResponse {
+public class ApplicationConfigResponse extends BaseResponse {
 
     private static final long serialVersionUID = -1L;
 
     private String message;
-
-    private ClusterElement[] clusters;
+    private ApplicationConfigElement[] applicationConfigs;
 
     /**
      * Constructor to be used if there is an error.
      *
      * @param error
-     *            CloudServiceException to be returned
+     *            CloudServiceException for this response
      */
-    public ClusterResponse(CloudServiceException error) {
+    public ApplicationConfigResponse(CloudServiceException error) {
         super(error);
     }
 
     /**
      * Default constructor.
      */
-    public ClusterResponse() {
+    public ApplicationConfigResponse() {
     }
 
     /**
-     * Human-readable message for client.
+     * Get the human-readable message for this response.
      *
-     * @return message from the server
+     * @return human-readable message
      */
     @XmlElement(name = "message")
     public String getMessage() {
@@ -69,42 +67,42 @@ public class ClusterResponse extends BaseResponse {
     }
 
     /**
-     * Sets the human readable message to return to clients.
+     * Set the human-readable message for this response.
      *
      * @param message
-     *            from the server
+     *            human-readable message
      */
     public void setMessage(String message) {
         this.message = message;
     }
 
     /**
-     * Get a list of cluster configs for this response.
+     * Get the array of applications for this response.
      *
-     * @return array of cluster config elements
+     * @return array of application configs
      */
-    @XmlElementWrapper(name = "clusters")
-    @XmlElement(name = "cluster")
-    public ClusterElement[] getClusters() {
-        if (clusters == null) {
+    @XmlElementWrapper(name = "applicationConfigs")
+    @XmlElement(name = "applicationConfig")
+    public ApplicationConfigElement[] getApplicationConfigs() {
+        if (applicationConfigs == null) {
             return null;
         } else {
-            return Arrays.copyOf(clusters, clusters.length);
+            return Arrays.copyOf(applicationConfigs, applicationConfigs.length);
         }
     }
 
     /**
-     * Set a list of cluster configs for this response.
+     * Set the array of applications for this response.
      *
-     * @param inClusterConfigs
-     *            array of cluster config elements for this response
+     * @param inApplicationConfigs
+     *            array of application configs
      */
-    public void setClusters(ClusterElement[] inClusterConfigs) {
-        if (inClusterConfigs == null) {
-            this.clusters = null;
+    public void setApplicationConfigs(ApplicationConfigElement[] inApplications) {
+        if (inApplications == null) {
+            this.applicationConfigs = null;
         } else {
-            this.clusters = Arrays.copyOf(inClusterConfigs,
-                    inClusterConfigs.length);
+            this.applicationConfigs = Arrays.copyOf(inApplications,
+                    inApplications.length);
         }
     }
 }

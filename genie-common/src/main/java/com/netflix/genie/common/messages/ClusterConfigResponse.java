@@ -20,15 +20,16 @@ package com.netflix.genie.common.messages;
 
 import java.util.Arrays;
 
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.ClusterConfigElement;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
+
 /**
- * Represents response from the ClusterConfig REST resource.
+ * Represents response from the Cluster REST resource.
  *
  * @author skrishnan
  */
@@ -39,7 +40,7 @@ public class ClusterConfigResponse extends BaseResponse {
 
     private String message;
 
-    private ClusterConfigElement[] clusterConfigs;
+    private ClusterConfigElement[] clusters;
 
     /**
      * Constructor to be used if there is an error.
@@ -82,13 +83,13 @@ public class ClusterConfigResponse extends BaseResponse {
      *
      * @return array of cluster config elements
      */
-    @XmlElementWrapper(name = "clusterConfigs")
-    @XmlElement(name = "clusterConfig")
-    public ClusterConfigElement[] getClusterConfigs() {
-        if (clusterConfigs == null) {
+    @XmlElementWrapper(name = "clusters")
+    @XmlElement(name = "cluster")
+    public ClusterConfigElement[] getClusters() {
+        if (clusters == null) {
             return null;
         } else {
-            return Arrays.copyOf(clusterConfigs, clusterConfigs.length);
+            return Arrays.copyOf(clusters, clusters.length);
         }
     }
 
@@ -98,11 +99,11 @@ public class ClusterConfigResponse extends BaseResponse {
      * @param inClusterConfigs
      *            array of cluster config elements for this response
      */
-    public void setClusterConfigs(ClusterConfigElement[] inClusterConfigs) {
+    public void setClusters(ClusterConfigElement[] inClusterConfigs) {
         if (inClusterConfigs == null) {
-            this.clusterConfigs = null;
+            this.clusters = null;
         } else {
-            this.clusterConfigs = Arrays.copyOf(inClusterConfigs,
+            this.clusters = Arrays.copyOf(inClusterConfigs,
                     inClusterConfigs.length);
         }
     }

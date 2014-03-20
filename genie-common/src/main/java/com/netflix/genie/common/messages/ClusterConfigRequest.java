@@ -24,16 +24,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.netflix.genie.common.model.ClusterConfigElement;
 
 /**
- * Represents request to the ClusterConfig REST resource.
+ * Represents request to the Cluster REST resource.
  *
- * @author skrishnan
+ * @author amsharma
  */
 @XmlRootElement(name = "request")
 public class ClusterConfigRequest extends BaseRequest {
 
     private static final long serialVersionUID = -1L;
 
-    private ClusterConfigElement clusterConfig;
+    private ClusterConfigElement cluster;
 
     /**
      * Constructor.
@@ -46,18 +46,18 @@ public class ClusterConfigRequest extends BaseRequest {
      *
      * @return cluster config element
      */
-    @XmlElement(name = "clusterConfig")
-    public ClusterConfigElement getClusterConfig() {
-        return clusterConfig;
+    @XmlElement(name = "cluster")
+    public ClusterConfigElement getCluster() {
+        return cluster;
     }
 
     /**
      * Sets the cluster config for this request.
      *
-     * @param clusterConfig
+     * @param cluster
      *            cluster config element to set
      */
-    public void setClusterConfig(ClusterConfigElement clusterConfig) {
-        this.clusterConfig = clusterConfig;
+    public void setCluster(ClusterConfigElement cluster) {
+        this.cluster = cluster;
     }
 }

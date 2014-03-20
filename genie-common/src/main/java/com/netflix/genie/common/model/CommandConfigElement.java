@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class CommandElement implements Serializable {
+public class CommandConfigElement implements Serializable {
     
     private static final long serialVersionUID = -6106046473373305992L;
     
     private static Logger logger = LoggerFactory
-            .getLogger(CommandElement.class);
+            .getLogger(CommandConfigElement.class);
 
     /**
      * Unique ID to represent a row in database.
@@ -68,9 +68,9 @@ public class CommandElement implements Serializable {
         //return appids;
         if(this.applications != null) {
             appids = new ArrayList<String>();
-            Iterator<ApplicationElement> it = this.applications.iterator();
+            Iterator<ApplicationConfigElement> it = this.applications.iterator();
             while(it.hasNext()){
-                appids.add(((ApplicationElement)it.next()).getId());
+                appids.add(((ApplicationConfigElement)it.next()).getId());
             }
         }
         return appids;
@@ -86,8 +86,8 @@ public class CommandElement implements Serializable {
     /**
      * Set of applications that can run this command - foreign key in database.
      */
-    @ManyToMany(targetEntity = ApplicationElement.class)    
-    private ArrayList<ApplicationElement> applications;
+    @ManyToMany(targetEntity = ApplicationConfigElement.class)    
+    private ArrayList<ApplicationConfigElement> applications;
 
     /**
      * User who created this command.
@@ -160,19 +160,19 @@ public class CommandElement implements Serializable {
     }
 
     @XmlTransient
-    public ArrayList<ApplicationElement> getApplications() {
+    public ArrayList<ApplicationConfigElement> getApplications() {
         return applications;
     }
 
-    public void setApplications(ArrayList<ApplicationElement> applications) {
+    public void setApplications(ArrayList<ApplicationConfigElement> applications) {
         this.applications = applications;
     }
     
     public void setApplications() {
-        ArrayList<ApplicationElement> appList = new ArrayList<ApplicationElement>();
+        ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
         Iterator<String> it = this.appids.iterator();
         while(it.hasNext()) {
-            ApplicationElement ae = new ApplicationElement();
+            ApplicationConfigElement ae = new ApplicationConfigElement();
             ae.setId((String)it.next());
             appList.add(ae);
         }

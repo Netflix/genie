@@ -21,44 +21,43 @@ package com.netflix.genie.common.messages;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.netflix.genie.common.model.CommandElement;
-
+import com.netflix.genie.common.model.ApplicationConfigElement;
 
 /**
- * Represents request to the Commands REST resource.
+ * Represents request to the Application REST resource.
  *
  * @author amsharma
  */
 @XmlRootElement(name = "request")
-public class CommandRequest extends BaseRequest {
+public class ApplicationConfigRequest extends BaseRequest {
 
     private static final long serialVersionUID = -1L;
 
-    private CommandElement command;
+    private ApplicationConfigElement applicationConfig;
 
     /**
      * Constructor.
      */
-    public CommandRequest() {
+    public ApplicationConfigRequest() {
     }
 
     /**
-     * Gets the command for this request.
+     * Gets the application Config for this request.
      *
-     * @return command element for this request
+     * @return application config element for this request
      */
-    @XmlElement(name = "command")
-    public CommandElement getCommand() {
-        return command;
+    @XmlElement(name = "applicationConfig")
+    public ApplicationConfigElement getApplication() {
+        return applicationConfig;
     }
 
     /**
-     * Sets the command element for this request.
+     * Sets the application config element for this request.
      *
-     * @param command
-     *            command element for this request
+     * @param applicationConfig
+     *            application element for this request
      */
-    public void setCommand(CommandElement command) {
-        this.command = command;
+    public void setApplication(ApplicationConfigElement applicationConfig) {
+        this.applicationConfig = applicationConfig;
     }
 }

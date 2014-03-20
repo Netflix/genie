@@ -25,20 +25,20 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ApplicationElement;
+import com.netflix.genie.common.model.CommandConfigElement;
 
 /**
- * Represents response from the Application Config REST resource.
+ * Represents response from the Commands REST resource.
  *
  * @author amsharma
  */
 @XmlRootElement(name = "response")
-public class ApplicationResponse extends BaseResponse {
+public class CommandConfigResponse extends BaseResponse {
 
     private static final long serialVersionUID = -1L;
 
     private String message;
-    private ApplicationElement[] applications;
+    private CommandConfigElement[] commands;
 
     /**
      * Constructor to be used if there is an error.
@@ -46,14 +46,14 @@ public class ApplicationResponse extends BaseResponse {
      * @param error
      *            CloudServiceException for this response
      */
-    public ApplicationResponse(CloudServiceException error) {
+    public CommandConfigResponse(CloudServiceException error) {
         super(error);
     }
 
     /**
      * Default constructor.
      */
-    public ApplicationResponse() {
+    public CommandConfigResponse() {
     }
 
     /**
@@ -77,32 +77,32 @@ public class ApplicationResponse extends BaseResponse {
     }
 
     /**
-     * Get the array of applications for this response.
+     * Get the array of commands for this response.
      *
-     * @return array of applications
+     * @return array of commands
      */
-    @XmlElementWrapper(name = "applications")
-    @XmlElement(name = "application")
-    public ApplicationElement[] getApplications() {
-        if (applications == null) {
+    @XmlElementWrapper(name = "commands")
+    @XmlElement(name = "command")
+    public CommandConfigElement[] getCommands() {
+        if (commands == null) {
             return null;
         } else {
-            return Arrays.copyOf(applications, applications.length);
+            return Arrays.copyOf(commands, commands.length);
         }
     }
 
     /**
-     * Set the array of applications for this response.
+     * Set the array of commands for this response.
      *
-     * @param inApplications
-     *            array of applications
+     * @param inCommands
+     *            array of commands
      */
-    public void setApplications(ApplicationElement[] inApplications) {
-        if (inApplications == null) {
-            this.applications = null;
+    public void setCommands(CommandConfigElement[] inCommands) {
+        if (inCommands == null) {
+            this.commands = null;
         } else {
-            this.applications = Arrays.copyOf(inApplications,
-                    inApplications.length);
+            this.commands = Arrays.copyOf(inCommands,
+                    inCommands.length);
         }
     }
 }
