@@ -217,6 +217,9 @@ public class JobMonitor extends Thread {
     public void run() {
         GenieNodeStatistics stats = GenieNodeStatistics.getInstance();
 
+        // flag to track if the job is killed. Used to determine status of email sent.
+        boolean killed = false;
+
         // wait for process to complete
         int exitCode = waitForExit();
         ji.setExitCode(exitCode);
@@ -266,6 +269,7 @@ public class JobMonitor extends Thread {
                 // if job status is killed, the kill thread will update status
                 logger.debug("Job has been killed - will not update DB: "
                         + ji.getJobID());
+                killed = true;
                 rwl.writeLock().unlock();
             }
         } finally {
@@ -282,7 +286,7 @@ public class JobMonitor extends Thread {
         if (emailTo != null) {
             logger.info("User email address: " + emailTo);
 
-            if (sendEmail(emailTo)) {
+            if (sendEmail(emailTo, killed)) {
                 // Email sent successfully. Update success email counter
                 stats.incrSuccessfulEmailCount();
             } else {
@@ -299,7 +303,7 @@ public class JobMonitor extends Thread {
      * mail properties and try and send email about Job Status.
      * @return 0 for success, -1 for failure
      */
-    private boolean sendEmail(String emailTo) {
+    private boolean sendEmail(String emailTo, boolean killed) {
         logger.debug("called");
 
         if (!config.getBoolean("netflix.genie.server.mail.enable", false)) {
@@ -363,11 +367,19 @@ public class JobMonitor extends Thread {
             message.addRecipient(Message.RecipientType.TO,
                     new InternetAddress(emailTo));
 
+            String jobStatus = new String();
+
+            if (killed) {
+                jobStatus = "KILLED";
+            } else {
+                jobStatus = ji.getStatus();
+            }
+
             // Set Subject: header field
             message.setSubject("Genie Job "
                          + ji.getJobName()
                          + " completed with Status: "
-                         + ji.getStatus());
+                         + jobStatus);
 
             // Now set the actual message
             String body = "Your Genie Job is complete\n\n"
