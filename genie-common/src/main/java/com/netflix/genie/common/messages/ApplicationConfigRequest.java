@@ -47,7 +47,7 @@ public class ApplicationConfigRequest extends BaseRequest {
      * @return application config element for this request
      */
     @XmlElement(name = "applicationConfig")
-    public ApplicationConfigElement getApplication() {
+    public ApplicationConfigElement getApplicationConfig() {
         return applicationConfig;
     }
 
@@ -57,7 +57,7 @@ public class ApplicationConfigRequest extends BaseRequest {
      * @param applicationConfig
      *            application element for this request
      */
-    public void setApplication(ApplicationConfigElement applicationConfig) {
+    public void setApplicationConfig(ApplicationConfigElement applicationConfig) {
         this.applicationConfig = applicationConfig;
     }
 }

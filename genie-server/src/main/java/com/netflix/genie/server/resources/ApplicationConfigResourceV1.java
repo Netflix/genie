@@ -1,16 +1,12 @@
 package com.netflix.genie.server.resources;
 
-import java.util.Iterator;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -22,13 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ApplicationConfigRequest;
 import com.netflix.genie.common.messages.ApplicationConfigResponse;
-import com.netflix.genie.common.messages.ClusterConfigRequestOld;
-import com.netflix.genie.common.messages.ClusterConfigResponseOld;
-import com.netflix.genie.common.messages.HiveConfigResponse;
 import com.netflix.genie.common.model.ApplicationConfigElement;
-import com.netflix.genie.common.model.JobElement;
-import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;
@@ -77,29 +67,19 @@ public class ApplicationConfigResourceV1 {
     public ApplicationConfigResourceV1() throws CloudServiceException {
         acs = ConfigServiceFactory.getApplicationConfigImpl();
     }
-    
+        
     /**
-     * Create Application configuration.
+     * Get Application config for given id.
      *
-     * @param request
-     *            contains a application config element 
+     * @param id
+     *            unique id for application config
      * @return successful response, or one with an HTTP error code
      */
-    @POST
-    @Path("/")
-    @Consumes({ "application/xml", "application/json" })
-    public Response createApplicationConfig(ApplicationConfigRequest request) {
-        logger.info("called to create new application");
-        //ClusterConfigResponseOld ccr = ccs.createClusterConfig(request);
-        
-        logger.debug("Received request:" + request.getApplication().getId());
-        ApplicationConfigResponse ar = new ApplicationConfigResponse();
-        
-        PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
-        ApplicationConfigElement ae = request.getApplication();
-        pm.createEntity(ae);
-        
-        return ResponseUtil.createResponse(ar);
+    @GET
+    @Path("/{id}")
+    public Response getApplicationConfig(@PathParam("id") String id) {
+        logger.info("called");
+        return getApplicationConfig(id, null);
     }
     
     /**
@@ -161,4 +141,83 @@ public class ApplicationConfigResourceV1 {
         response.setApplications(apps);
         return ResponseUtil.createResponse(response); */
     }  
+    
+    /**
+     * Create Application configuration.
+     *
+     * @param request
+     *            contains a application config element 
+     * @return successful response, or one with an HTTP error code
+     */
+    @POST
+    @Path("/")
+    @Consumes({ "application/xml", "application/json" })
+    public Response createApplicationConfig(ApplicationConfigRequest request) {
+        logger.info("called to create new application");
+        ApplicationConfigResponse acr = acs.createApplicationConfig(request);
+        return ResponseUtil.createResponse(acr);
+        
+   /*     //ClusterConfigResponseOld ccr = ccs.createClusterConfig(request);
+        
+        logger.debug("Received request:" + request.getApplication().getId());
+        ApplicationConfigResponse ar = new ApplicationConfigResponse();
+        
+        PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
+        ApplicationConfigElement ae = request.getApplication();
+        pm.createEntity(ae);
+        
+        return ResponseUtil.createResponse(ar); */
+    } 
+    
+    /**
+     * Insert/update application config.
+     *
+     * @param id
+     *            unique id for config to upsert
+     * @param request
+     *            contains the application config element for update
+     * @return successful response, or one with an HTTP error code
+     */
+    @PUT
+    @Path("/{id}")
+    @Consumes({ "application/xml", "application/json" })
+    public Response updateApplicationConfig(@PathParam("id") String id,
+            ApplicationConfigRequest request) {
+        logger.info("called to create/update application config");
+        ApplicationConfigElement applicationConfig = request.getApplicationConfig();
+        if (applicationConfig != null) {
+            // include "id" in the request
+            applicationConfig.setId(id);
+        }
+
+        ApplicationConfigResponse acr = acs.updateApplicationConfig(request);
+        return ResponseUtil.createResponse(acr);
+    }
+
+    /**
+     * Delete without an id, returns an error.
+     *
+     * @return error code, since no id is provided
+     */
+    @DELETE
+    @Path("/")
+    public Response deleteApplicationConfig() {
+        logger.info("called");
+        return deleteApplicationConfig(null);
+    }
+
+    /**
+     * Delete a application config from database.
+     *
+     * @param id
+     *            unique id for config to delete
+     * @return successful response, or one with an HTTP error code
+     */
+    @DELETE
+    @Path("/{id}")
+    public Response deleteApplicationConfig(@PathParam("id") String id) {
+        logger.info("called");
+        ApplicationConfigResponse acr = acs.deleteApplicationConfig(id);
+        return ResponseUtil.createResponse(acr);
+    }
 }
