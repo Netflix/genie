@@ -7,6 +7,7 @@ import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
@@ -53,13 +54,13 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Reference to all the configs  needed for this application.
      */
-    @ElementCollection
+    @ElementCollection(fetch=FetchType.EAGER)
     private ArrayList<String> configs;
 
     /**
      * Set of jars required for this application.
      */
-    @ElementCollection
+    @ElementCollection(fetch=FetchType.EAGER)
     private ArrayList<String> jars;
 
     /**

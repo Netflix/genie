@@ -1,5 +1,12 @@
 package com.netflix.genie.server.resources;
 
+import java.util.Iterator;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -124,7 +131,8 @@ public class ApplicationConfigResourceV1 {
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie");
         EntityManager em = factory.createEntityManager();
         
-        Query q = em.createQuery("select  x from ApplicationConfigElement x");
+        //Query q = em.createQuery("select  x from ApplicationConfigElement x");
+        Query q = em.createQuery("select T from ApplicationConfigElement T order by T.updateTime desc");
         List<ApplicationConfigElement> results = (List<ApplicationConfigElement>) q.getResultList();
         
         Iterator<ApplicationConfigElement> it = results.iterator();
@@ -133,12 +141,13 @@ public class ApplicationConfigResourceV1 {
         while(it.hasNext()) {
             ApplicationConfigElement c = (ApplicationConfigElement)it.next();
             apps[i] = c;
-            logger.debug(c.getId());
-            logger.debug(c.getJars().toString());
-            logger.debug(c.toString());
+            //logger.debug(c.getId());
+           logger.debug(c.getJars().toString());
+            //logger.debug(c.toString());
             i++;
         } 
-        response.setApplications(apps);
+        ApplicationConfigResponse response = new ApplicationConfigResponse();
+        response .setApplicationConfigs(apps);
         return ResponseUtil.createResponse(response); */
     }  
     

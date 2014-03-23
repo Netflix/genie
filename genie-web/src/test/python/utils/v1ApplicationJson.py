@@ -37,14 +37,14 @@ c1 = '''["adhoc", "prod", "stats"]'''
 c2 = '''["bonus", "sla", "nostats"]'''
 
 cclist = "[" + c1 + "," + c2 + "]"
-lst = json.dumps(['sla','adhoc'])
-print lst
+configs = json.dumps(['config1','config2'])
+jars = json.dumps(['jar1','jar2'])
 
 def addApplicationConfig():
     print "Running testJsonSubmitjob "
     payload = '''
     {
-        "application":
+        "applicationConfig":
         {
             "id":"''' + ID +'''",
             "name": "sample_app", 
@@ -52,8 +52,8 @@ def addApplicationConfig():
             "user" : "genietest", 
             "groupName" : "hadoop", 
             "version" : "laptop",
-            "configs": ''' + lst + ''', 
-            "jars": ''' + lst + ''' 
+            "configs": ''' + configs + ''', 
+            "jars": ''' + jars + ''' 
         }
     }
     '''
