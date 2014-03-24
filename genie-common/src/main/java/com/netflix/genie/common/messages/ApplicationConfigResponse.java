@@ -97,12 +97,12 @@ public class ApplicationConfigResponse extends BaseResponse {
      * @param inApplicationConfigs
      *            array of application configs
      */
-    public void setApplicationConfigs(ApplicationConfigElement[] inApplications) {
-        if (inApplications == null) {
+    public void setApplicationConfigs(ApplicationConfigElement[] inApplicationConfigs) {
+        if (inApplicationConfigs == null) {
             this.applicationConfigs = null;
         } else {
-            this.applicationConfigs = Arrays.copyOf(inApplications,
-                    inApplications.length);
+            this.applicationConfigs = Arrays.copyOf(inApplicationConfigs,
+                    inApplicationConfigs.length);
         }
     }
 }

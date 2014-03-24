@@ -44,7 +44,7 @@ public class ApplicationConfigRequest extends BaseRequest {
     /**
      * Gets the application Config for this request.
      *
-     * @return application config element for this request
+     * @return applicationConfig element for this request
      */
     @XmlElement(name = "applicationConfig")
     public ApplicationConfigElement getApplicationConfig() {

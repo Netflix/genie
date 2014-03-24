@@ -240,7 +240,7 @@ public class ApplicationConfigElement implements Serializable {
     }
 
     /**
-     * Sets the name for this application.
+     * Sets the create time for this application.
      *
      * @param createTime
      *           epoch time in ms

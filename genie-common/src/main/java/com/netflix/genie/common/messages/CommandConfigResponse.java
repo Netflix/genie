@@ -38,7 +38,7 @@ public class CommandConfigResponse extends BaseResponse {
     private static final long serialVersionUID = -1L;
 
     private String message;
-    private CommandConfigElement[] commands;
+    private CommandConfigElement[] commandConfigs;
 
     /**
      * Constructor to be used if there is an error.
@@ -81,28 +81,28 @@ public class CommandConfigResponse extends BaseResponse {
      *
      * @return array of commands
      */
-    @XmlElementWrapper(name = "commands")
-    @XmlElement(name = "command")
-    public CommandConfigElement[] getCommands() {
-        if (commands == null) {
+    @XmlElementWrapper(name = "commandConfigs")
+    @XmlElement(name = "commandConfig")
+    public CommandConfigElement[] getCommandConfigs() {
+        if (commandConfigs == null) {
             return null;
         } else {
-            return Arrays.copyOf(commands, commands.length);
+            return Arrays.copyOf(commandConfigs, commandConfigs.length);
         }
     }
 
     /**
      * Set the array of commands for this response.
      *
-     * @param inCommands
+     * @param inCommandConfigs
      *            array of commands
      */
-    public void setCommands(CommandConfigElement[] inCommands) {
-        if (inCommands == null) {
-            this.commands = null;
+    public void setCommandConfigs(CommandConfigElement[] inCommandConfigs) {
+        if (inCommandConfigs == null) {
+            this.commandConfigs = null;
         } else {
-            this.commands = Arrays.copyOf(inCommands,
-                    inCommands.length);
+            this.commandConfigs = Arrays.copyOf(inCommandConfigs,
+                    inCommandConfigs.length);
         }
     }
 }

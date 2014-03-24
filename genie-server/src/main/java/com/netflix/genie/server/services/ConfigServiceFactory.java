@@ -49,6 +49,9 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
     // handle to the ApplicationConfigService
     private static volatile ApplicationConfigService applicationConfigService;
 
+    // handle to the CommandConfigService
+    private static volatile CommandConfigService commandConfigService;
+    
     // never called
     private ConfigServiceFactory() {
     }
@@ -176,5 +179,30 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
 
         // return generated or cached impl
         return applicationConfigService;
+    }
+    
+    /**
+     * Get the singleton command config service impl.
+     *
+     * @return singleton command config service impl
+     * @throws CloudServiceException
+     */
+    public static CommandConfigService getCommandConfigImpl()
+            throws CloudServiceException {
+        logger.info("called");
+
+        // instantiate the impl if it hasn't been already
+        if (commandConfigService == null) {
+            synchronized (ConfigServiceFactory.class) {
+                // double-checked locking
+                if (commandConfigService == null) {
+                    commandConfigService = (CommandConfigService)
+                            instantiateFromProperty("netflix.genie.server.commandConfigImpl");
+                }
+            }
+        }
+
+        // return generated or cached impl
+        return commandConfigService;
     }
 }

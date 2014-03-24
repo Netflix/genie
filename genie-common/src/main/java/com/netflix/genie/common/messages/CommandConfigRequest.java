@@ -25,7 +25,7 @@ import com.netflix.genie.common.model.CommandConfigElement;
 
 
 /**
- * Represents request to the Commands REST resource.
+ * Represents request to the Command's REST resource.
  *
  * @author amsharma
  */
@@ -34,7 +34,7 @@ public class CommandConfigRequest extends BaseRequest {
 
     private static final long serialVersionUID = -1L;
 
-    private CommandConfigElement command;
+    private CommandConfigElement commandConfig;
 
     /**
      * Constructor.
@@ -47,18 +47,18 @@ public class CommandConfigRequest extends BaseRequest {
      *
      * @return command element for this request
      */
-    @XmlElement(name = "command")
-    public CommandConfigElement getCommand() {
-        return command;
+    @XmlElement(name = "commandConfig")
+    public CommandConfigElement getCommandConfig() {
+        return commandConfig;
     }
 
     /**
      * Sets the command element for this request.
      *
-     * @param command
+     * @param commandConfig
      *            command element for this request
      */
-    public void setCommand(CommandConfigElement command) {
-        this.command = command;
+    public void setCommandConfig(CommandConfigElement commandConfig) {
+        this.commandConfig = commandConfig;
     }
 }
