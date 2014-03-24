@@ -20,26 +20,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ApplicationConfigRequest;
-import com.netflix.genie.common.messages.ApplicationConfigResponse;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
-import com.netflix.genie.common.messages.ClusterConfigRequestOld;
-import com.netflix.genie.common.messages.ClusterConfigResponseOld;
 import com.netflix.genie.common.model.ApplicationConfigElement;
 import com.netflix.genie.common.model.CommandConfigElement;
-import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
-import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;
 import com.netflix.genie.server.util.ResponseUtil;
 
 /**
- * Code for ApplicationConfigResource - REST end-point for supporting Application
+ * Code for CommandConfigResource - REST end-point for supporting Command
  * @author amsharma
+ * 
  */
 @Path("/v1/config/command")
 @Produces({ "application/xml", "application/json" })

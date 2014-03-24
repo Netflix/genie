@@ -341,7 +341,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Gets the application id's supported by this command
      *
-     * @return updateTime - epoch time of update in milliseconds
+     * @return appids -  a list of all application id's supported by this command
      */
     @XmlElement
     public ArrayList<String> getAppids() {

@@ -33,7 +33,7 @@ public class ClusterConfigRequest extends BaseRequest {
 
     private static final long serialVersionUID = -1L;
 
-    private ClusterConfigElement cluster;
+    private ClusterConfigElement clusterConfig;
 
     /**
      * Constructor.
@@ -46,9 +46,9 @@ public class ClusterConfigRequest extends BaseRequest {
      *
      * @return cluster config element
      */
-    @XmlElement(name = "cluster")
-    public ClusterConfigElement getCluster() {
-        return cluster;
+    @XmlElement(name = "clusterConfig")
+    public ClusterConfigElement getClusterConfig() {
+        return clusterConfig;
     }
 
     /**
@@ -57,7 +57,7 @@ public class ClusterConfigRequest extends BaseRequest {
      * @param cluster
      *            cluster config element to set
      */
-    public void setCluster(ClusterConfigElement cluster) {
-        this.cluster = cluster;
+    public void setClusterConfig(ClusterConfigElement clusterConfig) {
+        this.clusterConfig = clusterConfig;
     }
 }

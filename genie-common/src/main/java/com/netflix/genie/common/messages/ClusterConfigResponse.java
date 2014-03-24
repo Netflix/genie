@@ -32,6 +32,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  * Represents response from the Cluster REST resource.
  *
  * @author skrishnan
+ * @author amsharma
  */
 @XmlRootElement(name = "response")
 public class ClusterConfigResponse extends BaseResponse {
@@ -40,7 +41,7 @@ public class ClusterConfigResponse extends BaseResponse {
 
     private String message;
 
-    private ClusterConfigElement[] clusters;
+    private ClusterConfigElement[] clusterConfigs;
 
     /**
      * Constructor to be used if there is an error.
@@ -83,13 +84,13 @@ public class ClusterConfigResponse extends BaseResponse {
      *
      * @return array of cluster config elements
      */
-    @XmlElementWrapper(name = "clusters")
-    @XmlElement(name = "cluster")
+    @XmlElementWrapper(name = "clusterConfigs")
+    @XmlElement(name = "clusterConfig")
     public ClusterConfigElement[] getClusters() {
-        if (clusters == null) {
+        if (clusterConfigs == null) {
             return null;
         } else {
-            return Arrays.copyOf(clusters, clusters.length);
+            return Arrays.copyOf(clusterConfigs, clusterConfigs.length);
         }
     }
 
@@ -101,9 +102,9 @@ public class ClusterConfigResponse extends BaseResponse {
      */
     public void setClusters(ClusterConfigElement[] inClusterConfigs) {
         if (inClusterConfigs == null) {
-            this.clusters = null;
+            this.clusterConfigs = null;
         } else {
-            this.clusters = Arrays.copyOf(inClusterConfigs,
+            this.clusterConfigs = Arrays.copyOf(inClusterConfigs,
                     inClusterConfigs.length);
         }
     }
