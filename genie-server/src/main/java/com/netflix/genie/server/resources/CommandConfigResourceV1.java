@@ -1,13 +1,9 @@
 package com.netflix.genie.server.resources;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -154,12 +150,29 @@ public class CommandConfigResourceV1 {
         logger.info("called to create new cluster");
         
         // Need to get the CommandConfig object and fetch the applcation objects from the DB 
-        // to set it in the object. 
-        
+        // to set it in the object.      
         CommandConfigElement ce = request.getCommandConfig();
-        fetchAndAddApplications(ce);
+        ArrayList<String> appids = ce.getAppids();
         
-        request.setCommandConfig(ce);
+        if(appids != null) {
+            PersistenceManager<ApplicationConfigElement> pma = new PersistenceManager<ApplicationConfigElement>();
+            ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
+            Iterator<String> it = appids.iterator();
+            while(it.hasNext()) {
+                String appId = (String)it.next();
+                ApplicationConfigElement ae = (ApplicationConfigElement)pma.getEntity(appId, ApplicationConfigElement.class);
+                if (ae != null) {
+                    appList.add(ae);
+                } else {
+                    CommandConfigResponse acr = new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
+                            "Application Does Not Exist: {" + appId +"}"));
+                    return ResponseUtil.createResponse(acr);
+                }               
+            }
+            ce.setApplications(appList);
+        }
+        
+        //request.setCommandConfig(ce);
         CommandConfigResponse acr = ccs.createCommandConfig(request);
         return ResponseUtil.createResponse(acr);
         
@@ -251,28 +264,29 @@ public class CommandConfigResourceV1 {
         if (commandConfig != null) {
             // include "id" in the request
             commandConfig.setId(id);
-            fetchAndAddApplications(commandConfig);
+            ArrayList<String> appids = commandConfig.getAppids();
+            
+            if(appids != null) {
+                PersistenceManager<ApplicationConfigElement> pma = new PersistenceManager<ApplicationConfigElement>();
+                ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
+                Iterator<String> it = appids.iterator();
+                while(it.hasNext()) {
+                    String appId = (String)it.next();
+                    ApplicationConfigElement ae = (ApplicationConfigElement)pma.getEntity(appId, ApplicationConfigElement.class);
+                    if (ae != null) {
+                        appList.add(ae);
+                    } else {
+                        CommandConfigResponse acr = new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
+                                "Application Does Not Exist: {" + appId +"}"));
+                        return ResponseUtil.createResponse(acr);
+                    }               
+                }
+                commandConfig.setApplications(appList);
+            }
         }
 
         CommandConfigResponse ccr = ccs.updateCommandConfig(request);
         return ResponseUtil.createResponse(ccr);
-    }
-    
-    private void fetchAndAddApplications(CommandConfigElement commandConfig) {
-        
-        ArrayList<String> appids = commandConfig.getAppids();
-        
-        // TODO Error handling in case apps are not present
-        if(appids != null) {
-            PersistenceManager<ApplicationConfigElement> pma = new PersistenceManager<ApplicationConfigElement>();
-            ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
-            Iterator<String> it = appids.iterator();
-            while(it.hasNext()) {
-                ApplicationConfigElement ae = (ApplicationConfigElement)pma.getEntity((String)it.next(), ApplicationConfigElement.class);
-                appList.add(ae);
-            }
-            commandConfig.setApplications(appList);
-        }
     }
 
     /**
