@@ -54,7 +54,7 @@ public class ClusterConfigRequest extends BaseRequest {
     /**
      * Sets the cluster config for this request.
      *
-     * @param cluster
+     * @param clusterConfig
      *            cluster config element to set
      */
     public void setClusterConfig(ClusterConfigElement clusterConfig) {

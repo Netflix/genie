@@ -40,7 +40,7 @@ import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
-import com.netflix.genie.server.services.ClusterConfigService;
+import com.netflix.genie.server.services.ClusterConfigServiceOld;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.StringUtil;
@@ -59,7 +59,7 @@ public class HadoopJobManager implements JobManager {
     /**
      * Reference to the cluster config service impl.
      */
-    protected ClusterConfigService ccs;
+    protected ClusterConfigServiceOld ccs;
     /**
      * Reference to the cluster config element to run the job on.
      */
@@ -122,7 +122,7 @@ public class HadoopJobManager implements JobManager {
      *             if there is any error in initialization
      */
     public HadoopJobManager() throws CloudServiceException {
-        ccs = ConfigServiceFactory.getClusterConfigImpl();
+        ccs = ConfigServiceFactory.getClusterConfigImplOld();
         clb = ConfigServiceFactory.getClusterLoadBalancer();
     }
 

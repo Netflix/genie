@@ -40,7 +40,10 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
     // handle to the PigConfigService
     private static volatile PigConfigService pigConfigService;
 
-    // handle to the ClusterConfigService
+    // handle to the ClusterConfigServiceOld
+    private static volatile ClusterConfigServiceOld clusterConfigServiceOld;
+    
+    // handle to the CommandConfigService
     private static volatile ClusterConfigService clusterConfigService;
 
     // handle to the ClusterLoadBalancer
@@ -106,6 +109,31 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
         return pigConfigService;
     }
 
+    /**
+     * Get the singleton cluster config service impl.
+     *
+     * @return singleton cluster config service impl
+     * @throws CloudServiceException
+     */
+    public static ClusterConfigServiceOld getClusterConfigImplOld()
+            throws CloudServiceException {
+        logger.info("called");
+
+        // instantiate the impl if it hasn't been already
+        if (clusterConfigServiceOld == null) {
+            synchronized (ConfigServiceFactory.class) {
+                // double-checked locking
+                if (clusterConfigServiceOld == null) {
+                    clusterConfigServiceOld = (ClusterConfigServiceOld)
+                            instantiateFromProperty("netflix.genie.server.clusterConfigImplOld");
+                }
+            }
+        }
+
+        // return generated or cached impl
+        return clusterConfigServiceOld;
+    }
+    
     /**
      * Get the singleton cluster config service impl.
      *

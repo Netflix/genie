@@ -33,25 +33,23 @@ GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/cluster'
 
-lst = json.dumps(['sla','adhoc'])
-cmds = json.dumps(['cmd-947cf3bc-f189-4571-8997-960b83c76d7a','cmd-c72a013d-dc83-471d-9866-01dbdcb7428f'])
-print cmds 
-print lst
+config = json.dumps(['sla','adhoc'])
+cmds = json.dumps(['cmd-1092fa18-e556-4515-905b-d01400c94202','cmd-11407715-ed80-477d-8d4d-80428ec78728'])
 
 def addClusterConfig():
     print "Running testJsonSubmitjob "
     payload = '''
     {
-        "cluster":
+        "clusterConfig":
         {
             "id":"''' + ID +'''",
             "name": "sample_cluster", 
-            "status" : "active",
+            "status" : "UP",
             "user" : "genietest", 
             "groupName" : "hadoop", 
             "version" : "laptop",
-            "configs": ''' + lst + ''',
-            "cmds": ''' + cmds + ''' 
+            "configs": ''' + config + ''',
+            "cmdIds": ''' + cmds + ''' 
         }
     }
     '''

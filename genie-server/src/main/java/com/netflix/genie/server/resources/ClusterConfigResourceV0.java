@@ -40,7 +40,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigRequestOld;
 import com.netflix.genie.common.messages.ClusterConfigResponseOld;
 import com.netflix.genie.common.model.ClusterConfigElementOld;
-import com.netflix.genie.server.services.ClusterConfigService;
+import com.netflix.genie.server.services.ClusterConfigServiceOld;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;
 import com.netflix.genie.server.util.ResponseUtil;
@@ -57,7 +57,7 @@ import com.netflix.genie.server.util.ResponseUtil;
 @Produces({ "application/xml", "application/json" })
 public class ClusterConfigResourceV0 {
 
-    private ClusterConfigService ccs;
+    private ClusterConfigServiceOld ccs;
     private static Logger logger = LoggerFactory
             .getLogger(ClusterConfigResourceV0.class);
 
@@ -88,7 +88,7 @@ public class ClusterConfigResourceV0 {
      *             if there is any error
      */
     public ClusterConfigResourceV0() throws CloudServiceException {
-        ccs = ConfigServiceFactory.getClusterConfigImpl();
+        ccs = ConfigServiceFactory.getClusterConfigImplOld();
     }
 
     /**

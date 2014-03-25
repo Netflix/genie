@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
 import com.netflix.genie.common.model.ApplicationConfigElement;
@@ -146,6 +147,12 @@ public class CommandConfigResourceV1 {
         // Need to get the CommandConfig object and fetch the applcation objects from the DB 
         // to set it in the object.      
         CommandConfigElement ce = request.getCommandConfig();
+        
+        if (ce == null) {
+            return ResponseUtil.createResponse(new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Missing commandConfig object.")));
+        }
+        
         ArrayList<String> appids = ce.getAppids();
         
         if(appids != null) {
