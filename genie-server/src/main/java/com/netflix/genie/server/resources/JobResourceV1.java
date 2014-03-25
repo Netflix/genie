@@ -21,6 +21,7 @@ import com.netflix.genie.common.messages.JobInfoResponse;
 import com.netflix.genie.common.messages.JobRequest;
 import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.server.persistence.PersistenceManager;
@@ -57,7 +58,8 @@ public class JobResourceV1 {
             super(new Class[]{JobRequest.class,
                     JobStatusResponse.class,
                     JobElement.class,
-                    JobResponse.class});
+                    JobResponse.class,
+                    ClusterCriteria.class});
         }
     }
     

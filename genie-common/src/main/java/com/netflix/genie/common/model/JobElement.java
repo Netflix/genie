@@ -91,7 +91,8 @@ public class JobElement implements Serializable {
      */
     @Transient
     //private ArrayList<ArrayList<String>> clusterCriteriaList;
-    private ArrayList<String> clusterCriteriaList;
+    //private ArrayList<String> clusterCriteriaList;
+    private ArrayList<ClusterCriteria> clusterCriteriaList;
     
     /**
      * String representation of the the cluster criteria array list object above.
@@ -100,8 +101,6 @@ public class JobElement implements Serializable {
     @Lob
     private String clusterCriteriaString;
     
-
-
     /**
      * Command line arguments (REQUIRED).
      */
@@ -335,11 +334,11 @@ public class JobElement implements Serializable {
         this.executionClusterId = executionClusterId;
     }
 
-    public ArrayList<String> getClusterCriteriaList() {
+    public ArrayList<ClusterCriteria> getClusterCriteriaList() {
         return clusterCriteriaList;
     }
 
-    public void setClusterCriteriaList(ArrayList<String> clusterCriteriaList) {
+    public void setClusterCriteriaList(ArrayList<ClusterCriteria> clusterCriteriaList) {
         this.clusterCriteriaList = clusterCriteriaList;
     }
 

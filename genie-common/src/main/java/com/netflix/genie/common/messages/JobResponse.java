@@ -30,6 +30,7 @@ import com.netflix.genie.common.model.JobElement;
 /**
  * Represents the response from the Jobs REST resource.
  *
+ * @author skrishnan
  * @author amsharma
  *
  */
