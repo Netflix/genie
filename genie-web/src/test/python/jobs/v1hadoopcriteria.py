@@ -38,7 +38,7 @@ inner = json.dumps(['sla','adhoc'])
 #lst = json.dumps(cclist)
 # works
 #lst = json.dumps([{"id": "t1"},{"id":"t2"}])
-lst = json.dumps([{"id": "t1","tagList" : ['a','b'] },{"id":"t2", "tagList": ['c','d']}])
+lst = json.dumps([{"tags" : ['a','b'] },{"tags": ['c','d']}])
 print lst
 
 def testJsonSubmitjob():

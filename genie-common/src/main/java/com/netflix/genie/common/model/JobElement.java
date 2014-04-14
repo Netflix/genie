@@ -322,10 +322,6 @@ public class JobElement implements Serializable {
         this.executionClusterName = executionClusterName;
     }
 
-    public void setClusterName(String executionClusterName) {
-        this.executionClusterName = executionClusterName;
-    }
-
     public String getExecutionClusterId() {
         return executionClusterId;
     }
@@ -536,6 +532,39 @@ public class JobElement implements Serializable {
                 this.clusterCriteriaString += ",";
             }
         }
+    }
+    
+    /**
+     * Set job status, and update start/update/finish times, if needed.
+     *
+     * @param jobStatus
+     *            status for job
+     */
+    public void setJobStatus(Types.JobStatus jobStatus) {
+        this.status = jobStatus.name();
+
+        if (jobStatus == Types.JobStatus.INIT) {
+            setStartTime(System.currentTimeMillis());
+        } else if (jobStatus == Types.JobStatus.SUCCEEDED
+                || jobStatus == Types.JobStatus.KILLED
+                || jobStatus == Types.JobStatus.FAILED) {
+            setFinishTime(System.currentTimeMillis());
+        }
+
+        setUpdateTime(System.currentTimeMillis());
+    }
+
+    /**
+     * Sets job status and human-readable message.
+     *
+     * @param status
+     *            predefined status
+     * @param msg
+     *            human-readable message
+     */
+    public void setJobStatus(Types.JobStatus status, String msg) {
+        setJobStatus(status);
+        setStatusMsg(msg);
     }
     // ------------------------------------------------------------------------
 }

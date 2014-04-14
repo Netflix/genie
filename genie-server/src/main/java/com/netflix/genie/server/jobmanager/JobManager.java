@@ -19,13 +19,14 @@
 package com.netflix.genie.server.jobmanager;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.JobInfoElement;
+import com.netflix.genie.common.model.JobElement;
 
 /**
  * The interface to be implemented by Hadoop, Hive and Pig job manager
  * implementations.
  *
  * @author skrishnan
+ * @author amsharma
  */
 public interface JobManager {
 
@@ -36,7 +37,7 @@ public interface JobManager {
      *            the JobInfo object for the job to be launched
      * @throws CloudServiceException
      */
-    void launch(JobInfoElement ji) throws CloudServiceException;
+    void launch(JobElement ji) throws CloudServiceException;
 
     /**
      * Kill a job using the job information - no need to initialize this job.
@@ -45,5 +46,5 @@ public interface JobManager {
      *            the JobInfo object for the job to be killed
      * @throws CloudServiceException
      */
-    void kill(JobInfoElement ji) throws CloudServiceException;
+    void kill(JobElement ji) throws CloudServiceException;
 }

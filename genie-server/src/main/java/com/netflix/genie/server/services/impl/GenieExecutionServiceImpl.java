@@ -35,10 +35,11 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.BaseRequest;
 import com.netflix.genie.common.messages.BaseResponse;
-import com.netflix.genie.common.messages.JobInfoRequest;
-import com.netflix.genie.common.messages.JobInfoResponse;
+import com.netflix.genie.common.messages.JobRequest;
+import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
-import com.netflix.genie.common.model.JobInfoElement;
+import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
@@ -63,6 +64,7 @@ import com.netflix.niws.client.http.RestClient;
  *
  * @author skrishnan
  * @author bmundlapudi
+ * @author amsharma
  */
 public class GenieExecutionServiceImpl implements ExecutionService {
 
@@ -75,10 +77,10 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     // these can be over-ridden in the properties file
     private static int serverPort = 7001;
     private static String jobDirPrefix = "genie-jobs";
-    private static String jobResourcePrefix = "genie/v0/jobs";
+    private static String jobResourcePrefix = "genie/v1/jobs";
 
     // per-instance variables
-    private PersistenceManager<JobInfoElement> pm;
+    private PersistenceManager<JobElement> pm;
     private GenieNodeStatistics stats;
 
     // initialize static variables
@@ -96,23 +98,23 @@ public class GenieExecutionServiceImpl implements ExecutionService {
      * classes.
      */
     public GenieExecutionServiceImpl() {
-        pm = new PersistenceManager<JobInfoElement>();
+        pm = new PersistenceManager<JobElement>();
         stats = GenieNodeStatistics.getInstance();
     }
 
     /** {@inheritDoc} */
     @Override
-    public JobInfoResponse submitJob(JobInfoRequest jir) {
+    public JobResponse submitJob(JobRequest jir) {
         logger.info("called");
 
-        JobInfoResponse response;
-        JobInfoElement jInfo = jir.getJobInfo();
+        JobResponse response;
+        JobElement jInfo = jir.getJobInfo();
 
         // validate parameters
         try {
             validateJobParams(jInfo);
         } catch (CloudServiceException e) {
-            response = new JobInfoResponse(e);
+            response = new JobResponse(e);
             return response;
         }
 
@@ -163,7 +165,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 if (numRunningJobs >= maxRunningJobs) {
                     // if we get here, job can't be forwarded to an idle
                     // instance anymore and current node is overloaded
-                    response = new JobInfoResponse(
+                    response = new JobResponse(
                             new CloudServiceException(
                                     HttpURLConnection.HTTP_UNAVAILABLE,
                                     "Number of running jobs greater than system limit ("
@@ -175,7 +177,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 // if job can be launched, update the URIs
                 buildJobURIs(jInfo);
             } catch (CloudServiceException e) {
-                response = new JobInfoResponse(e);
+                response = new JobResponse(e);
                 logger.error(response.getErrorMsg(), e);
                 return response;
             }
@@ -188,13 +190,13 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 if (e.getCause() instanceof EntityExistsException) {
                     logger.error(e.getCause().getMessage());
                     // most likely entity already exists - return useful message
-                    response = new JobInfoResponse(new CloudServiceException(
+                    response = new JobResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_CONFLICT,
                             "Job already exists for id: " + jInfo.getJobID()));
                     return response;
                 } else {
                     // unknown exception - send it back
-                    response = new JobInfoResponse(new CloudServiceException(
+                    response = new JobResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
                             "Received exception: " + e.getCause()));
                     return response;
@@ -214,10 +216,10 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             pm.updateEntity(jInfo);
 
             // verification
-            jInfo = pm.getEntity(jInfo.getJobID(), JobInfoElement.class);
+            jInfo = pm.getEntity(jInfo.getJobID(), JobElement.class);
 
             // return successful response
-            response = new JobInfoResponse();
+            response = new JobResponse();
             response.setMessage("Successfully launched job: "
                     + jInfo.getJobID());
             response.setJob(jInfo);
@@ -232,9 +234,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             stats.incrGenieFailedJobs();
             // if it is a known exception, handle differently
             if (e instanceof CloudServiceException) {
-                response = new JobInfoResponse((CloudServiceException) e);
+                response = new JobResponse((CloudServiceException) e);
             } else {
-                response = new JobInfoResponse(new CloudServiceException(
+                response = new JobResponse(new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
             }
             return response;
@@ -243,16 +245,16 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
     /** {@inheritDoc} */
     @Override
-    public JobInfoResponse getJobInfo(String jobId) {
+    public JobResponse getJobInfo(String jobId) {
         logger.info("called for jobId: " + jobId);
 
-        JobInfoResponse response;
-        JobInfoElement jInfo;
+        JobResponse response;
+        JobElement jInfo;
         try {
-            jInfo = pm.getEntity(jobId, JobInfoElement.class);
+            jInfo = pm.getEntity(jobId, JobElement.class);
         } catch (Exception e) {
             logger.error("Failed to get job info: ", e);
-            response = new JobInfoResponse(new CloudServiceException(
+            response = new JobResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
             return response;
         }
@@ -260,11 +262,11 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         if (jInfo == null) {
             String msg = "Job not found: " + jobId;
             logger.error(msg);
-            response = new JobInfoResponse(new CloudServiceException(
+            response = new JobResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND, msg));
             return response;
         } else {
-            response = new JobInfoResponse();
+            response = new JobResponse();
             response.setJob(jInfo);
             response.setMessage("Returning job information for: "
                     + jInfo.getJobID());
@@ -274,12 +276,12 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
     /** {@inheritDoc} */
     @Override
-    public JobInfoResponse getJobs(String jobID, String jobName, String userName, String jobType,
+    public JobResponse getJobs(String jobID, String jobName, String userName, String jobType,
             String status, String clusterName, String clusterId, Integer limit, Integer page) {
         logger.info("called");
 
-        JobInfoResponse response;
-        String table = JobInfoElement.class.getSimpleName();
+        JobResponse response;
+        String table = JobElement.class.getSimpleName();
 
         ClauseBuilder criteria = null;
         try {
@@ -325,7 +327,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             }
         } catch (CloudServiceException e) {
             logger.error(e.getMessage(), e);
-            response = new JobInfoResponse(e);
+            response = new JobResponse(e);
             return response;
         }
 
@@ -337,23 +339,23 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
         } catch (Exception e) {
             logger.error("Failed to get job results from database: ", e);
-            response = new JobInfoResponse(new CloudServiceException(
+            response = new JobResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
             return response;
         }
 
         if (results.length != 0) {
-            JobInfoElement[] jobInfos = new JobInfoElement[results.length];
+            JobElement[] jobInfos = new JobElement[results.length];
             for (int i = 0; i < results.length; i++) {
-                jobInfos[i] = (JobInfoElement) results[i];
+                jobInfos[i] = (JobElement) results[i];
             }
 
-            response = new JobInfoResponse();
+            response = new JobResponse();
             response.setJobs(jobInfos);
             response.setMessage("Returning job information for specified criteria");
             return response;
         } else {
-            response = new JobInfoResponse(new CloudServiceException(
+            response = new JobResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No jobs found for specified criteria"));
             return response;
@@ -367,9 +369,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
         JobStatusResponse response;
 
-        JobInfoElement jInfo;
+        JobElement jInfo;
         try {
-            jInfo = pm.getEntity(jobId, JobInfoElement.class);
+            jInfo = pm.getEntity(jobId, JobElement.class);
         } catch (Exception e) {
             logger.error("Failed to get job results from database: ", e);
             response = new JobStatusResponse(new CloudServiceException(
@@ -398,9 +400,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
         JobStatusResponse response;
 
-        JobInfoElement jInfo;
+        JobElement jInfo;
         try {
-            jInfo = pm.getEntity(jobId, JobInfoElement.class);
+            jInfo = pm.getEntity(jobId, JobElement.class);
         } catch (Exception e) {
             logger.error("Failed to get job results from database: ", e);
             response = new JobStatusResponse(new CloudServiceException(
@@ -489,7 +491,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             // this thread will simply overwrite it - final state will be KILLED
             rwl.writeLock().lock();
             jInfo.setUpdateTime(System.currentTimeMillis());
-            if (!jInfo.getDisableLogArchival()) {
+            if (!jInfo.isDisableLogArchival()) {
                 jInfo.setArchiveLocation(NetUtil.getArchiveURI(jobId));
             }
             pm.updateEntity(jInfo);
@@ -516,7 +518,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     /*
      * Check if this job has token as id sent from client.
      */
-    private void validateJobParams(JobInfoElement jobInfo)
+    private void validateJobParams(JobElement jobInfo)
             throws CloudServiceException {
         logger.debug("called");
 
@@ -543,12 +545,12 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
 
         // check if schedule is valid
-        validateNameValuePair("schedule", jobInfo.getSchedule());
+        //validateNameValuePair("schedule", jobInfo.getSchedule());
 
         // check if configuration is valid for Hive/Pig
-        if (Types.JobType.parse(jobInfo.getJobType()) != Types.JobType.HADOOP) {
-            validateNameValuePair("configuration", jobInfo.getConfiguration());
-        }
+//        if (Types.JobType.parse(jobInfo.getJobType()) != Types.JobType.HADOOP) {
+//            validateNameValuePair("configuration", jobInfo.getConfiguration());
+//        }
 
         // generate job id, if need be
         if (jobInfo.getJobID() == null || jobInfo.getJobID().isEmpty()) {
@@ -609,7 +611,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
     }
 
-    private void buildJobURIs(JobInfoElement ji) throws CloudServiceException {
+    private void buildJobURIs(JobElement ji) throws CloudServiceException {
         ji.setHostName(NetUtil.getHostName());
         ji.setOutputURI(getEndPoint() + "/" + jobDirPrefix + "/"
                 + ji.getJobID());
@@ -632,15 +634,15 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
     }
 
-    private JobInfoResponse forwardJobRequest(String hostURI,
-            JobInfoRequest request) {
-        JobInfoResponse response;
+    private JobResponse forwardJobRequest(String hostURI,
+            JobRequest request) {
+        JobResponse response;
         try {
             response = executeRequest(Verb.POST, hostURI, request,
-                    JobInfoResponse.class);
+                    JobResponse.class);
             return response;
         } catch (CloudServiceException e) {
-            return new JobInfoResponse(e);
+            return new JobResponse(e);
         }
     }
 

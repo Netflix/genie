@@ -12,12 +12,10 @@ public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;
 
-    private ArrayList<String> tagList;
-    private String id;
+    private ArrayList<String> tags;
     
-    public ClusterCriteria (String id, ArrayList<String> tlist) {
-        this.id = id;
-        this.tagList = tlist;
+    public ClusterCriteria (ArrayList<String> tags) {
+        this.tags = tags;
     }
     
     public ClusterCriteria() {
@@ -25,20 +23,11 @@ public class ClusterCriteria implements Serializable {
     }
     
     @XmlElement
-    public ArrayList<String> getTagList() {
-        return tagList;
+    public ArrayList<String> getTags() {
+        return tags;
     }
 
-    public void setTagList(ArrayList<String> tagList) {
-        this.tagList = tagList;
-    }
-
-    @XmlElement
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public void setTags(ArrayList<String> tags) {
+        this.tags = tags;
     }
 }

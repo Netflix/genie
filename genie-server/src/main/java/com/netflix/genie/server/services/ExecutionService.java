@@ -18,8 +18,8 @@
 
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.messages.JobInfoRequest;
-import com.netflix.genie.common.messages.JobInfoResponse;
+import com.netflix.genie.common.messages.JobRequest;
+import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
 
 /**
@@ -27,6 +27,7 @@ import com.netflix.genie.common.messages.JobStatusResponse;
  * Implementations must be thread-safe.
  *
  * @author skrishnan
+ * @author amsharma
  */
 public interface ExecutionService {
 
@@ -37,7 +38,7 @@ public interface ExecutionService {
      *            request object containing job info element for new job
      * @return successful response, or one with HTTP error code
      */
-    JobInfoResponse submitJob(JobInfoRequest rRequest);
+    JobResponse submitJob(JobRequest rRequest);
 
     /**
      * Get job information for given job id.
@@ -46,7 +47,7 @@ public interface ExecutionService {
      *            id for job to look up
      * @return successful response, or one with HTTP error code
      */
-    JobInfoResponse getJobInfo(String jobID);
+    JobResponse getJobInfo(String jobID);
 
     /**
      * Get job status for give job id.
@@ -89,6 +90,6 @@ public interface ExecutionService {
      *            page number for job
      * @return successful response, or one with HTTP error code
      */
-    JobInfoResponse getJobs(String jobID, String jobName, String userName, String jobType,
+    JobResponse getJobs(String jobID, String jobName, String userName, String jobType,
             String status, String clusterName, String clusterId, Integer limit, Integer page);
 }

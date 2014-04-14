@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
@@ -51,12 +52,14 @@ import com.netflix.genie.server.util.NetUtil;
  * The monitor thread that gets launched for each job.
  *
  * @author skrishnan
+ * @author amsharma
+ * 
  */
 public class JobMonitor extends Thread {
     private static Logger logger = LoggerFactory.getLogger(JobMonitor.class);
 
-    private JobInfoElement ji;
-    private PersistenceManager<JobInfoElement> pm;
+    private JobElement ji;
+    private PersistenceManager<JobElement> pm;
 
     // interval to poll for process status
     private static final int JOB_WAIT_TIME_MS = 5000;
@@ -95,7 +98,7 @@ public class JobMonitor extends Thread {
      * @param proc
      *            process handle for running job
      */
-    public JobMonitor(JobInfoElement ji, String workingDir, Process proc) {
+    public JobMonitor(JobElement ji, String workingDir, Process proc) {
         this.ji = ji;
         this.config = ConfigurationManager.getConfigInstance();
         this.workingDir = workingDir;
@@ -103,7 +106,7 @@ public class JobMonitor extends Thread {
             stdOutFile = new File(this.workingDir + File.separator + "stdout.log");
         }
         this.proc = proc;
-        this.pm = new PersistenceManager<JobInfoElement>();
+        this.pm = new PersistenceManager<JobElement>();
         this.maxStdoutSize = config.getLong("netflix.genie.job.max.stdout.size", null);
     }
 
@@ -168,8 +171,8 @@ public class JobMonitor extends Thread {
                 ReentrantReadWriteLock rwl = PersistenceManager.getDbLock();
                 try {
                     rwl.writeLock().lock();
-                    JobInfoElement dbJI = pm.getEntity(ji.getJobID(),
-                            JobInfoElement.class);
+                    JobElement dbJI = pm.getEntity(ji.getJobID(),
+                            JobElement.class);
                     if ((dbJI.getStatus() != null)
                             && !dbJI.getStatus().equalsIgnoreCase("KILLED")) {
                         pm.updateEntity(ji);
@@ -227,8 +230,8 @@ public class JobMonitor extends Thread {
             // acquire a write lock first
             rwl.writeLock().lock();
 
-            JobInfoElement dbJI = pm.getEntity(ji.getJobID(),
-                    JobInfoElement.class);
+            JobElement dbJI = pm.getEntity(ji.getJobID(),
+                    JobElement.class);
 
             // only update status if not KILLED
             if ((dbJI.getStatus() != null)
@@ -255,7 +258,7 @@ public class JobMonitor extends Thread {
                 }
 
                 // set the archive location - if needed
-                if (!ji.getDisableLogArchival()) {
+                if (!ji.isDisableLogArchival()) {
                     ji.setArchiveLocation(NetUtil.getArchiveURI(ji.getJobID()));
                 }
 

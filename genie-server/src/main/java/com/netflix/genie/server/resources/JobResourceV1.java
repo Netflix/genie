@@ -2,10 +2,12 @@ package com.netflix.genie.server.resources;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -125,6 +127,36 @@ public class JobResourceV1 {
     }
     
     /**
+     * Get job information for given job id.
+     *
+     * @param jobID
+     *            id for job to look up
+     * @return successful response, or one with HTTP error code
+     */
+    @GET
+    @Path("/{jobID}")
+    public Response getJobInfo(@PathParam("jobID") String jobID) {
+        logger.info("called for jobID: " + jobID);
+        JobResponse response = xs.getJobInfo(jobID);
+        return ResponseUtil.createResponse(response);
+    }
+    
+    /**
+     * Get job status for give job id.
+     *
+     * @param jobID
+     *            id for job to look up
+     * @return successful response, or one with HTTP error code
+     */
+    @GET
+    @Path("/{jobID}/status")
+    public Response getJobStatus(@PathParam("jobID") String jobID) {
+        logger.info("called for jobID" + jobID);
+        JobStatusResponse response = xs.getJobStatus(jobID);
+        return ResponseUtil.createResponse(response);
+    }
+    
+    /**
      * Get job info for given filter criteria.
      *
      * @param jobID
@@ -154,27 +186,28 @@ public class JobResourceV1 {
             @QueryParam("clusterId") String clusterId,
             @QueryParam("limit") @DefaultValue("1024") int limit,
             @QueryParam("page") @DefaultValue("0") int page) {
+       
         logger.info("called");
-        String table = JobElement.class.getSimpleName();
         
-        //JobResponse response = null;
-        //response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId,
-        //       limit, page);
-        JobResponse response = new JobResponse();
+        JobResponse response = null;
+        response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId,
+                limit, page);
         
-        PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-        QueryBuilder builder = new QueryBuilder().table(table);
-        Object[] results = pm.query(builder);
-        
-        if (results.length != 0) {
-            JobElement[] jobInfos = new JobElement[results.length];
-            for (int i = 0; i < results.length; i++) {
-                jobInfos[i] = (JobElement) results[i];
-            }
-            logger.debug("Results Array" + jobInfos.toString());
-            response.setJobs(jobInfos);
-        }
-           
+        return ResponseUtil.createResponse(response);
+    }
+    
+    /**
+     * Kill job based on given job ID.
+     *
+     * @param jobID
+     *            id for job to kill
+     * @return successful response, or one with HTTP error code
+     */
+    @DELETE
+    @Path("/{jobID}")
+    public Response killJob(@PathParam("jobID") String jobID) {
+        logger.info("called for jobID: " + jobID);
+        JobStatusResponse response = xs.killJob(jobID);
         return ResponseUtil.createResponse(response);
     }
 }
