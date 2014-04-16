@@ -122,8 +122,9 @@ public class JobResourceV0 {
             jobInfo.setClientHost(clientHost);
         }
 
-        JobInfoResponse response = xs.submitJob(request);
-        return ResponseUtil.createResponse(response);
+        //JobInfoResponse response = xs.submitJob(request);
+        //return ResponseUtil.createResponse(response);
+        return null;
     }
 
     /**
@@ -137,8 +138,9 @@ public class JobResourceV0 {
     @Path("/{jobID}")
     public Response getJobInfo(@PathParam("jobID") String jobID) {
         logger.info("called for jobID: " + jobID);
-        JobInfoResponse response = xs.getJobInfo(jobID);
-        return ResponseUtil.createResponse(response);
+        //JobInfoResponse response = xs.getJob(jobID);
+        //return ResponseUtil.createResponse(response);
+        return null;
     }
 
     /**
@@ -188,8 +190,8 @@ public class JobResourceV0 {
             @QueryParam("page") @DefaultValue("0") int page) {
         logger.info("called");
         JobInfoResponse response = null;
-        response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId,
-                limit, page);
+     //   response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId,
+      //          limit, page);
         return ResponseUtil.createResponse(response);
     }
 
