@@ -36,6 +36,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigResponseOld;
 import com.netflix.genie.common.model.ClusterConfigElementOld;
 import com.netflix.genie.common.model.FileAttachment;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
@@ -102,7 +103,7 @@ public class HadoopJobManager implements JobManager {
     /**
      * The job info for this job, which is persisted to the database.
      */
-    protected JobInfoElement ji;
+    protected JobElement ji;
 
     /**
      * The command-line arguments for this job.
@@ -135,7 +136,7 @@ public class HadoopJobManager implements JobManager {
      *             if there is any error in the job launch
      */
     @Override
-    public void launch(JobInfoElement ji) throws CloudServiceException {
+    public void launch(JobElement ji) throws CloudServiceException {
         logger.info("called");
 
         // initialize all the arguments and environment
@@ -243,7 +244,7 @@ public class HadoopJobManager implements JobManager {
      *             if there is any error in job killing
      */
     @Override
-    public void kill(JobInfoElement ji) throws CloudServiceException {
+    public void kill(JobElement ji) throws CloudServiceException {
         logger.info("called");
 
         // basic error checking
@@ -312,15 +313,15 @@ public class HadoopJobManager implements JobManager {
      * Initializes the object with the job information and environment prior to
      * job launch This method must be called before job is launched.
      *
-     * @param ji
+     * @param ji2
      *            the JobInfo object passed by the user
      * @throws CloudServiceException
      *             if there is an error during initialization
      */
-    protected void init(JobInfoElement ji) throws CloudServiceException {
+    protected void init(JobElement ji2) throws CloudServiceException {
         logger.info("called");
 
-        genieJobIDProp = GENIE_JOB_ID + "=" + ji.getJobID();
+        genieJobIDProp = GENIE_JOB_ID + "=" + ji2.getJobID();
         netflixEnvProp = NFLX_ENV + "="
                 + ConfigurationManager.getConfigInstance().getString(
                         "netflix.environment");
@@ -335,13 +336,13 @@ public class HadoopJobManager implements JobManager {
         }
 
         // construct the environment variables
-        this.env = initEnv(ji);
+        this.env = initEnv(ji2);
 
         // construct command-line args
-        this.args = initArgs(ji);
+        this.args = initArgs(ji2);
 
         // save/init args, environment and jobinfo
-        this.ji = ji;
+        this.ji = ji2;
     }
 
     /**
@@ -360,20 +361,20 @@ public class HadoopJobManager implements JobManager {
     /**
      * Extract/initialize command-line arguments passed by user.
      *
-     * @param ji
+     * @param ji2
      *            job info for this job
      * @return the parsed command-line arguments as an array
      * @throws CloudServiceException
      */
-    protected String[] initArgs(JobInfoElement ji) throws CloudServiceException {
+    protected String[] initArgs(JobElement ji2) throws CloudServiceException {
         logger.info("called");
 
-        String[] cmdArgs = StringUtil.splitCmdLine(ji.getCmdArgs());
+        String[] cmdArgs = StringUtil.splitCmdLine(ji2.getCmdArgs());
         String[] genieArgs = getGenieCmdArgs();
 
         // 2 additional args for joblauncher and job type
         String[] hArgs;
-        if (Types.JobType.parse(ji.getJobType()) == Types.JobType.HADOOP) {
+        if (Types.JobType.parse(ji2.getJobType()) == Types.JobType.HADOOP) {
             // no generic way to do this for Hadoop since CLASS is optional
             // so don't pass genie job id for now
             hArgs = new String[cmdArgs.length + 2];
@@ -386,10 +387,10 @@ public class HadoopJobManager implements JobManager {
 
         // first two args are the joblauncher and job type
         hArgs[0] = genieHome + File.separator + "joblauncher.sh";
-        hArgs[1] = ji.getJobType().toLowerCase();
+        hArgs[1] = ji2.getJobType().toLowerCase();
 
         // incorporate the genieArgs into the command-line for each case
-        if (Types.JobType.parse(ji.getJobType()) == Types.JobType.HADOOP) {
+        if (Types.JobType.parse(ji2.getJobType()) == Types.JobType.HADOOP) {
             logger.info("Not prepending genieArgs for hadoop job for now");
             System.arraycopy(cmdArgs, 0, hArgs, 2, cmdArgs.length);
         } else {
@@ -409,39 +410,40 @@ public class HadoopJobManager implements JobManager {
     /**
      * Set/initialize environment variables for this job.
      *
-     * @param ji
+     * @param ji2
      *            job info object for this job
      * @return a map containing environment variables for this job
      * @throws CloudServiceException
      *             if there is any error in initialization
      */
-    protected Map<String, String> initEnv(JobInfoElement ji)
+    protected Map<String, String> initEnv(JobElement ji2)
             throws CloudServiceException {
         logger.info("called");
 
         Map<String, String> hEnv = new HashMap<String, String>();
 
-        if ((ji.getFileDependencies() != null)
-                && (!ji.getFileDependencies().isEmpty())) {
-            hEnv.put("CURRENT_JOB_FILE_DEPENDENCIES", ji.getFileDependencies());
+        if ((ji2.getFileDependencies() != null)
+                && (!ji2.getFileDependencies().isEmpty())) {
+            hEnv.put("CURRENT_JOB_FILE_DEPENDENCIES", ji2.getFileDependencies());
         }
 
         // set the hadoop-related conf files
-        cluster = getClusterConfig(ji);
+        cluster = getClusterConfig(ji2);
         String s3HadoopConfLocation = cluster.getS3SiteXmlsAsCsv();
         hEnv.put("S3_HADOOP_CONF_FILES", s3HadoopConfLocation);
 
         // save the cluster name and id
-        ji.setClusterName(cluster.getName());
-        ji.setClusterId(cluster.getId());
-
+        ji2.setExecutionClusterName(cluster.getName());
+       //ji2.setClusterId(cluster.getId());
+        ji2.setExecutionClusterId(cluster.getId());
+        
         // put the user name for hadoop to use
-        hEnv.put("HADOOP_USER_NAME", ji.getUserName());
+        hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
 
         // add the group name
         String groupName = HADOOP_GROUP_NAME;
-        if (ji.getGroupName() != null) {
-            groupName = ji.getGroupName();
+        if (ji2.getGroupName() != null) {
+            groupName = ji2.getGroupName();
         }
         hEnv.put("HADOOP_GROUP_NAME", groupName);
 
@@ -528,7 +530,7 @@ public class HadoopJobManager implements JobManager {
 
         // set the archive location
         // unless user has explicitly requested for it to be disabled
-        if (!ji.getDisableLogArchival()) {
+        if (!ji2.isDisableLogArchival()) {
             String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
                     .getString("netflix.genie.server.s3.archive.location");
             if ((s3ArchiveLocation != null) && (!s3ArchiveLocation.isEmpty())) {
@@ -543,32 +545,32 @@ public class HadoopJobManager implements JobManager {
      * Figure out an appropriate cluster to run this job<br>
      * Schedule is ignored if clusterId or clusterName are not null.
      *
-     * @param ji
+     * @param ji2
      *            job info for this job
      * @return cluster config element to use for running this job
      * @throws CloudServiceException
      *             if there is any error finding a cluster for this job
      */
-    protected ClusterConfigElementOld getClusterConfig(JobInfoElement ji)
+    protected ClusterConfigElementOld getClusterConfig(JobElement ji2)
             throws CloudServiceException {
         logger.info("called");
 
-        ClusterConfigResponseOld ccr;
-        String clusterId = ji.getClusterId();
-        String clusterName = ji.getClusterName();
-        String schedule = null;
-        // only use the schedule if both cluster id and cluster name are null or empty
-        if (((clusterId == null) || clusterId.isEmpty())
-                && ((clusterName == null) || clusterName.isEmpty())) {
-            schedule = ji.getSchedule();
-        }
-
-        ccr = ccs.getClusterConfig(clusterId, clusterName,
-                Types.Configuration.parse(ji.getConfiguration()),
-                Types.Schedule.parse(schedule),
-                Types.JobType.parse(ji.getJobType()), Types.ClusterStatus.UP);
-
-        // return selected instance
+          ClusterConfigResponseOld ccr = null;
+//        String clusterId = ji2.getClusterId();
+//        String clusterName = ji2.getClusterName();
+//        String schedule = null;
+//        // only use the schedule if both cluster id and cluster name are null or empty
+//        if (((clusterId == null) || clusterId.isEmpty())
+//                && ((clusterName == null) || clusterName.isEmpty())) {
+//            schedule = ji2.getSchedule();
+//        }
+//
+//        ccr = ccs.getClusterConfig(clusterId, clusterName,
+//                Types.Configuration.parse(ji2.getConfiguration()),
+//                Types.Schedule.parse(schedule),
+//                Types.JobType.parse(ji2.getJobType()), Types.ClusterStatus.UP);
+//
+//        // return selected instance
         return clb.selectCluster(ccr.getClusterConfigs());
     }
 }
