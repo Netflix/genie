@@ -29,6 +29,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.HiveConfigResponse;
 import com.netflix.genie.common.model.HiveConfigElement;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.server.services.ConfigServiceFactory;
@@ -84,99 +85,99 @@ public class HiveJobManager extends HadoopJobManager {
      * @throws CloudServiceException
      */
     @Override
-    protected Map<String, String> initEnv(JobInfoElement ji)
+    protected Map<String, String> initEnv(JobElement ji)
             throws CloudServiceException {
         logger.info("called");
 
         // initialize common hadoop environment
-        Map<String, String> hEnv = super.initEnv(ji);
-
-        // append hive-specific env here
-
-        // get the hiveConfig - user param gets higher precedence
-        String hiveConfigId = ji.getHiveConfigId();
-        if (hiveConfigId == null) {
-            hiveConfigId = cluster.getHiveConfigId(Types.Configuration.parse(ji
-                    .getConfiguration()));
-        }
-
-        if (hiveConfigId == null) {
-            String msg = "Cluster has no hiveConfigs for configuration: "
-                    + ji.getConfiguration();
-            logger.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        HiveConfigResponse hcr = hcs.getHiveConfig(hiveConfigId);
-        HiveConfigElement[] hcArray = hcr.getHiveConfigs();
-
-        if (hcArray == null || hcArray.length == 0) {
-            String msg = "No hive configuration found to match hiveConfigID: "
-                    + hiveConfigId;
-            logger.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // ensure that hive config is not inactive
-        String status = hcArray[0].getStatus();
-        if (Types.ConfigStatus.parse(status) == Types.ConfigStatus.INACTIVE) {
-            String msg = "Hive config " + hiveConfigId + " is INACTIVE";
-            logger.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        String s3HiveConfLocation = hcArray[0].getS3HiveSiteXml();
-        hEnv.put("S3_HIVE_CONF_FILES", s3HiveConfLocation);
-
-        // if the hive version is available, overwrite the HIVE_HOME environment
-        // variable
-        // user param gets higher precedence over cluster default
-        String hiveVersion = ji.getHiveVersion();
-        if ((hiveVersion == null) || hiveVersion.isEmpty()) {
-            hiveVersion = hcArray[0].getHiveVersion();
-        }
-
-        // if the hive version is provided, overwrite the HIVE_HOME environment
-        // variable
-        if (hiveVersion != null) {
-            // try exact version first
-            String hiveHome = ConfigurationManager.getConfigInstance()
-                    .getString(
-                            "netflix.genie.server.hive." + hiveVersion
-                                    + ".home");
-            // if not, trim to 3 most significant digits
-            if (hiveHome == null) {
-                hiveVersion = StringUtil.trimVersion(hiveVersion);
-                hiveHome = ConfigurationManager.getConfigInstance().getString(
-                        "netflix.genie.server.hive." + hiveVersion + ".home");
-            }
-
-            if ((hiveHome == null) || (!new File(hiveHome).exists())) {
-                String msg = "This genie instance doesn't support Hive version: "
-                        + hiveVersion;
-                logger.error(msg);
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-            }
-            logger.info("Overriding HIVE_HOME from cluster config to: "
-                    + hiveHome);
-            hEnv.put("HIVE_HOME", hiveHome);
-        } else {
-            // set the default hive home
-            String hiveHome = ConfigurationManager.getConfigInstance().
-                    getString("netflix.genie.server.hive.home");
-            if ((hiveHome == null) || (!new File(hiveHome).exists())) {
-                String msg = "Property netflix.genie.server.hive.home is not set correctly";
-                logger.error(msg);
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-            }
-            hEnv.put("HIVE_HOME", hiveHome);
-        }
-
+        Map<String, String> hEnv = null; // = super.initEnv(ji);
+//
+//        // append hive-specific env here
+//
+//        // get the hiveConfig - user param gets higher precedence
+//        String hiveConfigId = ji.getHiveConfigId();
+//        if (hiveConfigId == null) {
+//            hiveConfigId = cluster.getHiveConfigId(Types.Configuration.parse(ji
+//                    .getConfiguration()));
+//        }
+//
+//        if (hiveConfigId == null) {
+//            String msg = "Cluster has no hiveConfigs for configuration: "
+//                    + ji.getConfiguration();
+//            logger.error(msg);
+//            throw new CloudServiceException(
+//                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+//        }
+//
+//        HiveConfigResponse hcr = hcs.getHiveConfig(hiveConfigId);
+//        HiveConfigElement[] hcArray = hcr.getHiveConfigs();
+//
+//        if (hcArray == null || hcArray.length == 0) {
+//            String msg = "No hive configuration found to match hiveConfigID: "
+//                    + hiveConfigId;
+//            logger.error(msg);
+//            throw new CloudServiceException(
+//                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+//        }
+//
+//        // ensure that hive config is not inactive
+//        String status = hcArray[0].getStatus();
+//        if (Types.ConfigStatus.parse(status) == Types.ConfigStatus.INACTIVE) {
+//            String msg = "Hive config " + hiveConfigId + " is INACTIVE";
+//            logger.error(msg);
+//            throw new CloudServiceException(
+//                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+//        }
+//
+//        String s3HiveConfLocation = hcArray[0].getS3HiveSiteXml();
+//        hEnv.put("S3_HIVE_CONF_FILES", s3HiveConfLocation);
+//
+//        // if the hive version is available, overwrite the HIVE_HOME environment
+//        // variable
+//        // user param gets higher precedence over cluster default
+//        String hiveVersion = ji.getHiveVersion();
+//        if ((hiveVersion == null) || hiveVersion.isEmpty()) {
+//            hiveVersion = hcArray[0].getHiveVersion();
+//        }
+//
+//        // if the hive version is provided, overwrite the HIVE_HOME environment
+//        // variable
+//        if (hiveVersion != null) {
+//            // try exact version first
+//            String hiveHome = ConfigurationManager.getConfigInstance()
+//                    .getString(
+//                            "netflix.genie.server.hive." + hiveVersion
+//                                    + ".home");
+//            // if not, trim to 3 most significant digits
+//            if (hiveHome == null) {
+//                hiveVersion = StringUtil.trimVersion(hiveVersion);
+//                hiveHome = ConfigurationManager.getConfigInstance().getString(
+//                        "netflix.genie.server.hive." + hiveVersion + ".home");
+//            }
+//
+//            if ((hiveHome == null) || (!new File(hiveHome).exists())) {
+//                String msg = "This genie instance doesn't support Hive version: "
+//                        + hiveVersion;
+//                logger.error(msg);
+//                throw new CloudServiceException(
+//                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+//            }
+//            logger.info("Overriding HIVE_HOME from cluster config to: "
+//                    + hiveHome);
+//            hEnv.put("HIVE_HOME", hiveHome);
+//        } else {
+//            // set the default hive home
+//            String hiveHome = ConfigurationManager.getConfigInstance().
+//                    getString("netflix.genie.server.hive.home");
+//            if ((hiveHome == null) || (!new File(hiveHome).exists())) {
+//                String msg = "Property netflix.genie.server.hive.home is not set correctly";
+//                logger.error(msg);
+//                throw new CloudServiceException(
+//                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+//            }
+//            hEnv.put("HIVE_HOME", hiveHome);
+//        }
+//
         return hEnv;
     }
 }
