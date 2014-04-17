@@ -86,6 +86,12 @@ public class ApplicationConfigElement implements Serializable {
      */
     @Basic
     private Long updateTime;
+    
+    /**
+     * Users can specify a property file location with environment variables.
+     */
+    @Basic
+    private String envPropFile;
 
     /**
      * Default constructor.
@@ -266,5 +272,24 @@ public class ApplicationConfigElement implements Serializable {
      */
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
+    }
+    
+    /**
+     * Gets the envPropFile name 
+     *
+     * @return envPropFile - file name containing environment variables.
+     */
+    public String getEnvPropFile() {
+        return envPropFile;
+    }
+
+    /**
+     * Sets the env property file name in string form.
+     *
+     * @param envPropFile
+     *           contains the list of env variables to set while running a command using this application.
+     */
+    public void setEnvPropFile(String envPropFile) {
+        this.envPropFile = envPropFile;
     }
 }

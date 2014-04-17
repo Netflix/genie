@@ -87,6 +87,12 @@ public class JobElement implements Serializable {
     private String executionClusterId;
 
     /**
+     * Users can specify a property file location with environment variables.
+     */
+    @Basic
+    private String envPropFile;
+
+    /**
      * Set of tags to use for scheduling (REQUIRED).
      */
     @Transient
@@ -566,5 +572,23 @@ public class JobElement implements Serializable {
         setJobStatus(status);
         setStatusMsg(msg);
     }
-    // ------------------------------------------------------------------------
+    
+    /**
+     * Gets the envPropFile name 
+     *
+     * @return envPropFile - file name containing environment variables.
+     */
+    public String getEnvPropFile() {
+        return envPropFile;
+    }
+
+    /**
+     * Sets the env property file name in string form.
+     *
+     * @param envPropFile
+     *           contains the list of env variables to set while running this job.
+     */
+    public void setEnvPropFile(String envPropFile) {
+        this.envPropFile = envPropFile;
+    }
 }

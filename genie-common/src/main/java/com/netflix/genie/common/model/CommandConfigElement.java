@@ -14,6 +14,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.slf4j.Logger;
@@ -58,6 +59,12 @@ public class CommandConfigElement implements Serializable {
     @Basic
     private String executable;
 
+    /**
+     * Users can specify a property file location with environment variables.
+     */
+    @Basic
+    private String envPropFile;
+    
     /**
      * Reference to all the config (xml's) needed for this command.
      */
@@ -364,5 +371,24 @@ public class CommandConfigElement implements Serializable {
      */
     public void setAppids(ArrayList<String> appids) {
         this.appids = appids;
+    }
+    
+    /**
+     * Gets the envPropFile name 
+     *
+     * @return envPropFile - file name containing environment variables.
+     */
+    public String getEnvPropFile() {
+        return envPropFile;
+    }
+
+    /**
+     * Sets the env property file name in string form.
+     *
+     * @param envPropFile
+     *           contains the list of env variables to set while running this command.
+     */
+    public void setEnvPropFile(String envPropFile) {
+        this.envPropFile = envPropFile;
     }
 }
