@@ -19,12 +19,15 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.messages.ClusterConfigResponseOld;
+import com.netflix.genie.common.model.ApplicationConfigElement;
 import com.netflix.genie.common.model.ClusterConfigElement;
 import com.netflix.genie.common.model.ClusterConfigElementOld;
+import com.netflix.genie.common.model.CommandConfigElement;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
+import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import com.netflix.genie.server.services.ConfigServiceFactory;
@@ -41,6 +44,10 @@ public class YarnJobManager implements JobManager {
     private static Logger logger = LoggerFactory
             .getLogger(YarnJobManager.class);
 
+    private PersistenceManager<ClusterConfigElement> pmCluster;
+    private PersistenceManager<CommandConfigElement> pmCommand;
+    private PersistenceManager<ApplicationConfigElement> pmApplication;
+    
     /**
      * The name of the Genie job id property to be passed to all jobs.
      */
@@ -102,6 +109,11 @@ public class YarnJobManager implements JobManager {
     protected JobElement ji;
      
     /**
+     * Actual command to run determined from the CommandConfigElement selected
+     */
+    protected String executable;
+    
+    /**
      * Default constructor - initializes cluster configuration and load
      * balancer.
      *
@@ -111,6 +123,9 @@ public class YarnJobManager implements JobManager {
     public YarnJobManager() throws CloudServiceException {
         ccs = ConfigServiceFactory.getClusterConfigImpl();
         clb = ConfigServiceFactory.getClusterLoadBalancer();
+        pmCluster = new PersistenceManager<ClusterConfigElement>();
+        pmCommand = new PersistenceManager<CommandConfigElement>();
+        pmApplication = new PersistenceManager<ApplicationConfigElement>();
     }
     
     /**
@@ -306,7 +321,6 @@ public class YarnJobManager implements JobManager {
         this.args = initArgs(ji2);
         
         // save/init args, environment and jobinfo
-        // TODO do we need to do this ... aaargghh... java reference/value confusion again
         this.ji = ji2;
     }
 
@@ -337,14 +351,98 @@ public class YarnJobManager implements JobManager {
         //hEnv.put("S3_HADOOP_CONF_FILES", s3HadoopConfLocation);
         ArrayList<String> clusterConfigList = cluster.getConfigs();
         
-        
         hEnv.put("S3_CLUSTER_CONF_FILES", convertListToCSV(clusterConfigList)); 
+
+        CommandConfigElement command = null;
+        ApplicationConfigElement application = null;
+        boolean done = false;
+        
+        
+        // If Command Id is specified use directly.
+        //If command Name is specified iterate through the commands in the cluster to get the Id that matches.
+        if ((ji2.getCommandId() != null) && (!(ji2.getCommandId().isEmpty()))) {
+            String cmdId = ji2.getCommandId();
+            // PUT LOGIC TO GET APP ID
+            command = pmCommand.getEntity(cmdId, CommandConfigElement.class);
+            ArrayList<ApplicationConfigElement> apps = command.getApplications();
+            Iterator<ApplicationConfigElement> appsIter = apps.iterator();
+            while(appsIter.hasNext()) {
+                ApplicationConfigElement ace = (ApplicationConfigElement)appsIter.next();
+               // If appid is specified check against it. If matches set It and break
+                if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {
+                    if (ace.getId().equals(ji2.getApplicationId())) {
+                        application = ace;
+                        break;
+                    }
+                 // If appName is specified check the name. if matches set it and break
+                } else  if ((ji2.getApplicationName() != null) && ((!ji2.getApplicationName().isEmpty()))) {
+                    if (ace.getName().equals(ji2.getApplicationName())) {
+                        application = ace;
+                        break;
+                    }
+                // If appName and appId are not specified use the first app for the command as default value
+                }  else {
+                    //appId = ace.getId();
+                    application = ace;
+                    break;
+                }
+            }
+        } else if ((ji2.getCommandName() != null) && (!(ji2.getCommandName().isEmpty()))) {
+            // Iterate through the commands the cluster supports and find the command that matches.
+            // There has to be one that matches, else the getClusterConfig wouldn't have . Check the applications as well
+            ArrayList<CommandConfigElement> cmds = cluster.getCommands();
+            Iterator<CommandConfigElement> cmdIter = cmds.iterator();
+            while(cmdIter.hasNext()) {
+                CommandConfigElement cce = (CommandConfigElement)cmdIter.next();
+                if (cce.getName().equals(ji2.getCommandName())) {
+                    // Name matches. Check Application Details
+                   // PUT LOGIC TO GET APP ID
+                    ArrayList<ApplicationConfigElement> apps = cce.getApplications();
+                    Iterator<ApplicationConfigElement> appsIter = apps.iterator();
+                    while(appsIter.hasNext()) {
+                        ApplicationConfigElement ace = (ApplicationConfigElement)appsIter.next();
+                       // If appid is specified check against it. If matches set It and break
+                        if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {
+                            if (ace.getId().equals(ji2.getApplicationId())) {
+                                command = cce;
+                                application = ace;
+                                done = true;
+                                break;
+                            }
+                         // If appName is specified check the name. if matches set it and break
+                        } else  if ((ji2.getApplicationName() != null) && ((!ji2.getApplicationName().isEmpty()))) {
+                            if (ace.getName().equals(ji2.getApplicationName())) {
+                                command = cce;
+                                application = ace;
+                                done = true;
+                                break;
+                            }
+                        // If appName and appId are not specified use the first app for the command as default value
+                        }  else {
+                            command = cce;
+                            application = ace;
+                            done = true;
+                            break;
+                        }
+                    }
+                    if (done) {
+                        break;
+                    }
+                }
+            }
+        }
+        
+        //CommandConfigElement ce = pmCommand.getEntity(cmdId, CommandConfigElement.class);
+        hEnv.put("S3_COMMAND_CONF_FILES",convertListToCSV(command.getConfigs()));
+        hEnv.put("S3_APPLICATION_CONF_FILES",convertListToCSV(application.getConfigs()));
+        hEnv.put("S3_APPLICATION_JAR_FILES",convertListToCSV(application.getJars()));
+        this.executable = command.getExecutable();
         
         // save the cluster name and id
         ji2.setExecutionClusterName(cluster.getName());
         ji2.setExecutionClusterId(cluster.getId());
         
-        //TODO: Set env variables to download command and application configs and jars
+        //TODO: Get envPropertyFile and read in properties and set it in the environment
         
         // put the user name for hadoop to use
         hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
@@ -381,7 +479,49 @@ public class YarnJobManager implements JobManager {
         }
         hEnv.put("XS_SYSTEM_HOME", genieHome);
         
-        // TODO: logic to set HADOOP_HOME
+        // if the cluster version is provided, overwrite the HADOOP_HOME
+        // environment variable
+        if (cluster.getVersion() != null) {
+            String hadoopVersion = cluster.getVersion();
+            logger.debug("Hadoop Version of the cluster: " + hadoopVersion);
+
+            // try exact version first
+            String hadoopHome = ConfigurationManager.getConfigInstance()
+                    .getString(
+                            "netflix.genie.server.hadoop." + hadoopVersion
+                                    + ".home");
+            // if not, trim to 3 most significant digits
+            if (hadoopHome == null) {
+                hadoopVersion = StringUtil.trimVersion(hadoopVersion);
+                hadoopHome = ConfigurationManager.getConfigInstance()
+                        .getString(
+                                "netflix.genie.server.hadoop." + hadoopVersion
+                                        + ".home");
+            }
+
+            if ((hadoopHome == null) || (!new File(hadoopHome).exists())) {
+                String msg = "This genie instance doesn't support Hadoop version: "
+                        + hadoopVersion;
+                logger.error(msg);
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            }
+
+            logger.info("Overriding HADOOP_HOME from cluster config to: "
+                    + hadoopHome);
+            hEnv.put("HADOOP_HOME", hadoopHome);
+        } else {
+            // set the default hadoop home
+            String hadoopHome = ConfigurationManager.getConfigInstance().
+                    getString("netflix.genie.server.hadoop.home");
+            if ((hadoopHome == null) || (!new File(hadoopHome).exists())) {
+                String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
+                logger.error(msg);
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            }
+            hEnv.put("HADOOP_HOME", hadoopHome);
+        }
         // This should actually be specified in the cluster env or commands? we just need to check if genie supports it
         
         // set the base working directory
@@ -417,15 +557,19 @@ public class YarnJobManager implements JobManager {
      * @return a string containing the other strings as csv
      */
     protected String convertListToCSV(ArrayList<String> list) {
+        // TODO trimming comma does not work
         Iterator<String> it = list.iterator();
         String csv = new String();
         
         while(it.hasNext()) {
-            csv.concat((String)it.next()+",");
+            //csv.concat((String)it.next()+",");
+            csv += (String)it.next()+",";
         }
         
         // Trim the last comma
-        csv.substring(0, csv.length()-1);
+        if(csv.length() > 1) {
+            csv = csv.substring(0, csv.length()-2);
+        }
         return csv;
     }
 
@@ -445,26 +589,14 @@ public class YarnJobManager implements JobManager {
 
           ClusterConfigResponse ccr = null;
           
-          // TODO Logic to determine cluster based on command/application combination
-          
-          ClusterConfigElement ce = new ClusterConfigElement();
-//        String clusterId = ji2.getClusterId();
-//        String clusterName = ji2.getClusterName();
-//        String schedule = null;
-//        // only use the schedule if both cluster id and cluster name are null or empty
-//        if (((clusterId == null) || clusterId.isEmpty())
-//                && ((clusterName == null) || clusterName.isEmpty())) {
-//            schedule = ji2.getSchedule();
-//        }
-//
-//        ccr = ccs.getClusterConfig(clusterId, clusterName,
-//                Types.Configuration.parse(ji2.getConfiguration()),
-//                Types.Schedule.parse(schedule),
-//                Types.JobType.parse(ji2.getJobType()), Types.ClusterStatus.UP);
-//
-//        // return selected instance
-        //return clb.selectCluster(ccr.getClusterConfigs());
-          return ce;
+          ccr = ccs.getClusterConfig(ji2.getApplicationId(),
+                  ji2.getApplicationName(),
+                  ji2.getCommandId(),
+                  ji2.getCommandName(),
+                  ji2.getClusterCriteriaList());
+  
+          // return selected instance
+          return clb.selectCluster(ccr.getClusterConfigs());
     }
     
     /**
@@ -480,13 +612,22 @@ public class YarnJobManager implements JobManager {
         logger.info("called");
 
         String[] cmdArgs = StringUtil.splitCmdLine(ji2.getCmdArgs());
+        
+        // TODO Genie args will be passed on to job launcher as environment variable
         String[] genieArgs = getGenieCmdArgs();
         
-        // TODO Figure out length of hArgs based on args
         String[] hArgs;
-        hArgs = new String[10];
+        hArgs = new String[cmdArgs.length + 2];
         
-        // TODO construct the hargs based on command
+        // get the location where genie scripts are installed
+        String genieHome = env.get("XS_SYSTEM_HOME");
+
+         // first two args are the joblauncher and job type
+        hArgs[0] = genieHome + File.separator + "joblauncher.sh";
+        hArgs[1] = executable;
+        
+        System.arraycopy(cmdArgs, 0, hArgs, 2, cmdArgs.length);
+        
         return hArgs;
     }
     

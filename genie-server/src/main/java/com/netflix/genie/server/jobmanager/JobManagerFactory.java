@@ -28,6 +28,7 @@ import com.netflix.genie.common.model.Types;
 import com.netflix.genie.server.jobmanager.impl.HadoopJobManager;
 import com.netflix.genie.server.jobmanager.impl.HiveJobManager;
 import com.netflix.genie.server.jobmanager.impl.PigJobManager;
+import com.netflix.genie.server.jobmanager.impl.YarnJobManager;
 
 /**
  * Factory class to instantiate individual Hadoop/Hive/Pig job managers.
@@ -62,6 +63,8 @@ public final class JobManagerFactory {
             return new HiveJobManager();
         } else if (Types.JobType.PIG.name().equalsIgnoreCase(type)) {
             return new PigJobManager();
+        } else if (Types.JobType.YARN.name().equalsIgnoreCase(type)) {
+            return new YarnJobManager();
         }
 
         String msg = String.format("JobManager [%s] is not supported", type);

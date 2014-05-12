@@ -44,6 +44,7 @@ import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
+import com.netflix.genie.server.jobmanager.impl.YarnJobManager;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.persistence.ClauseBuilder;
@@ -530,6 +531,16 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                     msg);
         }
 
+        // Either the commandId or the commandName have to be specified.
+        if((jobInfo.getCommandId() == null) || (jobInfo.getCommandId().isEmpty()) &&
+                (jobInfo.getCommandName() == null) || (jobInfo.getCommandName().isEmpty())) {
+            String msg = "Either the commandId or the commandName have to be specified";
+            logger.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    msg);
+        }
+        
         // check if userName is valid
         validateNameValuePair("userName", jobInfo.getUserName());
 

@@ -18,10 +18,12 @@
 
 package com.netflix.genie.server.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.netflix.genie.common.messages.ClusterConfigRequest;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Types;
 
 /**
@@ -85,6 +87,11 @@ public interface ClusterConfigService {
             List<String> status, List<String> tags, Long minUpdateTime, 
             Long maxUpdateTime, Integer limit, Integer page);
 
+    // TODO: Add Comments
+    ClusterConfigResponse getClusterConfig(String applicationId,
+            String applicationName, String commandId, String commandName,
+            ArrayList<ClusterCriteria> clusterCriteriaList);
+    
     /**
      * Create new cluster config.
      *

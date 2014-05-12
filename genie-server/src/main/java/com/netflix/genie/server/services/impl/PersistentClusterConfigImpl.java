@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityExistsException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.RollbackException;
 
 import org.slf4j.Logger;
@@ -18,6 +22,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigRequest;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.CommandConfigElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.ClusterStatus;
@@ -442,5 +447,78 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 //                clusterConfigElement.setUnitTest(Boolean.FALSE);
 //            }
         }
+    }
+
+    @Override
+    public ClusterConfigResponse getClusterConfig(String applicationId,
+            String applicationName, String commandId, String commandName,
+            ArrayList<ClusterCriteria> clusterCriteriaList) {
+        
+        ClusterConfigResponse ccr = null;
+        
+        Iterator<ClusterCriteria> criteriaIter = clusterCriteriaList.iterator();
+        //String queryString = "SELECT distinct x from ClusterConfigElement x, IN(x.tags) t WHERE " ;
+        //String queryString = "SELECT distinct x from Cluster x, IN(x.commands) cmds where :element1 member of  x.tags AND :element2 member of x.tags AND cmds.name=\"prodhive\"";
+        
+        while(criteriaIter.hasNext()) {
+            
+            String queryString = "SELECT distinct cstr from ClusterConfigElement cstr, IN(cstr.commands) cmds, IN(cmds.applications) apps where ";
+            
+            ClusterCriteria cc = (ClusterCriteria)criteriaIter.next();
+            
+            for(int i =0; i<cc.getTags().size(); i++) {
+                if (i != 0) {
+                    queryString += " AND ";
+                } 
+                
+                queryString += ":tag" + i + " member of cstr.tags ";
+            }
+            
+            if ((commandId !=null) && (!commandId.isEmpty())) {
+                queryString += " AND cmds.id = \"" + commandId  + "\" ";
+            } else if ((commandName !=null) && (!commandName.isEmpty())) {
+                queryString += " AND cmds.name = \"" + commandName  + "\" ";
+            }
+            
+            if ((applicationId != null) && (!applicationId.isEmpty())) {
+                queryString += " AND apps.id = \"" + applicationId  + "\" ";
+            } else if  ((applicationName != null) && (!applicationName.isEmpty())){
+                queryString += " AND apps.name = \"" + applicationName  + "\" ";
+            }
+            
+            Iterator<String> tagIter = cc.getTags().iterator();
+            
+            System.out.println("Query is " + queryString);
+            
+            java.util.Map<Object,Object> map = new java.util.HashMap<Object,Object>();
+            EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie", map);
+            EntityManager em = factory.createEntityManager();
+            Query q = em.createQuery(queryString);
+            
+            int tagNum = 0;
+            while(tagIter.hasNext()) {
+                String tag = (String)tagIter.next();
+                q.setParameter("tag"+tagNum, tag);
+                tagNum++;
+            }
+            
+            List<ClusterConfigElement> results = (List<ClusterConfigElement>) q.getResultList();
+            
+            ClusterConfigElement[] elements = new ClusterConfigElement[results.size()];
+            Iterator<ClusterConfigElement> cceIter = results.iterator();
+            
+            int j = 0;
+            while(cceIter.hasNext()) {
+                ClusterConfigElement cce = (ClusterConfigElement)cceIter.next();
+                elements[j] = cce;
+                j++;
+            }
+            
+            ccr = new ClusterConfigResponse();
+            ccr.setClusterConfigs(elements);
+            
+            return ccr;
+        }
+        return null;
     }
 }

@@ -107,22 +107,24 @@ public class JobResourceV1 {
           //  jobInfo.setClusterCriteriaString(jobInfo.getClusterCriteriaList());
         }
         
-        if (jobInfo != null) {
-            logger.debug("Genie V1 job request submitted to execution service. Trying to persist it.Object Details are");
-            logger.debug("Job Id: " + jobInfo.getJobID() + " Job Name: " + jobInfo.getJobName());
-            logger.debug("Cluster Criteria List: " + jobInfo.getClusterCriteriaList());
-            PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-            pm.createEntity(jobInfo);
-          
-            logger.debug("Persistence Successful. Return Response");
-            //JobResponse response = xs.submitJob(request);
-        } else {
-            logger.debug ("Job Info is Null. Inspecting request object");
-            logger.debug(request.toString());
-        }
+        JobResponse response = xs.submitJob(request);
         
-        JobResponse response  = new JobResponse();
-        response.setJob(jobInfo);
+//        if (jobInfo != null) {
+//            logger.debug("Genie V1 job request submitted to execution service. Trying to persist it.Object Details are");
+//            logger.debug("Job Id: " + jobInfo.getJobID() + " Job Name: " + jobInfo.getJobName());
+//            logger.debug("Cluster Criteria List: " + jobInfo.getClusterCriteriaList());
+//           // PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
+//            //pm.createEntity(jobInfo);
+//          
+//            //logger.debug("Persistence Successful. Return Response");
+//            JobResponse response = xs.submitJob(request);
+//        } else {
+//            logger.debug ("Job Info is Null. Inspecting request object");
+//            logger.debug(request.toString());
+//        }
+        
+        //JobResponse response  = new JobResponse();
+        //response.setJob(jobInfo);
         return ResponseUtil.createResponse(response);
     }
     

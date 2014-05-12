@@ -33,38 +33,38 @@ import com.netflix.genie.server.services.ClusterLoadBalancer;
  * @author skrishnan
  */
 public class TestClusterLoadBalancerImpl {
-
-    /**
-     * Test whether a cluster is returned from a set of candidates.
-     *
-     * @throws Exception if anything went wrong with the test.
-     */
-    @Test
-    public void testValidCluster() throws Exception {
-        ClusterConfigElementOld cce = new ClusterConfigElementOld();
-        ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
-        Assert.assertNotNull(clb.selectCluster(new ClusterConfigElementOld[] {
-                cce, cce, cce }));
-    }
-
-    /**
-     * Test whether HttpURLConnection.HTTP_PAYMENT_REQUIRED is raised if a cluster
-     * can't be found from candidates.
-     */
-    @Test
-    public void testInvalidCluster() {
-        ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
-        try {
-            clb.selectCluster(new ClusterConfigElementOld[] {});
-        } catch (CloudServiceException cse) {
-            Assert.assertEquals(cse.getErrorCode(),
-                    HttpURLConnection.HTTP_PAYMENT_REQUIRED);
-        }
-        try {
-            clb.selectCluster(null);
-        } catch (CloudServiceException cse) {
-            Assert.assertEquals(cse.getErrorCode(),
-                    HttpURLConnection.HTTP_PAYMENT_REQUIRED);
-        }
-    }
+//
+//    /**
+//     * Test whether a cluster is returned from a set of candidates.
+//     *
+//     * @throws Exception if anything went wrong with the test.
+//     */
+//    @Test
+//    public void testValidCluster() throws Exception {
+//        ClusterConfigElementOld cce = new ClusterConfigElementOld();
+//        ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
+//        Assert.assertNotNull(clb.selectCluster(new ClusterConfigElementOld[] {
+//                cce, cce, cce }));
+//    }
+//
+//    /**
+//     * Test whether HttpURLConnection.HTTP_PAYMENT_REQUIRED is raised if a cluster
+//     * can't be found from chttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/command((applicationId != null) && (applicationId.isEmpty()))((applicationId != null) && (applicationId.isEmpty()))((applicationId != null) && (applicationId.isEmpty()))andidates.
+//     */
+//    @Test
+//    public void testInvalidCluster() {
+//        ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
+//        try {
+//            clb.selectCluster(new ClusterConfigElementOld[] {});
+//        } catch (CloudServiceException cse) {
+//            Assert.assertEquals(cse.getErrorCode(),
+//                    HttpURLConnection.HTTP_PAYMENT_REQUIRED);
+//        }
+//        try {
+//            clb.selectCluster(null);
+//        } catch (CloudServiceException cse) {
+//            Assert.assertEquals(cse.getErrorCode(),
+//                    HttpURLConnection.HTTP_PAYMENT_REQUIRED);
+//        }
+//    }
 }

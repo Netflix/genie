@@ -571,6 +571,7 @@ public class HadoopJobManager implements JobManager {
 //                Types.JobType.parse(ji2.getJobType()), Types.ClusterStatus.UP);
 //
 //        // return selected instance
-        return clb.selectCluster(ccr.getClusterConfigs());
+        //return clb.selectCluster(ccr.getClusterConfigs());
+          return null;
     }
 }

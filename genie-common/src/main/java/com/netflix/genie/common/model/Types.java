@@ -86,7 +86,11 @@ public class Types {
         /**
          * Represents a Pig job.
          */
-        PIG;
+        PIG,
+        /**
+         * Represents a Yarn job.
+         */
+        YARN;
 
         /**
          * Parse job type.
@@ -104,6 +108,8 @@ public class Types {
                 return HIVE;
             } else if (value.compareToIgnoreCase("PIG") == 0) {
                 return PIG;
+            } else if (value.compareToIgnoreCase("YARN") == 0) {
+                return YARN;
             } else {
                 return null;
             }
