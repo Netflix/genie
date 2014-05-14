@@ -1,0 +1,8 @@
+apply plugin: 'java'
+
+// we are doing this to include genie-common classes in client's javadocs
+sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
+
+dependencies {
+    compile 'commons-configuration:commons-configuration:1.8'
+}
