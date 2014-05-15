@@ -3,7 +3,8 @@ subprojects {
 apply plugin: 'checkstyle'
 checkstyle {
     ignoreFailures = true 
-    configFile = rootProject.file('codequality/checkstyle.xml')
+    configFile = new File(project(':genie').projectDir, 'codequality/checkstyle.xml')
+    //configFile = new File(project(':genie').projectDir, 'codequality/checkstyle.xml')
 }
 
 // FindBugs
