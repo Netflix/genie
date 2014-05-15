@@ -44,7 +44,7 @@ import com.google.common.collect.Multimap;
  */
 public final class PigConfigServiceClient extends BaseGenieClient {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(PigConfigServiceClient.class);
 
     private static final String BASE_REST_URI = "/genie/v0/config/pig";
@@ -87,13 +87,13 @@ public final class PigConfigServiceClient extends BaseGenieClient {
             throws CloudServiceException {
         if (pigConfigElement == null) {
             String msg = "Required parameter pigConfig can't be NULL";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (pigConfigElement.getUser() == null) {
             String msg = "User name is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -115,7 +115,7 @@ public final class PigConfigServiceClient extends BaseGenieClient {
 
         if ((pcr.getPigConfigs() == null) || (pcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -138,13 +138,13 @@ public final class PigConfigServiceClient extends BaseGenieClient {
             throws CloudServiceException {
         if (pigConfigElement == null) {
             String msg = "Required parameter pigConfig can't be NULL";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (pigConfigElement.getUser() == null) {
             String msg = "User name is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -157,7 +157,7 @@ public final class PigConfigServiceClient extends BaseGenieClient {
 
         if ((pcr.getPigConfigs() == null) || (pcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -185,7 +185,7 @@ public final class PigConfigServiceClient extends BaseGenieClient {
 
         if ((pcr.getPigConfigs() == null) || (pcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -214,7 +214,7 @@ public final class PigConfigServiceClient extends BaseGenieClient {
         // reason
         if ((pcr.getPigConfigs() == null) || (pcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -234,7 +234,7 @@ public final class PigConfigServiceClient extends BaseGenieClient {
     public PigConfigElement deletePigConfig(String pigConfigId) throws CloudServiceException {
         if (pigConfigId == null) {
             String msg = "Missing required parameter: pigConfigId";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -244,7 +244,7 @@ public final class PigConfigServiceClient extends BaseGenieClient {
 
         if ((pcr.getPigConfigs() == null) || (pcr.getPigConfigs().length == 0)) {
             String msg = "Unable to parse pig config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }

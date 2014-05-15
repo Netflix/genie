@@ -14,14 +14,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- *  Representation of the state of the Command Object
+ * Representation of the state of the Command Object
  *  
  * @author amsharma
  */
@@ -31,9 +27,6 @@ import org.slf4j.LoggerFactory;
 public class CommandConfigElement implements Serializable {
     
     private static final long serialVersionUID = -6106046473373305992L;
-    
-    private static Logger logger = LoggerFactory
-            .getLogger(CommandConfigElement.class);
 
     /**
      * Unique ID to represent a row in database.

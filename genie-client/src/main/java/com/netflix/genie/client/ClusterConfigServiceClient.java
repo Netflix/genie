@@ -43,7 +43,7 @@ import com.google.common.collect.Multimap;
  */
 public final class ClusterConfigServiceClient extends BaseGenieClient {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigServiceClient.class);
 
     private static final String BASE_REST_URI = "/genie/v0/config/cluster";
@@ -86,13 +86,13 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
             throws CloudServiceException {
         if (ClusterConfigElementOld == null) {
             String msg = "Required parameter clusterConfig can't be NULL";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (ClusterConfigElementOld.getUser() == null) {
             String msg = "User name is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -102,7 +102,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
                 || (ClusterConfigElementOld.getName() == null)) {
             String msg = "Missing required Hadoop parameters for creating clusterConfig: "
                     + "{name, s3MapredSiteXml, s3HdfsSiteXml, s3CoreSiteXml}";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
@@ -116,7 +116,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
 
         if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -139,13 +139,13 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
             throws CloudServiceException {
         if (ClusterConfigElementOld == null) {
             String msg = "Required parameter clusterConfig can't be NULL";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (ClusterConfigElementOld.getUser() == null) {
             String msg = "User name is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -158,7 +158,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
 
         if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -186,7 +186,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
 
         if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -215,7 +215,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         // reason
         if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -235,7 +235,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
     public ClusterConfigElementOld deleteClusterConfig(String clusterConfigId) throws CloudServiceException {
         if (clusterConfigId == null) {
             String msg = "Missing required parameter: clusterConfigId";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -245,7 +245,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
 
         if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }

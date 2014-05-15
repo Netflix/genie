@@ -49,13 +49,13 @@ import com.netflix.discovery.DiscoveryManager;
  * Abstract REST client class that is extended to implement specific clients.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
 public abstract class BaseGenieClient {
 
     private static final String CLOUD = "cloud";
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(BaseGenieClient.class);
 
     /**
@@ -102,6 +102,7 @@ public abstract class BaseGenieClient {
      * Executes HTTP request based on user params, and performs
      * marshaling/unmarshaling.
      *
+     * @param <T>
      * @param verb
      *            GET, POST or DELETE
      * @param baseRestUri
@@ -143,7 +144,7 @@ public abstract class BaseGenieClient {
             // basic error checking
             if (response == null) {
                 String msg = "Received NULL response from Genie service";
-                logger.error(msg);
+                LOG.error(msg);
                 throw new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
             }
@@ -151,11 +152,11 @@ public abstract class BaseGenieClient {
             // extract/cast/unmarshal and return entity
             return extractEntityFromClientResponse(response, responseClass);
         } catch (URISyntaxException e) {
-            logger.error("Exception caught while executing request", e);
+            LOG.error("Exception caught while executing request", e);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, e);
         } catch (ClientException e) {
-            logger.error("Exception caught while executing request", e);
+            LOG.error("Exception caught while executing request", e);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, e);
         } finally {
@@ -182,13 +183,13 @@ public abstract class BaseGenieClient {
             throws CloudServiceException {
         if (response == null) {
             String msg = "Received null response from Genie Service";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
         int status = response.getStatus();
-        logger.debug("Response Status:" + status);
+        LOG.debug("Response Status:" + status);
         try {
             // check if entity exists within response
             if (!response.hasEntity()) {
@@ -196,7 +197,7 @@ public abstract class BaseGenieClient {
                 // didn't get to Genie
                 String msg = "Received status " + status
                         + " for Genie/NIWS call, but no entity/body";
-                logger.error(msg);
+                LOG.error(msg);
                 throw new CloudServiceException(
                         (status != HttpURLConnection.HTTP_OK) ? status
                                 : HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
@@ -208,7 +209,7 @@ public abstract class BaseGenieClient {
             if (templateResponse == null) {
                 String msg = "Received status " + status
                         + " - can't deserialize response from Genie Service";
-                logger.error(msg);
+                LOG.error(msg);
                 throw new CloudServiceException(
                         (status != HttpURLConnection.HTTP_OK) ? status
                                 : HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
@@ -216,7 +217,7 @@ public abstract class BaseGenieClient {
 
             // got an http error code from Genie, throw exception
             if (status != HttpURLConnection.HTTP_OK) {
-                logger.error("Received error for job: "
+                LOG.error("Received error for job: "
                         + templateResponse.getErrorMsg());
                 throw new CloudServiceException(status,
                         templateResponse.getErrorMsg());
@@ -225,7 +226,7 @@ public abstract class BaseGenieClient {
             // all good
             return templateResponse;
         } catch (Exception e) {
-            logger.error(
+            LOG.error(
                     "Exception caught while extracting entity from response", e);
             throw new CloudServiceException(
                     (status != HttpURLConnection.HTTP_OK) ? status

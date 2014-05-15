@@ -44,7 +44,7 @@ import com.google.common.collect.Multimap;
  */
 public final class HiveConfigServiceClient extends BaseGenieClient {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(HiveConfigServiceClient.class);
 
     private static final String BASE_REST_URI = "/genie/v0/config/hive";
@@ -87,13 +87,13 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
             throws CloudServiceException {
         if (hiveConfigElement == null) {
             String msg = "Required parameter hiveConfig can't be NULL";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (hiveConfigElement.getUser() == null) {
             String msg = "User name is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -115,7 +115,7 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
 
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -138,13 +138,13 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
             throws CloudServiceException {
         if (hiveConfigElement == null) {
             String msg = "Required parameter hiveConfig can't be NULL";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (hiveConfigElement.getUser() == null) {
             String msg = "User name is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -157,7 +157,7 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
 
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -185,7 +185,7 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
 
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -214,7 +214,7 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
         // reason
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -234,7 +234,7 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
     public HiveConfigElement deleteHiveConfig(String hiveConfigId) throws CloudServiceException {
         if (hiveConfigId == null) {
             String msg = "Missing required parameter: hiveConfigId";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -244,7 +244,7 @@ public final class HiveConfigServiceClient extends BaseGenieClient {
 
         if ((hcr.getHiveConfigs() == null) || (hcr.getHiveConfigs().length == 0)) {
             String msg = "Unable to parse hive config from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }

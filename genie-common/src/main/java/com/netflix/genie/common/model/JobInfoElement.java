@@ -47,7 +47,7 @@ public class JobInfoElement implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(JobInfoElement.class);
 
     /**
@@ -186,7 +186,7 @@ public class JobInfoElement implements Serializable {
     /**
      * Finish time for job - initialized to zero (for historic reasons).
      */
-    private Long finishTime = Long.valueOf(0);
+    private Long finishTime = 0L;
 
     /**
      * The host/ip address of the client submitting job.
@@ -464,7 +464,7 @@ public class JobInfoElement implements Serializable {
             this.status = jobStatus;
         } else {
             String msg = "Unkown Job Status string: " + jobStatus;
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }

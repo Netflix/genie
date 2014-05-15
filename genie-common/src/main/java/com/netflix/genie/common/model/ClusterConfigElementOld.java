@@ -42,7 +42,7 @@ public class ClusterConfigElementOld implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigElementOld.class);
 
     @Id
@@ -610,7 +610,7 @@ public class ClusterConfigElementOld implements Serializable {
      * @return appropriate hiveConfigId
      */
     public String getHiveConfigId(Types.Configuration configType) {
-        logger.debug("called");
+        LOG.debug("called");
         if (configType == null) {
             return null;
         } else if (configType == Types.Configuration.PROD) {
@@ -630,7 +630,7 @@ public class ClusterConfigElementOld implements Serializable {
      * @return appropriate pigConfigId
      */
     public String getPigConfigId(Types.Configuration configType) {
-        logger.debug("called");
+        LOG.debug("called");
         if (configType == null) {
             return null;
         } else if (configType == Types.Configuration.PROD) {
@@ -648,7 +648,7 @@ public class ClusterConfigElementOld implements Serializable {
      * @return (s3CoreSiteXml, s3MapredSiteXml, s3HdfsSiteXml)
      */
     public String getS3SiteXmlsAsCsv() {
-        logger.debug("called");
+        LOG.debug("called");
 
         StringBuilder csv = new StringBuilder();
         if (s3CoreSiteXml != null) {
