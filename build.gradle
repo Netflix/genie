@@ -38,7 +38,3 @@ subprojects {
         testCompile 'junit:junit:4.10'
     }
 }
-
-task printProject << {
-    println project
-}
