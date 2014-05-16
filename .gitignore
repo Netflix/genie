@@ -67,5 +67,5 @@ atlassian-ide-plugin.xml
 
 # NetBeans specific files/directories
 .nbattrs
-/.nb-gradle/private/
 .nb-gradle-properties
+.nb-gradle/
