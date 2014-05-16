@@ -4,7 +4,7 @@ apply plugin: 'java'
 // must perform build-time enhancement for OpenJPA
 //sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
 //sourceSets.main.java.srcDirs += new File(project.parent.project(':genie-common').projectDir, 'src/main/java')
-sourceSets.main.java.srcDirs += project.parent.project(':genie-common').sourceSets.main.java.srcDirs
+sourceSets.main.java.srcDirs += project.parent.childProjects.get('genie-common').sourceSets.main.java.srcDirs
 
 dependencies {
     compile 'com.netflix.archaius:archaius-core:0.5.8'
