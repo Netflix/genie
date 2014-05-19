@@ -38,7 +38,7 @@ inner = json.dumps(['sla','adhoc'])
 #lst = json.dumps(cclist)
 # works
 #lst = json.dumps([{"id": "t1"},{"id":"t2"}])
-lst = json.dumps([{"tags" : ['a','b'] },{"tags": ['c','d']}])
+lst = json.dumps([{"tags" : ['adhoc','test'] },{"tags": ['sla','prod']}])
 print lst
 
 def testJsonSubmitjob():
@@ -53,7 +53,7 @@ def testJsonSubmitjob():
             "userName" : "genietest", 
             "groupName" : "hadoop", 
             "userAgent" : "laptop",
-            "jobType": "hadoop", 
+            "jobType": "yarn", 
             "schedule": "adHoc",
             "cmdArgs":"jar hadoop-examples.jar sleep -m 1 -mt 1", 
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hadoop-examples.jar"

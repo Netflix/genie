@@ -532,13 +532,14 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
 
         // Either the commandId or the commandName have to be specified.
-        if((jobInfo.getCommandId() == null) || (jobInfo.getCommandId().isEmpty()) &&
-                (jobInfo.getCommandName() == null) || (jobInfo.getCommandName().isEmpty())) {
-            String msg = "Either the commandId or the commandName have to be specified";
-            logger.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+        if((jobInfo.getCommandId() == null) || (jobInfo.getCommandId().isEmpty())) {
+                if ((jobInfo.getCommandName() == null) || (jobInfo.getCommandName().isEmpty())){
+                    String msg = "Either the commandId or the commandName have to be specified";
+                    logger.error(msg);
+                    throw new CloudServiceException(
+                            HttpURLConnection.HTTP_BAD_REQUEST,
+                            msg);
+                }
         }
         
         // check if userName is valid
