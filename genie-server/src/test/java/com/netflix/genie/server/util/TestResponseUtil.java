@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.JobInfoResponse;
+import com.netflix.genie.common.messages.JobResponse;
 
 /**
  * Test case for the ResponseUtil.
@@ -40,7 +40,7 @@ public class TestResponseUtil {
      */
     @Test
     public void testSuccess() {
-        JobInfoResponse ji = new JobInfoResponse();
+        JobResponse ji = new JobResponse();
         Response resp = ResponseUtil.createResponse(ji);
         Assert.assertEquals(resp.getStatus(), HttpURLConnection.HTTP_OK);
     }
@@ -50,7 +50,7 @@ public class TestResponseUtil {
      */
     @Test
     public void testFailure() {
-        JobInfoResponse ji = new JobInfoResponse(new CloudServiceException(
+        JobResponse ji = new JobResponse(new CloudServiceException(
                 HttpURLConnection.HTTP_INTERNAL_ERROR, "This is an error"));
         Response resp = ResponseUtil.createResponse(ji);
         Assert.assertEquals(resp.getStatus(),

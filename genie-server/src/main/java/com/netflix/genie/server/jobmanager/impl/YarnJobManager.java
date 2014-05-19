@@ -44,9 +44,7 @@ public class YarnJobManager implements JobManager {
     private static Logger logger = LoggerFactory
             .getLogger(YarnJobManager.class);
 
-    private PersistenceManager<ClusterConfigElement> pmCluster;
     private PersistenceManager<CommandConfigElement> pmCommand;
-    private PersistenceManager<ApplicationConfigElement> pmApplication;
     
     /**
      * The name of the Genie job id property to be passed to all jobs.
@@ -123,9 +121,7 @@ public class YarnJobManager implements JobManager {
     public YarnJobManager() throws CloudServiceException {
         ccs = ConfigServiceFactory.getClusterConfigImpl();
         clb = ConfigServiceFactory.getClusterLoadBalancer();
-        pmCluster = new PersistenceManager<ClusterConfigElement>();
         pmCommand = new PersistenceManager<CommandConfigElement>();
-        pmApplication = new PersistenceManager<ApplicationConfigElement>();
     }
     
     /**
@@ -294,7 +290,7 @@ public class YarnJobManager implements JobManager {
      * Initializes the object with the job information and environment prior to
      * job launch This method must be called before job is launched.
      *
-     * @param jInfo
+     * @param ji2
      *            the JobInfo object passed by the user
      * @throws CloudServiceException
      *             if there is an error during initialization
@@ -310,9 +306,6 @@ public class YarnJobManager implements JobManager {
         String lipstickUuidPropName = ConfigurationManager.getConfigInstance().
                 getString("netflix.genie.server.lipstick.uuid.prop.name", "lipstick.uuid.prop.name");
 
-        // #TODO i am not sure lipstick UUID setting belongs in open source version of genie. 
-        // Maybe think of some other way of setting it
-        // set the lipstick job ID, if needed
         if (ConfigurationManager.getConfigInstance().getBoolean(
                         "netflix.genie.server.lipstick.enable", false)) {
             lipstickUuidProp = lipstickUuidPropName + "=" + GENIE_JOB_ID;
@@ -349,8 +342,6 @@ public class YarnJobManager implements JobManager {
         
         // set the hadoop-related conf files
         cluster = getClusterConfig(ji2);
-        //String s3HadoopConfLocation = cluster.getS3SiteXmlsAsCsv();
-        //hEnv.put("S3_HADOOP_CONF_FILES", s3HadoopConfLocation);
         ArrayList<String> clusterConfigList = cluster.getConfigs();
         
         hEnv.put("S3_CLUSTER_CONF_FILES", convertListToCSV(clusterConfigList)); 
@@ -661,9 +652,6 @@ public class YarnJobManager implements JobManager {
         logger.info("called");
 
         String[] cmdArgs = StringUtil.splitCmdLine(ji2.getCmdArgs());
-        
-        // TODO Genie args will be passed on to job launcher as environment variable
-        //String[] genieArgs = getGenieCmdArgs();
         
         String[] hArgs;
         hArgs = new String[cmdArgs.length + 2];
