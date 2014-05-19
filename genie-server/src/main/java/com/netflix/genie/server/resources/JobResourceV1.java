@@ -18,16 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.JobInfoRequest;
-import com.netflix.genie.common.messages.JobInfoResponse;
 import com.netflix.genie.common.messages.JobRequest;
 import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.JobElement;
-import com.netflix.genie.common.model.JobInfoElement;
-import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.ExecutionServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;

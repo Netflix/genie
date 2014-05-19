@@ -23,7 +23,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.netflix.genie.common.model.JobInfoElement;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.util.NetUtil;
 
@@ -42,8 +42,8 @@ public class TestJobCountManager {
     public void testNumInstanceJobs() throws Exception {
 
         // setup
-        PersistenceManager<JobInfoElement> pm = new PersistenceManager<JobInfoElement>();
-        JobInfoElement job = new JobInfoElement();
+        PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
+        JobElement job = new JobElement();
         UUID uuid = UUID.randomUUID();
         job.setJobID(uuid.toString());
         job.setJobName("My test job");

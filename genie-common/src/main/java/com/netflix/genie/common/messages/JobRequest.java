@@ -22,7 +22,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.netflix.genie.common.model.JobElement;
-import com.netflix.genie.common.model.JobInfoElement;
 
 /**
  * Represents request to the Jobs REST resource.

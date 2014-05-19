@@ -27,7 +27,7 @@ import com.netflix.discovery.DiscoveryClient;
 import com.netflix.discovery.DiscoveryManager;
 import com.netflix.discovery.shared.Application;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.JobInfoElement;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
@@ -43,7 +43,7 @@ public final class JobCountManager {
     private static Logger logger = LoggerFactory
             .getLogger(JobCountManager.class);
 
-    private static volatile PersistenceManager<JobInfoElement> pm;
+    private static volatile PersistenceManager<JobElement> pm;
 
     /**
      * Private constructor - never called.
@@ -57,7 +57,7 @@ public final class JobCountManager {
     private static synchronized void init() {
         logger.info("called");
         if (pm == null) {
-            pm = new PersistenceManager<JobInfoElement>();
+            pm = new PersistenceManager<JobElement>();
         }
     }
 
@@ -137,7 +137,7 @@ public final class JobCountManager {
         }
 
         // query without pagination
-        QueryBuilder builder = new QueryBuilder().table("JobInfoElement")
+        QueryBuilder builder = new QueryBuilder().table("JobElement")
                 .clause(criteria.toString()).paginate(false);
         Object[] results = pm.query(builder);
         if (results == null) {

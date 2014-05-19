@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.JobElement;
-import com.netflix.genie.common.model.JobInfoElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
