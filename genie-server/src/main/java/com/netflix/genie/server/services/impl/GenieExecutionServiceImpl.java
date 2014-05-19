@@ -185,6 +185,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
             // init state in DB - return if job already exists
             try {
+                // TODO add retries to avoid deadlock issue
                 pm.createEntity(jInfo);
             } catch (RollbackException e) {
                 logger.error("Can't create entity in the database", e);
@@ -551,11 +552,6 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         // check if jobType is valid
         validateNameValuePair("jobType", jobInfo.getJobType());
 
-        // check if Hive Params include "-e" or "-f"
-        if (Types.JobType.parse(jobInfo.getJobType()) == Types.JobType.HIVE) {
-            validateNameValuePair("hiveArgs", jobInfo.getCmdArgs());
-        }
-
         // check if schedule is valid
         //validateNameValuePair("schedule", jobInfo.getSchedule());
 
@@ -590,32 +586,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         if (name.equals("jobType") && (Types.JobType.parse(value) == null)) {
             msg = "Invalid "
                     + name
-                    + ", Valid types are hadoop or hive or pig. Wrong value received: "
-                    + value;
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        } else if (name.equals("hiveArgs")) {
-            if ((!value.contains("-f")) && (!value.contains("-e"))) {
-                msg = "Hive arguments must include either the -e or -f flag";
-                logger.error(msg);
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_BAD_REQUEST, msg);
-            }
-        } else if (name.equals("schedule")
-                && (Types.Schedule.parse(value) == null)) {
-            msg = "Invalid "
-                    + name
-                    + " type, Valid values are adhoc, sla or bonus. Wrong value received: "
-                    + value;
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        } else if (name.equals("configuration")
-                && (Types.Configuration.parse(value) == null)) {
-            msg = "Invalid "
-                    + name
-                    + " type, Valid values are prod or test or unittest. Wrong value received: "
+                    + ", Invalid Jop type received. Job type should be yarn. Wrong value received: "
                     + value;
             logger.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
