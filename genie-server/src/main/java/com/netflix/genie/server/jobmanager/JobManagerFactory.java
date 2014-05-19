@@ -25,9 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types;
-import com.netflix.genie.server.jobmanager.impl.HadoopJobManager;
-import com.netflix.genie.server.jobmanager.impl.HiveJobManager;
-import com.netflix.genie.server.jobmanager.impl.PigJobManager;
 import com.netflix.genie.server.jobmanager.impl.YarnJobManager;
 
 /**
