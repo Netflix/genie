@@ -3,21 +3,15 @@ package com.netflix.genie.common.model;
 import java.io.Serializable;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.ArrayList;
 
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * Representation of the state of a Genie 1.0 job.
@@ -30,10 +24,7 @@ import org.slf4j.LoggerFactory;
 public class JobElement implements Serializable {
 
     private static final long serialVersionUID = 2979506788441089067L;
-
-    private static Logger logger = LoggerFactory
-            .getLogger(JobElement.class);
-
+    
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
     // ------------------------------------------------------------------------

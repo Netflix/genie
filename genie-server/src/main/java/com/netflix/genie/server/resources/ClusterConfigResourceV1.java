@@ -1,14 +1,14 @@
 package com.netflix.genie.server.resources;
 
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Iterator;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.messages.ClusterConfigRequest;
+import com.netflix.genie.common.messages.ClusterConfigResponse;
+import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.server.services.ClusterConfigService;
+import com.netflix.genie.server.services.ConfigServiceFactory;
+import com.netflix.genie.server.util.JAXBContextResolver;
+import com.netflix.genie.server.util.ResponseUtil;
 import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -19,39 +19,22 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ApplicationConfigRequest;
-import com.netflix.genie.common.messages.ApplicationConfigResponse;
-import com.netflix.genie.common.messages.ClusterConfigRequest;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.messages.CommandConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfigElement;
-import com.netflix.genie.common.model.ClusterConfigElement;
-import com.netflix.genie.common.model.CommandConfigElement;
-import com.netflix.genie.common.model.JobElement;
-import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
-import com.netflix.genie.server.services.ClusterConfigService;
-import com.netflix.genie.server.services.ConfigServiceFactory;
-import com.netflix.genie.server.util.JAXBContextResolver;
-import com.netflix.genie.server.util.ResponseUtil;
 
 /**
  * Code for ApplicationConfigResource - REST end-point for supporting Application
  * @author amsharma
  */
 @Path("/v1/config/cluster")
-@Produces({ "application/xml", "application/json" })
+@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class ClusterConfigResourceV1 {
     
-    private ClusterConfigService ccs;
-    private static Logger logger = LoggerFactory
+    private final ClusterConfigService ccs;
+    private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigResourceV1.class);
 
     /**
@@ -94,7 +77,7 @@ public class ClusterConfigResourceV1 {
     @GET
     @Path("/{id}")
     public Response getClusterConfig(@PathParam("id") String id) {
-        logger.info("called with id: " + id);
+        LOG.info("called with id: " + id);
         ClusterConfigResponse ccr = ccs.getClusterConfig(id);
         return ResponseUtil.createResponse(ccr);
     }
@@ -110,6 +93,8 @@ public class ClusterConfigResourceV1 {
      *            cluster name (can be a pattern)
      * @param status
      *            valid types - Types.ClusterStatus
+     * @param tags
+     *            tags for the cluster
      * @param minUpdateTime
      *            min time when cluster config was updated
      * @param maxUpdateTime
@@ -130,7 +115,7 @@ public class ClusterConfigResourceV1 {
             @QueryParam("maxUpdateTime") Long maxUpdateTime,
             @QueryParam("limit") @DefaultValue("1024") int limit,
             @QueryParam("page") @DefaultValue("0") int page) {
-        logger.info("called");
+        LOG.info("called");
         // treat empty string values for booleans as nulls, not false
         ClusterConfigResponse ccr = ccs.getClusterConfig(id, name, status, tags, minUpdateTime, maxUpdateTime, limit, page);
         return ResponseUtil.createResponse(ccr);
@@ -166,9 +151,9 @@ public class ClusterConfigResourceV1 {
      */
     @POST
     @Path("/")
-    @Consumes({ "application/xml", "application/json" })
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response createClusterConfig(ClusterConfigRequest request) {
-        logger.info("called to create new cluster");
+        LOG.info("called to create new cluster");
         
         // Need to get the ClusterConfig object and fetch the command objects from the DB 
         // to set it in the object.      
@@ -210,10 +195,10 @@ public class ClusterConfigResourceV1 {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({ "application/xml", "application/json" })
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response updateClusterConfig(@PathParam("id") String id,
             ClusterConfigRequest request) {
-        logger.info("called to create/update cluster");
+        LOG.info("called to create/update cluster");
 
         ClusterConfigElement clusterConfig = request.getClusterConfig();
         if (clusterConfig != null) {
@@ -253,7 +238,7 @@ public class ClusterConfigResourceV1 {
     @DELETE
     @Path("/")
     public Response deleteClusterConfig() {
-        logger.info("called");
+        LOG.info("called");
         // this will just return an error
         return deleteClusterConfig(null);
     }
@@ -268,7 +253,7 @@ public class ClusterConfigResourceV1 {
     @DELETE
     @Path("/{id}")
     public Response deleteClusterConfig(@PathParam("id") String id) {
-        logger.info("delete called for id: " + id);
+        LOG.info("delete called for id: " + id);
         ClusterConfigResponse ccr = ccs.deleteClusterConfig(id);
         return ResponseUtil.createResponse(ccr);
     }

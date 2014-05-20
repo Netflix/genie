@@ -41,6 +41,9 @@ public final class ClusterConfigServiceSampleClient {
 
     /**
      * Main for running client code.
+     * 
+     * @param args
+     * @throws java.lang.Exception
      */
     public static void main(String[] args) throws Exception {
 

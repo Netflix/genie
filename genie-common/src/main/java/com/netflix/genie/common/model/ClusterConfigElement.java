@@ -16,9 +16,6 @@ import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  *  Representation of the state of the Cluster  object.
  * 
@@ -31,9 +28,6 @@ import org.slf4j.LoggerFactory;
 public class ClusterConfigElement implements Serializable {
 
     private static final long serialVersionUID = 8046582926818942370L;
-    
-    private static Logger logger = LoggerFactory
-            .getLogger(ClusterConfigElement.class);
 
     /**
      * Unique ID for this cluster.

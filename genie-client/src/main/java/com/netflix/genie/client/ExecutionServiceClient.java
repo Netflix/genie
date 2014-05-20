@@ -44,7 +44,7 @@ import com.google.common.collect.Multimap;
  */
 public final class ExecutionServiceClient extends BaseGenieClient {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(ExecutionServiceClient.class);
 
     private static final String BASE_REST_URI = "/genie/v0/jobs";
@@ -101,19 +101,19 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             throws CloudServiceException {
         if (jobInfo == null) {
             String msg = "Required parameter jobInfo can't be NULL";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (jobInfo.getUserName() == null) {
             String msg = "User name is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (jobInfo.getJobType() == null) {
             String msg = "JobType is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -121,19 +121,19 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                 .equalsIgnoreCase(Types.JobType.HADOOP.name()))
                 && (jobInfo.getConfiguration() == null)) {
             String msg = "Configuration is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (jobInfo.getSchedule() == null) {
             String msg = "Schedule is missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (jobInfo.getCmdArgs() == null) {
             String msg = "Command-line arguments are missing";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -148,7 +148,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
 
         if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
             String msg = "Unable to parse job info from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -176,7 +176,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
 
         if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
             String msg = "Unable to parse job info from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -205,7 +205,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         // reason
         if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
             String msg = "Unable to parse job info from response";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
@@ -254,7 +254,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             long pollTime) throws CloudServiceException, InterruptedException {
         if (jobID == null) {
             String msg = "Missing required parameter: jobID";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
@@ -275,7 +275,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                 Thread.sleep(pollTime);
             } else {
                 String msg = "Timed out waiting for job to finish";
-                logger.error(msg);
+                LOG.error(msg);
                 throw new InterruptedException(msg);
             }
         }
@@ -292,7 +292,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     public JobStatusResponse killJob(String jobID) throws CloudServiceException {
         if (jobID == null) {
             String msg = "Missing required parameter: jobID";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }

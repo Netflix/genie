@@ -1,26 +1,6 @@
 package com.netflix.genie.server.resources;
 
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
 import com.netflix.genie.common.model.ApplicationConfigElement;
@@ -30,6 +10,24 @@ import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;
 import com.netflix.genie.server.util.ResponseUtil;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Code for CommandConfigResource - REST end-point for supporting Command
@@ -37,11 +35,11 @@ import com.netflix.genie.server.util.ResponseUtil;
  * 
  */
 @Path("/v1/config/command")
-@Produces({ "application/xml", "application/json" })
+@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class CommandConfigResourceV1 {
     
-    private CommandConfigService ccs;
-    private static Logger logger = LoggerFactory
+    private final CommandConfigService ccs;
+    private static final Logger LOG = LoggerFactory
             .getLogger(CommandConfigResourceV1.class);
 
     /**
@@ -84,7 +82,7 @@ public class CommandConfigResourceV1 {
     @GET
     @Path("/{id}")
     public Response getCommandConfig(@PathParam("id") String id) {
-        logger.info("called");
+        LOG.info("called");
         return getCommandConfig(id, null);
     }
     
@@ -103,7 +101,7 @@ public class CommandConfigResourceV1 {
     public Response getCommandConfig (@QueryParam("id") String id,
             @QueryParam("name") String name) {
         
-        logger.info("called");
+        LOG.info("called");
         CommandConfigResponse ccr = ccs.getCommandConfig(id, name);
         return ResponseUtil.createResponse(ccr);
 //        
@@ -140,9 +138,9 @@ public class CommandConfigResourceV1 {
      */
     @POST
     @Path("/")
-    @Consumes({ "application/xml", "application/json" })
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response createCommandConfig(CommandConfigRequest request) {
-        logger.info("called to create new cluster");
+        LOG.info("called to create new cluster");
         
         // Need to get the CommandConfig object and fetch the applcation objects from the DB 
         // to set it in the object.      
@@ -257,10 +255,10 @@ public class CommandConfigResourceV1 {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({ "application/xml", "application/json" })
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response updateCommandConfig(@PathParam("id") String id,
             CommandConfigRequest request) {
-        logger.info("called to create/update comamnd config");
+        LOG.info("called to create/update comamnd config");
         CommandConfigElement commandConfig = request.getCommandConfig();
         if (commandConfig != null) {
             // include "id" in the request
@@ -298,7 +296,7 @@ public class CommandConfigResourceV1 {
     @DELETE
     @Path("/")
     public Response deleteCommandConfig() {
-        logger.info("called");
+        LOG.info("called");
         return deleteCommandConfig(null);
     }
     
@@ -312,7 +310,7 @@ public class CommandConfigResourceV1 {
     @DELETE
     @Path("/{id}")
     public Response deleteCommandConfig(@PathParam("id") String id) {
-        logger.info("called");
+        LOG.info("called");
         CommandConfigResponse ccr = ccs.deleteCommandConfig(id);
         return ResponseUtil.createResponse(ccr);
     }

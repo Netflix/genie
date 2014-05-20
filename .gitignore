@@ -50,7 +50,6 @@ Thumbs.db
 /build
 */build
 #
-# # IntelliJ specific files/directories
 
 # IntelliJ specific files/directories
 out
@@ -68,3 +67,5 @@ atlassian-ide-plugin.xml
 
 # NetBeans specific files/directories
 .nbattrs
+.nb-gradle-properties
+.nb-gradle/

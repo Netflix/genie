@@ -10,13 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-
-import org.codehaus.jackson.annotate.JsonUnwrapped;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *  Representation of the state of Application config object
@@ -29,9 +22,6 @@ import org.slf4j.LoggerFactory;
 public class ApplicationConfigElement implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private static Logger logger = LoggerFactory
-            .getLogger(ApplicationConfigElement.class);
     
     /**
      * Unique ID to represent a row in database.

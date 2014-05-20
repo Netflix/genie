@@ -1,5 +1,15 @@
 package com.netflix.genie.server.resources;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.messages.JobRequest;
+import com.netflix.genie.common.messages.JobResponse;
+import com.netflix.genie.common.messages.JobStatusResponse;
+import com.netflix.genie.common.model.ClusterCriteria;
+import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.server.services.ExecutionService;
+import com.netflix.genie.server.services.ExecutionServiceFactory;
+import com.netflix.genie.server.util.JAXBContextResolver;
+import com.netflix.genie.server.util.ResponseUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -11,32 +21,21 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.JobRequest;
-import com.netflix.genie.common.messages.JobResponse;
-import com.netflix.genie.common.messages.JobStatusResponse;
-import com.netflix.genie.common.model.ClusterCriteria;
-import com.netflix.genie.common.model.JobElement;
-import com.netflix.genie.server.services.ExecutionService;
-import com.netflix.genie.server.services.ExecutionServiceFactory;
-import com.netflix.genie.server.util.JAXBContextResolver;
-import com.netflix.genie.server.util.ResponseUtil;
 
 /**
  * @author amsharma
  */
 @Path("/v1/jobs")
-@Produces({ "application/xml", "application/json" })
+@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class JobResourceV1 {
 
-    private ExecutionService xs;
-    private static Logger logger = LoggerFactory.getLogger(JobResourceV1.class);
+    private final ExecutionService xs;
+    private static final Logger LOG = LoggerFactory.getLogger(JobResourceV1.class);
 
     /**
      * Custom JAXB context resolver based for the job request/responses.
@@ -80,7 +79,7 @@ public class JobResourceV1 {
      */
     @POST
     @Path("/")
-    @Consumes({ "application/xml", "application/json" })
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response submitJob(JobRequest request,
             @Context HttpServletRequest hsr) {
         // get client's host from the context
@@ -90,7 +89,7 @@ public class JobResourceV1 {
         } else {
             clientHost = hsr.getRemoteAddr();
         }
-        logger.info("called from: " + clientHost);
+        LOG.info("called from: " + clientHost);
 
         // set the clientHost, if it is not overridden already
         JobElement jobInfo = request.getJobInfo();
@@ -133,7 +132,7 @@ public class JobResourceV1 {
     @GET
     @Path("/{jobID}")
     public Response getJobInfo(@PathParam("jobID") String jobID) {
-        logger.info("called for jobID: " + jobID);
+        LOG.info("called for jobID: " + jobID);
         JobResponse response = xs.getJobInfo(jobID);
         return ResponseUtil.createResponse(response);
     }
@@ -148,7 +147,7 @@ public class JobResourceV1 {
     @GET
     @Path("/{jobID}/status")
     public Response getJobStatus(@PathParam("jobID") String jobID) {
-        logger.info("called for jobID" + jobID);
+        LOG.info("called for jobID" + jobID);
         JobStatusResponse response = xs.getJobStatus(jobID);
         return ResponseUtil.createResponse(response);
     }
@@ -166,6 +165,10 @@ public class JobResourceV1 {
      *            type of job - possible types Type.JobType
      * @param status
      *            status of job - possible types Type.JobStatus
+     * @param clusterName
+     *            the name of the cluster
+     * @param clusterId
+     *            the id of the cluster
      * @param limit
      *            max number of jobs to return
      * @param page
@@ -184,11 +187,9 @@ public class JobResourceV1 {
             @QueryParam("limit") @DefaultValue("1024") int limit,
             @QueryParam("page") @DefaultValue("0") int page) {
        
-        logger.info("called");
+        LOG.info("called");
         
-        JobResponse response = null;
-        response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId,
-                limit, page);
+        JobResponse response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId, limit, page);
         
         return ResponseUtil.createResponse(response);
     }
@@ -203,7 +204,7 @@ public class JobResourceV1 {
     @DELETE
     @Path("/{jobID}")
     public Response killJob(@PathParam("jobID") String jobID) {
-        logger.info("called for jobID: " + jobID);
+        LOG.info("called for jobID: " + jobID);
         JobStatusResponse response = xs.killJob(jobID);
         return ResponseUtil.createResponse(response);
     }

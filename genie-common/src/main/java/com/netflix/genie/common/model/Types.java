@@ -256,33 +256,33 @@ public class Types {
         ZOMBIE_JOB(212);
 
         // A map of all status-es and their corresponding messages
-        private static Map<Integer, String> statusMap = new HashMap<Integer, String>();
+        private static final Map<Integer, String> STATUS_MAP = new HashMap<Integer, String>();
         static {
             // assign error codes
-            statusMap.put(JOB_INTERRUPTED.code(), "Job execution interrupted");
-            statusMap.put(SUCCESS.code(), "Success");
-            statusMap.put(MKDIR_RESULTS_FAILURE.code(),
+            STATUS_MAP.put(JOB_INTERRUPTED.code(), "Job execution interrupted");
+            STATUS_MAP.put(SUCCESS.code(), "Success");
+            STATUS_MAP.put(MKDIR_RESULTS_FAILURE.code(),
                     "Failed to create job results dir");
-            statusMap.put(MKDIR_CONF_FAILURE.code(),
+            STATUS_MAP.put(MKDIR_CONF_FAILURE.code(),
                     "Failed to create job conf dir");
-            statusMap.put(USER_S3_COPY_FAILURE.code(),
+            STATUS_MAP.put(USER_S3_COPY_FAILURE.code(),
                     "Failed copying user files from S3");
-            statusMap.put(HADOOP_CONF_S3_COPY_FAILURE.code(),
+            STATUS_MAP.put(HADOOP_CONF_S3_COPY_FAILURE.code(),
                     "Failed copying hadoop conf files from S3");
-            statusMap.put(HIVE_CONF_S3_COPY_FAILURE.code(),
+            STATUS_MAP.put(HIVE_CONF_S3_COPY_FAILURE.code(),
                     "Failed copying hive conf files from S3");
-            statusMap.put(PIG_CONF_S3_COPY_FAILURE.code(),
+            STATUS_MAP.put(PIG_CONF_S3_COPY_FAILURE.code(),
                     "Failed copying pig conf files from S3");
-            statusMap.put(JOB_COMMAND_FAILURE.code(),
+            STATUS_MAP.put(JOB_COMMAND_FAILURE.code(),
                     "Job failed with non-zero exit code");
-            statusMap.put(MKDIR_HIVE_CLIENT_LOG_FAILURE.code(),
+            STATUS_MAP.put(MKDIR_HIVE_CLIENT_LOG_FAILURE.code(),
                     "Failed to create dir for hive client log");
-            statusMap.put(MKDIR_PIG_CLIENT_LOG_FAILURE.code(),
+            STATUS_MAP.put(MKDIR_PIG_CLIENT_LOG_FAILURE.code(),
                     "Failed to create dir for pig client log");
-            statusMap.put(S3_ARCHIVE_FAILURE.code(),
+            STATUS_MAP.put(S3_ARCHIVE_FAILURE.code(),
                     "Failed to archive job logs to S3");
-            statusMap.put(JOB_KILLED.code(), "Job killed after it exceeded system limits");
-            statusMap.put(ZOMBIE_JOB.code(), "Job has been marked as a zombie");
+            STATUS_MAP.put(JOB_KILLED.code(), "Job killed after it exceeded system limits");
+            STATUS_MAP.put(ZOMBIE_JOB.code(), "Job has been marked as a zombie");
         }
 
         private final int exitCode;
@@ -313,7 +313,7 @@ public class Types {
          * @return message for status code
          */
         public static String message(int code) {
-            return statusMap.get(code);
+            return STATUS_MAP.get(code);
         }
     }
 }
