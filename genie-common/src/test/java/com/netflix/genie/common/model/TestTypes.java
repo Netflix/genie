@@ -48,25 +48,6 @@ public class TestTypes {
     }
 
     /**
-     * Tests whether a valid configuration is parsed correctly.
-     */
-    @Test
-    public void testValidConfiguration() {
-        String config = Types.Configuration.PROD.name();
-        Assert.assertEquals(Types.Configuration.parse(config),
-                Types.Configuration.PROD);
-    }
-
-    /**
-     * Tests whether an invalid configuration returns null.
-     */
-    @Test
-    public void testInvalidConfiguration() {
-        String config = "DOES_NOT_EXIST";
-        Assert.assertNull(Types.Configuration.parse(config));
-    }
-
-    /**
      * Tests whether a valid job status is parsed correctly.
      */
     @Test
@@ -86,31 +67,12 @@ public class TestTypes {
     }
 
     /**
-     * Tests whether a valid schedule is parsed correctly.
-     */
-    @Test
-    public void testValidSchedule() {
-        String schedule = Types.Schedule.ADHOC.name();
-        Assert.assertEquals(Types.Schedule.parse(schedule),
-                Types.Schedule.ADHOC);
-    }
-
-    /**
-     * Tests whether an invalid schedule returns null.
-     */
-    @Test
-    public void testInvalidSchedule() {
-        String schedule = "DOES_NOT_EXIST";
-        Assert.assertNull(Types.Schedule.parse(schedule));
-    }
-
-    /**
      * Tests whether a valid job type is parsed correctly.
      */
     @Test
     public void testValidJobType() {
-        String type = Types.JobType.HIVE.name();
-        Assert.assertEquals(Types.JobType.parse(type), Types.JobType.HIVE);
+        String type = Types.JobType.YARN.name();
+        Assert.assertEquals(Types.JobType.parse(type), Types.JobType.YARN);
     }
 
     /**

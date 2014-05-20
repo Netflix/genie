@@ -29,64 +29,11 @@ import java.util.Map;
 public class Types {
 
     /**
-     * The configuration type for the metastores.
-     *
-     * @author skrishnan
-     */
-    public enum Configuration {
-        /**
-         * Represents test metastore.
-         */
-        TEST,
-        /**
-         * Represents prod metastore.
-         */
-        PROD,
-        /**
-         * Represents dev/unit test metastore.
-         */
-        UNITTEST;
-
-        /**
-         * Parse configuration string.
-         *
-         * @param value
-         *            string to parse/convert
-         * @return TEST, PROD, UNITEST if there is a match, else null
-         */
-        public static Configuration parse(String value) {
-            if (value == null) {
-                return null;
-            } else if (value.compareToIgnoreCase("TEST") == 0) {
-                return TEST;
-            } else if (value.compareToIgnoreCase("PROD") == 0) {
-                return PROD;
-            } else if (value.compareToIgnoreCase("UNITTEST") == 0) {
-                return UNITTEST;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    /**
      * Job types supported by the Execution Service.
      *
      * @author skrishnan
      */
     public enum JobType {
-        /**
-         * Represents a Hadoop job.
-         */
-        HADOOP,
-        /**
-         * Represents a Hive job.
-         */
-        HIVE,
-        /**
-         * Represents a Pig job.
-         */
-        PIG,
         /**
          * Represents a Yarn job.
          */
@@ -102,55 +49,8 @@ public class Types {
         public static JobType parse(String value) {
             if (value == null) {
                 return null;
-            } else if (value.compareToIgnoreCase("HADOOP") == 0) {
-                return HADOOP;
-            } else if (value.compareToIgnoreCase("HIVE") == 0) {
-                return HIVE;
-            } else if (value.compareToIgnoreCase("PIG") == 0) {
-                return PIG;
             } else if (value.compareToIgnoreCase("YARN") == 0) {
                 return YARN;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    /**
-     * Schedule type for choosing clusters.
-     *
-     * @author skrishnan
-     */
-    public enum Schedule {
-        /**
-         * Represents an ad-hoc (nor non-SLA driven) job.
-         */
-        ADHOC,
-        /**
-         * Represents a higher SLA-driven job.
-         */
-        SLA,
-        /**
-         * Represents the highests SLA-driven (or "bonus") job.
-         */
-        BONUS;
-
-        /**
-         * Parse schedule type.
-         *
-         * @param value
-         *            string to parse/convert
-         * @return ADHOC, SLA or BONUS if there is a match, else null
-         */
-        public static Schedule parse(String value) {
-            if (value == null) {
-                return null;
-            } else if (value.compareToIgnoreCase("ADHOC") == 0) {
-                return ADHOC;
-            } else if (value.compareToIgnoreCase("SLA") == 0) {
-                return SLA;
-            } else if (value.compareToIgnoreCase("BONUS") == 0) {
-                return BONUS;
             } else {
                 return null;
             }
@@ -252,7 +152,7 @@ public class Types {
     }
 
     /**
-     * The status type for Hive or Pig configs.
+     * The status type for  command and application configs.
      *
      * @author skrishnan
      */

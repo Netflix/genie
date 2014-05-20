@@ -38,10 +38,6 @@
     </provider>
 
     <!-- We must enumerate each entity in the persistence unit -->
-    <class>com.netflix.genie.common.model.HiveConfigElement</class>
-    <class>com.netflix.genie.common.model.PigConfigElement</class>       
-    <class>com.netflix.genie.common.model.ClusterConfigElementOld</class>
-    <class>com.netflix.genie.common.model.JobInfoElement</class>
 	<class>com.netflix.genie.common.model.JobElement</class>
 	<class>com.netflix.genie.common.model.ClusterConfigElement</class>
 	<class>com.netflix.genie.common.model.CommandConfigElement</class>

@@ -25,9 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types;
-import com.netflix.genie.server.jobmanager.impl.HadoopJobManager;
-import com.netflix.genie.server.jobmanager.impl.HiveJobManager;
-import com.netflix.genie.server.jobmanager.impl.PigJobManager;
 import com.netflix.genie.server.jobmanager.impl.YarnJobManager;
 
 /**
@@ -49,7 +46,7 @@ public final class JobManagerFactory {
      * Returns the right job manager for the job type.
      *
      * @param type
-     *            the string describing the job - could be HADOOP, HIVE or PIG
+     *            the string describing the job - for eg: YARN, PRESTO
      * @return instance of the appropriate job manager
      * @throws Exception
      */
@@ -57,13 +54,9 @@ public final class JobManagerFactory {
             throws CloudServiceException {
         logger.info("called");
 
-        if (Types.JobType.HADOOP.name().equalsIgnoreCase(type)) {
-            return new HadoopJobManager();
-        } else if (Types.JobType.HIVE.name().equalsIgnoreCase(type)) {
-            return new HiveJobManager();
-        } else if (Types.JobType.PIG.name().equalsIgnoreCase(type)) {
-            return new PigJobManager();
-        } else if (Types.JobType.YARN.name().equalsIgnoreCase(type)) {
+        // More Job Managers can be implemented here including
+        // a generic one
+        if (Types.JobType.YARN.name().equalsIgnoreCase(type)) {
             return new YarnJobManager();
         }
 

@@ -1,12 +1,5 @@
 package com.netflix.genie.server.resources;
 
-import java.util.Iterator;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -107,49 +100,7 @@ public class ApplicationConfigResourceV1 {
         logger.info("called");
         ApplicationConfigResponse acr = acs.getApplicationConfig(id, name);
         return ResponseUtil.createResponse(acr);
-        
-        /* String table = ApplicationConfigElement.class.getName();
-        
-        ApplicationConfigResponse response = new ApplicationConfigResponse();
-      PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
-        QueryBuilder builder = new QueryBuilder().table(table);
-        Object[] results = pm.query(builder);
-        
-        if (results.length != 0) {
-            ApplicationConfigElement[] apps = new ApplicationConfigElement[results.length];
-            for (int i = 0; i < results.length; i++) {
-                apps[i] = (ApplicationConfigElement) results[i];
-                logger.debug("Results Array" + apps[i].getId());
-                logger.debug("Jars is"+ apps[i].getJars());  
-            }
-            
-           response.setApplications(apps);
-        }
-         
-        
-        //java.util.Map<Object,Object> map = new java.util.HashMap<Object,Object>();
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie");
-        EntityManager em = factory.createEntityManager();
-        
-        //Query q = em.createQuery("select  x from ApplicationConfigElement x");
-        Query q = em.createQuery("select T from ApplicationConfigElement T order by T.updateTime desc");
-        List<ApplicationConfigElement> results = (List<ApplicationConfigElement>) q.getResultList();
-        
-        Iterator<ApplicationConfigElement> it = results.iterator();
-        ApplicationConfigElement[] apps = new ApplicationConfigElement[10];
-        int i =0;
-        while(it.hasNext()) {
-            ApplicationConfigElement c = (ApplicationConfigElement)it.next();
-            apps[i] = c;
-            //logger.debug(c.getId());
-           logger.debug(c.getJars().toString());
-            //logger.debug(c.toString());
-            i++;
-        } 
-        ApplicationConfigResponse response = new ApplicationConfigResponse();
-        response .setApplicationConfigs(apps);
-        return ResponseUtil.createResponse(response); */
-    }  
+    }
     
     /**
      * Create Application configuration.
@@ -165,17 +116,6 @@ public class ApplicationConfigResourceV1 {
         logger.info("called to create new application");
         ApplicationConfigResponse acr = acs.createApplicationConfig(request);
         return ResponseUtil.createResponse(acr);
-        
-   /*     //ClusterConfigResponseOld ccr = ccs.createClusterConfig(request);
-        
-        logger.debug("Received request:" + request.getApplication().getId());
-        ApplicationConfigResponse ar = new ApplicationConfigResponse();
-        
-        PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
-        ApplicationConfigElement ae = request.getApplication();
-        pm.createEntity(ae);
-        
-        return ResponseUtil.createResponse(ar); */
     } 
     
     /**

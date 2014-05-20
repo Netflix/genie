@@ -210,7 +210,7 @@ public class JobElement implements Serializable {
      * Finish time for job - initialized to zero (for historic reasons).
      */
     @Basic
-    private Long finishTime;
+    private Long finishTime = Long.valueOf(0);
 
     /**
      * The host/ip address of the client submitting job.

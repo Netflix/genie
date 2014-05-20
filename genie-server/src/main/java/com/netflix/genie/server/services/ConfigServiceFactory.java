@@ -34,15 +34,6 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
     private static Logger logger = LoggerFactory
             .getLogger(ConfigServiceFactory.class);
 
-    // handle to the HiveConfigService
-    private static volatile HiveConfigService hiveConfigService;
-
-    // handle to the PigConfigService
-    private static volatile PigConfigService pigConfigService;
-
-    // handle to the ClusterConfigServiceOld
-    private static volatile ClusterConfigServiceOld clusterConfigServiceOld;
-    
     // handle to the CommandConfigService
     private static volatile ClusterConfigService clusterConfigService;
 
@@ -57,81 +48,6 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
     
     // never called
     private ConfigServiceFactory() {
-    }
-
-    /**
-     * Get the singleton hive config service impl.
-     *
-     * @return singleton hive config service impl
-     * @throws CloudServiceException
-     */
-    public static HiveConfigService getHiveConfigImpl()
-            throws CloudServiceException {
-        logger.info("called");
-
-        // instantiate the impl if it hasn't been already
-        if (hiveConfigService == null) {
-            synchronized (ConfigServiceFactory.class) {
-                // double-checked locking
-                if (hiveConfigService == null) {
-                    hiveConfigService = (HiveConfigService)
-                            instantiateFromProperty("netflix.genie.server.hiveConfigImpl");
-                }
-            }
-        }
-
-        // return generated or cached impl
-        return hiveConfigService;
-    }
-
-    /**
-     * Get the singleton pig config service impl.
-     *
-     * @return singleton pig config service impl
-     * @throws CloudServiceException
-     */
-    public static PigConfigService getPigConfigImpl()
-            throws CloudServiceException {
-        logger.info("called");
-
-        // instantiate the impl if it hasn't been already
-        if (pigConfigService == null) {
-            synchronized (ConfigServiceFactory.class) {
-                // double-checked locking
-                if (pigConfigService == null) {
-                    pigConfigService = (PigConfigService)
-                            instantiateFromProperty("netflix.genie.server.pigConfigImpl");
-                }
-            }
-        }
-
-        // return generated or cached impl
-        return pigConfigService;
-    }
-
-    /**
-     * Get the singleton cluster config service impl.
-     *
-     * @return singleton cluster config service impl
-     * @throws CloudServiceException
-     */
-    public static ClusterConfigServiceOld getClusterConfigImplOld()
-            throws CloudServiceException {
-        logger.info("called");
-
-        // instantiate the impl if it hasn't been already
-        if (clusterConfigServiceOld == null) {
-            synchronized (ConfigServiceFactory.class) {
-                // double-checked locking
-                if (clusterConfigServiceOld == null) {
-                    clusterConfigServiceOld = (ClusterConfigServiceOld)
-                            instantiateFromProperty("netflix.genie.server.clusterConfigImplOld");
-                }
-            }
-        }
-
-        // return generated or cached impl
-        return clusterConfigServiceOld;
     }
     
     /**

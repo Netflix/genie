@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.model.JobInfoElement;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
@@ -38,7 +38,7 @@ import com.netflix.genie.server.persistence.QueryBuilder;
 public class JobJanitor extends Thread {
     private static Logger logger = LoggerFactory.getLogger(JobJanitor.class);
 
-    private PersistenceManager<JobInfoElement> pm;
+    private PersistenceManager<JobElement> pm;
     private AbstractConfiguration conf;
     private boolean stop;
 
@@ -47,7 +47,7 @@ public class JobJanitor extends Thread {
      */
     public JobJanitor() {
         conf = ConfigurationManager.getConfigInstance();
-        pm = new PersistenceManager<JobInfoElement>();
+        pm = new PersistenceManager<JobElement>();
         stop = false;
     }
 
@@ -61,7 +61,7 @@ public class JobJanitor extends Thread {
      */
     public int markZombies() throws Exception {
         // the equivalent query is as follows:
-        // update JobInfoElement set status='FAILED', updateTime=$max,
+        // update JobElement set status='FAILED', updateTime=$max,
         // finishTime=$max,
         // exitCode=$zombie_code, statusMsg='Job has been marked as a zombie'
         // where updateTime < $min and (status='RUNNING' or status='INIT')"
@@ -86,7 +86,7 @@ public class JobJanitor extends Thread {
         queryCriteria.append("(" + statusCriteria.toString() + ")", false);
 
         // set up the query
-        QueryBuilder query = new QueryBuilder().table("JobInfoElement")
+        QueryBuilder query = new QueryBuilder().table("JobElement")
                 .clause(queryCriteria.toString()).set(setCriteria.toString());
         int numRowsUpdated = pm.update(query);
         return numRowsUpdated;
