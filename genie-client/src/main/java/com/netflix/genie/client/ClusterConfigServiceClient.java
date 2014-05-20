@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.client;
 
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 
 import com.netflix.genie.common.messages.ClusterConfigRequest;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ClusterConfigElementOld;
+import com.netflix.genie.common.model.ClusterConfigElement;
 
 import com.netflix.client.http.HttpRequest.Verb;
 
@@ -39,14 +38,15 @@ import com.google.common.collect.Multimap;
  * Service.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
 public final class ClusterConfigServiceClient extends BaseGenieClient {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigServiceClient.class);
 
-    private static final String BASE_REST_URI = "/genie/v0/config/cluster";
+    private static final String BASE_CONFIG_CLUSTER_REST_URI
+            = BASE_REST_URI + "config/cluster";
 
     // reference to the instance object
     private static ClusterConfigServiceClient instance;
@@ -77,29 +77,29 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
     /**
      * Create a new cluster config.
      *
-     * @param ClusterConfigElementOld the object encapsulating the new Cluster config to create
+     * @param clusterConfigElement the object encapsulating the new Cluster
+     * config to create
      *
      * @return extracted cluster config response
      * @throws CloudServiceException
      */
-    public ClusterConfigElementOld createClusterConfig(ClusterConfigElementOld ClusterConfigElementOld)
-            throws CloudServiceException {
-        if (ClusterConfigElementOld == null) {
+    public ClusterConfigElement createClusterConfig(final ClusterConfigElement clusterConfigElement) throws CloudServiceException {
+        if (clusterConfigElement == null) {
             String msg = "Required parameter clusterConfig can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if (ClusterConfigElementOld.getUser() == null) {
+        if (clusterConfigElement.getUser() == null) {
             String msg = "User name is missing";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if ((ClusterConfigElementOld.getS3CoreSiteXml() == null)
-                || (ClusterConfigElementOld.getS3HdfsSiteXml() == null)
-                || (ClusterConfigElementOld.getS3MapredSiteXml() == null)
-                || (ClusterConfigElementOld.getName() == null)) {
+        if ((clusterConfigElement.getS3CoreSiteXml() == null)
+                || (clusterConfigElement.getS3HdfsSiteXml() == null)
+                || (clusterConfigElement.getS3MapredSiteXml() == null)
+                || (clusterConfigElement.getName() == null)) {
             String msg = "Missing required Hadoop parameters for creating clusterConfig: "
                     + "{name, s3MapredSiteXml, s3HdfsSiteXml, s3CoreSiteXml}";
             LOG.error(msg);
@@ -109,10 +109,15 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         ClusterConfigRequest request = new ClusterConfigRequest();
-        request.setClusterConfig(ClusterConfigElementOld);
+        request.setClusterConfig(clusterConfigElement);
 
-        ClusterConfigResponse ccr = executeRequest(Verb.POST, BASE_REST_URI,
-                null, null, request, ClusterConfigResponse.class);
+        ClusterConfigResponse ccr = executeRequest(
+                Verb.POST, 
+                BASE_CONFIG_CLUSTER_REST_URI,
+                null, 
+                null, 
+                request, 
+                ClusterConfigResponse.class);
 
         if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
@@ -129,21 +134,22 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * Create or update a cluster config.
      *
      * @param clusterConfigId the id for the cluster config to create or update
-     * @param ClusterConfigElementOld the object encapsulating the new Cluster config to create
+     * @param ClusterConfigElement the object encapsulating the new Cluster
+     * config to create
      *
      * @return extracted cluster config response
      * @throws CloudServiceException
      */
-    public ClusterConfigElementOld updateClusterConfig(String clusterConfigId,
-            ClusterConfigElementOld ClusterConfigElementOld)
+    public ClusterConfigElement updateClusterConfig(String clusterConfigId,
+            ClusterConfigElement ClusterConfigElement)
             throws CloudServiceException {
-        if (ClusterConfigElementOld == null) {
+        if (ClusterConfigElement == null) {
             String msg = "Required parameter clusterConfig can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if (ClusterConfigElementOld.getUser() == null) {
+        if (ClusterConfigElement.getUser() == null) {
             String msg = "User name is missing";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
@@ -151,10 +157,15 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         ClusterConfigRequest request = new ClusterConfigRequest();
-        request.setClusterConfig(ClusterConfigElementOld);
+        request.setClusterConfig(ClusterConfigElement);
 
-        ClusterConfigResponse ccr = executeRequest(Verb.PUT, BASE_REST_URI,
-                clusterConfigId, null, request, ClusterConfigResponse.class);
+        ClusterConfigResponse ccr = executeRequest(
+                Verb.PUT, 
+                BASE_CONFIG_CLUSTER_REST_URI,
+                clusterConfigId, 
+                null, 
+                request, 
+                ClusterConfigResponse.class);
 
         if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
@@ -170,21 +181,26 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
     /**
      * Gets information for a given clusterConfigId.
      *
-     * @param clusterConfigId
-     *            the cluster config id to get (can't be null)
+     * @param clusterConfigId the cluster config id to get (can't be null)
      * @return the cluster config for this clusterConfigId
      * @throws CloudServiceException
      */
-    public ClusterConfigElementOld getClusterConfig(String clusterConfigId) throws CloudServiceException {
+    public ClusterConfigElement getClusterConfig(String clusterConfigId) throws CloudServiceException {
         if (clusterConfigId == null) {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing required parameter: clusterConfigId");
         }
 
-        ClusterConfigResponse ccr = executeRequest(Verb.GET, BASE_REST_URI,
-                clusterConfigId, null, null, ClusterConfigResponse.class);
+        ClusterConfigResponse ccr = executeRequest(
+                Verb.GET, 
+                BASE_CONFIG_CLUSTER_REST_URI,
+                clusterConfigId, 
+                null, 
+                null, 
+                ClusterConfigResponse.class);
 
-        if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {
+        if ((ccr.getClusterConfigs() == null) || 
+                (ccr.getClusterConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
             LOG.error(msg);
             throw new CloudServiceException(
@@ -198,17 +214,16 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
     /**
      * Gets a set of cluster configs for the given parameters.
      *
-     * @param params
-     *            key/value pairs in a map object.<br>
+     * @param params key/value pairs in a map object.<br>
      *
-     *            More details on the parameters can be found
-     *            on the Genie User Guide on GitHub.
+     * More details on the parameters can be found on the Genie User Guide on
+     * GitHub.
      * @return array of cluster config elements that match the filter
      * @throws CloudServiceException
      */
-    public ClusterConfigElementOld[] getClusterConfigs(
+    public ClusterConfigElement[] getClusterConfigs(
             Multimap<String, String> params) throws CloudServiceException {
-        ClusterConfigResponse ccr = executeRequest(Verb.GET, BASE_REST_URI,
+        ClusterConfigResponse ccr = executeRequest(Verb.GET, BASE_CONFIG_CLUSTER_REST_URI,
                 null, params, null, ClusterConfigResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
@@ -227,12 +242,11 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
     /**
      * Delete a clusterConfig using its id.
      *
-     * @param clusterConfigId
-     *            the id for the cluster config to delete
+     * @param clusterConfigId the id for the cluster config to delete
      * @return the deleted cluster config
      * @throws CloudServiceException
      */
-    public ClusterConfigElementOld deleteClusterConfig(String clusterConfigId) throws CloudServiceException {
+    public ClusterConfigElement deleteClusterConfig(String clusterConfigId) throws CloudServiceException {
         if (clusterConfigId == null) {
             String msg = "Missing required parameter: clusterConfigId";
             LOG.error(msg);
@@ -240,7 +254,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
                     msg);
         }
 
-        ClusterConfigResponse ccr = executeRequest(Verb.DELETE, BASE_REST_URI,
+        ClusterConfigResponse ccr = executeRequest(Verb.DELETE, BASE_CONFIG_CLUSTER_REST_URI,
                 clusterConfigId, null, null, ClusterConfigResponse.class);
 
         if ((ccr.getClusterConfigs() == null) || (ccr.getClusterConfigs().length == 0)) {

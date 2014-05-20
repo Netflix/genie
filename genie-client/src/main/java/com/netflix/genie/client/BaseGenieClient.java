@@ -67,6 +67,11 @@ public abstract class BaseGenieClient {
      * The name of the server application.
      */
     protected static final String NIWS_APP_NAME_GENIE = "genie";
+    
+    /**
+     * Standard root for all rest services
+     */
+    protected static final String BASE_REST_URI = "/genie/v1/";
 
     /**
      * Protected constructor for singleton class.
