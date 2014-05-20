@@ -30,11 +30,9 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
 import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.FileAttachment;
-import com.netflix.genie.common.model.JobInfoElement;
-import com.netflix.genie.common.model.Types.Configuration;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.JobType;
-import com.netflix.genie.common.model.Types.Schedule;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
@@ -71,23 +69,23 @@ public final class ExecutionServiceSampleClient {
         System.out.println("Getting jobInfos using specified filter criteria");
         Multimap<String, String> params = ArrayListMultimap.create();
         params.put("userName", userName);
-        params.put("jobType", JobType.HIVE.name());
+        params.put("jobType", JobType.YARN.name());
         params.put("status", JobStatus.FAILED.name());
         params.put("limit", "3");
-        JobInfoElement[] responses = client.getJobs(params);
-        for (JobInfoElement ji : responses) {
+        JobElement[] responses = client.getJobs(params);
+        for (JobElement ji : responses) {
             System.out.println("Job Info: {id, status, finishTime} - {"
                     + ji.getJobID() + ", " + ji.getStatus() + ", "
                     + ji.getFinishTime() + "}");
         }
 
         System.out.println("Running Hive job");
-        JobInfoElement jobInfo = new JobInfoElement();
+        JobElement jobInfo = new JobElement();
         jobInfo.setUserName(userName);
-        jobInfo.setJobType(JobType.HIVE.name());
+        jobInfo.setJobType(JobType.YARN.name());
         jobInfo.setDescription("This is a test");
-        jobInfo.setConfiguration(Configuration.TEST.name());
-        jobInfo.setSchedule(Schedule.ADHOC.name());
+//        jobInfo.setConfiguration(Configuration.TEST.name());
+//        jobInfo.setSchedule(Schedule.ADHOC.name());
         // send the query as an attachment
         File query = File.createTempFile("hive", ".q");
         PrintWriter pw = new PrintWriter(query, "UTF-8");

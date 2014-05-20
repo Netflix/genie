@@ -96,12 +96,8 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if ((clusterConfigElement.getS3CoreSiteXml() == null)
-                || (clusterConfigElement.getS3HdfsSiteXml() == null)
-                || (clusterConfigElement.getS3MapredSiteXml() == null)
-                || (clusterConfigElement.getName() == null)) {
-            String msg = "Missing required Hadoop parameters for creating clusterConfig: "
-                    + "{name, s3MapredSiteXml, s3HdfsSiteXml, s3CoreSiteXml}";
+        if (clusterConfigElement.getConfigs().isEmpty()) {
+            String msg = "At least one configuration file is required for the cluster.";
             LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,

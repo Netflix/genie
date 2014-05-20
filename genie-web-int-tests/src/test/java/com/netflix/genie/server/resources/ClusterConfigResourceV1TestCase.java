@@ -17,7 +17,7 @@
 package com.netflix.genie.server.resources;
 
 import com.google.inject.Inject;
-import com.netflix.genie.common.messages.HiveConfigResponse;
+import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.server.utils.Deployments;
 import com.netflix.karyon.server.test.RunInKaryon;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -33,13 +33,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests the {@link HiveConfigResourceV0} class.
+ * Tests the {@link ClusterConfigResourceV1} class.
  *
  * @author Jakub Narloch (jmnarloch@gmail.com)
  */
 @RunWith(Arquillian.class)
 @RunInKaryon(applicationId = "genie")
-public class HiveConfigResourceV0TestCase {
+public class ClusterConfigResourceV1TestCase {
 
     /**
      * Creates the test deployment.
@@ -49,7 +49,6 @@ public class HiveConfigResourceV0TestCase {
     @SuppressWarnings("rawtypes")
     @Deployment
     public static Archive createTestArchive() {
-
         return Deployments.createDeployment();
     }
 
@@ -57,7 +56,7 @@ public class HiveConfigResourceV0TestCase {
      * The injected {@link HiveConfigResourceV0} class.
      */
     @Inject
-    private HiveConfigResourceV0 resource;
+    private ClusterConfigResourceV1 resource;
 
     /**
      * Test the {@link HiveConfigResourceV0#getHiveConfig(String, String, String)} method.
@@ -66,13 +65,13 @@ public class HiveConfigResourceV0TestCase {
     public void shouldRetrieveConfigs() {
 
         // when
-        Response response = resource.getHiveConfig(null, null, null);
+        Response response = resource.getClusterConfig(null);
 
         // then
         assertNotNull("The response entity was null.", response);
         assertNotNull("The response entity was null.", response.getEntity());
-        assertTrue("The response entity had incorrect type.", response.getEntity() instanceof HiveConfigResponse);
+        assertTrue("The response entity had incorrect type.", response.getEntity() instanceof ClusterConfigResponse);
         assertNull("The response list was expected to be null.",
-                ((HiveConfigResponse) response.getEntity()).getHiveConfigs());
+                ((ClusterConfigResponse) response.getEntity()).getClusterConfigs());
     }
 }

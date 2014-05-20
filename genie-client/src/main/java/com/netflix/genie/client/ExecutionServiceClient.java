@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.JobInfoRequest;
-import com.netflix.genie.common.messages.JobInfoResponse;
+import com.netflix.genie.common.messages.JobRequest;
+import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
-import com.netflix.genie.common.model.JobInfoElement;
+import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.common.model.Types;
 
 import com.netflix.client.http.HttpRequest.Verb;
@@ -47,7 +47,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     private static final Logger LOG = LoggerFactory
             .getLogger(ExecutionServiceClient.class);
 
-    private static final String BASE_REST_URI = "/genie/v0/jobs";
+    private static final String BASE_EXECUTION_REST_URI = BASE_REST_URI + "jobs";
 
     // reference to the instance object
     private static ExecutionServiceClient instance;
@@ -97,7 +97,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @return updated jobInfo for submitted job, if there is no error
      * @throws CloudServiceException
      */
-    public JobInfoElement submitJob(JobInfoElement jobInfo)
+    public JobElement submitJob(JobElement jobInfo)
             throws CloudServiceException {
         if (jobInfo == null) {
             String msg = "Required parameter jobInfo can't be NULL";
@@ -117,34 +117,32 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if ((!jobInfo.getJobType()
-                .equalsIgnoreCase(Types.JobType.HADOOP.name()))
-                && (jobInfo.getConfiguration() == null)) {
+        if (!jobInfo.getJobType().equalsIgnoreCase(Types.JobType.YARN.name())) {
             String msg = "Configuration is missing";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if (jobInfo.getSchedule() == null) {
-            String msg = "Schedule is missing";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
+//        if (jobInfo.getSchedule() == null) {
+//            String msg = "Schedule is missing";
+//            LOG.error(msg);
+//            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
+//                    msg);
+//        }
         if (jobInfo.getCmdArgs() == null) {
             String msg = "Command-line arguments are missing";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if (jobInfo.getUserAgent() == null) {
-            jobInfo.setUserAgent("java-client-library");
-        }
-        JobInfoRequest request = new JobInfoRequest();
+//        if (jobInfo.getUserAgent() == null) {
+//            jobInfo.setUserAgent("java-client-library");
+//        }
+        JobRequest request = new JobRequest();
         request.setJobInfo(jobInfo);
 
-        JobInfoResponse ji = executeRequest(Verb.POST, BASE_REST_URI,
-                null, null, request, JobInfoResponse.class);
+        JobResponse ji = executeRequest(Verb.POST, BASE_EXECUTION_REST_URI,
+                null, null, request, JobResponse.class);
 
         if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
             String msg = "Unable to parse job info from response";
@@ -165,14 +163,14 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @return the jobInfo for this jobID
      * @throws CloudServiceException
      */
-    public JobInfoElement getJob(String jobID) throws CloudServiceException {
+    public JobElement getJob(String jobID) throws CloudServiceException {
         if (jobID == null) {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing required parameter: jobID");
         }
 
-        JobInfoResponse ji = executeRequest(Verb.GET, BASE_REST_URI,
-                jobID, null, null, JobInfoResponse.class);
+        JobResponse ji = executeRequest(Verb.GET, BASE_EXECUTION_REST_URI,
+                jobID, null, null, JobResponse.class);
 
         if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
             String msg = "Unable to parse job info from response";
@@ -196,10 +194,10 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @return array of jobInfos that match the filter
      * @throws CloudServiceException
      */
-    public JobInfoElement[] getJobs(Multimap<String, String> params)
+    public JobElement[] getJobs(Multimap<String, String> params)
             throws CloudServiceException {
-        JobInfoResponse ji = executeRequest(Verb.GET, BASE_REST_URI, null,
-                params, null, JobInfoResponse.class);
+        JobResponse ji = executeRequest(Verb.GET, BASE_EXECUTION_REST_URI, null,
+                params, null, JobResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
@@ -228,7 +226,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws InterruptedException
      *             on timeout/thread errors
      */
-    public JobInfoElement waitForCompletion(String jobID, long blockTimeout)
+    public JobElement waitForCompletion(String jobID, long blockTimeout)
             throws CloudServiceException, InterruptedException {
         long pollTime = 10000;
         return waitForCompletion(jobID, blockTimeout, pollTime);
@@ -250,7 +248,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws InterruptedException
      *             on timeout/thread errors
      */
-    public JobInfoElement waitForCompletion(String jobID, long blockTimeout,
+    public JobElement waitForCompletion(String jobID, long blockTimeout,
             long pollTime) throws CloudServiceException, InterruptedException {
         if (jobID == null) {
             String msg = "Missing required parameter: jobID";
@@ -262,7 +260,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         long startTime = System.currentTimeMillis();
 
         while (true) {
-            JobInfoElement jobInfo = getJob(jobID);
+            JobElement jobInfo = getJob(jobID);
 
             // wait for job to finish - and finish time to be updated
             if (jobInfo.getFinishTime() > 0) {
@@ -299,8 +297,9 @@ public final class ExecutionServiceClient extends BaseGenieClient {
 
         // this assumes that the service will forward the delete to the right
         // instance
-        JobStatusResponse js = executeRequest(Verb.DELETE, BASE_REST_URI,
+        JobStatusResponse js = executeRequest(Verb.DELETE, BASE_EXECUTION_REST_URI,
                 jobID, null, null, JobStatusResponse.class);
+        
         // return the response
         return js;
     }
