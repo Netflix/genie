@@ -44,7 +44,7 @@ def testJsonSubmitjob():
             "jobType": "hive", 
             "configuration": "prod",
             "schedule": "ADHOC",
-            "clusterName": "h24query",
+            "clusterName": "h2query",
             "cmdArgs": "-f hive.q",
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hive.q"
         }

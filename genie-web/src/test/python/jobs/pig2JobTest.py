@@ -44,7 +44,7 @@ def testJsonSubmitjob():
             "jobType": "pig", 
             "configuration": "prod", 
             "schedule": "adHoc",
-            "clusterName": "h24query",
+            "clusterName": "h2query",
             "cmdArgs":" -f pig2.q", 
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/pig2.q"
         }
