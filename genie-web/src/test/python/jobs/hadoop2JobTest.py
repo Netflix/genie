@@ -43,7 +43,7 @@ def testJsonSubmitjob():
             "userAgent" : "laptop",
             "jobType": "hadoop", 
             "schedule": "ADHOC",
-            "clusterName": "h24query",
+            "clusterName": "h2query",
             "cmdArgs":"jar hadoop-examples.jar pi 50 10", 
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hadoop-examples.jar"
         }
