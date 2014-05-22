@@ -1,3 +1,21 @@
+/*
+ *
+ *  Copyright 2013 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+
 package com.netflix.genie.server.services.impl;
 
 import com.netflix.client.http.HttpRequest.Verb;
@@ -423,27 +441,6 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         } else {
             clusterConfigElement.setCreateTime(clusterConfigElement
                     .getUpdateTime());
-
-            // if booleans are received as NULL, set them to false, which is the
-            // default
-//            if (clusterConfigElement.getAdHoc() == null) {
-//                clusterConfigElement.setAdHoc(Boolean.FALSE);
-//            }
-//            if (clusterConfigElement.getSla() == null) {
-//                clusterConfigElement.setSla(Boolean.FALSE);
-//            }
-//            if (clusterConfigElement.getBonus() == null) {
-//                clusterConfigElement.setBonus(Boolean.FALSE);
-//            }
-//            if (clusterConfigElement.getProd() == null) {
-//                clusterConfigElement.setProd(Boolean.FALSE);
-//            }
-//            if (clusterConfigElement.getTest() == null) {
-//                clusterConfigElement.setTest(Boolean.FALSE);
-//            }
-//            if (clusterConfigElement.getUnitTest() == null) {
-//                clusterConfigElement.setUnitTest(Boolean.FALSE);
-//            }
         }
     }
 
@@ -454,7 +451,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
         ClusterConfigResponse ccr;
 
-        //TODO: Remove use of iterators explicitely
+        //TODO: Remove use of iterators explicitly
         Iterator<ClusterCriteria> criteriaIter = clusterCriteriaList.iterator();
         //String queryString = "SELECT distinct x from ClusterConfigElement x, IN(x.tags) t WHERE " ;
         //String queryString = "SELECT distinct x from Cluster x, IN(x.commands) cmds where :element1 member of  x.tags AND :element2 member of x.tags AND cmds.name=\"prodhive\"";

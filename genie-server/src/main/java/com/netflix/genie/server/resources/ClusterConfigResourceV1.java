@@ -1,3 +1,21 @@
+/*
+ *
+ *  Copyright 2013 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
@@ -118,28 +136,7 @@ public class ClusterConfigResourceV1 {
         LOG.info("called");
         // treat empty string values for booleans as nulls, not false
         ClusterConfigResponse ccr = ccs.getClusterConfig(id, name, status, tags, minUpdateTime, maxUpdateTime, limit, page);
-        return ResponseUtil.createResponse(ccr);
-//                .getClusterConfig(
-//                        id,
-//                        name,
-//                        (prod != null) && (!prod.isEmpty()) ? Boolean
-//                                .valueOf(prod) : null,
-//                        (test != null) && (!test.isEmpty()) ? Boolean
-//                                .valueOf(test) : null,
-//                        (unitTest != null) && (!unitTest.isEmpty()) ? Boolean
-//                                .valueOf(unitTest) : null,
-//                        (adHoc != null) && (!adHoc.isEmpty()) ? Boolean
-//                                .valueOf(adHoc) : null,
-//                        (sla != null) && (!sla.isEmpty()) ? Boolean
-//                                .valueOf(sla) : null,
-//                        (bonus != null) && (!bonus.isEmpty()) ? Boolean
-//                                .valueOf(bonus) : null,
-//                        jobType,
-//                        status,
-//                        (hasStats != null) && (!hasStats.isEmpty()) ? Boolean
-//                                .valueOf(hasStats) : null, minUpdateTime,
-//                        maxUpdateTime, limit, page);
-        
+        return ResponseUtil.createResponse(ccr);       
     }
     
     /**
