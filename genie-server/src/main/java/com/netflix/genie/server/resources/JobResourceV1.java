@@ -1,3 +1,21 @@
+/*
+ *
+ *  Copyright 2013 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
@@ -97,28 +115,10 @@ public class JobResourceV1 {
                 && ((jobInfo.getClientHost() == null)
                         || jobInfo.getClientHost().isEmpty())) {
             jobInfo.setClientHost(clientHost);
-            // TODO: Has to be a better way of doing it
-          //  jobInfo.setClusterCriteriaString(jobInfo.getClusterCriteriaList());
+            jobInfo.setClusterCriteriaString(jobInfo.getClusterCriteriaList());
         }
         
         JobResponse response = xs.submitJob(request);
-        
-//        if (jobInfo != null) {
-//            logger.debug("Genie V1 job request submitted to execution service. Trying to persist it.Object Details are");
-//            logger.debug("Job Id: " + jobInfo.getJobID() + " Job Name: " + jobInfo.getJobName());
-//            logger.debug("Cluster Criteria List: " + jobInfo.getClusterCriteriaList());
-//           // PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-//            //pm.createEntity(jobInfo);
-//          
-//            //logger.debug("Persistence Successful. Return Response");
-//            JobResponse response = xs.submitJob(request);
-//        } else {
-//            logger.debug ("Job Info is Null. Inspecting request object");
-//            logger.debug(request.toString());
-//        }
-        
-        //JobResponse response  = new JobResponse();
-        //response.setJob(jobInfo);
         return ResponseUtil.createResponse(response);
     }
     
