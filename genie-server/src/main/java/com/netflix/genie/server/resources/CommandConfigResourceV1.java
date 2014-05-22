@@ -76,7 +76,7 @@ public class CommandConfigResourceV1 {
      * Get Command config for given id.
      *
      * @param id
-     *            unique id for application config
+     *            unique id for command config
      * @return successful response, or one with an HTTP error code
      */
     @GET
@@ -104,36 +104,13 @@ public class CommandConfigResourceV1 {
         LOG.info("called");
         CommandConfigResponse ccr = ccs.getCommandConfig(id, name);
         return ResponseUtil.createResponse(ccr);
-//        
-//     EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie");
-//     EntityManager em = factory.createEntityManager();
-//      
-//      Query q = em.createQuery("select  x from CommandConfigElement x");
-//      List<CommandConfigElement> results = (List<CommandConfigElement>) q.getResultList();
-//      
-//      Iterator<CommandConfigElement> it = results.iterator();
-//      CommandConfigElement[] apps = new CommandConfigElement[10];
-//      int i =0;
-//      while(it.hasNext()) {
-//          CommandConfigElement c = (CommandConfigElement)it.next();
-//          c.getApplications();
-//          apps[i] = c;
-//          logger.debug(c.getId());
-//          //logger.debug(c.getJars().toString());
-//          logger.debug(c.toString());
-//          i++;
-//      } 
-//      
-//      CommandConfigResponse response = new CommandConfigResponse();
-//      response.setCommandConfigs(apps);
-//      return ResponseUtil.createResponse(response);
     }
     
     /**
-     * Create Application configuration.
+     * Create Command configuration.
      *
      * @param request
-     *            contains a application config element 
+     *            contains a command config element 
      * @return successful response, or one with an HTTP error code
      */
     @POST
@@ -171,78 +148,9 @@ public class CommandConfigResourceV1 {
             ce.setApplications(appList);
         }
         
-        //request.setCommandConfig(ce);
         CommandConfigResponse acr = ccs.createCommandConfig(request);
         return ResponseUtil.createResponse(acr);
-        
-        /*
-        return 
-        ClusterConfigResponseOld ccr = ccs.createClusterConfig(request);
-        
-        logger.debug("Received request:" + request.getCommandConfig().getId());
-        CommandConfigResponse ar = new CommandConfigResponse();
-        
-        PersistenceManager<CommandConfigElement> pm = new PersistenceManager<CommandConfigElement>();
-        
-        
-        CommandConfigElement ce = request.getCommandConfig();
-        //ce.setApplicationsFromAppids();
-        
-        ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
-        Iterator<String> it = ce.getAppids().iterator();
-        while(it.hasNext()) {
-            ApplicationConfigElement ae = (ApplicationConfigElement)pma.getEntity((String)it.next(), ApplicationConfigElement.class);
-            appList.add(ae);
-        }
-        ce.setApplications(appList);
-        
-        pm.createEntity(ce);
-        return ResponseUtil.createResponse(ar);*/
     }
-    
-//    @GET
-//    @Path("/")
-//    public Response getApplicationConfig () {
-//        String table = CommandConfigElement.class.getName();
-//        
-//        CommandConfigResponse response = new CommandConfigResponse();
-//      /*  PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
-//        QueryBuilder builder = new QueryBuilder().table(table);
-//        Object[] results = pm.query(builder);
-//        
-//        if (results.length != 0) {
-//            ApplicationConfigElement[] apps = new ApplicationConfigElement[results.length];
-//            for (int i = 0; i < results.length; i++) {
-//                apps[i] = (ApplicationConfigElement) results[i];
-//                logger.debug("Results Array" + apps[i].getId());
-//                logger.debug("Jars is"+ apps[i].getJars());  
-//            }
-//            
-//           response.setApplications(apps);
-//        }
-//         */
-//        
-//        //java.util.Map<Object,Object> map = new java.util.HashMap<Object,Object>();
-//        EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie");
-//        EntityManager em = factory.createEntityManager();
-//        
-//        Query q = em.createQuery("select  x from CommandConfigElement x");
-//        List<CommandConfigElement> results = (List<CommandConfigElement>) q.getResultList();
-//        
-//        Iterator<CommandConfigElement> it = results.iterator();
-//        CommandConfigElement[] apps = new CommandConfigElement[10];
-//        int i =0;
-//        while(it.hasNext()) {
-//            CommandConfigElement c = (CommandConfigElement)it.next();
-//            apps[i] = c;
-//            logger.debug(c.getId());
-//            //logger.debug(c.getJars().toString());
-//            logger.debug(c.toString());
-//            i++;
-//        } 
-//        response.setCommands(apps);
-//        return ResponseUtil.createResponse(response);
-//    }  
     
     /**
      * Insert/update command config.

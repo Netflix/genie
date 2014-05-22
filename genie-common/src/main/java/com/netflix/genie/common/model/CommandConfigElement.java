@@ -1,3 +1,21 @@
+/*
+ *
+ *  Copyright 2013 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+
 package com.netflix.genie.common.model;
 
 import java.io.Serializable;
@@ -29,13 +47,13 @@ public class CommandConfigElement implements Serializable {
     private static final long serialVersionUID = -6106046473373305992L;
 
     /**
-     * Unique ID to represent a row in database.
+     * Unique ID to represent a row in database - e.g. prodhive11_mr1, prodhive13_tez, hadoop24
      */
     @Id
     private String id;
 
     /**
-     * Name of this command - e.g. prodhive, prodpig, etc.
+     * Name of this command - e.g. prodhive, pig, hadoop etc.
      */
     @Basic
     private String name;
@@ -47,7 +65,7 @@ public class CommandConfigElement implements Serializable {
     private String status;
 
     /**
-     * Location of the executable for this command on Genie or gateways.
+     * Location of the executable for this command.
      */
     @Basic
     private String executable;
@@ -70,7 +88,7 @@ public class CommandConfigElement implements Serializable {
      * can be added to the command object before persistence.
      */
     @Transient
-    private ArrayList<String> appids;
+    private ArrayList<String> appIds;
 
     /**
      * Set of applications that can run this command - foreign key in database,
@@ -221,22 +239,6 @@ public class CommandConfigElement implements Serializable {
     }
 
     /**
-     * Constructs the application list using the appids columns.
-     */
-    public void setApplicationsFromAppids() {
-        ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
-        if (appids != null) {
-            Iterator<String> it = this.appids.iterator();
-            while (it.hasNext()) {
-                ApplicationConfigElement ae = new ApplicationConfigElement();
-                ae.setId((String) it.next());
-                appList.add(ae);
-            }
-            this.applications = appList;
-        }
-    }
-
-    /**
      * Gets the user that created this command.
      *
      * @return user
@@ -330,28 +332,27 @@ public class CommandConfigElement implements Serializable {
     /**
      * Gets the application id's supported by this command.
      *
-     * @return appids - a list of all application id's supported by this command
+     * @return appIds - a list of all application id's supported by this command
      */
     @XmlElement
     public ArrayList<String> getAppids() {
-        //return appids;
         if (this.applications != null) {
-            appids = new ArrayList<String>();
+            appIds = new ArrayList<String>();
             Iterator<ApplicationConfigElement> it = this.applications.iterator();
             while (it.hasNext()) {
-                appids.add(((ApplicationConfigElement) it.next()).getId());
+                appIds.add(((ApplicationConfigElement) it.next()).getId());
             }
         }
-        return appids;
+        return appIds;
     }
 
     /**
      * Sets the application id's for this command in string form.
      *
-     * @param appids list of application id's for this command
+     * @param appIds list of application id's for this command
      */
-    public void setAppids(ArrayList<String> appids) {
-        this.appids = appids;
+    public void setAppids(ArrayList<String> appIds) {
+        this.appIds = appIds;
     }
 
     /**
