@@ -18,9 +18,6 @@
 
 package com.netflix.genie.common.model;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 /**
  * Test case for ClusterConfigElement utility methods.
  *
@@ -28,8 +25,8 @@ import org.junit.Test;
  */
 public class TestClusterConfigElement {
 
-    private ClusterConfigElement cc = new ClusterConfigElement();
-    
+//    private ClusterConfigElement cc = new ClusterConfigElement();
+//
 //    /**
 //     * Tests csv generation from the *-site.xml's for the cluster.
 //     */

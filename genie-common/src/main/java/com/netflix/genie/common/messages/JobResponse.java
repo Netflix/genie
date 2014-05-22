@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.messages;
 
 import java.util.Arrays;
@@ -38,15 +37,13 @@ import com.netflix.genie.common.model.JobElement;
 public class JobResponse extends BaseResponse {
 
     private static final long serialVersionUID = -1L;
-    
     private String message;
     private JobElement[] jobs;
 
     /**
      * Constructor to use if there is an exception.
      *
-     * @param error
-     *            CloudServiceException for this response
+     * @param error CloudServiceException for this response
      */
     public JobResponse(CloudServiceException error) {
         super(error);
@@ -70,8 +67,7 @@ public class JobResponse extends BaseResponse {
     /**
      * Sets the human-readable message for this response.
      *
-     * @param message
-     *            human-readable message
+     * @param message human-readable message
      */
     @XmlElement(name = "message")
     public void setMessage(String message) {
@@ -96,8 +92,7 @@ public class JobResponse extends BaseResponse {
     /**
      * Sets list of jobs for this response.
      *
-     * @param inJobs
-     *            an array of jobInfo elements for this response
+     * @param inJobs an array of jobInfo elements for this response
      */
     public void setJobs(JobElement[] inJobs) {
         if (inJobs == null) {
@@ -110,10 +105,9 @@ public class JobResponse extends BaseResponse {
     /**
      * Set an individual job for this response.
      *
-     * @param job
-     *            an individual jobInfo element for this response
+     * @param job an individual jobInfo element for this response
      */
     public void setJob(JobElement job) {
-        setJobs(new JobElement[] {job});
+        setJobs(new JobElement[]{job});
     }
 }

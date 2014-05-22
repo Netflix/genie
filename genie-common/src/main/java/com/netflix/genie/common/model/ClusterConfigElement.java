@@ -2,8 +2,6 @@ package com.netflix.genie.common.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
-
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
@@ -16,9 +14,10 @@ import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+
 /**
- *  Representation of the state of the Cluster  object.
- * 
+ * Representation of the state of the Cluster object.
+ *
  * @author skrishnan
  * @author amsharma
  */
@@ -50,15 +49,15 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Set of tags for scheduling - e.g. adhoc, sla, vpc, etc.
      */
-    @ElementCollection(fetch=FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     private ArrayList<String> tags;
 
     /**
      * Reference to all the config (xml's) needed for this application.
      */
-    @ElementCollection(fetch=FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     private ArrayList<String> configs;
-    
+
     /**
      * A list of id's of all the commands supported by this cluster.
      */
@@ -67,9 +66,9 @@ public class ClusterConfigElement implements Serializable {
 
     /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
-     *          Foreign Key in the database implemented by OpenJpa using join tables
+     * Foreign Key in the database implemented by OpenJpa using join tables
      */
-    @ManyToMany(targetEntity = CommandConfigElement.class, fetch=FetchType.EAGER)
+    @ManyToMany(targetEntity = CommandConfigElement.class, fetch = FetchType.EAGER)
     private ArrayList<CommandConfigElement> commands;
 
     /**
@@ -79,7 +78,7 @@ public class ClusterConfigElement implements Serializable {
     private String version;
 
     /**
-     *  Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
+     * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
      */
     @Basic
     private String status;
@@ -108,8 +107,7 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Sets the id (primary key) for this cluster.
      *
-     * @param id
-     *            unique id for this cluster
+     * @param id unique id for this cluster
      */
     public void setId(String id) {
         this.id = id;
@@ -127,8 +125,7 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Sets the name for this cluster.
      *
-     * @param name
-     *            unique id for this cluster
+     * @param name unique id for this cluster
      */
     public void setName(String name) {
         this.name = name;
@@ -144,17 +141,16 @@ public class ClusterConfigElement implements Serializable {
     }
 
     /**
-     * Sets the user who created  this cluster.
+     * Sets the user who created this cluster.
      *
-     * @param user
-     *            user who created this cluster
+     * @param user user who created this cluster
      */
     public void setUser(String user) {
         this.user = user;
     }
 
     /**
-     * Gets the tags allocated to this cluster
+     * Gets the tags allocated to this cluster.
      *
      * @return tags
      */
@@ -163,7 +159,7 @@ public class ClusterConfigElement implements Serializable {
     }
 
     /**
-     * Sets the tags allocated to this cluster
+     * Sets the tags allocated to this cluster.
      *
      * @param tags
      */
@@ -174,7 +170,7 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Gets the configs for this cluster.
      *
-     * @return configs 
+     * @return The cluster configurations
      */
     public ArrayList<String> getConfigs() {
         return configs;
@@ -183,8 +179,7 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Sets the configs for this cluster.
      *
-     * @param configs
-     *            The config files that this cluster needs
+     * @param configs The config files that this cluster needs
      */
     public void setConfigs(ArrayList<String> configs) {
         this.configs = configs;
@@ -193,8 +188,8 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Gets the commands that this cluster supports.
      *
-     * @return commands 
-     *          Not supposed to be exposed in request/response messages hence marked transient. 
+     * @return commands Not supposed to be exposed in request/response messages
+     * hence marked transient.
      */
     @XmlTransient
     public ArrayList<CommandConfigElement> getCommands() {
@@ -204,8 +199,7 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Sets the commands for this cluster.
      *
-     * @param commands
-     *            The commands that this cluster supports
+     * @param commands The commands that this cluster supports
      */
     public void setCommands(ArrayList<CommandConfigElement> commands) {
         this.commands = commands;
@@ -223,8 +217,7 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Sets the version for this cluster.
      *
-     * @param version
-     *            version number for this cluster
+     * @param version version number for this cluster
      */
     public void setVersion(String version) {
         this.version = version;
@@ -242,8 +235,7 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Sets the status for this application.
      *
-     * @param status
-     *            possible values Types.ConfigStatus
+     * @param status possible values Types.ConfigStatus
      */
     public void setStatus(String status) {
         this.status = status;
@@ -253,7 +245,6 @@ public class ClusterConfigElement implements Serializable {
      * Gets the create time for this cluster.
      *
      * @return createTime - epoch time of creation in milliseconds
-     * 
      */
     public Long getCreateTime() {
         return createTime;
@@ -262,8 +253,7 @@ public class ClusterConfigElement implements Serializable {
     /**
      * Sets the create time for this cluster.
      *
-     * @param createTime
-     *           epoch time in ms
+     * @param createTime epoch time in ms
      */
     public void setCreateTime(Long createTime) {
         this.createTime = createTime;
@@ -280,36 +270,33 @@ public class ClusterConfigElement implements Serializable {
 
     /**
      * Sets the updated time for this comamnd.
-     * 
-     * @param updateTime
-     *            epoch time in milliseconds
+     *
+     * @param updateTime epoch time in milliseconds
      */
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
     }
-    
+
     /**
-     * Gets the command id's supported by this cluster
+     * Gets the command id's supported by this cluster.
      *
-     * @return cmdIds -  a list of all command id's supported by this cluster
+     * @return cmdIds - a list of all command id's supported by this cluster
      */
     @XmlElement
     public ArrayList<String> getCmdIds() {
-        if(this.commands != null) {
-            cmdIds = new ArrayList<String>();
-            Iterator<CommandConfigElement> it = this.commands.iterator();
-            while(it.hasNext()){
-                cmdIds.add(((CommandConfigElement)it.next()).getId());
+        if (this.commands != null) {
+            this.cmdIds = new ArrayList<String>();
+            for (final CommandConfigElement cce : this.commands) {
+                this.cmdIds.add(cce.getId());
             }
         }
         return cmdIds;
     }
 
     /**
-     * Sets the command id's  for this cluster in string form.
+     * Sets the command id's for this cluster in string form.
      *
-     * @param cmdIds
-     *           list of command id's for this cluster
+     * @param cmdIds list of command id's for this cluster
      */
     public void setCmdIds(ArrayList<String> cmdIds) {
         this.cmdIds = cmdIds;

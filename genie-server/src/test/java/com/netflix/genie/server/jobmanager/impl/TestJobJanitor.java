@@ -15,17 +15,12 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.jobmanager.impl;
-
-import java.util.UUID;
-
-import junit.framework.Assert;
-
-import org.junit.Test;
 
 import com.netflix.genie.common.model.JobElement;
 import com.netflix.genie.server.persistence.PersistenceManager;
+import java.util.UUID;
+import org.junit.Test;
 
 /**
  * Test code for the job janitor class, which marks un-updated jobs as zombies.
@@ -36,6 +31,7 @@ public class TestJobJanitor {
 
     /**
      * Test whether the janitor cleans up zombie jobs correctly.
+     *
      * @throws Exception if there is any error in cleaning up.
      */
     @Test
@@ -59,10 +55,9 @@ public class TestJobJanitor {
         JobJanitor janitor = new JobJanitor();
         int numRows = janitor.markZombies();
         System.out.println("Number of rows marked as zombies: " + numRows);
-        
+
         // TODO: make the test work
         //Assert.assertEquals(numRows >= 2, true);
-
         // shut down cleanly
         PersistenceManager.shutdown();
     }

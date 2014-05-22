@@ -15,35 +15,31 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.client;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Iterator;
-import java.util.Map.Entry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Multimap;
-import com.netflix.genie.common.messages.BaseResponse;
-import com.netflix.genie.common.exceptions.CloudServiceException;
-
-import com.netflix.client.http.HttpRequest;
-import com.netflix.client.http.HttpRequest.Verb;
-import com.netflix.client.http.HttpResponse;
-import com.netflix.niws.client.http.RestClient;
 import com.netflix.appinfo.CloudInstanceConfig;
 import com.netflix.appinfo.EurekaInstanceConfig;
 import com.netflix.appinfo.MyDataCenterInstanceConfig;
 import com.netflix.client.ClientException;
 import com.netflix.client.ClientFactory;
+import com.netflix.client.http.HttpRequest;
+import com.netflix.client.http.HttpRequest.Verb;
+import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.discovery.DefaultEurekaClientConfig;
 import com.netflix.discovery.DiscoveryManager;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.messages.BaseResponse;
+import com.netflix.niws.client.http.RestClient;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map.Entry;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract REST client class that is extended to implement specific clients.
@@ -67,14 +63,15 @@ public abstract class BaseGenieClient {
      * The name of the server application.
      */
     protected static final String NIWS_APP_NAME_GENIE = "genie";
-    
+
     /**
-     * Standard root for all rest services
+     * Standard root for all rest services.
      */
     protected static final String BASE_REST_URI = "/genie/v1/";
 
     /**
      * Protected constructor for singleton class.
+     *
      * @throws IOException if properties can't be loaded
      */
     protected BaseGenieClient() throws IOException {
@@ -83,7 +80,8 @@ public abstract class BaseGenieClient {
 
     /**
      * Initializes Eureka for the given environment, if it is being used -
-     * should only be used if the user of library hasn't initialized Eureka already.
+     * should only be used if the user of library hasn't initialized Eureka
+     * already.
      *
      * @param env "prod" or "test" or "dev"
      */
@@ -108,24 +106,25 @@ public abstract class BaseGenieClient {
      * marshaling/unmarshaling.
      *
      * @param <T>
-     * @param verb
-     *            GET, POST or DELETE
-     * @param baseRestUri
-     *            the base Uri to use in the request, e.g. genie/v0/jobs
-     * @param uuid
-     *            the id to append to the baseRestUri, if any (e.g. job ID)
-     * @param params
-     *            HTTP params (e.g. userName="foo")
-     * @param request
-     *            Genie request if applicable (for POST), null otherwise
-     * @param responseClass
-     *            class name of expected response to be used for unmarshalling
+     * @param verb GET, POST or DELETE
+     * @param baseRestUri the base Uri to use in the request, e.g. genie/v0/jobs
+     * @param uuid the id to append to the baseRestUri, if any (e.g. job ID)
+     * @param params HTTP params (e.g. userName="foo")
+     * @param request Genie request if applicable (for POST), null otherwise
+     * @param responseClass class name of expected response to be used for
+     * unmarshalling
      *
-     * @return extracted and unmarshalled response from the Genie Execution Service
+     * @return extracted and unmarshalled response from the Genie Execution
+     * Service
      * @throws CloudServiceException
      */
-    protected <T extends BaseResponse> T executeRequest(Verb verb, String baseRestUri, String uuid,
-            Multimap<String, String> params, Object request, Class<T> responseClass)
+    protected <T extends BaseResponse> T executeRequest(
+            final Verb verb,
+            final String baseRestUri,
+            final String uuid,
+            final Multimap<String, String> params,
+            final Object request,
+            final Class<T> responseClass)
             throws CloudServiceException {
         HttpResponse response = null;
         String requestUri = buildRequestUri(baseRestUri, uuid);
@@ -137,10 +136,8 @@ public abstract class BaseGenieClient {
                     .verb(verb).header("Accept", "application/json")
                     .uri(new URI(requestUri)).entity(request);
             if (params != null) {
-                Iterator<Entry<String, String>> it = params.entries().iterator();
-                while (it.hasNext()) {
-                    Entry<String, String> next = it.next();
-                    builder.queryParams(next.getKey(), next.getValue());
+                for (Entry<String, String> param : params.entries()) {
+                    builder.queryParams(param.getKey(), param.getValue());
                 }
             }
             HttpRequest req = builder.build();
@@ -177,10 +174,8 @@ public abstract class BaseGenieClient {
      * Converts a response to a specific response object which must extend
      * BaseResponse.
      *
-     * @param response
-     *            response from REST service
-     * @param responseClass
-     *            class name of expected response
+     * @param response response from REST service
+     * @param responseClass class name of expected response
      * @return specific response class extracted
      */
     private <T extends BaseResponse> T extractEntityFromClientResponse(
@@ -205,7 +200,7 @@ public abstract class BaseGenieClient {
                 LOG.error(msg);
                 throw new CloudServiceException(
                         (status != HttpURLConnection.HTTP_OK) ? status
-                                : HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                        : HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
             }
 
             // if Genie sent a response back, then we can marshal it to a
@@ -217,7 +212,7 @@ public abstract class BaseGenieClient {
                 LOG.error(msg);
                 throw new CloudServiceException(
                         (status != HttpURLConnection.HTTP_OK) ? status
-                                : HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                        : HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
             }
 
             // got an http error code from Genie, throw exception
@@ -235,7 +230,7 @@ public abstract class BaseGenieClient {
                     "Exception caught while extracting entity from response", e);
             throw new CloudServiceException(
                     (status != HttpURLConnection.HTTP_OK) ? status
-                            : HttpURLConnection.HTTP_INTERNAL_ERROR, e);
+                    : HttpURLConnection.HTTP_INTERNAL_ERROR, e);
         }
     }
 
@@ -243,14 +238,17 @@ public abstract class BaseGenieClient {
      * Given a urlPath such as genie/v0/jobs and a uuid, constructs the request
      * uri.
      *
-     * @param baseRestUri
-     *            e.g. genie/v0/jobs
-     * @param uuid
-     *            the uuid for the REST resource, if it exists
+     * @param baseRestUri e.g. genie/v1/jobs
+     * @param uuid the uuid for the REST resource, if it exists
      * @return request URI for the service
      */
-    private String buildRequestUri(String baseRestUri, String uuid) {
-        return (uuid == null || uuid.isEmpty()) ? baseRestUri : baseRestUri
-                + "/" + uuid;
+    private String buildRequestUri(final String baseRestUri, final String uuid) {
+        if (StringUtils.isEmpty(uuid)) {
+            return baseRestUri;
+        } else {
+            final StringBuilder builder = new StringBuilder();
+            builder.append(baseRestUri).append("/").append(uuid);
+            return builder.toString();
+        }
     }
 }

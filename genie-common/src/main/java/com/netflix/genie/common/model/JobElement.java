@@ -1,10 +1,8 @@
 package com.netflix.genie.common.model;
 
 import java.io.Serializable;
-
-import java.util.Iterator;
 import java.util.ArrayList;
-
+import java.util.Arrays;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
@@ -12,10 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Representation of the state of a Genie 1.0 job.
- * 
+ *
  * @author amsharma
  */
 @Entity
@@ -24,11 +23,10 @@ import javax.persistence.Transient;
 public class JobElement implements Serializable {
 
     private static final long serialVersionUID = 2979506788441089067L;
-    
+
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
     // ------------------------------------------------------------------------
-
     /**
      * User-specified or system-generated unique job id.
      */
@@ -90,14 +88,14 @@ public class JobElement implements Serializable {
     //private ArrayList<ArrayList<String>> clusterCriteriaList;
     //private ArrayList<String> clusterCriteriaList;
     private ArrayList<ClusterCriteria> clusterCriteriaList;
-    
+
     /**
-     * String representation of the the cluster criteria array list object above.
-     * TO DO: use pre/post persist to store the above list into the DB
+     * String representation of the the cluster criteria array list object
+     * above. TO DO: use pre/post persist to store the above list into the DB
      */
     @Lob
     private String clusterCriteriaString;
-    
+
     /**
      * Command line arguments (REQUIRED).
      */
@@ -111,10 +109,11 @@ public class JobElement implements Serializable {
     private String fileDependencies;
 
     /**
-     * Set of file dependencies, sent as MIME attachments.
-     * This is not persisted in the DB for space reasons.
+     * Set of file dependencies, sent as MIME attachments. This is not persisted
+     * in the DB for space reasons.
      */
     @Transient
+    //TODO: Why array and not collection?s
     private FileAttachment[] attachments;
 
     /**
@@ -124,28 +123,24 @@ public class JobElement implements Serializable {
     private boolean disableLogArchival;
 
     /**
-     * Email address of the user where he expects an email.
-     * This is sent once the aladdin job completes.
+     * Email address of the user where he expects an email. This is sent once
+     * the aladdin job completes.
      */
     @Basic
     private String userEmail;
 
     // ------------------------------------------------------------------------
-
-
     // ------------------------------------------------------------------------
     // HADOOP 2.0 SPECIFIC PARAMS FOR ALL COMMANDS - TO BE SPECIFIED BY CLIENTS
     // ------------------------------------------------------------------------
-
     /**
      * Application name - e.g. MR, Tez (as supported by the command).
      */
     @Basic
     private String applicationName;
-    
+
     /**
-     * Application Id to pin to specific application id 
-     * e.g. TBD.
+     * Application Id to pin to specific application id e.g. TBD.
      */
     @Basic
     private String applicationId;
@@ -155,27 +150,25 @@ public class JobElement implements Serializable {
      */
     @Basic
     private String commandName;
-    
+
     /**
-     * Command Id to run - Used to pin to a particular command
-     * e.g. prodhive11_mr1
+     * Command Id to run - Used to pin to a particular command e.g.
+     * prodhive11_mr1
      */
     @Basic
     private String commandId;
 
     // ------------------------------------------------------------------------
-
     // ------------------------------------------------------------------------
     // GENERAL COMMON STUFF FOR ALL JOBS
     // TO BE GENERATED/USED BY SERVER
     // ------------------------------------------------------------------------
-
     /**
      * Job type - hadoop, pig and hive (upper case in DB).
      */
     @Basic
     private String jobType;
-    
+
     /**
      * PID for job - updated by the server.
      */
@@ -210,7 +203,7 @@ public class JobElement implements Serializable {
      * Finish time for job - initialized to zero (for historic reasons).
      */
     @Basic
-    private Long finishTime = Long.valueOf(0);
+    private Long finishTime = 0L;
 
     /**
      * The host/ip address of the client submitting job.
@@ -314,7 +307,7 @@ public class JobElement implements Serializable {
     public String getExecutionClusterName() {
         return executionClusterName;
     }
-    
+
     public void setExecutionClusterName(String executionClusterName) {
         this.executionClusterName = executionClusterName;
     }
@@ -322,7 +315,7 @@ public class JobElement implements Serializable {
     public String getExecutionClusterId() {
         return executionClusterId;
     }
-    
+
     public void setExecutionClusterId(String executionClusterId) {
         this.executionClusterId = executionClusterId;
     }
@@ -351,12 +344,28 @@ public class JobElement implements Serializable {
         this.fileDependencies = fileDependencies;
     }
 
+    /**
+     * Get the attachments for this job.
+     *
+     * @return The attachments
+     */
     public FileAttachment[] getAttachments() {
-        return attachments;
+        if (this.attachments != null) {
+            return Arrays.copyOf(this.attachments, this.attachments.length);
+        } else {
+            return new FileAttachment[0];
+        }
     }
 
+    /**
+     * Set the attachments for this job.
+     *
+     * @param attachments The attachments to set
+     */
     public void setAttachments(FileAttachment[] attachments) {
-        this.attachments = attachments;
+        if (attachments != null) {
+            this.attachments = Arrays.copyOf(attachments, attachments.length);
+        }
     }
 
     public boolean isDisableLogArchival() {
@@ -390,7 +399,7 @@ public class JobElement implements Serializable {
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
     }
-    
+
     public String getCommandName() {
         return commandName;
     }
@@ -398,7 +407,7 @@ public class JobElement implements Serializable {
     public void setCommandName(String commandName) {
         this.commandName = commandName;
     }
-    
+
     public String getCommandId() {
         return commandId;
     }
@@ -518,24 +527,22 @@ public class JobElement implements Serializable {
     public void setClusterCriteriaString(String clusterCriteriaString) {
         this.clusterCriteriaString = clusterCriteriaString;
     }
-    
+
+    /**
+     * Set the cluster criteria string.
+     *
+     * @param ccl The cluster criteria strings
+     */
     public void setClusterCriteriaString(ArrayList<String> ccl) {
-        if(ccl != null) {
-            Iterator<String> it = ccl.iterator();
-            this.clusterCriteriaString = new String();
-            while(it.hasNext()) {
-                String tag = (String)it.next();
-                this.clusterCriteriaString += tag;
-                this.clusterCriteriaString += ",";
-            }
+        if (ccl != null) {
+            this.clusterCriteriaString = StringUtils.join(ccl, ",");
         }
     }
-    
+
     /**
      * Set job status, and update start/update/finish times, if needed.
      *
-     * @param jobStatus
-     *            status for job
+     * @param jobStatus status for job
      */
     public void setJobStatus(Types.JobStatus jobStatus) {
         this.status = jobStatus.name();
@@ -554,18 +561,16 @@ public class JobElement implements Serializable {
     /**
      * Sets job status and human-readable message.
      *
-     * @param status
-     *            predefined status
-     * @param msg
-     *            human-readable message
+     * @param status predefined status
+     * @param msg human-readable message
      */
     public void setJobStatus(Types.JobStatus status, String msg) {
         setJobStatus(status);
         setStatusMsg(msg);
     }
-    
+
     /**
-     * Gets the envPropFile name 
+     * Gets the envPropFile name.
      *
      * @return envPropFile - file name containing environment variables.
      */
@@ -576,8 +581,8 @@ public class JobElement implements Serializable {
     /**
      * Sets the env property file name in string form.
      *
-     * @param envPropFile
-     *           contains the list of env variables to set while running this job.
+     * @param envPropFile contains the list of env variables to set while
+     * running this job.
      */
     public void setEnvPropFile(String envPropFile) {
         this.envPropFile = envPropFile;
