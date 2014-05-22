@@ -20,7 +20,7 @@ package com.netflix.genie.server.resources;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigRequest;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.ClusterConfig;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;
@@ -71,7 +71,7 @@ public class ClusterConfigResourceV1 {
          * @throws Exception if there is any error in initialization
          */
         public ClusterJAXBContextResolver() throws Exception {
-            super(new Class[]{ClusterConfigElement.class,
+            super(new Class[]{ClusterConfig.class,
                 ClusterConfigRequest.class,
                 ClusterConfigResponse.class});
         }
@@ -144,7 +144,7 @@ public class ClusterConfigResourceV1 {
 
         // Need to get the ClusterConfig object and fetch the command objects from the DB
         // to set it in the object.
-//        ClusterConfigElement ce = request.getClusterConfig();
+//        ClusterConfig ce = request.getClusterConfig();
 //        if (ce != null) {
 //            ArrayList<String> cmdIds = ce.getCmdIds();
 //
@@ -184,7 +184,7 @@ public class ClusterConfigResourceV1 {
             ClusterConfigRequest request) {
         LOG.info("called to create/update cluster");
 
-        ClusterConfigElement clusterConfig = request.getClusterConfig();
+        ClusterConfig clusterConfig = request.getClusterConfig();
         if (clusterConfig != null) {
             // include "id" in the request
             clusterConfig.setId(id);
@@ -256,10 +256,10 @@ public class ClusterConfigResourceV1 {
 //        logger.debug("Received request:" + request.getClusterConfig().getId());
 //        ClusterConfigResponse cr = new ClusterConfigResponse();
 //
-//        PersistenceManager<ClusterConfigElement> pm = new PersistenceManager<ClusterConfigElement>();
+//        PersistenceManager<ClusterConfig> pm = new PersistenceManager<ClusterConfig>();
 //        PersistenceManager<CommandConfigElement> pmc = new PersistenceManager<CommandConfigElement>();
 //
-//        ClusterConfigElement cle = request.getClusterConfig();
+//        ClusterConfig cle = request.getClusterConfig();
 //
 //        ArrayList<CommandConfigElement> cmdList = new ArrayList<CommandConfigElement>();
 //        Iterator<String> it = cle.getCmdIds().iterator();
@@ -276,7 +276,7 @@ public class ClusterConfigResourceV1 {
 //    @GET
 //    @Path("/")
 //    public Response getClusterConfig () {
-//        String table = ClusterConfigElement.class.getName();
+//        String table = ClusterConfig.class.getName();
 //
 //        ClusterConfigResponse response = new ClusterConfigResponse();
 //      /*  PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
@@ -299,14 +299,14 @@ public class ClusterConfigResourceV1 {
 //        EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie");
 //        EntityManager em = factory.createEntityManager();
 //
-//        Query q = em.createQuery("select  x from ClusterConfigElement x");
-//        List<ClusterConfigElement> results = (List<ClusterConfigElement>) q.getResultList();
+//        Query q = em.createQuery("select  x from ClusterConfig x");
+//        List<ClusterConfig> results = (List<ClusterConfig>) q.getResultList();
 //
-//        Iterator<ClusterConfigElement> it = results.iterator();
-//        ClusterConfigElement[] apps = new ClusterConfigElement[10];
+//        Iterator<ClusterConfig> it = results.iterator();
+//        ClusterConfig[] apps = new ClusterConfig[10];
 //        int i =0;
 //        while(it.hasNext()) {
-//            ClusterConfigElement c = (ClusterConfigElement)it.next();
+//            ClusterConfig c = (ClusterConfig)it.next();
 //            apps[i] = c;
 //            logger.debug(c.getId());
 //            //logger.debug(c.toString());

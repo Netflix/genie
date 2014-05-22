@@ -33,7 +33,7 @@ public class TestJobStatus {
      */
     @Test
     public void testSetJobStatus() {
-        JobElement ji = new JobElement();
+        Job ji = new Job();
 
         // finish time is 0 on initialization
         Assert.assertEquals(ji.getFinishTime(), Long.valueOf(0));

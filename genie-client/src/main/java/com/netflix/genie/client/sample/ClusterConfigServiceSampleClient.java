@@ -22,7 +22,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ClusterConfigServiceClient;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.ClusterConfig;
 import com.netflix.genie.common.model.Types;
 
 /**
@@ -73,7 +73,7 @@ public final class ClusterConfigServiceSampleClient {
 //        System.out.println("Hive config created with id: " + hiveConfigId);
 
         System.out.println("Creating new cluster config");
-        ClusterConfigElement clusterConfigElement = new ClusterConfigElement();
+        ClusterConfig clusterConfigElement = new ClusterConfig();
         clusterConfigElement.setUser(userName);
         clusterConfigElement.setName(name);
 //        clusterConfigElement.setTest(Boolean.TRUE);
@@ -94,8 +94,8 @@ public final class ClusterConfigServiceSampleClient {
         params.put("adHoc", "false");
         params.put("test", "true");
         params.put("limit", "3");
-        ClusterConfigElement[] responses = client.getClusterConfigs(params);
-        for (ClusterConfigElement hce : responses) {
+        ClusterConfig[] responses = client.getClusterConfigs(params);
+        for (ClusterConfig hce : responses) {
             System.out.println("Cluster Configs: {id, status, updateTime} - {"
                     + hce.getId() + ", " + hce.getStatus() + ", "
                     + hce.getUpdateTime() + "}");

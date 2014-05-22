@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.CommandConfigElement;
+import com.netflix.genie.common.model.CommandConfig;
 
 /**
  * Represents response from the Commands REST resource.
@@ -38,7 +38,7 @@ public class CommandConfigResponse extends BaseResponse {
     private static final long serialVersionUID = -1L;
 
     private String message;
-    private CommandConfigElement[] commandConfigs;
+    private CommandConfig[] commandConfigs;
 
     /**
      * Constructor to be used if there is an error.
@@ -83,7 +83,7 @@ public class CommandConfigResponse extends BaseResponse {
      */
     @XmlElementWrapper(name = "commandConfigs")
     @XmlElement(name = "commandConfig")
-    public CommandConfigElement[] getCommandConfigs() {
+    public CommandConfig[] getCommandConfigs() {
         if (commandConfigs == null) {
             return null;
         } else {
@@ -97,7 +97,7 @@ public class CommandConfigResponse extends BaseResponse {
      * @param inCommandConfigs
      *            array of commands
      */
-    public void setCommandConfigs(CommandConfigElement[] inCommandConfigs) {
+    public void setCommandConfigs(CommandConfig[] inCommandConfigs) {
         if (inCommandConfigs == null) {
             this.commandConfigs = null;
         } else {

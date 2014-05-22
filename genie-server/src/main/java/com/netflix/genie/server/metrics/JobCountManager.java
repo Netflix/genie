@@ -27,7 +27,7 @@ import com.netflix.discovery.DiscoveryClient;
 import com.netflix.discovery.DiscoveryManager;
 import com.netflix.discovery.shared.Application;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
@@ -40,10 +40,10 @@ import com.netflix.genie.server.util.NetUtil;
  */
 public final class JobCountManager {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(JobCountManager.class);
 
-    private static volatile PersistenceManager<JobElement> pm;
+    private static volatile PersistenceManager<Job> pm;
 
     /**
      * Private constructor - never called.
@@ -55,9 +55,9 @@ public final class JobCountManager {
      * Use this method to initialize prior to use.
      */
     private static synchronized void init() {
-        logger.info("called");
+        LOG.info("called");
         if (pm == null) {
-            pm = new PersistenceManager<JobElement>();
+            pm = new PersistenceManager<Job>();
         }
     }
 
@@ -69,7 +69,7 @@ public final class JobCountManager {
      *             if there is an error
      */
     public static int getNumInstanceJobs() throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
 
         return getNumInstanceJobs(null, null, null);
     }
@@ -89,7 +89,7 @@ public final class JobCountManager {
      */
     public static int getNumInstanceJobs(Long minStartTime, Long maxStartTime)
             throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
 
         return getNumInstanceJobs(null, minStartTime, maxStartTime);
     }
@@ -110,7 +110,7 @@ public final class JobCountManager {
      */
     public static int getNumInstanceJobs(String hostName, Long minStartTime,
             Long maxStartTime) throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
 
         // initialize host name
         if (hostName == null) {
@@ -137,7 +137,7 @@ public final class JobCountManager {
         }
 
         // query without pagination
-        QueryBuilder builder = new QueryBuilder().table("JobElement")
+        QueryBuilder builder = new QueryBuilder().table("Job")
                 .clause(criteria.toString()).paginate(false);
         Object[] results = pm.query(builder);
         if (results == null) {
@@ -159,7 +159,7 @@ public final class JobCountManager {
      */
     public static String getIdleInstance(int minJobThreshold)
             throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
         String localhost = NetUtil.getHostName();
 
         // naive implementation where we loop through all instances in discovery
@@ -168,12 +168,12 @@ public final class JobCountManager {
         DiscoveryClient discoveryClient = DiscoveryManager.getInstance()
                 .getDiscoveryClient();
         if (discoveryClient == null) {
-            logger.warn("Can't instantiate DiscoveryClient - returning localhost");
+            LOG.warn("Can't instantiate DiscoveryClient - returning localhost");
             return localhost;
         }
         Application app = discoveryClient.getApplication("genie");
         if (app == null) {
-            logger.warn("Discovery client can't find genie - returning localhost");
+            LOG.warn("Discovery client can't find genie - returning localhost");
             return localhost;
         }
 
@@ -186,14 +186,14 @@ public final class JobCountManager {
 
             // if instance is UP, check if job can be forwarded to it
             String hostName = instance.getHostName();
-            logger.debug("Trying host name: " + hostName);
+            LOG.debug("Trying host name: " + hostName);
             int numInstanceJobs = getNumInstanceJobs(hostName, null, null);
             if (numInstanceJobs <= minJobThreshold) {
-                logger.info("Returning idle host: " + hostName + ", who has "
+                LOG.info("Returning idle host: " + hostName + ", who has "
                         + numInstanceJobs + " jobs running");
                 return hostName;
             } else {
-                logger.debug("Host: " + hostName + " skipped since it has "
+                LOG.debug("Host: " + hostName + " skipped since it has "
                         + numInstanceJobs + " running jobs, threshold is: "
                         + minJobThreshold);
             }
@@ -201,7 +201,7 @@ public final class JobCountManager {
 
         // no hosts found with numInstanceJobs < minJobThreshold, return current
         // instance
-        logger.info("Can't find any host to foward to - returning localhost");
+        LOG.info("Can't find any host to foward to - returning localhost");
         return localhost;
     }
 }

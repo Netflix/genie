@@ -13,7 +13,7 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
-import com.netflix.genie.common.model.CommandConfigElement;
+import com.netflix.genie.common.model.CommandConfig;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
@@ -30,14 +30,14 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
     private static final Logger LOG = LoggerFactory
             .getLogger(PersistentCommandConfigImpl.class);
 
-    private final PersistenceManager<CommandConfigElement> pm;
+    private final PersistenceManager<CommandConfig> pm;
 
     /**
      * Default constructor.
      */
     public PersistentCommandConfigImpl() {
         // instantiate PersistenceManager
-        pm = new PersistenceManager<CommandConfigElement>();
+        pm = new PersistenceManager<CommandConfig>();
     }
 
     /**
@@ -67,7 +67,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
                 // Perform a simple query for all the entities
                 QueryBuilder builder = new QueryBuilder()
-                        .table("CommandConfigElement");
+                        .table("CommandConfig");
 
                 results = pm.query(builder);
 
@@ -89,7 +89,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
                 // Get all the results as an array
                 QueryBuilder builder = new QueryBuilder().table(
-                        "CommandConfigElement").clause(criteria.toString());
+                        "CommandConfig").clause(criteria.toString());
                 results = pm.query(builder);
             }
 
@@ -103,9 +103,9 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 ccr.setMessage("Returning commandConfigs for input parameters");
             }
 
-            CommandConfigElement[] elements = new CommandConfigElement[results.length];
+            CommandConfig[] elements = new CommandConfig[results.length];
             for (int i = 0; i < elements.length; i++) {
-                elements[i] = (CommandConfigElement) results[i];
+                elements[i] = (CommandConfig) results[i];
             }
             ccr.setCommandConfigs(elements);
             return ccr;
@@ -159,8 +159,8 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
             try {
                 // delete the entity
-                CommandConfigElement element = pm.deleteEntity(id,
-                        CommandConfigElement.class);
+                CommandConfig element = pm.deleteEntity(id,
+                        CommandConfig.class);
 
                 if (element == null) {
                     ccr = new CommandConfigResponse(new CloudServiceException(
@@ -173,7 +173,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                     ccr = new CommandConfigResponse();
                     ccr.setMessage("Successfully deleted commandConfig for id: "
                             + id);
-                    CommandConfigElement[] elements = new CommandConfigElement[]{element};
+                    CommandConfig[] elements = new CommandConfig[]{element};
                     ccr.setCommandConfigs(elements);
                     return ccr;
                 }
@@ -195,7 +195,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             Verb method) {
         LOG.info("called");
         CommandConfigResponse ccr = null;
-        CommandConfigElement commandConfigElement = request.getCommandConfig();
+        CommandConfig commandConfigElement = request.getCommandConfig();
 
         // ensure that the element is not null
         if (commandConfigElement == null) {
@@ -262,7 +262,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 // create a response
                 ccr = new CommandConfigResponse();
                 ccr.setMessage("Successfully created commandConfig for id: " + id);
-                ccr.setCommandConfigs(new CommandConfigElement[]{commandConfigElement});
+                ccr.setCommandConfigs(new CommandConfig[]{commandConfigElement});
                 return ccr;
             } catch (RollbackException e) {
                 LOG.error(e.getMessage(), e);
@@ -287,8 +287,8 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             LOG.info("GENIE: updating config for id: " + id);
 
             try {
-                CommandConfigElement old = pm.getEntity(id,
-                        CommandConfigElement.class);
+                CommandConfig old = pm.getEntity(id,
+                        CommandConfig.class);
                 // check if this is a create or an update
                 if (old == null) {
                     try {
@@ -304,7 +304,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 // all good - create a response
                 ccr = new CommandConfigResponse();
                 ccr.setMessage("Successfully updated commandConfig for id: " + id);
-                ccr.setCommandConfigs(new CommandConfigElement[]{commandConfigElement});
+                ccr.setCommandConfigs(new CommandConfig[]{commandConfigElement});
                 return ccr;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
@@ -324,7 +324,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
      * @throws CloudServiceException if some params are missing - else
      * initialize, and set creation time
      */
-    private void initAndValidateNewElement(CommandConfigElement commandConfigElement)
+    private void initAndValidateNewElement(CommandConfig commandConfigElement)
             throws CloudServiceException {
 
         // basic error checking

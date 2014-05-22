@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class CommandConfigElement implements Serializable {
+public class CommandConfig implements Serializable {
 
     private static final long serialVersionUID = -6106046473373305992L;
 
@@ -95,8 +95,8 @@ public class CommandConfigElement implements Serializable {
      * implemented by openjpa using join table
      * CommandConfigElement_ApplicationConfigElement.
      */
-    @ManyToMany(targetEntity = ApplicationConfigElement.class, fetch = FetchType.EAGER)
-    private ArrayList<ApplicationConfigElement> applications;
+    @ManyToMany(targetEntity = ApplicationConfig.class, fetch = FetchType.EAGER)
+    private ArrayList<ApplicationConfig> applications;
 
     /**
      * User who created this command.
@@ -225,7 +225,7 @@ public class CommandConfigElement implements Serializable {
      * marked transient.
      */
     @XmlTransient
-    public ArrayList<ApplicationConfigElement> getApplications() {
+    public ArrayList<ApplicationConfig> getApplications() {
         return applications;
     }
 
@@ -234,7 +234,7 @@ public class CommandConfigElement implements Serializable {
      *
      * @param applications The applications that this command supports
      */
-    public void setApplications(ArrayList<ApplicationConfigElement> applications) {
+    public void setApplications(ArrayList<ApplicationConfig> applications) {
         this.applications = applications;
     }
 
@@ -338,9 +338,9 @@ public class CommandConfigElement implements Serializable {
     public ArrayList<String> getAppids() {
         if (this.applications != null) {
             appIds = new ArrayList<String>();
-            Iterator<ApplicationConfigElement> it = this.applications.iterator();
+            Iterator<ApplicationConfig> it = this.applications.iterator();
             while (it.hasNext()) {
-                appIds.add(((ApplicationConfigElement) it.next()).getId());
+                appIds.add(((ApplicationConfig) it.next()).getId());
             }
         }
         return appIds;

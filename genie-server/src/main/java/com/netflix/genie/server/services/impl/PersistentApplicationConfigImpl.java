@@ -4,7 +4,7 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ApplicationConfigRequest;
 import com.netflix.genie.common.messages.ApplicationConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfigElement;
+import com.netflix.genie.common.model.ApplicationConfig;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
@@ -28,14 +28,14 @@ public class PersistentApplicationConfigImpl implements
     private static final Logger LOG = LoggerFactory
             .getLogger(PersistentApplicationConfigImpl.class);
 
-    private final PersistenceManager<ApplicationConfigElement> pm;
+    private final PersistenceManager<ApplicationConfig> pm;
 
     /**
      * Default constructor.
      */
     public PersistentApplicationConfigImpl() {
         // instantiate PersistenceManager
-        pm = new PersistenceManager<ApplicationConfigElement>();
+        pm = new PersistenceManager<ApplicationConfig>();
     }
 
     /**
@@ -66,8 +66,9 @@ public class PersistentApplicationConfigImpl implements
                 LOG.info("GENIE: Returning all applicationConfig elements");
 
                 // Perform a simple query for all the entities
+                //TODO: Get rid of this customer query builder. Use JPA 2.0
                 QueryBuilder builder = new QueryBuilder()
-                        .table("ApplicationConfigElement");
+                        .table("ApplicationConfig");
                 results = pm.query(builder);
 
                 // set up a specific message
@@ -88,7 +89,7 @@ public class PersistentApplicationConfigImpl implements
 
                 // Get all the results as an array
                 QueryBuilder builder = new QueryBuilder().table(
-                        "ApplicationConfigElement").clause(criteria.toString());
+                        "ApplicationConfig").clause(criteria.toString());
                 results = pm.query(builder);
             }
 
@@ -102,9 +103,9 @@ public class PersistentApplicationConfigImpl implements
                 acr.setMessage("Returning applicationConfigs for input parameters");
             }
 
-            ApplicationConfigElement[] elements = new ApplicationConfigElement[results.length];
+            ApplicationConfig[] elements = new ApplicationConfig[results.length];
             for (int i = 0; i < elements.length; i++) {
-                elements[i] = (ApplicationConfigElement) results[i];
+                elements[i] = (ApplicationConfig) results[i];
             }
             acr.setApplicationConfigs(elements);
             return acr;
@@ -158,8 +159,8 @@ public class PersistentApplicationConfigImpl implements
 
             try {
                 // delete the entity
-                ApplicationConfigElement element = pm.deleteEntity(id,
-                        ApplicationConfigElement.class);
+                ApplicationConfig element = pm.deleteEntity(id,
+                        ApplicationConfig.class);
 
                 if (element == null) {
                     acr = new ApplicationConfigResponse(new CloudServiceException(
@@ -172,7 +173,7 @@ public class PersistentApplicationConfigImpl implements
                     acr = new ApplicationConfigResponse();
                     acr.setMessage("Successfully deleted applicationConfig for id: "
                             + id);
-                    ApplicationConfigElement[] elements = new ApplicationConfigElement[]{element};
+                    ApplicationConfig[] elements = new ApplicationConfig[]{element};
                     acr.setApplicationConfigs(elements);
                     return acr;
                 }
@@ -194,7 +195,7 @@ public class PersistentApplicationConfigImpl implements
             Verb method) {
         LOG.info("called");
         ApplicationConfigResponse acr = null;
-        ApplicationConfigElement applicationConfigElement = request.getApplicationConfig();
+        ApplicationConfig applicationConfigElement = request.getApplicationConfig();
 
         // ensure that the element is not null
         if (applicationConfigElement == null) {
@@ -261,7 +262,7 @@ public class PersistentApplicationConfigImpl implements
                 // create a response
                 acr = new ApplicationConfigResponse();
                 acr.setMessage("Successfully created applicationConfig for id: " + id);
-                acr.setApplicationConfigs(new ApplicationConfigElement[]{applicationConfigElement});
+                acr.setApplicationConfigs(new ApplicationConfig[]{applicationConfigElement});
                 return acr;
             } catch (RollbackException e) {
                 LOG.error(e.getMessage(), e);
@@ -286,8 +287,8 @@ public class PersistentApplicationConfigImpl implements
             LOG.info("GENIE: updating config for id: " + id);
 
             try {
-                ApplicationConfigElement old = pm.getEntity(id,
-                        ApplicationConfigElement.class);
+                ApplicationConfig old = pm.getEntity(id,
+                        ApplicationConfig.class);
                 // check if this is a create or an update
                 if (old == null) {
                     try {
@@ -303,7 +304,7 @@ public class PersistentApplicationConfigImpl implements
                 // all good - create a response
                 acr = new ApplicationConfigResponse();
                 acr.setMessage("Successfully updated applicationConfig for id: " + id);
-                acr.setApplicationConfigs(new ApplicationConfigElement[]{applicationConfigElement});
+                acr.setApplicationConfigs(new ApplicationConfig[]{applicationConfigElement});
                 return acr;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
@@ -323,7 +324,7 @@ public class PersistentApplicationConfigImpl implements
      * @throws CloudServiceException if some params are missing - else
      * initialize, and set creation time
      */
-    private void initAndValidateNewElement(ApplicationConfigElement applicationConfigElement)
+    private void initAndValidateNewElement(ApplicationConfig applicationConfigElement)
             throws CloudServiceException {
 
         // basic error checking

@@ -24,7 +24,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 
 /**
@@ -39,14 +39,14 @@ public class TestPersistenceManager {
      */
     @Test
     public void testCreateAndGetEntity() {
-        PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-        JobElement initial = new JobElement();
+        PersistenceManager<Job> pm = new PersistenceManager<Job>();
+        Job initial = new Job();
         UUID uuid = UUID.randomUUID();
         initial.setJobName("My test job");
         initial.setJobID(uuid.toString());
         pm.createEntity(initial);
-        JobElement result = pm.getEntity(uuid.toString(),
-                JobElement.class);
+        Job result = pm.getEntity(uuid.toString(),
+                Job.class);
         Assert.assertEquals(initial.getJobID(), result.getJobID());
     }
 
@@ -55,13 +55,13 @@ public class TestPersistenceManager {
      */
     @Test
     public void testDeleteEntity() {
-        PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-        JobElement initial = new JobElement();
+        PersistenceManager<Job> pm = new PersistenceManager<Job>();
+        Job initial = new Job();
         UUID uuid = UUID.randomUUID();
         initial.setJobID(uuid.toString());
         pm.createEntity(initial);
-        JobElement deleted = pm.deleteEntity(uuid.toString(),
-                JobElement.class);
+        Job deleted = pm.deleteEntity(uuid.toString(),
+                Job.class);
         Assert.assertNotNull(deleted);
     }
 
@@ -70,14 +70,14 @@ public class TestPersistenceManager {
      */
     @Test
     public void testUpdateEntity() {
-        PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-        JobElement initial = new JobElement();
+        PersistenceManager<Job> pm = new PersistenceManager<Job>();
+        Job initial = new Job();
         UUID uuid = UUID.randomUUID();
         initial.setJobID(uuid.toString());
         pm.createEntity(initial);
         initial.setJobStatus(JobStatus.FAILED);
-        JobElement updated = pm.updateEntity(initial);
-        Assert.assertEquals(updated.getStatus(), "FAILED");
+        Job updated = pm.updateEntity(initial);
+        Assert.assertEquals("FAILED", updated.getStatus());
     }
 
     /**
@@ -87,12 +87,12 @@ public class TestPersistenceManager {
      */
     @Test
     public void testUpdateEntities() throws Exception {
-        PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-        JobElement one = new JobElement();
+        PersistenceManager<Job> pm = new PersistenceManager<Job>();
+        Job one = new Job();
         one.setJobName("UPDATE_TEST");
         one.setJobID(UUID.randomUUID().toString());
         pm.createEntity(one);
-        JobElement two = new JobElement();
+        Job two = new Job();
         two.setJobName("UPDATE_TEST");
         two.setJobID(UUID.randomUUID().toString());
         pm.createEntity(two);
@@ -101,7 +101,7 @@ public class TestPersistenceManager {
         setCriteria.append("jobType='HADOOP'");
         ClauseBuilder queryCriteria = new ClauseBuilder(ClauseBuilder.AND);
         queryCriteria.append("jobName='UPDATE_TEST'");
-        QueryBuilder qb = new QueryBuilder().table("JobElement")
+        QueryBuilder qb = new QueryBuilder().table("Job")
                 .set(setCriteria.toString()).clause(queryCriteria.toString());
         int numRows = pm.update(qb);
         System.out.println("Number of rows updated: " + numRows);
@@ -115,8 +115,8 @@ public class TestPersistenceManager {
      */
     @Test
     public void testQuery() throws Exception {
-        PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-        JobElement initial = new JobElement();
+        PersistenceManager<Job> pm = new PersistenceManager<Job>();
+        Job initial = new Job();
         UUID uuid = UUID.randomUUID();
         initial.setJobID(uuid.toString());
         initial.setJobName("My test job");
@@ -126,11 +126,11 @@ public class TestPersistenceManager {
         ClauseBuilder cb = new ClauseBuilder(ClauseBuilder.AND);
         cb.append("jobID='" + initial.getJobID() + "'");
         cb.append("status='FAILED'");
-        QueryBuilder qb = new QueryBuilder().table("JobElement").clause(
+        QueryBuilder qb = new QueryBuilder().table("Job").clause(
                 cb.toString());
         Object[] results = pm.query(qb);
-        Assert.assertEquals(results.length, 1);
-        Assert.assertEquals(results[0] instanceof JobElement, true);
+        Assert.assertEquals(1, results.length);
+        Assert.assertEquals(results[0] instanceof Job, true);
     }
 
     /**

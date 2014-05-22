@@ -37,7 +37,7 @@ import javax.persistence.Table;
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class ApplicationConfigElement implements Serializable {
+public class ApplicationConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -104,7 +104,7 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Default constructor.
      */
-    public ApplicationConfigElement() {
+    public ApplicationConfig() {
     }
 
     /**

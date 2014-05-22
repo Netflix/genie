@@ -28,7 +28,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.JobRequest;
 import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types;
 
 import com.netflix.client.http.HttpRequest.Verb;
@@ -97,7 +97,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @return updated jobInfo for submitted job, if there is no error
      * @throws CloudServiceException
      */
-    public JobElement submitJob(JobElement jobInfo)
+    public Job submitJob(Job jobInfo)
             throws CloudServiceException {
         if (jobInfo == null) {
             String msg = "Required parameter jobInfo can't be NULL";
@@ -163,7 +163,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @return the jobInfo for this jobID
      * @throws CloudServiceException
      */
-    public JobElement getJob(String jobID) throws CloudServiceException {
+    public Job getJob(String jobID) throws CloudServiceException {
         if (jobID == null) {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing required parameter: jobID");
@@ -194,7 +194,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @return array of jobInfos that match the filter
      * @throws CloudServiceException
      */
-    public JobElement[] getJobs(Multimap<String, String> params)
+    public Job[] getJobs(Multimap<String, String> params)
             throws CloudServiceException {
         JobResponse ji = executeRequest(Verb.GET, BASE_EXECUTION_REST_URI, null,
                 params, null, JobResponse.class);
@@ -226,7 +226,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws InterruptedException
      *             on timeout/thread errors
      */
-    public JobElement waitForCompletion(String jobID, long blockTimeout)
+    public Job waitForCompletion(String jobID, long blockTimeout)
             throws CloudServiceException, InterruptedException {
         long pollTime = 10000;
         return waitForCompletion(jobID, blockTimeout, pollTime);
@@ -248,7 +248,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws InterruptedException
      *             on timeout/thread errors
      */
-    public JobElement waitForCompletion(String jobID, long blockTimeout,
+    public Job waitForCompletion(String jobID, long blockTimeout,
             long pollTime) throws CloudServiceException, InterruptedException {
         if (jobID == null) {
             String msg = "Missing required parameter: jobID";
@@ -260,7 +260,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         long startTime = System.currentTimeMillis();
 
         while (true) {
-            JobElement jobInfo = getJob(jobID);
+            Job jobInfo = getJob(jobID);
 
             // wait for job to finish - and finish time to be updated
             if (jobInfo.getFinishTime() > 0) {

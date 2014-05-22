@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 
 /**
  * Represents the response from the Jobs REST resource.
@@ -38,7 +38,7 @@ public class JobResponse extends BaseResponse {
 
     private static final long serialVersionUID = -1L;
     private String message;
-    private JobElement[] jobs;
+    private Job[] jobs;
 
     /**
      * Constructor to use if there is an exception.
@@ -81,7 +81,7 @@ public class JobResponse extends BaseResponse {
      */
     @XmlElementWrapper(name = "jobs")
     @XmlElement(name = "jobInfo")
-    public JobElement[] getJobs() {
+    public Job[] getJobs() {
         if (jobs == null) {
             return null;
         } else {
@@ -94,7 +94,7 @@ public class JobResponse extends BaseResponse {
      *
      * @param inJobs an array of jobInfo elements for this response
      */
-    public void setJobs(JobElement[] inJobs) {
+    public void setJobs(Job[] inJobs) {
         if (inJobs == null) {
             this.jobs = null;
         } else {
@@ -107,7 +107,7 @@ public class JobResponse extends BaseResponse {
      *
      * @param job an individual jobInfo element for this response
      */
-    public void setJob(JobElement job) {
-        setJobs(new JobElement[]{job});
+    public void setJob(Job job) {
+        setJobs(new Job[]{job});
     }
 }

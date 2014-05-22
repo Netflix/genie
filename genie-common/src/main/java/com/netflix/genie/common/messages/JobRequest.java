@@ -21,7 +21,7 @@ package com.netflix.genie.common.messages;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 
 /**
  * Represents request to the Jobs REST resource.
@@ -32,7 +32,7 @@ import com.netflix.genie.common.model.JobElement;
 public class JobRequest extends BaseRequest {
 
     private static final long serialVersionUID = -1L;
-    private JobElement jobInfo;
+    private Job jobInfo;
 
     /**
      * Default constructor.
@@ -46,7 +46,7 @@ public class JobRequest extends BaseRequest {
      * @param jobInfo
      *            job info element for this request
      */
-    public void setJobInfo(JobElement jobInfo) {
+    public void setJobInfo(Job jobInfo) {
         this.jobInfo = jobInfo;
     }
 
@@ -56,7 +56,7 @@ public class JobRequest extends BaseRequest {
      * @return job info for this request
      */
     @XmlElement(name = "jobInfo")
-    public JobElement getJobInfo() {
+    public Job getJobInfo() {
         return jobInfo;
     }
 }

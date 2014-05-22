@@ -22,7 +22,7 @@ import com.netflix.genie.common.messages.JobRequest;
 import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.ClusterCriteria;
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.ExecutionServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;
@@ -73,7 +73,7 @@ public class JobResourceV1 {
         public JobJAXBContextResolver() throws Exception {
             super(new Class[]{JobRequest.class,
                 JobStatusResponse.class,
-                JobElement.class,
+                Job.class,
                 JobResponse.class,
                 ClusterCriteria.class});
         }
@@ -110,7 +110,7 @@ public class JobResourceV1 {
         LOG.info("called from: " + clientHost);
 
         // set the clientHost, if it is not overridden already
-        JobElement jobInfo = request.getJobInfo();
+        Job jobInfo = request.getJobInfo();
         if ((jobInfo != null)
                 && ((jobInfo.getClientHost() == null)
                 || jobInfo.getClientHost().isEmpty())) {

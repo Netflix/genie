@@ -30,7 +30,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
 import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.FileAttachment;
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.JobType;
 
@@ -72,15 +72,15 @@ public final class ExecutionServiceSampleClient {
         params.put("jobType", JobType.YARN.name());
         params.put("status", JobStatus.FAILED.name());
         params.put("limit", "3");
-        JobElement[] responses = client.getJobs(params);
-        for (JobElement ji : responses) {
+        Job[] responses = client.getJobs(params);
+        for (Job ji : responses) {
             System.out.println("Job Info: {id, status, finishTime} - {"
                     + ji.getJobID() + ", " + ji.getStatus() + ", "
                     + ji.getFinishTime() + "}");
         }
 
         System.out.println("Running Hive job");
-        JobElement jobInfo = new JobElement();
+        Job jobInfo = new Job();
         jobInfo.setUserName(userName);
         jobInfo.setJobType(JobType.YARN.name());
         jobInfo.setDescription("This is a test");

@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class ClusterConfigElement implements Serializable {
+public class ClusterConfig implements Serializable {
 
     private static final long serialVersionUID = 8046582926818942370L;
 
@@ -85,8 +85,8 @@ public class ClusterConfigElement implements Serializable {
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
      * Foreign Key in the database implemented by OpenJpa using join tables
      */
-    @ManyToMany(targetEntity = CommandConfigElement.class, fetch = FetchType.EAGER)
-    private ArrayList<CommandConfigElement> commands;
+    @ManyToMany(targetEntity = CommandConfig.class, fetch = FetchType.EAGER)
+    private ArrayList<CommandConfig> commands;
 
     /**
      * Version of this cluster.
@@ -209,7 +209,7 @@ public class ClusterConfigElement implements Serializable {
      * hence marked transient.
      */
     @XmlTransient
-    public ArrayList<CommandConfigElement> getCommands() {
+    public ArrayList<CommandConfig> getCommands() {
         return commands;
     }
 
@@ -218,7 +218,7 @@ public class ClusterConfigElement implements Serializable {
      *
      * @param commands The commands that this cluster supports
      */
-    public void setCommands(ArrayList<CommandConfigElement> commands) {
+    public void setCommands(ArrayList<CommandConfig> commands) {
         this.commands = commands;
     }
 
@@ -303,7 +303,7 @@ public class ClusterConfigElement implements Serializable {
     public ArrayList<String> getCmdIds() {
         if (this.commands != null) {
             this.cmdIds = new ArrayList<String>();
-            for (final CommandConfigElement cce : this.commands) {
+            for (final CommandConfig cce : this.commands) {
                 this.cmdIds.add(cce.getId());
             }
         }

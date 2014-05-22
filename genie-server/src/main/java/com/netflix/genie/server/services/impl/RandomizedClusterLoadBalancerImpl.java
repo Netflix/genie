@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.ClusterConfig;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 
 /**
@@ -36,18 +36,18 @@ import com.netflix.genie.server.services.ClusterLoadBalancer;
  */
 public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(RandomizedClusterLoadBalancerImpl.class);
 
     /** {@inheritDoc} */
     @Override
-    public ClusterConfigElement selectCluster(ClusterConfigElement[] ceArray)
+    public ClusterConfig selectCluster(ClusterConfig[] ceArray)
             throws CloudServiceException {
-        logger.info("called");
+        LOG.info("called");
 
         if (ceArray == null || ceArray.length == 0) {
             String msg = "No cluster configuration found to match user params";
-            logger.error(msg);
+            LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_PAYMENT_REQUIRED, msg);
         }

@@ -38,10 +38,10 @@
     </provider>
 
     <!-- We must enumerate each entity in the persistence unit -->
-	<class>com.netflix.genie.common.model.JobElement</class>
-	<class>com.netflix.genie.common.model.ClusterConfigElement</class>
-	<class>com.netflix.genie.common.model.CommandConfigElement</class>
-	<class>com.netflix.genie.common.model.ApplicationConfigElement</class>
+	<class>com.netflix.genie.common.model.Job</class>
+	<class>com.netflix.genie.common.model.ClusterConfig</class>
+	<class>com.netflix.genie.common.model.CommandConfig</class>
+	<class>com.netflix.genie.common.model.ApplicationConfig</class>
 	
     <properties>
 <!--       properties for Derby/local

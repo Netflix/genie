@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ApplicationConfigElement;
+import com.netflix.genie.common.model.ApplicationConfig;
 
 /**
  * Represents response from the Application Config REST resource.
@@ -38,7 +38,7 @@ public class ApplicationConfigResponse extends BaseResponse {
     private static final long serialVersionUID = -1L;
 
     private String message;
-    private ApplicationConfigElement[] applicationConfigs;
+    private ApplicationConfig[] applicationConfigs;
 
     /**
      * Constructor to be used if there is an error.
@@ -83,7 +83,7 @@ public class ApplicationConfigResponse extends BaseResponse {
      */
     @XmlElementWrapper(name = "applicationConfigs")
     @XmlElement(name = "applicationConfig")
-    public ApplicationConfigElement[] getApplicationConfigs() {
+    public ApplicationConfig[] getApplicationConfigs() {
         if (applicationConfigs == null) {
             return null;
         } else {
@@ -97,7 +97,7 @@ public class ApplicationConfigResponse extends BaseResponse {
      * @param inApplicationConfigs
      *            array of application configs
      */
-    public void setApplicationConfigs(ApplicationConfigElement[] inApplicationConfigs) {
+    public void setApplicationConfigs(ApplicationConfig[] inApplicationConfigs) {
         if (inApplicationConfigs == null) {
             this.applicationConfigs = null;
         } else {

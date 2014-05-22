@@ -15,19 +15,17 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.jobmanager.impl;
 
-import org.apache.commons.configuration.AbstractConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
+import org.apache.commons.configuration.AbstractConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Janitor thread that marks jobs as zombies if status hasn't been updated for
@@ -36,10 +34,11 @@ import com.netflix.genie.server.persistence.QueryBuilder;
  * @author skrishnan
  */
 public class JobJanitor extends Thread {
-    private static Logger logger = LoggerFactory.getLogger(JobJanitor.class);
 
-    private PersistenceManager<JobElement> pm;
-    private AbstractConfiguration conf;
+    private static final Logger LOG = LoggerFactory.getLogger(JobJanitor.class);
+
+    private final PersistenceManager<Job> pm;
+    private final AbstractConfiguration conf;
     private boolean stop;
 
     /**
@@ -47,7 +46,7 @@ public class JobJanitor extends Thread {
      */
     public JobJanitor() {
         conf = ConfigurationManager.getConfigInstance();
-        pm = new PersistenceManager<JobElement>();
+        pm = new PersistenceManager<Job>();
         stop = false;
     }
 
@@ -56,12 +55,11 @@ public class JobJanitor extends Thread {
      * netflix.genie.server.janitor.zombie.delta.ms.
      *
      * @return Number of jobs marked as zombies
-     * @throws Exception
-     *             if there is any error during the process
+     * @throws Exception if there is any error during the process
      */
     public int markZombies() throws Exception {
         // the equivalent query is as follows:
-        // update JobElement set status='FAILED', updateTime=$max,
+        // update Job set status='FAILED', updateTime=$max,
         // finishTime=$max,
         // exitCode=$zombie_code, statusMsg='Job has been marked as a zombie'
         // where updateTime < $min and (status='RUNNING' or status='INIT')"
@@ -86,7 +84,7 @@ public class JobJanitor extends Thread {
         queryCriteria.append("(" + statusCriteria.toString() + ")", false);
 
         // set up the query
-        QueryBuilder query = new QueryBuilder().table("JobElement")
+        QueryBuilder query = new QueryBuilder().table("Job")
                 .clause(queryCriteria.toString()).set(setCriteria.toString());
         int numRowsUpdated = pm.update(query);
         return numRowsUpdated;
@@ -99,28 +97,28 @@ public class JobJanitor extends Thread {
     @Override
     public void run() {
         while (true) {
-            logger.info("Job janitor daemon waking up");
+            LOG.info("Job janitor daemon waking up");
             if (stop) {
-                logger.info("Job janitor stopping as per request");
+                LOG.info("Job janitor stopping as per request");
                 return;
             }
 
             try {
                 int numRowsUpdated = markZombies();
-                logger.info("Total jobs marked as zombies: " + numRowsUpdated);
+                LOG.info("Total jobs marked as zombies: " + numRowsUpdated);
             } catch (Exception e) {
                 // log error message and move on to next iteration
-                logger.error(e.getMessage());
+                LOG.error(e.getMessage());
             }
 
             // sleep for the configured timeout
             long sleepTime = conf.getLong(
                     "netflix.genie.server.janitor.sleep.ms", 5000);
-            logger.info("Job janitor daemon going to sleep");
+            LOG.info("Job janitor daemon going to sleep");
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                logger.warn(e.getMessage());
+                LOG.warn(e.getMessage());
                 continue;
             }
         }
@@ -129,8 +127,7 @@ public class JobJanitor extends Thread {
     /**
      * Tell the janitor thread to stop running at next iteration.
      *
-     * @param stop
-     *            true if the thread should stop running
+     * @param stop true if the thread should stop running
      */
     public void setStop(boolean stop) {
         this.stop = stop;

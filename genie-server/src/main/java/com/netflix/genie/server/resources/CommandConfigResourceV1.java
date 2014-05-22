@@ -3,8 +3,8 @@ package com.netflix.genie.server.resources;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfigElement;
-import com.netflix.genie.common.model.CommandConfigElement;
+import com.netflix.genie.common.model.ApplicationConfig;
+import com.netflix.genie.common.model.CommandConfig;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
@@ -57,7 +57,7 @@ public class CommandConfigResourceV1 {
          * @throws Exception if there is any error in initialization
          */
         public CommandJAXBContextResolver() throws Exception {
-            super(new Class[]{CommandConfigElement.class,
+            super(new Class[]{CommandConfig.class,
                 CommandConfigRequest.class,
                 CommandConfigResponse.class});
         }
@@ -117,7 +117,7 @@ public class CommandConfigResourceV1 {
 
         // Need to get the CommandConfig object and fetch the applcation objects from the DB
         // to set it in the object.
-        CommandConfigElement ce = request.getCommandConfig();
+        CommandConfig ce = request.getCommandConfig();
 
         if (ce == null) {
             return ResponseUtil.createResponse(new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
@@ -127,12 +127,12 @@ public class CommandConfigResourceV1 {
         ArrayList<String> appids = ce.getAppids();
 
         if (appids != null) {
-            PersistenceManager<ApplicationConfigElement> pma = new PersistenceManager<ApplicationConfigElement>();
-            ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
+            PersistenceManager<ApplicationConfig> pma = new PersistenceManager<ApplicationConfig>();
+            ArrayList<ApplicationConfig> appList = new ArrayList<ApplicationConfig>();
             Iterator<String> it = appids.iterator();
             while (it.hasNext()) {
                 String appId = (String) it.next();
-                ApplicationConfigElement ae = (ApplicationConfigElement) pma.getEntity(appId, ApplicationConfigElement.class);
+                ApplicationConfig ae = (ApplicationConfig) pma.getEntity(appId, ApplicationConfig.class);
                 if (ae != null) {
                     appList.add(ae);
                 } else {
@@ -161,19 +161,19 @@ public class CommandConfigResourceV1 {
     public Response updateCommandConfig(@PathParam("id") String id,
             CommandConfigRequest request) {
         LOG.info("called to create/update comamnd config");
-        CommandConfigElement commandConfig = request.getCommandConfig();
+        CommandConfig commandConfig = request.getCommandConfig();
         if (commandConfig != null) {
             // include "id" in the request
             commandConfig.setId(id);
             ArrayList<String> appids = commandConfig.getAppids();
 
             if (appids != null) {
-                PersistenceManager<ApplicationConfigElement> pma = new PersistenceManager<ApplicationConfigElement>();
-                ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
+                PersistenceManager<ApplicationConfig> pma = new PersistenceManager<ApplicationConfig>();
+                ArrayList<ApplicationConfig> appList = new ArrayList<ApplicationConfig>();
                 Iterator<String> it = appids.iterator();
                 while (it.hasNext()) {
                     String appId = (String) it.next();
-                    ApplicationConfigElement ae = (ApplicationConfigElement) pma.getEntity(appId, ApplicationConfigElement.class);
+                    ApplicationConfig ae = (ApplicationConfig) pma.getEntity(appId, ApplicationConfig.class);
                     if (ae != null) {
                         appList.add(ae);
                     } else {

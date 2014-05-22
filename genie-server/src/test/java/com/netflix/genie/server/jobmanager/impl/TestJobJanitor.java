@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import java.util.UUID;
 import org.junit.Test;
@@ -37,14 +37,14 @@ public class TestJobJanitor {
     @Test
     public void testJobJanitor() throws Exception {
         // create two old jobs
-        PersistenceManager<JobElement> pm = new PersistenceManager<JobElement>();
-        JobElement one = new JobElement();
+        PersistenceManager<Job> pm = new PersistenceManager<Job>();
+        Job one = new Job();
         one.setJobName("UPDATE_TEST");
         one.setJobID(UUID.randomUUID().toString());
         one.setUpdateTime(0L);
         one.setStatus("RUNNING");
         pm.createEntity(one);
-        JobElement two = new JobElement();
+        Job two = new Job();
         two.setJobName("UPDATE_TEST");
         two.setUpdateTime(0L);
         two.setStatus("INIT");

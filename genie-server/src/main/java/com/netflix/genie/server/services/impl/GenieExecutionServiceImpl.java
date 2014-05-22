@@ -28,7 +28,7 @@ import com.netflix.genie.common.messages.BaseResponse;
 import com.netflix.genie.common.messages.JobRequest;
 import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
-import com.netflix.genie.common.model.JobElement;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
@@ -75,7 +75,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     private static String jobResourcePrefix = "genie/v1/jobs";
 
     // per-instance variables
-    private final PersistenceManager<JobElement> pm;
+    private final PersistenceManager<Job> pm;
     private final GenieNodeStatistics stats;
 
     // initialize static variables
@@ -93,7 +93,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
      * classes.
      */
     public GenieExecutionServiceImpl() {
-        pm = new PersistenceManager<JobElement>();
+        pm = new PersistenceManager<Job>();
         stats = GenieNodeStatistics.getInstance();
     }
 
@@ -105,7 +105,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         LOG.info("called");
 
         JobResponse response;
-        JobElement jInfo = jir.getJobInfo();
+        Job jInfo = jir.getJobInfo();
 
         // validate parameters
         try {
@@ -214,7 +214,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             pm.updateEntity(jInfo);
 
             // verification
-            jInfo = pm.getEntity(jInfo.getJobID(), JobElement.class);
+            jInfo = pm.getEntity(jInfo.getJobID(), Job.class);
 
             // return successful response
             response = new JobResponse();
@@ -249,9 +249,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         LOG.info("called for jobId: " + jobId);
 
         JobResponse response;
-        JobElement jInfo;
+        Job jInfo;
         try {
-            jInfo = pm.getEntity(jobId, JobElement.class);
+            jInfo = pm.getEntity(jobId, Job.class);
         } catch (Exception e) {
             LOG.error("Failed to get job info: ", e);
             response = new JobResponse(new CloudServiceException(
@@ -283,7 +283,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         LOG.info("called");
 
         JobResponse response;
-        String table = JobElement.class.getSimpleName();
+        String table = Job.class.getSimpleName();
 
         ClauseBuilder criteria = null;
         try {
@@ -347,9 +347,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
 
         if (results.length != 0) {
-            JobElement[] jobInfos = new JobElement[results.length];
+            Job[] jobInfos = new Job[results.length];
             for (int i = 0; i < results.length; i++) {
-                jobInfos[i] = (JobElement) results[i];
+                jobInfos[i] = (Job) results[i];
             }
 
             response = new JobResponse();
@@ -373,9 +373,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
         JobStatusResponse response;
 
-        JobElement jInfo;
+        Job jInfo;
         try {
-            jInfo = pm.getEntity(jobId, JobElement.class);
+            jInfo = pm.getEntity(jobId, Job.class);
         } catch (Exception e) {
             LOG.error("Failed to get job results from database: ", e);
             response = new JobStatusResponse(new CloudServiceException(
@@ -406,9 +406,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
         JobStatusResponse response;
 
-        JobElement jInfo;
+        Job jInfo;
         try {
-            jInfo = pm.getEntity(jobId, JobElement.class);
+            jInfo = pm.getEntity(jobId, Job.class);
         } catch (Exception e) {
             LOG.error("Failed to get job results from database: ", e);
             response = new JobStatusResponse(new CloudServiceException(
@@ -523,7 +523,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     /*
      * Check if this job has token as id sent from client.
      */
-    private void validateJobParams(JobElement jobInfo)
+    private void validateJobParams(Job jobInfo)
             throws CloudServiceException {
         LOG.debug("called");
 
@@ -587,7 +587,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
     }
 
-    private void buildJobURIs(JobElement ji) throws CloudServiceException {
+    private void buildJobURIs(Job ji) throws CloudServiceException {
         ji.setHostName(NetUtil.getHostName());
         ji.setOutputURI(getEndPoint() + "/" + jobDirPrefix + "/"
                 + ji.getJobID());

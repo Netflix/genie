@@ -27,7 +27,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 
 import com.netflix.genie.common.messages.ClusterConfigRequest;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.model.ClusterConfig;
 
 import com.netflix.client.http.HttpRequest.Verb;
 
@@ -83,7 +83,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @return extracted cluster config response
      * @throws CloudServiceException
      */
-    public ClusterConfigElement createClusterConfig(final ClusterConfigElement clusterConfigElement)
+    public ClusterConfig createClusterConfig(final ClusterConfig clusterConfigElement)
             throws CloudServiceException {
         if (clusterConfigElement == null) {
             String msg = "Required parameter clusterConfig can't be NULL";
@@ -137,8 +137,8 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @return extracted cluster config response
      * @throws CloudServiceException
      */
-    public ClusterConfigElement updateClusterConfig(String clusterConfigId,
-            ClusterConfigElement clusterConfigElement)
+    public ClusterConfig updateClusterConfig(String clusterConfigId,
+            ClusterConfig clusterConfigElement)
             throws CloudServiceException {
         if (clusterConfigElement == null) {
             String msg = "Required parameter clusterConfig can't be NULL";
@@ -176,7 +176,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @return the cluster config for this clusterConfigId
      * @throws CloudServiceException
      */
-    public ClusterConfigElement getClusterConfig(String clusterConfigId) throws CloudServiceException {
+    public ClusterConfig getClusterConfig(String clusterConfigId) throws CloudServiceException {
         if (clusterConfigId == null) {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing required parameter: clusterConfigId");
@@ -212,7 +212,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @return array of cluster config elements that match the filter
      * @throws CloudServiceException
      */
-    public ClusterConfigElement[] getClusterConfigs(
+    public ClusterConfig[] getClusterConfigs(
             Multimap<String, String> params) throws CloudServiceException {
         ClusterConfigResponse ccr = executeRequest(Verb.GET, BASE_CONFIG_CLUSTER_REST_URI,
                 null, params, null, ClusterConfigResponse.class);
@@ -237,7 +237,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @return the deleted cluster config
      * @throws CloudServiceException
      */
-    public ClusterConfigElement deleteClusterConfig(String clusterConfigId) throws CloudServiceException {
+    public ClusterConfig deleteClusterConfig(String clusterConfigId) throws CloudServiceException {
         if (clusterConfigId == null) {
             String msg = "Missing required parameter: clusterConfigId";
             LOG.error(msg);

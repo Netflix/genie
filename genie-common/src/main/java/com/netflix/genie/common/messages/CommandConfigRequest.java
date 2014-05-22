@@ -21,7 +21,7 @@ package com.netflix.genie.common.messages;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.netflix.genie.common.model.CommandConfigElement;
+import com.netflix.genie.common.model.CommandConfig;
 
 
 /**
@@ -34,7 +34,7 @@ public class CommandConfigRequest extends BaseRequest {
 
     private static final long serialVersionUID = -1L;
 
-    private CommandConfigElement commandConfig;
+    private CommandConfig commandConfig;
 
     /**
      * Constructor.
@@ -48,7 +48,7 @@ public class CommandConfigRequest extends BaseRequest {
      * @return command element for this request
      */
     @XmlElement(name = "commandConfig")
-    public CommandConfigElement getCommandConfig() {
+    public CommandConfig getCommandConfig() {
         return commandConfig;
     }
 
@@ -58,7 +58,7 @@ public class CommandConfigRequest extends BaseRequest {
      * @param commandConfig
      *            command element for this request
      */
-    public void setCommandConfig(CommandConfigElement commandConfig) {
+    public void setCommandConfig(CommandConfig commandConfig) {
         this.commandConfig = commandConfig;
     }
 }

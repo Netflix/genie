@@ -37,7 +37,7 @@ import org.apache.commons.lang.StringUtils;
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class JobElement implements Serializable {
+public class Job implements Serializable {
 
     private static final long serialVersionUID = 2979506788441089067L;
 

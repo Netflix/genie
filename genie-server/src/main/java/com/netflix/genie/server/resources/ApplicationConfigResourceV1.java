@@ -21,7 +21,7 @@ package com.netflix.genie.server.resources;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ApplicationConfigRequest;
 import com.netflix.genie.common.messages.ApplicationConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfigElement;
+import com.netflix.genie.common.model.ApplicationConfig;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.JAXBContextResolver;
@@ -71,7 +71,7 @@ public class ApplicationConfigResourceV1 {
          * @throws Exception if there is any error in initialization
          */
         public ApplicationJAXBContextResolver() throws Exception {
-            super(new Class[]{ApplicationConfigElement.class,
+            super(new Class[]{ApplicationConfig.class,
                 ApplicationConfigRequest.class,
                 ApplicationConfigResponse.class});
         }
@@ -145,7 +145,7 @@ public class ApplicationConfigResourceV1 {
     public Response updateApplicationConfig(@PathParam("id") String id,
             ApplicationConfigRequest request) {
         LOG.info("called to create/update application config");
-        ApplicationConfigElement applicationConfig = request.getApplicationConfig();
+        ApplicationConfig applicationConfig = request.getApplicationConfig();
         if (applicationConfig != null) {
             // include "id" in the request
             applicationConfig.setId(id);

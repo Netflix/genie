@@ -21,7 +21,7 @@ package com.netflix.genie.common.messages;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.netflix.genie.common.model.ApplicationConfigElement;
+import com.netflix.genie.common.model.ApplicationConfig;
 
 /**
  * Represents request to the Application REST resource.
@@ -33,7 +33,7 @@ public class ApplicationConfigRequest extends BaseRequest {
 
     private static final long serialVersionUID = -1L;
 
-    private ApplicationConfigElement applicationConfig;
+    private ApplicationConfig applicationConfig;
 
     /**
      * Constructor.
@@ -47,7 +47,7 @@ public class ApplicationConfigRequest extends BaseRequest {
      * @return applicationConfig element for this request
      */
     @XmlElement(name = "applicationConfig")
-    public ApplicationConfigElement getApplicationConfig() {
+    public ApplicationConfig getApplicationConfig() {
         return applicationConfig;
     }
 
@@ -57,7 +57,7 @@ public class ApplicationConfigRequest extends BaseRequest {
      * @param applicationConfig
      *            application element for this request
      */
-    public void setApplicationConfig(ApplicationConfigElement applicationConfig) {
+    public void setApplicationConfig(ApplicationConfig applicationConfig) {
         this.applicationConfig = applicationConfig;
     }
 }
