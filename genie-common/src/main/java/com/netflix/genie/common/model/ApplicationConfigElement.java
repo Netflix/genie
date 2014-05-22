@@ -12,8 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- *  Representation of the state of Application config object
- *  
+ * Representation of the state of Application config object.
+ *
  * @author amsharma
  */
 @Entity
@@ -22,7 +22,7 @@ import javax.persistence.Table;
 public class ApplicationConfigElement implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Unique ID to represent a row in database.
      */
@@ -31,7 +31,7 @@ public class ApplicationConfigElement implements Serializable {
 
     /**
      * Name of this application - e.g. MR1, MR2, Tez etc.
-     */ 
+     */
     @Basic
     private String name;
 
@@ -42,15 +42,15 @@ public class ApplicationConfigElement implements Serializable {
     private String status;
 
     /**
-     * Reference to all the configs  needed for this application.
+     * Reference to all the configs needed for this application.
      */
-    @ElementCollection(fetch=FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     private ArrayList<String> configs;
 
     /**
      * Set of jars required for this application.
      */
-    @ElementCollection(fetch=FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     private ArrayList<String> jars;
 
     /**
@@ -76,7 +76,7 @@ public class ApplicationConfigElement implements Serializable {
      */
     @Basic
     private Long updateTime;
-    
+
     /**
      * Users can specify a property file location with environment variables.
      */
@@ -87,7 +87,7 @@ public class ApplicationConfigElement implements Serializable {
      * Default constructor.
      */
     public ApplicationConfigElement() {
-        
+
     }
 
     /**
@@ -102,8 +102,7 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the id (primary key) for this application.
      *
-     * @param id
-     *            unique id for this cluster
+     * @param id unique id for this cluster
      */
     public void setId(String id) {
         this.id = id;
@@ -121,8 +120,7 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the name for this application.
      *
-     * @param name
-     *            unique id for this cluster
+     * @param name unique id for this cluster
      */
     public void setName(String name) {
         this.name = name;
@@ -140,17 +138,16 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the status for this application.
      *
-     * @param status
-     *            possible values Types.ConfigStatus
+     * @param status possible values Types.ConfigStatus
      */
     public void setStatus(String status) {
         this.status = status.toUpperCase();
     }
-    
+
     /**
      * Gets the configs for this application.
      *
-     * @return configs 
+     * @return configs
      */
     public ArrayList<String> getConfigs() {
         return configs;
@@ -159,8 +156,7 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the configs for this application.
      *
-     * @param configs
-     *            The config files that this application needs
+     * @param configs The config files that this application needs
      */
     public void setConfigs(ArrayList<String> configs) {
         this.configs = configs;
@@ -169,8 +165,7 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Gets the jars for this application.
      *
-     * @return jars 
-     *              list of jars this application relies on for execution
+     * @return jars list of jars this application relies on for execution
      */
     public ArrayList<String> getJars() {
         return jars;
@@ -179,8 +174,7 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the jars needed for this application.
      *
-     * @param jars
-     *            All jars needed for execution of this application
+     * @param jars All jars needed for execution of this application
      */
     public void setJars(ArrayList<String> jars) {
         this.jars = jars;
@@ -196,10 +190,9 @@ public class ApplicationConfigElement implements Serializable {
     }
 
     /**
-     * Sets the user who created  this application.
+     * Sets the user who created this application.
      *
-     * @param user
-     *            user who created this application
+     * @param user user who created this application
      */
     public void setUser(String user) {
         this.user = user;
@@ -209,7 +202,7 @@ public class ApplicationConfigElement implements Serializable {
      * Gets the version of this application.
      *
      * @return version - like 1.2.3
-     *          
+     *
      */
     public String getVersion() {
         return version;
@@ -218,8 +211,7 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the version for this application.
      *
-     * @param version
-     *            version number for this application
+     * @param version version number for this application
      */
     public void setVersion(String version) {
         this.version = version;
@@ -229,7 +221,7 @@ public class ApplicationConfigElement implements Serializable {
      * Gets the create time for this application.
      *
      * @return createTime - epoch time of creation in milliseconds
-     * 
+     *
      */
     public Long getCreateTime() {
         return createTime;
@@ -238,8 +230,7 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the create time for this application.
      *
-     * @param createTime
-     *           epoch time in ms
+     * @param createTime epoch time in ms
      */
     public void setCreateTime(Long createTime) {
         this.createTime = createTime;
@@ -257,15 +248,14 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the updated time for this application.
      *
-     * @param updateTime
-     *            epoch time in milliseconds
+     * @param updateTime epoch time in milliseconds
      */
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
     }
-    
+
     /**
-     * Gets the envPropFile name 
+     * Gets the envPropFile name.
      *
      * @return envPropFile - file name containing environment variables.
      */
@@ -276,8 +266,8 @@ public class ApplicationConfigElement implements Serializable {
     /**
      * Sets the env property file name in string form.
      *
-     * @param envPropFile
-     *           contains the list of env variables to set while running a command using this application.
+     * @param envPropFile contains the list of env variables to set while
+     * running a command using this application.
      */
     public void setEnvPropFile(String envPropFile) {
         this.envPropFile = envPropFile;

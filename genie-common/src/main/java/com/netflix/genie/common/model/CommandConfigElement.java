@@ -17,15 +17,15 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * Representation of the state of the Command Object
- *  
+ * Representation of the state of the Command Object.
+ *
  * @author amsharma
  */
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
 public class CommandConfigElement implements Serializable {
-    
+
     private static final long serialVersionUID = -6106046473373305992L;
 
     /**
@@ -57,26 +57,27 @@ public class CommandConfigElement implements Serializable {
      */
     @Basic
     private String envPropFile;
-    
+
     /**
      * Reference to all the config (xml's) needed for this command.
      */
-    @ElementCollection(fetch=FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     private ArrayList<String> configs;
 
     /*
-     * A list of id's of all the Applications that this command supports. This is needed 
+     * A list of id's of all the Applications that this command supports. This is needed
      * to fetch each application from the database in the entity manager context so that it
      * can be added to the command object before persistence.
      */
     @Transient
     private ArrayList<String> appids;
-    
+
     /**
-     * Set of applications that can run this command - foreign key in database, implemented by openjpa
-     * using join table CommandConfigElement_ApplicationConfigElement.
+     * Set of applications that can run this command - foreign key in database,
+     * implemented by openjpa using join table
+     * CommandConfigElement_ApplicationConfigElement.
      */
-    @ManyToMany(targetEntity = ApplicationConfigElement.class,fetch=FetchType.EAGER)    
+    @ManyToMany(targetEntity = ApplicationConfigElement.class, fetch = FetchType.EAGER)
     private ArrayList<ApplicationConfigElement> applications;
 
     /**
@@ -84,7 +85,7 @@ public class CommandConfigElement implements Serializable {
      */
     @Basic
     private String user;
-    
+
     /**
      * Job type of the command. eg: hive, pig , hadoop etc.
      */
@@ -121,8 +122,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the id (primary key) for this command.
      *
-     * @param id
-     *            unique id for this command
+     * @param id unique id for this command
      */
     public void setId(String id) {
         this.id = id;
@@ -140,8 +140,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the name for this command.
      *
-     * @param name
-     *            unique id for this cluster
+     * @param name unique id for this cluster
      */
     public void setName(String name) {
         this.name = name;
@@ -159,8 +158,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the status for this application.
      *
-     * @param status
-     *            possible values Types.ConfigStatus
+     * @param status possible values Types.ConfigStatus
      */
     public void setStatus(String status) {
         this.status = status;
@@ -178,8 +176,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the executable for this command.
      *
-     * @param executable
-     *            Full path of the executable on the node
+     * @param executable Full path of the executable on the node
      */
     public void setExecutable(String executable) {
         this.executable = executable;
@@ -188,7 +185,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Gets the configs for this command.
      *
-     * @return configs 
+     * @return configs
      */
     public ArrayList<String> getConfigs() {
         return configs;
@@ -197,8 +194,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the configs for this command.
      *
-     * @param configs
-     *            The config files that this command needs
+     * @param configs The config files that this command needs
      */
     public void setConfigs(ArrayList<String> configs) {
         this.configs = configs;
@@ -207,8 +203,8 @@ public class CommandConfigElement implements Serializable {
     /**
      * Gets the applications that this command supports.
      *
-     * @return applications 
-     *          Not supposed to be exposed in request/response hence marked transient. 
+     * @return applications Not supposed to be exposed in request/response hence
+     * marked transient.
      */
     @XmlTransient
     public ArrayList<ApplicationConfigElement> getApplications() {
@@ -218,30 +214,28 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the applications for this command.
      *
-     * @param applications
-     *            The applications that this command supports
+     * @param applications The applications that this command supports
      */
     public void setApplications(ArrayList<ApplicationConfigElement> applications) {
         this.applications = applications;
     }
-    
+
     /**
-     * Constructs the application list using the appids columns
-     *
+     * Constructs the application list using the appids columns.
      */
     public void setApplicationsFromAppids() {
         ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
         if (appids != null) {
             Iterator<String> it = this.appids.iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 ApplicationConfigElement ae = new ApplicationConfigElement();
-                ae.setId((String)it.next());
+                ae.setId((String) it.next());
                 appList.add(ae);
             }
             this.applications = appList;
-        }     
+        }
     }
-    
+
     /**
      * Gets the user that created this command.
      *
@@ -252,17 +246,16 @@ public class CommandConfigElement implements Serializable {
     }
 
     /**
-     * Sets the user who created  this command.
+     * Sets the user who created this command.
      *
-     * @param user
-     *            user who created this command
+     * @param user user who created this command
      */
     public void setUser(String user) {
         this.user = user;
     }
 
     /**
-     * Gets the type of the command
+     * Gets the type of the command.
      *
      * @return jobType --- for eg: hive, pig, presto
      */
@@ -273,8 +266,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the job type for this command.
      *
-     * @param jobType
-     *            job type for this command
+     * @param jobType job type for this command
      */
     public void setJobType(String jobType) {
         this.jobType = jobType;
@@ -292,8 +284,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the version for this command.
      *
-     * @param version
-     *            version number for this command
+     * @param version version number for this command
      */
     public void setVersion(String version) {
         this.version = version;
@@ -303,7 +294,7 @@ public class CommandConfigElement implements Serializable {
      * Gets the create time for this command.
      *
      * @return createTime - epoch time of creation in milliseconds
-     * 
+     *
      */
     public Long getCreateTime() {
         return createTime;
@@ -312,8 +303,7 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the create time for this command.
      *
-     * @param createTime
-     *           epoch time in ms
+     * @param createTime epoch time in ms
      */
     public void setCreateTime(Long createTime) {
         this.createTime = createTime;
@@ -330,44 +320,42 @@ public class CommandConfigElement implements Serializable {
 
     /**
      * Sets the updated time for this comamnd.
-     * 
-     * @param updateTime
-     *            epoch time in milliseconds
+     *
+     * @param updateTime epoch time in milliseconds
      */
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
     }
-    
+
     /**
-     * Gets the application id's supported by this command
+     * Gets the application id's supported by this command.
      *
-     * @return appids -  a list of all application id's supported by this command
+     * @return appids - a list of all application id's supported by this command
      */
     @XmlElement
     public ArrayList<String> getAppids() {
         //return appids;
-        if(this.applications != null) {
+        if (this.applications != null) {
             appids = new ArrayList<String>();
             Iterator<ApplicationConfigElement> it = this.applications.iterator();
-            while(it.hasNext()){
-                appids.add(((ApplicationConfigElement)it.next()).getId());
+            while (it.hasNext()) {
+                appids.add(((ApplicationConfigElement) it.next()).getId());
             }
         }
         return appids;
     }
 
     /**
-     * Sets the application id's  for this command in string form.
+     * Sets the application id's for this command in string form.
      *
-     * @param appids
-     *           list of application id's for this command
+     * @param appids list of application id's for this command
      */
     public void setAppids(ArrayList<String> appids) {
         this.appids = appids;
     }
-    
+
     /**
-     * Gets the envPropFile name 
+     * Gets the envPropFile name.
      *
      * @return envPropFile - file name containing environment variables.
      */
@@ -378,8 +366,8 @@ public class CommandConfigElement implements Serializable {
     /**
      * Sets the env property file name in string form.
      *
-     * @param envPropFile
-     *           contains the list of env variables to set while running this command.
+     * @param envPropFile contains the list of env variables to set while
+     * running this command.
      */
     public void setEnvPropFile(String envPropFile) {
         this.envPropFile = envPropFile;

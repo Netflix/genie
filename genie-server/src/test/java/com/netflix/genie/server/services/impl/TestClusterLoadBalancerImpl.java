@@ -15,17 +15,15 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services.impl;
-
-import java.net.HttpURLConnection;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.ClusterConfigElement;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
+import java.net.HttpURLConnection;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
 
 /**
  * Test for the cluster load balancer.
@@ -43,13 +41,12 @@ public class TestClusterLoadBalancerImpl {
     public void testValidCluster() throws Exception {
         ClusterConfigElement cce = new ClusterConfigElement();
         ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
-        Assert.assertNotNull(clb.selectCluster(new ClusterConfigElement[] {
-                cce, cce, cce }));
+        assertNotNull(clb.selectCluster(new ClusterConfigElement[] {cce, cce, cce }));
     }
 
     /**
      * Test whether HttpURLConnection.HTTP_PAYMENT_REQUIRED is raised if a cluster
-     * can't be found from chttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/commandhttp://localhost:7001/genie/v1/config/command((applicationId != null) && (applicationId.isEmpty()))((applicationId != null) && (applicationId.isEmpty()))((applicationId != null) && (applicationId.isEmpty()))andidates.
+     * can't be found from http://localhost:7001/genie/v1/config/command.
      */
     @Test
     public void testInvalidCluster() {
@@ -57,14 +54,12 @@ public class TestClusterLoadBalancerImpl {
         try {
             clb.selectCluster(new ClusterConfigElement[] {});
         } catch (CloudServiceException cse) {
-            Assert.assertEquals(cse.getErrorCode(),
-                    HttpURLConnection.HTTP_PAYMENT_REQUIRED);
+            assertEquals(HttpURLConnection.HTTP_PAYMENT_REQUIRED, cse.getErrorCode());
         }
         try {
             clb.selectCluster(null);
         } catch (CloudServiceException cse) {
-            Assert.assertEquals(cse.getErrorCode(),
-                    HttpURLConnection.HTTP_PAYMENT_REQUIRED);
+            assertEquals(HttpURLConnection.HTTP_PAYMENT_REQUIRED, cse.getErrorCode());
         }
     }
 }

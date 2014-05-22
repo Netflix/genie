@@ -297,9 +297,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
 
         // this assumes that the service will forward the delete to the right
         // instance
-        JobStatusResponse js = executeRequest(Verb.DELETE, BASE_EXECUTION_REST_URI,
-                jobID, null, null, JobStatusResponse.class);
-        
+        JobStatusResponse js = executeRequest(Verb.DELETE, BASE_EXECUTION_REST_URI, jobID, null, null, JobStatusResponse.class);
+
         // return the response
         return js;
     }

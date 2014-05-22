@@ -7,4 +7,5 @@ sourceSets.main.java.srcDirs += project.parent.project(':genie-common').sourceSe
 
 dependencies {
     compile 'commons-configuration:commons-configuration:1.8'
+    compile 'org.apache.commons:commons-lang3:3.3.2'
 }
