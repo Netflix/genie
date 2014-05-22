@@ -438,9 +438,9 @@ public class YarnJobManager implements JobManager {
         
         // Get envPropertyFile for application, command and job and read in 
         // properties and set it in the environment
-        addEnvVariablesFromFile (application.getEnvPropFile(), hEnv);
-        addEnvVariablesFromFile (command.getEnvPropFile(), hEnv);
-        addEnvVariablesFromFile (ji2.getEnvPropFile(), hEnv);
+        hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
+        hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
+        hEnv.put("JOB_ENV_FILE", ji2.getEnvPropFile());
         
         // put the user name for hadoop to use
         hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
@@ -564,30 +564,6 @@ public class YarnJobManager implements JobManager {
         hEnv.put("CORE_SITE_XML_ARGS", genieJobIDProp + ";" +  netflixEnvProp + ";" + lipstickUuidProp);
         
         return hEnv;
-    }
-
-    private void addEnvVariablesFromFile(String envFileName, Map<String, String> hEnv) 
-            throws CloudServiceException {
-        try {
-            if ((envFileName != null) && (!envFileName.isEmpty())) {
-                PropertiesConfiguration pc = new PropertiesConfiguration(envFileName);
-                Iterator<String> propertiesIterator = pc.getKeys();
-                while(propertiesIterator.hasNext()) {
-                    String name = (String)propertiesIterator.next();
-                    String value = pc.getString(name);
-                    
-                    if((value != null) && (!value.isEmpty())) {
-                        hEnv.put(name, value);
-                    }
-                }
-            }
-        } 
-        catch (ConfigurationException e) {
-            String msg = "Could not load properties from file: " + envFileName ;
-            logger.error(msg, e);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
-        }
     }
 
     /**

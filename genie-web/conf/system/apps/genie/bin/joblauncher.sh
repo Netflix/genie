@@ -124,6 +124,45 @@ function updateCoreSiteXml {
     # dataoven.job.id
 }
 
+function setEnvVariables {
+    
+    if [ -n "$APPLICATION_ENV_FILE" ]
+    then
+        echo "Copy down and Source Application Env File"
+        #copyFiles "$APPLICATION_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        cp "$APPLICATION_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
+        APP_FILENAME=`basename $APPLICATION_ENV_FILE`
+        echo "App Env Filename: $APP_FILENAME"
+        #source "file://$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
+        source "$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
+        echo "$APPNAME"
+    fi
+
+    if [ -n "$COMMAND_ENV_FILE" ]
+    then
+        echo "Copy down and Source Command Env File"
+        #copyFiles "$COMMAND_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        cp "$COMMAND_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
+        COMMAND_FILENAME=`basename $COMMAND_ENV_FILE`
+        echo "Command Env Filename: $COMMAND_FILENAME"
+        #source "file://$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
+        source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
+        echo "$CMDNAME"
+    fi
+
+    if [ -n "$JOB_ENV_FILE" ]
+    then
+        echo "Copy down and Source Job File"
+        #copyFiles "$JOB_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        cp "$JOB_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
+        JOB_FILENAME=`basename $JOB_ENV_FILE`
+        echo "Job Env Filename: $JOB_FILENAME"
+        #source "file://$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
+        source "$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
+        echo "$JOBNAME"
+    fi
+}
+
 function archiveToS3 {
     # if the s3 archive location is not set, return immediately
     if [ "$S3_ARCHIVE_LOCATION" == "" ]
@@ -186,7 +225,8 @@ echo "CP_TIMEOUT = $CP_TIMEOUT"
 echo "COPY_COMMAND = $COPY_COMMAND"
 echo "MKDIR_COMMAND = $MKDIR_COMMAND"
 
-echo "All Env Variables are"
+
+echo "Env Variables"
 echo "****************************************************************"
 env
 echo "****************************************************************"
@@ -206,6 +246,9 @@ then
     copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "file://$CURRENT_JOB_WORKING_DIR"
     checkError 203
 fi
+
+# Setting Cluster, Command and Application Env Variables if specifed
+setEnvVariables
 
 # Uncomment the following if you want Genie to create users if they don't exist already
 # echo "Create user.group $USER_NAME.$GROUP_NAME, if it doesn't exist already"
