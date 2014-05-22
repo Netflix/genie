@@ -1,3 +1,21 @@
+/*
+ *
+ *  Copyright 2013 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+
 package com.netflix.genie.common.model;
 
 import java.io.Serializable;
@@ -12,7 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * Representation of the state of Application config object.
+ * Representation of the state of Application Config object.
  *
  * @author amsharma
  */
@@ -24,13 +42,13 @@ public class ApplicationConfigElement implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Unique ID to represent a row in database.
+     * Unique ID to represent a row in database - e.g. mr1,mr2, tz1 etc.
      */
     @Id
     private String id;
 
     /**
-     * Name of this application - e.g. MR1, MR2, Tez etc.
+     * Name of this application - e.g. mapredue1, mapreduce2, tez etc.
      */
     @Basic
     private String name;
@@ -42,7 +60,7 @@ public class ApplicationConfigElement implements Serializable {
     private String status;
 
     /**
-     * Reference to all the configs needed for this application.
+     * Reference to all the config's needed for this application.
      */
     @ElementCollection(fetch = FetchType.EAGER)
     private ArrayList<String> configs;
@@ -87,7 +105,6 @@ public class ApplicationConfigElement implements Serializable {
      * Default constructor.
      */
     public ApplicationConfigElement() {
-
     }
 
     /**

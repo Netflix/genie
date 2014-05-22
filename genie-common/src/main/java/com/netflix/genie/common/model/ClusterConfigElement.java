@@ -41,7 +41,7 @@ public class ClusterConfigElement implements Serializable {
     private String name;
 
     /**
-     * User name who created this cluster.
+     * User who created this cluster.
      */
     @Basic
     private String user;
