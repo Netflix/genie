@@ -553,12 +553,6 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         // check if jobType is valid
         validateNameValuePair("jobType", jobInfo.getJobType());
 
-        // check if schedule is valid
-        //validateNameValuePair("schedule", jobInfo.getSchedule());
-        // check if configuration is valid for Hive/Pig
-//        if (Types.JobType.parse(jobInfo.getJobType()) != Types.JobType.HADOOP) {
-//            validateNameValuePair("configuration", jobInfo.getConfiguration());
-//        }
         // generate job id, if need be
         if (jobInfo.getJobID() == null || jobInfo.getJobID().isEmpty()) {
             UUID uuid = UUID.randomUUID();

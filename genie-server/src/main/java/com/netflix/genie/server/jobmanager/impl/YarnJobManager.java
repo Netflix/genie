@@ -422,10 +422,14 @@ public class YarnJobManager implements JobManager {
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
-        if (application == null) {
-            final String msg = "No application found. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+        
+        // save the command name, application id and application name
+        ji2.setCommandId(command.getId());
+        ji2.setCommandName(command.getName());
+        
+        if (application != null) {
+            ji2.setApplicationId(application.getId());
+            ji2.setApplicationName(application.getName());
         }
 
         //CommandConfigElement ce = pmCommand.getEntity(cmdId, CommandConfigElement.class);
@@ -437,7 +441,7 @@ public class YarnJobManager implements JobManager {
         // save the cluster name and id
         ji2.setExecutionClusterName(cluster.getName());
         ji2.setExecutionClusterId(cluster.getId());
-
+        
         // Get envPropertyFile for application, command and job and read in 
         // properties and set it in the environment
         hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());

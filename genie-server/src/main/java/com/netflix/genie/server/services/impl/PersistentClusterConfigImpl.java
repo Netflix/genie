@@ -456,6 +456,8 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         //String queryString = "SELECT distinct x from ClusterConfigElement x, IN(x.tags) t WHERE " ;
         //String queryString = "SELECT distinct x from Cluster x, IN(x.commands) cmds where :element1 member of  x.tags AND :element2 member of x.tags AND cmds.name=\"prodhive\"";
 
+        ClusterConfigElement[] elements = null;
+        
         while (criteriaIter.hasNext()) {
             final StringBuilder builder = new StringBuilder();
             builder.append("SELECT distinct cstr from ClusterConfigElement cstr, IN(cstr.commands) cmds, IN(cmds.applications) apps where ");
@@ -501,21 +503,24 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
             List<ClusterConfigElement> results = (List<ClusterConfigElement>) q.getResultList();
 
-            ClusterConfigElement[] elements = new ClusterConfigElement[results.size()];
-            Iterator<ClusterConfigElement> cceIter = results.iterator();
-
-            int j = 0;
-            while (cceIter.hasNext()) {
-                ClusterConfigElement cce = (ClusterConfigElement) cceIter.next();
-                elements[j] = cce;
-                j++;
+            if (results.size() > 0) {
+                elements = new ClusterConfigElement[results.size()];
+                Iterator<ClusterConfigElement> cceIter = results.iterator();
+                int j = 0;
+                while (cceIter.hasNext()) {
+                    ClusterConfigElement cce = (ClusterConfigElement) cceIter.next();
+                    elements[j] = cce;
+                    j++;
+                }
+                break;
+            } else {
+                continue;
             }
-
-            ccr = new ClusterConfigResponse();
-            ccr.setClusterConfigs(elements);
-
-            return ccr;
         }
-        return null;
+        
+        ccr = new ClusterConfigResponse();
+        ccr.setClusterConfigs(elements);
+
+        return ccr;
     }
 }
