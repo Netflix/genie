@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.model;
 
 import java.io.Serializable;
@@ -294,7 +293,7 @@ public class JobElement implements Serializable {
     /**
      * Sets the name for this job.
      *
-     * @param jobName: name for the job
+     * @param jobName name for the job
      */
     public void setJobName(String jobName) {
         this.jobName = jobName;
@@ -312,14 +311,14 @@ public class JobElement implements Serializable {
     /**
      * Sets the description for this job.
      *
-     * @param description: description for the job
+     * @param description description for the job
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * Gets the user who submit the job
+     * Gets the user who submit the job.
      *
      * @return userName
      */
@@ -330,7 +329,7 @@ public class JobElement implements Serializable {
     /**
      * Sets the user who submits the job.
      *
-     * @param userName: user submitting the job
+     * @param userName user submitting the job
      */
     public void setUserName(String userName) {
         this.userName = userName;
@@ -348,15 +347,15 @@ public class JobElement implements Serializable {
     /**
      * Sets the group of the user who submits the job.
      *
-     * @param groupName: usergroup submitting the job
+     * @param groupName usergroup submitting the job
      */
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
 
     /**
-     * Get the client from which this job is submitted.
-     * used for grouping/identifying the source.
+     * Get the client from which this job is submitted. used for
+     * grouping/identifying the source.
      *
      * @return client
      */
@@ -367,14 +366,15 @@ public class JobElement implements Serializable {
     /**
      * Sets the client from which the job is submitted.
      *
-     * @param client: client from which the job is submitted. Used for book keeping/grouping.
+     * @param client client from which the job is submitted. Used for book
+     * keeping/grouping.
      */
     public void setClient(String client) {
         this.client = client;
     }
 
     /**
-     * Gets the type of job
+     * Gets the type of job.
      *
      * @return jobType
      */
@@ -385,7 +385,8 @@ public class JobElement implements Serializable {
     /**
      * Sets the type of the job.
      *
-     * @param jobType: type of the job. Interpreted from the command and populated in this field.
+     * @param jobType type of the job. Interpreted from the command and
+     * populated in this field.
      */
     public void setJobType(String jobType) {
         this.jobType = jobType;
@@ -403,7 +404,7 @@ public class JobElement implements Serializable {
     /**
      * Sets the name of the cluster on which this job is run.
      *
-     * @param executionClusterName: Name of the cluster on which job is executed.
+     * @param executionClusterName Name of the cluster on which job is executed.
      * Populated by the server.
      */
     public void setExecutionClusterName(String executionClusterName) {
@@ -411,7 +412,7 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Gets the id of the cluster on which this job was run
+     * Gets the id of the cluster on which this job was run.
      *
      * @return executionClusterId
      */
@@ -422,15 +423,15 @@ public class JobElement implements Serializable {
     /**
      * Sets the id of the cluster on which this job is run.
      *
-     * @param executionClusterId: Id of the cluster on which job is executed.
+     * @param executionClusterId Id of the cluster on which job is executed.
      * Populated by the server.
      */
     public void setExecutionClusterId(String executionClusterId) {
         this.executionClusterId = executionClusterId;
     }
-    
+
     /**
-     * Gets the criteria which was specified to pick a cluster to run the job
+     * Gets the criteria which was specified to pick a cluster to run the job.
      *
      * @return clusterCriteriaList
      */
@@ -439,17 +440,17 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Sets the list of cluster criteria specified to pick a cluster
+     * Sets the list of cluster criteria specified to pick a cluster.
      *
-     * @param clusterCriteriaList: .
-     * 
+     * @param clusterCriteriaList The criteria list
+     *
      */
     public void setClusterCriteriaList(ArrayList<ClusterCriteria> clusterCriteriaList) {
         this.clusterCriteriaList = clusterCriteriaList;
     }
 
     /**
-     * Gets the cmdArgs specified to run the job
+     * Gets the cmdArgs specified to run the job.
      *
      * @return cmdArgs
      */
@@ -458,17 +459,18 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Parameters specified to be run and fed as command line arguments to the job run.
+     * Parameters specified to be run and fed as command line arguments to the
+     * job run.
      *
-     * @param cmdArgs: Arguments to be used to run the command with. 
-     * 
+     * @param cmdArgs Arguments to be used to run the command with.
+     *
      */
     public void setCmdArgs(String cmdArgs) {
         this.cmdArgs = cmdArgs;
     }
 
     /**
-     * Gets the fileDependencies for the job
+     * Gets the fileDependencies for the job.
      *
      * @return fileDependencies
      */
@@ -477,10 +479,9 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Sets the fileDependencies for the job
+     * Sets the fileDependencies for the job.
      *
-     * @param fileDependencies:  Dependent files for the job in csv format
-     * 
+     * @param fileDependencies Dependent files for the job in csv format
      */
     public void setFileDependencies(String fileDependencies) {
         this.fileDependencies = fileDependencies;
@@ -519,7 +520,7 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Gets the cmdArgs specified to run the job
+     * Gets the cmdArgs specified to run the job.
      *
      * @return cmdArgs
      */
@@ -530,15 +531,14 @@ public class JobElement implements Serializable {
     /**
      * Set user Email address for the job.
      *
-     * @param userEmail
-     *            user email address
+     * @param userEmail user email address
      */
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
     }
 
     /**
-     * Gets the application name specified to run the job
+     * Gets the application name specified to run the job.
      *
      * @return applicationName
      */
@@ -549,15 +549,15 @@ public class JobElement implements Serializable {
     /**
      * Set application Name with which this job is run, if not null.
      *
-     * @param applicationName
-     *            Name of the application if specified on which the job is run
+     * @param applicationName Name of the application if specified on which the
+     * job is run
      */
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
     }
 
     /**
-     * Gets the application id specified to run the job
+     * Gets the application id specified to run the job.
      *
      * @return applicationId
      */
@@ -568,15 +568,15 @@ public class JobElement implements Serializable {
     /**
      * Set application Id with which this job is run, if not null.
      *
-     * @param applicationId
-     *            Id of the application if specified on which the job is run
+     * @param applicationId Id of the application if specified on which the job
+     * is run
      */
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
     }
 
     /**
-     * Gets the command name for this job
+     * Gets the command name for this job.
      *
      * @return commandName
      */
@@ -585,17 +585,17 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set command Name with which this job is run
+     * Set command Name with which this job is run.
      *
-     * @param commandName
-     *            Name of the command if specified on which the job is run
+     * @param commandName Name of the command if specified on which the job is
+     * run
      */
     public void setCommandName(String commandName) {
         this.commandName = commandName;
     }
 
     /**
-     * Gets the command id for this job
+     * Gets the command id for this job.
      *
      * @return commandId
      */
@@ -604,37 +604,36 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set command Id with which this job is run
+     * Set command Id with which this job is run.
      *
-     * @param commandId
-     *            Id of the command if specified on which the job is run
+     * @param commandId Id of the command if specified on which the job is run
      */
     public void setCommandId(String commandId) {
         this.commandId = commandId;
     }
 
     /**
-     * Get the process handle for the job
+     * Get the process handle for the job.
      *
      * @return processHandle
-     *            
+     *
      */
     public int getProcessHandle() {
         return processHandle;
     }
 
     /**
-     * Set the process handle for the job
+     * Set the process handle for the job.
      *
      * @param processHandle
-     *            
+     *
      */
     public void setProcessHandle(int processHandle) {
         this.processHandle = processHandle;
     }
 
     /**
-     * Gets the status for this job
+     * Gets the status for this job.
      *
      * @return status
      */
@@ -643,17 +642,17 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the status for the job
+     * Set the status for the job.
      *
      * @param status
-     *            
+     *
      */
     public void setStatus(String status) {
         this.status = status;
     }
 
     /**
-     * Gets the status message or this job
+     * Gets the status message or this job.
      *
      * @return statusMsg
      */
@@ -662,17 +661,16 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the status message for the job
+     * Set the status message for the job.
      *
      * @param statusMsg
-     *            
      */
     public void setStatusMsg(String statusMsg) {
         this.statusMsg = statusMsg;
     }
 
     /**
-     * Gets the start time for this job
+     * Gets the start time for this job.
      *
      * @return startTime : start time in ms
      */
@@ -681,18 +679,17 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the startTime for the job
+     * Set the startTime for the job.
      *
-     * @param startTime
-     *              epoch time in ms
-     *            
+     * @param startTime epoch time in ms
+     *
      */
     public void setStartTime(Long startTime) {
         this.startTime = startTime;
     }
 
     /**
-     * Gets the last update time for this job
+     * Gets the last update time for this job.
      *
      * @return updateTime
      */
@@ -701,18 +698,17 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the updateTime for the job
+     * Set the updateTime for the job.
      *
-     * @param updateTime
-     *              epoch time in ms
-     *            
+     * @param updateTime epoch time in ms
+     *
      */
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
     }
 
     /**
-     * Gets the finish time for this job
+     * Gets the finish time for this job.
      *
      * @return finishTime
      */
@@ -721,18 +717,17 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the finishTime for the job
+     * Set the finishTime for the job.
      *
-     * @param finishTime
-     *              epoch time in ms
-     *            
+     * @param finishTime epoch time in ms
+     *
      */
     public void setFinishTime(Long finishTime) {
         this.finishTime = finishTime;
     }
 
     /**
-     * Gets client hostname from which this job is run
+     * Gets client hostname from which this job is run.
      *
      * @return clientHost
      */
@@ -741,17 +736,17 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the client host for the job
+     * Set the client host for the job.
      *
      * @param clientHost
-     *            
+     *
      */
     public void setClientHost(String clientHost) {
         this.clientHost = clientHost;
     }
 
     /**
-     * Gets  genie hostname on which this job is run
+     * Gets genie hostname on which this job is run.
      *
      * @return hostName
      */
@@ -760,17 +755,17 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the genie hostname on which the job is run
+     * Set the genie hostname on which the job is run.
      *
      * @param hostName
-     *            
+     *
      */
     public void setHostName(String hostName) {
         this.hostName = hostName;
     }
 
     /**
-     * Get the kill URI for this job
+     * Get the kill URI for this job.
      *
      * @return killURI
      */
@@ -779,7 +774,7 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the kill URI for this job
+     * Set the kill URI for this job.
      *
      * @param killURI
      */
@@ -788,7 +783,7 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Get the output URI for this job
+     * Get the output URI for this job.
      *
      * @return outputURI
      */
@@ -797,7 +792,7 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the output URI for this job
+     * Set the output URI for this job.
      *
      * @param outputURI
      */
@@ -806,7 +801,7 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Get the exit code for this job
+     * Get the exit code for this job.
      *
      * @return exitCode
      */
@@ -815,7 +810,7 @@ public class JobElement implements Serializable {
     }
 
     /**
-     * Set the exit code for this job
+     * Set the exit code for this job.
      *
      * @param exitCode
      */
@@ -835,8 +830,7 @@ public class JobElement implements Serializable {
     /**
      * Has the job been forwarded to another instance.
      *
-     * @param forwarded
-     *            true, if forwarded
+     * @param forwarded true, if forwarded
      */
     public void setForwarded(boolean forwarded) {
         this.forwarded = forwarded;
@@ -854,15 +848,14 @@ public class JobElement implements Serializable {
     /**
      * Set location where logs are archived.
      *
-     * @param archiveLocation
-     *            s3/hdfs location where logs are archived
+     * @param archiveLocation s3/hdfs location where logs are archived
      */
     public void setArchiveLocation(String archiveLocation) {
         this.archiveLocation = archiveLocation;
     }
 
     /**
-     * Get the criteria specified to run this job in string format
+     * Get the criteria specified to run this job in string format.
      *
      * @return clusterCriteriaString
      */
@@ -873,13 +866,13 @@ public class JobElement implements Serializable {
     /**
      * Set the cluster criteria string.
      *
-     * @param cclist: A list of cluster criteria objects
+     * @param cclist A list of cluster criteria objects
      */
     //TODO: Can we use pre-persist/post-persist
     public void setClusterCriteriaString(ArrayList<ClusterCriteria> cclist) {
         this.clusterCriteriaString = "";
         for (final ClusterCriteria cc : cclist) {
-                this.clusterCriteriaString += StringUtils.join(cc.getTags(), ",");
+            this.clusterCriteriaString += StringUtils.join(cc.getTags(), ",");
         }
     }
 
