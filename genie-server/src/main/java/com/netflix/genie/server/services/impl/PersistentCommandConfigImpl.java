@@ -195,10 +195,10 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             Verb method) {
         LOG.info("called");
         CommandConfigResponse ccr = null;
-        CommandConfig commandConfigElement = request.getCommandConfig();
+        CommandConfig commandConfig = request.getCommandConfig();
 
         // ensure that the element is not null
-        if (commandConfigElement == null) {
+        if (commandConfig == null) {
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing commandConfig object"));
@@ -207,11 +207,11 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         }
 
         // generate/validate id for request
-        String id = commandConfigElement.getId();
+        String id = commandConfig.getId();
         if (id == null) {
             if (method.equals(Verb.POST)) {
                 id = UUID.randomUUID().toString();
-                commandConfigElement.setId(id);
+                commandConfig.setId(id);
             } else {
                 ccr = new CommandConfigResponse(new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST,
@@ -222,7 +222,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         }
 
         // basic error checking
-        String user = commandConfigElement.getUser();
+        String user = commandConfig.getUser();
         if (user == null) {
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -232,7 +232,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         }
 
         // ensure that the status object is valid
-        String status = commandConfigElement.getStatus();
+        String status = commandConfig.getStatus();
         if ((status != null) && (Types.ConfigStatus.parse(status) == null)) {
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -242,12 +242,12 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         }
 
         // common error checks done - set update time before proceeding
-        commandConfigElement.setUpdateTime(System.currentTimeMillis());
+        commandConfig.setUpdateTime(System.currentTimeMillis());
 
         // handle POST and PUT differently
         if (method.equals(Verb.POST)) {
             try {
-                initAndValidateNewElement(commandConfigElement);
+                initAndValidateNewElement(commandConfig);
             } catch (CloudServiceException e) {
                 ccr = new CommandConfigResponse(e);
                 LOG.error(ccr.getErrorMsg(), e);
@@ -257,12 +257,12 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
             LOG.info("GENIE: creating config for id: " + id);
             try {
-                pm.createEntity(commandConfigElement);
+                pm.createEntity(commandConfig);
 
                 // create a response
                 ccr = new CommandConfigResponse();
                 ccr.setMessage("Successfully created commandConfig for id: " + id);
-                ccr.setCommandConfigs(new CommandConfig[]{commandConfigElement});
+                ccr.setCommandConfigs(new CommandConfig[]{commandConfig});
                 return ccr;
             } catch (RollbackException e) {
                 LOG.error(e.getMessage(), e);
@@ -292,19 +292,19 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 // check if this is a create or an update
                 if (old == null) {
                     try {
-                        initAndValidateNewElement(commandConfigElement);
+                        initAndValidateNewElement(commandConfig);
                     } catch (CloudServiceException e) {
                         ccr = new CommandConfigResponse(e);
                         LOG.error(ccr.getErrorMsg(), e);
                         return ccr;
                     }
                 }
-                commandConfigElement = pm.updateEntity(commandConfigElement);
+                commandConfig = pm.updateEntity(commandConfig);
 
                 // all good - create a response
                 ccr = new CommandConfigResponse();
                 ccr.setMessage("Successfully updated commandConfig for id: " + id);
-                ccr.setCommandConfigs(new CommandConfig[]{commandConfigElement});
+                ccr.setCommandConfigs(new CommandConfig[]{commandConfig});
                 return ccr;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
@@ -320,15 +320,15 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
     /**
      * Initialize and validate new element.
      *
-     * @param commandConfigElement the element to initialize
-     * @throws CloudServiceException if some params are missing - else
+     * @param commandConfig the element to initialize
+     * @throws CloudServiceException if some params commandConfig are missing - else
      * initialize, and set creation time
      */
-    private void initAndValidateNewElement(CommandConfig commandConfigElement)
+    private void initAndValidateNewElement(CommandConfig commandConfig)
             throws CloudServiceException {
 
         // basic error checking
-        String name = commandConfigElement.getName();
+        String name = commandConfig.getName();
         //ArrayList<String> configs = commandConfigElement.getConfigs();
 
         //TODO Should we allow configs to be null?
@@ -336,7 +336,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Need all required params: {name}");
         } else {
-            commandConfigElement.setCreateTime(commandConfigElement.getUpdateTime());
+            commandConfig.setCreateTime(commandConfig.getUpdateTime());
         }
     }
 }
