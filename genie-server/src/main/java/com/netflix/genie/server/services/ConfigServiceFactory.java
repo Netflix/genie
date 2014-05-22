@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services;
 
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  */
 public final class ConfigServiceFactory extends BaseServiceFactory {
 
-    private static Logger logger = LoggerFactory
+    private static final  Logger LOG = LoggerFactory
             .getLogger(ConfigServiceFactory.class);
 
     // handle to the CommandConfigService
@@ -39,17 +38,17 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
 
     // handle to the ClusterLoadBalancer
     private static volatile ClusterLoadBalancer clusterLoadBalancer;
-    
+
     // handle to the ApplicationConfigService
     private static volatile ApplicationConfigService applicationConfigService;
 
     // handle to the CommandConfigService
     private static volatile CommandConfigService commandConfigService;
-    
+
     // never called
     private ConfigServiceFactory() {
     }
-    
+
     /**
      * Get the singleton cluster config service impl.
      *
@@ -58,15 +57,14 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
      */
     public static ClusterConfigService getClusterConfigImpl()
             throws CloudServiceException {
-        logger.info("called");
+        LOG.info("called");
 
         // instantiate the impl if it hasn't been already
         if (clusterConfigService == null) {
             synchronized (ConfigServiceFactory.class) {
                 // double-checked locking
                 if (clusterConfigService == null) {
-                    clusterConfigService = (ClusterConfigService)
-                            instantiateFromProperty("netflix.genie.server.clusterConfigImpl");
+                    clusterConfigService = (ClusterConfigService) instantiateFromProperty("netflix.genie.server.clusterConfigImpl");
                 }
             }
         }
@@ -83,15 +81,14 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
      */
     public static ClusterLoadBalancer getClusterLoadBalancer()
             throws CloudServiceException {
-        logger.info("called");
+        LOG.info("called");
 
         // instantiate the impl if it hasn't been already
         if (clusterLoadBalancer == null) {
             synchronized (ConfigServiceFactory.class) {
                 // double-checked locking
                 if (clusterLoadBalancer == null) {
-                    clusterLoadBalancer = (ClusterLoadBalancer)
-                            instantiateFromProperty("netflix.genie.server.clusterLoadBalancerImpl");
+                    clusterLoadBalancer = (ClusterLoadBalancer) instantiateFromProperty("netflix.genie.server.clusterLoadBalancerImpl");
                 }
             }
         }
@@ -99,7 +96,7 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
         // return generated or cached impl
         return clusterLoadBalancer;
     }
-    
+
     /**
      * Get the singleton application config service impl.
      *
@@ -108,15 +105,14 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
      */
     public static ApplicationConfigService getApplicationConfigImpl()
             throws CloudServiceException {
-        logger.info("called");
+        LOG.info("called");
 
         // instantiate the impl if it hasn't been already
         if (applicationConfigService == null) {
             synchronized (ConfigServiceFactory.class) {
                 // double-checked locking
                 if (applicationConfigService == null) {
-                    applicationConfigService = (ApplicationConfigService)
-                            instantiateFromProperty("netflix.genie.server.applicationConfigImpl");
+                    applicationConfigService = (ApplicationConfigService) instantiateFromProperty("netflix.genie.server.applicationConfigImpl");
                 }
             }
         }
@@ -124,7 +120,7 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
         // return generated or cached impl
         return applicationConfigService;
     }
-    
+
     /**
      * Get the singleton command config service impl.
      *
@@ -133,15 +129,14 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
      */
     public static CommandConfigService getCommandConfigImpl()
             throws CloudServiceException {
-        logger.info("called");
+        LOG.info("called");
 
         // instantiate the impl if it hasn't been already
         if (commandConfigService == null) {
             synchronized (ConfigServiceFactory.class) {
                 // double-checked locking
                 if (commandConfigService == null) {
-                    commandConfigService = (CommandConfigService)
-                            instantiateFromProperty("netflix.genie.server.commandConfigImpl");
+                    commandConfigService = (CommandConfigService) instantiateFromProperty("netflix.genie.server.commandConfigImpl");
                 }
             }
         }

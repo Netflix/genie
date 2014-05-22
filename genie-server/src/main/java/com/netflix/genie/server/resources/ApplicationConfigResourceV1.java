@@ -43,13 +43,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Code for ApplicationConfigResource - REST end-point for supporting
- * Application
+ * Application.
  *
  * @author amsharma
  *
  */
 @Path("/v1/config/application")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class ApplicationConfigResourceV1 {
 
     private final ApplicationConfigService acs;

@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
@@ -46,10 +45,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Resource class for executing and monitoring jobs via Genie.
+ *
  * @author amsharma
  */
 @Path("/v1/jobs")
-@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class JobResourceV1 {
 
     private final ExecutionService xs;
@@ -62,22 +63,23 @@ public class JobResourceV1 {
      */
     @Provider
     public static class JobJAXBContextResolver extends JAXBContextResolver {
+
         /**
-         * Constructor - initialize the resolver for the types that
-         * this resource cares about.
+         * Constructor - initialize the resolver for the types that this
+         * resource cares about.
          *
          * @throws Exception if there is any error in initialization
          */
         public JobJAXBContextResolver() throws Exception {
             super(new Class[]{JobRequest.class,
-                    JobStatusResponse.class,
-                    JobElement.class,
-                    JobResponse.class,
-                    ClusterCriteria.class});
+                JobStatusResponse.class,
+                JobElement.class,
+                JobResponse.class,
+                ClusterCriteria.class});
         }
     }
-    
-    /** 
+
+    /**
      * Default constructor.
      *
      * @throws CloudServiceException
@@ -85,19 +87,17 @@ public class JobResourceV1 {
     public JobResourceV1() throws CloudServiceException {
         xs = ExecutionServiceFactory.getExecutionServiceImpl();
     }
-    
+
     /**
      * Submit a new job.
      *
-     * @param request
-     *            request object containing job info element for new job
-     * @param hsr
-     *            servlet context
+     * @param request request object containing job info element for new job
+     * @param hsr servlet context
      * @return successful response, or one with HTTP error code
      */
     @POST
     @Path("/")
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response submitJob(JobRequest request,
             @Context HttpServletRequest hsr) {
         // get client's host from the context
@@ -113,20 +113,19 @@ public class JobResourceV1 {
         JobElement jobInfo = request.getJobInfo();
         if ((jobInfo != null)
                 && ((jobInfo.getClientHost() == null)
-                        || jobInfo.getClientHost().isEmpty())) {
+                || jobInfo.getClientHost().isEmpty())) {
             jobInfo.setClientHost(clientHost);
             jobInfo.setClusterCriteriaString(jobInfo.getClusterCriteriaList());
         }
-        
+
         JobResponse response = xs.submitJob(request);
         return ResponseUtil.createResponse(response);
     }
-    
+
     /**
      * Get job information for given job id.
      *
-     * @param jobID
-     *            id for job to look up
+     * @param jobID id for job to look up
      * @return successful response, or one with HTTP error code
      */
     @GET
@@ -136,12 +135,11 @@ public class JobResourceV1 {
         JobResponse response = xs.getJobInfo(jobID);
         return ResponseUtil.createResponse(response);
     }
-    
+
     /**
      * Get job status for give job id.
      *
-     * @param jobID
-     *            id for job to look up
+     * @param jobID id for job to look up
      * @return successful response, or one with HTTP error code
      */
     @GET
@@ -151,28 +149,19 @@ public class JobResourceV1 {
         JobStatusResponse response = xs.getJobStatus(jobID);
         return ResponseUtil.createResponse(response);
     }
-    
+
     /**
      * Get job info for given filter criteria.
      *
-     * @param jobID
-     *            id for job
-     * @param jobName
-     *            name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName
-     *            user who submitted job
-     * @param jobType
-     *            type of job - possible types Type.JobType
-     * @param status
-     *            status of job - possible types Type.JobStatus
-     * @param clusterName
-     *            the name of the cluster
-     * @param clusterId
-     *            the id of the cluster
-     * @param limit
-     *            max number of jobs to return
-     * @param page
-     *            page number for job
+     * @param jobID id for job
+     * @param jobName name of job (can be a SQL-style pattern such as HIVE%)
+     * @param userName user who submitted job
+     * @param jobType type of job - possible types Type.JobType
+     * @param status status of job - possible types Type.JobStatus
+     * @param clusterName the name of the cluster
+     * @param clusterId the id of the cluster
+     * @param limit max number of jobs to return
+     * @param page page number for job
      * @return successful response, or one with HTTP error code
      */
     @GET
@@ -186,19 +175,18 @@ public class JobResourceV1 {
             @QueryParam("clusterId") String clusterId,
             @QueryParam("limit") @DefaultValue("1024") int limit,
             @QueryParam("page") @DefaultValue("0") int page) {
-       
+
         LOG.info("called");
-        
+
         JobResponse response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId, limit, page);
-        
+
         return ResponseUtil.createResponse(response);
     }
-    
+
     /**
      * Kill job based on given job ID.
      *
-     * @param jobID
-     *            id for job to kill
+     * @param jobID id for job to kill
      * @return successful response, or one with HTTP error code
      */
     @DELETE

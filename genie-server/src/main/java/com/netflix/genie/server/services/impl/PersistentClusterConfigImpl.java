@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services.impl;
 
 import com.netflix.client.http.HttpRequest.Verb;
@@ -49,6 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Implementation of the PersistentClusterConfig interface.
+ *
  * @author skrishnan
  * @author amsharma
  */
@@ -457,7 +458,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         //String queryString = "SELECT distinct x from Cluster x, IN(x.commands) cmds where :element1 member of  x.tags AND :element2 member of x.tags AND cmds.name=\"prodhive\"";
 
         ClusterConfigElement[] elements = null;
-        
+
         while (criteriaIter.hasNext()) {
             final StringBuilder builder = new StringBuilder();
             builder.append("SELECT distinct cstr from ClusterConfigElement cstr, IN(cstr.commands) cmds, IN(cmds.applications) apps where ");
@@ -513,11 +514,9 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                     j++;
                 }
                 break;
-            } else {
-                continue;
             }
         }
-        
+
         ccr = new ClusterConfigResponse();
         ccr.setClusterConfigs(elements);
 

@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.messages.CommandConfigRequest;
@@ -32,8 +31,7 @@ public interface CommandConfigService {
     /**
      * Gets command configuration for given id.
      *
-     * @param id
-     *            unique id for command configuration to get
+     * @param id unique id for command configuration to get
      * @return successful response, or one with HTTP error code
      */
     CommandConfigResponse getCommandConfig(String id);
@@ -41,10 +39,8 @@ public interface CommandConfigService {
     /**
      * Get command configuration for given filter criteria.
      *
-     * @param id
-     *            unique id for command config (can be null)
-     * @param name
-     *            name of command config (can be null)
+     * @param id unique id for command config (can be null)
+     * @param name name of command config (can be null)
      * @return successful response, or one with HTTP error code
      */
     CommandConfigResponse getCommandConfig(String id, String name);
@@ -52,8 +48,7 @@ public interface CommandConfigService {
     /**
      * Create new command configuration.
      *
-     * @param request
-     *            encapsulates the command config element to create
+     * @param request encapsulates the command config element to create
      * @return successful response, or one with HTTP error code
      */
     CommandConfigResponse createCommandConfig(CommandConfigRequest request);
@@ -61,9 +56,8 @@ public interface CommandConfigService {
     /**
      * Update command configuration.
      *
-     * @param request
-     *            encapsulates the command config element to upsert, must contain
-     *            valid id
+     * @param request encapsulates the command config element to upsert, must
+     * contain valid id
      * @return successful response, or one with HTTP error code
      */
     CommandConfigResponse updateCommandConfig(CommandConfigRequest request);
@@ -71,8 +65,7 @@ public interface CommandConfigService {
     /**
      * Delete a command configuration from database.
      *
-     * @param id
-     *            unique if of command configuration to delete
+     * @param id unique if of command configuration to delete
      * @return successful response, or one with HTTP error code
      */
     CommandConfigResponse deleteCommandConfig(String id);

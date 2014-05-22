@@ -28,16 +28,16 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * Code for CommandConfigResource - REST end-point for supporting Command
+ * Code for CommandConfigResource - REST end-point for supporting Command.
+ *
  * @author amsharma
- * 
+ *
  */
 @Path("/v1/config/command")
-@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class CommandConfigResourceV1 {
-    
+
     private final CommandConfigService ccs;
     private static final Logger LOG = LoggerFactory
             .getLogger(CommandConfigResourceV1.class);
@@ -49,34 +49,33 @@ public class CommandConfigResourceV1 {
      */
     @Provider
     public static class CommandJAXBContextResolver extends JAXBContextResolver {
+
         /**
-         * Constructor - initialize the resolver for the types that
-         * this resource cares about.
+         * Constructor - initialize the resolver for the types that this
+         * resource cares about.
          *
          * @throws Exception if there is any error in initialization
          */
         public CommandJAXBContextResolver() throws Exception {
             super(new Class[]{CommandConfigElement.class,
-                    CommandConfigRequest.class,
-                    CommandConfigResponse.class});
+                CommandConfigRequest.class,
+                CommandConfigResponse.class});
         }
     }
-    
+
     /**
      * Default constructor.
      *
-     * @throws CloudServiceException
-     *             if there is any error
+     * @throws CloudServiceException if there is any error
      */
     public CommandConfigResourceV1() throws CloudServiceException {
         ccs = ConfigServiceFactory.getCommandConfigImpl();
     }
-    
+
     /**
      * Get Command config for given id.
      *
-     * @param id
-     *            unique id for command config
+     * @param id unique id for command config
      * @return successful response, or one with an HTTP error code
      */
     @GET
@@ -85,85 +84,80 @@ public class CommandConfigResourceV1 {
         LOG.info("called");
         return getCommandConfig(id, null);
     }
-    
+
     /**
      * Get Command config based on user params.
      *
-     * @param id
-     *            unique id for config (optional)
-     * @param name
-     *            name for config (optional)
-
+     * @param id unique id for config (optional)
+     * @param name name for config (optional)
+     *
      * @return successful response, or one with an HTTP error code
      */
     @GET
     @Path("/")
-    public Response getCommandConfig (@QueryParam("id") String id,
+    public Response getCommandConfig(@QueryParam("id") String id,
             @QueryParam("name") String name) {
-        
+
         LOG.info("called");
         CommandConfigResponse ccr = ccs.getCommandConfig(id, name);
         return ResponseUtil.createResponse(ccr);
     }
-    
+
     /**
      * Create Command configuration.
      *
-     * @param request
-     *            contains a command config element 
+     * @param request contains a command config element
      * @return successful response, or one with an HTTP error code
      */
     @POST
     @Path("/")
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createCommandConfig(CommandConfigRequest request) {
         LOG.info("called to create new cluster");
-        
-        // Need to get the CommandConfig object and fetch the applcation objects from the DB 
-        // to set it in the object.      
+
+        // Need to get the CommandConfig object and fetch the applcation objects from the DB
+        // to set it in the object.
         CommandConfigElement ce = request.getCommandConfig();
-        
+
         if (ce == null) {
             return ResponseUtil.createResponse(new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing commandConfig object.")));
         }
-        
+
         ArrayList<String> appids = ce.getAppids();
-        
-        if(appids != null) {
+
+        if (appids != null) {
             PersistenceManager<ApplicationConfigElement> pma = new PersistenceManager<ApplicationConfigElement>();
             ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
             Iterator<String> it = appids.iterator();
-            while(it.hasNext()) {
-                String appId = (String)it.next();
-                ApplicationConfigElement ae = (ApplicationConfigElement)pma.getEntity(appId, ApplicationConfigElement.class);
+            while (it.hasNext()) {
+                String appId = (String) it.next();
+                ApplicationConfigElement ae = (ApplicationConfigElement) pma.getEntity(appId, ApplicationConfigElement.class);
                 if (ae != null) {
                     appList.add(ae);
                 } else {
                     CommandConfigResponse acr = new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                            "Application Does Not Exist: {" + appId +"}"));
+                            "Application Does Not Exist: {" + appId + "}"));
                     return ResponseUtil.createResponse(acr);
-                }               
+                }
             }
             ce.setApplications(appList);
         }
-        
+
         CommandConfigResponse acr = ccs.createCommandConfig(request);
         return ResponseUtil.createResponse(acr);
     }
-    
+
     /**
      * Insert/update command config.
      *
-     * @param id
-     *            unique id for config to upsert
-     * @param request
-     *            contains the comamnd config element for update
+     * @param id unique id for config to upsert
+     * @param request contains the comamnd config element for update
      * @return successful response, or one with an HTTP error code
      */
     @PUT
     @Path("/{id}")
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateCommandConfig(@PathParam("id") String id,
             CommandConfigRequest request) {
         LOG.info("called to create/update comamnd config");
@@ -172,21 +166,21 @@ public class CommandConfigResourceV1 {
             // include "id" in the request
             commandConfig.setId(id);
             ArrayList<String> appids = commandConfig.getAppids();
-            
-            if(appids != null) {
+
+            if (appids != null) {
                 PersistenceManager<ApplicationConfigElement> pma = new PersistenceManager<ApplicationConfigElement>();
                 ArrayList<ApplicationConfigElement> appList = new ArrayList<ApplicationConfigElement>();
                 Iterator<String> it = appids.iterator();
-                while(it.hasNext()) {
-                    String appId = (String)it.next();
-                    ApplicationConfigElement ae = (ApplicationConfigElement)pma.getEntity(appId, ApplicationConfigElement.class);
+                while (it.hasNext()) {
+                    String appId = (String) it.next();
+                    ApplicationConfigElement ae = (ApplicationConfigElement) pma.getEntity(appId, ApplicationConfigElement.class);
                     if (ae != null) {
                         appList.add(ae);
                     } else {
                         CommandConfigResponse acr = new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                                "Application Does Not Exist: {" + appId +"}"));
+                                "Application Does Not Exist: {" + appId + "}"));
                         return ResponseUtil.createResponse(acr);
-                    }               
+                    }
                 }
                 commandConfig.setApplications(appList);
             }
@@ -207,12 +201,11 @@ public class CommandConfigResourceV1 {
         LOG.info("called");
         return deleteCommandConfig(null);
     }
-    
+
     /**
      * Delete a command config from database.
      *
-     * @param id
-     *            unique id for config to delete
+     * @param id unique id for config to delete
      * @return successful response, or one with an HTTP error code
      */
     @DELETE

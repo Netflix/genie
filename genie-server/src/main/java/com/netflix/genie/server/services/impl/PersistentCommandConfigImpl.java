@@ -21,15 +21,17 @@ import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.CommandConfigService;
 
 /**
+ * Implementation of the PersistentCommandConfig interface.
+ *
  * @author amsharma
  */
 public class PersistentCommandConfigImpl implements CommandConfigService {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(PersistentCommandConfigImpl.class);
-    
-    private PersistenceManager<CommandConfigElement> pm;
-    
+
+    private final PersistenceManager<CommandConfigElement> pm;
+
     /**
      * Default constructor.
      */
@@ -37,18 +39,22 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         // instantiate PersistenceManager
         pm = new PersistenceManager<CommandConfigElement>();
     }
-    
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CommandConfigResponse getCommandConfig(String id) {
-        logger.info("called");
+        LOG.info("called");
         return getCommandConfig(id, null);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CommandConfigResponse getCommandConfig(String id, String name) {
-        logger.info("called");
+        LOG.info("called");
         CommandConfigResponse ccr = null;
 
         try {
@@ -57,19 +63,19 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
             if ((id == null) && (name == null)) {
                 // return all
-                logger.info("GENIE: Returning all commandConfig elements");
+                LOG.info("GENIE: Returning all commandConfig elements");
 
                 // Perform a simple query for all the entities
                 QueryBuilder builder = new QueryBuilder()
                         .table("CommandConfigElement");
-                
+
                 results = pm.query(builder);
 
                 // set up a specific message
                 ccr.setMessage("Returning all commandConfig elements");
             } else {
                 // do some filtering
-                logger.info("GENIE: Returning config for {id, name}: "
+                LOG.info("GENIE: Returning config for {id, name}: "
                         + "{" + id + ", " + name + "}");
 
                 // construct query
@@ -91,7 +97,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 ccr = new CommandConfigResponse(new CloudServiceException(
                         HttpURLConnection.HTTP_NOT_FOUND,
                         "No commandConfigs found for input parameters"));
-                logger.error(ccr.getErrorMsg());
+                LOG.error(ccr.getErrorMsg());
                 return ccr;
             } else {
                 ccr.setMessage("Returning commandConfigs for input parameters");
@@ -104,7 +110,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             ccr.setCommandConfigs(elements);
             return ccr;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR,
                     "Received exception: " + e.getMessage()));
@@ -112,27 +118,33 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CommandConfigResponse createCommandConfig(
             CommandConfigRequest request) {
-        logger.info("called");
+        LOG.info("called");
         return createUpdateConfig(request, Verb.POST);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CommandConfigResponse updateCommandConfig(
             CommandConfigRequest request) {
-        logger.info("called");
+        LOG.info("called");
         return createUpdateConfig(request, Verb.PUT);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CommandConfigResponse deleteCommandConfig(String id) {
 
-        logger.info("called");
+        LOG.info("called");
         CommandConfigResponse ccr = null;
 
         if (id == null) {
@@ -140,10 +152,10 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing required parameter: id"));
-            logger.error(ccr.getErrorMsg());
+            LOG.error(ccr.getErrorMsg());
             return ccr;
         } else {
-            logger.info("GENIE: Deleting commandConfig for id: " + id);
+            LOG.info("GENIE: Deleting commandConfig for id: " + id);
 
             try {
                 // delete the entity
@@ -154,19 +166,19 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                     ccr = new CommandConfigResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_NOT_FOUND,
                             "No commandConfig exists for id: " + id));
-                    logger.error(ccr.getErrorMsg());
+                    LOG.error(ccr.getErrorMsg());
                     return ccr;
                 } else {
                     // all good - create a response
                     ccr = new CommandConfigResponse();
                     ccr.setMessage("Successfully deleted commandConfig for id: "
                             + id);
-                    CommandConfigElement[] elements = new CommandConfigElement[] {element};
+                    CommandConfigElement[] elements = new CommandConfigElement[]{element};
                     ccr.setCommandConfigs(elements);
                     return ccr;
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
                 ccr = new CommandConfigResponse(new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR,
                         "Received exception: " + e.getMessage()));
@@ -174,23 +186,23 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             }
         }
     }
-    
+
     /**
      * Common private method called by the create and update Can use either
      * method to create/update resource.
      */
     private CommandConfigResponse createUpdateConfig(CommandConfigRequest request,
             Verb method) {
-        logger.info("called");
+        LOG.info("called");
         CommandConfigResponse ccr = null;
         CommandConfigElement commandConfigElement = request.getCommandConfig();
-        
+
         // ensure that the element is not null
         if (commandConfigElement == null) {
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing commandConfig object"));
-            logger.error(ccr.getErrorMsg());
+            LOG.error(ccr.getErrorMsg());
             return ccr;
         }
 
@@ -204,7 +216,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 ccr = new CommandConfigResponse(new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST,
                         "Missing required parameter for PUT: id"));
-                logger.error(ccr.getErrorMsg());
+                LOG.error(ccr.getErrorMsg());
                 return ccr;
             }
         }
@@ -215,7 +227,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Need required param 'user' for create/update"));
-            logger.error(ccr.getErrorMsg());
+            LOG.error(ccr.getErrorMsg());
             return ccr;
         }
 
@@ -225,7 +237,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Config status can only be ACTIVE, DEPRECATED, INACTIVE"));
-            logger.error(ccr.getErrorMsg());
+            LOG.error(ccr.getErrorMsg());
             return ccr;
         }
 
@@ -238,41 +250,41 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 initAndValidateNewElement(commandConfigElement);
             } catch (CloudServiceException e) {
                 ccr = new CommandConfigResponse(e);
-                logger.error(ccr.getErrorMsg(), e);
+                LOG.error(ccr.getErrorMsg(), e);
                 return ccr;
 
             }
 
-            logger.info("GENIE: creating config for id: " + id);
+            LOG.info("GENIE: creating config for id: " + id);
             try {
                 pm.createEntity(commandConfigElement);
 
                 // create a response
                 ccr = new CommandConfigResponse();
                 ccr.setMessage("Successfully created commandConfig for id: " + id);
-                ccr.setCommandConfigs(new CommandConfigElement[] {commandConfigElement});
+                ccr.setCommandConfigs(new CommandConfigElement[]{commandConfigElement});
                 return ccr;
             } catch (RollbackException e) {
-                logger.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
                 if (e.getCause() instanceof EntityExistsException) {
                     // most likely entity already exists - return useful message
                     ccr = new CommandConfigResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_CONFLICT,
                             "CommandConfig already exists for id: " + id
-                                    + ", use PUT to update config"));
+                            + ", use PUT to update config"));
                     return ccr;
                 } else {
                     // unknown exception - send it back
                     ccr = new CommandConfigResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
                             "Received exception: " + e.getCause()));
-                    logger.error(ccr.getErrorMsg());
+                    LOG.error(ccr.getErrorMsg());
                     return ccr;
                 }
             }
         } else {
             // method is PUT
-            logger.info("GENIE: updating config for id: " + id);
+            LOG.info("GENIE: updating config for id: " + id);
 
             try {
                 CommandConfigElement old = pm.getEntity(id,
@@ -282,37 +294,35 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                     try {
                         initAndValidateNewElement(commandConfigElement);
                     } catch (CloudServiceException e) {
-                        ccr= new CommandConfigResponse(e);
-                        logger.error(ccr.getErrorMsg(), e);
+                        ccr = new CommandConfigResponse(e);
+                        LOG.error(ccr.getErrorMsg(), e);
                         return ccr;
                     }
                 }
                 commandConfigElement = pm.updateEntity(commandConfigElement);
 
                 // all good - create a response
-                ccr= new CommandConfigResponse();
+                ccr = new CommandConfigResponse();
                 ccr.setMessage("Successfully updated commandConfig for id: " + id);
-                ccr.setCommandConfigs(new CommandConfigElement[] {commandConfigElement});
+                ccr.setCommandConfigs(new CommandConfigElement[]{commandConfigElement});
                 return ccr;
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
                 // unknown exception - send it back
-                ccr= new CommandConfigResponse(new CloudServiceException(
+                ccr = new CommandConfigResponse(new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR,
                         "Received exception: " + e.getCause()));
                 return ccr;
             }
         }
     }
-    
+
     /**
      * Initialize and validate new element.
      *
-     * @param commandConfigElement
-     *            the element to initialize
-     * @throws CloudServiceException
-     *             if some params are missing - else initialize, and set
-     *             creation time
+     * @param commandConfigElement the element to initialize
+     * @throws CloudServiceException if some params are missing - else
+     * initialize, and set creation time
      */
     private void initAndValidateNewElement(CommandConfigElement commandConfigElement)
             throws CloudServiceException {
@@ -320,7 +330,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         // basic error checking
         String name = commandConfigElement.getName();
         //ArrayList<String> configs = commandConfigElement.getConfigs();
-        
+
         //TODO Should we allow configs to be null?
         if ((name == null)) {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,

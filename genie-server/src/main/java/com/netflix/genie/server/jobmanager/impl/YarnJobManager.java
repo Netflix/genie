@@ -22,11 +22,8 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import javax.activation.DataHandler;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +104,7 @@ public class YarnJobManager implements JobManager {
     protected JobElement ji;
 
     /**
-     * Actual command to run determined from the CommandConfigElement selected
+     * Actual command to run determined from the CommandConfigElement selected.
      */
     protected String executable;
 
@@ -380,7 +377,8 @@ public class YarnJobManager implements JobManager {
             }
         } else if ((ji2.getCommandName() != null) && (!(ji2.getCommandName().isEmpty()))) {
             // Iterate through the commands the cluster supports and find the command that matches.
-            // There has to be one that matches, else the getClusterConfig wouldn't have . Check the applications as well
+            // There has to be one that matches, else the getClusterConfig wouldn't have.
+            // Check the applications as well
             for (final CommandConfigElement cce : cluster.getCommands()) {
                 if (cce.getName().equals(ji2.getCommandName())) {
                     // Name matches. Check Application Details
@@ -415,18 +413,18 @@ public class YarnJobManager implements JobManager {
                 }
             }
         }
-        
+
         //Avoiding NPE
         if (command == null) {
             final String msg = "No command found. Unable to continue.";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
-        
+
         // save the command name, application id and application name
         ji2.setCommandId(command.getId());
         ji2.setCommandName(command.getName());
-        
+
         if (application != null) {
             ji2.setApplicationId(application.getId());
             ji2.setApplicationName(application.getName());
@@ -441,17 +439,17 @@ public class YarnJobManager implements JobManager {
         // save the cluster name and id
         ji2.setExecutionClusterName(cluster.getName());
         ji2.setExecutionClusterId(cluster.getId());
-        
-        // Get envPropertyFile for application, command and job and read in 
+
+        // Get envPropertyFile for application, command and job and read in
         // properties and set it in the environment
         hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
         hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
         hEnv.put("JOB_ENV_FILE", ji2.getEnvPropFile());
-        
+
         // put the user name for hadoop to use
         hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
 
-        // this is for the generic joblauncher.sh to use to create username 
+        // this is for the generic joblauncher.sh to use to create username
         // on the machine if needed
         hEnv.put("USER_NAME", ji2.getUserName());
 
@@ -572,7 +570,7 @@ public class YarnJobManager implements JobManager {
     }
 
     /**
-     * Converts a list of strings to a csv
+     * Converts a list of strings to a csv.
      *
      * @param list ArrayList object contains the strings
      * @return a string containing the other strings as csv
@@ -583,7 +581,7 @@ public class YarnJobManager implements JobManager {
 
     /**
      * Figure out an appropriate cluster to run this job<br>
-     * Cluster selection is done based on tags, command and application
+     * Cluster selection is done based on tags, command and application.
      *
      * @param ji2 job info for this job
      * @return cluster config element to use for running this job

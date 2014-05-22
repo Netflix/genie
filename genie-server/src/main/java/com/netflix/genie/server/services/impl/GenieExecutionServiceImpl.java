@@ -67,7 +67,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             .getLogger(GenieExecutionServiceImpl.class);
 
     // instance of the netflix configuration object
-    private static final AbstractConfiguration conf;
+    private static final AbstractConfiguration CONF;
 
     // these can be over-ridden in the properties file
     private static int serverPort = 7001;
@@ -80,11 +80,11 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
     // initialize static variables
     static {
-        conf = ConfigurationManager.getConfigInstance();
-        serverPort = conf.getInt("netflix.appinfo.port", serverPort);
-        jobDirPrefix = conf.getString("netflix.genie.server.job.dir.prefix",
+        CONF = ConfigurationManager.getConfigInstance();
+        serverPort = CONF.getInt("netflix.appinfo.port", serverPort);
+        jobDirPrefix = CONF.getString("netflix.genie.server.job.dir.prefix",
                 jobDirPrefix);
-        jobResourcePrefix = conf.getString(
+        jobResourcePrefix = CONF.getString(
                 "netflix.genie.server.job.resource.prefix", jobResourcePrefix);
     }
 
@@ -118,13 +118,13 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         // ensure that job won't overload system
         // synchronize until an entry is created and INIT-ed in DB
         // throttling related parameters
-        int maxRunningJobs = conf.getInt(
+        int maxRunningJobs = CONF.getInt(
                 "netflix.genie.server.max.running.jobs", 0);
-        int jobForwardThreshold = conf.getInt(
+        int jobForwardThreshold = CONF.getInt(
                 "netflix.genie.server.forward.jobs.threshold", 0);
-        int maxIdleHostThreshold = conf.getInt(
+        int maxIdleHostThreshold = CONF.getInt(
                 "netflix.genie.server.max.idle.host.threshold", 0);
-        int idleHostThresholdDelta = conf.getInt(
+        int idleHostThresholdDelta = CONF.getInt(
                 "netflix.genie.server.idle.host.threshold.delta", 0);
         synchronized (this) {
             try {

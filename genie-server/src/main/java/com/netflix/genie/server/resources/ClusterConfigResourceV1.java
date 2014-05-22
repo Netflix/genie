@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
@@ -44,13 +43,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Code for ApplicationConfigResource - REST end-point for supporting Application
+ * Code for ApplicationConfigResource - REST end-point for supporting
+ * Application.
+ *
  * @author amsharma
  */
 @Path("/v1/config/cluster")
-@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ClusterConfigResourceV1 {
-    
+
     private final ClusterConfigService ccs;
     private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigResourceV1.class);
@@ -62,34 +63,33 @@ public class ClusterConfigResourceV1 {
      */
     @Provider
     public static class ClusterJAXBContextResolver extends JAXBContextResolver {
+
         /**
-         * Constructor - initialize the resolver for the types that
-         * this resource cares about.
+         * Constructor - initialize the resolver for the types that this
+         * resource cares about.
          *
          * @throws Exception if there is any error in initialization
          */
         public ClusterJAXBContextResolver() throws Exception {
             super(new Class[]{ClusterConfigElement.class,
-                    ClusterConfigRequest.class,
-                    ClusterConfigResponse.class});
+                ClusterConfigRequest.class,
+                ClusterConfigResponse.class});
         }
     }
-    
+
     /**
      * Default constructor.
      *
-     * @throws CloudServiceException
-     *             if there is any error
+     * @throws CloudServiceException if there is any error
      */
     public ClusterConfigResourceV1() throws CloudServiceException {
         ccs = ConfigServiceFactory.getClusterConfigImpl();
     }
-    
+
     /**
      * Get cluster config from unique id.
      *
-     * @param id
-     *            id for cluster
+     * @param id id for cluster
      * @return successful response, or one with an HTTP error code
      */
     @GET
@@ -99,34 +99,25 @@ public class ClusterConfigResourceV1 {
         ClusterConfigResponse ccr = ccs.getClusterConfig(id);
         return ResponseUtil.createResponse(ccr);
     }
-    
+
     /**
      * Get cluster config based on user params. If empty strings are passed for
-     *  they are treated as
-     * nulls (not false).
+     * they are treated as nulls (not false).
      *
-     * @param id
-     *            unique id for cluster (can be a pattern)
-     * @param name
-     *            cluster name (can be a pattern)
-     * @param status
-     *            valid types - Types.ClusterStatus
-     * @param tags
-     *            tags for the cluster
-     * @param minUpdateTime
-     *            min time when cluster config was updated
-     * @param maxUpdateTime
-     *            max time when cluster config was updated
-     * @param limit
-     *            number of entries to return
-     * @param page
-     *            page number
+     * @param id unique id for cluster (can be a pattern)
+     * @param name cluster name (can be a pattern)
+     * @param status valid types - Types.ClusterStatus
+     * @param tags tags for the cluster
+     * @param minUpdateTime min time when cluster config was updated
+     * @param maxUpdateTime max time when cluster config was updated
+     * @param limit number of entries to return
+     * @param page page number
      * @return successful response, or one with an HTTP error code
      */
     @GET
     @Path("/")
     public Response getClusterConfig(@QueryParam("id") String id,
-            @QueryParam("name") String name, 
+            @QueryParam("name") String name,
             @QueryParam("status") List<String> status,
             @QueryParam("tags") List<String> tags,
             @QueryParam("minUpdateTime") Long minUpdateTime,
@@ -136,28 +127,27 @@ public class ClusterConfigResourceV1 {
         LOG.info("called");
         // treat empty string values for booleans as nulls, not false
         ClusterConfigResponse ccr = ccs.getClusterConfig(id, name, status, tags, minUpdateTime, maxUpdateTime, limit, page);
-        return ResponseUtil.createResponse(ccr);       
+        return ResponseUtil.createResponse(ccr);
     }
-    
+
     /**
      * Create cluster configuration.
      *
-     * @param request
-     *            contains the cluster config element for this cluster
+     * @param request contains the cluster config element for this cluster
      * @return successful response, or one with an HTTP error code
      */
     @POST
     @Path("/")
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createClusterConfig(ClusterConfigRequest request) {
         LOG.info("called to create new cluster");
-        
-        // Need to get the ClusterConfig object and fetch the command objects from the DB 
-        // to set it in the object.      
+
+        // Need to get the ClusterConfig object and fetch the command objects from the DB
+        // to set it in the object.
 //        ClusterConfigElement ce = request.getClusterConfig();
 //        if (ce != null) {
 //            ArrayList<String> cmdIds = ce.getCmdIds();
-//            
+//
 //            if(cmdIds != null) {
 //                PersistenceManager<CommandConfigElement> pma = new PersistenceManager<CommandConfigElement>();
 //                ArrayList<CommandConfigElement> cmdList = new ArrayList<CommandConfigElement>();
@@ -171,28 +161,25 @@ public class ClusterConfigResourceV1 {
 //                        ClusterConfigResponse acr = new ClusterConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
 //                                "Command Does Not Exist: {" + cmdId +"}"));
 //                        return ResponseUtil.createResponse(acr);
-//                    }               
+//                    }
 //                }
 //                ce.setCommands(cmdList);
 //            }
 //        }
-
         ClusterConfigResponse ccr = ccs.createClusterConfig(request);
         return ResponseUtil.createResponse(ccr);
     }
-    
+
     /**
      * Update/insert cluster configuration.
      *
-     * @param id
-     *            unique if for cluster to upsert
-     * @param request
-     *            contains the cluster config element for this cluster
+     * @param id unique if for cluster to upsert
+     * @param request contains the cluster config element for this cluster
      * @return successful response, or one with an HTTP error code
      */
     @PUT
     @Path("/{id}")
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateClusterConfig(@PathParam("id") String id,
             ClusterConfigRequest request) {
         LOG.info("called to create/update cluster");
@@ -202,7 +189,7 @@ public class ClusterConfigResourceV1 {
             // include "id" in the request
             clusterConfig.setId(id);
 //            ArrayList<String> cmdIds = clusterConfig.getCmdIds();
-//            
+//
 //            if(cmdIds != null) {
 //                PersistenceManager<CommandConfigElement> pma = new PersistenceManager<CommandConfigElement>();
 //                ArrayList<CommandConfigElement> cmdList = new ArrayList<CommandConfigElement>();
@@ -216,7 +203,7 @@ public class ClusterConfigResourceV1 {
 //                        ClusterConfigResponse acr = new ClusterConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
 //                                "Command Does Not Exist: {" + cmdId +"}"));
 //                        return ResponseUtil.createResponse(acr);
-//                    }               
+//                    }
 //                }
 //                clusterConfig.setCommands(cmdList);
 //            }
@@ -225,7 +212,7 @@ public class ClusterConfigResourceV1 {
         ClusterConfigResponse ccr = ccs.updateClusterConfig(request);
         return ResponseUtil.createResponse(ccr);
     }
-    
+
     /**
      * Delete cluster configuration - this will throw an error since no params
      * are sent.
@@ -243,8 +230,7 @@ public class ClusterConfigResourceV1 {
     /**
      * Delete entry for cluster.
      *
-     * @param id
-     *            unique id for cluster to delete
+     * @param id unique id for cluster to delete
      * @return successful response, or one with an HTTP error code
      */
     @DELETE
@@ -257,8 +243,7 @@ public class ClusterConfigResourceV1 {
     /**
      * Create Cluster configuration.
      *
-     * @param request
-     *            contains a cluster config element 
+     * @param request contains a cluster config element
      * @return successful response, or one with an HTTP error code
      */
 //    @POST
@@ -267,57 +252,56 @@ public class ClusterConfigResourceV1 {
 //    public Response createClusterConfig(ClusterConfigRequest request) {
 //        logger.info("called to create new cluster");
 //        //ClusterConfigResponseOld ccr = ccs.createClusterConfig(request);
-//        
+//
 //        logger.debug("Received request:" + request.getClusterConfig().getId());
 //        ClusterConfigResponse cr = new ClusterConfigResponse();
-//        
+//
 //        PersistenceManager<ClusterConfigElement> pm = new PersistenceManager<ClusterConfigElement>();
 //        PersistenceManager<CommandConfigElement> pmc = new PersistenceManager<CommandConfigElement>();
-//        
+//
 //        ClusterConfigElement cle = request.getClusterConfig();
-//        
+//
 //        ArrayList<CommandConfigElement> cmdList = new ArrayList<CommandConfigElement>();
 //        Iterator<String> it = cle.getCmdIds().iterator();
 //        while(it.hasNext()) {
-//            
 //            CommandConfigElement ce = (CommandConfigElement)pmc.getEntity((String)it.next(), CommandConfigElement.class);
 //            cmdList.add(ce);
 //        }
-//        
-//        cle.setCommands(cmdList); 
+//
+//        cle.setCommands(cmdList);
 //        pm.createEntity(cle);
 //        return ResponseUtil.createResponse(cr);
 //    }
-    
+
 //    @GET
 //    @Path("/")
 //    public Response getClusterConfig () {
 //        String table = ClusterConfigElement.class.getName();
-//        
+//
 //        ClusterConfigResponse response = new ClusterConfigResponse();
 //      /*  PersistenceManager<ApplicationConfigElement> pm = new PersistenceManager<ApplicationConfigElement>();
 //        QueryBuilder builder = new QueryBuilder().table(table);
 //        Object[] results = pm.query(builder);
-//        
+//
 //        if (results.length != 0) {
 //            ApplicationConfigElement[] apps = new ApplicationConfigElement[results.length];
 //            for (int i = 0; i < results.length; i++) {
 //                apps[i] = (ApplicationConfigElement) results[i];
 //                logger.debug("Results Array" + apps[i].getId());
-//                logger.debug("Jars is"+ apps[i].getJars());  
+//                logger.debug("Jars is"+ apps[i].getJars());
 //            }
-//            
+//
 //           response.setApplications(apps);
 //        }
 //         */
-//        
+//
 //        //java.util.Map<Object,Object> map = new java.util.HashMap<Object,Object>();
 //        EntityManagerFactory factory = Persistence.createEntityManagerFactory("genie");
 //        EntityManager em = factory.createEntityManager();
-//        
+//
 //        Query q = em.createQuery("select  x from ClusterConfigElement x");
 //        List<ClusterConfigElement> results = (List<ClusterConfigElement>) q.getResultList();
-//        
+//
 //        Iterator<ClusterConfigElement> it = results.iterator();
 //        ClusterConfigElement[] apps = new ClusterConfigElement[10];
 //        int i =0;
@@ -328,8 +312,8 @@ public class ClusterConfigResourceV1 {
 //            //logger.debug(c.toString());
 //            logger.debug(c.toString());
 //            i++;
-//        } 
+//        }
 //        response.setClusterConfigs(apps);
 //        return ResponseUtil.createResponse(response);
-//    }  
+//    }
 }
