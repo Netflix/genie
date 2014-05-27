@@ -428,21 +428,22 @@ public class YarnJobManager implements JobManager {
         if (application != null) {
             ji2.setApplicationId(application.getId());
             ji2.setApplicationName(application.getName());
+            hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
+            hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
+            hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
         }
 
         //CommandConfig ce = pmCommand.getEntity(cmdId, CommandConfig.class);
         hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
-        hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
-        hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
         this.executable = command.getExecutable();
 
         // save the cluster name and id
         ji2.setExecutionClusterName(cluster.getName());
         ji2.setExecutionClusterId(cluster.getId());
 
-        // Get envPropertyFile for application, command and job and read in
+        // Get envPropertyFile for command and job and read in
         // properties and set it in the environment
-        hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
+      
         hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
         hEnv.put("JOB_ENV_FILE", ji2.getEnvPropFile());
 

@@ -32,7 +32,7 @@ serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/comma
 def addCommandConfigProdhive11Mr1():
     print "Adding Command prodhive11_mr1"
     ID = "prodhive11_mr1"
-    configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml'])
+    configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
     apps = json.dumps(['mr1'])
     payload = '''
     {
@@ -58,7 +58,7 @@ def addCommandConfigProdhive11Mr1():
 def addCommandConfigProdhive11Mr2():
     print "Adding Command prodhive11_mr2"
     ID = "prodhive11_mr2"
-    configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml'])
+    configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
     apps = json.dumps(['mr2'])
     payload = '''
     {
