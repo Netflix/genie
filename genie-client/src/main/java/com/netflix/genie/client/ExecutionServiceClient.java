@@ -15,25 +15,20 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-
+import com.google.common.collect.Multimap;
+import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.JobRequest;
 import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types;
-
-import com.netflix.client.http.HttpRequest.Verb;
-
-import com.google.common.collect.Multimap;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Singleton class, which acts as the client library for the Genie Execution

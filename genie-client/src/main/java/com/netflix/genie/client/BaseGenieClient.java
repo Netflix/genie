@@ -87,7 +87,7 @@ public class BaseGenieClient {
      *
      * @param env "prod" or "test" or "dev"
      */
-    public static synchronized void initEureka(String env) {
+    public static synchronized void initEureka(final String env) {
         if (env != null) {
             System.setProperty("eureka.environment", env);
         }

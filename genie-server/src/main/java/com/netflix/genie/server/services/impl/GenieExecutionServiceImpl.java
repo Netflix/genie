@@ -74,9 +74,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     private static final AbstractConfiguration CONF;
 
     // these can be over-ridden in the properties file
-    private static final int serverPort;
-    private static final String jobDirPrefix;
-    private static final String jobResourcePrefix;
+    private static final int SERVER_PORT;
+    private static final String JOB_DIR_PREFIX;
+    private static final String JOB_RESOURCE_PREFIX;
 
     // per-instance variables
     private final PersistenceManager<Job> pm;
@@ -85,10 +85,10 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     // initialize static variables
     static {
         CONF = ConfigurationManager.getConfigInstance();
-        serverPort = CONF.getInt("netflix.appinfo.port", 7001);
-        jobDirPrefix = CONF.getString("netflix.genie.server.job.dir.prefix",
+        SERVER_PORT = CONF.getInt("netflix.appinfo.port", 7001);
+        JOB_DIR_PREFIX = CONF.getString("netflix.genie.server.job.dir.prefix",
                 "genie-jobs");
-        jobResourcePrefix = CONF.getString(
+        JOB_RESOURCE_PREFIX = CONF.getString(
                 "netflix.genie.server.job.resource.prefix", "genie/v1/jobs");
     }
 
@@ -158,7 +158,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                         jInfo.setForwarded(true);
                         stats.incrGenieForwardedJobs();
                         response = forwardJobRequest("http://" + idleHost + ":"
-                                + serverPort + "/" + jobResourcePrefix, request);
+                                + SERVER_PORT + "/" + JOB_RESOURCE_PREFIX, request);
                         return response;
                     } // else, no idle hosts found - run here if capacity exists
                 }
@@ -287,7 +287,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         LOG.info("called");
 
         JobResponse response;
-        
+
         final StringBuilder builder = new StringBuilder();
         builder.append("Select j");
         builder.append(" FROM Job j");
@@ -314,7 +314,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         if (!StringUtils.isEmpty(clusterId)) {
             clauses.add("j.clusterId = :clusterId");
         }
-        
+
         if (!clauses.isEmpty()) {
             builder.append(" WHERE");
         }
@@ -326,7 +326,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             builder.append(" ").append(clause);
             addAnd = true;
         }
-        
+
         final EntityManager em = pm.createEntityManager();
         try {
             final Query query = em.createQuery(builder.toString(), Job.class);
@@ -481,7 +481,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
         String localURI;
         try {
-            localURI = getEndPoint() + "/" + jobResourcePrefix + "/" + jobId;
+            localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + jobId;
         } catch (CloudServiceException e) {
             LOG.error("Error while retrieving local hostname: "
                     + e.getMessage(), e);
@@ -614,14 +614,14 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
     private void buildJobURIs(Job ji) throws CloudServiceException {
         ji.setHostName(NetUtil.getHostName());
-        ji.setOutputURI(getEndPoint() + "/" + jobDirPrefix + "/"
+        ji.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/"
                 + ji.getJobID());
-        ji.setKillURI(getEndPoint() + "/" + jobResourcePrefix + "/"
+        ji.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/"
                 + ji.getJobID());
     }
 
     private String getEndPoint() throws CloudServiceException {
-        return "http://" + NetUtil.getHostName() + ":" + serverPort;
+        return "http://" + NetUtil.getHostName() + ":" + SERVER_PORT;
     }
 
     private JobStatusResponse forwardJobKill(String killURI) {
