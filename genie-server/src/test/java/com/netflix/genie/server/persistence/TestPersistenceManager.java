@@ -44,6 +44,7 @@ public class TestPersistenceManager {
         UUID uuid = UUID.randomUUID();
         initial.setJobName("My test job");
         initial.setJobID(uuid.toString());
+        initial.setUserName("myUserName");
         pm.createEntity(initial);
         Job result = pm.getEntity(uuid.toString(),
                 Job.class);
@@ -59,6 +60,7 @@ public class TestPersistenceManager {
         Job initial = new Job();
         UUID uuid = UUID.randomUUID();
         initial.setJobID(uuid.toString());
+        initial.setUserName("myUserName");
         pm.createEntity(initial);
         Job deleted = pm.deleteEntity(uuid.toString(),
                 Job.class);
@@ -74,10 +76,11 @@ public class TestPersistenceManager {
         Job initial = new Job();
         UUID uuid = UUID.randomUUID();
         initial.setJobID(uuid.toString());
+        initial.setUserName("myUserName");
         pm.createEntity(initial);
         initial.setJobStatus(JobStatus.FAILED);
         Job updated = pm.updateEntity(initial);
-        Assert.assertEquals("FAILED", updated.getStatus());
+        Assert.assertEquals(JobStatus.FAILED, updated.getStatus());
     }
 
     /**
@@ -91,10 +94,12 @@ public class TestPersistenceManager {
         Job one = new Job();
         one.setJobName("UPDATE_TEST");
         one.setJobID(UUID.randomUUID().toString());
+        one.setUserName("myUserName");
         pm.createEntity(one);
         Job two = new Job();
         two.setJobName("UPDATE_TEST");
         two.setJobID(UUID.randomUUID().toString());
+        two.setUserName("myUserName2");
         pm.createEntity(two);
         ClauseBuilder setCriteria = new ClauseBuilder(ClauseBuilder.COMMA);
         setCriteria.append("jobName='TEST_UPDATE'");
@@ -122,10 +127,11 @@ public class TestPersistenceManager {
         initial.setJobName("My test job");
         initial.setJobStatus(JobStatus.FAILED);
         initial.setUpdateTime(System.currentTimeMillis());
+        initial.setUserName("myUserName");
         pm.createEntity(initial);
         ClauseBuilder cb = new ClauseBuilder(ClauseBuilder.AND);
         cb.append("jobID='" + initial.getJobID() + "'");
-        cb.append("status='FAILED'");
+        cb.append("userName='myUserName'");
         QueryBuilder qb = new QueryBuilder().table("Job").clause(
                 cb.toString());
         Object[] results = pm.query(qb);

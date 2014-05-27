@@ -18,6 +18,7 @@
 package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import java.util.UUID;
 import org.junit.Test;
@@ -42,13 +43,15 @@ public class TestJobJanitor {
         one.setJobName("UPDATE_TEST");
         one.setJobID(UUID.randomUUID().toString());
         one.setUpdateTime(0L);
-        one.setStatus("RUNNING");
+        one.setStatus(JobStatus.RUNNING);
+        one.setUserName("someUser");
         pm.createEntity(one);
         Job two = new Job();
         two.setJobName("UPDATE_TEST");
         two.setUpdateTime(0L);
-        two.setStatus("INIT");
+        two.setStatus(JobStatus.INIT);
         two.setJobID(UUID.randomUUID().toString());
+        two.setUserName("some other user name");
         pm.createEntity(two);
 
         // ensure that more than two jobs have been cleaned up

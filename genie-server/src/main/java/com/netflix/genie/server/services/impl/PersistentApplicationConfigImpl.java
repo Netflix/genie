@@ -5,7 +5,6 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ApplicationConfigRequest;
 import com.netflix.genie.common.messages.ApplicationConfigResponse;
 import com.netflix.genie.common.model.ApplicationConfig;
-import com.netflix.genie.common.model.Types;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
@@ -227,16 +226,6 @@ public class PersistentApplicationConfigImpl implements
             acr = new ApplicationConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Need required param 'user' for create/update"));
-            LOG.error(acr.getErrorMsg());
-            return acr;
-        }
-
-        // ensure that the status object is valid
-        String status = applicationConfig.getStatus();
-        if ((status != null) && (Types.ConfigStatus.parse(status) == null)) {
-            acr = new ApplicationConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Config status can only be ACTIVE, DEPRECATED, INACTIVE"));
             LOG.error(acr.getErrorMsg());
             return acr;
         }

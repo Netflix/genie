@@ -18,6 +18,7 @@
 
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.model.Types.ApplicationStatus;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -25,6 +26,8 @@ import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -50,14 +53,14 @@ public class ApplicationConfig implements Serializable {
     /**
      * Name of this application - e.g. mapredue1, mapreduce2, tez etc.
      */
-    @Basic
+    @Basic(optional = false)
     private String name;
 
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
-    @Basic
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus status;
 
     /**
      * Reference to all the config's needed for this application.
@@ -74,7 +77,7 @@ public class ApplicationConfig implements Serializable {
     /**
      * User who created this application.
      */
-    @Basic
+    @Basic(optional = false)
     private String user;
 
     /**
@@ -146,19 +149,20 @@ public class ApplicationConfig implements Serializable {
     /**
      * Gets the status for this application.
      *
-     * @return status - possible values: Types.ConfigStatus
+     * @return status
+     * @see ApplicationStatus
      */
-    public String getStatus() {
+    public ApplicationStatus getStatus() {
         return status;
     }
 
     /**
      * Sets the status for this application.
      *
-     * @param status possible values Types.ConfigStatus
+     * @param status One of the possible statuses
      */
-    public void setStatus(String status) {
-        this.status = status.toUpperCase();
+    public void setStatus(final ApplicationStatus status) {
+        this.status = status;
     }
 
     /**

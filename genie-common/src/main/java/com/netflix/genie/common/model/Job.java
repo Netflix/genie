@@ -17,12 +17,15 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -65,7 +68,7 @@ public class Job implements Serializable {
     /**
      * User who submitted the job (REQUIRED).
      */
-    @Basic
+    @Basic(optional = false)
     private String userName;
 
     /**
@@ -106,13 +109,15 @@ public class Job implements Serializable {
 
     /**
      * String representation of the the cluster criteria array list object
-     * above. TO DO: use pre/post persist to store the above list into the DB
+     * above.
+     * TODO: use pre/post persist to store the above list into the DB
      */
     @Lob
     private String clusterCriteriaString;
 
     /**
      * Command line arguments (REQUIRED).
+     * TODO: Enforce required
      */
     @Lob
     private String cmdArgs;
@@ -193,8 +198,8 @@ public class Job implements Serializable {
     /**
      * Job status - INIT, RUNNING, SUCCEEDED, KILLED, FAILED (upper case in DB).
      */
-    @Basic
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private JobStatus status;
 
     /**
      * More verbose status message.
@@ -636,18 +641,18 @@ public class Job implements Serializable {
      * Gets the status for this job.
      *
      * @return status
+     * @see JobStatus
      */
-    public String getStatus() {
+    public JobStatus getStatus() {
         return status;
     }
 
     /**
      * Set the status for the job.
      *
-     * @param status
-     *
+     * @param status The new status
      */
-    public void setStatus(String status) {
+    public void setStatus(final JobStatus status) {
         this.status = status;
     }
 
@@ -881,8 +886,8 @@ public class Job implements Serializable {
      *
      * @param jobStatus status for job
      */
-    public void setJobStatus(Types.JobStatus jobStatus) {
-        this.status = jobStatus.name();
+    public void setJobStatus(final JobStatus jobStatus) {
+        this.status = jobStatus;
 
         if (jobStatus == Types.JobStatus.INIT) {
             setStartTime(System.currentTimeMillis());

@@ -31,11 +31,11 @@ import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.Types.JobType;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
-import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.ExecutionService;
@@ -43,9 +43,13 @@ import com.netflix.genie.server.util.NetUtil;
 import com.netflix.niws.client.http.RestClient;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.persistence.EntityExistsException;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.RollbackException;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -60,6 +64,7 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author bmundlapudi
  * @author amsharma
+ * @author tgianos
  */
 public class GenieExecutionServiceImpl implements ExecutionService {
 
@@ -70,9 +75,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     private static final AbstractConfiguration CONF;
 
     // these can be over-ridden in the properties file
-    private static int serverPort = 7001;
-    private static String jobDirPrefix = "genie-jobs";
-    private static String jobResourcePrefix = "genie/v1/jobs";
+    private static final int serverPort;
+    private static final String jobDirPrefix;
+    private static final String jobResourcePrefix;
 
     // per-instance variables
     private final PersistenceManager<Job> pm;
@@ -81,11 +86,11 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     // initialize static variables
     static {
         CONF = ConfigurationManager.getConfigInstance();
-        serverPort = CONF.getInt("netflix.appinfo.port", serverPort);
+        serverPort = CONF.getInt("netflix.appinfo.port", 7001);
         jobDirPrefix = CONF.getString("netflix.genie.server.job.dir.prefix",
-                jobDirPrefix);
+                "genie-jobs");
         jobResourcePrefix = CONF.getString(
-                "netflix.genie.server.job.resource.prefix", jobResourcePrefix);
+                "netflix.genie.server.job.resource.prefix", "genie/v1/jobs");
     }
 
     /**
@@ -101,11 +106,11 @@ public class GenieExecutionServiceImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    public JobResponse submitJob(JobRequest jir) {
+    public JobResponse submitJob(JobRequest request) {
         LOG.info("called");
 
         JobResponse response;
-        Job jInfo = jir.getJobInfo();
+        Job jInfo = request.getJobInfo();
 
         // validate parameters
         try {
@@ -154,7 +159,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                         jInfo.setForwarded(true);
                         stats.incrGenieForwardedJobs();
                         response = forwardJobRequest("http://" + idleHost + ":"
-                                + serverPort + "/" + jobResourcePrefix, jir);
+                                + serverPort + "/" + jobResourcePrefix, request);
                         return response;
                     } // else, no idle hosts found - run here if capacity exists
                 }
@@ -222,7 +227,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                     + jInfo.getJobID());
             response.setJob(jInfo);
             return response;
-        } catch (Exception e) {
+        } catch (final CloudServiceException e) {
             LOG.error("Failed to submit job: ", e);
             // update db
             jInfo.setJobStatus(JobStatus.FAILED, e.getMessage());
@@ -278,88 +283,106 @@ public class GenieExecutionServiceImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    public JobResponse getJobs(String jobID, String jobName, String userName, String jobType,
-            String status, String clusterName, String clusterId, Integer limit, Integer page) {
+    public JobResponse getJobs(final String jobId, final String jobName, final String userName, final String jobType,
+            final String status, final String clusterName, final String clusterId, final Integer limit, final Integer page) {
         LOG.info("called");
 
         JobResponse response;
         String table = Job.class.getSimpleName();
+        
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Select j");
+        builder.append(" FROM Job j");
 
-        ClauseBuilder criteria = null;
-        try {
-            criteria = new ClauseBuilder(ClauseBuilder.AND);
-            if ((jobID != null) && (!jobID.isEmpty())) {
-                String query = "jobID like '" + jobID + "'";
-                criteria.append(query);
-            }
-            if ((jobName != null) && (!jobName.isEmpty())) {
-                String query = "jobName like '" + jobName + "'";
-                criteria.append(query);
-            }
-            if ((userName != null) && (!userName.isEmpty())) {
-                String query = "userName='" + userName + "'";
-                criteria.append(query);
-            }
-            if ((jobType != null) && (!jobType.isEmpty())) {
-                if (Types.JobType.parse(jobType) == null) {
-                    throw new CloudServiceException(
-                            HttpURLConnection.HTTP_BAD_REQUEST, "Job type: "
-                            + jobType
-                            + " can only be HADOOP, HIVE or PIG");
-                }
-                String query = "jobType='" + jobType.toUpperCase() + "'";
-                criteria.append(query);
-            }
-            if ((status != null) && (!status.isEmpty())) {
-                if (Types.JobStatus.parse(status) == null) {
-                    throw new CloudServiceException(
-                            HttpURLConnection.HTTP_BAD_REQUEST,
-                            "Unknown job status: " + status);
-                }
-                String query = "status='" + status.toUpperCase() + "'";
-                criteria.append(query);
-            }
-            if ((clusterName != null) && (!clusterName.isEmpty())) {
-                String query = "clusterName='" + clusterName + "'";
-                criteria.append(query);
-            }
-            if ((clusterId != null) && (!clusterId.isEmpty())) {
-                String query = "clusterId='" + clusterId + "'";
-                criteria.append(query);
-            }
-        } catch (CloudServiceException e) {
-            LOG.error(e.getMessage(), e);
-            response = new JobResponse(e);
-            return response;
+        final List<String> clauses = new ArrayList<String>();
+        if (!StringUtils.isEmpty(jobId)) {
+            clauses.add("j.jobID LIKE :jobId");
         }
-
-        Object[] results;
-        try {
-            QueryBuilder builder = new QueryBuilder().table(table)
-                    .clause(criteria.toString()).limit(limit).page(page);
-            results = pm.query(builder);
-
-        } catch (Exception e) {
-            LOG.error("Failed to get job results from database: ", e);
-            response = new JobResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
-            return response;
+        if (!StringUtils.isEmpty(jobName)) {
+            clauses.add("j.jobName LIKE :jobName");
         }
-
-        if (results.length != 0) {
-            Job[] jobInfos = new Job[results.length];
-            for (int i = 0; i < results.length; i++) {
-                jobInfos[i] = (Job) results[i];
+        if (!StringUtils.isEmpty(userName)) {
+            clauses.add("j.userName = :userName");
+        }
+        if (!StringUtils.isEmpty(jobType)) {
+            clauses.add("j.jobType = :jobType");
+        }
+        if (!StringUtils.isEmpty(status)) {
+            clauses.add("j.status = :status");
+        }
+        if (!StringUtils.isEmpty(clusterName)) {
+            clauses.add("j.clusterName = :clusterName");
+        }
+        if (!StringUtils.isEmpty(clusterId)) {
+            clauses.add("j.clusterId = :clusterId");
+        }
+        
+        if (!clauses.isEmpty()) {
+            builder.append(" WHERE");
+        }
+        boolean addAnd = false;
+        for (final String clause : clauses) {
+            if (addAnd) {
+                builder.append(" AND");
             }
-
-            response = new JobResponse();
-            response.setJobs(jobInfos);
-            response.setMessage("Returning job information for specified criteria");
-            return response;
-        } else {
-            response = new JobResponse(new CloudServiceException(
+            builder.append(" ").append(clause);
+            addAnd = true;
+        }
+        
+        final EntityManager em = pm.createEntityManager();
+        final Query query = em.createQuery(builder.toString(), Job.class);
+        if (!StringUtils.isEmpty(jobId)) {
+            query.setParameter("jobId", jobId);
+        }
+        if (!StringUtils.isEmpty(jobName)) {
+            query.setParameter("jobName", jobName);
+        }
+        if (!StringUtils.isEmpty(userName)) {
+            query.setParameter("userName", userName);
+        }
+        if (!StringUtils.isEmpty(jobType)) {
+            try {
+                query.setParameter("jobType", JobType.parse(jobType));
+            } catch (final CloudServiceException e) {
+                LOG.error(e.getMessage(), e);
+                response = new JobResponse(e);
+                return response;
+            }
+        }
+        if (!StringUtils.isEmpty(status)) {
+            try {
+                query.setParameter("status", JobStatus.parse(status));
+            } catch (final CloudServiceException e) {
+                LOG.error(e.getMessage(), e);
+                response = new JobResponse(e);
+                return response;
+            }
+        }
+        if (!StringUtils.isEmpty(clusterName)) {
+            query.setParameter("clusterName", clusterName);
+        }
+        if (!StringUtils.isEmpty(clusterId)) {
+            query.setParameter("clusterId", clusterId);
+        }
+        
+        //Limit the number of results and what page they want if requested
+        if (limit != null) {
+            query.setMaxResults(limit);
+            if (page != null) {
+                query.setFirstResult(limit * page);
+            }
+        }
+        
+        final List<Job> jobs = query.getResultList();
+        if (jobs.isEmpty()) {
+            //TODO: Why not just throw exception and let Jersey wrappers handle returning errors?
+            return new JobResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No jobs found for specified criteria"));
+        } else {
+            response = new JobResponse();
+            //TODO: Switch to just using Collections and not native arrays
+            response.setJobs(jobs.toArray(new Job[jobs.size()]));
             return response;
         }
     }
@@ -392,7 +415,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         } else {
             response = new JobStatusResponse();
             response.setMessage("Returning status for job: " + jobId);
-            response.setStatus(jInfo.getStatus());
+            response.setStatus(jInfo.getStatus().name());
             return response;
         }
     }
@@ -426,15 +449,15 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
 
         // check if it is done already
-        if (jInfo.getStatus().equalsIgnoreCase("SUCCEEDED")
-                || jInfo.getStatus().equalsIgnoreCase("KILLED")
-                || jInfo.getStatus().equalsIgnoreCase("FAILED")) {
+        if (jInfo.getStatus() == JobStatus.SUCCEEDED
+                || jInfo.getStatus() == JobStatus.KILLED
+                || jInfo.getStatus() == JobStatus.FAILED) {
             // job already exited, return status to user
             response = new JobStatusResponse();
-            response.setStatus(jInfo.getStatus());
+            response.setStatus(jInfo.getStatus().name());
             response.setMessage("Job " + jobId + " is already done");
             return response;
-        } else if (jInfo.getStatus().equalsIgnoreCase("INIT")
+        } else if (jInfo.getStatus() == JobStatus.INIT
                 || (jInfo.getProcessHandle() == -1)) {
             // can't kill a job if it is still initializing
             String msg = "Unable to kill job as it is still initializing: " + jobId;
@@ -473,7 +496,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         LOG.debug("killing job on same instance: " + jobId);
         try {
             JobManagerFactory.getJobManager(jInfo.getJobType()).kill(jInfo);
-        } catch (Exception e) {
+        } catch (final CloudServiceException e) {
             LOG.error("Failed to kill job: ", e);
             response = new JobStatusResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR,
@@ -515,7 +538,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
         // all good - return results
         response = new JobStatusResponse();
-        response.setStatus(jInfo.getStatus());
+        response.setStatus(jInfo.getStatus().name());
         response.setMessage("Successfully killed job: " + jobId);
         return response;
     }

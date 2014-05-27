@@ -40,10 +40,10 @@ public class QueryBuilder {
     private boolean paginate = true;
 
     // page number, defaults to 0th page
-    private Integer page = Integer.valueOf(0);
+    private Integer page = 0;
 
     // number of items to return (per page), defaults to max page size
-    private Integer limit = Integer.valueOf(PersistenceManager.MAX_PAGE_SIZE);
+    private Integer limit = PersistenceManager.MAX_PAGE_SIZE;
 
     // whether to enforce any ordering by updateTime or not, defaults to true
     private boolean orderByUpdateTime = true;

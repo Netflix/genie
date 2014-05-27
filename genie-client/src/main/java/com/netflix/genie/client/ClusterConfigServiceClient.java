@@ -86,19 +86,19 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
     public ClusterConfig createClusterConfig(final ClusterConfig clusterConfig)
             throws CloudServiceException {
         if (clusterConfig == null) {
-            String msg = "Required parameter clusterConfig can't be NULL";
+            final String msg = "Required parameter clusterConfig can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (clusterConfig.getUser() == null) {
-            String msg = "User name is missing";
+            final String msg = "User name is missing";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
         if (clusterConfig.getConfigs().isEmpty()) {
-            String msg = "At least one configuration file is required for the cluster.";
+            final String msg = "At least one configuration file is required for the cluster.";
             LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,

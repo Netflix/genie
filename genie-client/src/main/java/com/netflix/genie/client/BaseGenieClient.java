@@ -37,6 +37,8 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map.Entry;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
-public abstract class BaseGenieClient {
+public class BaseGenieClient {
 
     private static final String CLOUD = "cloud";
 
@@ -133,7 +135,7 @@ public abstract class BaseGenieClient {
             RestClient genieClient = (RestClient) ClientFactory
                     .getNamedClient(NIWS_CLIENT_NAME_GENIE);
             HttpRequest.Builder builder = HttpRequest.newBuilder()
-                    .verb(verb).header("Accept", "application/json")
+                    .verb(verb).header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                     .uri(new URI(requestUri)).entity(request);
             if (params != null) {
                 for (Entry<String, String> param : params.entries()) {
@@ -235,7 +237,7 @@ public abstract class BaseGenieClient {
     }
 
     /**
-     * Given a urlPath such as genie/v0/jobs and a uuid, constructs the request
+     * Given a urlPath such as genie/v1/jobs and a uuid, constructs the request
      * uri.
      *
      * @param baseRestUri e.g. genie/v1/jobs

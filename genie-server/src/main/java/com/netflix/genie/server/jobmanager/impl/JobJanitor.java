@@ -19,10 +19,12 @@ package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types;
-import com.netflix.genie.server.persistence.ClauseBuilder;
+import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * the configured timeout.
  *
  * @author skrishnan
+ * @author tgianos
  */
 public class JobJanitor extends Thread {
 
@@ -66,28 +69,25 @@ public class JobJanitor extends Thread {
         long currentTime = System.currentTimeMillis();
         long zombieTime = conf.getLong(
                 "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
-        ClauseBuilder setCriteria = new ClauseBuilder(ClauseBuilder.COMMA);
-        setCriteria.append("status='FAILED'");
-        setCriteria.append("updateTime=" + currentTime);
-        setCriteria.append("finishTime=" + currentTime);
-        int exitCode = Types.SubprocessStatus.ZOMBIE_JOB.code();
-        setCriteria.append("exitCode=" + exitCode);
-        setCriteria.append("statusMsg='"
-                + Types.SubprocessStatus.message(exitCode) + "'");
 
-        // generate the where clause
-        ClauseBuilder queryCriteria = new ClauseBuilder(ClauseBuilder.AND);
-        queryCriteria.append("updateTime < " + (currentTime - zombieTime));
-        ClauseBuilder statusCriteria = new ClauseBuilder(ClauseBuilder.OR);
-        statusCriteria.append("status='RUNNING'");
-        statusCriteria.append("status='INIT'");
-        queryCriteria.append("(" + statusCriteria.toString() + ")", false);
-
-        // set up the query
-        QueryBuilder query = new QueryBuilder().table("Job")
-                .clause(queryCriteria.toString()).set(setCriteria.toString());
-        int numRowsUpdated = pm.update(query);
-        return numRowsUpdated;
+        final StringBuilder builder = new StringBuilder();
+        builder.append("UPDATE Job j ");
+        builder.append("SET j.status = :failed, j.updateTime = :currentTime, j.finishTime = :currentTime, j.exitCode = :exitCode, j.statusMsg = :statusMessage ");
+        builder.append("WHERE j.updateTime = :updateTime AND (j.status = :running OR j.status = :init)");
+        final EntityManager em = pm.createEntityManager();
+        final Query query = em.createQuery(builder.toString())
+                .setParameter("failed", JobStatus.FAILED)
+                .setParameter("currentTime", currentTime)
+                .setParameter("exitCode", SubprocessStatus.ZOMBIE_JOB.code())
+                .setParameter("statusMessage", SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()))
+                .setParameter("updateTime", (currentTime - zombieTime))
+                .setParameter("running", JobStatus.RUNNING)
+                .setParameter("init", JobStatus.INIT);
+        final EntityTransaction trans = em.getTransaction();
+        trans.begin();
+        final int rowsUpdated = query.executeUpdate();
+        trans.commit();
+        return rowsUpdated;
     }
 
     /**
@@ -119,7 +119,6 @@ public class JobJanitor extends Thread {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 LOG.warn(e.getMessage());
-                continue;
             }
         }
     }
