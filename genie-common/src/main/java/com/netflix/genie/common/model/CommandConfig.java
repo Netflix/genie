@@ -338,7 +338,7 @@ public class CommandConfig implements Serializable {
      * @return appIds - a list of all application id's supported by this command
      */
     @XmlElement
-    public ArrayList<String> getAppids() {
+    public ArrayList<String> getAppIds() {
         if (this.applications != null) {
             appIds = new ArrayList<String>();
             Iterator<ApplicationConfig> it = this.applications.iterator();
@@ -354,7 +354,7 @@ public class CommandConfig implements Serializable {
      *
      * @param appIds list of application id's for this command
      */
-    public void setAppids(ArrayList<String> appIds) {
+    public void setAppIds(ArrayList<String> appIds) {
         this.appIds = appIds;
     }
 

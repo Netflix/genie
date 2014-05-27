@@ -124,7 +124,7 @@ public class CommandConfigResourceV1 {
                     "Missing commandConfig object.")));
         }
 
-        ArrayList<String> appids = ce.getAppids();
+        ArrayList<String> appids = ce.getAppIds();
 
         if (appids != null) {
             PersistenceManager<ApplicationConfig> pma = new PersistenceManager<ApplicationConfig>();
@@ -165,7 +165,7 @@ public class CommandConfigResourceV1 {
         if (commandConfig != null) {
             // include "id" in the request
             commandConfig.setId(id);
-            ArrayList<String> appids = commandConfig.getAppids();
+            ArrayList<String> appids = commandConfig.getAppIds();
 
             if (appids != null) {
                 PersistenceManager<ApplicationConfig> pma = new PersistenceManager<ApplicationConfig>();
