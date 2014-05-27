@@ -75,19 +75,23 @@ public class JobJanitor extends Thread {
         builder.append("SET j.status = :failed, j.updateTime = :currentTime, j.finishTime = :currentTime, j.exitCode = :exitCode, j.statusMsg = :statusMessage ");
         builder.append("WHERE j.updateTime = :updateTime AND (j.status = :running OR j.status = :init)");
         final EntityManager em = pm.createEntityManager();
-        final Query query = em.createQuery(builder.toString())
-                .setParameter("failed", JobStatus.FAILED)
-                .setParameter("currentTime", currentTime)
-                .setParameter("exitCode", SubprocessStatus.ZOMBIE_JOB.code())
-                .setParameter("statusMessage", SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()))
-                .setParameter("updateTime", (currentTime - zombieTime))
-                .setParameter("running", JobStatus.RUNNING)
-                .setParameter("init", JobStatus.INIT);
-        final EntityTransaction trans = em.getTransaction();
-        trans.begin();
-        final int rowsUpdated = query.executeUpdate();
-        trans.commit();
-        return rowsUpdated;
+        try {
+            final Query query = em.createQuery(builder.toString())
+                    .setParameter("failed", JobStatus.FAILED)
+                    .setParameter("currentTime", currentTime)
+                    .setParameter("exitCode", SubprocessStatus.ZOMBIE_JOB.code())
+                    .setParameter("statusMessage", SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()))
+                    .setParameter("updateTime", (currentTime - zombieTime))
+                    .setParameter("running", JobStatus.RUNNING)
+                    .setParameter("init", JobStatus.INIT);
+            final EntityTransaction trans = em.getTransaction();
+            trans.begin();
+            final int rowsUpdated = query.executeUpdate();
+            trans.commit();
+            return rowsUpdated;
+        } finally {
+            em.close();
+        }
     }
 
     /**

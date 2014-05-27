@@ -37,7 +37,6 @@ import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.NetUtil;
 import com.netflix.niws.client.http.RestClient;
@@ -288,7 +287,6 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         LOG.info("called");
 
         JobResponse response;
-        String table = Job.class.getSimpleName();
         
         final StringBuilder builder = new StringBuilder();
         builder.append("Select j");
@@ -330,60 +328,64 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         }
         
         final EntityManager em = pm.createEntityManager();
-        final Query query = em.createQuery(builder.toString(), Job.class);
-        if (!StringUtils.isEmpty(jobId)) {
-            query.setParameter("jobId", jobId);
-        }
-        if (!StringUtils.isEmpty(jobName)) {
-            query.setParameter("jobName", jobName);
-        }
-        if (!StringUtils.isEmpty(userName)) {
-            query.setParameter("userName", userName);
-        }
-        if (!StringUtils.isEmpty(jobType)) {
-            try {
-                query.setParameter("jobType", JobType.parse(jobType));
-            } catch (final CloudServiceException e) {
-                LOG.error(e.getMessage(), e);
-                response = new JobResponse(e);
+        try {
+            final Query query = em.createQuery(builder.toString(), Job.class);
+            if (!StringUtils.isEmpty(jobId)) {
+                query.setParameter("jobId", jobId);
+            }
+            if (!StringUtils.isEmpty(jobName)) {
+                query.setParameter("jobName", jobName);
+            }
+            if (!StringUtils.isEmpty(userName)) {
+                query.setParameter("userName", userName);
+            }
+            if (!StringUtils.isEmpty(jobType)) {
+                try {
+                    query.setParameter("jobType", JobType.parse(jobType));
+                } catch (final CloudServiceException e) {
+                    LOG.error(e.getMessage(), e);
+                    response = new JobResponse(e);
+                    return response;
+                }
+            }
+            if (!StringUtils.isEmpty(status)) {
+                try {
+                    query.setParameter("status", JobStatus.parse(status));
+                } catch (final CloudServiceException e) {
+                    LOG.error(e.getMessage(), e);
+                    response = new JobResponse(e);
+                    return response;
+                }
+            }
+            if (!StringUtils.isEmpty(clusterName)) {
+                query.setParameter("clusterName", clusterName);
+            }
+            if (!StringUtils.isEmpty(clusterId)) {
+                query.setParameter("clusterId", clusterId);
+            }
+
+            //Limit the number of results and what page they want if requested
+            if (limit != null) {
+                query.setMaxResults(limit);
+                if (page != null) {
+                    query.setFirstResult(limit * page);
+                }
+            }
+
+            final List<Job> jobs = query.getResultList();
+            if (jobs.isEmpty()) {
+                //TODO: Why not just throw exception and let Jersey wrappers handle returning errors?
+                return new JobResponse(new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No jobs found for specified criteria"));
+            } else {
+                response = new JobResponse();
+                //TODO: Switch to just using Collections and not native arrays
+                response.setJobs(jobs.toArray(new Job[jobs.size()]));
                 return response;
             }
-        }
-        if (!StringUtils.isEmpty(status)) {
-            try {
-                query.setParameter("status", JobStatus.parse(status));
-            } catch (final CloudServiceException e) {
-                LOG.error(e.getMessage(), e);
-                response = new JobResponse(e);
-                return response;
-            }
-        }
-        if (!StringUtils.isEmpty(clusterName)) {
-            query.setParameter("clusterName", clusterName);
-        }
-        if (!StringUtils.isEmpty(clusterId)) {
-            query.setParameter("clusterId", clusterId);
-        }
-        
-        //Limit the number of results and what page they want if requested
-        if (limit != null) {
-            query.setMaxResults(limit);
-            if (page != null) {
-                query.setFirstResult(limit * page);
-            }
-        }
-        
-        final List<Job> jobs = query.getResultList();
-        if (jobs.isEmpty()) {
-            //TODO: Why not just throw exception and let Jersey wrappers handle returning errors?
-            return new JobResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No jobs found for specified criteria"));
-        } else {
-            response = new JobResponse();
-            //TODO: Switch to just using Collections and not native arrays
-            response.setJobs(jobs.toArray(new Job[jobs.size()]));
-            return response;
+        } finally {
+            em.close();
         }
     }
 
@@ -523,17 +525,17 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 jInfo.setArchiveLocation(NetUtil.getArchiveURI(jobId));
             }
             pm.updateEntity(jInfo);
-            rwl.writeLock().unlock();
         } catch (Exception e) {
             LOG.error("Failed to update job status in database: ", e);
             response = new JobStatusResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
 
             // unlock before returning response
+            return response;
+        } finally {
             if (rwl.writeLock().isHeldByCurrentThread()) {
                 rwl.writeLock().unlock();
             }
-            return response;
         }
 
         // all good - return results

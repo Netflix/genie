@@ -124,21 +124,25 @@ public final class JobCountManager {
             init();
         }
         final EntityManager em = pm.createEntityManager();
-        final Query query = em.createQuery(builder.toString())
-                .setParameter("hostName", hostName)
-                .setParameter("running", JobStatus.RUNNING)
-                .setParameter("init", JobStatus.INIT);
-        if (minStartTime != null) {
-            query.setParameter("minStartTime", minStartTime);
+        try {
+            final Query query = em.createQuery(builder.toString())
+                    .setParameter("hostName", hostName)
+                    .setParameter("running", JobStatus.RUNNING)
+                    .setParameter("init", JobStatus.INIT);
+            if (minStartTime != null) {
+                query.setParameter("minStartTime", minStartTime);
+            }
+            if (maxStartTime != null) {
+                query.setParameter("maxStartTime", maxStartTime);
+            }
+            //TODO: This is read only not sure if need transaction. Spring read only would be convenient
+    //        final EntityTransaction trans = em.getTransaction();
+    //        trans.begin();
+            return ((Number) query.getSingleResult()).intValue();
+    //        trans.commit();
+        } finally {
+            em.close();
         }
-        if (maxStartTime != null) {
-            query.setParameter("maxStartTime", maxStartTime);
-        }
-        //TODO: This is read only not sure if need transaction. Spring read only would be convenient
-//        final EntityTransaction trans = em.getTransaction();
-//        trans.begin();
-        return ((Number) query.getSingleResult()).intValue();
-//        trans.commit();
     }
 
     /**
