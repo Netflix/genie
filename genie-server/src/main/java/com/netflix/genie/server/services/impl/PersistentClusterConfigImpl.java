@@ -261,9 +261,9 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             ClusterConfigRequest request, Verb method) {
         LOG.debug("called");
         ClusterConfigResponse ccr;
-        ClusterConfig clusterConfigElement = request.getClusterConfig();
+        ClusterConfig clusterConfig = request.getClusterConfig();
         // ensure that the element is not null
-        if (clusterConfigElement == null) {
+        if (clusterConfig == null) {
             ccr = new ClusterConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing clusterConfig object"));
@@ -272,12 +272,12 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         }
 
         // generate/validate id for request
-        String id = clusterConfigElement.getId();
+        String id = clusterConfig.getId();
         if (id == null) {
             if (method.equals(Verb.POST)) {
                 // create UUID for POST, if it doesn't exist
                 id = UUID.randomUUID().toString();
-                clusterConfigElement.setId(id);
+                clusterConfig.setId(id);
             } else {
                 ccr = new ClusterConfigResponse(new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST,
@@ -288,7 +288,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         }
 
         // more error checking
-        if (clusterConfigElement.getUser() == null) {
+        if (clusterConfig.getUser() == null) {
             ccr = new ClusterConfigResponse(
                     new CloudServiceException(
                             HttpURLConnection.HTTP_BAD_REQUEST,
@@ -298,7 +298,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         }
 
         // ensure that the status object is valid
-        String status = clusterConfigElement.getStatus();
+        String status = clusterConfig.getStatus();
         if ((status != null) && (Types.ClusterStatus.parse(status) == null)) {
             ccr = new ClusterConfigResponse(
                     new CloudServiceException(
@@ -310,7 +310,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
         // ensure that child command configs exist
         try {
-            validateChildren(clusterConfigElement);
+            validateChildren(clusterConfig);
         } catch (CloudServiceException cse) {
             ccr = new ClusterConfigResponse(cse);
             LOG.error(ccr.getErrorMsg(), cse);
@@ -318,7 +318,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         }
 
         // common error checks done - set update time before proceeding
-        clusterConfigElement.setUpdateTime(System.currentTimeMillis());
+        clusterConfig.setUpdateTime(System.currentTimeMillis());
 
         // handle POST and PUT differently
         if (method.equals(Verb.POST)) {
@@ -326,7 +326,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
             // validate/initialize new element
             try {
-                initAndValidateNewElement(clusterConfigElement);
+                initAndValidateNewElement(clusterConfig);
             } catch (CloudServiceException e) {
                 ccr = new ClusterConfigResponse(e);
                 LOG.error(ccr.getErrorMsg(), e);
@@ -335,13 +335,13 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
             // now create the new element
             try {
-                pm.createEntity(clusterConfigElement);
+                pm.createEntity(clusterConfig);
 
                 // create a response
                 ccr = new ClusterConfigResponse();
                 ccr.setMessage("Successfully created clusterConfig for id: "
                         + id);
-                ccr.setClusterConfigs(new ClusterConfig[]{clusterConfigElement});
+                ccr.setClusterConfigs(new ClusterConfig[]{clusterConfig});
                 return ccr;
             } catch (RollbackException e) {
                 LOG.error(e.getMessage(), e);
@@ -371,20 +371,20 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 // check if this is a create or an update
                 if (old == null) {
                     try {
-                        initAndValidateNewElement(clusterConfigElement);
+                        initAndValidateNewElement(clusterConfig);
                     } catch (CloudServiceException e) {
                         ccr = new ClusterConfigResponse(e);
                         LOG.error(ccr.getErrorMsg(), e);
                         return ccr;
                     }
                 }
-                clusterConfigElement = pm.updateEntity(clusterConfigElement);
+                clusterConfig = pm.updateEntity(clusterConfig);
 
                 // all good - create a response
                 ccr = new ClusterConfigResponse();
                 ccr.setMessage("Successfully updated clusterConfig for id: "
                         + id);
-                ccr.setClusterConfigs(new ClusterConfig[]{clusterConfigElement});
+                ccr.setClusterConfigs(new ClusterConfig[]{clusterConfig});
                 return ccr;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);

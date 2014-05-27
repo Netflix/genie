@@ -77,27 +77,27 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
     /**
      * Create a new cluster config.
      *
-     * @param clusterConfigElement the object encapsulating the new Cluster
+     * @param clusterConfig the object encapsulating the new Cluster
      * config to create
      *
      * @return extracted cluster config response
      * @throws CloudServiceException
      */
-    public ClusterConfig createClusterConfig(final ClusterConfig clusterConfigElement)
+    public ClusterConfig createClusterConfig(final ClusterConfig clusterConfig)
             throws CloudServiceException {
-        if (clusterConfigElement == null) {
+        if (clusterConfig == null) {
             String msg = "Required parameter clusterConfig can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if (clusterConfigElement.getUser() == null) {
+        if (clusterConfig.getUser() == null) {
             String msg = "User name is missing";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if (clusterConfigElement.getConfigs().isEmpty()) {
+        if (clusterConfig.getConfigs().isEmpty()) {
             String msg = "At least one configuration file is required for the cluster.";
             LOG.error(msg);
             throw new CloudServiceException(
@@ -106,7 +106,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         ClusterConfigRequest request = new ClusterConfigRequest();
-        request.setClusterConfig(clusterConfigElement);
+        request.setClusterConfig(clusterConfig);
 
         ClusterConfigResponse ccr = executeRequest(
                 Verb.POST,
@@ -131,22 +131,22 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * Create or update a cluster config.
      *
      * @param clusterConfigId the id for the cluster config to create or update
-     * @param clusterConfigElement the object encapsulating the new Cluster
+     * @param clusterConfig the object encapsulating the new Cluster
      * config to create
      *
      * @return extracted cluster config response
      * @throws CloudServiceException
      */
     public ClusterConfig updateClusterConfig(String clusterConfigId,
-            ClusterConfig clusterConfigElement)
+            ClusterConfig clusterConfig)
             throws CloudServiceException {
-        if (clusterConfigElement == null) {
+        if (clusterConfig == null) {
             String msg = "Required parameter clusterConfig can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     msg);
         }
-        if (clusterConfigElement.getUser() == null) {
+        if (clusterConfig.getUser() == null) {
             String msg = "User name is missing";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
@@ -154,7 +154,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         }
 
         ClusterConfigRequest request = new ClusterConfigRequest();
-        request.setClusterConfig(clusterConfigElement);
+        request.setClusterConfig(clusterConfig);
 
         ClusterConfigResponse ccr = executeRequest(Verb.PUT, BASE_CONFIG_CLUSTER_REST_URI, clusterConfigId, null, request, ClusterConfigResponse.class);
 

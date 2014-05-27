@@ -55,7 +55,7 @@ public class PersistentApplicationConfigImpl implements
             String name) {
 
         LOG.info("called");
-        ApplicationConfigResponse acr = null;
+        ApplicationConfigResponse acr;
 
         try {
             acr = new ApplicationConfigResponse();
@@ -109,11 +109,11 @@ public class PersistentApplicationConfigImpl implements
             }
             acr.setApplicationConfigs(elements);
             return acr;
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+        } catch (CloudServiceException cse) {
+            LOG.error(cse.getMessage(), cse);
             acr = new ApplicationConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    "Received exception: " + e.getMessage()));
+                    "Received exception: " + cse.getMessage()));
             return acr;
         }
     }
@@ -145,7 +145,7 @@ public class PersistentApplicationConfigImpl implements
     public ApplicationConfigResponse deleteApplicationConfig(String id) {
 
         LOG.info("called");
-        ApplicationConfigResponse acr = null;
+        ApplicationConfigResponse acr;
 
         if (id == null) {
             // basic error checking
@@ -194,11 +194,11 @@ public class PersistentApplicationConfigImpl implements
     private ApplicationConfigResponse createUpdateConfig(ApplicationConfigRequest request,
             Verb method) {
         LOG.info("called");
-        ApplicationConfigResponse acr = null;
-        ApplicationConfig applicationConfigElement = request.getApplicationConfig();
+        ApplicationConfigResponse acr;
+        ApplicationConfig applicationConfig = request.getApplicationConfig();
 
         // ensure that the element is not null
-        if (applicationConfigElement == null) {
+        if (applicationConfig == null) {
             acr = new ApplicationConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing applicationConfig object"));
@@ -207,11 +207,11 @@ public class PersistentApplicationConfigImpl implements
         }
 
         // generate/validate id for request
-        String id = applicationConfigElement.getId();
+        String id = applicationConfig.getId();
         if (id == null) {
             if (method.equals(Verb.POST)) {
                 id = UUID.randomUUID().toString();
-                applicationConfigElement.setId(id);
+                applicationConfig.setId(id);
             } else {
                 acr = new ApplicationConfigResponse(new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST,
@@ -222,7 +222,7 @@ public class PersistentApplicationConfigImpl implements
         }
 
         // basic error checking
-        String user = applicationConfigElement.getUser();
+        String user = applicationConfig.getUser();
         if (user == null) {
             acr = new ApplicationConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -232,7 +232,7 @@ public class PersistentApplicationConfigImpl implements
         }
 
         // ensure that the status object is valid
-        String status = applicationConfigElement.getStatus();
+        String status = applicationConfig.getStatus();
         if ((status != null) && (Types.ConfigStatus.parse(status) == null)) {
             acr = new ApplicationConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -242,12 +242,12 @@ public class PersistentApplicationConfigImpl implements
         }
 
         // common error checks done - set update time before proceeding
-        applicationConfigElement.setUpdateTime(System.currentTimeMillis());
+        applicationConfig.setUpdateTime(System.currentTimeMillis());
 
         // handle POST and PUT differently
         if (method.equals(Verb.POST)) {
             try {
-                initAndValidateNewElement(applicationConfigElement);
+                initAndValidateNewElement(applicationConfig);
             } catch (CloudServiceException e) {
                 acr = new ApplicationConfigResponse(e);
                 LOG.error(acr.getErrorMsg(), e);
@@ -257,12 +257,12 @@ public class PersistentApplicationConfigImpl implements
 
             LOG.info("GENIE: creating config for id: " + id);
             try {
-                pm.createEntity(applicationConfigElement);
+                pm.createEntity(applicationConfig);
 
                 // create a response
                 acr = new ApplicationConfigResponse();
                 acr.setMessage("Successfully created applicationConfig for id: " + id);
-                acr.setApplicationConfigs(new ApplicationConfig[]{applicationConfigElement});
+                acr.setApplicationConfigs(new ApplicationConfig[]{applicationConfig});
                 return acr;
             } catch (RollbackException e) {
                 LOG.error(e.getMessage(), e);
@@ -292,19 +292,19 @@ public class PersistentApplicationConfigImpl implements
                 // check if this is a create or an update
                 if (old == null) {
                     try {
-                        initAndValidateNewElement(applicationConfigElement);
+                        initAndValidateNewElement(applicationConfig);
                     } catch (CloudServiceException e) {
                         acr = new ApplicationConfigResponse(e);
                         LOG.error(acr.getErrorMsg(), e);
                         return acr;
                     }
                 }
-                applicationConfigElement = pm.updateEntity(applicationConfigElement);
+                applicationConfig = pm.updateEntity(applicationConfig);
 
                 // all good - create a response
                 acr = new ApplicationConfigResponse();
                 acr.setMessage("Successfully updated applicationConfig for id: " + id);
-                acr.setApplicationConfigs(new ApplicationConfig[]{applicationConfigElement});
+                acr.setApplicationConfigs(new ApplicationConfig[]{applicationConfig});
                 return acr;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
@@ -321,14 +321,14 @@ public class PersistentApplicationConfigImpl implements
      * Initialize and validate new element.
      *
      * @param applicationConfigElement the element to initialize
-     * @throws CloudServiceException if some params are missing - else
+     * @throws CloudServiceException if some params applicationConfig missing - else
      * initialize, and set creation time
      */
-    private void initAndValidateNewElement(ApplicationConfig applicationConfigElement)
+    private void initAndValidateNewElement(ApplicationConfig applicationConfig)
             throws CloudServiceException {
 
         // basic error checking
-        String name = applicationConfigElement.getName();
+        String name = applicationConfig.getName();
         //ArrayList<String> configs = applicationConfigElement.getConfigs();
         //ArrayList<String> jars = applicationConfigElement.getJars();
 
@@ -337,7 +337,7 @@ public class PersistentApplicationConfigImpl implements
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Need all required params: {name}");
         } else {
-            applicationConfigElement.setCreateTime(applicationConfigElement.getUpdateTime());
+            applicationConfig.setCreateTime(applicationConfig.getUpdateTime());
         }
     }
 }

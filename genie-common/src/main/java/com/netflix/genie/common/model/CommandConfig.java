@@ -93,7 +93,7 @@ public class CommandConfig implements Serializable {
     /**
      * Set of applications that can run this command - foreign key in database,
      * implemented by openjpa using join table
-     * CommandConfigElement_ApplicationConfigElement.
+     * CommandConfig_ApplicationConfig.
      */
     @ManyToMany(targetEntity = ApplicationConfig.class, fetch = FetchType.EAGER)
     private ArrayList<ApplicationConfig> applications;
