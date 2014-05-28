@@ -35,7 +35,7 @@ def addClusterConfigCprod1():
     
     tags = json.dumps(['sla','cprod1','bdp_prod_20140101'])
     config = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_prod_20140415/hdfs-site.xml','s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_prod_20140415/core-site.xml','s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_prod_20140415/mapred-site.xml'])
-    cmds = json.dumps(['prodhive11_mr1'])
+    cmds = json.dumps(['prodhive11_mr1','pig11_mr1'])
     
     payload = '''
     {
@@ -62,8 +62,8 @@ def addClusterConfigCquery1():
     print "Registering cquery1"
     ID="bdp_query_20140101"
     tags = json.dumps(['adhoc'])
-    config = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/mapred-site.xml','s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/core-site.xml','s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/hdfs-site.xml'])
-    cmds = json.dumps(['prodhive11_mr1'])
+    config = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/core-site.xml','s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/hdfs-site.xml'])
+    cmds = json.dumps(['prodhive11_mr1','pig11_mr1'])
     payload = '''
     {
         "clusterConfig":
@@ -84,9 +84,36 @@ def addClusterConfigCquery1():
     print "\n"
     print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
 
+def addClusterConfigH2query():
+    print "Registering h2query"
+    ID="bdp_hquery_20140505_185527"
+    tags = json.dumps(['adhoc','h2query','bdp_hquery_20140505_185527'])
+    config = json.dumps(['s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml','s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml','s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/yarn-site.xml'])
+    cmds = json.dumps(['pig11_mr2','pig13_mr2','prodhive11_mr2'])
+    payload = '''
+    {
+        "clusterConfig":
+        {
+            "id":"''' + ID +'''",
+            "name": "h2query", 
+            "status" : "UP",
+            "user" : "amsharma", 
+            "groupName" : "hadoop", 
+            "version" : "1.0.3",
+            "configs": ''' + config + ''',
+            "tags": ''' + tags + ''',
+            "cmdIds": ''' + cmds + ''' 
+        }
+    }
+    '''
+    print payload
+    print "\n"
+    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
 # driver method for all tests                
 if __name__ == "__main__":
    print "Registering Clusters:\n"
    print "\n"
    addClusterConfigCprod1()
    addClusterConfigCquery1()
+   addClusterConfigH2query()

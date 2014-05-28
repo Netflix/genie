@@ -44,7 +44,6 @@ def addCommandConfigProdhive11Mr1():
             "executable": "/apps/hive/0.11/bin/hive",
             "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/envFile.sh",
             "user" : "amsharma", 
-            "groupName" : "hadoop", 
             "version" : "0.11",
             "configs": ''' + configs + ''',
             "appIds": ''' + apps + ''' 
@@ -67,10 +66,9 @@ def addCommandConfigProdhive11Mr2():
             "id":"''' + ID +'''",
             "name": "prodhive", 
             "status" : "active",
-            "executable": "/apps/hive/0.11-h2/bin/hive",
-            "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/envFile.sh",
+            "executable": "/apps/hive/0.11/bin/hive",
+            "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr2/envFile.sh",
             "user" : "amsharma", 
-            "groupName" : "hadoop", 
             "version" : "0.11",
             "configs": ''' + configs + ''',
             "appIds": ''' + apps + ''' 
@@ -82,10 +80,79 @@ def addCommandConfigProdhive11Mr2():
     print "\n"
     print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
 
+def addCommandConfigPig11Mr1():
+    print "Adding Command pig11_mr1"
+    ID = "pig11_mr1"
+    apps = json.dumps(['mr1'])
+    payload = '''
+    {
+        "commandConfig":
+        {
+            "id":"''' + ID +'''",
+            "name": "pig", 
+            "status" : "active",
+            "executable": "/apps/pig/0.11/bin/pig",
+            "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr1/envFile.sh",
+            "user" : "amsharma", 
+            "version" : "0.11"
+        }
+    }
+    '''
+    print payload
+    print "\n"
+    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
+def addCommandConfigPig11Mr2():
+    print "Adding Command pig11_mr2"
+    ID = "pig11_mr2"
+    apps = json.dumps(['mr2'])
+    payload = '''
+    {
+        "commandConfig":
+        {
+            "id":"''' + ID +'''",
+            "name": "pig", 
+            "status" : "active",
+            "executable": "/apps/pig/0.11-h2/bin/pig",
+            "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr2/envFile.sh",
+            "user" : "amsharma", 
+            "version" : "0.11-h2"
+        }
+    }
+    '''
+    print payload
+    print "\n"
+    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
+def addCommandConfigPig13Mr2():
+    print "Adding Command pig13_mr2"
+    ID = "pig13_mr2"
+    apps = json.dumps(['mr2'])
+    payload = '''
+    {
+        "commandConfig":
+        {
+            "id":"''' + ID +'''",
+            "name": "pig", 
+            "status" : "active",
+            "executable": "/apps/pig/0.13/bin/pig",
+            "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh",
+            "user" : "amsharma", 
+            "version" : "0.13"
+        }
+    }
+    '''
+    print payload
+    print "\n"
+    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
 # driver method for all tests                
 if __name__ == "__main__":
    print "Adding Commands: \n"
    print "\n"
 
-   addCommandConfigProdhive11Mr1()
-   addCommandConfigProdhive11Mr2()
+   #addCommandConfigProdhive11Mr1()
+   #addCommandConfigProdhive11Mr2()
+   addCommandConfigPig11Mr1()
+   addCommandConfigPig11Mr2()
+   addCommandConfigPig13Mr2()

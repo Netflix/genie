@@ -61,7 +61,7 @@ def addApplicationConfigMr2():
     print "Creating App mr2 "
     
     ID = "mr2"
-    configs = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/mapred-site.xml'])
+    configs = json.dumps(['s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml'])
     jars = json.dumps(['s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar'])
     
     payload = '''
@@ -130,6 +130,6 @@ def addApplicationConfigTz2():
 if __name__ == "__main__":
    print "Creating Application Configs:\n"
    #addApplicationConfigMr1()
-   #addApplicationConfigMr2()
-   addApplicationConfigTz1()
-   addApplicationConfigTz2()
+   addApplicationConfigMr2()
+   #addApplicationConfigTz1()
+   #addApplicationConfigTz2()
