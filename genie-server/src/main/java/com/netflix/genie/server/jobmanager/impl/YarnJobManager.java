@@ -430,24 +430,33 @@ public class YarnJobManager implements JobManager {
         if (application != null) {
             ji2.setApplicationId(application.getId());
             ji2.setApplicationName(application.getName());
+            
+            if((application.getConfigs() != null) && (!application.getConfigs().isEmpty())) {
+                hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
+            }
+            
+            if((application.getJars() != null) && (!application.getJars().isEmpty()))  {
+                hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
+            }
+            
+            if((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
+                hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
+            }
         }
 
         //CommandConfig ce = pmCommand.getEntity(cmdId, CommandConfig.class);
-        hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
-        hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
-        hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
+        if((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
+            hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
+        }
+
+        //TODO: cannot be null in config. check while creating
         this.executable = command.getExecutable();
 
         // save the cluster name and id
         ji2.setExecutionClusterName(cluster.getName());
         ji2.setExecutionClusterId(cluster.getId());
 
-        // Get envPropertyFile for application, command and job and read in
-        // properties and set it in the environment
-        if((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
-            hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
-        }
-        
+        // Get envPropertyFile for command and job and set env variable
         if((command.getEnvPropFile() != null) && (!command.getEnvPropFile().isEmpty())) {
             hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
         }
