@@ -461,8 +461,16 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
         while (criteriaIter.hasNext()) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("SELECT distinct cstr from ClusterConfig cstr, IN(cstr.commands) cmds, IN(cmds.applications) apps where ");
+            builder.append("SELECT distinct cstr from ClusterConfig cstr, IN(cstr.commands) cmds ");
 
+            if ((applicationId != null) && (!applicationId.isEmpty())) {
+                builder.append(", IN(cmds.applications) apps ");
+            } else if ((applicationName != null) && (!applicationName.isEmpty())) {
+                builder.append(", IN(cmds.applications) apps ");
+            }
+            
+            builder.append(" where ");
+            
             ClusterCriteria cc = (ClusterCriteria) criteriaIter.next();
 
             for (int i = 0; i < cc.getTags().size(); i++) {
