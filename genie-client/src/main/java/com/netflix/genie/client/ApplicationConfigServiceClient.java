@@ -25,11 +25,12 @@ import com.netflix.genie.common.messages.ApplicationConfigResponse;
 import com.netflix.genie.common.model.ApplicationConfig;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Singleton class, which acts as the client library for the Command Config
+ * Singleton class, which acts as the client library for the Application Config
  * Service.
  *
  * @author tgianos
@@ -39,8 +40,8 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     private static final Logger LOG = LoggerFactory
             .getLogger(ApplicationConfigServiceClient.class);
 
-    private static final String BASE_CONFIG_COMMAND_REST_URI
-            = BASE_REST_URI + "config/command";
+    private static final String BASE_CONFIG_APPLICATION_REST_URI
+            = BASE_REST_URI + "config/application";
 
     // reference to the instance object
     private static ApplicationConfigServiceClient instance;
@@ -57,7 +58,7 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     /**
      * Returns the singleton instance that can be used by clients.
      *
-     * @return ExecutionServiceClient instance
+     * @return ApplicationConfigServiceClient instance
      * @throws IOException if there is an error instantiating client
      */
     public static synchronized ApplicationConfigServiceClient getInstance() throws IOException {
@@ -69,53 +70,33 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     }
 
     /**
-     * Create a new cluster config.
+     * Create a new cluster configuration.
      *
-     * @param commandConfig the object encapsulating the new Cluster
+     * @param applicationConfig the object encapsulating the new application
      * config to create
      *
-     * @return extracted cluster config response
+     * @return extracted application config response
      * @throws CloudServiceException
      */
-    public ApplicationConfig createApplicationConfig(final ApplicationConfig commandConfig)
+    public ApplicationConfig createApplicationConfig(final ApplicationConfig applicationConfig)
             throws CloudServiceException {
-        //TODO: Fix required elements
-        if (commandConfig == null) {
-            final String msg = "Required parameter commandConfig can't be NULL";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if (commandConfig.getUser() == null) {
-            final String msg = "User name is missing";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if (commandConfig.getConfigs().isEmpty()) {
-            final String msg = "At least one configuration file is required for the cluster.";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
+        checkErrorConditions(applicationConfig);
 
         final ApplicationConfigRequest request = new ApplicationConfigRequest();
-        request.setApplicationConfig(commandConfig);
+        request.setApplicationConfig(applicationConfig);
 
-        ApplicationConfigResponse ccr = executeRequest(
+        final ApplicationConfigResponse ccr = executeRequest(
                 Verb.POST,
-                BASE_CONFIG_COMMAND_REST_URI,
+                BASE_CONFIG_APPLICATION_REST_URI,
                 null,
                 null,
                 request,
                 ApplicationConfigResponse.class);
 
-        if ((ccr.getApplicationConfigs() == null) || (ccr.getApplicationConfigs().length == 0)) {
+        if (ccr.getApplicationConfigs() == null || ccr.getApplicationConfigs().length == 0) {
             String msg = "Unable to parse command config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
         // return the first (only) cluster config
@@ -123,34 +104,38 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     }
 
     /**
-     * Create or update a cluster config.
+     * Create or update an application configuration.
      *
-     * @param commandConfigId the id for the cluster config to create or update
-     * @param commandConfig the object encapsulating the new Cluster
-     * config to create
+     * @param id the id for the application config to create or update
+     * @param applicationConfig the object encapsulating the new application config to
+     * create
      *
      * @return extracted cluster config response
      * @throws CloudServiceException
      */
-    public ApplicationConfig updateApplicationConfig(final String commandConfigId,
-            final ApplicationConfig commandConfig) throws CloudServiceException {
-        if (commandConfig == null) {
+    public ApplicationConfig updateApplicationConfig(final String id, final ApplicationConfig applicationConfig) 
+            throws CloudServiceException {
+        if (applicationConfig == null) {
             String msg = "Required parameter commandConfig can't be NULL";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        if (commandConfig.getUser() == null) {
+        if (applicationConfig.getUser() == null) {
             String msg = "User name is missing";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final ApplicationConfigRequest request = new ApplicationConfigRequest();
-        request.setApplicationConfig(commandConfig);
+        request.setApplicationConfig(applicationConfig);
 
-        ApplicationConfigResponse ccr = executeRequest(Verb.PUT, BASE_CONFIG_COMMAND_REST_URI, commandConfigId, null, request, ApplicationConfigResponse.class);
+        ApplicationConfigResponse ccr = executeRequest(
+                Verb.PUT,
+                BASE_CONFIG_APPLICATION_REST_URI,
+                id,
+                null,
+                request,
+                ApplicationConfigResponse.class);
 
         if ((ccr.getApplicationConfigs() == null) || (ccr.getApplicationConfigs().length == 0)) {
             String msg = "Unable to parse cluster config from response";
@@ -178,7 +163,7 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
 
         ApplicationConfigResponse ccr = executeRequest(
                 Verb.GET,
-                BASE_CONFIG_COMMAND_REST_URI,
+                BASE_CONFIG_APPLICATION_REST_URI,
                 clusterConfigId,
                 null,
                 null,
@@ -208,7 +193,7 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
      */
     public ApplicationConfig[] getApplicationConfigs(
             Multimap<String, String> params) throws CloudServiceException {
-        ApplicationConfigResponse ccr = executeRequest(Verb.GET, BASE_CONFIG_COMMAND_REST_URI,
+        ApplicationConfigResponse ccr = executeRequest(Verb.GET, BASE_CONFIG_APPLICATION_REST_URI,
                 null, params, null, ApplicationConfigResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
@@ -239,7 +224,7 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
                     msg);
         }
 
-        ApplicationConfigResponse ccr = executeRequest(Verb.DELETE, BASE_CONFIG_COMMAND_REST_URI,
+        ApplicationConfigResponse ccr = executeRequest(Verb.DELETE, BASE_CONFIG_APPLICATION_REST_URI,
                 clusterConfigId, null, null, ApplicationConfigResponse.class);
 
         if ((ccr.getApplicationConfigs() == null) || (ccr.getApplicationConfigs().length == 0)) {
@@ -251,5 +236,34 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
 
         // return the first (only) cluster config
         return ccr.getApplicationConfigs()[0];
+    }
+    
+    /**
+     * Check to make sure that the required parameters exist.
+     * 
+     * @param applicationConfig The configuration to check
+     * @throws CloudServiceException 
+     */
+    private void checkErrorConditions(final ApplicationConfig applicationConfig) throws CloudServiceException {
+        if (applicationConfig == null) {
+            final String msg = "Required parameter applicationConfig can't be NULL";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (StringUtils.isEmpty(applicationConfig.getUser())) {
+            final String msg = "User name is missing and is required. Unable to create.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (StringUtils.isEmpty(applicationConfig.getName())) {
+            final String msg = "Application name is missing and is required. Unable to create.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (applicationConfig.getStatus() == null) {
+            final String msg = "No application status entered. Required to create";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
     }
 }
