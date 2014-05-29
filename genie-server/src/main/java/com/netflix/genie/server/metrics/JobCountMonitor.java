@@ -31,9 +31,9 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  */
 public class JobCountMonitor extends Thread {
 
-    private static Logger logger = LoggerFactory.getLogger(JobCountMonitor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobCountMonitor.class);
 
-    private GenieNodeStatistics stats;
+    private final GenieNodeStatistics stats;
     private boolean stop;
 
     /**
@@ -54,7 +54,7 @@ public class JobCountMonitor extends Thread {
      *             if there is any error
      */
     public int getNumInstanceJobs() throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
         return JobCountManager.getNumInstanceJobs();
     }
 
@@ -66,7 +66,7 @@ public class JobCountMonitor extends Thread {
      *             if there is any error
      */
     public int getNumInstanceJobs15Mins() throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
         long time = System.currentTimeMillis();
         return JobCountManager.getNumInstanceJobs(time - 15 * 60 * 1000, null);
     }
@@ -79,7 +79,7 @@ public class JobCountMonitor extends Thread {
      *             if there is any error
      */
     public int getNumInstanceJobs2Hrs() throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
         long time = System.currentTimeMillis();
         return JobCountManager.getNumInstanceJobs(time - 2 * 60 * 60 * 1000,
                 time - 15 * 60 * 1000);
@@ -93,7 +93,7 @@ public class JobCountMonitor extends Thread {
      *             if there is any error
      */
     public int getNumInstanceJobs8Hrs() throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
         long time = System.currentTimeMillis();
         return JobCountManager.getNumInstanceJobs(time - 8 * 60 * 60 * 1000,
                 time - 2 * 60 * 60 * 1000);
@@ -107,7 +107,7 @@ public class JobCountMonitor extends Thread {
      *             if there is any error
      */
     public int getNumInstanceJobs8HrsPlus() throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
         long time = System.currentTimeMillis();
         return JobCountManager.getNumInstanceJobs(null, time - 8 * 60 * 60
                 * 1000);
@@ -121,9 +121,9 @@ public class JobCountMonitor extends Thread {
     public void run() {
         while (true) {
             try {
-                logger.info("JobCountMonitor daemon waking up");
+                LOG.info("JobCountMonitor daemon waking up");
                 if (stop) {
-                    logger.info("JobCountMonitor stopping as per request");
+                    LOG.info("JobCountMonitor stopping as per request");
                     return;
                 }
 
@@ -152,16 +152,16 @@ public class JobCountMonitor extends Thread {
                 if (!stop) {
                     long sleepTime = ConfigurationManager.
                             getConfigInstance().getLong("netflix.genie.server.metrics.sleep.ms", 30000);
-                    logger.info("JobCountMonitor daemon going to sleep");
+                    LOG.info("JobCountMonitor daemon going to sleep");
                     Thread.sleep(sleepTime);
                 }
             } catch (InterruptedException e) {
                 // log error and move on
-                logger.warn("Interrupted exception caught", e);
+                LOG.warn("Interrupted exception caught", e);
                 continue;
             } catch (CloudServiceException e) {
                 // log error and move on
-                logger.warn("Exception while setting number of running jobs", e);
+                LOG.warn("Exception while setting number of running jobs", e);
                 continue;
             }
         }

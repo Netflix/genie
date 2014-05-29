@@ -18,6 +18,10 @@
 
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.Types.JobType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,62 +29,70 @@ import org.junit.Test;
  * Test case for utility methods under Types.
  *
  * @author skrishnan
+ * @author tgianos
  */
 public class TestTypes {
 
     /**
      * Tests whether a valid cluster status is parsed correctly.
+     *
+     * @throws com.netflix.genie.common.exceptions.CloudServiceException
      */
     @Test
-    public void testValidClusterStatus() {
-        String status = Types.ClusterStatus.UP.name();
-        Assert.assertEquals(Types.ClusterStatus.parse(status),
-                Types.ClusterStatus.UP);
+    public void testValidClusterStatus() throws CloudServiceException {
+        String status = ClusterStatus.UP.name();
+        Assert.assertEquals(ClusterStatus.UP, ClusterStatus.parse(status));
     }
 
     /**
      * Tests whether an invalid cluster status returns null.
+     *
+     * @throws com.netflix.genie.common.exceptions.CloudServiceException
      */
-    @Test
-    public void testInvalidClusterStatus() {
-        String status = "DOES_NOT_EXIST";
-        Assert.assertNull(Types.ClusterStatus.parse(status));
+    @Test(expected = CloudServiceException.class)
+    public void testInvalidClusterStatus() throws CloudServiceException {
+        Types.ClusterStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
      * Tests whether a valid job status is parsed correctly.
+     *
+     * @throws com.netflix.genie.common.exceptions.CloudServiceException
      */
     @Test
-    public void testValidJobStatus() {
-        String status = Types.JobStatus.RUNNING.name();
-        Assert.assertEquals(Types.JobStatus.parse(status),
-                Types.JobStatus.RUNNING);
+    public void testValidJobStatus() throws CloudServiceException {
+        String status = JobStatus.RUNNING.name();
+        Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(status));
     }
 
     /**
      * Tests whether an invalid job status returns null.
+     *
+     * @throws com.netflix.genie.common.exceptions.CloudServiceException
      */
-    @Test
-    public void testInvalidJobStatus() {
-        String status = "DOES_NOT_EXIST";
-        Assert.assertNull(Types.JobStatus.parse(status));
+    @Test(expected = CloudServiceException.class)
+    public void testInvalidJobStatus() throws CloudServiceException {
+        JobStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
      * Tests whether a valid job type is parsed correctly.
+     *
+     * @throws com.netflix.genie.common.exceptions.CloudServiceException
      */
     @Test
-    public void testValidJobType() {
-        String type = Types.JobType.YARN.name();
-        Assert.assertEquals(Types.JobType.parse(type), Types.JobType.YARN);
+    public void testValidJobType() throws CloudServiceException {
+        String type = JobType.YARN.name();
+        Assert.assertEquals(JobType.YARN, JobType.parse(type));
     }
 
     /**
      * Tests whether an invalid job type returns null.
+     *
+     * @throws com.netflix.genie.common.exceptions.CloudServiceException
      */
-    @Test
-    public void testInvalidJobType() {
-        String type = "DOES_NOT_EXIST";
-        Assert.assertNull(Types.JobType.parse(type));
+    @Test(expected = CloudServiceException.class)
+    public void testInvalidJobType() throws CloudServiceException {
+        JobType.parse("DOES_NOT_EXIST");
     }
 }

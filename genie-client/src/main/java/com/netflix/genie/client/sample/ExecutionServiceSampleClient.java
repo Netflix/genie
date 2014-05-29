@@ -72,8 +72,7 @@ public final class ExecutionServiceSampleClient {
         params.put("jobType", JobType.YARN.name());
         params.put("status", JobStatus.FAILED.name());
         params.put("limit", "3");
-        Job[] responses = client.getJobs(params);
-        for (Job ji : responses) {
+        for (Job ji : client.getJobs(params)) {
             System.out.println("Job Info: {id, status, finishTime} - {"
                     + ji.getJobID() + ", " + ji.getStatus() + ", "
                     + ji.getFinishTime() + "}");

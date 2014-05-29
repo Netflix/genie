@@ -15,25 +15,36 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Common enums used by other model objects.
  *
  * @author skrishnan
+ * @author tgianos
  */
-public class Types {
+public final class Types {
+
+    /**
+     * Basically a utility container class.
+     */
+    private Types() {
+    }
 
     /**
      * Job types supported by the Execution Service.
      *
      * @author skrishnan
+     * @author tgianos
      */
     public enum JobType {
+
         /**
          * Represents a Yarn job.
          */
@@ -42,17 +53,19 @@ public class Types {
         /**
          * Parse job type.
          *
-         * @param value
-         *            string to parse/convert
-         * @return HADOOP, HIVE, PIG if there is a match, else null
+         * @param value string to parse/convert
+         * @return YARN
+         * @throws CloudServiceException if invalid value passed in
          */
-        public static JobType parse(String value) {
-            if (value == null) {
-                return null;
+        public static JobType parse(final String value) throws CloudServiceException {
+            if (StringUtils.isEmpty(value)) {
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable job type. Must be one of {YARN}");
             } else if (value.compareToIgnoreCase("YARN") == 0) {
                 return YARN;
             } else {
-                return null;
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable job type. Must be one of {YARN}");
             }
         }
     }
@@ -61,8 +74,10 @@ public class Types {
      * Acceptable status codes for jobs.
      *
      * @author skrishnan
+     * @author tgianos
      */
     public enum JobStatus {
+
         /**
          * Job has been initialized, but not running yet.
          */
@@ -87,25 +102,27 @@ public class Types {
         /**
          * Parse job status.
          *
-         * @param value
-         *            string to parse/convert
-         * @return INIT, RUNNING, SUCCEEDED, KILLED, FAILED if match, else null
+         * @param value string to parse/convert
+         * @return INIT, RUNNING, SUCCEEDED, KILLED, FAILED if match
+         * @throws CloudServiceException if invalid value passed in
          */
-        public static JobStatus parse(String value) {
-            if (value == null) {
-                return null;
-            } else if (value.compareToIgnoreCase("INIT") == 0) {
+        public static JobStatus parse(final String value) throws CloudServiceException {
+            if (StringUtils.isEmpty(value)) {
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed}");
+            } else if (value.equalsIgnoreCase("INIT")) {
                 return INIT;
-            } else if (value.compareToIgnoreCase("RUNNING") == 0) {
+            } else if (value.equalsIgnoreCase("RUNNING")) {
                 return RUNNING;
-            } else if (value.compareToIgnoreCase("SUCCEEDED") == 0) {
+            } else if (value.equalsIgnoreCase("SUCCEEDED")) {
                 return SUCCEEDED;
-            } else if (value.compareToIgnoreCase("KILLED") == 0) {
+            } else if (value.equalsIgnoreCase("KILLED")) {
                 return KILLED;
-            } else if (value.compareToIgnoreCase("FAILED") == 0) {
+            } else if (value.equalsIgnoreCase("FAILED")) {
                 return FAILED;
             } else {
-                return null;
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed}");
             }
         }
     }
@@ -114,8 +131,10 @@ public class Types {
      * The status type for a cluster.
      *
      * @author skrishnan
+     * @author tgianos
      */
     public enum ClusterStatus {
+
         /**
          * Cluster is UP, and accepting jobs.
          */
@@ -132,62 +151,112 @@ public class Types {
         /**
          * Parse cluster status.
          *
-         * @param value
-         *            string to parse/convert into cluster status
-         * @return UP, OUT_OF_SERVICE, TERMINATED if match, else return null
+         * @param value string to parse/convert into cluster status
+         * @return UP, OUT_OF_SERVICE, TERMINATED if match
+         * @throws CloudServiceException on invalid value
          */
-        public static ClusterStatus parse(String value) {
-            if (value == null) {
-                return null;
-            } else if (value.compareToIgnoreCase("UP") == 0) {
+        public static ClusterStatus parse(final String value) throws CloudServiceException {
+            if (StringUtils.isEmpty(value)) {
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}");
+            } else if (value.equalsIgnoreCase("UP")) {
                 return UP;
-            } else if (value.compareToIgnoreCase("OUT_OF_SERVICE") == 0) {
+            } else if (value.equalsIgnoreCase("OUT_OF_SERVICE")) {
                 return OUT_OF_SERVICE;
-            } else if (value.compareToIgnoreCase("TERMINATED") == 0) {
+            } else if (value.equalsIgnoreCase("TERMINATED")) {
                 return TERMINATED;
             } else {
-                return null;
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}");
             }
         }
     }
 
     /**
-     * The status type for  command and application configs.
+     * The status type for command and application configs.
      *
      * @author skrishnan
+     * @author tgianos
      */
-    public enum ConfigStatus {
+    public enum ApplicationStatus {
+
         /**
-         * Configuration is active, and in-use.
+         * Application is active, and in-use.
          */
         ACTIVE,
         /**
-         * Configuration is deprecated, and will be made inactive in the future.
+         * Application is deprecated, and will be made inactive in the future.
          */
         DEPRECATED,
         /**
-         * Cluster is inactive, and not in-use.
+         * Application is inactive, and not in-use.
          */
         INACTIVE;
 
         /**
          * Parse config status.
          *
-         * @param value
-         *            string to parse/convert into config status
-         * @return ACTIVE, DEPRECATED, INACTIVE if match, else return null
+         * @param value string to parse/convert into config status
+         * @return ACTIVE, DEPRECATED, INACTIVE if match
+         * @throws CloudServiceException on invalid value
          */
-        public static ConfigStatus parse(String value) {
-            if (value == null) {
-                return null;
-            } else if (value.compareToIgnoreCase("ACTIVE") == 0) {
+        public static ApplicationStatus parse(final String value) throws CloudServiceException {
+            if (StringUtils.isEmpty(value)) {
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable application status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
+            } else if (value.equalsIgnoreCase("ACTIVE")) {
                 return ACTIVE;
-            } else if (value.compareToIgnoreCase("DEPRECATED") == 0) {
+            } else if (value.equalsIgnoreCase("DEPRECATED")) {
                 return DEPRECATED;
-            } else if (value.compareToIgnoreCase("INACTIVE") == 0) {
+            } else if (value.equalsIgnoreCase("INACTIVE")) {
                 return INACTIVE;
             } else {
-                return null;
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable application status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
+            }
+        }
+    }
+
+    /**
+     * The status type for command configs.
+     *
+     * @author tgianos
+     */
+    public enum CommandStatus {
+
+        /**
+         * Command is active, and in-use.
+         */
+        ACTIVE,
+        /**
+         * Command is deprecated, and will be made inactive in the future.
+         */
+        DEPRECATED,
+        /**
+         * Command is inactive, and not in-use.
+         */
+        INACTIVE;
+
+        /**
+         * Parse config status.
+         *
+         * @param value string to parse/convert into config status
+         * @return ACTIVE, DEPRECATED, INACTIVE if match
+         * @throws CloudServiceException on invalid value
+         */
+        public static CommandStatus parse(final String value) throws CloudServiceException {
+            if (StringUtils.isEmpty(value)) {
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable command status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
+            } else if (value.equalsIgnoreCase("ACTIVE")) {
+                return ACTIVE;
+            } else if (value.equalsIgnoreCase("DEPRECATED")) {
+                return DEPRECATED;
+            } else if (value.equalsIgnoreCase("INACTIVE")) {
+                return INACTIVE;
+            } else {
+                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                        "Unacceptable command status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
             }
         }
     }
@@ -198,6 +267,7 @@ public class Types {
      * @author skrishnan
      */
     public enum SubprocessStatus {
+
         /**
          * Job was run, but interrupted.
          */
@@ -257,6 +327,7 @@ public class Types {
 
         // A map of all status-es and their corresponding messages
         private static final Map<Integer, String> STATUS_MAP = new HashMap<Integer, String>();
+
         static {
             // assign error codes
             STATUS_MAP.put(JOB_INTERRUPTED.code(), "Job execution interrupted");
@@ -308,8 +379,7 @@ public class Types {
         /**
          * Return the message associated with each status code.
          *
-         * @param code
-         *            status code to get the message for
+         * @param code status code to get the message for
          * @return message for status code
          */
         public static String message(int code) {

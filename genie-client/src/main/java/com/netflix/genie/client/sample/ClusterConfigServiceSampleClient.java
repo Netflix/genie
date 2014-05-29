@@ -23,7 +23,7 @@ import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ClusterConfigServiceClient;
 import com.netflix.genie.common.model.ClusterConfig;
-import com.netflix.genie.common.model.Types;
+import com.netflix.genie.common.model.Types.ClusterStatus;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
@@ -78,7 +78,7 @@ public final class ClusterConfigServiceSampleClient {
         clusterConfig.setName(name);
 //        clusterConfigElement.setTest(Boolean.TRUE);
 //        clusterConfigElement.setAdHoc(Boolean.FALSE);
-        clusterConfig.setStatus(Types.ClusterStatus.OUT_OF_SERVICE.name());
+        clusterConfig.setStatus(ClusterStatus.OUT_OF_SERVICE);
 //        clusterConfigElement.setS3MapredSiteXml("s3://PATH/TO/MAPRED-SITE.XML");
 //        clusterConfigElement.setS3HdfsSiteXml("s3://PATH/TO/HDFS-SITE.XML");
 //        clusterConfigElement.setS3CoreSiteXml("s3://PATH/TO/CORE-SITE.XML");
@@ -94,8 +94,7 @@ public final class ClusterConfigServiceSampleClient {
         params.put("adHoc", "false");
         params.put("test", "true");
         params.put("limit", "3");
-        ClusterConfig[] responses = client.getClusterConfigs(params);
-        for (ClusterConfig hce : responses) {
+        for (ClusterConfig hce : client.getClusterConfigs(params)) {
             System.out.println("Cluster Configs: {id, status, updateTime} - {"
                     + hce.getId() + ", " + hce.getStatus() + ", "
                     + hce.getUpdateTime() + "}");
@@ -106,7 +105,7 @@ public final class ClusterConfigServiceSampleClient {
         System.out.println("Cluster config status: " + clusterConfig.getStatus());
 
         System.out.println("Updating existing cluster config");
-        clusterConfig.setStatus(Types.ClusterStatus.TERMINATED.name());
+        clusterConfig.setStatus(ClusterStatus.TERMINATED);
         clusterConfig = client.updateClusterConfig(id, clusterConfig);
         System.out.println("Updated status: " + clusterConfig.getStatus()
                 + " at time: " + clusterConfig.getUpdateTime());

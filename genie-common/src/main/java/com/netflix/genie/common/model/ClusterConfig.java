@@ -17,12 +17,15 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -54,13 +57,13 @@ public class ClusterConfig implements Serializable {
     /**
      * Name for this cluster, e.g. cquery.
      */
-    @Basic
+    @Basic(optional = false)
     private String name;
 
     /**
      * User who created this cluster.
      */
-    @Basic
+    @Basic(optional = false)
     private String user;
 
     /**
@@ -97,8 +100,8 @@ public class ClusterConfig implements Serializable {
     /**
      * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
      */
-    @Basic
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ClusterStatus status;
 
     /**
      * When was this cluster created?
@@ -245,7 +248,7 @@ public class ClusterConfig implements Serializable {
      *
      * @return status - possible values: Types.ConfigStatus
      */
-    public String getStatus() {
+    public ClusterStatus getStatus() {
         return status;
     }
 
@@ -254,7 +257,7 @@ public class ClusterConfig implements Serializable {
      *
      * @param status possible values Types.ConfigStatus
      */
-    public void setStatus(String status) {
+    public void setStatus(final ClusterStatus status) {
         this.status = status;
     }
 

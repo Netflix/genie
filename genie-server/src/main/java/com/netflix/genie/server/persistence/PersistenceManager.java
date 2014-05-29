@@ -15,22 +15,18 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.persistence;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
 
 /**
  * Generic PersistenceManager utility class that will be shared across various
@@ -38,18 +34,18 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  *
  * @author skrishnan
  * @author bmundlapudi
-
+ *
  * @param <T> the class that must be persisted in the database
  */
 public class PersistenceManager<T> {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(PersistenceManager.class);
 
     // a global instance-wide lock to ensure that no two threads
     // are writing at the same time
     // we may need a distributed (global) lock in the future
-    private static ReentrantReadWriteLock dbLock = new ReentrantReadWriteLock();
+    private static final ReentrantReadWriteLock DB_LOCK = new ReentrantReadWriteLock();
 
     // a static instance to the factory, which initializes the connection pool
     // we only need one instance of this factory per JVM
@@ -87,18 +83,17 @@ public class PersistenceManager<T> {
      * @return reference to the database lock shared by this instance
      */
     public static ReentrantReadWriteLock getDbLock() {
-        logger.debug("called");
-        return dbLock;
+        LOG.debug("called");
+        return DB_LOCK;
     }
 
     /**
      * Persist an entity in the database.
      *
-     * @param entity
-     *            element to store in database
+     * @param entity element to store in database
      */
     public void createEntity(T entity) {
-        logger.debug("called");
+        LOG.debug("called");
         EntityManager em = createEntityManager();
         try {
             em.getTransaction().begin();
@@ -112,13 +107,12 @@ public class PersistenceManager<T> {
     /**
      * Query the database using the specified query builder.
      *
-     * @param builder
-     *            object encapsulating the query
+     * @param builder object encapsulating the query
      * @return array of objects satisfying given criteria
      */
     @SuppressWarnings("unchecked")
     public T[] query(QueryBuilder builder) {
-        logger.debug("called");
+        LOG.debug("called");
         EntityManager em = createEntityManager();
         try {
             String strQuery;
@@ -127,8 +121,8 @@ public class PersistenceManager<T> {
             strQuery = ((criteria == null) || criteria.isEmpty()) ? String
                     .format("select %s from %s %s", ENTITY_ALIAS, table,
                             ENTITY_ALIAS) : String.format(
-                    "select %s from %s %s where %s", ENTITY_ALIAS, table,
-                    ENTITY_ALIAS, criteria);
+                            "select %s from %s %s where %s", ENTITY_ALIAS, table,
+                            ENTITY_ALIAS, criteria);
 
             // order by update time, if need be
             boolean orderByUpdateTime = builder.isOrderByUpdateTime();
@@ -144,13 +138,13 @@ public class PersistenceManager<T> {
             }
 
             Query q = em.createQuery(strQuery);
-            logger.debug("Query string: " + strQuery);
+            LOG.debug("Query string: " + strQuery);
 
             // set max results to default, or requested limit (capped by MAX)
             // for paginated results, limit is per page
             Integer limit = builder.getLimit();
             if ((limit == null) || (limit > MAX_PAGE_SIZE)) {
-                limit = Integer.valueOf(MAX_PAGE_SIZE);
+                limit = MAX_PAGE_SIZE;
             }
             boolean paginate = builder.isPaginate();
             if (paginate) {
@@ -176,13 +170,13 @@ public class PersistenceManager<T> {
     /**
      * Update a set of rows based on the given criteria.
      *
-     * @param builder
-     *            object encapsulating querying, having both a "set" and a
-     *            "clause"
+     * @param builder object encapsulating querying, having both a "set" and a
+     * "clause"
      * @return number of rows updated
+     * @throws CloudServiceException
      */
     public int update(QueryBuilder builder) throws CloudServiceException {
-        logger.debug("called");
+        LOG.debug("called");
         EntityManager em = createEntityManager();
         try {
             String strQuery;
@@ -190,7 +184,7 @@ public class PersistenceManager<T> {
             String set = builder.getSet();
             if ((set == null) || (set.isEmpty())) {
                 String msg = "Set can't be empty/null in an update statement";
-                logger.error(msg);
+                LOG.error(msg);
                 throw new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST, msg);
             }
@@ -212,12 +206,11 @@ public class PersistenceManager<T> {
     /**
      * Update an entity in the database.
      *
-     * @param entity
-     *            the entity to update
+     * @param entity the entity to update
      * @return updated entity
      */
     public T updateEntity(T entity) {
-        logger.debug("called");
+        LOG.debug("called");
         EntityManager em = createEntityManager();
         try {
             em.getTransaction().begin();
@@ -232,14 +225,12 @@ public class PersistenceManager<T> {
     /**
      * Delete an entity from the database.
      *
-     * @param id
-     *            entity to delete from database
-     * @param type
-     *            type of entity to delete
+     * @param id entity to delete from database
+     * @param type type of entity to delete
      * @return deleted entity
      */
     public T deleteEntity(String id, Class<T> type) {
-        logger.debug("called");
+        LOG.debug("called");
         EntityManager em = createEntityManager();
         try {
             em.getTransaction().begin();
@@ -258,16 +249,13 @@ public class PersistenceManager<T> {
     /**
      * Get an entity from the database.
      *
-     * @param id
-     *            the id to look up in the database
-     * @param type
-     *            class name for the entity to look up
-     * @param em
-     *            reference to the entity manager
+     * @param id the id to look up in the database
+     * @param type class name for the entity to look up
+     * @param em reference to the entity manager
      * @return the entity returned by the database
      */
     private T getEntity(String id, Class<T> type, EntityManager em) {
-        logger.debug("called");
+        LOG.debug("called");
         try {
             return type.cast(em.find(type, id));
         } catch (Exception e) {
@@ -278,14 +266,12 @@ public class PersistenceManager<T> {
     /**
      * Get an entity from the database.
      *
-     * @param id
-     *            the id to look up in the database
-     * @param type
-     *            class name for the entity to look up
+     * @param id the id to look up in the database
+     * @param type class name for the entity to look up
      * @return the entity returned by the database
      */
     public T getEntity(String id, Class<T> type) {
-        logger.debug("called");
+        LOG.debug("called");
         EntityManager em = createEntityManager();
         try {
             return type.cast(em.find(type, id));
@@ -300,11 +286,11 @@ public class PersistenceManager<T> {
      *
      * @return entity manager object
      */
-    private EntityManager createEntityManager() {
+    public EntityManager createEntityManager() {
         synchronized (PersistenceManager.class) {
             if ((entityManagerFactory == null) || (!entityManagerFactory.isOpen())) {
                 String persistenceUnitName = "genie";
-                logger.info("Initializing PersistenceManager: "
+                LOG.info("Initializing PersistenceManager: "
                         + persistenceUnitName);
                 entityManagerFactory = Persistence
                         .createEntityManagerFactory(persistenceUnitName);
@@ -316,10 +302,8 @@ public class PersistenceManager<T> {
     /**
      * Get the start position to return rows from.
      *
-     * @param pageNumber
-     *            the page number to return from
-     * @param limit
-     *            number of entries per page
+     * @param pageNumber the page number to return from
+     * @param limit number of entries per page
      * @return the start position
      */
     private int getStartPosition(int pageNumber, int limit) {
