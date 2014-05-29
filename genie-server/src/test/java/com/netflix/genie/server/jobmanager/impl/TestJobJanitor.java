@@ -45,6 +45,7 @@ public class TestJobJanitor {
         one.setUpdateTime(0L);
         one.setStatus(JobStatus.RUNNING);
         one.setUserName("someUser");
+        one.setCmdArgs("someArgs");
         pm.createEntity(one);
         Job two = new Job();
         two.setJobName("UPDATE_TEST");
@@ -52,6 +53,7 @@ public class TestJobJanitor {
         two.setStatus(JobStatus.INIT);
         two.setJobID(UUID.randomUUID().toString());
         two.setUserName("some other user name");
+        two.setCmdArgs("someArgs2");
         pm.createEntity(two);
 
         // ensure that more than two jobs have been cleaned up

@@ -25,13 +25,16 @@ import com.netflix.genie.common.messages.ApplicationConfigResponse;
 import com.netflix.genie.common.model.ApplicationConfig;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Singleton class, which acts as the client library for the Application Config
- * Service.
+ * Singleton class, which acts as the client library for the Application
+ * Configuration Service.
  *
  * @author tgianos
  */
@@ -70,20 +73,20 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     }
 
     /**
-     * Create a new cluster configuration.
+     * Create a new application configuration.
      *
-     * @param applicationConfig the object encapsulating the new application
-     * config to create
+     * @param config the object encapsulating the new application config to
+     * create
      *
      * @return extracted application config response
      * @throws CloudServiceException
      */
-    public ApplicationConfig createApplicationConfig(final ApplicationConfig applicationConfig)
+    public ApplicationConfig createApplicationConfig(final ApplicationConfig config)
             throws CloudServiceException {
-        checkErrorConditions(applicationConfig);
+        checkErrorConditions(config);
 
         final ApplicationConfigRequest request = new ApplicationConfigRequest();
-        request.setApplicationConfig(applicationConfig);
+        request.setApplicationConfig(config);
 
         final ApplicationConfigResponse ccr = executeRequest(
                 Verb.POST,
@@ -94,40 +97,38 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
                 ApplicationConfigResponse.class);
 
         if (ccr.getApplicationConfigs() == null || ccr.getApplicationConfigs().length == 0) {
-            String msg = "Unable to parse command config from response";
+            String msg = "Unable to parse application config from response";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) application config
         return ccr.getApplicationConfigs()[0];
     }
 
     /**
      * Create or update an application configuration.
      *
-     * @param id the id for the application config to create or update
-     * @param applicationConfig the object encapsulating the new application config to
-     * create
+     * @param id the id for the application configuration to create or update
+     * @param config the object encapsulating the new application configuration
+     * to create
      *
-     * @return extracted cluster config response
+     * @return extracted application configuration response
      * @throws CloudServiceException
      */
-    public ApplicationConfig updateApplicationConfig(final String id, final ApplicationConfig applicationConfig) 
+    public ApplicationConfig updateApplicationConfig(final String id, final ApplicationConfig config)
             throws CloudServiceException {
-        if (applicationConfig == null) {
-            String msg = "Required parameter commandConfig can't be NULL";
+        if (StringUtils.isEmpty(id)) {
+            final String msg = "Required parameter id is missing. Unable to update.";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        if (applicationConfig.getUser() == null) {
-            String msg = "User name is missing";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
+        //Check to make sure we have all the parameters we need for a valid
+        //application config
+        checkErrorConditions(config);
 
         final ApplicationConfigRequest request = new ApplicationConfigRequest();
-        request.setApplicationConfig(applicationConfig);
+        request.setApplicationConfig(config);
 
         ApplicationConfigResponse ccr = executeRequest(
                 Verb.PUT,
@@ -137,131 +138,144 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
                 request,
                 ApplicationConfigResponse.class);
 
-        if ((ccr.getApplicationConfigs() == null) || (ccr.getApplicationConfigs().length == 0)) {
-            String msg = "Unable to parse cluster config from response";
+        if (ccr.getApplicationConfigs() == null || ccr.getApplicationConfigs().length == 0) {
+            String msg = "Unable to parse application config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) application config
         return ccr.getApplicationConfigs()[0];
     }
 
     /**
-     * Gets information for a given clusterConfigId.
+     * Gets information for a given id.
      *
-     * @param clusterConfigId the cluster config id to get (can't be null)
-     * @return the cluster config for this clusterConfigId
+     * @param id the application configuration id to get (can't be null or
+     * empty)
+     * @return the application configuration for this id
      * @throws CloudServiceException
      */
-    public ApplicationConfig getApplicationConfig(String clusterConfigId) throws CloudServiceException {
-        if (clusterConfigId == null) {
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Missing required parameter: clusterConfigId");
+    public ApplicationConfig getApplicationConfig(final String id) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            final String msg = "Required parameter id is missing. Unable to get.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         ApplicationConfigResponse ccr = executeRequest(
                 Verb.GET,
                 BASE_CONFIG_APPLICATION_REST_URI,
-                clusterConfigId,
+                id,
                 null,
                 null,
                 ApplicationConfigResponse.class);
 
-        if ((ccr.getApplicationConfigs() == null)
-                || (ccr.getApplicationConfigs().length == 0)) {
-            String msg = "Unable to parse cluster config from response";
+        if (ccr.getApplicationConfigs() == null || ccr.getApplicationConfigs().length == 0) {
+            final String msg = "Unable to parse application config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) application config
         return ccr.getApplicationConfigs()[0];
     }
 
     /**
-     * Gets a set of cluster configs for the given parameters.
+     * Gets a set of application configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
      *
      * More details on the parameters can be found on the Genie User Guide on
      * GitHub.
-     * @return array of cluster config elements that match the filter
+     * @return List of application configuration elements that match the filter
      * @throws CloudServiceException
      */
-    public ApplicationConfig[] getApplicationConfigs(
-            Multimap<String, String> params) throws CloudServiceException {
-        ApplicationConfigResponse ccr = executeRequest(Verb.GET, BASE_CONFIG_APPLICATION_REST_URI,
-                null, params, null, ApplicationConfigResponse.class);
+    public List<ApplicationConfig> getApplicationConfigs(final Multimap<String, String> params)
+            throws CloudServiceException {
+        final ApplicationConfigResponse ccr = executeRequest(
+                Verb.GET,
+                BASE_CONFIG_APPLICATION_REST_URI,
+                null,
+                params,
+                null,
+                ApplicationConfigResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
-        if ((ccr.getApplicationConfigs() == null) || (ccr.getApplicationConfigs().length == 0)) {
-            String msg = "Unable to parse cluster config from response";
+        if (ccr.getApplicationConfigs() == null || ccr.getApplicationConfigs().length == 0) {
+            String msg = "Unable to parse application config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // if we get here, there are non-zero cluster config elements - return all
-        return ccr.getApplicationConfigs();
+        // if we get here, there are non-zero application config elements - return all
+        return Arrays.asList(ccr.getApplicationConfigs());
     }
 
     /**
-     * Delete a clusterConfig using its id.
+     * Delete an application configuration using its id.
      *
-     * @param clusterConfigId the id for the cluster config to delete
-     * @return the deleted cluster config
+     * @param id the id for the application configuration to delete
+     * @return the deleted application configuration
      * @throws CloudServiceException
      */
-    public ApplicationConfig deleteApplicationConfig(String clusterConfigId) throws CloudServiceException {
-        if (clusterConfigId == null) {
-            String msg = "Missing required parameter: clusterConfigId";
+    public ApplicationConfig deleteApplicationConfig(final String id) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        ApplicationConfigResponse ccr = executeRequest(Verb.DELETE, BASE_CONFIG_APPLICATION_REST_URI,
-                clusterConfigId, null, null, ApplicationConfigResponse.class);
+        ApplicationConfigResponse ccr = executeRequest(
+                Verb.DELETE,
+                BASE_CONFIG_APPLICATION_REST_URI,
+                id,
+                null,
+                null,
+                ApplicationConfigResponse.class);
 
-        if ((ccr.getApplicationConfigs() == null) || (ccr.getApplicationConfigs().length == 0)) {
-            String msg = "Unable to parse cluster config from response";
+        if (ccr.getApplicationConfigs() == null || ccr.getApplicationConfigs().length == 0) {
+            String msg = "Unable to parse application config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) application config
         return ccr.getApplicationConfigs()[0];
     }
-    
+
     /**
      * Check to make sure that the required parameters exist.
-     * 
-     * @param applicationConfig The configuration to check
-     * @throws CloudServiceException 
+     *
+     * @param config The configuration to check
+     * @throws CloudServiceException
      */
-    private void checkErrorConditions(final ApplicationConfig applicationConfig) throws CloudServiceException {
-        if (applicationConfig == null) {
-            final String msg = "Required parameter applicationConfig can't be NULL";
+    private void checkErrorConditions(final ApplicationConfig config) throws CloudServiceException {
+        if (config == null) {
+            final String msg = "Required parameter config can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        if (StringUtils.isEmpty(applicationConfig.getUser())) {
-            final String msg = "User name is missing and is required. Unable to create.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+
+        final List<String> messages = new ArrayList<String>();
+        if (StringUtils.isEmpty(config.getUser())) {
+            messages.add("User name is missing and is required. Unable to create.\n");
         }
-        if (StringUtils.isEmpty(applicationConfig.getName())) {
-            final String msg = "Application name is missing and is required. Unable to create.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        if (StringUtils.isEmpty(config.getName())) {
+            messages.add("Application name is missing and is required. Unable to create.\n");
         }
-        if (applicationConfig.getStatus() == null) {
-            final String msg = "No application status entered. Required to create";
+        if (config.getStatus() == null) {
+            messages.add("No application status entered. Required to create\n");
+        }
+
+        if (!messages.isEmpty()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Cluster configuration errors:\n");
+            for (final String message : messages) {
+                builder.append(message);
+            }
+            final String msg = builder.toString();
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }

@@ -45,6 +45,7 @@ public class TestPersistenceManager {
         initial.setJobName("My test job");
         initial.setJobID(uuid.toString());
         initial.setUserName("myUserName");
+        initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
         Job result = pm.getEntity(uuid.toString(),
                 Job.class);
@@ -61,6 +62,7 @@ public class TestPersistenceManager {
         UUID uuid = UUID.randomUUID();
         initial.setJobID(uuid.toString());
         initial.setUserName("myUserName");
+        initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
         Job deleted = pm.deleteEntity(uuid.toString(),
                 Job.class);
@@ -77,6 +79,7 @@ public class TestPersistenceManager {
         UUID uuid = UUID.randomUUID();
         initial.setJobID(uuid.toString());
         initial.setUserName("myUserName");
+        initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
         initial.setJobStatus(JobStatus.FAILED);
         Job updated = pm.updateEntity(initial);
@@ -95,11 +98,13 @@ public class TestPersistenceManager {
         one.setJobName("UPDATE_TEST");
         one.setJobID(UUID.randomUUID().toString());
         one.setUserName("myUserName");
+        one.setCmdArgs("commandArg");
         pm.createEntity(one);
         Job two = new Job();
         two.setJobName("UPDATE_TEST");
         two.setJobID(UUID.randomUUID().toString());
         two.setUserName("myUserName2");
+        two.setCmdArgs("commandArg2");
         pm.createEntity(two);
         ClauseBuilder setCriteria = new ClauseBuilder(ClauseBuilder.COMMA);
         setCriteria.append("jobName='TEST_UPDATE'");
@@ -128,6 +133,7 @@ public class TestPersistenceManager {
         initial.setJobStatus(JobStatus.FAILED);
         initial.setUpdateTime(System.currentTimeMillis());
         initial.setUserName("myUserName");
+        initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
         ClauseBuilder cb = new ClauseBuilder(ClauseBuilder.AND);
         cb.append("jobID='" + initial.getJobID() + "'");

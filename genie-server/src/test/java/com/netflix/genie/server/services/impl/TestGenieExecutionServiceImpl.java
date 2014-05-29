@@ -63,6 +63,7 @@ public class TestGenieExecutionServiceImpl {
         job.setKillURI("http://DOES/NOT/EXIST");
         job.setStatus(JobStatus.SUCCEEDED);
         job.setUserName("myUserName");
+        job.setCmdArgs("commandArg");
         pm.createEntity(job);
 
         // should return immediately despite bogus killURI

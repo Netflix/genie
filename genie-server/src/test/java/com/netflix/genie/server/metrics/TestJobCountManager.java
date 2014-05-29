@@ -52,6 +52,7 @@ public class TestJobCountManager {
         job.setHostName(NetUtil.getHostName());
         job.setStartTime(1L);
         job.setUserName("myUser");
+        job.setCmdArgs("someCommandArg");
         pm.createEntity(job);
 
         // number of running jobs - should be > 0

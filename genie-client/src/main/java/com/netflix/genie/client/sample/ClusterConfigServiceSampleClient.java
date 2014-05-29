@@ -94,8 +94,7 @@ public final class ClusterConfigServiceSampleClient {
         params.put("adHoc", "false");
         params.put("test", "true");
         params.put("limit", "3");
-        ClusterConfig[] responses = client.getClusterConfigs(params);
-        for (ClusterConfig hce : responses) {
+        for (ClusterConfig hce : client.getClusterConfigs(params)) {
             System.out.println("Cluster Configs: {id, status, updateTime} - {"
                     + hce.getId() + ", " + hce.getStatus() + ", "
                     + hce.getUpdateTime() + "}");

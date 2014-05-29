@@ -110,12 +110,12 @@ public class JobResourceV1 {
         LOG.info("called from: " + clientHost);
 
         // set the clientHost, if it is not overridden already
-        Job jobInfo = request.getJobInfo();
-        if ((jobInfo != null)
-                && ((jobInfo.getClientHost() == null)
-                || jobInfo.getClientHost().isEmpty())) {
-            jobInfo.setClientHost(clientHost);
-            jobInfo.setClusterCriteriaString(jobInfo.getClusterCriteriaList());
+        Job job = request.getJobInfo();
+        if ((job != null)
+                && ((job.getClientHost() == null)
+                || job.getClientHost().isEmpty())) {
+            job.setClientHost(clientHost);
+            job.setClusterCriteriaString(job.getClusterCriteriaList());
         }
 
         JobResponse response = xs.submitJob(request);

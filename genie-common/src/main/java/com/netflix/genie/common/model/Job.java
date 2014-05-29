@@ -33,7 +33,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Representation of the state of a Genie 1.0 job.
+ * Representation of the state of a Genie 2.0 job.
  *
  * @author amsharma
  */
@@ -117,9 +117,9 @@ public class Job implements Serializable {
 
     /**
      * Command line arguments (REQUIRED).
-     * TODO: Enforce required
      */
     @Lob
+    @Basic(optional = false)
     private String cmdArgs;
 
     /**

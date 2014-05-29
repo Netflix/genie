@@ -25,12 +25,16 @@ import com.netflix.genie.common.messages.CommandConfigResponse;
 import com.netflix.genie.common.model.CommandConfig;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Singleton class, which acts as the client library for the Command Config
- * Service.
+ * Singleton class, which acts as the client library for the Command
+ * Configuration Service.
  *
  * @author tgianos
  */
@@ -69,39 +73,20 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
     }
 
     /**
-     * Create a new cluster config.
+     * Create a new command configuration.
      *
-     * @param commandConfig the object encapsulating the new Cluster
-     * config to create
+     * @param config the object encapsulating the new Cluster configuration to
+     * create
      *
-     * @return extracted cluster config response
+     * @return extracted command configuration response
      * @throws CloudServiceException
      */
-    public CommandConfig createCommandConfig(final CommandConfig commandConfig)
+    public CommandConfig createCommandConfig(final CommandConfig config)
             throws CloudServiceException {
-        //TODO: Fix required elements
-        if (commandConfig == null) {
-            final String msg = "Required parameter commandConfig can't be NULL";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if (commandConfig.getUser() == null) {
-            final String msg = "User name is missing";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if (commandConfig.getConfigs().isEmpty()) {
-            final String msg = "At least one configuration file is required for the cluster.";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
+        checkErrorConditions(config);
 
         final CommandConfigRequest request = new CommandConfigRequest();
-        request.setCommandConfig(commandConfig);
+        request.setCommandConfig(config);
 
         CommandConfigResponse ccr = executeRequest(
                 Verb.POST,
@@ -111,145 +96,187 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
                 request,
                 CommandConfigResponse.class);
 
-        if ((ccr.getCommandConfigs() == null) || (ccr.getCommandConfigs().length == 0)) {
+        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
             String msg = "Unable to parse command config from response";
             LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) command config
         return ccr.getCommandConfigs()[0];
     }
 
     /**
-     * Create or update a cluster config.
+     * Create or update a command configuration.
      *
-     * @param commandConfigId the id for the cluster config to create or update
-     * @param commandConfig the object encapsulating the new Cluster
-     * config to create
+     * @param id the id for the command configuration to create or update
+     * @param config the object encapsulating the new Cluster configuration to
+     * create
      *
-     * @return extracted cluster config response
+     * @return extracted command configuration response
      * @throws CloudServiceException
      */
-    public CommandConfig updateCommandConfig(final String commandConfigId,
-            final CommandConfig commandConfig) throws CloudServiceException {
-        if (commandConfig == null) {
-            String msg = "Required parameter commandConfig can't be NULL";
+    public CommandConfig updateCommandConfig(final String id, final CommandConfig config)
+            throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            String msg = "Required parameter id can't be null or empty.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        if (commandConfig.getUser() == null) {
-            String msg = "User name is missing";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
+        checkErrorConditions(config);
 
         final CommandConfigRequest request = new CommandConfigRequest();
-        request.setCommandConfig(commandConfig);
+        request.setCommandConfig(config);
 
-        CommandConfigResponse ccr = executeRequest(Verb.PUT, BASE_CONFIG_COMMAND_REST_URI, commandConfigId, null, request, CommandConfigResponse.class);
+        CommandConfigResponse ccr = executeRequest(
+                Verb.PUT,
+                BASE_CONFIG_COMMAND_REST_URI,
+                id,
+                null,
+                request,
+                CommandConfigResponse.class);
 
-        if ((ccr.getCommandConfigs() == null) || (ccr.getCommandConfigs().length == 0)) {
-            String msg = "Unable to parse cluster config from response";
+        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
+            String msg = "Unable to parse command config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) command config
         return ccr.getCommandConfigs()[0];
     }
 
     /**
-     * Gets information for a given clusterConfigId.
+     * Gets information for a given configId.
      *
-     * @param clusterConfigId the cluster config id to get (can't be null)
-     * @return the cluster config for this clusterConfigId
+     * @param id the command configuration id to get (can't be null or empty)
+     * @return the command configuration for this id
      * @throws CloudServiceException
      */
-    public CommandConfig getCommandConfig(String clusterConfigId) throws CloudServiceException {
-        if (clusterConfigId == null) {
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Missing required parameter: clusterConfigId");
+    public CommandConfig getCommandConfig(final String id) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        CommandConfigResponse ccr = executeRequest(
+        final CommandConfigResponse ccr = executeRequest(
                 Verb.GET,
                 BASE_CONFIG_COMMAND_REST_URI,
-                clusterConfigId,
+                id,
                 null,
                 null,
                 CommandConfigResponse.class);
 
-        if ((ccr.getCommandConfigs() == null)
-                || (ccr.getCommandConfigs().length == 0)) {
-            String msg = "Unable to parse cluster config from response";
+        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
+            final String msg = "Unable to parse command config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) command config
         return ccr.getCommandConfigs()[0];
     }
 
     /**
-     * Gets a set of cluster configs for the given parameters.
+     * Gets a set of command configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
      *
      * More details on the parameters can be found on the Genie User Guide on
      * GitHub.
-     * @return array of cluster config elements that match the filter
+     * @return List of command configuration elements that match the filter
      * @throws CloudServiceException
      */
-    public CommandConfig[] getCommandConfigs(
-            Multimap<String, String> params) throws CloudServiceException {
-        CommandConfigResponse ccr = executeRequest(Verb.GET, BASE_CONFIG_COMMAND_REST_URI,
-                null, params, null, CommandConfigResponse.class);
+    public List<CommandConfig> getCommandConfigs(final Multimap<String, String> params)
+            throws CloudServiceException {
+        final CommandConfigResponse ccr = executeRequest(
+                Verb.GET,
+                BASE_CONFIG_COMMAND_REST_URI,
+                null,
+                params,
+                null,
+                CommandConfigResponse.class);
 
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
-        if ((ccr.getCommandConfigs() == null) || (ccr.getCommandConfigs().length == 0)) {
-            String msg = "Unable to parse cluster config from response";
+        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
+            final String msg = "Unable to parse command config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // if we get here, there are non-zero cluster config elements - return all
-        return ccr.getCommandConfigs();
+        // if we get here, there are non-zero command config elements - return all
+        return Arrays.asList(ccr.getCommandConfigs());
     }
 
     /**
-     * Delete a clusterConfig using its id.
+     * Delete a configuration using its id.
      *
-     * @param clusterConfigId the id for the cluster config to delete
-     * @return the deleted cluster config
+     * @param id the id for the command configuration to delete. Not null or
+     * empty.
+     * @return the deleted command configuration
      * @throws CloudServiceException
      */
-    public CommandConfig deleteCommandConfig(String clusterConfigId) throws CloudServiceException {
-        if (clusterConfigId == null) {
-            String msg = "Missing required parameter: clusterConfigId";
+    public CommandConfig deleteCommandConfig(final String id) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        CommandConfigResponse ccr = executeRequest(Verb.DELETE, BASE_CONFIG_COMMAND_REST_URI,
-                clusterConfigId, null, null, CommandConfigResponse.class);
+        CommandConfigResponse ccr = executeRequest(
+                Verb.DELETE,
+                BASE_CONFIG_COMMAND_REST_URI,
+                id,
+                null,
+                null,
+                CommandConfigResponse.class);
 
-        if ((ccr.getCommandConfigs() == null) || (ccr.getCommandConfigs().length == 0)) {
-            String msg = "Unable to parse cluster config from response";
+        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
+            String msg = "Unable to parse command config from response";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) command config
         return ccr.getCommandConfigs()[0];
+    }
+
+    /**
+     * Check to make sure that the required parameters exist.
+     *
+     * @param config The configuration to check
+     * @throws CloudServiceException
+     */
+    private void checkErrorConditions(final CommandConfig config) throws CloudServiceException {
+        if (config == null) {
+            final String msg = "Required parameter config can't be NULL";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final List<String> messages = new ArrayList<String>();
+        if (StringUtils.isEmpty(config.getUser())) {
+            messages.add("User name is missing and required.\n");
+        }
+        if (StringUtils.isEmpty(config.getName())) {
+            messages.add("The command name is empty but is required.\n");
+        }
+        if (config.getStatus() == null) {
+            messages.add("The command status is null and is required.\n");
+        }
+
+        if (!messages.isEmpty()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Command configuration errors:\n");
+            for (final String message : messages) {
+                builder.append(message);
+            }
+            final String msg = builder.toString();
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
     }
 }
