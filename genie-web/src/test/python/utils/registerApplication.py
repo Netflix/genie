@@ -47,7 +47,6 @@ def addApplicationConfigMr1():
             "name": "mapreduce1", 
             "status" : "active",
             "user" : "amsharma", 
-            "groupName" : "hadoop", 
             "version" : "1.0",
             "configs": ''' + configs + ''', 
             "jars": ''' + jars + ''' 
@@ -62,7 +61,7 @@ def addApplicationConfigMr2():
     print "Creating App mr2 "
     
     ID = "mr2"
-    configs = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/mapred-site.xml'])
+    configs = json.dumps(['s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml'])
     jars = json.dumps(['s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar'])
     
     payload = '''
@@ -73,7 +72,6 @@ def addApplicationConfigMr2():
             "name": "mapreduce2", 
             "status" : "active",
             "user" : "amsharma", 
-            "groupName" : "hadoop", 
             "version" : "2.4.0",
             "configs": ''' + configs + ''', 
             "jars": ''' + jars + ''' 
@@ -84,8 +82,54 @@ def addApplicationConfigMr2():
     print "\n"
     print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
 
+def addApplicationConfigTz1():
+    print "Creating App tz1"
+    
+    ID = "tz1"
+    payload = '''
+    {
+        "applicationConfig":
+        {
+            "id":"''' + ID +'''",
+            "name": "tez", 
+            "status" : "active",
+            "user" : "amsharma", 
+            "groupName" : "hadoop", 
+            "version" : "1.0"
+        }
+    }
+    '''
+
+    print payload
+    print "\n"
+    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
+def addApplicationConfigTz2():
+    print "Creating App tz2"
+    
+    ID = "tz2"
+    payload = '''
+    {
+        "applicationConfig":
+        {
+            "id":"''' + ID +'''",
+            "name": "tez", 
+            "status" : "active",
+            "user" : "amsharma", 
+            "groupName" : "hadoop", 
+            "version" : "2.0"
+        }
+    }
+    '''
+
+    print payload
+    print "\n"
+    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
 # driver method for all tests                
 if __name__ == "__main__":
    print "Creating Application Configs:\n"
-   addApplicationConfigMr1()
+   #addApplicationConfigMr1()
    addApplicationConfigMr2()
+   #addApplicationConfigTz1()
+   #addApplicationConfigTz2()

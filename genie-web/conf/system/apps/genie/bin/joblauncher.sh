@@ -71,7 +71,7 @@ function executeCommand {
 
     # Assuming cluster config files HAVE to be specified
     echo "Copying cluster Config files ..."
-    copyFiles "S3_CLUSTER_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+    copyFiles "$S3_CLUSTER_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
     checkError 204
     
     # Start Non-Generic Code 
@@ -93,19 +93,19 @@ function executeCommand {
 
     if [ -n "$S3_COMMAND_CONF_FILES" ]; then
         echo "Copying command Config files ..."
-        copyFiles "S3_COMMAND_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        copyFiles "$S3_COMMAND_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
         checkError 204
     fi
     
     if [ -n "$S3_APPLICATION_CONF_FILES" ]; then
         echo "Copying application Config files ..."
-        copyFiles "S3_APPLICATION_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        copyFiles "$S3_APPLICATION_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
         checkError 204
     fi
 
     if [ -n "$S3_APPLICATION_JAR_FILES" ]; then
         echo "Copying application jar files ..."
-        copyFiles "S3_APPLICATION_JAR_FILES" "file://$CURRENT_JOB_JAR_DIR"/
+        copyFiles "$S3_APPLICATION_JAR_FILES" "file://$CURRENT_JOB_JAR_DIR"/
         checkError 204
     fi
     
@@ -129,36 +129,36 @@ function setEnvVariables {
     if [ -n "$APPLICATION_ENV_FILE" ]
     then
         echo "Copy down and Source Application Env File"
-        #copyFiles "$APPLICATION_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        cp "$APPLICATION_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
+        copyFiles "$APPLICATION_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        #cp "$APPLICATION_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
         APP_FILENAME=`basename $APPLICATION_ENV_FILE`
         echo "App Env Filename: $APP_FILENAME"
-        #source "file://$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
         source "$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
+        #source "$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
         echo "$APPNAME"
     fi
 
     if [ -n "$COMMAND_ENV_FILE" ]
     then
         echo "Copy down and Source Command Env File"
-        #copyFiles "$COMMAND_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        cp "$COMMAND_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
+        copyFiles "$COMMAND_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        #cp "$COMMAND_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
         COMMAND_FILENAME=`basename $COMMAND_ENV_FILE`
         echo "Command Env Filename: $COMMAND_FILENAME"
-        #source "file://$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
         source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
+        #source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
         echo "$CMDNAME"
     fi
 
     if [ -n "$JOB_ENV_FILE" ]
     then
         echo "Copy down and Source Job File"
-        #copyFiles "$JOB_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        cp "$JOB_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
+        copyFiles "$JOB_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        #cp "$JOB_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
         JOB_FILENAME=`basename $JOB_ENV_FILE`
         echo "Job Env Filename: $JOB_FILENAME"
-        #source "file://$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
         source "$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
+        #source "$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
         echo "$JOBNAME"
     fi
 }

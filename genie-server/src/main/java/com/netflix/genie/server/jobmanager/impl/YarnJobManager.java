@@ -207,8 +207,10 @@ public class YarnJobManager implements JobManager {
 
         // set environment variables for the process
         Map<String, String> penv = pb.environment();
+        
         penv.putAll(env);
 
+        LOG.info("Setting job working dir , conf dir and jar dir");
         // setup env for current job, conf and jar directories directories
         penv.put("CURRENT_JOB_WORKING_DIR", cWorkingDir);
         penv.put("CURRENT_JOB_CONF_DIR", cWorkingDir + "/conf");
@@ -428,25 +430,41 @@ public class YarnJobManager implements JobManager {
         if (application != null) {
             ji2.setApplicationId(application.getId());
             ji2.setApplicationName(application.getName());
-            hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
-            hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
-            hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
+            
+            if((application.getConfigs() != null) && (!application.getConfigs().isEmpty())) {
+                hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
+            }
+            
+            if((application.getJars() != null) && (!application.getJars().isEmpty()))  {
+                hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
+            }
+            
+            if((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
+                hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
+            }
         }
 
         //CommandConfig ce = pmCommand.getEntity(cmdId, CommandConfig.class);
-        hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
+        if((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
+            hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
+        }
+
+        //TODO: cannot be null in config. check while creating
         this.executable = command.getExecutable();
 
         // save the cluster name and id
         ji2.setExecutionClusterName(cluster.getName());
         ji2.setExecutionClusterId(cluster.getId());
 
-        // Get envPropertyFile for command and job and read in
-        // properties and set it in the environment
-      
-        hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
-        hEnv.put("JOB_ENV_FILE", ji2.getEnvPropFile());
-
+        // Get envPropertyFile for command and job and set env variable
+        if((command.getEnvPropFile() != null) && (!command.getEnvPropFile().isEmpty())) {
+            hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
+        }
+        
+        if((ji2.getEnvPropFile() != null) && (!ji2.getEnvPropFile().isEmpty())) {
+            hEnv.put("JOB_ENV_FILE", ji2.getEnvPropFile());
+        }
+        
         // put the user name for hadoop to use
         hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
 
