@@ -54,6 +54,29 @@ def addCommandConfigProdhive11Mr1():
     print "\n"
     print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
 
+def addCommandConfigHadoop103():
+    print "Adding Command hadoop103"
+    ID = "hadoop103"
+    apps = json.dumps(['mr1'])
+    payload = '''
+    {
+        "commandConfig":
+        {
+            "id":"''' + ID +'''",
+            "name": "hadoop", 
+            "status" : "active",
+            "executable": "/apps/hadoop/1.0.3/bin/hadoop",
+            "user" : "amsharma", 
+            "version" : "1.0.3",
+            "appIds": ''' + apps + ''' 
+        }
+    }
+    '''
+
+    print payload
+    print "\n"
+    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
 def addCommandConfigProdhive11Mr2():
     print "Adding Command prodhive11_mr2"
     ID = "prodhive11_mr2"
@@ -94,7 +117,8 @@ def addCommandConfigPig11Mr1():
             "executable": "/apps/pig/0.11/bin/pig",
             "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr1/envFile.sh",
             "user" : "amsharma", 
-            "version" : "0.11"
+            "version" : "0.11",
+            "appIds": ''' + apps + ''' 
         }
     }
     '''
@@ -116,7 +140,8 @@ def addCommandConfigPig11Mr2():
             "executable": "/apps/pig/0.11-h2/bin/pig",
             "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr2/envFile.sh",
             "user" : "amsharma", 
-            "version" : "0.11-h2"
+            "version" : "0.11-h2",
+            "appIds": ''' + apps + ''' 
         }
     }
     '''
@@ -153,6 +178,7 @@ if __name__ == "__main__":
 
    #addCommandConfigProdhive11Mr1()
    #addCommandConfigProdhive11Mr2()
-   addCommandConfigPig11Mr1()
-   addCommandConfigPig11Mr2()
-   addCommandConfigPig13Mr2()
+   #addCommandConfigPig11Mr1()
+   #addCommandConfigPig11Mr2()
+   #addCommandConfigPig13Mr2()
+   addCommandConfigHadoop103()
