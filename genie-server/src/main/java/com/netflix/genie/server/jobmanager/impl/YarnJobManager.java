@@ -193,7 +193,7 @@ public class YarnJobManager implements JobManager {
 
         // set environment variables for the process
         Map<String, String> penv = pb.environment();
-        
+
         penv.putAll(env);
 
         LOG.info("Setting job working dir , conf dir and jar dir");
@@ -420,22 +420,22 @@ public class YarnJobManager implements JobManager {
         if (application != null) {
             ji2.setApplicationId(application.getId());
             ji2.setApplicationName(application.getName());
-            
-            if((application.getConfigs() != null) && (!application.getConfigs().isEmpty())) {
+
+            if ((application.getConfigs() != null) && (!application.getConfigs().isEmpty())) {
                 hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
             }
-            
-            if((application.getJars() != null) && (!application.getJars().isEmpty()))  {
+
+            if ((application.getJars() != null) && (!application.getJars().isEmpty())) {
                 hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
             }
-            
-            if((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
+
+            if ((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
                 hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
             }
         }
 
         //Command ce = pmCommand.getEntity(cmdId, Command.class);
-        if((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
+        if ((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
             hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
         }
 
@@ -447,14 +447,14 @@ public class YarnJobManager implements JobManager {
         ji2.setExecutionClusterId(cluster.getId());
 
         // Get envPropertyFile for command and job and set env variable
-        if((command.getEnvPropFile() != null) && (!command.getEnvPropFile().isEmpty())) {
+        if ((command.getEnvPropFile() != null) && (!command.getEnvPropFile().isEmpty())) {
             hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
         }
-        
-        if((ji2.getEnvPropFile() != null) && (!ji2.getEnvPropFile().isEmpty())) {
+
+        if ((ji2.getEnvPropFile() != null) && (!ji2.getEnvPropFile().isEmpty())) {
             hEnv.put("JOB_ENV_FILE", ji2.getEnvPropFile());
         }
-        
+
         // put the user name for hadoop to use
         hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
 

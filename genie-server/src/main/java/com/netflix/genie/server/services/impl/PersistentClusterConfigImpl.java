@@ -310,7 +310,6 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         // common error checks done - set update time before proceeding
         //Should now be done automatically by @PreUpdate but will leave just in case
 //        clusterConfig.setUpdateTime(System.currentTimeMillis());
-
         // handle POST and PUT differently
         if (method.equals(Verb.POST)) {
             LOG.info("GENIE: creating config for id: " + id);
@@ -456,9 +455,9 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             } else if ((applicationName != null) && (!applicationName.isEmpty())) {
                 builder.append(", IN(cmds.applications) apps ");
             }
-            
+
             builder.append(" where ");
-            
+
             ClusterCriteria cc = (ClusterCriteria) criteriaIter.next();
 
             for (int i = 0; i < cc.getTags().size(); i++) {

@@ -48,10 +48,10 @@ public final class JobManagerFactory {
     /**
      * Reference to the cluster load balancer implementation.
      */
-    private ClusterLoadBalancer clb;
+    private final ClusterLoadBalancer clb;
 
     /**
-     * Default constructor
+     * Default constructor.
      *
      * @throws CloudServiceException
      */
@@ -101,7 +101,7 @@ public final class JobManagerFactory {
      */
     private Cluster getCluster(final Job job) throws CloudServiceException {
         LOG.info("called");
-        
+
         if (job == null) {
             final String msg = "No job entered. Unable to continue";
             LOG.error(msg);
