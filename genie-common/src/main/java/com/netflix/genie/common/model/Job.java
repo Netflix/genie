@@ -177,12 +177,6 @@ public class Job extends Auditable implements Serializable {
     // TO BE GENERATED/USED BY SERVER
     // ------------------------------------------------------------------------
     /**
-     * Job type - e.g. hadoop, pig and hive (upper case in DB).
-     */
-    @Basic
-    private String jobType;
-
-    /**
      * PID for job - updated by the server.
      */
     @Basic
@@ -358,25 +352,6 @@ public class Job extends Auditable implements Serializable {
      */
     public void setClient(String client) {
         this.client = client;
-    }
-
-    /**
-     * Gets the type of job.
-     *
-     * @return jobType
-     */
-    public String getJobType() {
-        return jobType;
-    }
-
-    /**
-     * Sets the type of the job.
-     *
-     * @param jobType type of the job. Interpreted from the command and
-     * populated in this field.
-     */
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
     }
 
     /**

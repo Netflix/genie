@@ -91,6 +91,12 @@ public class Cluster extends Auditable implements Serializable {
     private String version;
 
     /**
+     * The class to use as the job manager for this cluster.
+     */
+    @Basic(optional = false)
+    private String jobManager;
+
+    /**
      * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
      */
     @Enumerated(EnumType.STRING)
@@ -211,6 +217,24 @@ public class Cluster extends Auditable implements Serializable {
      */
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    /**
+     * Get the job manager class to use for this cluster.
+     *
+     * @return The class to use
+     */
+    public String getJobManager() {
+        return this.jobManager;
+    }
+
+    /**
+     * Set the job manager class to use for this cluster.
+     *
+     * @param jobManager The job manager class to use
+     */
+    public void setJobManager(final String jobManager) {
+        this.jobManager = jobManager;
     }
 
     /**

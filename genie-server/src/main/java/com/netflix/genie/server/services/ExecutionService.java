@@ -68,7 +68,6 @@ public interface ExecutionService {
      * @param jobId id for job
      * @param jobName name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName user who submitted job
-     * @param jobType type of job - possible types Type.JobType
      * @param status status of job - possible types Type.JobStatus
      * @param clusterName name of cluster for job
      * @param clusterId id of cluster for job
@@ -76,6 +75,6 @@ public interface ExecutionService {
      * @param page page number for job
      * @return successful response, or one with HTTP error code
      */
-    JobResponse getJobs(String jobId, String jobName, String userName, String jobType,
+    JobResponse getJobs(String jobId, String jobName, String userName,
             String status, String clusterName, String clusterId, Integer limit, Integer page);
 }

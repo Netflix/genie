@@ -75,7 +75,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Create a new application configuration.
      *
-     * @param application the object encapsulating the new application 
+     * @param application the object encapsulating the new application
      * configuration to create
      *
      * @return extracted application config response
@@ -110,8 +110,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Create or update an application configuration.
      *
      * @param id the id for the application to create or update
-     * @param application the object encapsulating the new application
-     * to create
+     * @param application the object encapsulating the new application to create
      *
      * @return extracted application configuration response
      * @throws CloudServiceException
@@ -151,8 +150,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Gets information for a given id.
      *
-     * @param id the application id to get (can't be null or
-     * empty)
+     * @param id the application id to get (can't be null or empty)
      * @return the application for this id
      * @throws CloudServiceException
      */

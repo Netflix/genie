@@ -15,15 +15,10 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.jobmanager;
 
-import java.net.HttpURLConnection;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import org.junit.Test;
 
 /**
  * Basic tests for the JobManagerFactory.
@@ -31,17 +26,14 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  * @author skrishnan
  */
 public class TestJobManagerFactory {
-
     /**
-     * Tests whether an invalid job type throws an exception.
+     * Tests whether an invalid class name throws an exception.
+     *
+     * @throws com.netflix.genie.common.exceptions.CloudServiceException
      */
-    @Test
-    public void testInvalidJobType() {
-        try {
-            JobManagerFactory.getJobManager("NotSupported");
-        } catch (CloudServiceException cse) {
-            Assert.assertEquals(cse.getErrorCode(),
-                    HttpURLConnection.HTTP_BAD_REQUEST);
-        }
+    @Test(expected = CloudServiceException.class)
+    public void testInvalidClassName() throws CloudServiceException {
+        final JobManagerFactory factory = new JobManagerFactory();
+        factory.getJobManager(null);
     }
 }

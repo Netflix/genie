@@ -156,7 +156,6 @@ public class JobResourceV1 {
      * @param jobID id for job
      * @param jobName name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName user who submitted job
-     * @param jobType type of job - possible types Type.JobType
      * @param status status of job - possible types Type.JobStatus
      * @param clusterName the name of the cluster
      * @param clusterId the id of the cluster
@@ -169,7 +168,6 @@ public class JobResourceV1 {
     public Response getJobs(@QueryParam("jobID") String jobID,
             @QueryParam("jobName") String jobName,
             @QueryParam("userName") String userName,
-            @QueryParam("jobType") String jobType,
             @QueryParam("status") String status,
             @QueryParam("clusterName") String clusterName,
             @QueryParam("clusterId") String clusterId,
@@ -178,7 +176,7 @@ public class JobResourceV1 {
 
         LOG.info("called");
 
-        JobResponse response = xs.getJobs(jobID, jobName, userName, jobType, status, clusterName, clusterId, limit, page);
+        JobResponse response = xs.getJobs(jobID, jobName, userName, status, clusterName, clusterId, limit, page);
 
         return ResponseUtil.createResponse(response);
     }

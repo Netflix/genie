@@ -108,7 +108,6 @@ public class TestPersistenceManager {
         pm.createEntity(two);
         ClauseBuilder setCriteria = new ClauseBuilder(ClauseBuilder.COMMA);
         setCriteria.append("jobName='TEST_UPDATE'");
-        setCriteria.append("jobType='HADOOP'");
         ClauseBuilder queryCriteria = new ClauseBuilder(ClauseBuilder.AND);
         queryCriteria.append("jobName='UPDATE_TEST'");
         QueryBuilder qb = new QueryBuilder().table("Job")

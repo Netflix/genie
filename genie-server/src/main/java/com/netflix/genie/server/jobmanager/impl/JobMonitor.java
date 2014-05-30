@@ -188,10 +188,11 @@ public class JobMonitor extends Thread {
                     LOG.warn("Killing job " + job.getId() + " as its stdout is greater than limit");
                     // kill the job - no need to update status, as it will be updated during next iteration
                     try {
-                        JobManagerFactory.getJobManager(job.getJobType()).kill(job);
-                        terminated = true;
+                        final JobManagerFactory factory = new JobManagerFactory();
+                        factory.getJobManager(this.job).kill(this.job);
+                        this.terminated = true;
                     } catch (CloudServiceException e) {
-                        LOG.error("Can't kill job " + job.getId()
+                        LOG.error("Can't kill job " + this.job.getId()
                                 + " after exceeding stdout limit", e);
                         // continue - hoping that it can get cleaned up during next iteration
                     }
