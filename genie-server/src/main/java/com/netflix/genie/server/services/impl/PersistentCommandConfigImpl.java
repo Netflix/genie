@@ -1,6 +1,7 @@
 package com.netflix.genie.server.services.impl;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.persistence.EntityExistsException;
@@ -11,13 +12,16 @@ import org.slf4j.LoggerFactory;
 
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
+import com.netflix.genie.common.model.ApplicationConfig;
 import com.netflix.genie.common.model.CommandConfig;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.CommandConfigService;
+import com.netflix.genie.server.util.ResponseUtil;
 
 /**
  * Implementation of the PersistentCommandConfig interface.
@@ -230,6 +234,15 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             return ccr;
         }
 
+        // ensure that child command configs exist
+        try {
+            validateChildren(commandConfig);
+        } catch (CloudServiceException cse) {
+            ccr = new CommandConfigResponse(cse);
+            LOG.error(ccr.getErrorMsg(), cse);
+            return ccr;
+        }
+        
         // common error checks done - set update time before proceeding
         commandConfig.setUpdateTime(System.currentTimeMillis());
 
@@ -304,6 +317,25 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 return ccr;
             }
         }
+    }
+
+    private void validateChildren(CommandConfig commandConfig) 
+            throws CloudServiceException {
+
+        ArrayList<String> appIds = commandConfig.getAppIds();
+        PersistenceManager<ApplicationConfig> pma = new PersistenceManager<ApplicationConfig>();
+        ArrayList<ApplicationConfig> appList = new ArrayList<ApplicationConfig>();
+        
+        for (String appId: appIds) {
+            ApplicationConfig ae = (ApplicationConfig) pma.getEntity(appId, ApplicationConfig.class);
+            if (ae != null) {
+                appList.add(ae);
+            } else {
+                throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
+                        "Application Does Not Exist: {" + appId + "}");
+            }
+        }
+        commandConfig.setApplications(appList);
     }
 
     /**

@@ -396,28 +396,21 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             throws CloudServiceException {
 
         ArrayList<String> cmdIds = clusterConfigElement.getCmdIds();
-
-        if (cmdIds != null) {
-            PersistenceManager<CommandConfig> pma = new PersistenceManager<CommandConfig>();
-            ArrayList<CommandConfig> cmdList = new ArrayList<CommandConfig>();
-            Iterator<String> it = cmdIds.iterator();
-            while (it.hasNext()) {
-                String cmdId = (String) it.next();
-                CommandConfig cmde = (CommandConfig) pma.getEntity(cmdId, CommandConfig.class);
-                if (cmde != null) {
-                    cmdList.add(cmde);
-                } else {
-                    throw new CloudServiceException(
-                            HttpURLConnection.HTTP_BAD_REQUEST,
-                            "Command Does Not Exist: {" + cmdId + "}");
-                }
+        PersistenceManager<CommandConfig> pma = new PersistenceManager<CommandConfig>();
+        ArrayList<CommandConfig> cmdList = new ArrayList<CommandConfig>();
+            
+        for(String cmdId: cmdIds) {
+            CommandConfig cmde = (CommandConfig) pma.getEntity(cmdId, CommandConfig.class);
+            if (cmde != null) {
+                cmdList.add(cmde);
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        "Command Does Not Exist: {" + cmdId + "}");
             }
-            clusterConfigElement.setCommands(cmdList);
-        } else {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No commandId's specified for the cluster");
         }
+        
+        clusterConfigElement.setCommands(cmdList);
     }
 
     /*

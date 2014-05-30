@@ -115,44 +115,15 @@ public class CommandConfigResourceV1 {
     public Response createCommandConfig(CommandConfigRequest request) {
         LOG.info("called to create new cluster");
 
-        // Need to get the CommandConfig object and fetch the applcation objects from the DB
-        // to set it in the object.
-        CommandConfig ce = request.getCommandConfig();
-
-        if (ce == null) {
-            return ResponseUtil.createResponse(new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Missing commandConfig object.")));
-        }
-
-        ArrayList<String> appids = ce.getAppIds();
-
-        if (appids != null) {
-            PersistenceManager<ApplicationConfig> pma = new PersistenceManager<ApplicationConfig>();
-            ArrayList<ApplicationConfig> appList = new ArrayList<ApplicationConfig>();
-            Iterator<String> it = appids.iterator();
-            while (it.hasNext()) {
-                String appId = (String) it.next();
-                ApplicationConfig ae = (ApplicationConfig) pma.getEntity(appId, ApplicationConfig.class);
-                if (ae != null) {
-                    appList.add(ae);
-                } else {
-                    CommandConfigResponse acr = new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                            "Application Does Not Exist: {" + appId + "}"));
-                    return ResponseUtil.createResponse(acr);
-                }
-            }
-            ce.setApplications(appList);
-        }
-
-        CommandConfigResponse acr = ccs.createCommandConfig(request);
-        return ResponseUtil.createResponse(acr);
+        CommandConfigResponse ccr = ccs.createCommandConfig(request);
+        return ResponseUtil.createResponse(ccr);
     }
 
     /**
      * Insert/update command config.
      *
      * @param id unique id for config to upsert
-     * @param request contains the comamnd config element for update
+     * @param request contains the command config element for update
      * @return successful response, or one with an HTTP error code
      */
     @PUT
