@@ -74,7 +74,7 @@ public final class ExecutionServiceSampleClient {
         params.put("limit", "3");
         for (Job ji : client.getJobs(params)) {
             System.out.println("Job Info: {id, status, finishTime} - {"
-                    + ji.getJobID() + ", " + ji.getStatus() + ", "
+                    + ji.getId() + ", " + ji.getStatus() + ", "
                     + ji.getFinishTime() + "}");
         }
 
@@ -99,7 +99,7 @@ public final class ExecutionServiceSampleClient {
         jobInfo.setCmdArgs("-f hive.q");
         jobInfo = client.submitJob(jobInfo);
 
-        String jobID = jobInfo.getJobID();
+        String jobID = jobInfo.getId();
         String outputURI = jobInfo.getOutputURI();
         System.out.println("Job ID: " + jobID);
         System.out.println("Output URL: " + outputURI);

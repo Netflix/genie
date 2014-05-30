@@ -24,7 +24,7 @@ import java.util.Arrays;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import com.netflix.genie.common.model.ClusterConfig;
+import com.netflix.genie.common.model.Cluster;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 
@@ -41,7 +41,7 @@ public class ClusterConfigResponse extends BaseResponse {
 
     private String message;
 
-    private ClusterConfig[] clusterConfigs;
+    private Cluster[] clusterConfigs;
 
     /**
      * Constructor to be used if there is an error.
@@ -86,7 +86,7 @@ public class ClusterConfigResponse extends BaseResponse {
      */
     @XmlElementWrapper(name = "clusterConfigs")
     @XmlElement(name = "clusterConfig")
-    public ClusterConfig[] getClusterConfigs() {
+    public Cluster[] getClusterConfigs() {
         if (clusterConfigs == null) {
             return null;
         } else {
@@ -100,7 +100,7 @@ public class ClusterConfigResponse extends BaseResponse {
      * @param inClusterConfigs
      *            array of cluster config elements for this response
      */
-    public void setClusterConfigs(ClusterConfig[] inClusterConfigs) {
+    public void setClusterConfigs(Cluster[] inClusterConfigs) {
         if (inClusterConfigs == null) {
             this.clusterConfigs = null;
         } else {

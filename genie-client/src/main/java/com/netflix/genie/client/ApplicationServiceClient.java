@@ -22,7 +22,7 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ApplicationConfigRequest;
 import com.netflix.genie.common.messages.ApplicationConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfig;
+import com.netflix.genie.common.model.Application;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -38,35 +38,35 @@ import org.slf4j.LoggerFactory;
  *
  * @author tgianos
  */
-public final class ApplicationConfigServiceClient extends BaseGenieClient {
+public final class ApplicationServiceClient extends BaseGenieClient {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(ApplicationConfigServiceClient.class);
+            .getLogger(ApplicationServiceClient.class);
 
     private static final String BASE_CONFIG_APPLICATION_REST_URI
             = BASE_REST_URI + "config/application";
 
     // reference to the instance object
-    private static ApplicationConfigServiceClient instance;
+    private static ApplicationServiceClient instance;
 
     /**
      * Private constructor for singleton class.
      *
      * @throws IOException if there is any error during initialization
      */
-    private ApplicationConfigServiceClient() throws IOException {
+    private ApplicationServiceClient() throws IOException {
         super();
     }
 
     /**
      * Returns the singleton instance that can be used by clients.
      *
-     * @return ApplicationConfigServiceClient instance
+     * @return ApplicationServiceClient instance
      * @throws IOException if there is an error instantiating client
      */
-    public static synchronized ApplicationConfigServiceClient getInstance() throws IOException {
+    public static synchronized ApplicationServiceClient getInstance() throws IOException {
         if (instance == null) {
-            instance = new ApplicationConfigServiceClient();
+            instance = new ApplicationServiceClient();
         }
 
         return instance;
@@ -75,18 +75,18 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     /**
      * Create a new application configuration.
      *
-     * @param config the object encapsulating the new application config to
-     * create
+     * @param application the object encapsulating the new application 
+     * configuration to create
      *
      * @return extracted application config response
      * @throws CloudServiceException
      */
-    public ApplicationConfig createApplicationConfig(final ApplicationConfig config)
+    public Application createApplication(final Application application)
             throws CloudServiceException {
-        checkErrorConditions(config);
+        checkErrorConditions(application);
 
         final ApplicationConfigRequest request = new ApplicationConfigRequest();
-        request.setApplicationConfig(config);
+        request.setApplicationConfig(application);
 
         final ApplicationConfigResponse ccr = executeRequest(
                 Verb.POST,
@@ -109,14 +109,14 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     /**
      * Create or update an application configuration.
      *
-     * @param id the id for the application configuration to create or update
-     * @param config the object encapsulating the new application configuration
+     * @param id the id for the application to create or update
+     * @param application the object encapsulating the new application
      * to create
      *
      * @return extracted application configuration response
      * @throws CloudServiceException
      */
-    public ApplicationConfig updateApplicationConfig(final String id, final ApplicationConfig config)
+    public Application updateApplication(final String id, final Application application)
             throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             final String msg = "Required parameter id is missing. Unable to update.";
@@ -125,10 +125,10 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
         }
         //Check to make sure we have all the parameters we need for a valid
         //application config
-        checkErrorConditions(config);
+        checkErrorConditions(application);
 
         final ApplicationConfigRequest request = new ApplicationConfigRequest();
-        request.setApplicationConfig(config);
+        request.setApplicationConfig(application);
 
         ApplicationConfigResponse ccr = executeRequest(
                 Verb.PUT,
@@ -151,12 +151,12 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     /**
      * Gets information for a given id.
      *
-     * @param id the application configuration id to get (can't be null or
+     * @param id the application id to get (can't be null or
      * empty)
-     * @return the application configuration for this id
+     * @return the application for this id
      * @throws CloudServiceException
      */
-    public ApplicationConfig getApplicationConfig(final String id) throws CloudServiceException {
+    public Application getApplication(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             final String msg = "Required parameter id is missing. Unable to get.";
             LOG.error(msg);
@@ -191,7 +191,7 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
      * @return List of application configuration elements that match the filter
      * @throws CloudServiceException
      */
-    public List<ApplicationConfig> getApplicationConfigs(final Multimap<String, String> params)
+    public List<Application> getApplications(final Multimap<String, String> params)
             throws CloudServiceException {
         final ApplicationConfigResponse ccr = executeRequest(
                 Verb.GET,
@@ -216,18 +216,18 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     /**
      * Delete an application configuration using its id.
      *
-     * @param id the id for the application configuration to delete
-     * @return the deleted application configuration
+     * @param id the id for the application to delete
+     * @return the deleted application
      * @throws CloudServiceException
      */
-    public ApplicationConfig deleteApplicationConfig(final String id) throws CloudServiceException {
+    public Application deleteApplication(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        ApplicationConfigResponse ccr = executeRequest(
+        final ApplicationConfigResponse ccr = executeRequest(
                 Verb.DELETE,
                 BASE_CONFIG_APPLICATION_REST_URI,
                 id,
@@ -248,24 +248,24 @@ public final class ApplicationConfigServiceClient extends BaseGenieClient {
     /**
      * Check to make sure that the required parameters exist.
      *
-     * @param config The configuration to check
+     * @param application The applications to check
      * @throws CloudServiceException
      */
-    private void checkErrorConditions(final ApplicationConfig config) throws CloudServiceException {
-        if (config == null) {
+    private void checkErrorConditions(final Application application) throws CloudServiceException {
+        if (application == null) {
             final String msg = "Required parameter config can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(config.getUser())) {
+        if (StringUtils.isEmpty(application.getUser())) {
             messages.add("User name is missing and is required. Unable to create.\n");
         }
-        if (StringUtils.isEmpty(config.getName())) {
+        if (StringUtils.isEmpty(application.getName())) {
             messages.add("Application name is missing and is required. Unable to create.\n");
         }
-        if (config.getStatus() == null) {
+        if (application.getStatus() == null) {
             messages.add("No application status entered. Required to create\n");
         }
 

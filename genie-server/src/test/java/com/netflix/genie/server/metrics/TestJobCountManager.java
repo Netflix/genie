@@ -46,7 +46,7 @@ public class TestJobCountManager {
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
         Job job = new Job();
         UUID uuid = UUID.randomUUID();
-        job.setJobID(uuid.toString());
+        job.setId(uuid.toString());
         job.setJobName("My test job");
         job.setStatus(JobStatus.RUNNING);
         job.setHostName(NetUtil.getHostName());

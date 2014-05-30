@@ -144,14 +144,14 @@ public class JobMonitor extends Thread {
             try {
                 Thread.sleep(JOB_WAIT_TIME_MS);
             } catch (InterruptedException e) {
-                LOG.error("Exception while waiting for job " + job.getJobID()
+                LOG.error("Exception while waiting for job " + job.getId()
                         + " to finish", e);
                 // move on
             }
 
             // update status only in JOB_UPDATE_TIME_MS intervals
             if (shouldUpdateJob()) {
-                LOG.debug("Updating db for job: " + job.getJobID());
+                LOG.debug("Updating db for job: " + job.getId());
 
                 lastUpdatedTimeMS = System.currentTimeMillis();
                 job.setJobStatus(JobStatus.RUNNING, "Job is running");
@@ -161,7 +161,7 @@ public class JobMonitor extends Thread {
                 ReentrantReadWriteLock rwl = PersistenceManager.getDbLock();
                 try {
                     rwl.writeLock().lock();
-                    Job dbJI = pm.getEntity(job.getJobID(),
+                    Job dbJI = pm.getEntity(job.getId(),
                             Job.class);
                     if ((dbJI.getStatus() != null)
                             && dbJI.getStatus() != JobStatus.KILLED) {
@@ -170,7 +170,7 @@ public class JobMonitor extends Thread {
                 } catch (Exception e) {
                     LOG.error(
                             "Exception while trying to update status for job: "
-                            + job.getJobID(), e);
+                            + job.getId(), e);
                     // continue - as we shouldn't terminate this thread until
                     // job is running
                 } finally {
@@ -185,13 +185,13 @@ public class JobMonitor extends Thread {
                 if ((stdOutFile != null) && (stdOutFile.exists())
                         && (maxStdoutSize != null) && (stdOutFile.length() > maxStdoutSize)
                         && (!terminated)) {
-                    LOG.warn("Killing job " + job.getJobID() + " as its stdout is greater than limit");
+                    LOG.warn("Killing job " + job.getId() + " as its stdout is greater than limit");
                     // kill the job - no need to update status, as it will be updated during next iteration
                     try {
                         JobManagerFactory.getJobManager(job.getJobType()).kill(job);
                         terminated = true;
                     } catch (CloudServiceException e) {
-                        LOG.error("Can't kill job " + job.getJobID()
+                        LOG.error("Can't kill job " + job.getId()
                                 + " after exceeding stdout limit", e);
                         // continue - hoping that it can get cleaned up during next iteration
                     }
@@ -223,7 +223,7 @@ public class JobMonitor extends Thread {
             // acquire a write lock first
             rwl.writeLock().lock();
 
-            Job dbJI = pm.getEntity(job.getJobID(),
+            Job dbJI = pm.getEntity(job.getId(),
                     Job.class);
 
             // only update status if not KILLED
@@ -252,7 +252,7 @@ public class JobMonitor extends Thread {
 
                 // set the archive location - if needed
                 if (!job.isDisableLogArchival()) {
-                    job.setArchiveLocation(NetUtil.getArchiveURI(job.getJobID()));
+                    job.setArchiveLocation(NetUtil.getArchiveURI(job.getId()));
                 }
 
                 // update the job status
@@ -261,7 +261,7 @@ public class JobMonitor extends Thread {
             } else {
                 // if job status is killed, the kill thread will update status
                 LOG.debug("Job has been killed - will not update DB: "
-                        + job.getJobID());
+                        + job.getId());
                 killed = true;
                 rwl.writeLock().unlock();
             }
@@ -378,7 +378,7 @@ public class JobMonitor extends Thread {
             // Now set the actual message
             String body = "Your Genie Job is complete\n\n"
                     + "Job ID: "
-                    + job.getJobID()
+                    + job.getId()
                     + "\n"
                     + "Job Name: "
                     + job.getJobName()

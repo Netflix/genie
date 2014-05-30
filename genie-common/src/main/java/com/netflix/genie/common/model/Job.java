@@ -26,7 +26,6 @@ import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -36,23 +35,18 @@ import org.apache.commons.lang.StringUtils;
  * Representation of the state of a Genie 2.0 job.
  *
  * @author amsharma
+ * @author tgianos
  */
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class Job implements Serializable {
+public class Job extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 2979506788441089067L;
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
     // ------------------------------------------------------------------------
-    /**
-     * User-specified or system-generated unique job id.
-     */
-    @Id
-    private String jobID;
-
     /**
      * User-specified or system-generated job name.
      */
@@ -109,8 +103,7 @@ public class Job implements Serializable {
 
     /**
      * String representation of the the cluster criteria array list object
-     * above.
-     * TODO: use pre/post persist to store the above list into the DB
+     * above. TODO: use pre/post persist to store the above list into the DB
      */
     @Lob
     private String clusterCriteriaString;
@@ -269,21 +262,10 @@ public class Job implements Serializable {
     private String archiveLocation;
 
     /**
-     * Gets the id (primary key) for this job.
-     *
-     * @return jobID
+     * Default Constructor.
      */
-    public String getJobID() {
-        return jobID;
-    }
-
-    /**
-     * Sets the id (primary key) for this job.
-     *
-     * @param jobID unique id for this job
-     */
-    public void setJobID(String jobID) {
-        this.jobID = jobID;
+    public Job() {
+        super();
     }
 
     /**

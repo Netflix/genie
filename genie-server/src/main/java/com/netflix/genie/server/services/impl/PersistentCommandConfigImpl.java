@@ -13,11 +13,12 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
-import com.netflix.genie.common.model.CommandConfig;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.CommandConfigService;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Implementation of the PersistentCommandConfig interface.
@@ -29,14 +30,14 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
     private static final Logger LOG = LoggerFactory
             .getLogger(PersistentCommandConfigImpl.class);
 
-    private final PersistenceManager<CommandConfig> pm;
+    private final PersistenceManager<Command> pm;
 
     /**
      * Default constructor.
      */
     public PersistentCommandConfigImpl() {
         // instantiate PersistenceManager
-        pm = new PersistenceManager<CommandConfig>();
+        pm = new PersistenceManager<Command>();
     }
 
     /**
@@ -66,7 +67,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
                 // Perform a simple query for all the entities
                 QueryBuilder builder = new QueryBuilder()
-                        .table("CommandConfig");
+                        .table("Command");
 
                 results = pm.query(builder);
 
@@ -88,7 +89,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
                 // Get all the results as an array
                 QueryBuilder builder = new QueryBuilder().table(
-                        "CommandConfig").clause(criteria.toString());
+                        "Command").clause(criteria.toString());
                 results = pm.query(builder);
             }
 
@@ -102,9 +103,9 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 ccr.setMessage("Returning commandConfigs for input parameters");
             }
 
-            CommandConfig[] elements = new CommandConfig[results.length];
+            Command[] elements = new Command[results.length];
             for (int i = 0; i < elements.length; i++) {
-                elements[i] = (CommandConfig) results[i];
+                elements[i] = (Command) results[i];
             }
             ccr.setCommandConfigs(elements);
             return ccr;
@@ -158,8 +159,8 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
             try {
                 // delete the entity
-                CommandConfig element = pm.deleteEntity(id,
-                        CommandConfig.class);
+                Command element = pm.deleteEntity(id,
+                        Command.class);
 
                 if (element == null) {
                     ccr = new CommandConfigResponse(new CloudServiceException(
@@ -172,7 +173,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                     ccr = new CommandConfigResponse();
                     ccr.setMessage("Successfully deleted commandConfig for id: "
                             + id);
-                    CommandConfig[] elements = new CommandConfig[]{element};
+                    Command[] elements = new Command[]{element};
                     ccr.setCommandConfigs(elements);
                     return ccr;
                 }
@@ -194,7 +195,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             Verb method) {
         LOG.info("called");
         CommandConfigResponse ccr = null;
-        CommandConfig commandConfig = request.getCommandConfig();
+        Command commandConfig = request.getCommandConfig();
 
         // ensure that the element is not null
         if (commandConfig == null) {
@@ -231,7 +232,8 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         }
 
         // common error checks done - set update time before proceeding
-        commandConfig.setUpdateTime(System.currentTimeMillis());
+        //Should now be done automatically by @PreUpdate but will leave just in case
+//        commandConfig.setUpdateTime(System.currentTimeMillis());
 
         // handle POST and PUT differently
         if (method.equals(Verb.POST)) {
@@ -251,7 +253,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 // create a response
                 ccr = new CommandConfigResponse();
                 ccr.setMessage("Successfully created commandConfig for id: " + id);
-                ccr.setCommandConfigs(new CommandConfig[]{commandConfig});
+                ccr.setCommandConfigs(new Command[]{commandConfig});
                 return ccr;
             } catch (RollbackException e) {
                 LOG.error(e.getMessage(), e);
@@ -259,7 +261,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                     // most likely entity already exists - return useful message
                     ccr = new CommandConfigResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_CONFLICT,
-                            "CommandConfig already exists for id: " + id
+                            "Command already exists for id: " + id
                             + ", use PUT to update config"));
                     return ccr;
                 } else {
@@ -276,8 +278,8 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             LOG.info("GENIE: updating config for id: " + id);
 
             try {
-                CommandConfig old = pm.getEntity(id,
-                        CommandConfig.class);
+                Command old = pm.getEntity(id,
+                        Command.class);
                 // check if this is a create or an update
                 if (old == null) {
                     try {
@@ -293,7 +295,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                 // all good - create a response
                 ccr = new CommandConfigResponse();
                 ccr.setMessage("Successfully updated commandConfig for id: " + id);
-                ccr.setCommandConfigs(new CommandConfig[]{commandConfig});
+                ccr.setCommandConfigs(new Command[]{commandConfig});
                 return ccr;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
@@ -313,7 +315,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
      * @throws CloudServiceException if some params commandConfig are missing - else
      * initialize, and set creation time
      */
-    private void initAndValidateNewElement(CommandConfig commandConfig)
+    private void initAndValidateNewElement(Command commandConfig)
             throws CloudServiceException {
 
         // basic error checking
@@ -321,11 +323,9 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
         //ArrayList<String> configs = commandConfigElement.getConfigs();
 
         //TODO Should we allow configs to be null?
-        if ((name == null)) {
+        if (StringUtils.isEmpty(name)) {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Need all required params: {name}");
-        } else {
-            commandConfig.setCreateTime(commandConfig.getUpdateTime());
         }
     }
 }

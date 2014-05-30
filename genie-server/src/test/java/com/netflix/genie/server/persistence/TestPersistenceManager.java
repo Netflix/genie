@@ -43,13 +43,13 @@ public class TestPersistenceManager {
         Job initial = new Job();
         UUID uuid = UUID.randomUUID();
         initial.setJobName("My test job");
-        initial.setJobID(uuid.toString());
+        initial.setId(uuid.toString());
         initial.setUserName("myUserName");
         initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
         Job result = pm.getEntity(uuid.toString(),
                 Job.class);
-        Assert.assertEquals(initial.getJobID(), result.getJobID());
+        Assert.assertEquals(initial.getId(), result.getId());
     }
 
     /**
@@ -60,7 +60,7 @@ public class TestPersistenceManager {
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
         Job initial = new Job();
         UUID uuid = UUID.randomUUID();
-        initial.setJobID(uuid.toString());
+        initial.setId(uuid.toString());
         initial.setUserName("myUserName");
         initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
@@ -77,7 +77,7 @@ public class TestPersistenceManager {
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
         Job initial = new Job();
         UUID uuid = UUID.randomUUID();
-        initial.setJobID(uuid.toString());
+        initial.setId(uuid.toString());
         initial.setUserName("myUserName");
         initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
@@ -96,13 +96,13 @@ public class TestPersistenceManager {
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
         Job one = new Job();
         one.setJobName("UPDATE_TEST");
-        one.setJobID(UUID.randomUUID().toString());
+        one.setId(UUID.randomUUID().toString());
         one.setUserName("myUserName");
         one.setCmdArgs("commandArg");
         pm.createEntity(one);
         Job two = new Job();
         two.setJobName("UPDATE_TEST");
-        two.setJobID(UUID.randomUUID().toString());
+        two.setId(UUID.randomUUID().toString());
         two.setUserName("myUserName2");
         two.setCmdArgs("commandArg2");
         pm.createEntity(two);
@@ -128,7 +128,7 @@ public class TestPersistenceManager {
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
         Job initial = new Job();
         UUID uuid = UUID.randomUUID();
-        initial.setJobID(uuid.toString());
+        initial.setId(uuid.toString());
         initial.setJobName("My test job");
         initial.setJobStatus(JobStatus.FAILED);
         initial.setUpdateTime(System.currentTimeMillis());
@@ -136,7 +136,7 @@ public class TestPersistenceManager {
         initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
         ClauseBuilder cb = new ClauseBuilder(ClauseBuilder.AND);
-        cb.append("jobID='" + initial.getJobID() + "'");
+        cb.append("id='" + initial.getId() + "'");
         cb.append("userName='myUserName'");
         QueryBuilder qb = new QueryBuilder().table("Job").clause(
                 cb.toString());

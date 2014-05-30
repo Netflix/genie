@@ -194,7 +194,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                     // most likely entity already exists - return useful message
                     response = new JobResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_CONFLICT,
-                            "Job already exists for id: " + jInfo.getJobID()));
+                            "Job already exists for id: " + jInfo.getId()));
                     return response;
                 } else {
                     // unknown exception - send it back
@@ -218,12 +218,12 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             pm.updateEntity(jInfo);
 
             // verification
-            jInfo = pm.getEntity(jInfo.getJobID(), Job.class);
+            jInfo = pm.getEntity(jInfo.getId(), Job.class);
 
             // return successful response
             response = new JobResponse();
             response.setMessage("Successfully launched job: "
-                    + jInfo.getJobID());
+                    + jInfo.getId());
             response.setJob(jInfo);
             return response;
         } catch (final CloudServiceException e) {
@@ -273,7 +273,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             response = new JobResponse();
             response.setJob(jInfo);
             response.setMessage("Returning job information for: "
-                    + jInfo.getJobID());
+                    + jInfo.getId());
             return response;
         }
     }
@@ -579,9 +579,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         validateNameValuePair("jobType", jobInfo.getJobType());
 
         // generate job id, if need be
-        if (jobInfo.getJobID() == null || jobInfo.getJobID().isEmpty()) {
+        if (jobInfo.getId() == null || jobInfo.getId().isEmpty()) {
             UUID uuid = UUID.randomUUID();
-            jobInfo.setJobID(uuid.toString());
+            jobInfo.setId(uuid.toString());
         }
 
         jobInfo.setJobStatus(JobStatus.INIT, "Initializing job");
@@ -615,9 +615,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
     private void buildJobURIs(Job ji) throws CloudServiceException {
         ji.setHostName(NetUtil.getHostName());
         ji.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/"
-                + ji.getJobID());
+                + ji.getId());
         ji.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/"
-                + ji.getJobID());
+                + ji.getId());
     }
 
     private String getEndPoint() throws CloudServiceException {

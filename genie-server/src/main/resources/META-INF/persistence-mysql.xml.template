@@ -39,9 +39,10 @@
 
     <!-- We must enumerate each entity in the persistence unit -->
 	<class>com.netflix.genie.common.model.Job</class>
-	<class>com.netflix.genie.common.model.ClusterConfig</class>
-	<class>com.netflix.genie.common.model.CommandConfig</class>
-	<class>com.netflix.genie.common.model.ApplicationConfig</class>
+	<class>com.netflix.genie.common.model.Cluster</class>
+	<class>com.netflix.genie.common.model.Command</class>
+	<class>com.netflix.genie.common.model.Application</class>
+    <class>com.netflix.genie.common.model.Auditable</class>
     
     <properties>
       <!-- properties for MySQL -->

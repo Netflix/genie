@@ -69,3 +69,5 @@ atlassian-ide-plugin.xml
 .nbattrs
 .nb-gradle-properties
 .nb-gradle/
+/private
+*/private

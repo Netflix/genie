@@ -29,26 +29,20 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
  * Representation of the state of Application Config object.
  *
  * @author amsharma
+ * @author tgianos
  */
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class ApplicationConfig implements Serializable {
+public class Application extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Unique ID to represent a row in database - e.g. mr1,mr2, tz1 etc.
-     */
-    @Id
-    private String id;
 
     /**
      * Name of this application - e.g. mapredue1, mapreduce2, tez etc.
@@ -87,18 +81,6 @@ public class ApplicationConfig implements Serializable {
     private String version;
 
     /**
-     * When was this created?
-     */
-    @Basic
-    private Long createTime;
-
-    /**
-     * When was this last updated?
-     */
-    @Basic
-    private Long updateTime;
-
-    /**
      * Users can specify a property file location with environment variables.
      */
     @Basic
@@ -107,25 +89,8 @@ public class ApplicationConfig implements Serializable {
     /**
      * Default constructor.
      */
-    public ApplicationConfig() {
-    }
-
-    /**
-     * Gets the id (primary key) for this application.
-     *
-     * @return id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Sets the id (primary key) for this application.
-     *
-     * @param id unique id for this cluster
-     */
-    public void setId(String id) {
-        this.id = id;
+    public Application() {
+        super();
     }
 
     /**
@@ -236,43 +201,6 @@ public class ApplicationConfig implements Serializable {
      */
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    /**
-     * Gets the create time for this application.
-     *
-     * @return createTime - epoch time of creation in milliseconds
-     *
-     */
-    public Long getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * Sets the create time for this application.
-     *
-     * @param createTime epoch time in ms
-     */
-    public void setCreateTime(Long createTime) {
-        this.createTime = createTime;
-    }
-
-    /**
-     * Gets the last updated time for this application.
-     *
-     * @return updateTime - epoch time of update in milliseconds
-     */
-    public Long getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * Sets the updated time for this application.
-     *
-     * @param updateTime epoch time in milliseconds
-     */
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
     }
 
     /**

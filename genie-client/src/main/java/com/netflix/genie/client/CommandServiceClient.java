@@ -22,7 +22,7 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
-import com.netflix.genie.common.model.CommandConfig;
+import com.netflix.genie.common.model.Command;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -38,23 +38,23 @@ import org.slf4j.LoggerFactory;
  *
  * @author tgianos
  */
-public final class CommandConfigServiceClient extends BaseGenieClient {
+public final class CommandServiceClient extends BaseGenieClient {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(CommandConfigServiceClient.class);
+            .getLogger(CommandServiceClient.class);
 
     private static final String BASE_CONFIG_COMMAND_REST_URI
             = BASE_REST_URI + "config/command";
 
     // reference to the instance object
-    private static CommandConfigServiceClient instance;
+    private static CommandServiceClient instance;
 
     /**
      * Private constructor for singleton class.
      *
      * @throws IOException if there is any error during initialization
      */
-    private CommandConfigServiceClient() throws IOException {
+    private CommandServiceClient() throws IOException {
         super();
     }
 
@@ -64,9 +64,9 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
      * @return ExecutionServiceClient instance
      * @throws IOException if there is an error instantiating client
      */
-    public static synchronized CommandConfigServiceClient getInstance() throws IOException {
+    public static synchronized CommandServiceClient getInstance() throws IOException {
         if (instance == null) {
-            instance = new CommandConfigServiceClient();
+            instance = new CommandServiceClient();
         }
 
         return instance;
@@ -75,18 +75,18 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
     /**
      * Create a new command configuration.
      *
-     * @param config the object encapsulating the new Cluster configuration to
+     * @param command the object encapsulating the new Cluster configuration to
      * create
      *
      * @return extracted command configuration response
      * @throws CloudServiceException
      */
-    public CommandConfig createCommandConfig(final CommandConfig config)
+    public Command createCommand(final Command command)
             throws CloudServiceException {
-        checkErrorConditions(config);
+        checkErrorConditions(command);
 
         final CommandConfigRequest request = new CommandConfigRequest();
-        request.setCommandConfig(config);
+        request.setCommandConfig(command);
 
         CommandConfigResponse ccr = executeRequest(
                 Verb.POST,
@@ -111,23 +111,23 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
      * Create or update a command configuration.
      *
      * @param id the id for the command configuration to create or update
-     * @param config the object encapsulating the new Cluster configuration to
+     * @param command the object encapsulating the new Cluster configuration to
      * create
      *
      * @return extracted command configuration response
      * @throws CloudServiceException
      */
-    public CommandConfig updateCommandConfig(final String id, final CommandConfig config)
+    public Command updateCommand(final String id, final Command command)
             throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             String msg = "Required parameter id can't be null or empty.";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        checkErrorConditions(config);
+        checkErrorConditions(command);
 
         final CommandConfigRequest request = new CommandConfigRequest();
-        request.setCommandConfig(config);
+        request.setCommandConfig(command);
 
         CommandConfigResponse ccr = executeRequest(
                 Verb.PUT,
@@ -154,7 +154,7 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
      * @return the command configuration for this id
      * @throws CloudServiceException
      */
-    public CommandConfig getCommandConfig(final String id) throws CloudServiceException {
+    public Command getCommand(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -189,7 +189,7 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
      * @return List of command configuration elements that match the filter
      * @throws CloudServiceException
      */
-    public List<CommandConfig> getCommandConfigs(final Multimap<String, String> params)
+    public List<Command> getCommands(final Multimap<String, String> params)
             throws CloudServiceException {
         final CommandConfigResponse ccr = executeRequest(
                 Verb.GET,
@@ -219,7 +219,7 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
      * @return the deleted command configuration
      * @throws CloudServiceException
      */
-    public CommandConfig deleteCommandConfig(final String id) throws CloudServiceException {
+    public Command deleteCommand(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -247,24 +247,24 @@ public final class CommandConfigServiceClient extends BaseGenieClient {
     /**
      * Check to make sure that the required parameters exist.
      *
-     * @param config The configuration to check
+     * @param command The configuration to check
      * @throws CloudServiceException
      */
-    private void checkErrorConditions(final CommandConfig config) throws CloudServiceException {
-        if (config == null) {
-            final String msg = "Required parameter config can't be NULL";
+    private void checkErrorConditions(final Command command) throws CloudServiceException {
+        if (command == null) {
+            final String msg = "Required parameter command can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(config.getUser())) {
+        if (StringUtils.isEmpty(command.getUser())) {
             messages.add("User name is missing and required.\n");
         }
-        if (StringUtils.isEmpty(config.getName())) {
+        if (StringUtils.isEmpty(command.getName())) {
             messages.add("The command name is empty but is required.\n");
         }
-        if (config.getStatus() == null) {
+        if (command.getStatus() == null) {
             messages.add("The command status is null and is required.\n");
         }
 

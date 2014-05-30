@@ -3,9 +3,9 @@ package com.netflix.genie.server.jobmanager.impl;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfig;
-import com.netflix.genie.common.model.ClusterConfig;
-import com.netflix.genie.common.model.CommandConfig;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
@@ -40,7 +40,7 @@ public class YarnJobManager implements JobManager {
     private static final Logger LOG = LoggerFactory
             .getLogger(YarnJobManager.class);
 
-    private final PersistenceManager<CommandConfig> pmCommand;
+    private final PersistenceManager<Command> pmCommand;
 
     /**
      * The name of the Genie job id property to be passed to all jobs.
@@ -81,7 +81,7 @@ public class YarnJobManager implements JobManager {
     /**
      * Reference to the cluster config element to run the job on.
      */
-    protected ClusterConfig cluster;
+    protected Cluster cluster;
 
     /**
      * Default group name for job submissions.
@@ -104,7 +104,7 @@ public class YarnJobManager implements JobManager {
     protected Job ji;
 
     /**
-     * Actual command to run determined from the CommandConfig selected.
+     * Actual command to run determined from the Command selected.
      */
     protected String executable;
 
@@ -117,7 +117,7 @@ public class YarnJobManager implements JobManager {
     public YarnJobManager() throws CloudServiceException {
         ccs = ConfigServiceFactory.getClusterConfigImpl();
         clb = ConfigServiceFactory.getClusterLoadBalancer();
-        pmCommand = new PersistenceManager<CommandConfig>();
+        pmCommand = new PersistenceManager<Command>();
     }
 
     /**
@@ -138,7 +138,7 @@ public class YarnJobManager implements JobManager {
 
         // set current working directory for the process
         String cWorkingDir = env.get("BASE_USER_WORKING_DIR") + File.separator
-                + ji.getJobID();
+                + ji.getId();
         File userJobDir = new File(cWorkingDir);
 
         // check if working directory already exists
@@ -299,7 +299,7 @@ public class YarnJobManager implements JobManager {
     protected void init(Job ji2) throws CloudServiceException {
         LOG.info("called");
 
-        genieJobIDProp = GENIE_JOB_ID + "=" + ji2.getJobID();
+        genieJobIDProp = GENIE_JOB_ID + "=" + ji2.getId();
         netflixEnvProp = NFLX_ENV + "="
                 + ConfigurationManager.getConfigInstance().getString(
                         "netflix.environment");
@@ -345,8 +345,8 @@ public class YarnJobManager implements JobManager {
 
         hEnv.put("S3_CLUSTER_CONF_FILES", convertListToCSV(clusterConfigList));
 
-        CommandConfig command = null;
-        ApplicationConfig application = null;
+        Command command = null;
+        Application application = null;
         boolean done = false;
 
         // If Command Id is specified use directly.
@@ -356,8 +356,8 @@ public class YarnJobManager implements JobManager {
         if ((ji2.getCommandId() != null) && (!(ji2.getCommandId().isEmpty()))) {
             String cmdId = ji2.getCommandId();
 
-            command = pmCommand.getEntity(cmdId, CommandConfig.class);
-            for (final ApplicationConfig ace : command.getApplications()) {
+            command = pmCommand.getEntity(cmdId, Command.class);
+            for (final Application ace : command.getApplications()) {
                 // If appid is specified check against it. If matches set It and break
                 if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {
                     if (ace.getId().equals(ji2.getApplicationId())) {
@@ -381,10 +381,10 @@ public class YarnJobManager implements JobManager {
             // Iterate through the commands the cluster supports and find the command that matches.
             // There has to be one that matches, else the getClusterConfig wouldn't have.
             // Check the applications as well
-            for (final CommandConfig cce : cluster.getCommands()) {
+            for (final Command cce : cluster.getCommands()) {
                 if (cce.getName().equals(ji2.getCommandName())) {
                     // Name matches. Check Application Details
-                    for (final ApplicationConfig ace : cce.getApplications()) {
+                    for (final Application ace : cce.getApplications()) {
                         // If appid is specified check against it. If matches set It and break
                         if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {
                             if (ace.getId().equals(ji2.getApplicationId())) {
@@ -444,7 +444,7 @@ public class YarnJobManager implements JobManager {
             }
         }
 
-        //CommandConfig ce = pmCommand.getEntity(cmdId, CommandConfig.class);
+        //Command ce = pmCommand.getEntity(cmdId, Command.class);
         if((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
             hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
         }
@@ -607,7 +607,7 @@ public class YarnJobManager implements JobManager {
      * @throws CloudServiceException if there is any error finding a cluster for
      * this job
      */
-    protected ClusterConfig getClusterConfig(Job ji2)
+    protected Cluster getClusterConfig(Job ji2)
             throws CloudServiceException {
         LOG.info("called");
 

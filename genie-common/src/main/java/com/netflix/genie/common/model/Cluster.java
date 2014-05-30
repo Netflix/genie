@@ -27,32 +27,25 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-
 /**
  * Representation of the state of the Cluster object.
  *
  * @author skrishnan
  * @author amsharma
+ * @author tgianos
  */
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class ClusterConfig implements Serializable {
+public class Cluster extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 8046582926818942370L;
-
-    /**
-     * Unique ID for this cluster.
-     */
-    @Id
-    private String id;
 
     /**
      * Name for this cluster, e.g. cquery.
@@ -88,8 +81,8 @@ public class ClusterConfig implements Serializable {
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
      * Foreign Key in the database implemented by OpenJpa using join tables
      */
-    @ManyToMany(targetEntity = CommandConfig.class, fetch = FetchType.EAGER)
-    private ArrayList<CommandConfig> commands;
+    @ManyToMany(targetEntity = Command.class, fetch = FetchType.EAGER)
+    private ArrayList<Command> commands;
 
     /**
      * Version of this cluster.
@@ -104,33 +97,10 @@ public class ClusterConfig implements Serializable {
     private ClusterStatus status;
 
     /**
-     * When was this cluster created?
+     * Default Constructor.
      */
-    @Basic
-    private Long createTime;
-
-    /**
-     * When was this cluster last updated?
-     */
-    @Basic
-    private Long updateTime;
-
-    /**
-     * Gets the id (primary key) for this cluster.
-     *
-     * @return id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Sets the id (primary key) for this cluster.
-     *
-     * @param id unique id for this cluster
-     */
-    public void setId(String id) {
-        this.id = id;
+    public Cluster() {
+        super();
     }
 
     /**
@@ -212,7 +182,7 @@ public class ClusterConfig implements Serializable {
      * hence marked transient.
      */
     @XmlTransient
-    public ArrayList<CommandConfig> getCommands() {
+    public ArrayList<Command> getCommands() {
         return commands;
     }
 
@@ -221,7 +191,7 @@ public class ClusterConfig implements Serializable {
      *
      * @param commands The commands that this cluster supports
      */
-    public void setCommands(ArrayList<CommandConfig> commands) {
+    public void setCommands(ArrayList<Command> commands) {
         this.commands = commands;
     }
 
@@ -262,42 +232,6 @@ public class ClusterConfig implements Serializable {
     }
 
     /**
-     * Gets the create time for this cluster.
-     *
-     * @return createTime - epoch time of creation in milliseconds
-     */
-    public Long getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * Sets the create time for this cluster.
-     *
-     * @param createTime epoch time in ms
-     */
-    public void setCreateTime(Long createTime) {
-        this.createTime = createTime;
-    }
-
-    /**
-     * Gets the last updated time for this cluster.
-     *
-     * @return updateTime - epoch time of update in milliseconds
-     */
-    public Long getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * Sets the updated time for this comamnd.
-     *
-     * @param updateTime epoch time in milliseconds
-     */
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    /**
      * Gets the command id's supported by this cluster.
      *
      * @return cmdIds - a list of all command id's supported by this cluster
@@ -306,7 +240,7 @@ public class ClusterConfig implements Serializable {
     public ArrayList<String> getCmdIds() {
         if (this.commands != null) {
             this.cmdIds = new ArrayList<String>();
-            for (final CommandConfig cce : this.commands) {
+            for (final Command cce : this.commands) {
                 this.cmdIds.add(cce.getId());
             }
         }

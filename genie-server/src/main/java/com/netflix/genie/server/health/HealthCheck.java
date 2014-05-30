@@ -30,14 +30,14 @@ import javax.annotation.PostConstruct;
  */
 public class HealthCheck implements HealthCheckHandler {
 
-    private static Logger logger = LoggerFactory.getLogger(HealthCheck.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HealthCheck.class);
 
     /**
      * Any custom initialization goes here - but empty right now.
      */
     @PostConstruct
     public void init() {
-        logger.info("Health check initialized.");
+        LOG.info("Health check initialized.");
     }
 
     /**
@@ -47,7 +47,7 @@ public class HealthCheck implements HealthCheckHandler {
     @Override
     public int getStatus() {
         // Custom health check logic goes here
-        logger.debug("Health check invoked.");
+        LOG.debug("Health check invoked.");
         return 200;
     }
 }
