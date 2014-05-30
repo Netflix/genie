@@ -44,6 +44,7 @@ import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.util.NetUtil;
+import java.util.Date;
 
 /**
  * The monitor thread that gets launched for each job.
@@ -155,7 +156,7 @@ public class JobMonitor extends Thread {
 
                 lastUpdatedTimeMS = System.currentTimeMillis();
                 job.setJobStatus(JobStatus.RUNNING, "Job is running");
-                job.setUpdateTime(lastUpdatedTimeMS);
+                job.setUpdated(new Date(lastUpdatedTimeMS));
 
                 // only update DB if it is not KILLED already
                 ReentrantReadWriteLock rwl = PersistenceManager.getDbLock();

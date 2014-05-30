@@ -47,7 +47,6 @@ public class TestJobJanitor {
         Job one = new Job();
         one.setId(UUID.randomUUID().toString());
         one.setJobName("UPDATE_TEST");
-        one.setUpdateTime(0L);
         one.setStatus(JobStatus.RUNNING);
         one.setUserName("someUser");
         one.setCmdArgs("someArgs");
@@ -55,7 +54,6 @@ public class TestJobJanitor {
         Job two = new Job();
         two.setId(UUID.randomUUID().toString());
         two.setJobName("UPDATE_TEST");
-        two.setUpdateTime(0L);
         two.setStatus(JobStatus.INIT);
         two.setUserName("some other user name");
         two.setCmdArgs("someArgs2");
@@ -66,8 +64,8 @@ public class TestJobJanitor {
         int numRows = janitor.markZombies();
         LOG.info("Number of rows marked as zombies: " + numRows);
 
-        // TODO: make the test work
-        //Assert.assertEquals(numRows >= 2, true);
+        // TODO: make the test work. Need to delay time or force update time older.
+//        Assert.assertEquals(numRows >= 2, true);
         // shut down cleanly
         PersistenceManager.shutdown();
     }

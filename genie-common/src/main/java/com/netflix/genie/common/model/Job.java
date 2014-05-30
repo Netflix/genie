@@ -21,6 +21,7 @@ import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
@@ -199,12 +200,6 @@ public class Job extends Auditable implements Serializable {
      */
     @Basic
     private Long startTime;
-
-    /**
-     * Last update time for job - initialized to null.
-     */
-    @Basic
-    private Long updateTime;
 
     /**
      * Finish time for job - initialized to zero (for historic reasons).
@@ -651,25 +646,6 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the last update time for this job.
-     *
-     * @return updateTime
-     */
-    public Long getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * Set the updateTime for the job.
-     *
-     * @param updateTime epoch time in ms
-     *
-     */
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    /**
      * Gets the finish time for this job.
      *
      * @return finishTime
@@ -854,7 +830,7 @@ public class Job extends Auditable implements Serializable {
             setFinishTime(System.currentTimeMillis());
         }
 
-        setUpdateTime(System.currentTimeMillis());
+        setUpdated(new Date());
     }
 
     /**

@@ -41,6 +41,7 @@ import com.netflix.niws.client.http.RestClient;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -213,7 +214,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             factory.getJobManager(job).launch(job);
 
             // update entity in DB
-            job.setUpdateTime(System.currentTimeMillis());
+            job.setUpdated(new Date());
             pm.updateEntity(job);
 
             // verification
@@ -229,7 +230,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             LOG.error("Failed to submit job: ", e);
             // update db
             job.setJobStatus(JobStatus.FAILED, e.getMessage());
-            job.setUpdateTime(System.currentTimeMillis());
+            job.setUpdated(new Date());
             pm.updateEntity(job);
             // increment counter for failed jobs
             stats.incrGenieFailedJobs();
@@ -508,7 +509,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             // if job status changed between when it was read and now,
             // this thread will simply overwrite it - final state will be KILLED
             rwl.writeLock().lock();
-            job.setUpdateTime(System.currentTimeMillis());
+            job.setUpdated(new Date());
             if (!job.isDisableLogArchival()) {
                 job.setArchiveLocation(NetUtil.getArchiveURI(jobId));
             }

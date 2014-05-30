@@ -22,6 +22,7 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
+import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
@@ -62,9 +63,8 @@ public class JobJanitor extends Thread {
      */
     public int markZombies() throws Exception {
         // the equivalent query is as follows:
-        // update Job set status='FAILED', updateTime=$max,
-        // finishTime=$max,
-        // exitCode=$zombie_code, statusMsg='Job has been marked as a zombie'
+        // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code, 
+        // statusMsg='Job has been marked as a zombie'
         // where updateTime < $min and (status='RUNNING' or status='INIT')"
         long currentTime = System.currentTimeMillis();
         long zombieTime = conf.getLong(
@@ -72,8 +72,8 @@ public class JobJanitor extends Thread {
 
         final StringBuilder builder = new StringBuilder();
         builder.append("UPDATE Job j ");
-        builder.append("SET j.status = :failed, j.updateTime = :currentTime, j.finishTime = :currentTime, j.exitCode = :exitCode, j.statusMsg = :statusMessage ");
-        builder.append("WHERE j.updateTime = :updateTime AND (j.status = :running OR j.status = :init)");
+        builder.append("SET j.status = :failed, j.finishTime = :currentTime, j.exitCode = :exitCode, j.statusMsg = :statusMessage ");
+        builder.append("WHERE j.updated < :updated AND (j.status = :running OR j.status = :init)");
         final EntityManager em = pm.createEntityManager();
         try {
             final Query query = em.createQuery(builder.toString())
@@ -81,7 +81,7 @@ public class JobJanitor extends Thread {
                     .setParameter("currentTime", currentTime)
                     .setParameter("exitCode", SubprocessStatus.ZOMBIE_JOB.code())
                     .setParameter("statusMessage", SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()))
-                    .setParameter("updateTime", (currentTime - zombieTime))
+                    .setParameter("updated", new Date((currentTime - zombieTime)))
                     .setParameter("running", JobStatus.RUNNING)
                     .setParameter("init", JobStatus.INIT);
             final EntityTransaction trans = em.getTransaction();

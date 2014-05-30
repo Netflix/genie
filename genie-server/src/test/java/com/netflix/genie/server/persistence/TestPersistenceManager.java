@@ -130,7 +130,6 @@ public class TestPersistenceManager {
         initial.setId(uuid.toString());
         initial.setJobName("My test job");
         initial.setJobStatus(JobStatus.FAILED);
-        initial.setUpdateTime(System.currentTimeMillis());
         initial.setUserName("myUserName");
         initial.setCmdArgs("commandArg");
         pm.createEntity(initial);
