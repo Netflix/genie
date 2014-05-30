@@ -49,7 +49,8 @@ def addClusterConfigCprod1():
             "version" : "1.0.3",
             "configs": ''' + config + ''',
             "tags": ''' + tags + ''',
-            "cmdIds": ''' + cmds + ''' 
+            "cmdIds": ''' + cmds + ''',
+            "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager" 
         }
     }
     '''
@@ -76,7 +77,8 @@ def addClusterConfigCquery1():
             "version" : "1.0.3",
             "configs": ''' + config + ''',
             "tags": ''' + tags + ''',
-            "cmdIds": ''' + cmds + ''' 
+            "cmdIds": ''' + cmds + ''',
+            "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager"
         }
     }
     '''
@@ -103,7 +105,8 @@ def addClusterConfigH2query():
             "version" : "1.0.3",
             "configs": ''' + config + ''',
             "tags": ''' + tags + ''',
-            "cmdIds": ''' + cmds + ''' 
+            "cmdIds": ''' + cmds + ''',
+            "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager" 
         }
     }
     '''
@@ -116,5 +119,5 @@ if __name__ == "__main__":
    print "Registering Clusters:\n"
    print "\n"
    addClusterConfigCprod1()
-   #addClusterConfigCquery1()
-   #addClusterConfigH2query()
+   addClusterConfigCquery1()
+   addClusterConfigH2query()

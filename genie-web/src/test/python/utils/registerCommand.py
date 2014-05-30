@@ -176,9 +176,9 @@ if __name__ == "__main__":
    print "Adding Commands: \n"
    print "\n"
 
-   #addCommandConfigProdhive11Mr1()
-   #addCommandConfigProdhive11Mr2()
-   #addCommandConfigPig11Mr1()
-   #addCommandConfigPig11Mr2()
-   #addCommandConfigPig13Mr2()
+   addCommandConfigProdhive11Mr1()
+   addCommandConfigProdhive11Mr2()
+   addCommandConfigPig11Mr1()
+   addCommandConfigPig11Mr2()
+   addCommandConfigPig13Mr2()
    addCommandConfigHadoop103()

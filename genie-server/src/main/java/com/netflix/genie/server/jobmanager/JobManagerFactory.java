@@ -108,7 +108,7 @@ public final class JobManagerFactory {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final ClusterConfigResponse ccr = ccs.getClusterConfig(
+        final ClusterConfigResponse ccr = this.ccs.getClusterConfig(
                 job.getApplicationId(),
                 job.getApplicationName(),
                 job.getCommandId(),

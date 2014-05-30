@@ -129,7 +129,7 @@ def addApplicationConfigTz2():
 # driver method for all tests                
 if __name__ == "__main__":
    print "Creating Application Configs:\n"
-   #addApplicationConfigMr1()
+   addApplicationConfigMr1()
    addApplicationConfigMr2()
-   #addApplicationConfigTz1()
-   #addApplicationConfigTz2()
+   addApplicationConfigTz1()
+   addApplicationConfigTz2()
