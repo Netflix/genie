@@ -15,17 +15,18 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.model.Types.CommandStatus;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -55,14 +56,14 @@ public class CommandConfig implements Serializable {
     /**
      * Name of this command - e.g. prodhive, pig, hadoop etc.
      */
-    @Basic
+    @Basic(optional = false)
     private String name;
 
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
-    @Basic
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private CommandStatus status;
 
     /**
      * Location of the executable for this command.
@@ -101,7 +102,7 @@ public class CommandConfig implements Serializable {
     /**
      * User who created this command.
      */
-    @Basic
+    @Basic(optional = false)
     private String user;
 
     /**
@@ -167,18 +168,20 @@ public class CommandConfig implements Serializable {
     /**
      * Gets the status for this command.
      *
-     * @return status - possible values: Types.ConfigStatus
+     * @return the status
+     * @see CommandStatus
      */
-    public String getStatus() {
+    public CommandStatus getStatus() {
         return status;
     }
 
     /**
      * Sets the status for this application.
      *
-     * @param status possible values Types.ConfigStatus
+     * @param status The new status
+     * @see CommandStatus
      */
-    public void setStatus(String status) {
+    public void setStatus(final CommandStatus status) {
         this.status = status;
     }
 

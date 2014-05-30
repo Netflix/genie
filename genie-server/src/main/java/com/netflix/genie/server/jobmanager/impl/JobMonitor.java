@@ -164,7 +164,7 @@ public class JobMonitor extends Thread {
                     Job dbJI = pm.getEntity(job.getJobID(),
                             Job.class);
                     if ((dbJI.getStatus() != null)
-                            && !dbJI.getStatus().equalsIgnoreCase("KILLED")) {
+                            && dbJI.getStatus() != JobStatus.KILLED) {
                         pm.updateEntity(job);
                     }
                 } catch (Exception e) {
@@ -228,7 +228,7 @@ public class JobMonitor extends Thread {
 
             // only update status if not KILLED
             if ((dbJI.getStatus() != null)
-                    && !dbJI.getStatus().equalsIgnoreCase("KILLED")) {
+                    && dbJI.getStatus() != JobStatus.KILLED) {
 
                 if (exitCode != SubprocessStatus.SUCCESS.code()) {
                     // all other failures except s3 log archival failure
@@ -361,10 +361,10 @@ public class JobMonitor extends Thread {
             message.addRecipient(Message.RecipientType.TO,
                     new InternetAddress(emailTo));
 
-            String jobStatus;
+            JobStatus jobStatus;
 
             if (killed) {
-                jobStatus = "KILLED";
+                jobStatus = JobStatus.KILLED;
             } else {
                 jobStatus = job.getStatus();
             }

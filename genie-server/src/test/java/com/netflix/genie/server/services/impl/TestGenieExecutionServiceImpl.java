@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ExecutionService;
 
@@ -60,12 +61,14 @@ public class TestGenieExecutionServiceImpl {
         UUID uuid = UUID.randomUUID();
         job.setJobID(uuid.toString());
         job.setKillURI("http://DOES/NOT/EXIST");
-        job.setStatus("SUCCEEDED");
+        job.setStatus(JobStatus.SUCCEEDED);
+        job.setUserName("myUserName");
+        job.setCmdArgs("commandArg");
         pm.createEntity(job);
 
         // should return immediately despite bogus killURI
         JobStatusResponse status = xs.killJob(job.getJobID());
-        Assert.assertEquals(status.getStatus(), "SUCCEEDED");
+        Assert.assertEquals("SUCCEEDED", status.getStatus());
     }
 
     /**

@@ -14,7 +14,6 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
 import com.netflix.genie.common.model.CommandConfig;
-import com.netflix.genie.common.model.Types;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
@@ -227,16 +226,6 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             ccr = new CommandConfigResponse(new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Need required param 'user' for create/update"));
-            LOG.error(ccr.getErrorMsg());
-            return ccr;
-        }
-
-        // ensure that the status object is valid
-        String status = commandConfig.getStatus();
-        if ((status != null) && (Types.ConfigStatus.parse(status) == null)) {
-            ccr = new CommandConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Config status can only be ACTIVE, DEPRECATED, INACTIVE"));
             LOG.error(ccr.getErrorMsg());
             return ccr;
         }

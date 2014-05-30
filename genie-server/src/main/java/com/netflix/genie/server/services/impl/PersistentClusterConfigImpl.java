@@ -303,17 +303,6 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             return ccr;
         }
 
-        // ensure that the status object is valid
-        String status = clusterConfig.getStatus();
-        if ((status != null) && (Types.ClusterStatus.parse(status) == null)) {
-            ccr = new ClusterConfigResponse(
-                    new CloudServiceException(
-                            HttpURLConnection.HTTP_BAD_REQUEST,
-                            "Cluster status can only be UP, OUT_OF_SERVICE or TERMINATED"));
-            LOG.error(ccr.getErrorMsg());
-            return ccr;
-        }
-
         // ensure that child command configs exist
         try {
             validateChildren(clusterConfig);

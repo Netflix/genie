@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.util.NetUtil;
 
@@ -47,9 +48,11 @@ public class TestJobCountManager {
         UUID uuid = UUID.randomUUID();
         job.setJobID(uuid.toString());
         job.setJobName("My test job");
-        job.setStatus("RUNNING");
+        job.setStatus(JobStatus.RUNNING);
         job.setHostName(NetUtil.getHostName());
         job.setStartTime(1L);
+        job.setUserName("myUser");
+        job.setCmdArgs("someCommandArg");
         pm.createEntity(job);
 
         // number of running jobs - should be > 0
@@ -66,7 +69,7 @@ public class TestJobCountManager {
         Assert.assertEquals(numJobs == 0, true);
 
         // cleanup
-        job.setStatus("SUCCEEDED");
+        job.setStatus(JobStatus.SUCCEEDED);
         pm.updateEntity(job);
     }
 

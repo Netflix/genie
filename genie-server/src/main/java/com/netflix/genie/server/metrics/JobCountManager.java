@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.metrics;
 
 import org.slf4j.Logger;
@@ -28,10 +27,11 @@ import com.netflix.discovery.DiscoveryManager;
 import com.netflix.discovery.shared.Application;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.server.persistence.ClauseBuilder;
+import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.util.NetUtil;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 /**
  * Utility class to get number of jobs running on this instance.
@@ -65,8 +65,7 @@ public final class JobCountManager {
      * Get number of running jobs running on this instance.
      *
      * @return number of running jobs on this instance
-     * @throws CloudServiceException
-     *             if there is an error
+     * @throws CloudServiceException if there is an error
      */
     public static int getNumInstanceJobs() throws CloudServiceException {
         LOG.debug("called");
@@ -79,13 +78,10 @@ public final class JobCountManager {
      * maxStartTime on this instance min/max startTimes are ignored if they are
      * null.
      *
-     * @param minStartTime
-     *            min start time in ms
-     * @param maxStartTime
-     *            max start time in ms
+     * @param minStartTime min start time in ms
+     * @param maxStartTime max start time in ms
      * @return number of running jobs between the specified times
-     * @throws CloudServiceException
-     *             if there is an error
+     * @throws CloudServiceException if there is an error
      */
     public static int getNumInstanceJobs(Long minStartTime, Long maxStartTime)
             throws CloudServiceException {
@@ -95,18 +91,14 @@ public final class JobCountManager {
     }
 
     /**
-     * Get number of running jobs with minStartTime < startTime < maxStartTime
+     * Get number of running jobs with minStartTime <= startTime < maxStartTime
      * min/max startTimes are ignored if they are null.
      *
-     * @param hostName
-     *            - if null, local host name is used
-     * @param minStartTime
-     *            min start time in ms
-     * @param maxStartTime
-     *            max start time in ms
+     * @param hostName - if null, local host name is used
+     * @param minStartTime min start time in ms
+     * @param maxStartTime max start time in ms
      * @return number of running jobs matching specified critiera
-     * @throws CloudServiceException
-     *             if there is an error
+     * @throws CloudServiceException if there is an error
      */
     public static int getNumInstanceJobs(String hostName, Long minStartTime,
             Long maxStartTime) throws CloudServiceException {
@@ -116,34 +108,40 @@ public final class JobCountManager {
         if (hostName == null) {
             hostName = NetUtil.getHostName();
         }
-
-        // return number of jobs running/init-ed on this instance
-        ClauseBuilder criteria = new ClauseBuilder(ClauseBuilder.AND);
-        criteria.append("hostName = '" + hostName + "'");
+        
+        final StringBuilder builder = new StringBuilder();
+        builder.append("SELECT COUNT(j)");
+        builder.append(" FROM Job j ");
+        builder.append(" WHERE j.hostName = :hostName");
+        builder.append(" AND (j.status = :running OR j.status = :init)");
         if (minStartTime != null) {
-            criteria.append("startTime > " + minStartTime);
+            builder.append(" AND j.startTime >= :minStartTime");
         }
         if (maxStartTime != null) {
-            criteria.append("startTime < " + maxStartTime);
+            builder.append(" AND j.startTime < :maxStartTime");
         }
-        ClauseBuilder status = new ClauseBuilder(ClauseBuilder.OR);
-        status.append("status='RUNNING'");
-        status.append("status='INIT'");
-        criteria.append("(" + status.toString() + ")", false);
-
-        // initialize, if need be
         if (pm == null) {
             init();
         }
-
-        // query without pagination
-        QueryBuilder builder = new QueryBuilder().table("Job")
-                .clause(criteria.toString()).paginate(false);
-        Object[] results = pm.query(builder);
-        if (results == null) {
-            return 0;
-        } else {
-            return results.length;
+        final EntityManager em = pm.createEntityManager();
+        try {
+            final Query query = em.createQuery(builder.toString())
+                    .setParameter("hostName", hostName)
+                    .setParameter("running", JobStatus.RUNNING)
+                    .setParameter("init", JobStatus.INIT);
+            if (minStartTime != null) {
+                query.setParameter("minStartTime", minStartTime);
+            }
+            if (maxStartTime != null) {
+                query.setParameter("maxStartTime", maxStartTime);
+            }
+            //TODO: This is read only not sure if need transaction. Spring read only would be convenient
+    //        final EntityTransaction trans = em.getTransaction();
+    //        trans.begin();
+            return ((Number) query.getSingleResult()).intValue();
+    //        trans.commit();
+        } finally {
+            em.close();
         }
     }
 
@@ -151,11 +149,9 @@ public final class JobCountManager {
      * Returns the most idle Genie instance (&lt; minJobThreshold running jobs),
      * if possible - else returns current instance.
      *
-     * @param minJobThreshold
-     *            the threshold to use to look for idle instances
+     * @param minJobThreshold the threshold to use to look for idle instances
      * @return host name of most idle Genie instance
-     * @throws CloudServiceException
-     *             if there is any error
+     * @throws CloudServiceException if there is any error
      */
     public static String getIdleInstance(int minJobThreshold)
             throws CloudServiceException {
