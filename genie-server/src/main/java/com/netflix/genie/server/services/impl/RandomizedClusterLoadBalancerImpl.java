@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ClusterConfig;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 
 /**
@@ -41,7 +41,7 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
 
     /** {@inheritDoc} */
     @Override
-    public ClusterConfig selectCluster(ClusterConfig[] ceArray)
+    public Cluster selectCluster(Cluster[] ceArray)
             throws CloudServiceException {
         LOG.info("called");
 

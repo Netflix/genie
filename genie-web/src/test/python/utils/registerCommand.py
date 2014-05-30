@@ -27,7 +27,7 @@ import uuid
 import restclient
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/command'
+serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/commands'
 
 def addCommandConfigProdhive11Mr1():
     print "Adding Command prodhive11_mr1"
@@ -176,9 +176,9 @@ if __name__ == "__main__":
    print "Adding Commands: \n"
    print "\n"
 
-   #addCommandConfigProdhive11Mr1()
-   #addCommandConfigProdhive11Mr2()
-   #addCommandConfigPig11Mr1()
-   #addCommandConfigPig11Mr2()
-   #addCommandConfigPig13Mr2()
+   addCommandConfigProdhive11Mr1()
+   addCommandConfigProdhive11Mr2()
+   addCommandConfigPig11Mr1()
+   addCommandConfigPig11Mr2()
+   addCommandConfigPig13Mr2()
    addCommandConfigHadoop103()

@@ -21,9 +21,9 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigRequest;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ClusterConfig;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
-import com.netflix.genie.common.model.CommandConfig;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.server.persistence.ClauseBuilder;
@@ -44,6 +44,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
     private static final Logger LOG = LoggerFactory
             .getLogger(PersistentClusterConfigImpl.class);
 
-    private final PersistenceManager<ClusterConfig> pm;
+    private final PersistenceManager<Cluster> pm;
 
     /**
      * Default constructor - initialize all required dependencies.
@@ -67,7 +68,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      */
     public PersistentClusterConfigImpl() throws CloudServiceException {
         // instantiate PersistenceManager
-        this.pm = new PersistenceManager<ClusterConfig>();
+        this.pm = new PersistenceManager<Cluster>();
     }
 
     @Override
@@ -75,9 +76,9 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         LOG.info("called");
 
         ClusterConfigResponse ccr;
-        ClusterConfig cce;
+        Cluster cce;
         try {
-            cce = pm.getEntity(id, ClusterConfig.class);
+            cce = pm.getEntity(id, Cluster.class);
         } catch (Exception e) {
             LOG.error("Failed to get cluster config: ", e);
             ccr = new ClusterConfigResponse(new CloudServiceException(
@@ -93,7 +94,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             return ccr;
         } else {
             ccr = new ClusterConfigResponse();
-            ccr.setClusterConfigs(new ClusterConfig[]{cce});
+            ccr.setClusterConfigs(new Cluster[]{cce});
             ccr.setMessage("Returning cluster config for: " + id);
             return ccr;
         }
@@ -131,10 +132,10 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 criteria.append("name like '" + name + "'");
             }
             if (minUpdateTime != null) {
-                criteria.append("updateTime >= " + minUpdateTime);
+                criteria.append("updated >= " + minUpdateTime);
             }
             if (maxUpdateTime != null) {
-                criteria.append("updateTime <= " + maxUpdateTime);
+                criteria.append("updated <= " + maxUpdateTime);
             }
 
             if(tags != null) {
@@ -173,7 +174,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             String criteriaString = criteria.toString();
             LOG.info("Criteria: " + criteriaString);
             QueryBuilder builder = new QueryBuilder()
-                    .table("ClusterConfig").clause(criteriaString)
+                    .table("Cluster").clause(criteriaString)
                     .limit(limit).page(page);
             results = pm.query(builder);
 
@@ -187,9 +188,9 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 ccr.setMessage("Returning clusterConfigs for input parameters");
             }
 
-            ClusterConfig[] elements = new ClusterConfig[results.length];
+            Cluster[] elements = new Cluster[results.length];
             for (int i = 0; i < elements.length; i++) {
-                elements[i] = (ClusterConfig) results[i];
+                elements[i] = (Cluster) results[i];
             }
             ccr.setClusterConfigs(elements);
             return ccr;
@@ -232,8 +233,8 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             // do some filtering
             LOG.info("GENIE: Deleting clusterConfig for id: " + id);
             try {
-                ClusterConfig element = pm.deleteEntity(id,
-                        ClusterConfig.class);
+                Cluster element = pm.deleteEntity(id,
+                        Cluster.class);
                 if (element == null) {
                     // element doesn't exist
                     ccr = new ClusterConfigResponse(new CloudServiceException(
@@ -245,7 +246,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                     ccr = new ClusterConfigResponse();
                     ccr.setMessage("Successfully deleted clusterConfig for id: "
                             + id);
-                    ClusterConfig[] elements = new ClusterConfig[]{element};
+                    Cluster[] elements = new Cluster[]{element};
                     ccr.setClusterConfigs(elements);
                 }
             } catch (Exception e) {
@@ -267,7 +268,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             ClusterConfigRequest request, Verb method) {
         LOG.debug("called");
         ClusterConfigResponse ccr;
-        ClusterConfig clusterConfig = request.getClusterConfig();
+        Cluster clusterConfig = request.getClusterConfig();
         // ensure that the element is not null
         if (clusterConfig == null) {
             ccr = new ClusterConfigResponse(new CloudServiceException(
@@ -313,8 +314,8 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         }
 
         // common error checks done - set update time before proceeding
-        clusterConfig.setUpdateTime(System.currentTimeMillis());
-
+        //Should now be done automatically by @PreUpdate but will leave just in case
+//        clusterConfig.setUpdateTime(System.currentTimeMillis());
         // handle POST and PUT differently
         if (method.equals(Verb.POST)) {
             LOG.info("GENIE: creating config for id: " + id);
@@ -336,7 +337,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 ccr = new ClusterConfigResponse();
                 ccr.setMessage("Successfully created clusterConfig for id: "
                         + id);
-                ccr.setClusterConfigs(new ClusterConfig[]{clusterConfig});
+                ccr.setClusterConfigs(new Cluster[]{clusterConfig});
                 return ccr;
             } catch (RollbackException e) {
                 LOG.error(e.getMessage(), e);
@@ -344,7 +345,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                     // most likely entity already exists - return useful message
                     ccr = new ClusterConfigResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_CONFLICT,
-                            "ClusterConfig already exists for id: " + id
+                            "Cluster already exists for id: " + id
                             + ", use PUT to update config"));
                     return ccr;
                 } else {
@@ -361,8 +362,8 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             LOG.info("GENIE: updating config for id: " + id);
 
             try {
-                ClusterConfig old = pm.getEntity(id,
-                        ClusterConfig.class);
+                Cluster old = pm.getEntity(id,
+                        Cluster.class);
                 // check if this is a create or an update
                 if (old == null) {
                     try {
@@ -379,7 +380,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 ccr = new ClusterConfigResponse();
                 ccr.setMessage("Successfully updated clusterConfig for id: "
                         + id);
-                ccr.setClusterConfigs(new ClusterConfig[]{clusterConfig});
+                ccr.setClusterConfigs(new Cluster[]{clusterConfig});
                 return ccr;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
@@ -392,15 +393,16 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
         }
     }
 
-    private void validateChildren(ClusterConfig clusterConfigElement)
+    private void validateChildren(Cluster clusterConfigElement)
             throws CloudServiceException {
 
         ArrayList<String> cmdIds = clusterConfigElement.getCmdIds();
-        PersistenceManager<CommandConfig> pma = new PersistenceManager<CommandConfig>();
-        ArrayList<CommandConfig> cmdList = new ArrayList<CommandConfig>();
+
+        PersistenceManager<Command> pma = new PersistenceManager<Command>();
+        ArrayList<Command> cmdList = new ArrayList<Command>();
             
         for(String cmdId: cmdIds) {
-            CommandConfig cmde = (CommandConfig) pma.getEntity(cmdId, CommandConfig.class);
+            Command cmde = (Command) pma.getEntity(cmdId, Command.class);
             if (cmde != null) {
                 cmdList.add(cmde);
             } else {
@@ -418,18 +420,15 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      * initialize, and set creation time.
      */
     private void initAndValidateNewElement(
-            ClusterConfig clusterConfigElement)
+            Cluster clusterConfigElement)
             throws CloudServiceException {
 
         //TODO Figure out all mandatory parameters for a cluster
-        if ((clusterConfigElement.getName() == null)) {
+        if (StringUtils.isEmpty(clusterConfigElement.getName())) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Missing required Hadoop parameters for creating clusterConfig: "
                     + "{name, s3MapredSiteXml, s3HdfsSiteXml, s3CoreSiteXml}");
-        } else {
-            clusterConfigElement.setCreateTime(clusterConfigElement
-                    .getUpdateTime());
         }
     }
 
@@ -442,23 +441,23 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
         //TODO: Remove use of iterators explicitly
         Iterator<ClusterCriteria> criteriaIter = clusterCriteriaList.iterator();
-        //String queryString = "SELECT distinct x from ClusterConfig x, IN(x.tags) t WHERE " ;
+        //String queryString = "SELECT distinct x from Cluster x, IN(x.tags) t WHERE " ;
         //String queryString = "SELECT distinct x from Cluster x, IN(x.commands) cmds where :element1 member of  x.tags AND :element2 member of x.tags AND cmds.name=\"prodhive\"";
 
-        ClusterConfig[] elements = null;
+        Cluster[] elements = null;
 
         while (criteriaIter.hasNext()) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("SELECT distinct cstr from ClusterConfig cstr, IN(cstr.commands) cmds ");
+            builder.append("SELECT distinct cstr from Cluster cstr, IN(cstr.commands) cmds ");
 
             if ((applicationId != null) && (!applicationId.isEmpty())) {
                 builder.append(", IN(cmds.applications) apps ");
             } else if ((applicationName != null) && (!applicationName.isEmpty())) {
                 builder.append(", IN(cmds.applications) apps ");
             }
-            
+
             builder.append(" where ");
-            
+
             ClusterCriteria cc = (ClusterCriteria) criteriaIter.next();
 
             for (int i = 0; i < cc.getTags().size(); i++) {
@@ -498,14 +497,14 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 tagNum++;
             }
 
-            List<ClusterConfig> results = (List<ClusterConfig>) q.getResultList();
+            List<Cluster> results = (List<Cluster>) q.getResultList();
 
             if (results.size() > 0) {
-                elements = new ClusterConfig[results.size()];
-                Iterator<ClusterConfig> cceIter = results.iterator();
+                elements = new Cluster[results.size()];
+                Iterator<Cluster> cceIter = results.iterator();
                 int j = 0;
                 while (cceIter.hasNext()) {
-                    ClusterConfig cce = (ClusterConfig) cceIter.next();
+                    Cluster cce = (Cluster) cceIter.next();
                     elements[j] = cce;
                     j++;
                 }

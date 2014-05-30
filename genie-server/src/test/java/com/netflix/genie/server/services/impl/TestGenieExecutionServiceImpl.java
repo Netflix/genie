@@ -59,7 +59,7 @@ public class TestGenieExecutionServiceImpl {
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
         Job job = new Job();
         UUID uuid = UUID.randomUUID();
-        job.setJobID(uuid.toString());
+        job.setId(uuid.toString());
         job.setKillURI("http://DOES/NOT/EXIST");
         job.setStatus(JobStatus.SUCCEEDED);
         job.setUserName("myUserName");
@@ -67,7 +67,7 @@ public class TestGenieExecutionServiceImpl {
         pm.createEntity(job);
 
         // should return immediately despite bogus killURI
-        JobStatusResponse status = xs.killJob(job.getJobID());
+        JobStatusResponse status = xs.killJob(job.getId());
         Assert.assertEquals("SUCCEEDED", status.getStatus());
     }
 

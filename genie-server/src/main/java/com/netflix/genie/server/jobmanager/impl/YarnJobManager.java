@@ -2,18 +2,14 @@ package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfig;
-import com.netflix.genie.common.model.ClusterConfig;
-import com.netflix.genie.common.model.CommandConfig;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.services.ClusterConfigService;
-import com.netflix.genie.server.services.ClusterLoadBalancer;
-import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.netflix.genie.server.util.StringUtil;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +36,7 @@ public class YarnJobManager implements JobManager {
     private static final Logger LOG = LoggerFactory
             .getLogger(YarnJobManager.class);
 
-    private final PersistenceManager<CommandConfig> pmCommand;
+    private final PersistenceManager<Command> pmCommand;
 
     /**
      * The name of the Genie job id property to be passed to all jobs.
@@ -74,24 +70,14 @@ public class YarnJobManager implements JobManager {
     protected Map<String, String> env;
 
     /**
-     * Reference to the cluster load balancer implementation.
-     */
-    protected ClusterLoadBalancer clb;
-
-    /**
      * Reference to the cluster config element to run the job on.
      */
-    protected ClusterConfig cluster;
+    protected Cluster cluster;
 
     /**
      * Default group name for job submissions.
      */
     protected static final String HADOOP_GROUP_NAME = "hadoop";
-
-    /**
-     * Reference to the cluster config service impl.
-     */
-    protected ClusterConfigService ccs;
 
     /**
      * The command-line arguments for this job.
@@ -104,7 +90,7 @@ public class YarnJobManager implements JobManager {
     protected Job ji;
 
     /**
-     * Actual command to run determined from the CommandConfig selected.
+     * Actual command to run determined from the Command selected.
      */
     protected String executable;
 
@@ -112,12 +98,12 @@ public class YarnJobManager implements JobManager {
      * Default constructor - initializes cluster configuration and load
      * balancer.
      *
+     * @param cluster The cluster this job manager will be working with
      * @throws CloudServiceException if there is any error in initialization
      */
-    public YarnJobManager() throws CloudServiceException {
-        ccs = ConfigServiceFactory.getClusterConfigImpl();
-        clb = ConfigServiceFactory.getClusterLoadBalancer();
-        pmCommand = new PersistenceManager<CommandConfig>();
+    public YarnJobManager(final Cluster cluster) throws CloudServiceException {
+        this.cluster = cluster;
+        this.pmCommand = new PersistenceManager<Command>();
     }
 
     /**
@@ -138,7 +124,7 @@ public class YarnJobManager implements JobManager {
 
         // set current working directory for the process
         String cWorkingDir = env.get("BASE_USER_WORKING_DIR") + File.separator
-                + ji.getJobID();
+                + ji.getId();
         File userJobDir = new File(cWorkingDir);
 
         // check if working directory already exists
@@ -207,7 +193,7 @@ public class YarnJobManager implements JobManager {
 
         // set environment variables for the process
         Map<String, String> penv = pb.environment();
-        
+
         penv.putAll(env);
 
         LOG.info("Setting job working dir , conf dir and jar dir");
@@ -275,7 +261,12 @@ public class YarnJobManager implements JobManager {
                 }
                 Runtime.getRuntime().exec(
                         genieHome + File.separator + "jobkill.sh " + processId);
-            } catch (Exception e) {
+            } catch (CloudServiceException e) {
+                String msg = "Failed to kill the job";
+                LOG.error(msg, e);
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
+            } catch (IOException e) {
                 String msg = "Failed to kill the job";
                 LOG.error(msg, e);
                 throw new CloudServiceException(
@@ -299,7 +290,7 @@ public class YarnJobManager implements JobManager {
     protected void init(Job ji2) throws CloudServiceException {
         LOG.info("called");
 
-        genieJobIDProp = GENIE_JOB_ID + "=" + ji2.getJobID();
+        genieJobIDProp = GENIE_JOB_ID + "=" + ji2.getId();
         netflixEnvProp = NFLX_ENV + "="
                 + ConfigurationManager.getConfigInstance().getString(
                         "netflix.environment");
@@ -340,13 +331,12 @@ public class YarnJobManager implements JobManager {
         }
 
         // set the hadoop-related conf files
-        cluster = getClusterConfig(ji2);
-        ArrayList<String> clusterConfigList = cluster.getConfigs();
+        ArrayList<String> clusterConfigList = this.cluster.getConfigs();
 
         hEnv.put("S3_CLUSTER_CONF_FILES", convertListToCSV(clusterConfigList));
 
-        CommandConfig command = null;
-        ApplicationConfig application = null;
+        Command command = null;
+        Application application = null;
         boolean done = false;
 
         // If Command Id is specified use directly.
@@ -356,8 +346,8 @@ public class YarnJobManager implements JobManager {
         if ((ji2.getCommandId() != null) && (!(ji2.getCommandId().isEmpty()))) {
             String cmdId = ji2.getCommandId();
 
-            command = pmCommand.getEntity(cmdId, CommandConfig.class);
-            for (final ApplicationConfig ace : command.getApplications()) {
+            command = pmCommand.getEntity(cmdId, Command.class);
+            for (final Application ace : command.getApplications()) {
                 // If appid is specified check against it. If matches set It and break
                 if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {
                     if (ace.getId().equals(ji2.getApplicationId())) {
@@ -379,12 +369,12 @@ public class YarnJobManager implements JobManager {
             }
         } else if ((ji2.getCommandName() != null) && (!(ji2.getCommandName().isEmpty()))) {
             // Iterate through the commands the cluster supports and find the command that matches.
-            // There has to be one that matches, else the getClusterConfig wouldn't have.
+            // There has to be one that matches, else the getCluster wouldn't have.
             // Check the applications as well
-            for (final CommandConfig cce : cluster.getCommands()) {
+            for (final Command cce : cluster.getCommands()) {
                 if (cce.getName().equals(ji2.getCommandName())) {
                     // Name matches. Check Application Details
-                    for (final ApplicationConfig ace : cce.getApplications()) {
+                    for (final Application ace : cce.getApplications()) {
                         // If appid is specified check against it. If matches set It and break
                         if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {
                             if (ace.getId().equals(ji2.getApplicationId())) {
@@ -430,22 +420,22 @@ public class YarnJobManager implements JobManager {
         if (application != null) {
             ji2.setApplicationId(application.getId());
             ji2.setApplicationName(application.getName());
-            
-            if((application.getConfigs() != null) && (!application.getConfigs().isEmpty())) {
+
+            if ((application.getConfigs() != null) && (!application.getConfigs().isEmpty())) {
                 hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
             }
-            
-            if((application.getJars() != null) && (!application.getJars().isEmpty()))  {
+
+            if ((application.getJars() != null) && (!application.getJars().isEmpty())) {
                 hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
             }
-            
-            if((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
+
+            if ((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
                 hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
             }
         }
 
-        //CommandConfig ce = pmCommand.getEntity(cmdId, CommandConfig.class);
-        if((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
+        //Command ce = pmCommand.getEntity(cmdId, Command.class);
+        if ((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
             hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
         }
 
@@ -457,14 +447,14 @@ public class YarnJobManager implements JobManager {
         ji2.setExecutionClusterId(cluster.getId());
 
         // Get envPropertyFile for command and job and set env variable
-        if((command.getEnvPropFile() != null) && (!command.getEnvPropFile().isEmpty())) {
+        if ((command.getEnvPropFile() != null) && (!command.getEnvPropFile().isEmpty())) {
             hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
         }
-        
-        if((ji2.getEnvPropFile() != null) && (!ji2.getEnvPropFile().isEmpty())) {
+
+        if ((ji2.getEnvPropFile() != null) && (!ji2.getEnvPropFile().isEmpty())) {
             hEnv.put("JOB_ENV_FILE", ji2.getEnvPropFile());
         }
-        
+
         // put the user name for hadoop to use
         hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
 
@@ -549,7 +539,7 @@ public class YarnJobManager implements JobManager {
                 ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
 
-        String cpOpts = "";
+        String cpOpts;
         cpOpts = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server.hadoop.s3cp.opts", "");
 
@@ -596,31 +586,6 @@ public class YarnJobManager implements JobManager {
      */
     protected String convertListToCSV(final ArrayList<String> list) {
         return StringUtils.join(list, ",");
-    }
-
-    /**
-     * Figure out an appropriate cluster to run this job<br>
-     * Cluster selection is done based on tags, command and application.
-     *
-     * @param ji2 job info for this job
-     * @return cluster config element to use for running this job
-     * @throws CloudServiceException if there is any error finding a cluster for
-     * this job
-     */
-    protected ClusterConfig getClusterConfig(Job ji2)
-            throws CloudServiceException {
-        LOG.info("called");
-
-        ClusterConfigResponse ccr = null;
-
-        ccr = ccs.getClusterConfig(ji2.getApplicationId(),
-                ji2.getApplicationName(),
-                ji2.getCommandId(),
-                ji2.getCommandName(),
-                ji2.getClusterCriteriaList());
-
-        // return selected instance
-        return clb.selectCluster(ccr.getClusterConfigs());
     }
 
     /**

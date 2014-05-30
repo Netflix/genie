@@ -41,5 +41,10 @@ jar {
 }
 
 test {
-	it.dependsOn enhance
+    it.dependsOn enhance
+}
+
+clean {
+    delete 'genie-db'
+    delete 'derby.log'
 }

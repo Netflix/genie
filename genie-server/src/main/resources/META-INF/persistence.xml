@@ -15,53 +15,52 @@
      limitations under the License.
 
 -->
-
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
-	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	     version="1.0">
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             version="1.0">
 
-  <!--
-      A persistence unit is a set of listed persistent entities as well
-      the configuration of an EntityManagerFactory. This is the default -
-      and uses a local Derby database
-  -->
-
-  <persistence-unit name="genie" transaction-type="RESOURCE_LOCAL">
     <!--
-	The default provider can be OpenJPA, or some other product.
-	This element is optional if OpenJPA is the only JPA provider
-	in the current classloading environment, but can be specified
-	in cases where there are multiple JPA implementations available.
+        A persistence unit is a set of listed persistent entities as well
+        the configuration of an EntityManagerFactory. This is the default -
+        and uses a local Derby database
     -->
-    <provider>
-      org.apache.openjpa.persistence.PersistenceProviderImpl
-    </provider>
+    <persistence-unit name="genie" transaction-type="RESOURCE_LOCAL">
+        <!--
+        The default provider can be OpenJPA, or some other product.
+        This element is optional if OpenJPA is the only JPA provider
+        in the current classloading environment, but can be specified
+        in cases where there are multiple JPA implementations available.
+        -->
+        <provider>
+            org.apache.openjpa.persistence.PersistenceProviderImpl
+        </provider>
 
-    <!-- We must enumerate each entity in the persistence unit -->
-	<class>com.netflix.genie.common.model.Job</class>
-	<class>com.netflix.genie.common.model.ClusterConfig</class>
-	<class>com.netflix.genie.common.model.CommandConfig</class>
-	<class>com.netflix.genie.common.model.ApplicationConfig</class>
+        <!-- We must enumerate each entity in the persistence unit -->
+        <class>com.netflix.genie.common.model.Job</class>
+        <class>com.netflix.genie.common.model.Cluster</class>
+        <class>com.netflix.genie.common.model.Command</class>
+        <class>com.netflix.genie.common.model.Application</class>
+        <class>com.netflix.genie.common.model.Auditable</class>
 	
-    <properties>
-<!--       properties for Derby/local  -->
-      <property name="openjpa.ConnectionURL" 
-		value="jdbc:derby:genie-db;create=true"/>
-      <property name="openjpa.ConnectionDriverName" 
-		value="org.apache.derby.jdbc.EmbeddedDriver"/>
-      <property name="openjpa.ConnectionUserName" 
-		value="me"/>
-      <property name="openjpa.ConnectionPassword" 
-		value="mine"/>
-      <property name="openjpa.jdbc.Schema"
-		value="genie"/>
+        <properties>
+            <!--       properties for Derby/local  -->
+            <property name="openjpa.ConnectionURL" 
+                value="jdbc:derby:genie-db;create=true"/>
+            <property name="openjpa.ConnectionDriverName" 
+                value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <property name="openjpa.ConnectionUserName" 
+                value="me"/>
+            <property name="openjpa.ConnectionPassword" 
+                value="mine"/>
+            <property name="openjpa.jdbc.Schema"
+                value="genie"/>
       
-      <!-- common properties -->
-      <property name="openjpa.jdbc.SynchronizeMappings"
-		value="buildSchema(SchemaAction='add')"/>               
+            <!-- common properties -->
+            <property name="openjpa.jdbc.SynchronizeMappings"
+                value="buildSchema(SchemaAction='add')"/>               
       
-      <property name="openjpa.DynamicEnhancementAgent" value="false"/>
-      <property name="openjpa.RuntimeUnenhancedClasses" value="unsupported"/>
-    </properties>
-  </persistence-unit>
+            <property name="openjpa.DynamicEnhancementAgent" value="false"/>
+            <property name="openjpa.RuntimeUnenhancedClasses" value="unsupported"/>
+        </properties>
+    </persistence-unit>
 </persistence>

@@ -4,7 +4,7 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ApplicationConfigRequest;
 import com.netflix.genie.common.messages.ApplicationConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfig;
+import com.netflix.genie.common.model.Application;
 import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.persistence.QueryBuilder;
@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.util.UUID;
 import javax.persistence.EntityExistsException;
 import javax.persistence.RollbackException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,14 +28,14 @@ public class PersistentApplicationConfigImpl implements
     private static final Logger LOG = LoggerFactory
             .getLogger(PersistentApplicationConfigImpl.class);
 
-    private final PersistenceManager<ApplicationConfig> pm;
+    private final PersistenceManager<Application> pm;
 
     /**
      * Default constructor.
      */
     public PersistentApplicationConfigImpl() {
         // instantiate PersistenceManager
-        pm = new PersistenceManager<ApplicationConfig>();
+        pm = new PersistenceManager<Application>();
     }
 
     /**
@@ -67,7 +68,7 @@ public class PersistentApplicationConfigImpl implements
                 // Perform a simple query for all the entities
                 //TODO: Get rid of this customer query builder. Use JPA 2.0
                 QueryBuilder builder = new QueryBuilder()
-                        .table("ApplicationConfig");
+                        .table("Application");
                 results = pm.query(builder);
 
                 // set up a specific message
@@ -88,7 +89,7 @@ public class PersistentApplicationConfigImpl implements
 
                 // Get all the results as an array
                 QueryBuilder builder = new QueryBuilder().table(
-                        "ApplicationConfig").clause(criteria.toString());
+                        "Application").clause(criteria.toString());
                 results = pm.query(builder);
             }
 
@@ -102,9 +103,9 @@ public class PersistentApplicationConfigImpl implements
                 acr.setMessage("Returning applicationConfigs for input parameters");
             }
 
-            ApplicationConfig[] elements = new ApplicationConfig[results.length];
+            Application[] elements = new Application[results.length];
             for (int i = 0; i < elements.length; i++) {
-                elements[i] = (ApplicationConfig) results[i];
+                elements[i] = (Application) results[i];
             }
             acr.setApplicationConfigs(elements);
             return acr;
@@ -158,8 +159,8 @@ public class PersistentApplicationConfigImpl implements
 
             try {
                 // delete the entity
-                ApplicationConfig element = pm.deleteEntity(id,
-                        ApplicationConfig.class);
+                Application element = pm.deleteEntity(id,
+                        Application.class);
 
                 if (element == null) {
                     acr = new ApplicationConfigResponse(new CloudServiceException(
@@ -172,7 +173,7 @@ public class PersistentApplicationConfigImpl implements
                     acr = new ApplicationConfigResponse();
                     acr.setMessage("Successfully deleted applicationConfig for id: "
                             + id);
-                    ApplicationConfig[] elements = new ApplicationConfig[]{element};
+                    Application[] elements = new Application[]{element};
                     acr.setApplicationConfigs(elements);
                     return acr;
                 }
@@ -194,7 +195,7 @@ public class PersistentApplicationConfigImpl implements
             Verb method) {
         LOG.info("called");
         ApplicationConfigResponse acr;
-        ApplicationConfig applicationConfig = request.getApplicationConfig();
+        Application applicationConfig = request.getApplicationConfig();
 
         // ensure that the element is not null
         if (applicationConfig == null) {
@@ -231,7 +232,8 @@ public class PersistentApplicationConfigImpl implements
         }
 
         // common error checks done - set update time before proceeding
-        applicationConfig.setUpdateTime(System.currentTimeMillis());
+        //Should now be done automatically by @PreUpdate but will leave just in case
+//        applicationConfig.setUpdateTime(System.currentTimeMillis());
 
         // handle POST and PUT differently
         if (method.equals(Verb.POST)) {
@@ -251,7 +253,7 @@ public class PersistentApplicationConfigImpl implements
                 // create a response
                 acr = new ApplicationConfigResponse();
                 acr.setMessage("Successfully created applicationConfig for id: " + id);
-                acr.setApplicationConfigs(new ApplicationConfig[]{applicationConfig});
+                acr.setApplicationConfigs(new Application[]{applicationConfig});
                 return acr;
             } catch (RollbackException e) {
                 LOG.error(e.getMessage(), e);
@@ -259,7 +261,7 @@ public class PersistentApplicationConfigImpl implements
                     // most likely entity already exists - return useful message
                     acr = new ApplicationConfigResponse(new CloudServiceException(
                             HttpURLConnection.HTTP_CONFLICT,
-                            "ApplicationConfig already exists for id: " + id
+                            "Application already exists for id: " + id
                             + ", use PUT to update config"));
                     return acr;
                 } else {
@@ -276,8 +278,8 @@ public class PersistentApplicationConfigImpl implements
             LOG.info("GENIE: updating config for id: " + id);
 
             try {
-                ApplicationConfig old = pm.getEntity(id,
-                        ApplicationConfig.class);
+                Application old = pm.getEntity(id,
+                        Application.class);
                 // check if this is a create or an update
                 if (old == null) {
                     try {
@@ -293,7 +295,7 @@ public class PersistentApplicationConfigImpl implements
                 // all good - create a response
                 acr = new ApplicationConfigResponse();
                 acr.setMessage("Successfully updated applicationConfig for id: " + id);
-                acr.setApplicationConfigs(new ApplicationConfig[]{applicationConfig});
+                acr.setApplicationConfigs(new Application[]{applicationConfig});
                 return acr;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
@@ -313,7 +315,7 @@ public class PersistentApplicationConfigImpl implements
      * @throws CloudServiceException if some params applicationConfig missing - else
      * initialize, and set creation time
      */
-    private void initAndValidateNewElement(ApplicationConfig applicationConfig)
+    private void initAndValidateNewElement(Application applicationConfig)
             throws CloudServiceException {
 
         // basic error checking
@@ -322,11 +324,9 @@ public class PersistentApplicationConfigImpl implements
         //ArrayList<String> jars = applicationConfigElement.getJars();
 
         //TODO Should we allow configs and jars to be null?
-        if ((name == null)) {
+        if (StringUtils.isEmpty(name)) {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
                     "Need all required params: {name}");
-        } else {
-            applicationConfig.setCreateTime(applicationConfig.getUpdateTime());
         }
     }
 }

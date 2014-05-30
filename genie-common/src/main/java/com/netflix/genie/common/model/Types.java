@@ -38,39 +38,6 @@ public final class Types {
     }
 
     /**
-     * Job types supported by the Execution Service.
-     *
-     * @author skrishnan
-     * @author tgianos
-     */
-    public enum JobType {
-
-        /**
-         * Represents a Yarn job.
-         */
-        YARN;
-
-        /**
-         * Parse job type.
-         *
-         * @param value string to parse/convert
-         * @return YARN
-         * @throws CloudServiceException if invalid value passed in
-         */
-        public static JobType parse(final String value) throws CloudServiceException {
-            if (StringUtils.isEmpty(value)) {
-                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
-                        "Unacceptable job type. Must be one of {YARN}");
-            } else if (value.compareToIgnoreCase("YARN") == 0) {
-                return YARN;
-            } else {
-                throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
-                        "Unacceptable job type. Must be one of {YARN}");
-            }
-        }
-    }
-
-    /**
      * Acceptable status codes for jobs.
      *
      * @author skrishnan

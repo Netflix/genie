@@ -15,14 +15,13 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.client.sample;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.client.ClusterConfigServiceClient;
-import com.netflix.genie.common.model.ClusterConfig;
+import com.netflix.genie.client.ClusterServiceClient;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 
 /**
@@ -31,9 +30,9 @@ import com.netflix.genie.common.model.Types.ClusterStatus;
  * @author skrishnan
  *
  */
-public final class ClusterConfigServiceSampleClient {
+public final class ClusterServiceSampleClient {
 
-    private ClusterConfigServiceSampleClient() {
+    private ClusterServiceSampleClient() {
         // never called
     }
 
@@ -47,14 +46,14 @@ public final class ClusterConfigServiceSampleClient {
 
         // Initialize Eureka, if it is being used
         // System.out.println("Initializing Eureka");
-        // ClusterConfigServiceClient.initEureka("test");
+        // ClusterServiceClient.initEureka("test");
 
         System.out.println("Initializing list of Genie servers");
         ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
                 "localhost:7001");
 
         System.out.println("Initializing ClusterConfigServiceClient");
-        ClusterConfigServiceClient client = ClusterConfigServiceClient.getInstance();
+        ClusterServiceClient client = ClusterServiceClient.getInstance();
 
         String userName = "genietest";
         String name = "MY_TEST_CLUSTER_CONFIG";
@@ -73,19 +72,13 @@ public final class ClusterConfigServiceSampleClient {
 //        System.out.println("Hive config created with id: " + hiveConfigId);
 
         System.out.println("Creating new cluster config");
-        ClusterConfig clusterConfig = new ClusterConfig();
-        clusterConfig.setUser(userName);
-        clusterConfig.setName(name);
-//        clusterConfigElement.setTest(Boolean.TRUE);
-//        clusterConfigElement.setAdHoc(Boolean.FALSE);
-        clusterConfig.setStatus(ClusterStatus.OUT_OF_SERVICE);
-//        clusterConfigElement.setS3MapredSiteXml("s3://PATH/TO/MAPRED-SITE.XML");
-//        clusterConfigElement.setS3HdfsSiteXml("s3://PATH/TO/HDFS-SITE.XML");
-//        clusterConfigElement.setS3CoreSiteXml("s3://PATH/TO/CORE-SITE.XML");
-//        clusterConfigElement.setTestHiveConfigId(hiveConfigId);
+        Cluster cluster = new Cluster();
+        cluster.setUser(userName);
+        cluster.setName(name);
+        cluster.setStatus(ClusterStatus.OUT_OF_SERVICE);
 
-        clusterConfig = client.createClusterConfig(clusterConfig);
-        String id = clusterConfig.getId();
+        cluster = client.createCluster(cluster);
+        String id = cluster.getId();
         System.out.println("Cluster config created with id: " + id);
 
         System.out.println("Getting clusterConfigs using specified filter criteria");
@@ -94,29 +87,25 @@ public final class ClusterConfigServiceSampleClient {
         params.put("adHoc", "false");
         params.put("test", "true");
         params.put("limit", "3");
-        for (ClusterConfig hce : client.getClusterConfigs(params)) {
+        for (Cluster hce : client.getClusterConfigs(params)) {
             System.out.println("Cluster Configs: {id, status, updateTime} - {"
                     + hce.getId() + ", " + hce.getStatus() + ", "
-                    + hce.getUpdateTime() + "}");
+                    + hce.getUpdated().toString() + "}");
         }
 
         System.out.println("Getting cluster config by id");
-        clusterConfig = client.getClusterConfig(id);
-        System.out.println("Cluster config status: " + clusterConfig.getStatus());
+        cluster = client.getCluster(id);
+        System.out.println("Cluster config status: " + cluster.getStatus());
 
         System.out.println("Updating existing cluster config");
-        clusterConfig.setStatus(ClusterStatus.TERMINATED);
-        clusterConfig = client.updateClusterConfig(id, clusterConfig);
-        System.out.println("Updated status: " + clusterConfig.getStatus()
-                + " at time: " + clusterConfig.getUpdateTime());
+        cluster.setStatus(ClusterStatus.TERMINATED);
+        cluster = client.updateCluster(id, cluster);
+        System.out.println("Updated status: " + cluster.getStatus()
+                + " at time: " + cluster.getUpdated().toString());
 
         System.out.println("Deleting cluster config using id");
-        clusterConfig = client.deleteClusterConfig(id);
-        System.out.println("Deleted cluster config with id: " + clusterConfig.getId());
-
-//        System.out.println("Deleting hive config using id");
-//        hiveConfigElement = hiveConfigClient.deleteHiveConfig(hiveConfigId);
-//        System.out.println("Deleted hive config with id: " + hiveConfigElement.getId());
+        cluster = client.deleteClusterConfig(id);
+        System.out.println("Deleted cluster config with id: " + cluster.getId());
 
         System.out.println("Done");
     }
