@@ -44,7 +44,7 @@ public final class CommandServiceClient extends BaseGenieClient {
             .getLogger(CommandServiceClient.class);
 
     private static final String BASE_CONFIG_COMMAND_REST_URI
-            = BASE_REST_URI + "config/command";
+            = BASE_REST_URI + "config/commands";
 
     // reference to the instance object
     private static CommandServiceClient instance;

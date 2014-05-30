@@ -31,7 +31,7 @@ ID = "cstr-" + str(uuid.uuid4())
 GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/cluster'
+serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/clusters'
 
 config = json.dumps(['sla','adhoc'])
 cmds = json.dumps(['cmd-1092fa18-e556-4515-905b-d01400c94202','cmd-11407715-ed80-477d-8d4d-80428ec78728'])

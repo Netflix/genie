@@ -44,7 +44,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             .getLogger(ApplicationServiceClient.class);
 
     private static final String BASE_CONFIG_APPLICATION_REST_URI
-            = BASE_REST_URI + "config/application";
+            = BASE_REST_URI + "config/applications";
 
     // reference to the instance object
     private static ApplicationServiceClient instance;

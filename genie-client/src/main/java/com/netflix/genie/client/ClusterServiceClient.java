@@ -45,7 +45,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
             .getLogger(ClusterServiceClient.class);
 
     private static final String BASE_CONFIG_CLUSTER_REST_URI
-            = BASE_REST_URI + "config/cluster";
+            = BASE_REST_URI + "config/clusters";
 
     // reference to the instance object
     private static ClusterServiceClient instance;

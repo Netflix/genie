@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  *
  */
-@Path("/v1/config/command")
+@Path("/v1/config/commands")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class CommandConfigResourceV1 {
 

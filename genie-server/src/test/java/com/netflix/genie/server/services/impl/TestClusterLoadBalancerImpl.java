@@ -46,7 +46,7 @@ public class TestClusterLoadBalancerImpl {
 
     /**
      * Test whether HttpURLConnection.HTTP_PAYMENT_REQUIRED is raised if a cluster
-     * can't be found from http://localhost:7001/genie/v1/config/command.
+     * can't be found from http://localhost:7001/genie/v1/config/commands.
      */
     @Test
     public void testInvalidCluster() {

@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author amsharma
  */
-@Path("/v1/config/cluster")
+@Path("/v1/config/clusters")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ClusterConfigResourceV1 {
 

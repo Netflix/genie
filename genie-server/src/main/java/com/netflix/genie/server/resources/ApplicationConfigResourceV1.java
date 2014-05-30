@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  *
  */
-@Path("/v1/config/application")
+@Path("/v1/config/applications")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class ApplicationConfigResourceV1 {
 
