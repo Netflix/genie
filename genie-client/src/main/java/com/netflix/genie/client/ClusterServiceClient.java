@@ -22,7 +22,7 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.ClusterConfigRequest;
 import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.model.ClusterConfig;
+import com.netflix.genie.common.model.Cluster;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -39,23 +39,23 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
-public final class ClusterConfigServiceClient extends BaseGenieClient {
+public final class ClusterServiceClient extends BaseGenieClient {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(ClusterConfigServiceClient.class);
+            .getLogger(ClusterServiceClient.class);
 
     private static final String BASE_CONFIG_CLUSTER_REST_URI
-            = BASE_REST_URI + "config/cluster";
+            = BASE_REST_URI + "config/clusters";
 
     // reference to the instance object
-    private static ClusterConfigServiceClient instance;
+    private static ClusterServiceClient instance;
 
     /**
      * Private constructor for singleton class.
      *
      * @throws IOException if there is any error during initialization
      */
-    private ClusterConfigServiceClient() throws IOException {
+    private ClusterServiceClient() throws IOException {
         super();
     }
 
@@ -65,9 +65,9 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @return ExecutionServiceClient instance
      * @throws IOException if there is an error instantiating client
      */
-    public static synchronized ClusterConfigServiceClient getInstance() throws IOException {
+    public static synchronized ClusterServiceClient getInstance() throws IOException {
         if (instance == null) {
-            instance = new ClusterConfigServiceClient();
+            instance = new ClusterServiceClient();
         }
 
         return instance;
@@ -76,18 +76,18 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
     /**
      * Create a new cluster configuration.
      *
-     * @param config the object encapsulating the new Cluster configuration to
+     * @param cluster the object encapsulating the new Cluster configuration to
      * create
      *
      * @return extracted cluster configuration response
      * @throws CloudServiceException
      */
-    public ClusterConfig createClusterConfig(final ClusterConfig config)
+    public Cluster createCluster(final Cluster cluster)
             throws CloudServiceException {
-        checkErrorConditions(config);
+        checkErrorConditions(cluster);
 
         final ClusterConfigRequest request = new ClusterConfigRequest();
-        request.setClusterConfig(config);
+        request.setClusterConfig(cluster);
 
         final ClusterConfigResponse ccr = executeRequest(
                 Verb.POST,
@@ -111,23 +111,23 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * Create or update a cluster configuration.
      *
      * @param id the id for the cluster configuration to create or update
-     * @param config the object encapsulating the new Cluster configuration to
+     * @param cluster the object encapsulating the new Cluster configuration to
      * create
      *
      * @return extracted cluster configuration response
      * @throws CloudServiceException
      */
-    public ClusterConfig updateClusterConfig(final String id, final ClusterConfig config)
+    public Cluster updateCluster(final String id, final Cluster cluster)
             throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             String msg = "Required parameter id can't be null or empty.";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        checkErrorConditions(config);
+        checkErrorConditions(cluster);
 
         ClusterConfigRequest request = new ClusterConfigRequest();
-        request.setClusterConfig(config);
+        request.setClusterConfig(cluster);
 
         ClusterConfigResponse ccr = executeRequest(
                 Verb.PUT,
@@ -154,7 +154,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @return the cluster configuration for this id
      * @throws CloudServiceException
      */
-    public ClusterConfig getClusterConfig(final String id) throws CloudServiceException {
+    public Cluster getCluster(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -170,12 +170,12 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
                 ClusterConfigResponse.class);
 
         if (ccr.getClusterConfigs() == null || ccr.getClusterConfigs().length == 0) {
-            String msg = "Unable to parse cluster config from response";
+            String msg = "Unable to parse cluster from response";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) cluster
         return ccr.getClusterConfigs()[0];
     }
 
@@ -189,7 +189,7 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
      * @return List of cluster configuration elements that match the filter
      * @throws CloudServiceException
      */
-    public List<ClusterConfig> getClusterConfigs(final Multimap<String, String> params)
+    public List<Cluster> getClusterConfigs(final Multimap<String, String> params)
             throws CloudServiceException {
         final ClusterConfigResponse ccr = executeRequest(
                 Verb.GET,
@@ -202,23 +202,23 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
         // this will only happen if 200 is returned, and parsing fails for some
         // reason
         if (ccr.getClusterConfigs() == null || ccr.getClusterConfigs().length == 0) {
-            String msg = "Unable to parse cluster config from response";
+            String msg = "Unable to parse cluster from response";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // if we get here, there are non-zero cluster config elements - return all
+        // if we get here, there are non-zero cluster cluster elements - return all
         return Arrays.asList(ccr.getClusterConfigs());
     }
 
     /**
-     * Delete a config using its id.
+     * Delete a cluster using its id.
      *
-     * @param id the id for the cluster config to delete
-     * @return the deleted cluster config
+     * @param id the id for the cluster cluster to delete
+     * @return the deleted cluster cluster
      * @throws CloudServiceException
      */
-    public ClusterConfig deleteClusterConfig(final String id) throws CloudServiceException {
+    public Cluster deleteClusterConfig(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -234,39 +234,39 @@ public final class ClusterConfigServiceClient extends BaseGenieClient {
                 ClusterConfigResponse.class);
 
         if (ccr.getClusterConfigs() == null || ccr.getClusterConfigs().length == 0) {
-            String msg = "Unable to parse cluster config from response";
+            String msg = "Unable to parse cluster from response";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
-        // return the first (only) cluster config
+        // return the first (only) cluster
         return ccr.getClusterConfigs()[0];
     }
 
     /**
      * Check to make sure that the required parameters exist.
      *
-     * @param config The configuration to check
+     * @param cluster The configuration to check
      * @throws CloudServiceException
      */
-    private void checkErrorConditions(final ClusterConfig config) throws CloudServiceException {
-        if (config == null) {
-            final String msg = "Required parameter config can't be NULL";
+    private void checkErrorConditions(final Cluster cluster) throws CloudServiceException {
+        if (cluster == null) {
+            final String msg = "Required parameter cluster can't be NULL";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(config.getUser())) {
+        if (StringUtils.isEmpty(cluster.getUser())) {
             messages.add("User name is missing. Unable to continue.\n");
         }
-        if (StringUtils.isEmpty(config.getName())) {
+        if (StringUtils.isEmpty(cluster.getName())) {
             messages.add("Cluster name is missing. Unable to continue.\n");
         }
-        if (config.getStatus() == null) {
-            messages.add("No application status entered. Required to create.\n");
+        if (cluster.getStatus() == null) {
+            messages.add("No cluster status entered. Unable to continue.\n");
         }
-        if (config.getConfigs().isEmpty()) {
+        if (cluster.getConfigs().isEmpty()) {
             messages.add("At least one configuration file is required for the cluster.\n");
         }
 

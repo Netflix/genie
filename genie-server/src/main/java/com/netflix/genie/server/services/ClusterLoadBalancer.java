@@ -19,7 +19,7 @@
 package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ClusterConfig;
+import com.netflix.genie.common.model.Cluster;
 
 /**
  * Interface for the cluster load-balancer, which returns the "best" cluster to
@@ -39,6 +39,6 @@ public interface ClusterLoadBalancer {
      * @throws CloudServiceException
      *             if there is any error
      */
-    ClusterConfig selectCluster(ClusterConfig[] ceArray)
+    Cluster selectCluster(Cluster[] ceArray)
             throws CloudServiceException;
 }

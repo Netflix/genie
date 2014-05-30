@@ -21,7 +21,6 @@ package com.netflix.genie.common.model;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.common.model.Types.JobType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -73,26 +72,5 @@ public class TestTypes {
     @Test(expected = CloudServiceException.class)
     public void testInvalidJobStatus() throws CloudServiceException {
         JobStatus.parse("DOES_NOT_EXIST");
-    }
-
-    /**
-     * Tests whether a valid job type is parsed correctly.
-     *
-     * @throws com.netflix.genie.common.exceptions.CloudServiceException
-     */
-    @Test
-    public void testValidJobType() throws CloudServiceException {
-        String type = JobType.YARN.name();
-        Assert.assertEquals(JobType.YARN, JobType.parse(type));
-    }
-
-    /**
-     * Tests whether an invalid job type returns null.
-     *
-     * @throws com.netflix.genie.common.exceptions.CloudServiceException
-     */
-    @Test(expected = CloudServiceException.class)
-    public void testInvalidJobType() throws CloudServiceException {
-        JobType.parse("DOES_NOT_EXIST");
     }
 }

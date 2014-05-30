@@ -21,12 +21,12 @@ import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -36,23 +36,18 @@ import org.apache.commons.lang.StringUtils;
  * Representation of the state of a Genie 2.0 job.
  *
  * @author amsharma
+ * @author tgianos
  */
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class Job implements Serializable {
+public class Job extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 2979506788441089067L;
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
     // ------------------------------------------------------------------------
-    /**
-     * User-specified or system-generated unique job id.
-     */
-    @Id
-    private String jobID;
-
     /**
      * User-specified or system-generated job name.
      */
@@ -109,8 +104,7 @@ public class Job implements Serializable {
 
     /**
      * String representation of the the cluster criteria array list object
-     * above.
-     * TODO: use pre/post persist to store the above list into the DB
+     * above. TODO: use pre/post persist to store the above list into the DB
      */
     @Lob
     private String clusterCriteriaString;
@@ -184,12 +178,6 @@ public class Job implements Serializable {
     // TO BE GENERATED/USED BY SERVER
     // ------------------------------------------------------------------------
     /**
-     * Job type - e.g. hadoop, pig and hive (upper case in DB).
-     */
-    @Basic
-    private String jobType;
-
-    /**
      * PID for job - updated by the server.
      */
     @Basic
@@ -212,12 +200,6 @@ public class Job implements Serializable {
      */
     @Basic
     private Long startTime;
-
-    /**
-     * Last update time for job - initialized to null.
-     */
-    @Basic
-    private Long updateTime;
 
     /**
      * Finish time for job - initialized to zero (for historic reasons).
@@ -269,21 +251,10 @@ public class Job implements Serializable {
     private String archiveLocation;
 
     /**
-     * Gets the id (primary key) for this job.
-     *
-     * @return jobID
+     * Default Constructor.
      */
-    public String getJobID() {
-        return jobID;
-    }
-
-    /**
-     * Sets the id (primary key) for this job.
-     *
-     * @param jobID unique id for this job
-     */
-    public void setJobID(String jobID) {
-        this.jobID = jobID;
+    public Job() {
+        super();
     }
 
     /**
@@ -376,25 +347,6 @@ public class Job implements Serializable {
      */
     public void setClient(String client) {
         this.client = client;
-    }
-
-    /**
-     * Gets the type of job.
-     *
-     * @return jobType
-     */
-    public String getJobType() {
-        return jobType;
-    }
-
-    /**
-     * Sets the type of the job.
-     *
-     * @param jobType type of the job. Interpreted from the command and
-     * populated in this field.
-     */
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
     }
 
     /**
@@ -694,25 +646,6 @@ public class Job implements Serializable {
     }
 
     /**
-     * Gets the last update time for this job.
-     *
-     * @return updateTime
-     */
-    public Long getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * Set the updateTime for the job.
-     *
-     * @param updateTime epoch time in ms
-     *
-     */
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    /**
      * Gets the finish time for this job.
      *
      * @return finishTime
@@ -897,7 +830,7 @@ public class Job implements Serializable {
             setFinishTime(System.currentTimeMillis());
         }
 
-        setUpdateTime(System.currentTimeMillis());
+        setUpdated(new Date());
     }
 
     /**

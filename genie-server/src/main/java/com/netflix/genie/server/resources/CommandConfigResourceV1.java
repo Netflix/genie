@@ -3,8 +3,8 @@ package com.netflix.genie.server.resources;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.messages.CommandConfigRequest;
 import com.netflix.genie.common.messages.CommandConfigResponse;
-import com.netflix.genie.common.model.ApplicationConfig;
-import com.netflix.genie.common.model.CommandConfig;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  *
  */
-@Path("/v1/config/command")
+@Path("/v1/config/commands")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class CommandConfigResourceV1 {
 
@@ -57,7 +57,7 @@ public class CommandConfigResourceV1 {
          * @throws Exception if there is any error in initialization
          */
         public CommandJAXBContextResolver() throws Exception {
-            super(new Class[]{CommandConfig.class,
+            super(new Class[]{Command.class,
                 CommandConfigRequest.class,
                 CommandConfigResponse.class});
         }
@@ -115,9 +115,9 @@ public class CommandConfigResourceV1 {
     public Response createCommandConfig(CommandConfigRequest request) {
         LOG.info("called to create new cluster");
 
-        // Need to get the CommandConfig object and fetch the applcation objects from the DB
+        // Need to get the Command object and fetch the applcation objects from the DB
         // to set it in the object.
-        CommandConfig ce = request.getCommandConfig();
+        Command ce = request.getCommandConfig();
 
         if (ce == null) {
             return ResponseUtil.createResponse(new CommandConfigResponse(new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
@@ -127,12 +127,12 @@ public class CommandConfigResourceV1 {
         ArrayList<String> appids = ce.getAppIds();
 
         if (appids != null) {
-            PersistenceManager<ApplicationConfig> pma = new PersistenceManager<ApplicationConfig>();
-            ArrayList<ApplicationConfig> appList = new ArrayList<ApplicationConfig>();
+            PersistenceManager<Application> pma = new PersistenceManager<Application>();
+            ArrayList<Application> appList = new ArrayList<Application>();
             Iterator<String> it = appids.iterator();
             while (it.hasNext()) {
                 String appId = (String) it.next();
-                ApplicationConfig ae = (ApplicationConfig) pma.getEntity(appId, ApplicationConfig.class);
+                Application ae = (Application) pma.getEntity(appId, Application.class);
                 if (ae != null) {
                     appList.add(ae);
                 } else {
@@ -161,19 +161,19 @@ public class CommandConfigResourceV1 {
     public Response updateCommandConfig(@PathParam("id") String id,
             CommandConfigRequest request) {
         LOG.info("called to create/update comamnd config");
-        CommandConfig commandConfig = request.getCommandConfig();
+        Command commandConfig = request.getCommandConfig();
         if (commandConfig != null) {
             // include "id" in the request
             commandConfig.setId(id);
             ArrayList<String> appids = commandConfig.getAppIds();
 
             if (appids != null) {
-                PersistenceManager<ApplicationConfig> pma = new PersistenceManager<ApplicationConfig>();
-                ArrayList<ApplicationConfig> appList = new ArrayList<ApplicationConfig>();
+                PersistenceManager<Application> pma = new PersistenceManager<Application>();
+                ArrayList<Application> appList = new ArrayList<Application>();
                 Iterator<String> it = appids.iterator();
                 while (it.hasNext()) {
                     String appId = (String) it.next();
-                    ApplicationConfig ae = (ApplicationConfig) pma.getEntity(appId, ApplicationConfig.class);
+                    Application ae = (Application) pma.getEntity(appId, Application.class);
                     if (ae != null) {
                         appList.add(ae);
                     } else {

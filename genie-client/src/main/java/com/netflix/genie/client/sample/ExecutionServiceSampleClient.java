@@ -32,7 +32,6 @@ import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.common.model.Types.JobType;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
@@ -69,19 +68,17 @@ public final class ExecutionServiceSampleClient {
         System.out.println("Getting jobInfos using specified filter criteria");
         Multimap<String, String> params = ArrayListMultimap.create();
         params.put("userName", userName);
-        params.put("jobType", JobType.YARN.name());
         params.put("status", JobStatus.FAILED.name());
         params.put("limit", "3");
         for (Job ji : client.getJobs(params)) {
             System.out.println("Job Info: {id, status, finishTime} - {"
-                    + ji.getJobID() + ", " + ji.getStatus() + ", "
+                    + ji.getId() + ", " + ji.getStatus() + ", "
                     + ji.getFinishTime() + "}");
         }
 
         System.out.println("Running Hive job");
         Job jobInfo = new Job();
         jobInfo.setUserName(userName);
-        jobInfo.setJobType(JobType.YARN.name());
         jobInfo.setDescription("This is a test");
 //        jobInfo.setConfiguration(Configuration.TEST.name());
 //        jobInfo.setSchedule(Schedule.ADHOC.name());
@@ -99,7 +96,7 @@ public final class ExecutionServiceSampleClient {
         jobInfo.setCmdArgs("-f hive.q");
         jobInfo = client.submitJob(jobInfo);
 
-        String jobID = jobInfo.getJobID();
+        String jobID = jobInfo.getId();
         String outputURI = jobInfo.getOutputURI();
         System.out.println("Job ID: " + jobID);
         System.out.println("Output URL: " + outputURI);

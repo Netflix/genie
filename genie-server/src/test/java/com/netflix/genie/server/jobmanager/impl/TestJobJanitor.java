@@ -22,13 +22,18 @@ import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import java.util.UUID;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test code for the job janitor class, which marks un-updated jobs as zombies.
  *
  * @author skrishnan
+ * @author tgianos
  */
 public class TestJobJanitor {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TestJobJanitor.class);
 
     /**
      * Test whether the janitor cleans up zombie jobs correctly.
@@ -40,18 +45,16 @@ public class TestJobJanitor {
         // create two old jobs
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
         Job one = new Job();
+        one.setId(UUID.randomUUID().toString());
         one.setJobName("UPDATE_TEST");
-        one.setJobID(UUID.randomUUID().toString());
-        one.setUpdateTime(0L);
         one.setStatus(JobStatus.RUNNING);
         one.setUserName("someUser");
         one.setCmdArgs("someArgs");
         pm.createEntity(one);
         Job two = new Job();
+        two.setId(UUID.randomUUID().toString());
         two.setJobName("UPDATE_TEST");
-        two.setUpdateTime(0L);
         two.setStatus(JobStatus.INIT);
-        two.setJobID(UUID.randomUUID().toString());
         two.setUserName("some other user name");
         two.setCmdArgs("someArgs2");
         pm.createEntity(two);
@@ -59,10 +62,10 @@ public class TestJobJanitor {
         // ensure that more than two jobs have been cleaned up
         JobJanitor janitor = new JobJanitor();
         int numRows = janitor.markZombies();
-        System.out.println("Number of rows marked as zombies: " + numRows);
+        LOG.info("Number of rows marked as zombies: " + numRows);
 
-        // TODO: make the test work
-        //Assert.assertEquals(numRows >= 2, true);
+        // TODO: make the test work. Need to delay time or force update time older.
+//        Assert.assertEquals(numRows >= 2, true);
         // shut down cleanly
         PersistenceManager.shutdown();
     }

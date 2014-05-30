@@ -28,7 +28,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -43,15 +42,9 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
-public class CommandConfig implements Serializable {
+public class Command extends Auditable implements Serializable {
 
     private static final long serialVersionUID = -6106046473373305992L;
-
-    /**
-     * Unique ID to represent a row in database - e.g. prodhive11_mr1, prodhive13_tez, hadoop24
-     */
-    @Id
-    private String id;
 
     /**
      * Name of this command - e.g. prodhive, pig, hadoop etc.
@@ -93,11 +86,10 @@ public class CommandConfig implements Serializable {
 
     /**
      * Set of applications that can run this command - foreign key in database,
-     * implemented by openjpa using join table
-     * CommandConfig_ApplicationConfig.
+     * implemented by openjpa using join table CommandConfig_ApplicationConfig.
      */
-    @ManyToMany(targetEntity = ApplicationConfig.class, fetch = FetchType.EAGER)
-    private ArrayList<ApplicationConfig> applications;
+    @ManyToMany(targetEntity = Application.class, fetch = FetchType.EAGER)
+    private ArrayList<Application> applications;
 
     /**
      * User who created this command.
@@ -118,33 +110,10 @@ public class CommandConfig implements Serializable {
     private String version;
 
     /**
-     * When was this created?
+     * Default Constructor.
      */
-    @Basic
-    private Long createTime;
-
-    /**
-     * When was this last updated?
-     */
-    @Basic
-    private Long updateTime;
-
-    /**
-     * Gets the id (primary key) for this command.
-     *
-     * @return id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Sets the id (primary key) for this command.
-     *
-     * @param id unique id for this command
-     */
-    public void setId(String id) {
-        this.id = id;
+    public Command() {
+        super();
     }
 
     /**
@@ -228,7 +197,7 @@ public class CommandConfig implements Serializable {
      * marked transient.
      */
     @XmlTransient
-    public ArrayList<ApplicationConfig> getApplications() {
+    public ArrayList<Application> getApplications() {
         return applications;
     }
 
@@ -237,7 +206,7 @@ public class CommandConfig implements Serializable {
      *
      * @param applications The applications that this command supports
      */
-    public void setApplications(ArrayList<ApplicationConfig> applications) {
+    public void setApplications(ArrayList<Application> applications) {
         this.applications = applications;
     }
 
@@ -296,43 +265,6 @@ public class CommandConfig implements Serializable {
     }
 
     /**
-     * Gets the create time for this command.
-     *
-     * @return createTime - epoch time of creation in milliseconds
-     *
-     */
-    public Long getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * Sets the create time for this command.
-     *
-     * @param createTime epoch time in ms
-     */
-    public void setCreateTime(Long createTime) {
-        this.createTime = createTime;
-    }
-
-    /**
-     * Gets the last updated time for this command.
-     *
-     * @return updateTime - epoch time of update in milliseconds
-     */
-    public Long getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * Sets the updated time for this comamnd.
-     *
-     * @param updateTime epoch time in milliseconds
-     */
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    /**
      * Gets the application id's supported by this command.
      *
      * @return appIds - a list of all application id's supported by this command
@@ -341,9 +273,9 @@ public class CommandConfig implements Serializable {
     public ArrayList<String> getAppIds() {
         if (this.applications != null) {
             appIds = new ArrayList<String>();
-            Iterator<ApplicationConfig> it = this.applications.iterator();
+            Iterator<Application> it = this.applications.iterator();
             while (it.hasNext()) {
-                appIds.add(((ApplicationConfig) it.next()).getId());
+                appIds.add(((Application) it.next()).getId());
             }
         }
         return appIds;

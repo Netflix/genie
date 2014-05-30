@@ -31,7 +31,7 @@ import restclient
 GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/application'
+serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/applications'
 
 
 def addApplicationConfigMr1():
@@ -129,7 +129,7 @@ def addApplicationConfigTz2():
 # driver method for all tests                
 if __name__ == "__main__":
    print "Creating Application Configs:\n"
-   #addApplicationConfigMr1()
+   addApplicationConfigMr1()
    addApplicationConfigMr2()
-   #addApplicationConfigTz1()
-   #addApplicationConfigTz2()
+   addApplicationConfigTz1()
+   addApplicationConfigTz2()

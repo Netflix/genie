@@ -129,10 +129,10 @@ public class PersistenceManager<T> {
             if (orderByUpdateTime) {
                 boolean desc = builder.isDesc();
                 if (desc) {
-                    strQuery += String.format(" order by %s.updateTime desc",
+                    strQuery += String.format(" order by %s.updated desc",
                             ENTITY_ALIAS);
                 } else {
-                    strQuery += String.format(" order by %s.updateTime asc",
+                    strQuery += String.format(" order by %s.updated asc",
                             ENTITY_ALIAS);
                 }
             }

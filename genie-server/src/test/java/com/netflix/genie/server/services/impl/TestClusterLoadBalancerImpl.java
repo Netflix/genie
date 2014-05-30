@@ -18,7 +18,7 @@
 package com.netflix.genie.server.services.impl;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ClusterConfig;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import java.net.HttpURLConnection;
 import static org.junit.Assert.assertEquals;
@@ -39,20 +39,20 @@ public class TestClusterLoadBalancerImpl {
      */
     @Test
     public void testValidCluster() throws Exception {
-        ClusterConfig cce = new ClusterConfig();
+        Cluster cce = new Cluster();
         ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
-        assertNotNull(clb.selectCluster(new ClusterConfig[] {cce, cce, cce }));
+        assertNotNull(clb.selectCluster(new Cluster[] {cce, cce, cce }));
     }
 
     /**
      * Test whether HttpURLConnection.HTTP_PAYMENT_REQUIRED is raised if a cluster
-     * can't be found from http://localhost:7001/genie/v1/config/command.
+     * can't be found from http://localhost:7001/genie/v1/config/commands.
      */
     @Test
     public void testInvalidCluster() {
         ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
         try {
-            clb.selectCluster(new ClusterConfig[] {});
+            clb.selectCluster(new Cluster[] {});
         } catch (CloudServiceException cse) {
             assertEquals(HttpURLConnection.HTTP_PAYMENT_REQUIRED, cse.getErrorCode());
         }
