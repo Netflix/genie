@@ -137,6 +137,12 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                 criteria.append("updateTime <= " + maxUpdateTime);
             }
 
+            if(tags != null) {
+                for (String tag : tags) {
+                    criteria.append("\"" + tag + "\" member of T.tags", false);
+                }
+            }
+            
             if ((status != null) && !status.isEmpty()) {
                 int count = 0;
                 ClauseBuilder statusCriteria = new ClauseBuilder(ClauseBuilder.OR);
