@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ package com.netflix.genie.server.services.impl;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
-import java.net.HttpURLConnection;
-import static org.junit.Assert.assertEquals;
+import java.util.ArrayList;
+import java.util.Arrays;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
@@ -29,37 +29,40 @@ import org.junit.Test;
  * Test for the cluster load balancer.
  *
  * @author skrishnan
+ * @author tgianos
  */
-public class TestClusterLoadBalancerImpl {
+public class TestRandomizedClusterLoadBalancerImpl {
+
+    private final ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
 
     /**
      * Test whether a cluster is returned from a set of candidates.
      *
-     * @throws Exception if anything went wrong with the test.
+     * @throws CloudServiceException if anything went wrong with the test.
      */
     @Test
-    public void testValidCluster() throws Exception {
+    public void testValidCluster() throws CloudServiceException {
         Cluster cce = new Cluster();
-        ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
-        assertNotNull(clb.selectCluster(new Cluster[] {cce, cce, cce }));
+        assertNotNull(this.clb.selectCluster(Arrays.asList(new Cluster[]{cce, cce, cce})));
     }
 
     /**
-     * Test whether HttpURLConnection.HTTP_PAYMENT_REQUIRED is raised if a cluster
-     * can't be found from http://localhost:7001/genie/v1/config/commands.
+     * Ensure exception is thrown if no cluster is found.
+     *
+     * @throws CloudServiceException
      */
-    @Test
-    public void testInvalidCluster() {
-        ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
-        try {
-            clb.selectCluster(new Cluster[] {});
-        } catch (CloudServiceException cse) {
-            assertEquals(HttpURLConnection.HTTP_PAYMENT_REQUIRED, cse.getErrorCode());
-        }
-        try {
-            clb.selectCluster(null);
-        } catch (CloudServiceException cse) {
-            assertEquals(HttpURLConnection.HTTP_PAYMENT_REQUIRED, cse.getErrorCode());
-        }
+    @Test(expected = CloudServiceException.class)
+    public void testEmptyList() throws CloudServiceException {
+        this.clb.selectCluster(new ArrayList<Cluster>());
+    }
+
+    /**
+     * Ensure exception is thrown if no cluster is found.
+     *
+     * @throws CloudServiceException
+     */
+    @Test(expected = CloudServiceException.class)
+    public void testNullList() throws CloudServiceException {
+        this.clb.selectCluster(null);
     }
 }

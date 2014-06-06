@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,17 +15,13 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ApplicationConfigRequest;
-import com.netflix.genie.common.messages.ApplicationConfigResponse;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
-import com.netflix.genie.server.util.JAXBContextResolver;
-import com.netflix.genie.server.util.ResponseUtil;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,8 +32,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +40,10 @@ import org.slf4j.LoggerFactory;
  * Application.
  *
  * @author amsharma
- *
+ * @author tgianos
  */
 @Path("/v1/config/applications")
-@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ApplicationConfigResourceV1 {
 
     private final ApplicationConfigService acs;
@@ -57,127 +51,90 @@ public class ApplicationConfigResourceV1 {
             .getLogger(ApplicationConfigResourceV1.class);
 
     /**
-     * Custom JAXB context resolver for the cluster config requests/responses.
-     *
-     * @author amsharma
-     */
-    @Provider
-    public static class ApplicationJAXBContextResolver extends JAXBContextResolver {
-
-        /**
-         * Constructor - initialize the resolver for the types that this
-         * resource cares about.
-         *
-         * @throws Exception if there is any error in initialization
-         */
-        public ApplicationJAXBContextResolver() throws Exception {
-            super(new Class[]{Application.class,
-                ApplicationConfigRequest.class,
-                ApplicationConfigResponse.class});
-        }
-    }
-
-    /**
      * Default constructor.
      *
      * @throws CloudServiceException if there is any error
      */
     public ApplicationConfigResourceV1() throws CloudServiceException {
-        acs = ConfigServiceFactory.getApplicationConfigImpl();
+        this.acs = ConfigServiceFactory.getApplicationConfigImpl();
     }
 
     /**
-     * Get Application config for given id.
+     * Get Application configuration for given id.
      *
-     * @param id unique id for application config
-     * @return successful response, or one with an HTTP error code
+     * @param id unique id for application configuration
+     * @return The application configuration
+     * @throws CloudServiceException
      */
     @GET
     @Path("/{id}")
-    public Response getApplicationConfig(@PathParam("id") String id) {
-        LOG.info("called");
-        return getApplicationConfig(id, null);
+    public Application getApplicationConfig(@PathParam("id") final String id)
+            throws CloudServiceException {
+        LOG.debug("Called");
+        return this.acs.getApplicationConfig(id);
     }
 
     /**
-     * Get Application config based on user params.
+     * Get Application configuration based on user parameters.
      *
-     * @param id unique id for config (optional)
-     * @param name name for config (optional)
-     *
-     * @return successful response, or one with an HTTP error code
+     * @param name name for configuration (optional)
+     * @param userName the user who created the application (optional)
+     * @return All applications matching the criteria
+     * @throws CloudServiceException
      */
     @GET
-    @Path("/")
-    public Response getApplicationConfig(@QueryParam("id") String id,
-            @QueryParam("name") String name) {
-
-        LOG.info("called");
-        ApplicationConfigResponse acr = acs.getApplicationConfig(id, name);
-        return ResponseUtil.createResponse(acr);
+    public List<Application> getApplicationConfigs(
+            @QueryParam("name") final String name,
+            @QueryParam("userName") final String userName)
+            throws CloudServiceException {
+        LOG.debug("called");
+        return this.acs.getApplicationConfigs(name, userName);
     }
 
     /**
-     * Create Application configuration.
+     * Create an Application configuration.
      *
-     * @param request contains a application config element
-     * @return successful response, or one with an HTTP error code
+     * @param app The application to create
+     * @return The created application configuration
+     * @throws CloudServiceException
      */
     @POST
-    @Path("/")
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public Response createApplicationConfig(ApplicationConfigRequest request) {
-        LOG.info("called to create new application");
-        ApplicationConfigResponse acr = acs.createApplicationConfig(request);
-        return ResponseUtil.createResponse(acr);
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Application createApplicationConfig(final Application app) throws CloudServiceException {
+        LOG.debug("Called to create new application");
+        return this.acs.createApplicationConfig(app);
     }
 
     /**
-     * Insert/update application config.
+     * Update application configuration.
      *
-     * @param id unique id for config to upsert
-     * @param request contains the application config element for update
+     * @param id unique id for configuration to update
+     * @param updateApp contains the application information to update
      * @return successful response, or one with an HTTP error code
+     * @throws CloudServiceException
      */
     @PUT
     @Path("/{id}")
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public Response updateApplicationConfig(@PathParam("id") String id,
-            ApplicationConfigRequest request) {
-        LOG.info("called to create/update application config");
-        Application applicationConfig = request.getApplicationConfig();
-        if (applicationConfig != null) {
-            // include "id" in the request
-            applicationConfig.setId(id);
-        }
-
-        ApplicationConfigResponse acr = acs.updateApplicationConfig(request);
-        return ResponseUtil.createResponse(acr);
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Application updateApplicationConfig(
+            @PathParam("id") final String id,
+            final Application updateApp) throws CloudServiceException {
+        LOG.debug("called to update application config with info " + updateApp.toString());
+        return this.acs.updateApplicationConfig(id, updateApp);
     }
 
     /**
-     * Delete without an id, returns an error.
+     * Delete an application configuration from database.
      *
-     * @return error code, since no id is provided
-     */
-    @DELETE
-    @Path("/")
-    public Response deleteApplicationConfig() {
-        LOG.info("called");
-        return deleteApplicationConfig(null);
-    }
-
-    /**
-     * Delete a application config from database.
-     *
-     * @param id unique id for config to delete
-     * @return successful response, or one with an HTTP error code
+     * @param id unique id of configuration to delete
+     * @return The deleted application configuration
+     * @throws CloudServiceException
      */
     @DELETE
     @Path("/{id}")
-    public Response deleteApplicationConfig(@PathParam("id") String id) {
-        LOG.info("called");
-        ApplicationConfigResponse acr = acs.deleteApplicationConfig(id);
-        return ResponseUtil.createResponse(acr);
+    public Application deleteApplicationConfig(@PathParam("id") final String id)
+            throws CloudServiceException {
+        LOG.debug("called");
+        return this.acs.deleteApplicationConfig(id);
     }
 }

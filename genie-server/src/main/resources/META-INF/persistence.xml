@@ -1,6 +1,6 @@
 <!--
 
-  Copyright 2013 Netflix, Inc.
+  Copyright 2014 Netflix, Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -45,19 +45,33 @@
         <properties>
             <!--       properties for Derby/local  -->
             <property name="openjpa.ConnectionURL" 
-                value="jdbc:derby:genie-db;create=true"/>
+                      value="jdbc:derby:genie-db;create=true"/>
             <property name="openjpa.ConnectionDriverName" 
-                value="org.apache.derby.jdbc.EmbeddedDriver"/>
+                      value="org.apache.derby.jdbc.EmbeddedDriver"/>
             <property name="openjpa.ConnectionUserName" 
-                value="me"/>
+                      value="me"/>
             <property name="openjpa.ConnectionPassword" 
-                value="mine"/>
+                      value="mine"/>
             <property name="openjpa.jdbc.Schema"
-                value="genie"/>
+                      value="genie"/>      
+            
+<!--            <property name="openjpa.ConnectionProperties" 
+                value="driverClass=com.mysql.jdbc.Driver,
+		       jdbcUrl=jdbc:mysql://127.0.0.1/bdp_dev_v1?autoReconnect=true,
+		       minPoolSize=5,
+		       acquireRetryAttempts=3,
+		       maxPoolSize=20,
+		       preferredTestQuery=SELECT 1;,
+		       testConnectionOnCheckout=true,
+		       user=root, 
+		       password="/>
+		       
+            <property name="openjpa.ConnectionDriverName" 
+                value="com.mchange.v2.c3p0.ComboPooledDataSource"/>-->
       
             <!-- common properties -->
             <property name="openjpa.jdbc.SynchronizeMappings"
-                value="buildSchema(SchemaAction='add')"/>               
+                      value="buildSchema(SchemaAction='add')"/>               
       
             <property name="openjpa.DynamicEnhancementAgent" value="false"/>
             <property name="openjpa.RuntimeUnenhancedClasses" value="unsupported"/>

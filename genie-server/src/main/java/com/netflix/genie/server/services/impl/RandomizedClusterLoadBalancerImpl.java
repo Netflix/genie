@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,45 +15,46 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services.impl;
-
-import java.net.HttpURLConnection;
-import java.util.Random;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
+import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Random;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic implementation of a load balancer where a cluster is picked at random.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
 public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(RandomizedClusterLoadBalancerImpl.class);
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
     @Override
-    public Cluster selectCluster(Cluster[] ceArray)
+    public Cluster selectCluster(final List<Cluster> clusters)
             throws CloudServiceException {
         LOG.info("called");
 
-        if (ceArray == null || ceArray.length == 0) {
-            String msg = "No cluster configuration found to match user params";
+        if (clusters == null || clusters.isEmpty()) {
+            final String msg = "No cluster configuration found to match user params";
             LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_PAYMENT_REQUIRED, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_NOT_FOUND, msg);
         }
 
         // return a random one
-        Random rand = new Random();
-        return ceArray[Math.abs(rand.nextInt(ceArray.length))];
+        final Random rand = new Random();
+        return clusters.get(Math.abs(rand.nextInt(clusters.size())));
     }
 }

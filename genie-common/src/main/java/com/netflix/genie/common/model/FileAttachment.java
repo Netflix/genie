@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,14 +19,12 @@
 package com.netflix.genie.common.model;
 
 import java.io.Serializable;
-
 import javax.activation.DataHandler;
 
 /**
  * Representation of a file attachment sent as part of the job request.
  *
  * @author skrishnan
- *
  */
 public class FileAttachment implements Serializable {
 
@@ -48,7 +46,7 @@ public class FileAttachment implements Serializable {
      * @return name of file for this attachment
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -56,7 +54,7 @@ public class FileAttachment implements Serializable {
      *
      * @param name name of the file for this attachment
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -66,7 +64,7 @@ public class FileAttachment implements Serializable {
      * @return the data handler containing data for the attachment
      */
     public DataHandler getData() {
-        return data;
+        return this.data;
     }
 
     /**
@@ -74,7 +72,7 @@ public class FileAttachment implements Serializable {
      *
      * @param data the data handler for the attachment.
      */
-    public void setData(DataHandler data) {
+    public void setData(final DataHandler data) {
         this.data = data;
     }
 }

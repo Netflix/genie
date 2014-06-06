@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
  */
 package com.netflix.genie.server.services;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.netflix.genie.common.messages.ClusterConfigRequest;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
-import com.netflix.genie.common.model.Types;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Abstraction layer to encapsulate data ClusterConfig functionality.<br>
@@ -31,83 +29,87 @@ import com.netflix.genie.common.model.Types;
  *
  * @author skrishnan
  * @author amsharma
+ * @author tgianos
  */
 public interface ClusterConfigService {
 
     /**
-     * Gets the cluster config by id.
+     * Get the cluster configuration by id.
      *
-     * @param id unique id of cluster config to return
-     * @return successful response, or one with HTTP error code
+     * @param id unique id of cluster configuration to return
+     * @return The cluster configuration
+     * @throws CloudServiceException
      */
-    ClusterConfigResponse getClusterConfig(String id);
+    Cluster getClusterConfig(final String id) throws CloudServiceException;
 
     /**
-     * Get the cluster config by various params.
+     * Get cluster info for various parameters. Null or empty parameters are
+     * ignored.
      *
-     * @param id unique id for cluster (can be a pattern)
-     * @param name name of cluster (can be a pattern)
-     * @param commandId commands supported by the cluster
-     * @param tags tags allocated to this cluster
-     * @param status status for cluster
-     * @return successful response, or one with HTTP error code
-     */
-    ClusterConfigResponse getClusterConfig(String id, String name,
-            String commandId, List<String> tags, Types.ClusterStatus status);
-
-    /**
-     * Get cluster info for various params Null parameters are ignored.
-     *
-     * @param id unique id for cluster
      * @param name cluster name
-     * @param status valid types - Types.ClusterStatus
+     * @param statuses valid types - Types.ClusterStatus
      * @param tags tags allocated to this cluster
-     * @param minUpdateTime min time when cluster config was updated
-     * @param maxUpdateTime max time when cluster config was updated
+     * @param minUpdateTime min time when cluster configuration was updated
+     * @param maxUpdateTime max time when cluster configuration was updated
      * @param limit number of entries to return
      * @param page page number
-     * @return successful response, or one with HTTP error code
+     * @return All the clusters matching the criteria
+     * @throws CloudServiceException
      */
-    ClusterConfigResponse getClusterConfig(String id, String name,
-            List<String> status, List<String> tags, Long minUpdateTime,
-            Long maxUpdateTime, Integer limit, Integer page);
+    //TODO: Combine the two getAlls into one if possible
+    List<Cluster> getClusterConfigs(
+            final String name,
+            final List<String> statuses,
+            final List<String> tags,
+            final Long minUpdateTime,
+            final Long maxUpdateTime,
+            final Integer limit,
+            final Integer page) throws CloudServiceException;
 
     /**
-     * Get the cluster config for various params.
+     * Get the cluster configurations for various parameters.
      *
      * @param applicationId The application id
      * @param applicationName The application name
      * @param commandId The command identifier
      * @param commandName The command name
-     * @param clusterCriteriaList List of cluster criteria
+     * @param clusterCriterias List of cluster criteria
      * @return successful response, or one with HTTP error code
      */
-    ClusterConfigResponse getClusterConfig(String applicationId,
-            String applicationName, String commandId, String commandName,
-            ArrayList<ClusterCriteria> clusterCriteriaList);
+    List<Cluster> getClusterConfigs(
+            final String applicationId,
+            final String applicationName,
+            final String commandId,
+            final String commandName,
+            final Set<ClusterCriteria> clusterCriterias);
 
     /**
-     * Create new cluster config.
+     * Create new cluster configuration.
      *
-     * @param request
-     * @return successful response, or one with HTTP error code
+     * @param cluster The cluster to create
+     * @return The created cluster
+     * @throws CloudServiceException
      */
-    ClusterConfigResponse createClusterConfig(ClusterConfigRequest request);
+    Cluster createClusterConfig(final Cluster cluster) throws CloudServiceException;
 
     /**
-     * Update/insert cluster config.
+     * Update a cluster configuration.
      *
-     * @param request enscapsulates cluster config to upsert, must contain valid
-     * id
-     * @return successful response, or one with HTTP error code
+     * @param id The id of the cluster to update
+     * @param updateCluster the information to update the cluster with
+     * @return the updated cluster
+     * @throws CloudServiceException
      */
-    ClusterConfigResponse updateClusterConfig(ClusterConfigRequest request);
+    Cluster updateClusterConfig(
+            final String id,
+            final Cluster updateCluster) throws CloudServiceException;
 
     /**
-     * Delete a cluster config by id.
+     * Delete a cluster configuration by id.
      *
      * @param id unique id for cluster to delete
-     * @return successful response, or one with HTTP error code
+     * @return the deleted cluster
+     * @throws CloudServiceException
      */
-    ClusterConfigResponse deleteClusterConfig(String id);
+    Cluster deleteClusterConfig(final String id) throws CloudServiceException;
 }

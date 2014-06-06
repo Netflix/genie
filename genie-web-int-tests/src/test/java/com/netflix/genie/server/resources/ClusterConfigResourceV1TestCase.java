@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Netflix, Inc.
+ * Copyright 2014 Netflix, Inc.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.genie.server.resources;
 
 import com.google.inject.Inject;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.server.utils.Deployments;
 import com.netflix.karyon.server.test.RunInKaryon;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -25,12 +24,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.ws.rs.core.Response;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link ClusterConfigResourceV1} class.
@@ -59,19 +52,19 @@ public class ClusterConfigResourceV1TestCase {
     private ClusterConfigResourceV1 resource;
 
     /**
-     * Test the {@link HiveConfigResourceV0#getHiveConfig(String, String, String)} method.
+     * Test to make sure configuration is right
+     *
+     * @throws CloudServiceException
      */
-    @Test
-    public void shouldRetrieveConfigs() {
+    @Test(expected = CloudServiceException.class)
+    public void shouldRetrieveConfigs() throws CloudServiceException {
+        this.resource.getClusterConfig(null);
 
-        // when
-        Response response = resource.getClusterConfig(null);
-
-        // then
-        assertNotNull("The response entity was null.", response);
-        assertNotNull("The response entity was null.", response.getEntity());
-        assertTrue("The response entity had incorrect type.", response.getEntity() instanceof ClusterConfigResponse);
-        assertNull("The response list was expected to be null.",
-                ((ClusterConfigResponse) response.getEntity()).getClusterConfigs());
+//        // then
+//        assertNotNull("The response entity was null.", response);
+//        assertNotNull("The response entity was null.", response.getEntity());
+//        assertTrue("The response entity had incorrect type.", response.getEntity() instanceof ClusterConfigResponse);
+//        assertNull("The response list was expected to be null.",
+//                ((ClusterConfigResponse) response.getEntity()).getClusterConfigs());
     }
 }

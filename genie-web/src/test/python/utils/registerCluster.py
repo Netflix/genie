@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2013 Netflix, Inc.
+#  Copyright 2014 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -35,23 +35,19 @@ def addClusterConfigCprod1():
     
     tags = json.dumps(['sla','cprod1','bdp_prod_20140101'])
     config = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_prod_20140415/hdfs-site.xml','s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_prod_20140415/core-site.xml','s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_prod_20140415/mapred-site.xml'])
-    cmds = json.dumps(['prodhive11_mr1','pig11_mr1','hadoop103'])
+    cmds = json.dumps([{'id':'prodhive11_mr1'},{'id':'pig11_mr1'},{'id':'hadoop103'}])
     
     payload = '''
     {
-        "clusterConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "cprod1", 
-            "status" : "UP",
-            "user" : "amsharma", 
-            "groupName" : "hadoop", 
-            "version" : "1.0.3",
-            "configs": ''' + config + ''',
-            "tags": ''' + tags + ''',
-            "cmdIds": ''' + cmds + ''',
-            "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager" 
-        }
+        "id":"''' + ID +'''",
+        "name": "cprod1", 
+        "status" : "UP",
+        "user" : "amsharma", 
+        "version" : "1.0.3",
+        "configs": ''' + config + ''',
+        "tags": ''' + tags + ''',
+        "commands": ''' + cmds + ''',
+        "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager" 
     }
     '''
     print payload
@@ -64,22 +60,18 @@ def addClusterConfigCquery1():
     ID="bdp_query_20140101"
     tags = json.dumps(['adhoc'])
     config = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/core-site.xml','s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/hdfs-site.xml'])
-    cmds = json.dumps(['prodhive11_mr1','pig11_mr1'])
+    cmds = json.dumps([{'id':'prodhive11_mr1'},{'id':'pig11_mr1'}])
     payload = '''
     {
-        "clusterConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "cquery1", 
-            "status" : "UP",
-            "user" : "amsharma", 
-            "groupName" : "hadoop", 
-            "version" : "1.0.3",
-            "configs": ''' + config + ''',
-            "tags": ''' + tags + ''',
-            "cmdIds": ''' + cmds + ''',
-            "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager"
-        }
+        "id":"''' + ID +'''",
+        "name": "cquery1", 
+        "status" : "UP",
+        "user" : "amsharma",
+        "version" : "1.0.3",
+        "configs": ''' + config + ''',
+        "tags": ''' + tags + ''',
+        "commands": ''' + cmds + ''',
+        "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager"
     }
     '''
     print payload
@@ -91,23 +83,18 @@ def addClusterConfigH2query():
     ID="bdp_hquery_20140505_185527"
     tags = json.dumps(['adhoc','h2query','bdp_hquery_20140505_185527'])
     config = json.dumps(['s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml','s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml','s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/yarn-site.xml'])
-    cmds = json.dumps(['pig11_mr2','pig13_mr2','prodhive11_mr2'])
-    #cmds = json.dumps(['prodhive11_mr2'])
+    cmds = json.dumps([{'id':'pig11_mr2'},{'id':'pig13_mr2'},{'id':'prodhive11_mr2'}])
     payload = '''
     {
-        "clusterConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "h2query", 
-            "status" : "UP",
-            "user" : "amsharma", 
-            "groupName" : "hadoop", 
-            "version" : "1.0.3",
-            "configs": ''' + config + ''',
-            "tags": ''' + tags + ''',
-            "cmdIds": ''' + cmds + ''',
-            "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager" 
-        }
+        "id":"''' + ID +'''",
+        "name": "h2query", 
+        "status" : "UP",
+        "user" : "amsharma",
+        "version" : "1.0.3",
+        "configs": ''' + config + ''',
+        "tags": ''' + tags + ''',
+        "commands": ''' + cmds + ''',
+        "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager"
     }
     '''
     print payload

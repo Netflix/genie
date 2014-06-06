@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,65 +15,64 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.messages.ApplicationConfigRequest;
-import com.netflix.genie.common.messages.ApplicationConfigResponse;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Application;
+import java.util.List;
 
 /**
  * Abstraction layer to encapsulate ApplicationConfig functionality.<br>
  * Classes implementing this abstraction layer must be thread-safe.
  *
  * @author amsharma
+ * @author tgianos
  */
 public interface ApplicationConfigService {
 
     /**
      * Gets application configuration for given id.
      *
-     * @param id
-     *            unique id for application configuration to get
-     * @return successful response, or one with HTTP error code
+     * @param id unique id for application configuration to get. Not null/empty.
+     * @return The application if one exists or null if not.
+     * @throws CloudServiceException
      */
-    ApplicationConfigResponse getApplicationConfig(String id);
+    Application getApplicationConfig(final String id) throws CloudServiceException;
 
     /**
      * Get application configuration for given filter criteria.
      *
-     * @param id
-     *            unique id for application config (can be null)
-     * @param name
-     *            name of application config (can be null)
+     * @param name name of application. Can be null or empty.
+     * @param userName The user who created the application. Can be null/empty
      * @return successful response, or one with HTTP error code
      */
-    ApplicationConfigResponse getApplicationConfig(String id, String name);
+    List<Application> getApplicationConfigs(final String name, final String userName);
 
     /**
      * Create new application configuration.
      *
-     * @param request
-     *            encapsulates the application config element to create
-     * @return successful response, or one with HTTP error code
+     * @param app The application configuration to create
+     * @return The application that was created
+     * @throws CloudServiceException
      */
-    ApplicationConfigResponse createApplicationConfig(ApplicationConfigRequest request);
+    Application createApplicationConfig(final Application app) throws CloudServiceException;
 
     /**
-     * Update application configuration.
+     * Update an application configuration.
      *
-     * @param request
-     *            encapsulates the application config element to upsert, must contain
-     *            valid id
-     * @return successful response, or one with HTTP error code
+     * @param id The id of the application configuration to update
+     * @param updateApp Information to update for the application configuration with
+     * @return The updated application
+     * @throws CloudServiceException
      */
-    ApplicationConfigResponse updateApplicationConfig(ApplicationConfigRequest request);
+    Application updateApplicationConfig(final String id, final Application updateApp) throws CloudServiceException;
 
     /**
-     * Delete a application configuration from database.
+     * Delete an application configuration from database.
      *
-     * @param id
-     *            unique if of application configuration to delete
-     * @return successful response, or one with HTTP error code
+     * @param id unique id of application configuration to delete
+     * @return The deleted application
+     * @throws CloudServiceException
      */
-    ApplicationConfigResponse deleteApplicationConfig(String id);
+    Application deleteApplicationConfig(final String id) throws CloudServiceException;
 }

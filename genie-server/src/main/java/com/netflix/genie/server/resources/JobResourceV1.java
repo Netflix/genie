@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,15 +18,12 @@
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.JobRequest;
-import com.netflix.genie.common.messages.JobResponse;
-import com.netflix.genie.common.messages.JobStatusResponse;
-import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.ExecutionServiceFactory;
-import com.netflix.genie.server.util.JAXBContextResolver;
-import com.netflix.genie.server.util.ResponseUtil;
+import java.net.HttpURLConnection;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -39,8 +36,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * Resource class for executing and monitoring jobs via Genie.
  *
  * @author amsharma
+ * @author tgianos
  */
 @Path("/v1/jobs")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -55,29 +52,6 @@ public class JobResourceV1 {
 
     private final ExecutionService xs;
     private static final Logger LOG = LoggerFactory.getLogger(JobResourceV1.class);
-
-    /**
-     * Custom JAXB context resolver based for the job request/responses.
-     *
-     * @author amsharma
-     */
-    @Provider
-    public static class JobJAXBContextResolver extends JAXBContextResolver {
-
-        /**
-         * Constructor - initialize the resolver for the types that this
-         * resource cares about.
-         *
-         * @throws Exception if there is any error in initialization
-         */
-        public JobJAXBContextResolver() throws Exception {
-            super(new Class[]{JobRequest.class,
-                JobStatusResponse.class,
-                Job.class,
-                JobResponse.class,
-                ClusterCriteria.class});
-        }
-    }
 
     /**
      * Default constructor.
@@ -91,15 +65,16 @@ public class JobResourceV1 {
     /**
      * Submit a new job.
      *
-     * @param request request object containing job info element for new job
+     * @param job request object containing job info element for new job
      * @param hsr servlet context
-     * @return successful response, or one with HTTP error code
+     * @return The submitted job
+     * @throws CloudServiceException
      */
     @POST
-    @Path("/")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response submitJob(JobRequest request,
-            @Context HttpServletRequest hsr) {
+    public Job submitJob(
+            final Job job,
+            @Context final HttpServletRequest hsr) throws CloudServiceException {
         // get client's host from the context
         String clientHost = hsr.getHeader("X-Forwarded-For");
         if (clientHost != null) {
@@ -107,53 +82,57 @@ public class JobResourceV1 {
         } else {
             clientHost = hsr.getRemoteAddr();
         }
-        LOG.info("called from: " + clientHost);
-
-        // set the clientHost, if it is not overridden already
-        Job job = request.getJobInfo();
-        if ((job != null)
-                && ((job.getClientHost() == null)
-                || job.getClientHost().isEmpty())) {
-            job.setClientHost(clientHost);
-            job.setClusterCriteriaString(job.getClusterCriteriaList());
+        LOG.debug("called from: " + clientHost);
+        if (job == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job entered. Unable to submit.");
         }
 
-        JobResponse response = xs.submitJob(request);
-        return ResponseUtil.createResponse(response);
+        // set the clientHost, if it is not overridden already
+        if (StringUtils.isEmpty(clientHost)) {
+            job.setClientHost(clientHost);
+            job.setClusterCriteriaString(job.getClusterCriteria());
+        }
+
+        return this.xs.submitJob(job);
     }
 
     /**
      * Get job information for given job id.
      *
-     * @param jobID id for job to look up
-     * @return successful response, or one with HTTP error code
+     * @param id id for job to look up
+     * @return the Job
+     * @throws CloudServiceException
      */
     @GET
-    @Path("/{jobID}")
-    public Response getJobInfo(@PathParam("jobID") String jobID) {
-        LOG.info("called for jobID: " + jobID);
-        JobResponse response = xs.getJobInfo(jobID);
-        return ResponseUtil.createResponse(response);
+    @Path("/{id}")
+    public Job getJobInfo(
+            @PathParam("id") final String id) throws CloudServiceException {
+        LOG.debug("called for jobID: " + id);
+        return this.xs.getJobInfo(id);
     }
 
     /**
      * Get job status for give job id.
      *
-     * @param jobID id for job to look up
-     * @return successful response, or one with HTTP error code
+     * @param id id for job to look up
+     * @return The status of the job
+     * @throws CloudServiceException
      */
     @GET
-    @Path("/{jobID}/status")
-    public Response getJobStatus(@PathParam("jobID") String jobID) {
-        LOG.info("called for jobID" + jobID);
-        JobStatusResponse response = xs.getJobStatus(jobID);
-        return ResponseUtil.createResponse(response);
+    @Path("/{id}/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JobStatus getJobStatus(
+            @PathParam("id") final String id) throws CloudServiceException {
+        LOG.debug("called for jobID" + id);
+        return this.xs.getJobStatus(id);
     }
 
     /**
-     * Get job info for given filter criteria.
+     * Get jobs for given filter criteria.
      *
-     * @param jobID id for job
+     * @param id id for job
      * @param jobName name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName user who submitted job
      * @param status status of job - possible types Type.JobStatus
@@ -162,36 +141,35 @@ public class JobResourceV1 {
      * @param limit max number of jobs to return
      * @param page page number for job
      * @return successful response, or one with HTTP error code
+     * @throws CloudServiceException
      */
     @GET
-    @Path("/")
-    public Response getJobs(@QueryParam("jobID") String jobID,
+    public List<Job> getJobs(
+            @QueryParam("id") String id,
             @QueryParam("jobName") String jobName,
             @QueryParam("userName") String userName,
             @QueryParam("status") String status,
             @QueryParam("clusterName") String clusterName,
             @QueryParam("clusterId") String clusterId,
             @QueryParam("limit") @DefaultValue("1024") int limit,
-            @QueryParam("page") @DefaultValue("0") int page) {
+            @QueryParam("page") @DefaultValue("0") int page)
+            throws CloudServiceException {
+        LOG.debug("Called");
 
-        LOG.info("called");
-
-        JobResponse response = xs.getJobs(jobID, jobName, userName, status, clusterName, clusterId, limit, page);
-
-        return ResponseUtil.createResponse(response);
+        return this.xs.getJobs(id, jobName, userName, status, clusterName, clusterId, limit, page);
     }
 
     /**
      * Kill job based on given job ID.
      *
-     * @param jobID id for job to kill
-     * @return successful response, or one with HTTP error code
+     * @param id id for job to kill
+     * @return The job that was killed
+     * @throws CloudServiceException
      */
     @DELETE
-    @Path("/{jobID}")
-    public Response killJob(@PathParam("jobID") String jobID) {
-        LOG.info("called for jobID: " + jobID);
-        JobStatusResponse response = xs.killJob(jobID);
-        return ResponseUtil.createResponse(response);
+    @Path("/{id}")
+    public Job killJob(@PathParam("id") final String id) throws CloudServiceException {
+        LOG.debug("called for jobID: " + id);
+        return this.xs.killJob(id);
     }
 }

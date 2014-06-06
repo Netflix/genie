@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.net.HttpURLConnection;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
@@ -30,7 +32,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Representation of the state of a Genie 2.0 job.
@@ -38,12 +45,16 @@ import org.apache.commons.lang.StringUtils;
  * @author amsharma
  * @author tgianos
  */
+//TODO: Should we check all string parameters for null/empty?
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Job extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 2979506788441089067L;
+    private static final Logger LOG = LoggerFactory.getLogger(Command.class);
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
@@ -100,7 +111,7 @@ public class Job extends Auditable implements Serializable {
      * Set of tags to use for scheduling (REQUIRED).
      */
     @Transient
-    private ArrayList<ClusterCriteria> clusterCriteriaList;
+    private Set<ClusterCriteria> clusterCriteria = new HashSet<ClusterCriteria>();
 
     /**
      * String representation of the the cluster criteria array list object
@@ -263,7 +274,7 @@ public class Job extends Auditable implements Serializable {
      * @return jobName
      */
     public String getJobName() {
-        return jobName;
+        return this.jobName;
     }
 
     /**
@@ -271,7 +282,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param jobName name for the job
      */
-    public void setJobName(String jobName) {
+    public void setJobName(final String jobName) {
         this.jobName = jobName;
     }
 
@@ -281,7 +292,7 @@ public class Job extends Auditable implements Serializable {
      * @return description
      */
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     /**
@@ -289,7 +300,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param description description for the job
      */
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -299,7 +310,7 @@ public class Job extends Auditable implements Serializable {
      * @return userName
      */
     public String getUserName() {
-        return userName;
+        return this.userName;
     }
 
     /**
@@ -307,7 +318,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param userName user submitting the job
      */
-    public void setUserName(String userName) {
+    public void setUserName(final String userName) {
         this.userName = userName;
     }
 
@@ -317,7 +328,7 @@ public class Job extends Auditable implements Serializable {
      * @return groupName
      */
     public String getGroupName() {
-        return groupName;
+        return this.groupName;
     }
 
     /**
@@ -325,7 +336,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param groupName usergroup submitting the job
      */
-    public void setGroupName(String groupName) {
+    public void setGroupName(final String groupName) {
         this.groupName = groupName;
     }
 
@@ -336,7 +347,7 @@ public class Job extends Auditable implements Serializable {
      * @return client
      */
     public String getClient() {
-        return client;
+        return this.client;
     }
 
     /**
@@ -345,7 +356,7 @@ public class Job extends Auditable implements Serializable {
      * @param client client from which the job is submitted. Used for book
      * keeping/grouping.
      */
-    public void setClient(String client) {
+    public void setClient(final String client) {
         this.client = client;
     }
 
@@ -355,7 +366,7 @@ public class Job extends Auditable implements Serializable {
      * @return executionClusterName
      */
     public String getExecutionClusterName() {
-        return executionClusterName;
+        return this.executionClusterName;
     }
 
     /**
@@ -364,7 +375,7 @@ public class Job extends Auditable implements Serializable {
      * @param executionClusterName Name of the cluster on which job is executed.
      * Populated by the server.
      */
-    public void setExecutionClusterName(String executionClusterName) {
+    public void setExecutionClusterName(final String executionClusterName) {
         this.executionClusterName = executionClusterName;
     }
 
@@ -374,7 +385,7 @@ public class Job extends Auditable implements Serializable {
      * @return executionClusterId
      */
     public String getExecutionClusterId() {
-        return executionClusterId;
+        return this.executionClusterId;
     }
 
     /**
@@ -383,27 +394,32 @@ public class Job extends Auditable implements Serializable {
      * @param executionClusterId Id of the cluster on which job is executed.
      * Populated by the server.
      */
-    public void setExecutionClusterId(String executionClusterId) {
+    public void setExecutionClusterId(final String executionClusterId) {
         this.executionClusterId = executionClusterId;
     }
 
     /**
      * Gets the criteria which was specified to pick a cluster to run the job.
      *
-     * @return clusterCriteriaList
+     * @return clusterCriteria
      */
-    public ArrayList<ClusterCriteria> getClusterCriteriaList() {
-        return clusterCriteriaList;
+    public Set<ClusterCriteria> getClusterCriteria() {
+        return this.clusterCriteria;
     }
 
     /**
      * Sets the list of cluster criteria specified to pick a cluster.
      *
-     * @param clusterCriteriaList The criteria list
-     *
+     * @param clusterCriteria The criteria list
+     * @throws CloudServiceException
      */
-    public void setClusterCriteriaList(ArrayList<ClusterCriteria> clusterCriteriaList) {
-        this.clusterCriteriaList = clusterCriteriaList;
+    public void setClusterCriteria(final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
+        if (clusterCriteria == null) {
+            final String msg = "No criteria passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        this.clusterCriteria = clusterCriteria;
     }
 
     /**
@@ -412,7 +428,7 @@ public class Job extends Auditable implements Serializable {
      * @return cmdArgs
      */
     public String getCmdArgs() {
-        return cmdArgs;
+        return this.cmdArgs;
     }
 
     /**
@@ -420,9 +436,8 @@ public class Job extends Auditable implements Serializable {
      * job run.
      *
      * @param cmdArgs Arguments to be used to run the command with.
-     *
      */
-    public void setCmdArgs(String cmdArgs) {
+    public void setCmdArgs(final String cmdArgs) {
         this.cmdArgs = cmdArgs;
     }
 
@@ -432,7 +447,7 @@ public class Job extends Auditable implements Serializable {
      * @return fileDependencies
      */
     public String getFileDependencies() {
-        return fileDependencies;
+        return this.fileDependencies;
     }
 
     /**
@@ -440,7 +455,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param fileDependencies Dependent files for the job in csv format
      */
-    public void setFileDependencies(String fileDependencies) {
+    public void setFileDependencies(final String fileDependencies) {
         this.fileDependencies = fileDependencies;
     }
 
@@ -461,18 +476,33 @@ public class Job extends Auditable implements Serializable {
      * Set the attachments for this job.
      *
      * @param attachments The attachments to set
+     * @throws CloudServiceException
      */
-    public void setAttachments(FileAttachment[] attachments) {
+    public void setAttachments(final FileAttachment[] attachments) throws CloudServiceException {
         if (attachments != null) {
             this.attachments = Arrays.copyOf(attachments, attachments.length);
+        } else {
+            final String msg = "No attachments passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 
+    /**
+     * Is the log archival disabled.
+     *
+     * @return true if it's disabled
+     */
     public boolean isDisableLogArchival() {
-        return disableLogArchival;
+        return this.disableLogArchival;
     }
 
-    public void setDisableLogArchival(boolean disableLogArchival) {
+    /**
+     * Set whether the log archival is disabled or not.
+     *
+     * @param disableLogArchival True if disabling is desired
+     */
+    public void setDisableLogArchival(final boolean disableLogArchival) {
         this.disableLogArchival = disableLogArchival;
     }
 
@@ -482,7 +512,7 @@ public class Job extends Auditable implements Serializable {
      * @return cmdArgs
      */
     public String getUserEmail() {
-        return userEmail;
+        return this.userEmail;
     }
 
     /**
@@ -490,7 +520,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param userEmail user email address
      */
-    public void setUserEmail(String userEmail) {
+    public void setUserEmail(final String userEmail) {
         this.userEmail = userEmail;
     }
 
@@ -500,7 +530,7 @@ public class Job extends Auditable implements Serializable {
      * @return applicationName
      */
     public String getApplicationName() {
-        return applicationName;
+        return this.applicationName;
     }
 
     /**
@@ -509,7 +539,7 @@ public class Job extends Auditable implements Serializable {
      * @param applicationName Name of the application if specified on which the
      * job is run
      */
-    public void setApplicationName(String applicationName) {
+    public void setApplicationName(final String applicationName) {
         this.applicationName = applicationName;
     }
 
@@ -519,7 +549,7 @@ public class Job extends Auditable implements Serializable {
      * @return applicationId
      */
     public String getApplicationId() {
-        return applicationId;
+        return this.applicationId;
     }
 
     /**
@@ -528,7 +558,7 @@ public class Job extends Auditable implements Serializable {
      * @param applicationId Id of the application if specified on which the job
      * is run
      */
-    public void setApplicationId(String applicationId) {
+    public void setApplicationId(final String applicationId) {
         this.applicationId = applicationId;
     }
 
@@ -538,7 +568,7 @@ public class Job extends Auditable implements Serializable {
      * @return commandName
      */
     public String getCommandName() {
-        return commandName;
+        return this.commandName;
     }
 
     /**
@@ -547,7 +577,7 @@ public class Job extends Auditable implements Serializable {
      * @param commandName Name of the command if specified on which the job is
      * run
      */
-    public void setCommandName(String commandName) {
+    public void setCommandName(final String commandName) {
         this.commandName = commandName;
     }
 
@@ -557,7 +587,7 @@ public class Job extends Auditable implements Serializable {
      * @return commandId
      */
     public String getCommandId() {
-        return commandId;
+        return this.commandId;
     }
 
     /**
@@ -565,7 +595,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param commandId Id of the command if specified on which the job is run
      */
-    public void setCommandId(String commandId) {
+    public void setCommandId(final String commandId) {
         this.commandId = commandId;
     }
 
@@ -576,16 +606,15 @@ public class Job extends Auditable implements Serializable {
      *
      */
     public int getProcessHandle() {
-        return processHandle;
+        return this.processHandle;
     }
 
     /**
      * Set the process handle for the job.
      *
      * @param processHandle
-     *
      */
-    public void setProcessHandle(int processHandle) {
+    public void setProcessHandle(final int processHandle) {
         this.processHandle = processHandle;
     }
 
@@ -596,7 +625,7 @@ public class Job extends Auditable implements Serializable {
      * @see JobStatus
      */
     public JobStatus getStatus() {
-        return status;
+        return this.status;
     }
 
     /**
@@ -614,7 +643,7 @@ public class Job extends Auditable implements Serializable {
      * @return statusMsg
      */
     public String getStatusMsg() {
-        return statusMsg;
+        return this.statusMsg;
     }
 
     /**
@@ -622,7 +651,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param statusMsg
      */
-    public void setStatusMsg(String statusMsg) {
+    public void setStatusMsg(final String statusMsg) {
         this.statusMsg = statusMsg;
     }
 
@@ -631,17 +660,17 @@ public class Job extends Auditable implements Serializable {
      *
      * @return startTime : start time in ms
      */
+    //TODO: Why use Long object here?
     public Long getStartTime() {
-        return startTime;
+        return this.startTime;
     }
 
     /**
      * Set the startTime for the job.
      *
      * @param startTime epoch time in ms
-     *
      */
-    public void setStartTime(Long startTime) {
+    public void setStartTime(final Long startTime) {
         this.startTime = startTime;
     }
 
@@ -651,16 +680,15 @@ public class Job extends Auditable implements Serializable {
      * @return finishTime
      */
     public Long getFinishTime() {
-        return finishTime;
+        return this.finishTime;
     }
 
     /**
      * Set the finishTime for the job.
      *
      * @param finishTime epoch time in ms
-     *
      */
-    public void setFinishTime(Long finishTime) {
+    public void setFinishTime(final Long finishTime) {
         this.finishTime = finishTime;
     }
 
@@ -670,16 +698,15 @@ public class Job extends Auditable implements Serializable {
      * @return clientHost
      */
     public String getClientHost() {
-        return clientHost;
+        return this.clientHost;
     }
 
     /**
      * Set the client host for the job.
      *
      * @param clientHost
-     *
      */
-    public void setClientHost(String clientHost) {
+    public void setClientHost(final String clientHost) {
         this.clientHost = clientHost;
     }
 
@@ -689,14 +716,13 @@ public class Job extends Auditable implements Serializable {
      * @return hostName
      */
     public String getHostName() {
-        return hostName;
+        return this.hostName;
     }
 
     /**
      * Set the genie hostname on which the job is run.
      *
      * @param hostName
-     *
      */
     public void setHostName(String hostName) {
         this.hostName = hostName;
@@ -708,7 +734,7 @@ public class Job extends Auditable implements Serializable {
      * @return killURI
      */
     public String getKillURI() {
-        return killURI;
+        return this.killURI;
     }
 
     /**
@@ -716,7 +742,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param killURI
      */
-    public void setKillURI(String killURI) {
+    public void setKillURI(final String killURI) {
         this.killURI = killURI;
     }
 
@@ -726,7 +752,7 @@ public class Job extends Auditable implements Serializable {
      * @return outputURI
      */
     public String getOutputURI() {
-        return outputURI;
+        return this.outputURI;
     }
 
     /**
@@ -734,7 +760,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param outputURI
      */
-    public void setOutputURI(String outputURI) {
+    public void setOutputURI(final String outputURI) {
         this.outputURI = outputURI;
     }
 
@@ -743,8 +769,9 @@ public class Job extends Auditable implements Serializable {
      *
      * @return exitCode
      */
+    //TODO: Why Integer and not just int?
     public Integer getExitCode() {
-        return exitCode;
+        return this.exitCode;
     }
 
     /**
@@ -752,7 +779,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param exitCode
      */
-    public void setExitCode(Integer exitCode) {
+    public void setExitCode(final Integer exitCode) {
         this.exitCode = exitCode;
     }
 
@@ -762,7 +789,7 @@ public class Job extends Auditable implements Serializable {
      * @return true, if forwarded
      */
     public boolean isForwarded() {
-        return forwarded;
+        return this.forwarded;
     }
 
     /**
@@ -770,7 +797,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param forwarded true, if forwarded
      */
-    public void setForwarded(boolean forwarded) {
+    public void setForwarded(final boolean forwarded) {
         this.forwarded = forwarded;
     }
 
@@ -780,7 +807,7 @@ public class Job extends Auditable implements Serializable {
      * @return s3/hdfs location where logs are archived
      */
     public String getArchiveLocation() {
-        return archiveLocation;
+        return this.archiveLocation;
     }
 
     /**
@@ -788,7 +815,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @param archiveLocation s3/hdfs location where logs are archived
      */
-    public void setArchiveLocation(String archiveLocation) {
+    public void setArchiveLocation(final String archiveLocation) {
         this.archiveLocation = archiveLocation;
     }
 
@@ -798,20 +825,27 @@ public class Job extends Auditable implements Serializable {
      * @return clusterCriteriaString
      */
     public String getClusterCriteriaString() {
-        return clusterCriteriaString;
+        return this.clusterCriteriaString;
     }
 
     /**
      * Set the cluster criteria string.
      *
-     * @param cclist A list of cluster criteria objects
+     * @param ccList A list of cluster criteria objects
+     * @throws CloudServiceException
      */
     //TODO: Can we use pre-persist/post-persist
-    public void setClusterCriteriaString(ArrayList<ClusterCriteria> cclist) {
-        this.clusterCriteriaString = "";
-        for (final ClusterCriteria cc : cclist) {
-            this.clusterCriteriaString += StringUtils.join(cc.getTags(), ",");
+    public void setClusterCriteriaString(final Set<ClusterCriteria> ccList) throws CloudServiceException {
+        if (ccList == null) {
+            final String msg = "No cluster criteria passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
+        final StringBuilder builder = new StringBuilder();
+        for (final ClusterCriteria cc : ccList) {
+            builder.append(StringUtils.join(cc.getTags(), ","));
+        }
+        this.clusterCriteriaString = builder.toString();
     }
 
     /**
@@ -829,8 +863,6 @@ public class Job extends Auditable implements Serializable {
                 || jobStatus == Types.JobStatus.FAILED) {
             setFinishTime(System.currentTimeMillis());
         }
-
-        setUpdated(new Date());
     }
 
     /**
@@ -839,7 +871,7 @@ public class Job extends Auditable implements Serializable {
      * @param status predefined status
      * @param msg human-readable message
      */
-    public void setJobStatus(Types.JobStatus status, String msg) {
+    public void setJobStatus(final JobStatus status, final String msg) {
         setJobStatus(status);
         setStatusMsg(msg);
     }
@@ -850,7 +882,7 @@ public class Job extends Auditable implements Serializable {
      * @return envPropFile - file name containing environment variables.
      */
     public String getEnvPropFile() {
-        return envPropFile;
+        return this.envPropFile;
     }
 
     /**
@@ -859,7 +891,7 @@ public class Job extends Auditable implements Serializable {
      * @param envPropFile contains the list of env variables to set while
      * running this job.
      */
-    public void setEnvPropFile(String envPropFile) {
+    public void setEnvPropFile(final String envPropFile) {
         this.envPropFile = envPropFile;
     }
 }

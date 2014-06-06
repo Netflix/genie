@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
+import java.io.IOException;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Id;
@@ -25,6 +26,9 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract class to support basic columns for all entities for genie.
@@ -33,6 +37,8 @@ import javax.persistence.TemporalType;
  */
 @MappedSuperclass
 public class Auditable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Auditable.class);
 
     /**
      * Default constructor.
@@ -51,14 +57,14 @@ public class Auditable {
      */
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
-    private Date created;
+    private Date created = new Date();
 
     /**
      * The update timestamp.
      */
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
-    private Date updated;
+    private Date updated = new Date();
 
     /**
      * Updates the created and updated timestamps to be creation time.
@@ -102,7 +108,7 @@ public class Auditable {
      * @return The created timestamps
      */
     public Date getCreated() {
-        return this.created;
+        return new Date(this.created.getTime());
     }
 
     /**
@@ -110,8 +116,13 @@ public class Auditable {
      *
      * @param created The created timestamp
      */
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setCreated(final Date created) {
+        //This is to prevent the create time from being updated after
+        //an entity has been persisted and someone is just trying to
+        //update another field in the entity
+        if (created.before(this.created)) {
+            this.created.setTime(created.getTime());
+        }
     }
 
     /**
@@ -120,7 +131,7 @@ public class Auditable {
      * @return The updated timestamp
      */
     public Date getUpdated() {
-        return this.updated;
+        return new Date(this.updated.getTime());
     }
 
     /**
@@ -129,6 +140,22 @@ public class Auditable {
      * @param updated The updated timestamp
      */
     public void setUpdated(final Date updated) {
-        this.updated = updated;
+        this.updated.setTime(updated.getTime());
+    }
+
+    /**
+     * Convert this object to a string representation.
+     *
+     * @return This application data represented as a JSON structure
+     */
+    @Override
+    public String toString() {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(this);
+        } catch (final IOException ioe) {
+            LOG.error(ioe.getLocalizedMessage(), ioe);
+            return ioe.getLocalizedMessage();
+        }
     }
 }

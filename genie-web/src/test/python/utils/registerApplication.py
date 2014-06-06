@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2013 Netflix, Inc.
+#  Copyright 2014 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -41,16 +41,13 @@ def addApplicationConfigMr1():
     jars = json.dumps(['s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar'])
     payload = '''
     {
-        "applicationConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "mapreduce1", 
-            "status" : "active",
-            "user" : "amsharma", 
-            "version" : "1.0",
-            "configs": ''' + configs + ''', 
-            "jars": ''' + jars + ''' 
-        }
+        "id":"''' + ID +'''",
+        "name": "mapreduce1", 
+        "status" : "ACTIVE",
+        "user" : "amsharma", 
+        "version" : "1.0",
+        "configs": ''' + configs + ''', 
+        "jars": ''' + jars + ''' 
     }
     '''
     print payload
@@ -66,16 +63,13 @@ def addApplicationConfigMr2():
     
     payload = '''
     {
-        "applicationConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "mapreduce2", 
-            "status" : "active",
-            "user" : "amsharma", 
-            "version" : "2.4.0",
-            "configs": ''' + configs + ''', 
-            "jars": ''' + jars + ''' 
-        }
+        "id":"''' + ID +'''",
+        "name": "mapreduce2", 
+        "status" : "ACTIVE",
+        "user" : "amsharma", 
+        "version" : "2.4.0",
+        "configs": ''' + configs + ''', 
+        "jars": ''' + jars + ''' 
     }
     '''
     print payload
@@ -88,15 +82,11 @@ def addApplicationConfigTz1():
     ID = "tz1"
     payload = '''
     {
-        "applicationConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "tez", 
-            "status" : "active",
-            "user" : "amsharma", 
-            "groupName" : "hadoop", 
-            "version" : "1.0"
-        }
+        "id":"''' + ID +'''",
+        "name": "tez", 
+        "status" : "ACTIVE",
+        "user" : "amsharma",
+        "version" : "1.0"
     }
     '''
 
@@ -110,15 +100,11 @@ def addApplicationConfigTz2():
     ID = "tz2"
     payload = '''
     {
-        "applicationConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "tez", 
-            "status" : "active",
-            "user" : "amsharma", 
-            "groupName" : "hadoop", 
-            "version" : "2.0"
-        }
+        "id":"''' + ID +'''",
+        "name": "tez", 
+        "status" : "ACTIVE",
+        "user" : "amsharma",
+        "version" : "2.0"
     }
     '''
 

@@ -1,34 +1,45 @@
+/*
+ *
+ *  Copyright 2014 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.genie.server.services.impl;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Command;
+import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-
-import javax.persistence.EntityExistsException;
-import javax.persistence.RollbackException;
-
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.netflix.client.http.HttpRequest.Verb;
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
-import com.netflix.genie.common.messages.CommandConfigRequest;
-import com.netflix.genie.common.messages.CommandConfigResponse;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Command;
-
-import com.netflix.genie.server.persistence.ClauseBuilder;
-import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
-import com.netflix.genie.server.services.CommandConfigService;
-import com.netflix.genie.server.util.ResponseUtil;
-import org.apache.commons.lang.StringUtils;
-
 /**
- * Implementation of the PersistentCommandConfig interface.
+ * Implementation of the CommandConfigService interface.
  *
  * @author amsharma
+ * @author tgianos
  */
 public class PersistentCommandConfigImpl implements CommandConfigService {
 
@@ -42,84 +53,35 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
      */
     public PersistentCommandConfigImpl() {
         // instantiate PersistenceManager
-        pm = new PersistenceManager<Command>();
+        this.pm = new PersistenceManager<Command>();
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws CloudServiceException
      */
     @Override
-    public CommandConfigResponse getCommandConfig(String id) {
-        LOG.info("called");
-        return getCommandConfig(id, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public CommandConfigResponse getCommandConfig(String id, String name) {
-        LOG.info("called");
-        CommandConfigResponse ccr = null;
-
+    public Command getCommandConfig(final String id) throws CloudServiceException {
+        LOG.debug("called");
+        if (StringUtils.isEmpty(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Id can't be null or empty.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
         try {
-            ccr = new CommandConfigResponse();
-            Object[] results;
-
-            if ((id == null) && (name == null)) {
-                // return all
-                LOG.info("GENIE: Returning all commandConfig elements");
-
-                // Perform a simple query for all the entities
-                QueryBuilder builder = new QueryBuilder()
-                        .table("Command");
-
-                results = pm.query(builder);
-
-                // set up a specific message
-                ccr.setMessage("Returning all commandConfig elements");
+            //No need for a transation for a get
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                return command;
             } else {
-                // do some filtering
-                LOG.info("GENIE: Returning config for {id, name}: "
-                        + "{" + id + ", " + name + "}");
-
-                // construct query
-                ClauseBuilder criteria = new ClauseBuilder(ClauseBuilder.AND);
-                if (id != null) {
-                    criteria.append("id = '" + id + "'");
-                }
-                if (name != null) {
-                    criteria.append("name = '" + name + "'");
-                }
-
-                // Get all the results as an array
-                QueryBuilder builder = new QueryBuilder().table(
-                        "Command").clause(criteria.toString());
-                results = pm.query(builder);
-            }
-
-            if (results.length == 0) {
-                ccr = new CommandConfigResponse(new CloudServiceException(
+                throw new CloudServiceException(
                         HttpURLConnection.HTTP_NOT_FOUND,
-                        "No commandConfigs found for input parameters"));
-                LOG.error(ccr.getErrorMsg());
-                return ccr;
-            } else {
-                ccr.setMessage("Returning commandConfigs for input parameters");
+                        "No command with id " + id + " exists.");
             }
-
-            Command[] elements = new Command[results.length];
-            for (int i = 0; i < elements.length; i++) {
-                elements[i] = (Command) results[i];
-            }
-            ccr.setCommandConfigs(elements);
-            return ccr;
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            ccr = new CommandConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    "Received exception: " + e.getMessage()));
-            return ccr;
+        } finally {
+            em.close();
         }
     }
 
@@ -127,238 +89,190 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
-    public CommandConfigResponse createCommandConfig(
-            CommandConfigRequest request) {
-        LOG.info("called");
-        return createUpdateConfig(request, Verb.POST);
-    }
+    public List<Command> getCommandConfigs(final String name, final String userName) {
+        LOG.debug("Called");
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public CommandConfigResponse updateCommandConfig(
-            CommandConfigRequest request) {
-        LOG.info("called");
-        return createUpdateConfig(request, Verb.PUT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public CommandConfigResponse deleteCommandConfig(String id) {
-
-        LOG.info("called");
-        CommandConfigResponse ccr = null;
-
-        if (id == null) {
-            // basic error checking
-            ccr = new CommandConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Missing required parameter: id"));
-            LOG.error(ccr.getErrorMsg());
-            return ccr;
-        } else {
-            LOG.info("GENIE: Deleting commandConfig for id: " + id);
-
-            try {
-                // delete the entity
-                Command element = pm.deleteEntity(id,
-                        Command.class);
-
-                if (element == null) {
-                    ccr = new CommandConfigResponse(new CloudServiceException(
-                            HttpURLConnection.HTTP_NOT_FOUND,
-                            "No commandConfig exists for id: " + id));
-                    LOG.error(ccr.getErrorMsg());
-                    return ccr;
-                } else {
-                    // all good - create a response
-                    ccr = new CommandConfigResponse();
-                    ccr.setMessage("Successfully deleted commandConfig for id: "
-                            + id);
-                    Command[] elements = new Command[]{element};
-                    ccr.setCommandConfigs(elements);
-                    return ccr;
-                }
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                ccr = new CommandConfigResponse(new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        "Received exception: " + e.getMessage()));
-                return ccr;
-            }
-        }
-    }
-
-    /**
-     * Common private method called by the create and update Can use either
-     * method to create/update resource.
-     */
-    private CommandConfigResponse createUpdateConfig(CommandConfigRequest request,
-            Verb method) {
-        LOG.info("called");
-        CommandConfigResponse ccr = null;
-        Command commandConfig = request.getCommandConfig();
-
-        // ensure that the element is not null
-        if (commandConfig == null) {
-            ccr = new CommandConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Missing commandConfig object"));
-            LOG.error(ccr.getErrorMsg());
-            return ccr;
-        }
-
-        // generate/validate id for request
-        String id = commandConfig.getId();
-        if (id == null) {
-            if (method.equals(Verb.POST)) {
-                id = UUID.randomUUID().toString();
-                commandConfig.setId(id);
-            } else {
-                ccr = new CommandConfigResponse(new CloudServiceException(
-                        HttpURLConnection.HTTP_BAD_REQUEST,
-                        "Missing required parameter for PUT: id"));
-                LOG.error(ccr.getErrorMsg());
-                return ccr;
-            }
-        }
-
-        // basic error checking
-        String user = commandConfig.getUser();
-        if (user == null) {
-            ccr = new CommandConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Need required param 'user' for create/update"));
-            LOG.error(ccr.getErrorMsg());
-            return ccr;
-        }
-
-        // ensure that child command configs exist
+        final EntityManager em = this.pm.createEntityManager();
         try {
-            validateChildren(commandConfig);
-        } catch (CloudServiceException cse) {
-            ccr = new CommandConfigResponse(cse);
-            LOG.error(ccr.getErrorMsg(), cse);
-            return ccr;
-        }
-        
-        // common error checks done - set update time before proceeding
-        //Should now be done automatically by @PreUpdate but will leave just in case
-//        commandConfig.setUpdateTime(System.currentTimeMillis());
-
-        // handle POST and PUT differently
-        if (method.equals(Verb.POST)) {
-            try {
-                initAndValidateNewElement(commandConfig);
-            } catch (CloudServiceException e) {
-                ccr = new CommandConfigResponse(e);
-                LOG.error(ccr.getErrorMsg(), e);
-                return ccr;
-
-            }
-
-            LOG.info("GENIE: creating config for id: " + id);
-            try {
-                pm.createEntity(commandConfig);
-
-                // create a response
-                ccr = new CommandConfigResponse();
-                ccr.setMessage("Successfully created commandConfig for id: " + id);
-                ccr.setCommandConfigs(new Command[]{commandConfig});
-                return ccr;
-            } catch (RollbackException e) {
-                LOG.error(e.getMessage(), e);
-                if (e.getCause() instanceof EntityExistsException) {
-                    // most likely entity already exists - return useful message
-                    ccr = new CommandConfigResponse(new CloudServiceException(
-                            HttpURLConnection.HTTP_CONFLICT,
-                            "Command already exists for id: " + id
-                            + ", use PUT to update config"));
-                    return ccr;
-                } else {
-                    // unknown exception - send it back
-                    ccr = new CommandConfigResponse(new CloudServiceException(
-                            HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            "Received exception: " + e.getCause()));
-                    LOG.error(ccr.getErrorMsg());
-                    return ccr;
+            final StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT c FROM Command c");
+            if (StringUtils.isNotEmpty(name) || StringUtils.isNotEmpty(userName)) {
+                queryString.append(" WHERE ");
+                final List<String> clauses = new ArrayList<String>();
+                if (StringUtils.isNotEmpty(name)) {
+                    clauses.add("c.name = :name");
+                }
+                if (StringUtils.isNotEmpty(userName)) {
+                    clauses.add("c.user = :userName");
+                }
+                boolean wroteClause = false;
+                for (final String clause : clauses) {
+                    if (wroteClause) {
+                        queryString.append(" AND ");
+                    }
+                    queryString.append(clause);
+                    wroteClause = true;
                 }
             }
-        } else {
-            // method is PUT
-            LOG.info("GENIE: updating config for id: " + id);
+            final TypedQuery<Command> query = em.createQuery(queryString.toString(), Command.class);
+            if (StringUtils.isNotEmpty(name)) {
+                query.setParameter("name", name);
+            }
+            if (StringUtils.isNotEmpty(userName)) {
+                query.setParameter("userName", userName);
+            }
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 
-            try {
-                Command old = pm.getEntity(id,
-                        Command.class);
-                // check if this is a create or an update
-                if (old == null) {
-                    try {
-                        initAndValidateNewElement(commandConfig);
-                    } catch (CloudServiceException e) {
-                        ccr = new CommandConfigResponse(e);
-                        LOG.error(ccr.getErrorMsg(), e);
-                        return ccr;
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Command createCommandConfig(final Command command) throws CloudServiceException {
+        if (command == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command entered. Unable to create.");
+        }
+        LOG.debug("Called with command " + command.toString());
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            if (StringUtils.isEmpty(command.getId())) {
+                command.setId(UUID.randomUUID().toString());
+            }
+            if (em.contains(command)) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        "A command with id " + command.getId() + " already exists");
+            }
+            final Set<Application> detachedApps = command.getApplications();
+            final Set<Application> attachedApps = new HashSet<Application>();
+            if (detachedApps != null) {
+                for (final Application detached : detachedApps) {
+                    final Application app = em.find(Application.class, detached.getId());
+                    if (app != null) {
+                        app.getCommands().add(command);
+                        attachedApps.add(app);
                     }
                 }
-                commandConfig = pm.updateEntity(commandConfig);
-
-                // all good - create a response
-                ccr = new CommandConfigResponse();
-                ccr.setMessage("Successfully updated commandConfig for id: " + id);
-                ccr.setCommandConfigs(new Command[]{commandConfig});
-                return ccr;
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                // unknown exception - send it back
-                ccr = new CommandConfigResponse(new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        "Received exception: " + e.getCause()));
-                return ccr;
             }
-        }
-    }
-
-    private void validateChildren(Command commandConfig) 
-            throws CloudServiceException {
-
-        ArrayList<String> appIds = commandConfig.getAppIds();
-        PersistenceManager<Application> pma = new PersistenceManager<Application>();
-        ArrayList<Application> appList = new ArrayList<Application>();
-        
-        for (String appId: appIds) {
-            Application ae = (Application) pma.getEntity(appId, Application.class);
-            if (ae != null) {
-                appList.add(ae);
-            } else {
-                throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                        "Application Does Not Exist: {" + appId + "}");
+            command.setApplications(attachedApps);
+            em.persist(command);
+            trans.commit();
+            return command;
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
             }
+            em.close();
         }
-        commandConfig.setApplications(appList);
     }
 
     /**
-     * Initialize and validate new element.
+     * {@inheritDoc}
      *
-     * @param commandConfig the element to initialize
-     * @throws CloudServiceException if some params commandConfig are missing - else
-     * initialize, and set creation time
+     * @throws CloudServiceException
      */
-    private void initAndValidateNewElement(Command commandConfig)
-            throws CloudServiceException {
+    @Override
+    public Command updateCommandConfig(
+            final String id,
+            final Command updateCommand) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No id entered. Unable to update.");
+        }
+        if (updateCommand == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command info entered. Unable to update.");
+        }
+        LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
+        final EntityManager em = pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command == null) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists to update.");
+            }
+            if (StringUtils.isNotEmpty(updateCommand.getName())) {
+                command.setName(updateCommand.getName());
+            }
+            if (StringUtils.isNotEmpty(updateCommand.getEnvPropFile())) {
+                command.setEnvPropFile(updateCommand.getEnvPropFile());
+            }
+            if (StringUtils.isNotEmpty(updateCommand.getExecutable())) {
+                command.setExecutable(updateCommand.getExecutable());
+            }
+            if (StringUtils.isNotEmpty(updateCommand.getJobType())) {
+                command.setJobType(updateCommand.getJobType());
+            }
+            if (StringUtils.isNotEmpty(updateCommand.getUser())) {
+                command.setUser(updateCommand.getUser());
+            }
+            if (StringUtils.isNotEmpty(updateCommand.getVersion())) {
+                command.setVersion(updateCommand.getVersion());
+            }
+            if (updateCommand.getStatus() != null
+                    && updateCommand.getStatus() != command.getStatus()) {
+                command.setStatus(updateCommand.getStatus());
+            }
+            trans.commit();
+            return command;
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
 
-        // basic error checking
-        String name = commandConfig.getName();
-        //ArrayList<String> configs = commandConfigElement.getConfigs();
-
-        //TODO Should we allow configs to be null?
-        if (StringUtils.isEmpty(name)) {
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Need all required params: {name}");
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Command deleteCommandConfig(final String id) throws CloudServiceException {
+        LOG.debug("Called to delete command config with id " + id);
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command == null) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists to delete.");
+            }
+            //Remove the command from the associated Application references
+            final Set<Application> apps = command.getApplications();
+            if (apps != null) {
+                for (final Application app : apps) {
+                    final Set<Command> commands = app.getCommands();
+                    if (commands != null) {
+                        commands.remove(command);
+                    }
+                }
+            }
+            em.remove(command);
+            trans.commit();
+            return command;
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
         }
     }
 }

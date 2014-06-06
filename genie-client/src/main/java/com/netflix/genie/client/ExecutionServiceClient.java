@@ -275,7 +275,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         if (StringUtils.isEmpty(job.getCmdArgs())) {
             messages.add("Command arguments are required\n");
         }
-        if (job.getClusterCriteriaList().isEmpty()) {
+        if (job.getClusterCriteria().isEmpty()) {
             messages.add("At least one cluster criteria is required in order to figure out where to run this job.\n");
         }
 

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.net.HttpURLConnection;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
@@ -31,20 +33,31 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Representation of the state of the Command Object.
  *
  * @author amsharma
+ * @author tgianos
  */
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Command extends Auditable implements Serializable {
 
     private static final long serialVersionUID = -6106046473373305992L;
+    private static final Logger LOG = LoggerFactory.getLogger(Command.class);
 
     /**
      * Name of this command - e.g. prodhive, pig, hadoop etc.
@@ -71,25 +84,38 @@ public class Command extends Auditable implements Serializable {
     private String envPropFile;
 
     /**
-     * Reference to all the config (xml's) needed for this command.
+     * Reference to all the configuration (xml's) needed for this command.
      */
+    @XmlElementWrapper(name = "configs")
+    @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
-    private ArrayList<String> configs;
+    private Set<String> configs = new HashSet<String>();
 
     /*
      * A list of id's of all the Applications that this command supports. This is needed
      * to fetch each application from the database in the entity manager context so that it
      * can be added to the command object before persistence.
      */
+    @XmlElementWrapper(name = "appIds")
+    @XmlElement(name = "appId")
     @Transient
-    private ArrayList<String> appIds;
+    private Set<String> appIds = new HashSet<String>();
 
     /**
-     * Set of applications that can run this command - foreign key in database,
-     * implemented by openjpa using join table CommandConfig_ApplicationConfig.
+     * Set of applications that can run this command.
      */
-    @ManyToMany(targetEntity = Application.class, fetch = FetchType.EAGER)
-    private ArrayList<Application> applications;
+    @XmlElementWrapper(name = "applications")
+    @XmlElement(name = "application")
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Application> applications = new HashSet<Application>();
+
+    /**
+     * The clusters this command is available on.
+     */
+    @XmlTransient
+    @JsonIgnore
+    @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
+    private Set<Cluster> clusters = new HashSet<Cluster>();
 
     /**
      * User who created this command.
@@ -101,6 +127,7 @@ public class Command extends Auditable implements Serializable {
      * Job type of the command. eg: hive, pig , hadoop etc.
      */
     @Basic
+    //TODO: Do we still need this field?
     private String jobType;
 
     /**
@@ -122,7 +149,7 @@ public class Command extends Auditable implements Serializable {
      * @return name
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -130,7 +157,7 @@ public class Command extends Auditable implements Serializable {
      *
      * @param name unique id for this cluster
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -141,7 +168,7 @@ public class Command extends Auditable implements Serializable {
      * @see CommandStatus
      */
     public CommandStatus getStatus() {
-        return status;
+        return this.status;
     }
 
     /**
@@ -160,7 +187,7 @@ public class Command extends Auditable implements Serializable {
      * @return executable -- full path on the node
      */
     public String getExecutable() {
-        return executable;
+        return this.executable;
     }
 
     /**
@@ -168,45 +195,61 @@ public class Command extends Auditable implements Serializable {
      *
      * @param executable Full path of the executable on the node
      */
-    public void setExecutable(String executable) {
+    public void setExecutable(final String executable) {
         this.executable = executable;
     }
 
     /**
-     * Gets the configs for this command.
+     * Gets the configurations for this command.
      *
-     * @return configs
+     * @return the configurations
      */
-    public ArrayList<String> getConfigs() {
-        return configs;
+    public Set<String> getConfigs() {
+        return this.configs;
     }
 
     /**
-     * Sets the configs for this command.
+     * Sets the configurations for this command.
      *
-     * @param configs The config files that this command needs
+     * @param configs The configuration files that this command needs
+     * @throws CloudServiceException
      */
-    public void setConfigs(ArrayList<String> configs) {
+    public void setConfigs(final Set<String> configs) throws CloudServiceException {
+        if (configs == null) {
+            final String msg = "No configurations passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        //TODO: This leaves external components able to modify internal state
+        //      tried a few solutions but need to revisit in all collections
         this.configs = configs;
     }
 
     /**
      * Gets the applications that this command supports.
      *
-     * @return applications Not supposed to be exposed in request/response hence
-     * marked transient.
+     * @return applications
      */
-    @XmlTransient
-    public ArrayList<Application> getApplications() {
-        return applications;
+    public Set<Application> getApplications() {
+        //TODO: This leaves external components able to modify internal state
+        //      tried a few solutions but need to revisit in all collections
+        return this.applications;
     }
 
     /**
      * Sets the applications for this command.
      *
      * @param applications The applications that this command supports
+     * @throws CloudServiceException
      */
-    public void setApplications(ArrayList<Application> applications) {
+    public void setApplications(final Set<Application> applications) throws CloudServiceException {
+        //TODO: Utility method for logging errors and throwsing exception
+        //      to get rid of all this repetitive code
+        if (applications == null) {
+            final String msg = "No applications passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
         this.applications = applications;
     }
 
@@ -216,7 +259,7 @@ public class Command extends Auditable implements Serializable {
      * @return user
      */
     public String getUser() {
-        return user;
+        return this.user;
     }
 
     /**
@@ -224,7 +267,7 @@ public class Command extends Auditable implements Serializable {
      *
      * @param user user who created this command
      */
-    public void setUser(String user) {
+    public void setUser(final String user) {
         this.user = user;
     }
 
@@ -234,7 +277,7 @@ public class Command extends Auditable implements Serializable {
      * @return jobType --- for eg: hive, pig, presto
      */
     public String getJobType() {
-        return jobType;
+        return this.jobType;
     }
 
     /**
@@ -242,7 +285,7 @@ public class Command extends Auditable implements Serializable {
      *
      * @param jobType job type for this command
      */
-    public void setJobType(String jobType) {
+    public void setJobType(final String jobType) {
         this.jobType = jobType;
     }
 
@@ -252,7 +295,7 @@ public class Command extends Auditable implements Serializable {
      * @return version
      */
     public String getVersion() {
-        return version;
+        return this.version;
     }
 
     /**
@@ -260,7 +303,7 @@ public class Command extends Auditable implements Serializable {
      *
      * @param version version number for this command
      */
-    public void setVersion(String version) {
+    public void setVersion(final String version) {
         this.version = version;
     }
 
@@ -269,24 +312,28 @@ public class Command extends Auditable implements Serializable {
      *
      * @return appIds - a list of all application id's supported by this command
      */
-    @XmlElement
-    public ArrayList<String> getAppIds() {
+    public Set<String> getAppIds() {
+        this.appIds.clear();
         if (this.applications != null) {
-            appIds = new ArrayList<String>();
-            Iterator<Application> it = this.applications.iterator();
-            while (it.hasNext()) {
-                appIds.add(((Application) it.next()).getId());
+            for (final Application app : getApplications()) {
+                this.appIds.add(app.getId());
             }
         }
-        return appIds;
+        return this.appIds;
     }
 
     /**
      * Sets the application id's for this command in string form.
      *
-     * @param appIds list of application id's for this command
+     * @param appIds set of application id's for this command
+     * @throws CloudServiceException
      */
-    public void setAppIds(ArrayList<String> appIds) {
+    public void setAppIds(final Set<String> appIds) throws CloudServiceException {
+        if (appIds == null) {
+            final String msg = "No application ids passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
         this.appIds = appIds;
     }
 
@@ -296,7 +343,7 @@ public class Command extends Auditable implements Serializable {
      * @return envPropFile - file name containing environment variables.
      */
     public String getEnvPropFile() {
-        return envPropFile;
+        return this.envPropFile;
     }
 
     /**
@@ -305,7 +352,31 @@ public class Command extends Auditable implements Serializable {
      * @param envPropFile contains the list of env variables to set while
      * running this command.
      */
-    public void setEnvPropFile(String envPropFile) {
+    public void setEnvPropFile(final String envPropFile) {
         this.envPropFile = envPropFile;
+    }
+
+    /**
+     * Get the clusters this command is available on.
+     *
+     * @return The clusters.
+     */
+    public Set<Cluster> getClusters() {
+        return this.clusters;
+    }
+
+    /**
+     * Set the clusters this command is available on.
+     *
+     * @param clusters the clusters
+     * @throws CloudServiceException
+     */
+    public void setClusters(Set<Cluster> clusters) throws CloudServiceException {
+        if (clusters == null) {
+            final String msg = "No clusters passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        this.clusters = clusters;
     }
 }

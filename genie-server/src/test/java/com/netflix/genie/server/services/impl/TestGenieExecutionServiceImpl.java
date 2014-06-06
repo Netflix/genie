@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,21 +15,17 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services.impl;
 
-import java.util.UUID;
-
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ExecutionService;
+import java.util.UUID;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Test for the Genie execution service class.
@@ -67,8 +63,8 @@ public class TestGenieExecutionServiceImpl {
         pm.createEntity(job);
 
         // should return immediately despite bogus killURI
-        JobStatusResponse status = xs.killJob(job.getId());
-        Assert.assertEquals("SUCCEEDED", status.getStatus());
+        Job status = xs.killJob(job.getId());
+        Assert.assertEquals(JobStatus.SUCCEEDED, status.getStatus());
     }
 
     /**

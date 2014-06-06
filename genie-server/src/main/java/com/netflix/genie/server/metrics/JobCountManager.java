@@ -108,7 +108,7 @@ public final class JobCountManager {
         if (hostName == null) {
             hostName = NetUtil.getHostName();
         }
-        
+
         final StringBuilder builder = new StringBuilder();
         builder.append("SELECT COUNT(j)");
         builder.append(" FROM Job j ");
@@ -136,10 +136,10 @@ public final class JobCountManager {
                 query.setParameter("maxStartTime", maxStartTime);
             }
             //TODO: This is read only not sure if need transaction. Spring read only would be convenient
-    //        final EntityTransaction trans = em.getTransaction();
-    //        trans.begin();
+            //        final EntityTransaction trans = em.getTransaction();
+            //        trans.begin();
             return ((Number) query.getSingleResult()).intValue();
-    //        trans.commit();
+            //        trans.commit();
         } finally {
             em.close();
         }

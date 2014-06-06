@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -23,10 +23,6 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.BaseRequest;
-import com.netflix.genie.common.messages.BaseResponse;
-import com.netflix.genie.common.messages.JobRequest;
-import com.netflix.genie.common.messages.JobResponse;
 import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
@@ -47,8 +43,9 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import javax.persistence.EntityTransaction;
 import javax.persistence.RollbackException;
+import javax.persistence.TypedQuery;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -96,117 +93,98 @@ public class GenieExecutionServiceImpl implements ExecutionService {
      * classes.
      */
     public GenieExecutionServiceImpl() {
-        pm = new PersistenceManager<Job>();
-        stats = GenieNodeStatistics.getInstance();
+        this.pm = new PersistenceManager<Job>();
+        this.stats = GenieNodeStatistics.getInstance();
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws CloudServiceException
      */
     @Override
-    public JobResponse submitJob(JobRequest request) {
-        LOG.info("called");
-
-        JobResponse response;
-        Job job = request.getJobInfo();
+    public Job submitJob(final Job job) throws CloudServiceException {
+        LOG.debug("Called");
 
         // validate parameters
-        try {
-            validateJobParams(job);
-        } catch (CloudServiceException e) {
-            response = new JobResponse(e);
-            return response;
-        }
+        validateJobParams(job);
 
         // ensure that job won't overload system
         // synchronize until an entry is created and INIT-ed in DB
         // throttling related parameters
-        int maxRunningJobs = CONF.getInt(
+        final int maxRunningJobs = CONF.getInt(
                 "netflix.genie.server.max.running.jobs", 0);
-        int jobForwardThreshold = CONF.getInt(
+        final int jobForwardThreshold = CONF.getInt(
                 "netflix.genie.server.forward.jobs.threshold", 0);
-        int maxIdleHostThreshold = CONF.getInt(
+        final int maxIdleHostThreshold = CONF.getInt(
                 "netflix.genie.server.max.idle.host.threshold", 0);
-        int idleHostThresholdDelta = CONF.getInt(
+        final int idleHostThresholdDelta = CONF.getInt(
                 "netflix.genie.server.idle.host.threshold.delta", 0);
         synchronized (this) {
-            try {
-                int numRunningJobs = JobCountManager.getNumInstanceJobs();
-                LOG.info("Number of running jobs: " + numRunningJobs);
+            final int numRunningJobs = JobCountManager.getNumInstanceJobs();
+            LOG.info("Number of running jobs: " + numRunningJobs);
 
-                // find an instance with fewer than (numRunningJobs -
-                // idleHostThresholdDelta)
-                int idleHostThreshold = numRunningJobs - idleHostThresholdDelta;
-                // if numRunningJobs is already >= maxRunningJobs, forward
-                // aggressively
-                // but cap it at the max
-                if ((idleHostThreshold > maxIdleHostThreshold)
-                        || (numRunningJobs >= maxRunningJobs)) {
-                    idleHostThreshold = maxIdleHostThreshold;
-                }
-
-                // check to see if job should be forwarded - only forward it
-                // once. the assumption is that jobForwardThreshold < maxRunningJobs
-                // (set in properties file)
-                if ((numRunningJobs >= jobForwardThreshold)
-                        && (!job.isForwarded())) {
-                    LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
-                    String idleHost = JobCountManager
-                            .getIdleInstance(idleHostThreshold);
-                    if (!idleHost.equals(NetUtil.getHostName())) {
-                        job.setForwarded(true);
-                        stats.incrGenieForwardedJobs();
-                        response = forwardJobRequest("http://" + idleHost + ":"
-                                + SERVER_PORT + "/" + JOB_RESOURCE_PREFIX, request);
-                        return response;
-                    } // else, no idle hosts found - run here if capacity exists
-                }
-
-                if (numRunningJobs >= maxRunningJobs) {
-                    // if we get here, job can't be forwarded to an idle
-                    // instance anymore and current node is overloaded
-                    response = new JobResponse(
-                            new CloudServiceException(
-                                    HttpURLConnection.HTTP_UNAVAILABLE,
-                                    "Number of running jobs greater than system limit ("
-                                    + maxRunningJobs
-                                    + ") - try another instance or try again later"));
-                    return response;
-                }
-
-                // if job can be launched, update the URIs
-                buildJobURIs(job);
-            } catch (CloudServiceException e) {
-                response = new JobResponse(e);
-                LOG.error(response.getErrorMsg(), e);
-                return response;
+            // find an instance with fewer than (numRunningJobs -
+            // idleHostThresholdDelta)
+            int idleHostThreshold = numRunningJobs - idleHostThresholdDelta;
+            // if numRunningJobs is already >= maxRunningJobs, forward
+            // aggressively
+            // but cap it at the max
+            if ((idleHostThreshold > maxIdleHostThreshold)
+                    || (numRunningJobs >= maxRunningJobs)) {
+                idleHostThreshold = maxIdleHostThreshold;
             }
+
+            // check to see if job should be forwarded - only forward it
+            // once. the assumption is that jobForwardThreshold < maxRunningJobs
+            // (set in properties file)
+            if (numRunningJobs >= jobForwardThreshold && !job.isForwarded()) {
+                LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
+                final String idleHost = JobCountManager
+                        .getIdleInstance(idleHostThreshold);
+                if (!idleHost.equals(NetUtil.getHostName())) {
+                    job.setForwarded(true);
+                    this.stats.incrGenieForwardedJobs();
+                    return forwardJobRequest("http://" + idleHost + ":"
+                            + SERVER_PORT + "/" + JOB_RESOURCE_PREFIX, job);
+                } // else, no idle hosts found - run here if capacity exists
+            }
+
+            if (numRunningJobs >= maxRunningJobs) {
+                // if we get here, job can't be forwarded to an idle
+                // instance anymore and current node is overloaded
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_UNAVAILABLE,
+                        "Number of running jobs greater than system limit ("
+                        + maxRunningJobs
+                        + ") - try another instance or try again later");
+            }
+
+            // if job can be launched, update the URIs
+            buildJobURIs(job);
 
             // init state in DB - return if job already exists
             try {
                 // TODO add retries to avoid deadlock issue
-                pm.createEntity(job);
-            } catch (RollbackException e) {
+                this.pm.createEntity(job);
+            } catch (final RollbackException e) {
                 LOG.error("Can't create entity in the database", e);
                 if (e.getCause() instanceof EntityExistsException) {
-                    LOG.error(e.getCause().getMessage());
                     // most likely entity already exists - return useful message
-                    response = new JobResponse(new CloudServiceException(
+                    throw new CloudServiceException(
                             HttpURLConnection.HTTP_CONFLICT,
-                            "Job already exists for id: " + job.getId()));
-                    return response;
+                            "Job already exists for id: " + job.getId());
                 } else {
                     // unknown exception - send it back
-                    response = new JobResponse(new CloudServiceException(
+                    throw new CloudServiceException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            "Received exception: " + e.getCause()));
-                    return response;
+                            "Received exception: " + e.getCause());
                 }
             }
         } // end synchronize
 
         // increment number of submitted jobs
-        stats.incrGenieJobSubmissions();
+        this.stats.incrGenieJobSubmissions();
 
         // try to run the job - return success or error
         try {
@@ -215,85 +193,72 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
             // update entity in DB
             job.setUpdated(new Date());
-            pm.updateEntity(job);
-
-            // verification
-            job = pm.getEntity(job.getId(), Job.class);
-
-            // return successful response
-            response = new JobResponse();
-            response.setMessage("Successfully launched job: "
-                    + job.getId());
-            response.setJob(job);
-            return response;
+            this.pm.updateEntity(job);
+            return job;
         } catch (final CloudServiceException e) {
             LOG.error("Failed to submit job: ", e);
             // update db
             job.setJobStatus(JobStatus.FAILED, e.getMessage());
-            job.setUpdated(new Date());
-            pm.updateEntity(job);
+            this.pm.updateEntity(job);
             // increment counter for failed jobs
-            stats.incrGenieFailedJobs();
+            this.stats.incrGenieFailedJobs();
             // if it is a known exception, handle differently
-            if (e instanceof CloudServiceException) {
-                response = new JobResponse((CloudServiceException) e);
-            } else {
-                response = new JobResponse(new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
-            }
-            return response;
+            throw e;
         }
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws CloudServiceException
      */
     @Override
-    public JobResponse getJobInfo(String jobId) {
-        LOG.info("called for jobId: " + jobId);
+    public Job getJobInfo(final String id) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No id entered unable to retreive job.");
+        }
+        LOG.debug("called for jobId: " + id);
 
-        JobResponse response;
-        Job jInfo;
+        final EntityManager em = this.pm.createEntityManager();
         try {
-            jInfo = pm.getEntity(jobId, Job.class);
-        } catch (Exception e) {
-            LOG.error("Failed to get job info: ", e);
-            response = new JobResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
-            return response;
-        }
-
-        if (jInfo == null) {
-            String msg = "Job not found: " + jobId;
-            LOG.error(msg);
-            response = new JobResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_NOT_FOUND, msg));
-            return response;
-        } else {
-            response = new JobResponse();
-            response.setJob(jInfo);
-            response.setMessage("Returning job information for: "
-                    + jInfo.getId());
-            return response;
+            final Job job = em.find(Job.class, id);
+            if (job != null) {
+                return job;
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No job exists for id " + id + ". Unable to retrieve.");
+            }
+        } finally {
+            em.close();
         }
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws CloudServiceException
      */
     @Override
-    public JobResponse getJobs(final String jobId, final String jobName, final String userName,
-            final String status, final String clusterName, final String clusterId, final Integer limit, final Integer page) {
-        LOG.info("called");
-
-        JobResponse response;
+    public List<Job> getJobs(
+            final String id,
+            final String jobName,
+            final String userName,
+            final String status,
+            final String clusterName,
+            final String clusterId,
+            final Integer limit,
+            final Integer page) throws CloudServiceException {
+        LOG.debug("called");
 
         final StringBuilder builder = new StringBuilder();
         builder.append("Select j");
         builder.append(" FROM Job j");
 
         final List<String> clauses = new ArrayList<String>();
-        if (!StringUtils.isEmpty(jobId)) {
+        if (!StringUtils.isEmpty(id)) {
             clauses.add("j.jobID LIKE :jobId");
         }
         if (!StringUtils.isEmpty(jobName)) {
@@ -326,9 +291,9 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
         final EntityManager em = pm.createEntityManager();
         try {
-            final Query query = em.createQuery(builder.toString(), Job.class);
-            if (!StringUtils.isEmpty(jobId)) {
-                query.setParameter("jobId", jobId);
+            final TypedQuery<Job> query = em.createQuery(builder.toString(), Job.class);
+            if (!StringUtils.isEmpty(id)) {
+                query.setParameter("jobId", id);
             }
             if (!StringUtils.isEmpty(jobName)) {
                 query.setParameter("jobName", jobName);
@@ -337,13 +302,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 query.setParameter("userName", userName);
             }
             if (!StringUtils.isEmpty(status)) {
-                try {
-                    query.setParameter("status", JobStatus.parse(status));
-                } catch (final CloudServiceException e) {
-                    LOG.error(e.getMessage(), e);
-                    response = new JobResponse(e);
-                    return response;
-                }
+                query.setParameter("status", JobStatus.parse(status));
             }
             if (!StringUtils.isEmpty(clusterName)) {
                 query.setParameter("clusterName", clusterName);
@@ -360,18 +319,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 }
             }
 
-            final List<Job> jobs = query.getResultList();
-            if (jobs.isEmpty()) {
-                //TODO: Why not just throw exception and let Jersey wrappers handle returning errors?
-                return new JobResponse(new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No jobs found for specified criteria"));
-            } else {
-                response = new JobResponse();
-                //TODO: Switch to just using Collections and not native arrays
-                response.setJobs(jobs.toArray(new Job[jobs.size()]));
-                return response;
-            }
+            return query.getResultList();
         } finally {
             em.close();
         }
@@ -379,170 +327,121 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws CloudServiceException
      */
     @Override
-    public JobStatusResponse getJobStatus(String jobId) {
-        LOG.info("called for jobId: " + jobId);
-
-        JobStatusResponse response;
-
-        Job jInfo;
-        try {
-            jInfo = pm.getEntity(jobId, Job.class);
-        } catch (Exception e) {
-            LOG.error("Failed to get job results from database: ", e);
-            response = new JobStatusResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
-            return response;
-        }
-
-        if (jInfo == null) {
-            String msg = "Job not found: " + jobId;
-            LOG.error(msg);
-            response = new JobStatusResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_NOT_FOUND, msg));
-            return response;
-        } else {
-            response = new JobStatusResponse();
-            response.setMessage("Returning status for job: " + jobId);
-            response.setStatus(jInfo.getStatus().name());
-            return response;
-        }
+    public JobStatus getJobStatus(final String id) throws CloudServiceException {
+        return getJobInfo(id).getStatus();
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws CloudServiceException
      */
     @Override
-    public JobStatusResponse killJob(String jobId) {
-        LOG.info("called for jobId: " + jobId);
+    public Job killJob(final String id) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No id entered unable to kill job.");
+        }
+        LOG.debug("called for jobId: " + id);
 
-        JobStatusResponse response;
-
-        Job job;
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
         try {
-            job = pm.getEntity(jobId, Job.class);
-        } catch (Exception e) {
-            LOG.error("Failed to get job results from database: ", e);
-            response = new JobStatusResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
-            return response;
-        }
+            trans.begin();
+            final Job job = em.find(Job.class, id);
 
-        // do some basic error handling
-        if (job == null) {
-            String msg = "Job not found: " + jobId;
-            LOG.error(msg);
-            response = new JobStatusResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_NOT_FOUND, msg));
-            return response;
-        }
+            // do some basic error handling
+            if (job == null) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No job exists for id " + id + ". Unable to kill.");
+            }
 
-        // check if it is done already
-        if (job.getStatus() == JobStatus.SUCCEEDED
-                || job.getStatus() == JobStatus.KILLED
-                || job.getStatus() == JobStatus.FAILED) {
-            // job already exited, return status to user
-            response = new JobStatusResponse();
-            response.setStatus(job.getStatus().name());
-            response.setMessage("Job " + jobId + " is already done");
-            return response;
-        } else if (job.getStatus() == JobStatus.INIT
-                || (job.getProcessHandle() == -1)) {
-            // can't kill a job if it is still initializing
-            String msg = "Unable to kill job as it is still initializing: " + jobId;
-            LOG.error(msg);
-            response = new JobStatusResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg));
-            return response;
-        }
+            // check if it is done already
+            if (job.getStatus() == JobStatus.SUCCEEDED
+                    || job.getStatus() == JobStatus.KILLED
+                    || job.getStatus() == JobStatus.FAILED) {
+                // job already exited, return status to user
+                return job;
+            } else if (job.getStatus() == JobStatus.INIT
+                    || (job.getProcessHandle() == -1)) {
+                // can't kill a job if it is still initializing
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR,
+                        "Unable to kill job as it is still initializing");
+            }
 
-        // if we get here, job is still running - and can be killed
-        // redirect to the right node if killURI points to a different node
-        String killURI = job.getKillURI();
-        if (killURI == null) {
-            String msg = "Failed to get killURI for jobID: " + jobId;
-            LOG.error(msg);
-            response = new JobStatusResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg));
-            return response;
-        }
-        String localURI;
-        try {
-            localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + jobId;
-        } catch (CloudServiceException e) {
-            LOG.error("Error while retrieving local hostname: "
-                    + e.getMessage(), e);
-            response = new JobStatusResponse(e);
-            return response;
-        }
-        if (!killURI.equals(localURI)) {
-            LOG.debug("forwarding kill request to: " + killURI);
-            response = forwardJobKill(killURI);
-            return response;
-        }
+            // if we get here, job is still running - and can be killed
+            // redirect to the right node if killURI points to a different node
+            final String killURI = job.getKillURI();
+            if (StringUtils.isEmpty(killURI)) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR,
+                        "Failed to get killURI for jobID: " + id);
+            }
+            final String localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + id;
+            
+            if (!killURI.equals(localURI)) {
+                LOG.debug("forwarding kill request to: " + killURI);
+                return forwardJobKill(killURI);
+            }
 
-        // if we get here, killURI == localURI, and job should be killed here
-        LOG.debug("killing job on same instance: " + jobId);
-        try {
+            // if we get here, killURI == localURI, and job should be killed here
+            LOG.debug("killing job on same instance: " + id);
             final JobManagerFactory factory = new JobManagerFactory();
             factory.getJobManager(job).kill(job);
-        } catch (final CloudServiceException e) {
-            LOG.error("Failed to kill job: ", e);
-            response = new JobStatusResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    "Failed to kill job: " + e.getCause()));
-            return response;
-        }
 
-        job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
-        job.setExitCode(SubprocessStatus.JOB_KILLED.code());
+            job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
+            job.setExitCode(SubprocessStatus.JOB_KILLED.code());
 
-        // increment counter for killed jobs
-        stats.incrGenieKilledJobs();
+            // increment counter for killed jobs
+            this.stats.incrGenieKilledJobs();
 
-        // update final status in DB
-        ReentrantReadWriteLock rwl = PersistenceManager.getDbLock();
-        try {
-            LOG.debug("updating job status to KILLED for: " + jobId);
-            // acquire write lock first, and then update status
-            // if job status changed between when it was read and now,
-            // this thread will simply overwrite it - final state will be KILLED
-            rwl.writeLock().lock();
-            job.setUpdated(new Date());
-            if (!job.isDisableLogArchival()) {
-                job.setArchiveLocation(NetUtil.getArchiveURI(jobId));
+            // update final status in DB
+            final ReentrantReadWriteLock rwl = PersistenceManager.getDbLock();
+            try {
+                LOG.debug("updating job status to KILLED for: " + id);
+                // acquire write lock first, and then update status
+                // if job status changed between when it was read and now,
+                // this thread will simply overwrite it - final state will be KILLED
+                rwl.writeLock().lock();
+                if (!job.isDisableLogArchival()) {
+                    job.setArchiveLocation(NetUtil.getArchiveURI(id));
+                }
+                trans.commit();
+            } catch (final Exception e) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR, 
+                        e.getMessage());
+            } finally {
+                if (rwl.writeLock().isHeldByCurrentThread()) {
+                    rwl.writeLock().unlock();
+                }
             }
-            pm.updateEntity(job);
-        } catch (Exception e) {
-            LOG.error("Failed to update job status in database: ", e);
-            response = new JobStatusResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage()));
 
-            // unlock before returning response
-            return response;
+            // all good - return results
+            return job;
         } finally {
-            if (rwl.writeLock().isHeldByCurrentThread()) {
-                rwl.writeLock().unlock();
+            if (trans.isActive()) {
+                trans.rollback();
             }
+            em.close();
         }
-
-        // all good - return results
-        response = new JobStatusResponse();
-        response.setStatus(job.getStatus().name());
-        response.setMessage("Successfully killed job: " + jobId);
-        return response;
     }
 
     /*
      * Check if this job has token as id sent from client.
      */
-    private void validateJobParams(Job job)
-            throws CloudServiceException {
+    private void validateJobParams(final Job job) throws CloudServiceException {
         LOG.debug("called");
 
         if (job == null) {
-            String msg = "Missing jobInfo object";
+            final String msg = "Missing job object";
             LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -565,95 +464,78 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         validateNameValuePair("cmdArgs", job.getCmdArgs());
 
         // generate job id, if need be
-        if (job.getId() == null || job.getId().isEmpty()) {
-            UUID uuid = UUID.randomUUID();
-            job.setId(uuid.toString());
+        if (StringUtils.isEmpty(job.getId())) {
+            job.setId(UUID.randomUUID().toString());
         }
 
         job.setJobStatus(JobStatus.INIT, "Initializing job");
     }
 
-    private void validateNameValuePair(String name, String value)
-            throws CloudServiceException {
+    private void validateNameValuePair(
+            final String name,
+            final String value) throws CloudServiceException {
         LOG.debug("called");
-        String msg;
 
         // ensure that the value is not null/empty
-        if (value == null || value.isEmpty()) {
-            msg = "Invalid " + name + " parameter, can't be null or empty";
+        if (StringUtils.isEmpty(value)) {
+            final String msg = "Invalid. " + name + " parameter, can't be null or empty";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 
-    private void buildJobURIs(Job ji) throws CloudServiceException {
-        ji.setHostName(NetUtil.getHostName());
-        ji.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/"
-                + ji.getId());
-        ji.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/"
-                + ji.getId());
+    private void buildJobURIs(final Job job) throws CloudServiceException {
+        job.setHostName(NetUtil.getHostName());
+        job.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/" + job.getId());
+        job.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + job.getId());
     }
 
     private String getEndPoint() throws CloudServiceException {
         return "http://" + NetUtil.getHostName() + ":" + SERVER_PORT;
     }
 
-    private JobStatusResponse forwardJobKill(String killURI) {
-        JobStatusResponse response;
-        try {
-            response = executeRequest(Verb.DELETE, killURI, null,
-                    JobStatusResponse.class);
-            return response;
-        } catch (CloudServiceException e) {
-            return new JobStatusResponse(e);
-        }
+    private Job forwardJobKill(final String killURI) throws CloudServiceException {
+        return executeRequest(Verb.DELETE, killURI, null);
     }
 
-    private JobResponse forwardJobRequest(String hostURI,
-            JobRequest request) {
-        JobResponse response;
-        try {
-            response = executeRequest(Verb.POST, hostURI, request,
-                    JobResponse.class);
-            return response;
-        } catch (CloudServiceException e) {
-            return new JobResponse(e);
-        }
+    private Job forwardJobRequest(
+            final String hostURI,
+            final Job job) throws CloudServiceException {
+        return executeRequest(Verb.POST, hostURI, job);
     }
 
-    private <T extends BaseResponse> T executeRequest(Verb method,
-            String restURI, BaseRequest request, Class<T> responseClass)
+    private Job executeRequest(
+            final Verb method,
+            final String restURI,
+            final Job job)
             throws CloudServiceException {
         HttpResponse clientResponse = null;
-        T response;
         try {
-            RestClient genieClient = (RestClient) ClientFactory
+            final RestClient genieClient = (RestClient) ClientFactory
                     .getNamedClient("genie");
-            HttpRequest req = HttpRequest.newBuilder()
+            final HttpRequest req = HttpRequest.newBuilder()
                     .verb(method).header("Accept", "application/json")
-                    .uri(new URI(restURI)).entity(request).build();
+                    .uri(new URI(restURI)).entity(job).build();
             clientResponse = genieClient.execute(req);
             if (clientResponse != null) {
                 int status = clientResponse.getStatus();
-                LOG.info("Response Status:" + status);
-                response = clientResponse.getEntity(responseClass);
-                return response;
+                LOG.info("Response Status: " + status);
+                return clientResponse.getEntity(Job.class);
             } else {
                 String msg = "Received null response while auto-forwarding request to Genie instance";
                 LOG.error(msg);
                 throw new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
             }
-        } catch (CloudServiceException e) {
+        } catch (final CloudServiceException e) {
             // just raise it rightaway
             throw e;
-        } catch (Exception e) {
-            String msg = "Error while trying to auto-forward request: "
+        } catch (final Exception e) {
+            final String msg = "Error while trying to auto-forward request: "
                     + e.getMessage();
             LOG.error(msg, e);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         } finally {
             if (clientResponse != null) {
                 // this is really really important

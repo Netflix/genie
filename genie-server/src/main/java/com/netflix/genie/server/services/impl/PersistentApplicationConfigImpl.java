@@ -1,18 +1,18 @@
 package com.netflix.genie.server.services.impl;
 
-import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ApplicationConfigRequest;
-import com.netflix.genie.common.messages.ApplicationConfigResponse;
 import com.netflix.genie.common.model.Application;
-import com.netflix.genie.server.persistence.ClauseBuilder;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import javax.persistence.EntityExistsException;
-import javax.persistence.RollbackException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +21,11 @@ import org.slf4j.LoggerFactory;
  * OpenJPA based implementation of the ApplicationConfigService.
  *
  * @author amsharma
+ * @author tgianos
  */
-public class PersistentApplicationConfigImpl implements
-        ApplicationConfigService {
+public class PersistentApplicationConfigImpl implements ApplicationConfigService {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(PersistentApplicationConfigImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PersistentApplicationConfigImpl.class);
 
     private final PersistenceManager<Application> pm;
 
@@ -35,298 +34,214 @@ public class PersistentApplicationConfigImpl implements
      */
     public PersistentApplicationConfigImpl() {
         // instantiate PersistenceManager
-        pm = new PersistenceManager<Application>();
+        this.pm = new PersistenceManager<Application>();
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws CloudServiceException
      */
     @Override
-    public ApplicationConfigResponse getApplicationConfig(String id) {
-        LOG.info("called");
-        return getApplicationConfig(id, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ApplicationConfigResponse getApplicationConfig(String id,
-            String name) {
-
-        LOG.info("called");
-        ApplicationConfigResponse acr;
-
+    public Application getApplicationConfig(final String id) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            //Messages will be logged by exception mapper at resource level
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No id entered. Unable to get");
+        }
+        LOG.debug("Called with id " + id);
+        final EntityManager em = this.pm.createEntityManager();
         try {
-            acr = new ApplicationConfigResponse();
-            Object[] results;
-
-            if ((id == null) && (name == null)) {
-                // return all
-                LOG.info("GENIE: Returning all applicationConfig elements");
-
-                // Perform a simple query for all the entities
-                //TODO: Get rid of this customer query builder. Use JPA 2.0
-                QueryBuilder builder = new QueryBuilder()
-                        .table("Application");
-                results = pm.query(builder);
-
-                // set up a specific message
-                acr.setMessage("Returning all applicationConfig elements");
-            } else {
-                // do some filtering
-                LOG.info("GENIE: Returning config for {id, name}: "
-                        + "{" + id + ", " + name + "}");
-
-                // construct query
-                ClauseBuilder criteria = new ClauseBuilder(ClauseBuilder.AND);
-                if (id != null) {
-                    criteria.append("id = '" + id + "'");
-                }
-                if (name != null) {
-                    criteria.append("name = '" + name + "'");
-                }
-
-                // Get all the results as an array
-                QueryBuilder builder = new QueryBuilder().table(
-                        "Application").clause(criteria.toString());
-                results = pm.query(builder);
-            }
-
-            if (results.length == 0) {
-                acr = new ApplicationConfigResponse(new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No applicationConfigs found for input parameters"));
-                LOG.error(acr.getErrorMsg());
-                return acr;
-            } else {
-                acr.setMessage("Returning applicationConfigs for input parameters");
-            }
-
-            Application[] elements = new Application[results.length];
-            for (int i = 0; i < elements.length; i++) {
-                elements[i] = (Application) results[i];
-            }
-            acr.setApplicationConfigs(elements);
-            return acr;
-        } catch (CloudServiceException cse) {
-            LOG.error(cse.getMessage(), cse);
-            acr = new ApplicationConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    "Received exception: " + cse.getMessage()));
-            return acr;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ApplicationConfigResponse createApplicationConfig(
-            ApplicationConfigRequest request) {
-        LOG.info("called");
-        return createUpdateConfig(request, Verb.POST);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ApplicationConfigResponse updateApplicationConfig(
-            ApplicationConfigRequest request) {
-        LOG.info("called");
-        return createUpdateConfig(request, Verb.PUT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ApplicationConfigResponse deleteApplicationConfig(String id) {
-
-        LOG.info("called");
-        ApplicationConfigResponse acr;
-
-        if (id == null) {
-            // basic error checking
-            acr = new ApplicationConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Missing required parameter: id"));
-            LOG.error(acr.getErrorMsg());
-            return acr;
-        } else {
-            LOG.info("GENIE: Deleting applicationConfig for id: " + id);
-
-            try {
-                // delete the entity
-                Application element = pm.deleteEntity(id,
-                        Application.class);
-
-                if (element == null) {
-                    acr = new ApplicationConfigResponse(new CloudServiceException(
-                            HttpURLConnection.HTTP_NOT_FOUND,
-                            "No applicationConfig exists for id: " + id));
-                    LOG.error(acr.getErrorMsg());
-                    return acr;
-                } else {
-                    // all good - create a response
-                    acr = new ApplicationConfigResponse();
-                    acr.setMessage("Successfully deleted applicationConfig for id: "
-                            + id);
-                    Application[] elements = new Application[]{element};
-                    acr.setApplicationConfigs(elements);
-                    return acr;
-                }
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                acr = new ApplicationConfigResponse(new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        "Received exception: " + e.getMessage()));
-                return acr;
-            }
-        }
-    }
-
-    /**
-     * Common private method called by the create and update Can use either
-     * method to create/update resource.
-     */
-    private ApplicationConfigResponse createUpdateConfig(ApplicationConfigRequest request,
-            Verb method) {
-        LOG.info("called");
-        ApplicationConfigResponse acr;
-        Application applicationConfig = request.getApplicationConfig();
-
-        // ensure that the element is not null
-        if (applicationConfig == null) {
-            acr = new ApplicationConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Missing applicationConfig object"));
-            LOG.error(acr.getErrorMsg());
-            return acr;
-        }
-
-        // generate/validate id for request
-        String id = applicationConfig.getId();
-        if (id == null) {
-            if (method.equals(Verb.POST)) {
-                id = UUID.randomUUID().toString();
-                applicationConfig.setId(id);
-            } else {
-                acr = new ApplicationConfigResponse(new CloudServiceException(
+            final Application app = em.find(Application.class, id);
+            if (app == null) {
+                throw new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST,
-                        "Missing required parameter for PUT: id"));
-                LOG.error(acr.getErrorMsg());
-                return acr;
+                        "No application with id " + id);
+            } else {
+                return app;
             }
+        } finally {
+            em.close();
         }
+    }
 
-        // basic error checking
-        String user = applicationConfig.getUser();
-        if (user == null) {
-            acr = new ApplicationConfigResponse(new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Need required param 'user' for create/update"));
-            LOG.error(acr.getErrorMsg());
-            return acr;
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Application> getApplicationConfigs(
+            final String name,
+            final String userName) {
+        LOG.debug("Called");
 
-        // common error checks done - set update time before proceeding
-        //Should now be done automatically by @PreUpdate but will leave just in case
-//        applicationConfig.setUpdateTime(System.currentTimeMillis());
-
-        // handle POST and PUT differently
-        if (method.equals(Verb.POST)) {
-            try {
-                initAndValidateNewElement(applicationConfig);
-            } catch (CloudServiceException e) {
-                acr = new ApplicationConfigResponse(e);
-                LOG.error(acr.getErrorMsg(), e);
-                return acr;
-
-            }
-
-            LOG.info("GENIE: creating config for id: " + id);
-            try {
-                pm.createEntity(applicationConfig);
-
-                // create a response
-                acr = new ApplicationConfigResponse();
-                acr.setMessage("Successfully created applicationConfig for id: " + id);
-                acr.setApplicationConfigs(new Application[]{applicationConfig});
-                return acr;
-            } catch (RollbackException e) {
-                LOG.error(e.getMessage(), e);
-                if (e.getCause() instanceof EntityExistsException) {
-                    // most likely entity already exists - return useful message
-                    acr = new ApplicationConfigResponse(new CloudServiceException(
-                            HttpURLConnection.HTTP_CONFLICT,
-                            "Application already exists for id: " + id
-                            + ", use PUT to update config"));
-                    return acr;
-                } else {
-                    // unknown exception - send it back
-                    acr = new ApplicationConfigResponse(new CloudServiceException(
-                            HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            "Received exception: " + e.getCause()));
-                    LOG.error(acr.getErrorMsg());
-                    return acr;
+        final EntityManager em = this.pm.createEntityManager();
+        try {
+            final StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT a FROM Application a");
+            if (StringUtils.isNotEmpty(name) || StringUtils.isNotEmpty(userName)) {
+                queryString.append(" WHERE ");
+                final List<String> clauses = new ArrayList<String>();
+                if (StringUtils.isNotEmpty(name)) {
+                    clauses.add("a.name = :name");
+                }
+                if (StringUtils.isNotEmpty(userName)) {
+                    clauses.add("a.user = :userName");
+                }
+                boolean wroteClause = false;
+                for (final String clause : clauses) {
+                    if (wroteClause) {
+                        queryString.append(" AND ");
+                    }
+                    queryString.append(clause);
+                    wroteClause = true;
                 }
             }
-        } else {
-            // method is PUT
-            LOG.info("GENIE: updating config for id: " + id);
+            final TypedQuery<Application> query = em.createQuery(queryString.toString(), Application.class);
+            if (StringUtils.isNotEmpty(name)) {
+                query.setParameter("name", name);
+            }
+            if (StringUtils.isNotEmpty(userName)) {
+                query.setParameter("userName", userName);
+            }
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 
-            try {
-                Application old = pm.getEntity(id,
-                        Application.class);
-                // check if this is a create or an update
-                if (old == null) {
-                    try {
-                        initAndValidateNewElement(applicationConfig);
-                    } catch (CloudServiceException e) {
-                        acr = new ApplicationConfigResponse(e);
-                        LOG.error(acr.getErrorMsg(), e);
-                        return acr;
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Application createApplicationConfig(final Application app) throws CloudServiceException {
+        if (app == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application entered. Unable to create.");
+        }
+        LOG.debug("Called with application: " + app.toString());
+        if (StringUtils.isEmpty(app.getId())) {
+            app.setId(UUID.randomUUID().toString());
+        }
+        //TODO: validate application contents via Validate method in Application class
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            if (em.contains(app)) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        "An application with id " + app.getId() + " already exists");
+            }
+            em.persist(app);
+            trans.commit();
+            return app;
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Application updateApplicationConfig(final String id, final Application updateApp) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to update.");
+        }
+        if (updateApp == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application information entered. Unable to update.");
+        }
+        LOG.debug("Called with app " + updateApp.toString());
+        //TODO: What to do about sets like jars, etc?
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Application app = em.find(Application.class, id);
+            if (app == null) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No application with id " + id + " exists to update.");
+            }
+            if (StringUtils.isNotEmpty(updateApp.getEnvPropFile())) {
+                app.setEnvPropFile(updateApp.getEnvPropFile());
+            }
+            if (StringUtils.isNotEmpty(updateApp.getName())) {
+                app.setName(updateApp.getName());
+            }
+            if (StringUtils.isNotEmpty(updateApp.getUser())) {
+                app.setUser(updateApp.getUser());
+            }
+            if (StringUtils.isNotEmpty(updateApp.getVersion())) {
+                app.setVersion(updateApp.getVersion());
+            }
+            if (updateApp.getStatus() != null
+                    && updateApp.getStatus() != app.getStatus()) {
+                app.setStatus(updateApp.getStatus());
+            }
+            trans.commit();
+            return app;
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Application deleteApplicationConfig(final String id) throws CloudServiceException {
+        if (StringUtils.isEmpty(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to delete.");
+        }
+        LOG.debug("Called with id " + id);
+        final EntityManager em = pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Application app = em.find(Application.class, id);
+            if (app == null) {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No application with id " + id + " exists.");
+            }
+            final Set<Command> commands = app.getCommands();
+            if (commands != null) {
+                for (final Command command : commands) {
+                    final Set<Application> apps = command.getApplications();
+                    if (apps != null) {
+                        apps.remove(app);
                     }
                 }
-                applicationConfig = pm.updateEntity(applicationConfig);
-
-                // all good - create a response
-                acr = new ApplicationConfigResponse();
-                acr.setMessage("Successfully updated applicationConfig for id: " + id);
-                acr.setApplicationConfigs(new Application[]{applicationConfig});
-                return acr;
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                // unknown exception - send it back
-                acr = new ApplicationConfigResponse(new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        "Received exception: " + e.getCause()));
-                return acr;
             }
-        }
-    }
-
-    /**
-     * Initialize and validate new element.
-     *
-     * @param applicationConfigElement the element to initialize
-     * @throws CloudServiceException if some params applicationConfig missing - else
-     * initialize, and set creation time
-     */
-    private void initAndValidateNewElement(Application applicationConfig)
-            throws CloudServiceException {
-
-        // basic error checking
-        String name = applicationConfig.getName();
-        //ArrayList<String> configs = applicationConfigElement.getConfigs();
-        //ArrayList<String> jars = applicationConfigElement.getJars();
-
-        //TODO Should we allow configs and jars to be null?
-        if (StringUtils.isEmpty(name)) {
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Need all required params: {name}");
+            em.remove(app);
+            trans.commit();
+            return app;
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
         }
     }
 }

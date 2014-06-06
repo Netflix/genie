@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.net.HttpURLConnection;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
@@ -30,8 +33,13 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Representation of the state of the Cluster object.
@@ -43,9 +51,12 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Cluster extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 8046582926818942370L;
+    private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
 
     /**
      * Name for this cluster, e.g. cquery.
@@ -62,27 +73,34 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Set of tags for scheduling - e.g. adhoc, sla, vpc etc.
      */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
     @ElementCollection(fetch = FetchType.EAGER)
-    private ArrayList<String> tags;
+    private Set<String> tags = new HashSet<String>();
 
     /**
-     * Reference to all the config (xml's) needed for this cluster.
+     * Reference to all the configuration (xml's) needed for this cluster.
      */
+    @XmlElementWrapper(name = "configs")
+    @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
-    private ArrayList<String> configs;
+    private Set<String> configs = new HashSet<String>();
 
     /**
      * A list of id's of all the commands supported by this cluster.
      */
+    @XmlElementWrapper(name = "cmdIds")
+    @XmlElement(name = "cmdId")
     @Transient
-    private ArrayList<String> cmdIds;
+    private Set<String> cmdIds = new HashSet<String>();
 
     /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
-     * Foreign Key in the database implemented by OpenJpa using join tables
      */
-    @ManyToMany(targetEntity = Command.class, fetch = FetchType.EAGER)
-    private ArrayList<Command> commands;
+    @XmlElementWrapper(name = "commands")
+    @XmlElement(name = "command")
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Command> commands = new HashSet<Command>();
 
     /**
      * Version of this cluster.
@@ -115,7 +133,7 @@ public class Cluster extends Auditable implements Serializable {
      * @return name
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -123,7 +141,7 @@ public class Cluster extends Auditable implements Serializable {
      *
      * @param name unique id for this cluster
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -133,7 +151,7 @@ public class Cluster extends Auditable implements Serializable {
      * @return user
      */
     public String getUser() {
-        return user;
+        return this.user;
     }
 
     /**
@@ -141,43 +159,55 @@ public class Cluster extends Auditable implements Serializable {
      *
      * @param user user who created this cluster
      */
-    public void setUser(String user) {
+    public void setUser(final String user) {
         this.user = user;
     }
 
     /**
      * Gets the tags allocated to this cluster.
      *
-     * @return tags
+     * @return the tags as an unmodifiable list
      */
-    public ArrayList<String> getTags() {
-        return tags;
+    public Set<String> getTags() {
+        return this.tags;
     }
 
     /**
      * Sets the tags allocated to this cluster.
      *
-     * @param tags
+     * @param tags the tags to set
+     * @throws CloudServiceException
      */
-    public void setTags(ArrayList<String> tags) {
+    public void setTags(final Set<String> tags) throws CloudServiceException {
+        if (tags == null) {
+            final String msg = "No tags passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
         this.tags = tags;
     }
 
     /**
-     * Gets the configs for this cluster.
+     * Gets the configurations for this cluster.
      *
-     * @return The cluster configurations
+     * @return The cluster configurations as unmodifiable list
      */
-    public ArrayList<String> getConfigs() {
-        return configs;
+    public Set<String> getConfigs() {
+        return this.configs;
     }
 
     /**
-     * Sets the configs for this cluster.
+     * Sets the configurations for this cluster.
      *
-     * @param configs The config files that this cluster needs
+     * @param configs The configuration files that this cluster needs
+     * @throws CloudServiceException
      */
-    public void setConfigs(ArrayList<String> configs) {
+    public void setConfigs(final Set<String> configs) throws CloudServiceException {
+        if (configs == null) {
+            final String msg = "No configs passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
         this.configs = configs;
     }
 
@@ -187,17 +217,22 @@ public class Cluster extends Auditable implements Serializable {
      * @return commands Not supposed to be exposed in request/response messages
      * hence marked transient.
      */
-    @XmlTransient
-    public ArrayList<Command> getCommands() {
-        return commands;
+    public Set<Command> getCommands() {
+        return this.commands;
     }
 
     /**
      * Sets the commands for this cluster.
      *
      * @param commands The commands that this cluster supports
+     * @throws CloudServiceException
      */
-    public void setCommands(ArrayList<Command> commands) {
+    public void setCommands(final Set<Command> commands) throws CloudServiceException {
+        if (commands == null) {
+            final String msg = "No commands passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
         this.commands = commands;
     }
 
@@ -215,7 +250,7 @@ public class Cluster extends Auditable implements Serializable {
      *
      * @param version version number for this cluster
      */
-    public void setVersion(String version) {
+    public void setVersion(final String version) {
         this.version = version;
     }
 
@@ -260,23 +295,26 @@ public class Cluster extends Auditable implements Serializable {
      *
      * @return cmdIds - a list of all command id's supported by this cluster
      */
-    @XmlElement
-    public ArrayList<String> getCmdIds() {
-        if (this.commands != null) {
-            this.cmdIds = new ArrayList<String>();
-            for (final Command cce : this.commands) {
-                this.cmdIds.add(cce.getId());
-            }
+    public Set<String> getCmdIds() {
+        this.cmdIds.clear();
+        for (final Command cce : this.commands) {
+            this.cmdIds.add(cce.getId());
         }
-        return cmdIds;
+        return this.cmdIds;
     }
 
     /**
-     * Sets the command id's for this cluster in string form.
+     * Sets the command id's for this cluster.
      *
      * @param cmdIds list of command id's for this cluster
+     * @throws CloudServiceException
      */
-    public void setCmdIds(ArrayList<String> cmdIds) {
+    public void setCmdIds(final Set<String> cmdIds) throws CloudServiceException {
+        if (cmdIds == null) {
+            final String msg = "No command ids passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
         this.cmdIds = cmdIds;
     }
 }
