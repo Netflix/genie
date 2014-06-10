@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,29 +15,25 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.client.sample;
-
-import java.io.File;
-import java.io.PrintWriter;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
-import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
+import java.io.File;
+import java.io.PrintWriter;
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
 public final class ExecutionServiceSampleClient {
 
@@ -64,13 +60,13 @@ public final class ExecutionServiceSampleClient {
         System.out.println("Initializing ExecutionServiceClient");
         ExecutionServiceClient client = ExecutionServiceClient.getInstance();
 
-        String userName = "genietest";
+        final String userName = "genietest";
         System.out.println("Getting jobInfos using specified filter criteria");
-        Multimap<String, String> params = ArrayListMultimap.create();
+        final Multimap<String, String> params = ArrayListMultimap.create();
         params.put("userName", userName);
         params.put("status", JobStatus.FAILED.name());
         params.put("limit", "3");
-        for (Job ji : client.getJobs(params)) {
+        for (final Job ji : client.getJobs(params)) {
             System.out.println("Job Info: {id, status, finishTime} - {"
                     + ji.getId() + ", " + ji.getStatus() + ", "
                     + ji.getFinishTime() + "}");
@@ -80,8 +76,6 @@ public final class ExecutionServiceSampleClient {
         Job jobInfo = new Job();
         jobInfo.setUserName(userName);
         jobInfo.setDescription("This is a test");
-//        jobInfo.setConfiguration(Configuration.TEST.name());
-//        jobInfo.setSchedule(Schedule.ADHOC.name());
         // send the query as an attachment
         File query = File.createTempFile("hive", ".q");
         PrintWriter pw = new PrintWriter(query, "UTF-8");
@@ -110,9 +104,8 @@ public final class ExecutionServiceSampleClient {
         System.out.println("Job status: " + jobInfo.getStatus());
 
         System.out.println("Killing jobs using jobID");
-        JobStatusResponse jobStatus = client.killJob(jobID);
-        System.out.println("Message from server: " + jobStatus.getMessage());
-        System.out.println("Job status: " + jobStatus.getStatus());
+        Job job = client.killJob(jobID);
+        System.out.println("Job status: " + job.getStatus());
 
         System.out.println("Done");
     }

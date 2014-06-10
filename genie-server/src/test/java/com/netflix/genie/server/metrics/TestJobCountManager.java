@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2013 Netflix, Inc.
+ * Copyright 2014 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,19 +14,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.netflix.genie.server.metrics;
-
-import java.util.UUID;
-
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Test;
 
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.util.NetUtil;
+import java.util.UUID;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Basic tests for the JobCountManager.
@@ -37,6 +34,7 @@ public class TestJobCountManager {
 
     /**
      * Test getting number of running jobs on one instance.
+     *
      * @throws Exception if there is any error during this test
      */
     @Test

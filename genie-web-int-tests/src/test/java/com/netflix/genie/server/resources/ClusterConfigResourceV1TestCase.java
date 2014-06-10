@@ -52,7 +52,7 @@ public class ClusterConfigResourceV1TestCase {
     private ClusterConfigResourceV1 resource;
 
     /**
-     * Test to make sure configuration is right
+     * Test to make sure configuration is right.
      *
      * @throws CloudServiceException
      */

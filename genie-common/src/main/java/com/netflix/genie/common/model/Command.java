@@ -21,7 +21,9 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -32,13 +34,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,16 +92,6 @@ public class Command extends Auditable implements Serializable {
     @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> configs = new HashSet<String>();
-
-    /*
-     * A list of id's of all the Applications that this command supports. This is needed
-     * to fetch each application from the database in the entity manager context so that it
-     * can be added to the command object before persistence.
-     */
-    @XmlElementWrapper(name = "appIds")
-    @XmlElement(name = "appId")
-    @Transient
-    private Set<String> appIds = new HashSet<String>();
 
     /**
      * Set of applications that can run this command.
@@ -308,36 +300,6 @@ public class Command extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the application id's supported by this command.
-     *
-     * @return appIds - a list of all application id's supported by this command
-     */
-    public Set<String> getAppIds() {
-        this.appIds.clear();
-        if (this.applications != null) {
-            for (final Application app : getApplications()) {
-                this.appIds.add(app.getId());
-            }
-        }
-        return this.appIds;
-    }
-
-    /**
-     * Sets the application id's for this command in string form.
-     *
-     * @param appIds set of application id's for this command
-     * @throws CloudServiceException
-     */
-    public void setAppIds(final Set<String> appIds) throws CloudServiceException {
-        if (appIds == null) {
-            final String msg = "No application ids passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-        this.appIds = appIds;
-    }
-
-    /**
      * Gets the envPropFile name.
      *
      * @return envPropFile - file name containing environment variables.
@@ -378,5 +340,41 @@ public class Command extends Auditable implements Serializable {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         this.clusters = clusters;
+    }
+
+    /**
+     * Check to make sure that the required parameters exist.
+     *
+     * @param command The configuration to check
+     * @throws CloudServiceException
+     */
+    public static void validate(final Command command) throws CloudServiceException {
+        if (command == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command entered to validate");
+        }
+
+        final List<String> messages = new ArrayList<String>();
+        if (StringUtils.isEmpty(command.getUser())) {
+            messages.add("User name is missing and required.\n");
+        }
+        if (StringUtils.isEmpty(command.getName())) {
+            messages.add("The command name is empty but is required.\n");
+        }
+        if (command.getStatus() == null) {
+            messages.add("The command status is null and is required.\n");
+        }
+
+        if (!messages.isEmpty()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Command configuration errors:\n");
+            for (final String message : messages) {
+                builder.append(message);
+            }
+            final String msg = builder.toString();
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
     }
 }

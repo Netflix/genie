@@ -21,7 +21,9 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ApplicationStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -38,6 +40,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -276,5 +279,41 @@ public class Application extends Auditable implements Serializable {
      */
     public void setCommands(final Set<Command> commands) {
         this.commands = commands;
+    }
+
+    /**
+     * Check to make sure that the required parameters exist.
+     *
+     * @param application The applications to check
+     * @throws CloudServiceException
+     */
+    public static void validate(final Application application) throws CloudServiceException {
+        if (application == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application passed in. Unable to validate.");
+        }
+
+        final List<String> messages = new ArrayList<String>();
+        if (StringUtils.isEmpty(application.getUser())) {
+            messages.add("User name is missing and is required. Unable to create.\n");
+        }
+        if (StringUtils.isEmpty(application.getName())) {
+            messages.add("Application name is missing and is required. Unable to create.\n");
+        }
+        if (application.getStatus() == null) {
+            messages.add("No application status entered. Required to create\n");
+        }
+
+        if (!messages.isEmpty()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Application configuration errors:\n");
+            for (final String message : messages) {
+                builder.append(message);
+            }
+            final String msg = builder.toString();
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
     }
 }

@@ -89,7 +89,11 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
-    public List<Command> getCommandConfigs(final String name, final String userName) {
+    public List<Command> getCommandConfigs(
+            final String name,
+            final String userName,
+            final int page,
+            final int limit) {
         LOG.debug("Called");
 
         final EntityManager em = this.pm.createEntityManager();
@@ -121,6 +125,8 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
             if (StringUtils.isNotEmpty(userName)) {
                 query.setParameter("userName", userName);
             }
+            query.setFirstResult(page * limit);
+            query.setMaxResults(limit);
             return query.getResultList();
         } finally {
             em.close();
@@ -134,12 +140,8 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
      */
     @Override
     public Command createCommandConfig(final Command command) throws CloudServiceException {
-        if (command == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command entered. Unable to create.");
-        }
-        LOG.debug("Called with command " + command.toString());
+        Command.validate(command);
+        LOG.debug("Called to create command " + command.toString());
         final EntityManager em = this.pm.createEntityManager();
         final EntityTransaction trans = em.getTransaction();
         try {
@@ -227,6 +229,7 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
                     && updateCommand.getStatus() != command.getStatus()) {
                 command.setStatus(updateCommand.getStatus());
             }
+            Command.validate(command);
             trans.commit();
             return command;
         } finally {

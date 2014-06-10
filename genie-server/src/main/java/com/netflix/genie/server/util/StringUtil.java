@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  */
 public final class StringUtil {
+
     private static final Logger LOG = LoggerFactory.getLogger(StringUtil.class);
 
     /**
@@ -43,10 +44,9 @@ public final class StringUtil {
      * Mimics bash command-line parsing as close as possible.<br>
      * Caveat - only supports double quotes, not single quotes.
      *
-     * @param input
-     *            command-line arguments as a string
+     * @param input command-line arguments as a string
      * @return argument array that is split using (as to close to) bash rules as
-     *         possible
+     * possible
      * @throws CloudServiceException
      */
     public static String[] splitCmdLine(String input)
@@ -84,8 +84,7 @@ public final class StringUtil {
      * X.Y.Z.<br>
      * 0.8.1.4 -> 0.8.1, 0.8.2 -> 0.8.2, 0.8 -> 0.8.
      *
-     * @param fullVersion
-     *            input version number
+     * @param fullVersion input version number
      * @return trimmed version number as documented
      */
     public static String trimVersion(String fullVersion) {

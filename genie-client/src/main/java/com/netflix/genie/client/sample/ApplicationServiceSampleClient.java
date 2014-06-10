@@ -65,7 +65,7 @@ public final class ApplicationServiceSampleClient {
         final ApplicationServiceClient appClient = ApplicationServiceClient.getInstance();
 
         LOG.info("Creating new application config");
-        final Application app1 = appClient.createApplication(getSampleApplication(ID));
+        final Application app1 = appClient.createApplication(getSampleApplication(null));
         LOG.info("Application configuration created with id: " + app1.getId());
         LOG.info(app1.toString());
 
@@ -108,7 +108,7 @@ public final class ApplicationServiceSampleClient {
      */
     public static Application getSampleApplication(final String id) throws CloudServiceException {
         final Application app = new Application();
-        if (!StringUtils.isEmpty(id)) {
+        if (StringUtils.isNotEmpty(id)) {
             app.setId(id);
         }
         app.setUser("tgianos");

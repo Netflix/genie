@@ -19,11 +19,13 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -79,16 +81,26 @@ public class ApplicationConfigResourceV1 {
      *
      * @param name name for configuration (optional)
      * @param userName the user who created the application (optional)
+     * @param page The page to start one (optional)
+     * @param limit the max number of results to return per page (optional)
      * @return All applications matching the criteria
      * @throws CloudServiceException
      */
     @GET
     public List<Application> getApplicationConfigs(
             @QueryParam("name") final String name,
-            @QueryParam("userName") final String userName)
+            @QueryParam("userName") final String userName,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("limit") @DefaultValue("1024") int limit)
             throws CloudServiceException {
         LOG.debug("called");
-        return this.acs.getApplicationConfigs(name, userName);
+        if (page < 0) {
+            page = PersistenceManager.DEFAULT_PAGE_NUMBER;
+        }
+        if (limit < 0) {
+            limit = PersistenceManager.DEFAULT_PAGE_SIZE;
+        }
+        return this.acs.getApplicationConfigs(name, userName, page, limit);
     }
 
     /**

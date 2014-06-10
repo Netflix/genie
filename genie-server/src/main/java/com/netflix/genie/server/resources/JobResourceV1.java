@@ -20,6 +20,7 @@ package com.netflix.genie.server.resources;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.ExecutionServiceFactory;
 import java.net.HttpURLConnection;
@@ -138,24 +139,29 @@ public class JobResourceV1 {
      * @param status status of job - possible types Type.JobStatus
      * @param clusterName the name of the cluster
      * @param clusterId the id of the cluster
-     * @param limit max number of jobs to return
      * @param page page number for job
+     * @param limit max number of jobs to return
      * @return successful response, or one with HTTP error code
      * @throws CloudServiceException
      */
     @GET
     public List<Job> getJobs(
-            @QueryParam("id") String id,
-            @QueryParam("jobName") String jobName,
-            @QueryParam("userName") String userName,
-            @QueryParam("status") String status,
-            @QueryParam("clusterName") String clusterName,
-            @QueryParam("clusterId") String clusterId,
-            @QueryParam("limit") @DefaultValue("1024") int limit,
-            @QueryParam("page") @DefaultValue("0") int page)
+            @QueryParam("id") final String id,
+            @QueryParam("jobName") final String jobName,
+            @QueryParam("userName") final String userName,
+            @QueryParam("status") final String status,
+            @QueryParam("clusterName") final String clusterName,
+            @QueryParam("clusterId") final String clusterId,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("limit") @DefaultValue("1024") int limit)
             throws CloudServiceException {
         LOG.debug("Called");
-
+        if (page < 0) {
+            page = PersistenceManager.DEFAULT_PAGE_NUMBER;
+        }
+        if (limit < 0) {
+            limit = PersistenceManager.DEFAULT_PAGE_SIZE;
+        }
         return this.xs.getJobs(id, jobName, userName, status, clusterName, clusterId, limit, page);
     }
 

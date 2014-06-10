@@ -19,6 +19,7 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import java.util.List;
@@ -81,8 +82,8 @@ public class ClusterConfigResourceV1 {
      * @param name cluster name (can be a pattern)
      * @param statuses valid types - Types.ClusterStatus
      * @param tags tags for the cluster
-     * @param minUpdateTime min time when cluster config was updated
-     * @param maxUpdateTime max time when cluster config was updated
+     * @param minUpdateTime min time when cluster configuration was updated
+     * @param maxUpdateTime max time when cluster configuration was updated
      * @param limit number of entries to return
      * @param page page number
      * @return the Clusters found matching the criteria
@@ -95,10 +96,16 @@ public class ClusterConfigResourceV1 {
             @QueryParam("tag") final List<String> tags,
             @QueryParam("minUpdateTime") final Long minUpdateTime,
             @QueryParam("maxUpdateTime") final Long maxUpdateTime,
-            @QueryParam("limit") @DefaultValue("1024") int limit,
-            @QueryParam("page") @DefaultValue("0") int page)
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("limit") @DefaultValue("1024") int limit)
             throws CloudServiceException {
         LOG.debug("called");
+        if (page < 0) {
+            page = PersistenceManager.DEFAULT_PAGE_NUMBER;
+        }
+        if (limit < 0) {
+            limit = PersistenceManager.DEFAULT_PAGE_SIZE;
+        }
         return this.ccs.getClusterConfigs(name, statuses, tags, minUpdateTime, maxUpdateTime, limit, page);
     }
 

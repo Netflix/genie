@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -44,10 +44,10 @@ public final class NetUtil {
     // The instance meta-data uri's for public and private host/ip's
     // More info about EC2's instance metadata API is here:
     // http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
-    private static final String PUBLIC_HOSTNAME_URI =
-            "http://169.254.169.254/latest/meta-data/public-hostname";
-    private static final String LOCAL_IPV4_URI =
-            "http://169.254.169.254/latest/meta-data/local-ipv4";
+    private static final String PUBLIC_HOSTNAME_URI
+            = "http://169.254.169.254/latest/meta-data/public-hostname";
+    private static final String LOCAL_IPV4_URI
+            = "http://169.254.169.254/latest/meta-data/local-ipv4";
 
     private NetUtil() {
         // never called
@@ -56,8 +56,7 @@ public final class NetUtil {
     /**
      * Returns the s3 location where job logs will be archived.
      *
-     * @param jobID
-     *            to build archive location for
+     * @param jobID to build archive location for
      * @return s3 location
      */
     public static String getArchiveURI(final String jobID) {
@@ -72,10 +71,10 @@ public final class NetUtil {
     }
 
     /**
-     * Return either the cloud or dc host name, depending on the datacenter.
-     * If the property netflix.genie.server.host is set, that value will always be returned.
-     * If the property is not set, then the instance metadata will be used in the cloud,
-     * or InetAddress.getLocalHost() will be used in the DC.
+     * Return either the cloud or dc host name, depending on the datacenter. If
+     * the property netflix.genie.server.host is set, that value will always be
+     * returned. If the property is not set, then the instance metadata will be
+     * used in the cloud, or InetAddress.getLocalHost() will be used in the DC.
      *
      * @return host name
      * @throws CloudServiceException
@@ -141,7 +140,8 @@ public final class NetUtil {
     }
 
     /**
-     * Returns the response from an HTTP GET call if it succeeds, null otherwise.
+     * Returns the response from an HTTP GET call if it succeeds, null
+     * otherwise.
      *
      * @param uri The URI to execute the HTTP GET on
      * @return response from an HTTP GET call if it succeeds, null otherwise

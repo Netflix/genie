@@ -21,8 +21,10 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -893,5 +895,44 @@ public class Job extends Auditable implements Serializable {
      */
     public void setEnvPropFile(final String envPropFile) {
         this.envPropFile = envPropFile;
+    }
+
+    /**
+     * Check to make sure that the required parameters exist.
+     *
+     * @param job The configuration to check
+     * @throws CloudServiceException
+     */
+    public static void validate(final Job job) throws CloudServiceException {
+        if (job == null) {
+            final String msg = "Required parameter job can't be NULL";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final List<String> messages = new ArrayList<String>();
+        if (StringUtils.isEmpty(job.getUserName())) {
+            messages.add("User name is missing.\n");
+        }
+        if (StringUtils.isEmpty(job.getCommandId()) && StringUtils.isEmpty(job.getCommandName())) {
+            messages.add("Need one of command id or command name in order to run a job\n");
+        }
+        if (StringUtils.isEmpty(job.getCmdArgs())) {
+            messages.add("Command arguments are required\n");
+        }
+        if (job.getClusterCriteria().isEmpty()) {
+            messages.add("At least one cluster criteria is required in order to figure out where to run this job.\n");
+        }
+
+        if (!messages.isEmpty()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Job configuration errors:\n");
+            for (final String message : messages) {
+                builder.append(message);
+            }
+            final String msg = builder.toString();
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
     }
 }

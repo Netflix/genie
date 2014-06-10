@@ -23,7 +23,6 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
@@ -107,7 +106,14 @@ public class GenieExecutionServiceImpl implements ExecutionService {
         LOG.debug("Called");
 
         // validate parameters
-        validateJobParams(job);
+        Job.validate(job);
+        
+        // generate job id, if need be
+        if (StringUtils.isEmpty(job.getId())) {
+            job.setId(UUID.randomUUID().toString());
+        }
+
+        job.setJobStatus(JobStatus.INIT, "Initializing job");
 
         // ensure that job won't overload system
         // synchronize until an entry is created and INIT-ed in DB
@@ -178,7 +184,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                     // unknown exception - send it back
                     throw new CloudServiceException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            "Received exception: " + e.getCause());
+                            e);
                 }
             }
         } // end synchronize
@@ -385,7 +391,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                         "Failed to get killURI for jobID: " + id);
             }
             final String localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + id;
-            
+
             if (!killURI.equals(localURI)) {
                 LOG.debug("forwarding kill request to: " + killURI);
                 return forwardJobKill(killURI);
@@ -416,7 +422,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 trans.commit();
             } catch (final Exception e) {
                 throw new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, 
+                        HttpURLConnection.HTTP_INTERNAL_ERROR,
                         e.getMessage());
             } finally {
                 if (rwl.writeLock().isHeldByCurrentThread()) {
@@ -431,57 +437,6 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 trans.rollback();
             }
             em.close();
-        }
-    }
-
-    /*
-     * Check if this job has token as id sent from client.
-     */
-    private void validateJobParams(final Job job) throws CloudServiceException {
-        LOG.debug("called");
-
-        if (job == null) {
-            final String msg = "Missing job object";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-
-        // Either the commandId or the commandName have to be specified.
-        if (StringUtils.isEmpty(job.getCommandId()) && StringUtils.isEmpty(job.getCommandName())) {
-            String msg = "Either the commandId or the commandName have to be specified";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-
-        // check if userName is valid
-        validateNameValuePair("userName", job.getUserName());
-
-        // check if cmdArgs is valid
-        validateNameValuePair("cmdArgs", job.getCmdArgs());
-
-        // generate job id, if need be
-        if (StringUtils.isEmpty(job.getId())) {
-            job.setId(UUID.randomUUID().toString());
-        }
-
-        job.setJobStatus(JobStatus.INIT, "Initializing job");
-    }
-
-    private void validateNameValuePair(
-            final String name,
-            final String value) throws CloudServiceException {
-        LOG.debug("called");
-
-        // ensure that the value is not null/empty
-        if (StringUtils.isEmpty(value)) {
-            final String msg = "Invalid. " + name + " parameter, can't be null or empty";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 

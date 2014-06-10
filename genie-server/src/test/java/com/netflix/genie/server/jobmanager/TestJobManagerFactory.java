@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.junit.Test;
  * @author skrishnan
  */
 public class TestJobManagerFactory {
+
     /**
      * Tests whether an invalid class name throws an exception.
      *

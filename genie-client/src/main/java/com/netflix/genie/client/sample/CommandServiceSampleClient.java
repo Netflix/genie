@@ -150,11 +150,6 @@ public final class CommandServiceSampleClient {
         command.setUser("tgianos");
         command.setVersion("0.13");
         if (apps != null && !apps.isEmpty()) {
-            final Set<String> appIds = new HashSet<String>();
-            for (final Application app : apps) {
-                appIds.add(app.getId());
-            }
-            command.setAppIds(appIds);
             command.setApplications(apps);
         }
         return command;

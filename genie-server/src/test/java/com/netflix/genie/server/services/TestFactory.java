@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services;
 
+import com.netflix.config.ConfigurationManager;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.commons.configuration.AbstractConfiguration;
-import com.netflix.config.ConfigurationManager;
-
 /**
- * Test for factories that instanstiate services.
+ * Test for factories that instantiate services.
  *
  * @author skrishnan
  */
@@ -47,16 +46,12 @@ public class TestFactory {
 
     /**
      * Test error throwing/handling if a bad/non-existing property is provided.
+     * @throws CloudServiceException
      */
-    @Test
-    public void testBadInstantiation() {
+    @Test(expected = CloudServiceException.class)
+    public void testBadInstantiation() throws CloudServiceException {
         AbstractConfiguration conf = ConfigurationManager.getConfigInstance();
         conf.setProperty("unit.test", "java.lang.NotAString");
-        try {
-            BaseServiceFactory.instantiateFromProperty("unit.test");
-            Assert.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
+        BaseServiceFactory.instantiateFromProperty("unit.test");
     }
 }

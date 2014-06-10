@@ -44,9 +44,14 @@ public interface ApplicationConfigService {
      *
      * @param name name of application. Can be null or empty.
      * @param userName The user who created the application. Can be null/empty
+     * @param page Page number to start results on
+     * @param limit Max number of results per page
      * @return successful response, or one with HTTP error code
      */
-    List<Application> getApplicationConfigs(final String name, final String userName);
+    List<Application> getApplicationConfigs(final String name,
+            final String userName,
+            final int page,
+            final int limit);
 
     /**
      * Create new application configuration.
@@ -61,11 +66,14 @@ public interface ApplicationConfigService {
      * Update an application configuration.
      *
      * @param id The id of the application configuration to update
-     * @param updateApp Information to update for the application configuration with
+     * @param updateApp Information to update for the application configuration
+     * with
      * @return The updated application
      * @throws CloudServiceException
      */
-    Application updateApplicationConfig(final String id, final Application updateApp) throws CloudServiceException;
+    Application updateApplicationConfig(
+            final String id,
+            final Application updateApp) throws CloudServiceException;
 
     /**
      * Delete an application configuration from database.

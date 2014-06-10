@@ -83,12 +83,12 @@ public interface ExecutionService {
      * @throws CloudServiceException
      */
     List<Job> getJobs(
-            final String id, 
-            final String jobName, 
+            final String id,
+            final String jobName,
             final String userName,
-            final String status, 
-            final String clusterName, 
-            final String clusterId, 
-            final Integer limit, 
+            final String status,
+            final String clusterName,
+            final String clusterId,
+            final Integer limit,
             final Integer page) throws CloudServiceException;
 }

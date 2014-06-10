@@ -21,7 +21,9 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -32,12 +34,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,14 +87,6 @@ public class Cluster extends Auditable implements Serializable {
     @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> configs = new HashSet<String>();
-
-    /**
-     * A list of id's of all the commands supported by this cluster.
-     */
-    @XmlElementWrapper(name = "cmdIds")
-    @XmlElement(name = "cmdId")
-    @Transient
-    private Set<String> cmdIds = new HashSet<String>();
 
     /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
@@ -291,30 +285,41 @@ public class Cluster extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the command id's supported by this cluster.
+     * Check to make sure that the required parameters exist.
      *
-     * @return cmdIds - a list of all command id's supported by this cluster
-     */
-    public Set<String> getCmdIds() {
-        this.cmdIds.clear();
-        for (final Command cce : this.commands) {
-            this.cmdIds.add(cce.getId());
-        }
-        return this.cmdIds;
-    }
-
-    /**
-     * Sets the command id's for this cluster.
-     *
-     * @param cmdIds list of command id's for this cluster
+     * @param cluster The configuration to check
      * @throws CloudServiceException
      */
-    public void setCmdIds(final Set<String> cmdIds) throws CloudServiceException {
-        if (cmdIds == null) {
-            final String msg = "No command ids passed in to set. Unable to continue.";
+    public static void validate(final Cluster cluster) throws CloudServiceException {
+        if (cluster == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster entered. Unable to validate.");
+        }
+
+        final List<String> messages = new ArrayList<String>();
+        if (StringUtils.isEmpty(cluster.getUser())) {
+            messages.add("User name is missing. Unable to continue.\n");
+        }
+        if (StringUtils.isEmpty(cluster.getName())) {
+            messages.add("Cluster name is missing. Unable to continue.\n");
+        }
+        if (cluster.getStatus() == null) {
+            messages.add("No cluster status entered. Unable to continue.\n");
+        }
+        if (cluster.getConfigs().isEmpty()) {
+            messages.add("At least one configuration file is required for the cluster.\n");
+        }
+
+        if (!messages.isEmpty()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Cluster configuration errors:\n");
+            for (final String message : messages) {
+                builder.append(message);
+            }
+            final String msg = builder.toString();
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        this.cmdIds = cmdIds;
     }
 }

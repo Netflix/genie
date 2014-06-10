@@ -19,11 +19,13 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -77,14 +79,24 @@ public class CommandConfigResourceV1 {
      *
      * @param name name for config (optional)
      * @param userName the user who created the configuration (optional)
+     * @param page The page to start one (optional)
+     * @param limit the max number of results to return per page (optional)
      * @return All the Commands matching the criteria or all if no criteria
      */
     @GET
-    public List<Command> getCommandConfig(
+    public List<Command> getCommandConfigs(
             @QueryParam("name") final String name,
-            @QueryParam("userName") final String userName) {
+            @QueryParam("userName") final String userName,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("limit") @DefaultValue("1024") int limit) {
         LOG.debug("Called");
-        return this.ccs.getCommandConfigs(name, userName);
+        if (page < 0) {
+            page = PersistenceManager.DEFAULT_PAGE_NUMBER;
+        }
+        if (limit < 0) {
+            limit = PersistenceManager.DEFAULT_PAGE_SIZE;
+        }
+        return this.ccs.getCommandConfigs(name, userName, page, limit);
     }
 
     /**

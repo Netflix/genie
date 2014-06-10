@@ -22,13 +22,10 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.ClusterStatus;
-import com.netflix.genie.server.persistence.ClauseBuilder;
 import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.persistence.QueryBuilder;
 import com.netflix.genie.server.services.ClusterConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -98,7 +95,6 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
-    //TODO: Get this out of the query/clause builder so class can be deleted
     public List<Cluster> getClusterConfigs(
             final String name,
             final List<String> statuses, //TODO: Why can't this be the ENUM already?
@@ -107,50 +103,62 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             final Long maxUpdateTime,
             final Integer limit,
             final Integer page) throws CloudServiceException {
-        LOG.debug("Called");
-
         LOG.debug("GENIE: Returning configs for specified params");
 
-        // construct query
-        ClauseBuilder criteria = new ClauseBuilder(ClauseBuilder.AND);
-        if (StringUtils.isNotEmpty(name)) {
-            criteria.append("name like '" + name + "'");
-        }
-        if (minUpdateTime != null) {
-            criteria.append("updated >= " + minUpdateTime);
-        }
-        if (maxUpdateTime != null) {
-            criteria.append("updated <= " + maxUpdateTime);
-        }
+        final EntityManager em = this.pm.createEntityManager();
+        try {
+            final StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT c FROM Cluster c");
 
-        if (tags != null) {
-            for (final String tag : tags) {
-                criteria.append("\"" + tag + "\" member of T.tags", false);
+            final List<String> criterias = new ArrayList<String>();
+            if (StringUtils.isNotEmpty(name)) {
+                criterias.add("c.name LIKE \"" + name + "\"");
             }
-        }
-
-        if (statuses != null && !statuses.isEmpty()) {
-            int count = 0;
-            final ClauseBuilder statusCriteria = new ClauseBuilder(ClauseBuilder.OR);
-            for (final String status : statuses) {
-                if (StringUtils.isEmpty(status)) {
-                    continue;
+            if (minUpdateTime != null) {
+                criterias.add("c.updated >= " + minUpdateTime);
+            }
+            if (maxUpdateTime != null) {
+                criterias.add("c.updated <= " + maxUpdateTime);
+            }
+            if (tags != null) {
+                for (final String tag : tags) {
+                    criterias.add("\"" + tag + "\" MEMBER OF c.tags");
                 }
-                statusCriteria.append("status = '" + ClusterStatus.parse(status) + "'");
-                count++;
             }
-            if (count > 0) {
-                criteria.append("(" + statusCriteria.toString() + ")", false);
-            }
-        }
 
-        // Get all the results as an array
-        final String criteriaString = criteria.toString();
-        LOG.debug("Criteria: " + criteriaString);
-        QueryBuilder builder = new QueryBuilder()
-                .table("Cluster").clause(criteriaString)
-                .limit(limit).page(page);
-        return Arrays.asList(this.pm.query(builder));
+            if (statuses != null && !statuses.isEmpty()) {
+                final StringBuilder statusBuilder = new StringBuilder();
+                boolean addedStatus = false;
+                for (final String status : statuses) {
+                    if (addedStatus) {
+                        statusBuilder.append(" OR ");
+                    }
+                    statusBuilder.append("c.status = \"").append(ClusterStatus.parse(status)).append("\"");
+                    addedStatus = true;
+                }
+                if (statusBuilder.length() != 0) {
+                    criterias.add("(" + statusBuilder.toString() + ")");
+                }
+            }
+            
+            if (!criterias.isEmpty()) {
+                queryBuilder.append(" WHERE ");
+            }
+            boolean addedCriteria = false;
+            for (final String criteria : criterias) {
+                if (addedCriteria) {
+                    queryBuilder.append(" AND ");
+                }
+                queryBuilder.append(criteria);
+            }
+            
+            final TypedQuery<Cluster> query = em.createQuery(queryBuilder.toString(), Cluster.class);
+            query.setFirstResult(limit * page);
+            query.setMaxResults(limit);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
     }
 
     /**
@@ -236,26 +244,19 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      */
     @Override
     public Cluster createClusterConfig(final Cluster cluster) throws CloudServiceException {
-        if (cluster == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No cluster entered. Unable to create");
-        }
-        LOG.info("Called");
-        if (StringUtils.isEmpty(cluster.getId())) {
-            cluster.setId(UUID.randomUUID().toString());
-        }
+        Cluster.validate(cluster);
+        LOG.debug("Called to create cluster " + cluster.toString());
         final EntityManager em = this.pm.createEntityManager();
         final EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
+            if (StringUtils.isEmpty(cluster.getId())) {
+                cluster.setId(UUID.randomUUID().toString());
+            }
             if (em.contains(cluster)) {
                 throw new CloudServiceException(
                         HttpURLConnection.HTTP_BAD_REQUEST,
                         "A cluster with id " + cluster.getId() + " already exists");
-            }
-            if (StringUtils.isEmpty(cluster.getId())) {
-                cluster.setId(UUID.randomUUID().toString());
             }
             final Set<Command> detachedCommands = cluster.getCommands();
             final Set<Command> attachedCommands = new HashSet<Command>();
@@ -325,6 +326,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
                     && updateCluster.getStatus() != cluster.getStatus()) {
                 cluster.setStatus(updateCluster.getStatus());
             }
+            Cluster.validate(cluster);
             trans.commit();
             return cluster;
         } finally {

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,13 +20,9 @@ package com.netflix.genie.client;
 import com.google.common.collect.Multimap;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.CommandConfigRequest;
-import com.netflix.genie.common.messages.CommandConfigResponse;
 import com.netflix.genie.common.model.Command;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -83,28 +79,15 @@ public final class CommandServiceClient extends BaseGenieClient {
      */
     public Command createCommand(final Command command)
             throws CloudServiceException {
-        checkErrorConditions(command);
+        Command.validate(command);
 
-        final CommandConfigRequest request = new CommandConfigRequest();
-        request.setCommandConfig(command);
-
-        CommandConfigResponse ccr = executeRequest(
+        return executeRequestForSingleEntity(
                 Verb.POST,
                 BASE_CONFIG_COMMAND_REST_URI,
                 null,
                 null,
-                request,
-                CommandConfigResponse.class);
-
-        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
-            String msg = "Unable to parse command config from response";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // return the first (only) command config
-        return ccr.getCommandConfigs()[0];
+                command,
+                Command.class);
     }
 
     /**
@@ -124,27 +107,15 @@ public final class CommandServiceClient extends BaseGenieClient {
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        checkErrorConditions(command);
+        Command.validate(command);
 
-        final CommandConfigRequest request = new CommandConfigRequest();
-        request.setCommandConfig(command);
-
-        CommandConfigResponse ccr = executeRequest(
+        return executeRequestForSingleEntity(
                 Verb.PUT,
                 BASE_CONFIG_COMMAND_REST_URI,
                 id,
                 null,
-                request,
-                CommandConfigResponse.class);
-
-        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
-            String msg = "Unable to parse command config from response";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // return the first (only) command config
-        return ccr.getCommandConfigs()[0];
+                command,
+                Command.class);
     }
 
     /**
@@ -161,22 +132,13 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final CommandConfigResponse ccr = executeRequest(
+        return executeRequestForSingleEntity(
                 Verb.GET,
                 BASE_CONFIG_COMMAND_REST_URI,
                 id,
                 null,
                 null,
-                CommandConfigResponse.class);
-
-        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
-            final String msg = "Unable to parse command config from response";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // return the first (only) command config
-        return ccr.getCommandConfigs()[0];
+                Command.class);
     }
 
     /**
@@ -191,24 +153,13 @@ public final class CommandServiceClient extends BaseGenieClient {
      */
     public List<Command> getCommands(final Multimap<String, String> params)
             throws CloudServiceException {
-        final CommandConfigResponse ccr = executeRequest(
+        return executeRequestForListOfEntities(
                 Verb.GET,
                 BASE_CONFIG_COMMAND_REST_URI,
                 null,
                 params,
                 null,
-                CommandConfigResponse.class);
-
-        // this will only happen if 200 is returned, and parsing fails for some
-        // reason
-        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
-            final String msg = "Unable to parse command config from response";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // if we get here, there are non-zero command config elements - return all
-        return Arrays.asList(ccr.getCommandConfigs());
+                Command.class);
     }
 
     /**
@@ -226,57 +177,12 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        CommandConfigResponse ccr = executeRequest(
+        return executeRequestForSingleEntity(
                 Verb.DELETE,
                 BASE_CONFIG_COMMAND_REST_URI,
                 id,
                 null,
                 null,
-                CommandConfigResponse.class);
-
-        if (ccr.getCommandConfigs() == null || ccr.getCommandConfigs().length == 0) {
-            String msg = "Unable to parse command config from response";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // return the first (only) command config
-        return ccr.getCommandConfigs()[0];
-    }
-
-    /**
-     * Check to make sure that the required parameters exist.
-     *
-     * @param command The configuration to check
-     * @throws CloudServiceException
-     */
-    private void checkErrorConditions(final Command command) throws CloudServiceException {
-        if (command == null) {
-            final String msg = "Required parameter command can't be NULL";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-
-        final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(command.getUser())) {
-            messages.add("User name is missing and required.\n");
-        }
-        if (StringUtils.isEmpty(command.getName())) {
-            messages.add("The command name is empty but is required.\n");
-        }
-        if (command.getStatus() == null) {
-            messages.add("The command status is null and is required.\n");
-        }
-
-        if (!messages.isEmpty()) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Command configuration errors:\n");
-            for (final String message : messages) {
-                builder.append(message);
-            }
-            final String msg = builder.toString();
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
+                Command.class);
     }
 }

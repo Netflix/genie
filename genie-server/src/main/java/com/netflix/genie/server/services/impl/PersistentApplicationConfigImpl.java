@@ -9,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
@@ -72,7 +71,9 @@ public class PersistentApplicationConfigImpl implements ApplicationConfigService
     @Override
     public List<Application> getApplicationConfigs(
             final String name,
-            final String userName) {
+            final String userName,
+            final int page,
+            final int limit) {
         LOG.debug("Called");
 
         final EntityManager em = this.pm.createEntityManager();
@@ -104,6 +105,8 @@ public class PersistentApplicationConfigImpl implements ApplicationConfigService
             if (StringUtils.isNotEmpty(userName)) {
                 query.setParameter("userName", userName);
             }
+            query.setFirstResult(page * limit);
+            query.setMaxResults(limit);
             return query.getResultList();
         } finally {
             em.close();
@@ -117,16 +120,8 @@ public class PersistentApplicationConfigImpl implements ApplicationConfigService
      */
     @Override
     public Application createApplicationConfig(final Application app) throws CloudServiceException {
-        if (app == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application entered. Unable to create.");
-        }
+        Application.validate(app);
         LOG.debug("Called with application: " + app.toString());
-        if (StringUtils.isEmpty(app.getId())) {
-            app.setId(UUID.randomUUID().toString());
-        }
-        //TODO: validate application contents via Validate method in Application class
         final EntityManager em = this.pm.createEntityManager();
         final EntityTransaction trans = em.getTransaction();
         try {
@@ -192,6 +187,7 @@ public class PersistentApplicationConfigImpl implements ApplicationConfigService
                     && updateApp.getStatus() != app.getStatus()) {
                 app.setStatus(updateApp.getStatus());
             }
+            Application.validate(app);
             trans.commit();
             return app;
         } finally {

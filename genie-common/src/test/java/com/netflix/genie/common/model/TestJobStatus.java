@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.model;
 
 import org.junit.Assert;
@@ -29,22 +28,23 @@ import org.junit.Test;
 public class TestJobStatus {
 
     /**
-     * Tests whether a job status is updated correctly, and update time is changed accordingly.
+     * Tests whether a job status is updated correctly, and update time is
+     * changed accordingly.
      */
     @Test
     public void testSetJobStatus() {
-        Job ji = new Job();
+        Job job = new Job();
 
         // finish time is 0 on initialization
-        Assert.assertEquals(ji.getFinishTime(), Long.valueOf(0));
+        Assert.assertTrue(0L == job.getFinishTime());
 
         // start time is not zero on INIT, finish time is still 0
-        ji.setJobStatus(Types.JobStatus.INIT);
-        Assert.assertNotNull(ji.getStartTime());
-        Assert.assertEquals(ji.getFinishTime(), Long.valueOf(0));
+        job.setJobStatus(Types.JobStatus.INIT);
+        Assert.assertNotNull(job.getStartTime());
+        Assert.assertTrue(0L == job.getFinishTime());
 
         // finish time is non-zero on completion
-        ji.setJobStatus(Types.JobStatus.SUCCEEDED);
-        Assert.assertNotSame(ji.getFinishTime(), Long.valueOf(0));
+        job.setJobStatus(Types.JobStatus.SUCCEEDED);
+        Assert.assertFalse(0L == job.getFinishTime());
     }
 }

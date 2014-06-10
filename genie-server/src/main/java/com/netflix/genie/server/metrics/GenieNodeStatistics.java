@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,18 +15,15 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.metrics;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.netflix.servo.annotations.DataSourceType;
 import com.netflix.servo.annotations.Monitor;
 import com.netflix.servo.monitor.Monitors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Singleton class that implements all servo monitoring for Genie.
@@ -35,13 +32,13 @@ import com.netflix.servo.monitor.Monitors;
  */
 public final class GenieNodeStatistics {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(GenieNodeStatistics.class);
 
     // static instance for singleton class
     private static volatile GenieNodeStatistics instance;
 
-    private JobCountMonitor jobCountMonitor;
+    private final JobCountMonitor jobCountMonitor;
 
     @Monitor(name = "2xx_Count", type = DataSourceType.COUNTER)
     private AtomicLong genie2xxCount = new AtomicLong(0);
@@ -68,25 +65,25 @@ public final class GenieNodeStatistics {
     private AtomicLong genieKilledJobs = new AtomicLong(0);
 
     @Monitor(name = "Running_Jobs", type = DataSourceType.GAUGE)
-    private AtomicInteger genieRunningJobs = new AtomicInteger(0);
+    private final AtomicInteger genieRunningJobs = new AtomicInteger(0);
 
     @Monitor(name = "Running_Jobs_0_15m", type = DataSourceType.GAUGE)
-    private AtomicInteger genieRunningJobs0To15m = new AtomicInteger(0);
+    private final AtomicInteger genieRunningJobs0To15m = new AtomicInteger(0);
 
     @Monitor(name = "Running_Jobs_15m_2h", type = DataSourceType.GAUGE)
-    private AtomicInteger genieRunningJobs15mTo2h = new AtomicInteger(0);
+    private final AtomicInteger genieRunningJobs15mTo2h = new AtomicInteger(0);
 
     @Monitor(name = "Running_Jobs_2h_8h", type = DataSourceType.GAUGE)
-    private AtomicInteger genieRunningJobs2hTo8h = new AtomicInteger(0);
+    private final AtomicInteger genieRunningJobs2hTo8h = new AtomicInteger(0);
 
     @Monitor(name = "Running_Jobs_8h_plus", type = DataSourceType.GAUGE)
-    private AtomicInteger genieRunningJobs8hPlus = new AtomicInteger(0);
+    private final AtomicInteger genieRunningJobs8hPlus = new AtomicInteger(0);
 
     @Monitor(name = "Successful_Email_Count", type = DataSourceType.COUNTER)
-    private AtomicLong successEmailCount = new AtomicLong(0);
+    private final AtomicLong successEmailCount = new AtomicLong(0);
 
     @Monitor(name = "Failed_Email_Count", type = DataSourceType.COUNTER)
-    private AtomicLong failedEmailCount = new AtomicLong(0);
+    private final AtomicLong failedEmailCount = new AtomicLong(0);
 
     /**
      * Private constructor for singleton.
@@ -101,8 +98,8 @@ public final class GenieNodeStatistics {
      * Register static instance with servo.
      */
     public static void register() {
-        logger.debug("called");
-        logger.info("Registering Servo Monitor");
+        LOG.debug("called");
+        LOG.info("Registering Servo Monitor");
         Monitors.registerObject(getInstance());
     }
 
@@ -112,7 +109,7 @@ public final class GenieNodeStatistics {
      * @return singleton instance
      */
     public static synchronized GenieNodeStatistics getInstance() {
-        logger.info("called");
+        LOG.info("called");
         // create an instance if it hasn't been created already
         if (instance == null) {
             instance = new GenieNodeStatistics();
@@ -126,7 +123,7 @@ public final class GenieNodeStatistics {
      * @return count of 2xx responses
      */
     public AtomicLong getGenie2xxCount() {
-        logger.debug("called");
+        LOG.debug("called");
         return genie2xxCount;
     }
 
@@ -134,7 +131,7 @@ public final class GenieNodeStatistics {
      * Increment 2xx response count atomically.
      */
     public void incrGenie2xxCount() {
-        logger.debug("called");
+        LOG.debug("called");
         genie2xxCount.incrementAndGet();
     }
 
@@ -144,7 +141,7 @@ public final class GenieNodeStatistics {
      * @return count of 4xx responses
      */
     public AtomicLong getGenie4xxCount() {
-        logger.debug("called");
+        LOG.debug("called");
         return genie4xxCount;
     }
 
@@ -152,7 +149,7 @@ public final class GenieNodeStatistics {
      * Increment 4xx response count atomically.
      */
     public void incrGenie4xxCount() {
-        logger.debug("called");
+        LOG.debug("called");
         genie4xxCount.incrementAndGet();
     }
 
@@ -162,7 +159,7 @@ public final class GenieNodeStatistics {
      * @return count of 5xx responses
      */
     public AtomicLong getGenie5xxCount() {
-        logger.debug("called");
+        LOG.debug("called");
         return genie5xxCount;
     }
 
@@ -170,7 +167,7 @@ public final class GenieNodeStatistics {
      * Increment 5xx response count atomically.
      */
     public void incrGenie5xxCount() {
-        logger.debug("called");
+        LOG.debug("called");
         genie5xxCount.incrementAndGet();
     }
 
@@ -180,7 +177,7 @@ public final class GenieNodeStatistics {
      * @return number of job submissions on this instance
      */
     public AtomicLong getGenieJobSubmissions() {
-        logger.debug("called");
+        LOG.debug("called");
         return genieJobSubmissions;
     }
 
@@ -188,7 +185,7 @@ public final class GenieNodeStatistics {
      * Increment job submissions on this instance atomically.
      */
     public void incrGenieJobSubmissions() {
-        logger.debug("called");
+        LOG.debug("called");
         genieJobSubmissions.incrementAndGet();
     }
 
@@ -198,7 +195,7 @@ public final class GenieNodeStatistics {
      * @return number of successful email sent from this instance
      */
     public AtomicLong getSuccessfulEmailSentCount() {
-        logger.debug("called");
+        LOG.debug("called");
         return successEmailCount;
     }
 
@@ -206,17 +203,17 @@ public final class GenieNodeStatistics {
      * Increment successful email sent from this instance atomically.
      */
     public void incrSuccessfulEmailCount() {
-        logger.debug("called");
+        LOG.debug("called");
         successEmailCount.incrementAndGet();
     }
 
     /**
-     * Get number of  email that failed to be sent from this instance.
+     * Get number of email that failed to be sent from this instance.
      *
      * @return number of failed email attempts on this instance
      */
     public AtomicLong getFailedEmailSentCount() {
-        logger.debug("called");
+        LOG.debug("called");
         return failedEmailCount;
     }
 
@@ -224,8 +221,8 @@ public final class GenieNodeStatistics {
      * Increment failed email sent count on this instance atomically.
      */
     public void incrFailedEmailCount() {
-        logger.debug("called");
-       failedEmailCount.incrementAndGet();
+        LOG.debug("called");
+        failedEmailCount.incrementAndGet();
     }
 
     /**
@@ -234,7 +231,7 @@ public final class GenieNodeStatistics {
      * @return number of successful jobs on this instance
      */
     public AtomicLong getGenieSuccessfulJobs() {
-        logger.debug("called");
+        LOG.debug("called");
         return genieSuccessfulJobs;
     }
 
@@ -242,7 +239,7 @@ public final class GenieNodeStatistics {
      * Increment number of successful jobs atomically.
      */
     public void incrGenieSuccessfulJobs() {
-        logger.debug("called");
+        LOG.debug("called");
         genieSuccessfulJobs.incrementAndGet();
     }
 
@@ -252,7 +249,7 @@ public final class GenieNodeStatistics {
      * @return number of failed jobs on this instance
      */
     public AtomicLong getGenieFailedJobs() {
-        logger.debug("called");
+        LOG.debug("called");
         return genieFailedJobs;
     }
 
@@ -260,7 +257,7 @@ public final class GenieNodeStatistics {
      * Increment number of failed jobs atomically.
      */
     public void incrGenieFailedJobs() {
-        logger.debug("called");
+        LOG.debug("called");
         genieFailedJobs.incrementAndGet();
     }
 
@@ -270,7 +267,7 @@ public final class GenieNodeStatistics {
      * @return number of forwarded jobs from this instance
      */
     public AtomicLong getGenieForwardedJobs() {
-        logger.debug("called");
+        LOG.debug("called");
         return genieForwardedJobs;
     }
 
@@ -278,7 +275,7 @@ public final class GenieNodeStatistics {
      * Increment number of forwarded jobs atomically.
      */
     public void incrGenieForwardedJobs() {
-        logger.debug("called");
+        LOG.debug("called");
         genieForwardedJobs.incrementAndGet();
     }
 
@@ -288,7 +285,7 @@ public final class GenieNodeStatistics {
      * @return number of killed jobs on this instance
      */
     public AtomicLong getGenieKilledJobs() {
-        logger.debug("called");
+        LOG.debug("called");
         return genieKilledJobs;
     }
 
@@ -296,10 +293,9 @@ public final class GenieNodeStatistics {
      * Increment number of killed jobs atomically.
      */
     public void incrGenieKilledJobs() {
-        logger.debug("called");
+        LOG.debug("called");
         genieKilledJobs.incrementAndGet();
     }
-
 
     /**
      * A setter method for 2xx count.
@@ -403,7 +399,8 @@ public final class GenieNodeStatistics {
     /**
      * Set the number of running jobs with runtime less than 15 mins.
      *
-     * @param genieRunningJobs0To15m number of running jobs with runtime less than 15 mins
+     * @param genieRunningJobs0To15m number of running jobs with runtime less
+     * than 15 mins
      */
     public void setGenieRunningJobs0To15m(int genieRunningJobs0To15m) {
         this.genieRunningJobs0To15m.set(genieRunningJobs0To15m);
@@ -421,8 +418,8 @@ public final class GenieNodeStatistics {
     /**
      * Set the number of running jobs with runtime between 15 mins and 2 hours.
      *
-     * @param genieRunningJobs15mTo2h number of running jobs with runtime between
-     *          15 mins and 2 hours
+     * @param genieRunningJobs15mTo2h number of running jobs with runtime
+     * between 15 mins and 2 hours
      */
     public void setGenieRunningJobs15mTo2h(int genieRunningJobs15mTo2h) {
         this.genieRunningJobs15mTo2h.set(genieRunningJobs15mTo2h);
@@ -440,8 +437,8 @@ public final class GenieNodeStatistics {
     /**
      * Set the number of running jobs with runtime between 2 to 8 hours.
      *
-     * @param genieRunningJobs2hTo8h number of running jobs with runtime
-     *          between 2 to 8 hours.
+     * @param genieRunningJobs2hTo8h number of running jobs with runtime between
+     * 2 to 8 hours.
      */
     public void setGenieRunningJobs2hTo8h(int genieRunningJobs2hTo8h) {
         this.genieRunningJobs2hTo8h.set(genieRunningJobs2hTo8h);
@@ -459,8 +456,8 @@ public final class GenieNodeStatistics {
     /**
      * Set the number of running jobs with runtime greater than 8 hours.
      *
-     * @param genieRunningJobs8hPlus number of running jobs with runtime
-     *          greater than 8 hours
+     * @param genieRunningJobs8hPlus number of running jobs with runtime greater
+     * than 8 hours
      */
     public void setGenieRunningJobs8hPlus(int genieRunningJobs8hPlus) {
         this.genieRunningJobs8hPlus.set(genieRunningJobs8hPlus);
@@ -470,7 +467,7 @@ public final class GenieNodeStatistics {
      * Shut down cleanly.
      */
     public void shutdown() {
-        logger.info("Shutting down Servo monitor");
+        LOG.info("Shutting down Servo monitor");
         Monitors.unregisterObject(this);
         jobCountMonitor.setStop(true);
     }

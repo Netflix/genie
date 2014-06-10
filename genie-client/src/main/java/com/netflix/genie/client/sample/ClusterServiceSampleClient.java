@@ -175,11 +175,6 @@ public final class ClusterServiceSampleClient {
         cluster.setVersion("2.4.0");
         cluster.setJobManager("com.netflix.genie.server.jobmanager.impl.YarnJobManager");
         if (commands != null && !commands.isEmpty()) {
-            final Set<String> cmdIds = new HashSet<String>();
-            for (final Command command : commands) {
-                cmdIds.add(command.getId());
-            }
-            cluster.setCmdIds(cmdIds);
             cluster.setCommands(commands);
         }
         return cluster;
