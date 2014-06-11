@@ -1,1 +1,20 @@
 apply plugin: 'java'
+
+task enhance << {
+    ant.taskdef(
+        name      : 'openjpaenhancer',
+        classpath : project.runtimeClasspath.asPath,
+        classname : 'org.apache.openjpa.ant.PCEnhancerTask'
+    )
+
+    ant.openjpaenhancer(
+        classpath : project.runtimeClasspath.asPath)
+}
+
+jar {
+    it.dependsOn enhance
+}
+
+test {
+    it.dependsOn enhance
+}

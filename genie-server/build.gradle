@@ -2,7 +2,7 @@ apply plugin: 'java'
 
 // we are doing this rather than a dependency since we 
 // must perform build-time enhancement for OpenJPA
-sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
+//sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
 //sourceSets.main.java.srcDirs += new File(project.parent.project(':genie-common').projectDir, 'src/main/java')
 //sourceSets.main.java.srcDirs += project.parent.childProjects.get('genie-common').sourceSets.main.java.srcDirs
 
@@ -16,6 +16,7 @@ dependencies {
     compile 'commons-httpclient:commons-httpclient:3.1'
     compile 'javax.mail:mail:1.4.1'
     compile 'com.googlecode.json-simple:json-simple:1.1'
+    compile project.parent.childProjects.get('genie-common')
 
     runtime 'org.apache.derby:derby:10.2.2.0'
     runtime 'mysql:mysql-connector-java:5.1.16'
@@ -23,25 +24,6 @@ dependencies {
     runtime 'com.mchange:mchange-commons-java:0.2.3.3'
 
     provided 'javax.servlet:servlet-api:2.5'
-}
-
-task enhance << {
-    ant.taskdef(
-        name      : 'openjpaenhancer',
-        classpath : project.runtimeClasspath.asPath,
-        classname : 'org.apache.openjpa.ant.PCEnhancerTask'
-    )
-
-    ant.openjpaenhancer(
-        classpath : project.runtimeClasspath.asPath)
-}
-
-jar {
-    it.dependsOn enhance
-}
-
-test {
-    it.dependsOn enhance
 }
 
 clean {
