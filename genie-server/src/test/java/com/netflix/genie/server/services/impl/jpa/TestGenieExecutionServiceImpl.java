@@ -15,15 +15,20 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.services.impl;
+package com.netflix.genie.server.services.impl.jpa;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ExecutionService;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,13 +40,28 @@ import org.junit.Test;
 public class TestGenieExecutionServiceImpl {
 
     private static ExecutionService xs;
+    private Set<ClusterCriteria> criterias;
 
     /**
      * Initialize stats object before any tests are run.
      */
     @BeforeClass
     public static void init() {
-        xs = new GenieExecutionServiceImpl();
+        xs = new ExecutionServiceJPAImpl();
+    }
+
+    /**
+     * Setup the tests.
+     *
+     * @throws CloudServiceException
+     */
+    @Before
+    public void setup() throws CloudServiceException {
+        final Set<String> criteriaTags = new HashSet<String>();
+        criteriaTags.add("prod");
+        final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
+        this.criterias = new HashSet<ClusterCriteria>();
+        this.criterias.add(criteria);
     }
 
     /**
@@ -53,13 +73,10 @@ public class TestGenieExecutionServiceImpl {
     public void testOptimizedJobKill() throws Exception {
         // add a successful job with a bogus killURI
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
-        Job job = new Job();
-        UUID uuid = UUID.randomUUID();
-        job.setId(uuid.toString());
+        final Job job = new Job("someUser", "commandId", null, "someArg", this.criterias);
+        job.setId(UUID.randomUUID().toString());
         job.setKillURI("http://DOES/NOT/EXIST");
         job.setStatus(JobStatus.SUCCEEDED);
-        job.setUserName("myUserName");
-        job.setCmdArgs("commandArg");
         pm.createEntity(job);
 
         // should return immediately despite bogus killURI

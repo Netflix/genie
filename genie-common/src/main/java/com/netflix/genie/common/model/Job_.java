@@ -36,7 +36,7 @@ public class Job_ extends Auditable_ {
     public static volatile SingularAttribute<Job, String> client;
     public static volatile SingularAttribute<Job, String> clientHost;
     public static volatile SingularAttribute<Job, String> clusterCriteriaString;
-    public static volatile SingularAttribute<Job, String> cmdArgs;
+    public static volatile SingularAttribute<Job, String> commandArgs;
     public static volatile SingularAttribute<Job, String> commandId;
     public static volatile SingularAttribute<Job, String> commandName;
     public static volatile SingularAttribute<Job, String> description;
@@ -48,15 +48,15 @@ public class Job_ extends Auditable_ {
     public static volatile SingularAttribute<Job, String> fileDependencies;
     public static volatile SingularAttribute<Job, Long> finishTime;
     public static volatile SingularAttribute<Job, Boolean> forwarded;
-    public static volatile SingularAttribute<Job, String> groupName;
+    public static volatile SingularAttribute<Job, String> group;
     public static volatile SingularAttribute<Job, String> hostName;
-    public static volatile SingularAttribute<Job, String> jobName;
+    public static volatile SingularAttribute<Job, String> name;
     public static volatile SingularAttribute<Job, String> killURI;
     public static volatile SingularAttribute<Job, String> outputURI;
     public static volatile SingularAttribute<Job, Integer> processHandle;
     public static volatile SingularAttribute<Job, Long> startTime;
     public static volatile SingularAttribute<Job, JobStatus> status;
     public static volatile SingularAttribute<Job, String> statusMsg;
-    public static volatile SingularAttribute<Job, String> userEmail;
-    public static volatile SingularAttribute<Job, String> userName;
+    public static volatile SingularAttribute<Job, String> email;
+    public static volatile SingularAttribute<Job, String> user;
 }

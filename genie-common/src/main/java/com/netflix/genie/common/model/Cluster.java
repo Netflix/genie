@@ -21,12 +21,11 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -73,12 +72,24 @@ public class Cluster extends Auditable implements Serializable {
     private String user;
 
     /**
-     * Set of tags for scheduling - e.g. adhoc, sla, vpc etc.
+     * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
      */
-    @XmlElementWrapper(name = "tags")
-    @XmlElement(name = "tag")
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> tags = new HashSet<String>();
+    @Basic(optional = false)
+    @Enumerated(EnumType.STRING)
+    private ClusterStatus status;
+
+    /**
+     * The class to use as the job manager for this cluster.
+     */
+    @Basic(optional = false)
+    private String jobManager;
+
+    /**
+     * Version of this cluster.
+     */
+    @Basic
+    @Column(name = "clusterVersion")
+    private String version;
 
     /**
      * Reference to all the configuration (xml's) needed for this cluster.
@@ -89,6 +100,14 @@ public class Cluster extends Auditable implements Serializable {
     private Set<String> configs = new HashSet<String>();
 
     /**
+     * Set of tags for scheduling - e.g. adhoc, sla, vpc etc.
+     */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> tags = new HashSet<String>();
+
+    /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
      */
     @XmlElementWrapper(name = "commands")
@@ -97,28 +116,36 @@ public class Cluster extends Auditable implements Serializable {
     private Set<Command> commands = new HashSet<Command>();
 
     /**
-     * Version of this cluster.
-     */
-    @Basic
-    private String version;
-
-    /**
-     * The class to use as the job manager for this cluster.
-     */
-    @Basic(optional = false)
-    private String jobManager;
-
-    /**
-     * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
-     */
-    @Enumerated(EnumType.STRING)
-    private ClusterStatus status;
-
-    /**
      * Default Constructor.
      */
-    public Cluster() {
+    protected Cluster() {
         super();
+    }
+
+    /**
+     * Construct a new Cluster.
+     *
+     * @param name The name of the cluster. Not null/empty/blank.
+     * @param user The user who created the cluster. Not null/empty/blank.
+     * @param status The status of the cluster. Not null.
+     * @param jobManager The job manager for the cluster. Not null/empty/blank.
+     * @param configs The configuration files for the cluster. Not null or
+     * empty.
+     * @throws CloudServiceException
+     */
+    public Cluster(
+            final String name,
+            final String user,
+            final ClusterStatus status,
+            final String jobManager,
+            final Set<String> configs) throws CloudServiceException {
+        super();
+        validate(name, user, status, jobManager, configs);
+        this.name = name;
+        this.user = user;
+        this.status = status;
+        this.jobManager = jobManager;
+        this.configs = configs;
     }
 
     /**
@@ -133,9 +160,11 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Sets the name for this cluster.
      *
-     * @param name unique id for this cluster
+     * @param name name for this cluster. Not null/empty/blank.
+     * @throws CloudServiceException
      */
-    public void setName(final String name) {
+    public void setName(final String name) throws CloudServiceException {
+        validate(name, this.user, this.status, this.jobManager, this.configs);
         this.name = name;
     }
 
@@ -151,10 +180,71 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Sets the user who created this cluster.
      *
-     * @param user user who created this cluster
+     * @param user user who created this cluster. Not null/empty/blank.
+     * @throws CloudServiceException
      */
-    public void setUser(final String user) {
+    public void setUser(final String user) throws CloudServiceException {
+        validate(this.name, user, this.status, this.jobManager, this.configs);
         this.user = user;
+    }
+
+    /**
+     * Gets the status for this cluster.
+     *
+     * @return status - possible values: Types.ConfigStatus
+     */
+    public ClusterStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * Sets the status for this cluster.
+     *
+     * @param status The status of the cluster. Not null.
+     * @throws CloudServiceException
+     * @see ClusterStatus
+     */
+    public void setStatus(final ClusterStatus status) throws CloudServiceException {
+        validate(this.name, this.user, status, this.jobManager, this.configs);
+        this.status = status;
+    }
+
+    /**
+     * Get the job manager class to use for this cluster.
+     *
+     * @return The class to use
+     */
+    public String getJobManager() {
+        return this.jobManager;
+    }
+
+    /**
+     * Set the job manager class to use for this cluster.
+     *
+     * @param jobManager The job manager class to use. Not null/empty/blank.
+     * @throws CloudServiceException
+     */
+    public void setJobManager(final String jobManager) throws CloudServiceException {
+        validate(this.name, this.user, this.status, jobManager, this.configs);
+        this.jobManager = jobManager;
+    }
+
+    /**
+     * Gets the version of this cluster.
+     *
+     * @return version
+     */
+    public String getVersion() {
+        return this.version;
+    }
+
+    /**
+     * Sets the version for this cluster.
+     *
+     * @param version version number for this cluster
+     */
+    public void setVersion(final String version) {
+        this.version = version;
     }
 
     /**
@@ -169,7 +259,7 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Sets the tags allocated to this cluster.
      *
-     * @param tags the tags to set
+     * @param tags the tags to set. Not Null.
      * @throws CloudServiceException
      */
     public void setTags(final Set<String> tags) throws CloudServiceException {
@@ -193,15 +283,12 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Sets the configurations for this cluster.
      *
-     * @param configs The configuration files that this cluster needs
+     * @param configs The configuration files that this cluster needs. Not
+     * null/empty.
      * @throws CloudServiceException
      */
     public void setConfigs(final Set<String> configs) throws CloudServiceException {
-        if (configs == null) {
-            final String msg = "No configs passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
+        validate(this.name, this.user, this.status, this.jobManager, configs);
         this.configs = configs;
     }
 
@@ -231,60 +318,6 @@ public class Cluster extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the version of this cluster.
-     *
-     * @return version
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * Sets the version for this cluster.
-     *
-     * @param version version number for this cluster
-     */
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    /**
-     * Get the job manager class to use for this cluster.
-     *
-     * @return The class to use
-     */
-    public String getJobManager() {
-        return this.jobManager;
-    }
-
-    /**
-     * Set the job manager class to use for this cluster.
-     *
-     * @param jobManager The job manager class to use
-     */
-    public void setJobManager(final String jobManager) {
-        this.jobManager = jobManager;
-    }
-
-    /**
-     * Gets the status for this cluster.
-     *
-     * @return status - possible values: Types.ConfigStatus
-     */
-    public ClusterStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * Sets the status for this cluster.
-     *
-     * @param status possible values Types.ConfigStatus
-     */
-    public void setStatus(final ClusterStatus status) {
-        this.status = status;
-    }
-
-    /**
      * Check to make sure that the required parameters exist.
      *
      * @param cluster The configuration to check
@@ -296,27 +329,49 @@ public class Cluster extends Auditable implements Serializable {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster entered. Unable to validate.");
         }
+        validate(
+                cluster.getName(),
+                cluster.getUser(),
+                cluster.getStatus(),
+                cluster.getJobManager(),
+                cluster.getConfigs());
+    }
 
-        final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(cluster.getUser())) {
-            messages.add("User name is missing. Unable to continue.\n");
+    /**
+     * Helper method to ensure that values are valid for a cluster.
+     *
+     * @param name The name of the cluster
+     * @param user The user who created the cluster
+     * @param status The status of the cluster
+     * @param jobManager The job manager for the cluster
+     * @param configs The configuration files for the cluster
+     * @throws CloudServiceException
+     */
+    private static void validate(
+            final String name,
+            final String user,
+            final ClusterStatus status,
+            final String jobManager,
+            final Set<String> configs) throws CloudServiceException {
+        final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isBlank(name)) {
+            builder.append("Cluster name is missing and required.\n");
         }
-        if (StringUtils.isEmpty(cluster.getName())) {
-            messages.add("Cluster name is missing. Unable to continue.\n");
+        if (StringUtils.isBlank(user)) {
+            builder.append("User name is missing and required.\n");
         }
-        if (cluster.getStatus() == null) {
-            messages.add("No cluster status entered. Unable to continue.\n");
+        if (status == null) {
+            builder.append("No cluster status entered and is required.\n");
         }
-        if (cluster.getConfigs().isEmpty()) {
-            messages.add("At least one configuration file is required for the cluster.\n");
+        if (StringUtils.isBlank(jobManager)) {
+            builder.append("No cluster job manager entered and is required.\n");
+        }
+        if (configs == null || configs.isEmpty()) {
+            builder.append("At least one configuration file is required for the cluster.\n");
         }
 
-        if (!messages.isEmpty()) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Cluster configuration errors:\n");
-            for (final String message : messages) {
-                builder.append(message);
-            }
+        if (builder.length() != 0) {
+            builder.insert(0, "Cluster configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);

@@ -1,4 +1,4 @@
-package com.netflix.genie.server.services.impl;
+package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
@@ -27,16 +27,16 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-public class PersistentApplicationConfigImpl implements ApplicationConfigService {
+public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PersistentApplicationConfigImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigServiceJPAImpl.class);
 
     private final PersistenceManager<Application> pm;
 
     /**
      * Default constructor.
      */
-    public PersistentApplicationConfigImpl() {
+    public ApplicationConfigServiceJPAImpl() {
         // instantiate PersistenceManager
         this.pm = new PersistenceManager<Application>();
     }

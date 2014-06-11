@@ -19,9 +19,12 @@ package com.netflix.genie.server.services.impl;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
@@ -42,7 +45,9 @@ public class TestRandomizedClusterLoadBalancerImpl {
      */
     @Test
     public void testValidCluster() throws CloudServiceException {
-        Cluster cce = new Cluster();
+        final Set<String> configs = new HashSet<String>();
+        configs.add("SomeConfig");
+        final Cluster cce = new Cluster("name", "tgianos", ClusterStatus.UP, "jobManager", configs);
         assertNotNull(this.clb.selectCluster(Arrays.asList(new Cluster[]{cce, cce, cce})));
     }
 

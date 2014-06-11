@@ -276,7 +276,7 @@ public class JobMonitor extends Thread {
 
         // Check if user email address is specified. If so
         // send an email to user about job completion.
-        String emailTo = job.getUserEmail();
+        String emailTo = job.getEmail();
 
         if (emailTo != null) {
             LOG.info("User email address: " + emailTo);
@@ -373,7 +373,7 @@ public class JobMonitor extends Thread {
 
             // Set Subject: header field
             message.setSubject("Genie Job "
-                    + job.getJobName()
+                    + job.getName()
                     + " completed with Status: "
                     + jobStatus);
 
@@ -383,7 +383,7 @@ public class JobMonitor extends Thread {
                     + job.getId()
                     + "\n"
                     + "Job Name: "
-                    + job.getJobName()
+                    + job.getName()
                     + "\n"
                     + "Status: "
                     + job.getStatus()
@@ -425,7 +425,7 @@ public class JobMonitor extends Thread {
          */
         @Override
         public PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication(username, password);
+            return new PasswordAuthentication(this.username, this.password);
         }
     }
 }

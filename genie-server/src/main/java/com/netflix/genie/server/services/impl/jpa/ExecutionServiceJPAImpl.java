@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.services.impl;
+package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.client.ClientFactory;
 import com.netflix.client.http.HttpRequest;
@@ -65,10 +65,10 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-public class GenieExecutionServiceImpl implements ExecutionService {
+public class ExecutionServiceJPAImpl implements ExecutionService {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(GenieExecutionServiceImpl.class);
+            .getLogger(ExecutionServiceJPAImpl.class);
 
     // instance of the netflix configuration object
     private static final AbstractConfiguration CONF;
@@ -96,7 +96,7 @@ public class GenieExecutionServiceImpl implements ExecutionService {
      * Default constructor - initializes persistence manager, and other utility
      * classes.
      */
-    public GenieExecutionServiceImpl() {
+    public ExecutionServiceJPAImpl() {
         this.pm = new PersistenceManager<Job>();
         this.stats = GenieNodeStatistics.getInstance();
     }
@@ -274,10 +274,10 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                 predicates.add(cb.like(j.get(Job_.id), id));
             }
             if (StringUtils.isNotEmpty(jobName)) {
-                predicates.add(cb.like(j.get(Job_.jobName), jobName));
+                predicates.add(cb.like(j.get(Job_.name), jobName));
             }
             if (StringUtils.isNotEmpty(userName)) {
-                predicates.add(cb.equal(j.get(Job_.userName), userName));
+                predicates.add(cb.equal(j.get(Job_.user), userName));
             }
             if (status != null) {
                 predicates.add(cb.equal(j.get(Job_.status), status));

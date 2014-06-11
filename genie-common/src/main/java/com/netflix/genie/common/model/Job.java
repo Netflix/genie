@@ -21,22 +21,24 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Lob;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +48,6 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-//TODO: Should we check all string parameters for null/empty?
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
@@ -55,16 +56,31 @@ import org.slf4j.LoggerFactory;
 public class Job extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 2979506788441089067L;
-    private static final Logger LOG = LoggerFactory.getLogger(Command.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Job.class);
+    private static final char CRITERIA_SET_DELIMITER = '|';
+    private static final char CRITERIA_DELIMITER = ',';
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
     // ------------------------------------------------------------------------
     /**
+     * User who submitted the job (REQUIRED).
+     */
+    @Basic(optional = false)
+    private String user;
+
+    /**
+     * Command line arguments (REQUIRED).
+     */
+    @Lob
+    @Basic(optional = false)
+    private String commandArgs;
+
+    /**
      * User-specified or system-generated job name.
      */
     @Basic
-    private String jobName;
+    private String name;
 
     /**
      * Human readable description.
@@ -73,16 +89,11 @@ public class Job extends Auditable implements Serializable {
     private String description;
 
     /**
-     * User who submitted the job (REQUIRED).
-     */
-    @Basic(optional = false)
-    private String userName;
-
-    /**
      * The group user belongs.
      */
     @Basic
-    private String groupName;
+    @Column(name = "groupName")
+    private String group;
 
     /**
      * Client - UC4, Ab Initio, Search.
@@ -112,21 +123,17 @@ public class Job extends Auditable implements Serializable {
      * Set of tags to use for scheduling (REQUIRED).
      */
     @Transient
-    private Set<ClusterCriteria> clusterCriteria = new HashSet<ClusterCriteria>();
+    private Set<ClusterCriteria> clusterCriteria;
 
     /**
      * String representation of the the cluster criteria array list object
-     * above. TODO: use pre/post persist to store the above list into the DB
+     * above.
      */
-    @Lob
-    private String clusterCriteriaString;
-
-    /**
-     * Command line arguments (REQUIRED).
-     */
+    @XmlTransient
+    @JsonIgnore
     @Lob
     @Basic(optional = false)
-    private String cmdArgs;
+    private String clusterCriteriaString;
 
     /**
      * File dependencies.
@@ -148,13 +155,12 @@ public class Job extends Auditable implements Serializable {
     private boolean disableLogArchival;
 
     /**
-     * Email address of the user where he expects an email. This is sent once
-     * the aladdin job completes.
+     * Email address of the user where they expects an email. This is sent once
+     * the Genie job completes.
      */
     @Basic
-    private String userEmail;
+    private String email;
 
-    // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
     // Genie2 command and application combinations to be specified by the user while running jobs.
     // ------------------------------------------------------------------------
@@ -184,7 +190,6 @@ public class Job extends Auditable implements Serializable {
     private String commandId;
 
     // ------------------------------------------------------------------------
-    // ------------------------------------------------------------------------
     // GENERAL COMMON STUFF FOR ALL JOBS
     // TO BE GENERATED/USED BY SERVER
     // ------------------------------------------------------------------------
@@ -197,6 +202,7 @@ public class Job extends Auditable implements Serializable {
     /**
      * Job status - INIT, RUNNING, SUCCEEDED, KILLED, FAILED (upper case in DB).
      */
+    @Basic
     @Enumerated(EnumType.STRING)
     private JobStatus status;
 
@@ -264,26 +270,63 @@ public class Job extends Auditable implements Serializable {
     /**
      * Default Constructor.
      */
-    public Job() {
+    protected Job() {
         super();
+    }
+
+    /**
+     * Construct a new Job.
+     *
+     * @param user The name of the user running the job. Not null/empty/blank.
+     * @param commandId The id of the command to run for the job. Not
+     * null/empty/blank if no commandName entered.
+     * @param commandName The name of the command to run for the job. Not
+     * null/empty/blank if no commandId entered.
+     * @param commandArgs The command line arguments for the job. Not
+     * null/empty/blank.
+     * @param clusterCriteria The cluster criteria for the job. Not null/empty.
+     * @throws CloudServiceException
+     */
+    public Job(
+            final String user,
+            final String commandId,
+            final String commandName,
+            final String commandArgs,
+            final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
+        validate(user, commandId, commandName, commandArgs, clusterCriteria);
+        this.user = user;
+        this.commandId = commandId;
+        this.commandName = commandName;
+        this.commandArgs = commandArgs;
+        this.clusterCriteria = clusterCriteria;
+    }
+
+    /**
+     * Makes sure non-transient fields are set from transient fields.
+     *
+     * @throws CloudServiceException
+     */
+    @PrePersist
+    protected void onCreateJob() throws CloudServiceException {
+        this.clusterCriteriaString = criteriaToString(this.clusterCriteria);
     }
 
     /**
      * Gets the name for this job.
      *
-     * @return jobName
+     * @return name
      */
-    public String getJobName() {
-        return this.jobName;
+    public String getName() {
+        return this.name;
     }
 
     /**
      * Sets the name for this job.
      *
-     * @param jobName name for the job
+     * @param name name for the job
      */
-    public void setJobName(final String jobName) {
-        this.jobName = jobName;
+    public void setName(final String name) {
+        this.name = name;
     }
 
     /**
@@ -307,37 +350,39 @@ public class Job extends Auditable implements Serializable {
     /**
      * Gets the user who submit the job.
      *
-     * @return userName
+     * @return the user
      */
-    public String getUserName() {
-        return this.userName;
+    public String getUser() {
+        return this.user;
     }
 
     /**
      * Sets the user who submits the job.
      *
-     * @param userName user submitting the job
+     * @param user user submitting the job
+     * @throws CloudServiceException
      */
-    public void setUserName(final String userName) {
-        this.userName = userName;
+    public void setUser(final String user) throws CloudServiceException {
+        validate(user, this.commandId, this.commandName, this.commandArgs, this.clusterCriteria);
+        this.user = user;
     }
 
     /**
      * Gets the group name of the user who submitted the job.
      *
-     * @return groupName
+     * @return group
      */
-    public String getGroupName() {
-        return this.groupName;
+    public String getGroup() {
+        return this.group;
     }
 
     /**
      * Sets the group of the user who submits the job.
      *
-     * @param groupName usergroup submitting the job
+     * @param group group of the user submitting the job
      */
-    public void setGroupName(final String groupName) {
-        this.groupName = groupName;
+    public void setGroup(final String group) {
+        this.group = group;
     }
 
     /**
@@ -414,31 +459,30 @@ public class Job extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setClusterCriteria(final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
-        if (clusterCriteria == null) {
-            final String msg = "No criteria passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
+        validate(this.user, this.commandId, this.commandName, this.commandArgs, clusterCriteria);
         this.clusterCriteria = clusterCriteria;
+        this.clusterCriteriaString = criteriaToString(clusterCriteria);
     }
 
     /**
-     * Gets the cmdArgs specified to run the job.
+     * Gets the commandArgs specified to run the job.
      *
-     * @return cmdArgs
+     * @return commandArgs
      */
-    public String getCmdArgs() {
-        return this.cmdArgs;
+    public String getCommandArgs() {
+        return this.commandArgs;
     }
 
     /**
      * Parameters specified to be run and fed as command line arguments to the
      * job run.
      *
-     * @param cmdArgs Arguments to be used to run the command with.
+     * @param commandArgs Arguments to be used to run the command with.
+     * @throws CloudServiceException
      */
-    public void setCmdArgs(final String cmdArgs) {
-        this.cmdArgs = cmdArgs;
+    public void setCommandArgs(final String commandArgs) throws CloudServiceException {
+        validate(this.user, this.commandId, this.commandName, commandArgs, this.clusterCriteria);
+        this.commandArgs = commandArgs;
     }
 
     /**
@@ -503,21 +547,21 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the cmdArgs specified to run the job.
+     * Gets the commandArgs specified to run the job.
      *
-     * @return cmdArgs
+     * @return commandArgs
      */
-    public String getUserEmail() {
-        return this.userEmail;
+    public String getEmail() {
+        return this.email;
     }
 
     /**
      * Set user Email address for the job.
      *
-     * @param userEmail user email address
+     * @param email user email address
      */
-    public void setUserEmail(final String userEmail) {
-        this.userEmail = userEmail;
+    public void setEmail(final String email) {
+        this.email = email;
     }
 
     /**
@@ -572,8 +616,10 @@ public class Job extends Auditable implements Serializable {
      *
      * @param commandName Name of the command if specified on which the job is
      * run
+     * @throws CloudServiceException
      */
-    public void setCommandName(final String commandName) {
+    public void setCommandName(final String commandName) throws CloudServiceException {
+        validate(this.user, this.commandId, commandName, this.commandArgs, this.clusterCriteria);
         this.commandName = commandName;
     }
 
@@ -590,8 +636,10 @@ public class Job extends Auditable implements Serializable {
      * Set command Id with which this job is run.
      *
      * @param commandId Id of the command if specified on which the job is run
+     * @throws CloudServiceException
      */
-    public void setCommandId(final String commandId) {
+    public void setCommandId(final String commandId) throws CloudServiceException {
+        validate(this.user, commandId, this.commandName, this.commandArgs, this.clusterCriteria);
         this.commandId = commandId;
     }
 
@@ -656,7 +704,6 @@ public class Job extends Auditable implements Serializable {
      *
      * @return startTime : start time in ms
      */
-    //TODO: Why use Long object here?
     public Long getStartTime() {
         return this.startTime;
     }
@@ -765,7 +812,6 @@ public class Job extends Auditable implements Serializable {
      *
      * @return exitCode
      */
-    //TODO: Why Integer and not just int?
     public Integer getExitCode() {
         return this.exitCode;
     }
@@ -820,28 +866,24 @@ public class Job extends Auditable implements Serializable {
      *
      * @return clusterCriteriaString
      */
-    public String getClusterCriteriaString() {
+    protected String getClusterCriteriaString() {
         return this.clusterCriteriaString;
     }
 
     /**
      * Set the cluster criteria string.
      *
-     * @param ccList A list of cluster criteria objects
+     * @param clusterCriteriaString A list of cluster criteria objects
      * @throws CloudServiceException
      */
-    //TODO: Can we use pre-persist/post-persist
-    public void setClusterCriteriaString(final Set<ClusterCriteria> ccList) throws CloudServiceException {
-        if (ccList == null) {
-            final String msg = "No cluster criteria passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+    protected void setClusterCriteriaString(final String clusterCriteriaString) throws CloudServiceException {
+        if (StringUtils.isBlank(clusterCriteriaString)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No clusterCriteriaString passed in to set. Unable to continue.");
         }
-        final StringBuilder builder = new StringBuilder();
-        for (final ClusterCriteria cc : ccList) {
-            builder.append(StringUtils.join(cc.getTags(), ","));
-        }
-        this.clusterCriteriaString = builder.toString();
+        this.clusterCriteriaString = clusterCriteriaString;
+        this.clusterCriteria = stringToCriteria(clusterCriteriaString);
     }
 
     /**
@@ -903,30 +945,106 @@ public class Job extends Auditable implements Serializable {
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
+        validate(
+                job.getUser(),
+                job.getCommandId(),
+                job.getCommandName(),
+                job.getCommandArgs(),
+                job.getClusterCriteria());
+    }
 
-        final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(job.getUserName())) {
-            messages.add("User name is missing.\n");
+    /**
+     * Validate that required parameters are present for a Job.
+     *
+     * @param user The name of the user running the job
+     * @param commandId The id of the command to run for the job
+     * @param commandName The name of the command to run for the job
+     * @param commandArgs The command line arguments for the job
+     * @param criteria The cluster criteria for the job
+     * @throws CloudServiceException
+     */
+    private static void validate(
+            final String user,
+            final String commandId,
+            final String commandName,
+            final String commandArgs,
+            final Set<ClusterCriteria> criteria) throws CloudServiceException {
+        final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isBlank(user)) {
+            builder.append("User name is missing.\n");
         }
-        if (StringUtils.isEmpty(job.getCommandId()) && StringUtils.isEmpty(job.getCommandName())) {
-            messages.add("Need one of command id or command name in order to run a job\n");
+        if (StringUtils.isBlank(commandId) && StringUtils.isBlank(commandName)) {
+            builder.append("Need one of command id or command name in order to run a job\n");
         }
-        if (StringUtils.isEmpty(job.getCmdArgs())) {
-            messages.add("Command arguments are required\n");
+        if (StringUtils.isEmpty(commandArgs)) {
+            builder.append("Command arguments are required\n");
         }
-        if (job.getClusterCriteria().isEmpty()) {
-            messages.add("At least one cluster criteria is required in order to figure out where to run this job.\n");
+        if (criteria == null || criteria.isEmpty()) {
+            builder.append("At least one cluster criteria is required in order to figure out where to run this job.\n");
         }
 
-        if (!messages.isEmpty()) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Job configuration errors:\n");
-            for (final String message : messages) {
-                builder.append(message);
-            }
+        if (builder.length() != 0) {
+            builder.insert(0, "Job configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
+    }
+
+    /**
+     * Helper method for building the cluster criteria string.
+     *
+     * @param clusterCriteria The criteria to build up from
+     * @return The cluster criteria string
+     */
+    private String criteriaToString(final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
+        if (clusterCriteria == null || clusterCriteria.isEmpty()) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster criteria entered unable to create string");
+        }
+        final StringBuilder builder = new StringBuilder();
+        for (final ClusterCriteria cc : clusterCriteria) {
+            if (builder.length() != 0) {
+                builder.append(CRITERIA_SET_DELIMITER);
+            }
+            builder.append(StringUtils.join(cc.getTags(), CRITERIA_DELIMITER));
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Convert a string to cluster criteria objects.
+     *
+     * @param criteriaString The string to convert
+     * @return The set of ClusterCriteria
+     * @throws CloudServiceException
+     */
+    private Set<ClusterCriteria> stringToCriteria(final String criteriaString) throws CloudServiceException {
+        //Rebuild the cluster criteria objects
+        final Set<ClusterCriteria> cc = new HashSet<ClusterCriteria>();
+        final String[] criteriaSets = StringUtils.split(criteriaString, CRITERIA_SET_DELIMITER);
+        if (criteriaSets == null || criteriaSets.length == 0) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster criteria found. Unable to continue.");
+        }
+        for (final String criteriaSet : criteriaSets) {
+            final String[] criterias = StringUtils.split(criteriaSet, CRITERIA_DELIMITER);
+            if (criterias == null || criterias.length == 0) {
+                continue;
+            }
+            final Set<String> c = new HashSet<String>();
+            for (final String criteria : criterias) {
+                c.add(criteria);
+            }
+            cc.add(new ClusterCriteria(c));
+        }
+        if (cc.isEmpty()) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No Cluster Criteria found. Unable to continue");
+        }
+        return cc;
     }
 }

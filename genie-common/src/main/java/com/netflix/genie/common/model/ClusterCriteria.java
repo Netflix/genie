@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import org.slf4j.Logger;
@@ -43,15 +42,15 @@ public class ClusterCriteria implements Serializable {
     /**
      * Create a cluster criteria object with the included tags.
      * @param tags The tags to add
+     * @throws CloudServiceException
      */
-    public ClusterCriteria(final List<String> tags) {
-        this.tags.addAll(tags);
-    }
-
-    /**
-     * Default constructor.
-     */
-    public ClusterCriteria() {
+    public ClusterCriteria(final Set<String> tags) throws CloudServiceException {
+        if (tags == null || tags.isEmpty()) {
+            final String msg = "No tags passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        this.tags = tags;
     }
 
     /**
@@ -70,7 +69,7 @@ public class ClusterCriteria implements Serializable {
      * @throws CloudServiceException
      */
     public void setTags(final Set<String> tags) throws CloudServiceException {
-        if (tags == null) {
+        if (tags == null || tags.isEmpty()) {
             final String msg = "No tags passed in to set. Unable to continue.";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);

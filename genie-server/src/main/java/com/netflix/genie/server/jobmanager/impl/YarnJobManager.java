@@ -474,16 +474,16 @@ public class YarnJobManager implements JobManager {
         }
 
         // put the user name for hadoop to use
-        hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
+        hEnv.put("HADOOP_USER_NAME", ji2.getUser());
 
         // this is for the generic joblauncher.sh to use to create username
         // on the machine if needed
-        hEnv.put("USER_NAME", ji2.getUserName());
+        hEnv.put("USER_NAME", ji2.getUser());
 
         // add the group name
         String groupName = HADOOP_GROUP_NAME;
-        if (ji2.getGroupName() != null) {
-            groupName = ji2.getGroupName();
+        if (ji2.getGroup() != null) {
+            groupName = ji2.getGroup();
             hEnv.put("GROUP_NAME", groupName);
         }
         hEnv.put("HADOOP_GROUP_NAME", groupName);
@@ -617,7 +617,7 @@ public class YarnJobManager implements JobManager {
 
         LOG.info("called");
 
-        String[] cmdArgs = StringUtil.splitCmdLine(ji2.getCmdArgs());
+        String[] cmdArgs = StringUtil.splitCmdLine(ji2.getCommandArgs());
 
         String[] hArgs;
         hArgs = new String[cmdArgs.length + 2];

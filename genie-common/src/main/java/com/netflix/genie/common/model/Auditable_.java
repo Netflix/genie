@@ -33,4 +33,5 @@ public class Auditable_ {
     public static volatile SingularAttribute<Auditable, String> id;
     public static volatile SingularAttribute<Auditable, Date> created;
     public static volatile SingularAttribute<Auditable, Date> updated;
+    public static volatile SingularAttribute<Auditable, Long> entityVersion;
 }

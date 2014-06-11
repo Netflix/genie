@@ -155,25 +155,25 @@ public final class ClusterServiceSampleClient {
     }
 
     public static Cluster createSampleCluster(final String id, final Set<Command> commands) throws CloudServiceException {
-        final Cluster cluster = new Cluster();
+        final Set<String> configs = new HashSet<String>();
+        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
+        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
+        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/yarn-site.xml");
+        final Cluster cluster = new Cluster(
+                NAME,
+                "tgianos",
+                ClusterStatus.OUT_OF_SERVICE,
+                "com.netflix.genie.server.jobmanager.impl.YarnJobManager",
+                configs);
         if (StringUtils.isNotEmpty(id)) {
             cluster.setId(id);
         }
-        cluster.setName(NAME);
-        cluster.setStatus(ClusterStatus.OUT_OF_SERVICE);
         final Set<String> tags = new HashSet<String>();
         tags.add("adhoc");
         tags.add("h2query");
         tags.add(cluster.getId());
         cluster.setTags(tags);
-        final Set<String> configs = new HashSet<String>();
-        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
-        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
-        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/yarn-site.xml");
-        cluster.setConfigs(configs);
-        cluster.setUser("tgianos");
         cluster.setVersion("2.4.0");
-        cluster.setJobManager("com.netflix.genie.server.jobmanager.impl.YarnJobManager");
         if (commands != null && !commands.isEmpty()) {
             cluster.setCommands(commands);
         }

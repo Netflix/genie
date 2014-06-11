@@ -139,15 +139,15 @@ public final class CommandServiceSampleClient {
      * @throws CloudServiceException
      */
     public static Command createSampleCommand(final String id, final Set<Application> apps) throws CloudServiceException {
-        final Command command = new Command();
+        final Command command = new Command(
+                NAME,
+                "tgianos",
+                CommandStatus.ACTIVE,
+                "/apps/pig/0.13/bin/pig");
         if (!StringUtils.isEmpty(id)) {
             command.setId(id);
         }
-        command.setName(NAME);
-        command.setStatus(CommandStatus.ACTIVE);
-        command.setExecutable("/apps/pig/0.13/bin/pig");
         command.setEnvPropFile("s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh");
-        command.setUser("tgianos");
         command.setVersion("0.13");
         if (apps != null && !apps.isEmpty()) {
             command.setApplications(apps);

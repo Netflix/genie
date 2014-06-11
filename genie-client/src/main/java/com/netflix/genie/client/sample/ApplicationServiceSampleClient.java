@@ -107,13 +107,10 @@ public final class ApplicationServiceSampleClient {
      * @throws CloudServiceException
      */
     public static Application getSampleApplication(final String id) throws CloudServiceException {
-        final Application app = new Application();
+        final Application app = new Application(APP_NAME, "tgianos", ApplicationStatus.ACTIVE);
         if (StringUtils.isNotEmpty(id)) {
             app.setId(id);
         }
-        app.setUser("tgianos");
-        app.setName(APP_NAME);
-        app.setStatus(ApplicationStatus.ACTIVE);
         app.setVersion("2.4.0");
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml");

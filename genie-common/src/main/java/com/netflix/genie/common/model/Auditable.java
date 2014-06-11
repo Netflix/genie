@@ -21,12 +21,19 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Version;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +44,8 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @MappedSuperclass
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Auditable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Auditable.class);
@@ -44,7 +53,7 @@ public class Auditable {
     /**
      * Default constructor.
      */
-    public Auditable() {
+    protected Auditable() {
     }
 
     /**
@@ -68,10 +77,19 @@ public class Auditable {
     private Date updated = new Date();
 
     /**
+     * The version of this entity. Auto handled by JPA.
+     */
+    @XmlTransient
+    @JsonIgnore
+    @Version
+    @Column(name = "version")
+    private Long entityVersion;
+
+    /**
      * Updates the created and updated timestamps to be creation time.
      */
     @PrePersist
-    protected void onCreate() {
+    protected void onCreateAuditable() {
         final Date date = new Date();
         this.updated = date;
         this.created = date;
@@ -86,7 +104,7 @@ public class Auditable {
      * On any update to the entity will update the update time.
      */
     @PreUpdate
-    protected void onUpdate() {
+    protected void onUpdateAuditable() {
         this.updated = new Date();
     }
 
@@ -147,6 +165,24 @@ public class Auditable {
      */
     public void setUpdated(final Date updated) {
         this.updated.setTime(updated.getTime());
+    }
+
+    /**
+     * Get the version of this entity.
+     *
+     * @return The entityVersion of this entity as handled by JPA
+     */
+    public Long getEntityVersion() {
+        return entityVersion;
+    }
+
+    /**
+     * Set the version of this entity. Shouldn't be called. Handled by JPA.
+     *
+     * @param entityVersion The new entityVersion
+     */
+    protected void setEntityVersion(final Long entityVersion) {
+        this.entityVersion = entityVersion;
     }
 
     /**

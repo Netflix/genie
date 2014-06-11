@@ -21,12 +21,11 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ApplicationStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -62,16 +61,36 @@ public class Application extends Auditable implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
     /**
-     * Name of this application - e.g. mapredue1, mapreduce2, tez etc.
+     * Name of this application - e.g. mapreduce1, mapreduce2, tez etc.
      */
     @Basic(optional = false)
     private String name;
 
     /**
+     * User who created this application.
+     */
+    @Basic(optional = false)
+    private String user;
+
+    /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
+    @Basic(optional = false)
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
+
+    /**
+     * Version number for this application.
+     */
+    @Basic
+    @Column(name = "appVersion")
+    private String version;
+
+    /**
+     * Users can specify a property file location with environment variables.
+     */
+    @Basic
+    private String envPropFile;
 
     /**
      * Reference to all the configurations needed for this application.
@@ -90,24 +109,6 @@ public class Application extends Auditable implements Serializable {
     private Set<String> jars = new HashSet<String>();
 
     /**
-     * User who created this application.
-     */
-    @Basic(optional = false)
-    private String user;
-
-    /**
-     * Version number for this application.
-     */
-    @Basic
-    private String version;
-
-    /**
-     * Users can specify a property file location with environment variables.
-     */
-    @Basic
-    private String envPropFile;
-
-    /**
      * The commands this application is associated with.
      */
     @XmlTransient
@@ -118,8 +119,27 @@ public class Application extends Auditable implements Serializable {
     /**
      * Default constructor.
      */
-    public Application() {
+    protected Application() {
         super();
+    }
+
+    /**
+     * Construct a new Application with all required parameters.
+     *
+     * @param name The name of the application. Not null/empty/blank.
+     * @param user The user who created the application. Not null/empty/blank.
+     * @param status The status of the application. Not null.
+     * @throws CloudServiceException
+     */
+    public Application(
+            final String name,
+            final String user,
+            final ApplicationStatus status) throws CloudServiceException {
+        super();
+        validate(name, user, status);
+        this.name = name;
+        this.user = user;
+        this.status = status;
     }
 
     /**
@@ -134,10 +154,32 @@ public class Application extends Auditable implements Serializable {
     /**
      * Sets the name for this application.
      *
-     * @param name unique id for this cluster
+     * @param name the new name of this application. Not null/empty/blank
+     * @throws CloudServiceException
      */
-    public void setName(final String name) {
+    public void setName(final String name) throws CloudServiceException {
+        validate(name, this.user, this.status);
         this.name = name;
+    }
+
+    /**
+     * Gets the user that created this application.
+     *
+     * @return user
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     * Sets the user who created this application.
+     *
+     * @param user user who created this application
+     * @throws CloudServiceException
+     */
+    public void setUser(final String user) throws CloudServiceException {
+        validate(this.name, user, this.status);
+        this.user = user;
     }
 
     /**
@@ -154,9 +196,49 @@ public class Application extends Auditable implements Serializable {
      * Sets the status for this application.
      *
      * @param status One of the possible statuses
+     * @throws CloudServiceException
      */
-    public void setStatus(final ApplicationStatus status) {
+    public void setStatus(final ApplicationStatus status) throws CloudServiceException {
+        validate(this.name, this.user, status);
         this.status = status;
+    }
+
+    /**
+     * Gets the version of this application.
+     *
+     * @return version - like 1.2.3
+     *
+     */
+    public String getVersion() {
+        return this.version;
+    }
+
+    /**
+     * Sets the version for this application.
+     *
+     * @param version version number for this application
+     */
+    public void setVersion(final String version) {
+        this.version = version;
+    }
+
+    /**
+     * Gets the envPropFile name.
+     *
+     * @return envPropFile - file name containing environment variables.
+     */
+    public String getEnvPropFile() {
+        return envPropFile;
+    }
+
+    /**
+     * Sets the env property file name in string form.
+     *
+     * @param envPropFile contains the list of env variables to set while
+     * running a command using this application.
+     */
+    public void setEnvPropFile(final String envPropFile) {
+        this.envPropFile = envPropFile;
     }
 
     /**
@@ -208,62 +290,6 @@ public class Application extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the user that created this application.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return user;
-    }
-
-    /**
-     * Sets the user who created this application.
-     *
-     * @param user user who created this application
-     */
-    public void setUser(final String user) {
-        this.user = user;
-    }
-
-    /**
-     * Gets the version of this application.
-     *
-     * @return version - like 1.2.3
-     *
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * Sets the version for this application.
-     *
-     * @param version version number for this application
-     */
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    /**
-     * Gets the envPropFile name.
-     *
-     * @return envPropFile - file name containing environment variables.
-     */
-    public String getEnvPropFile() {
-        return envPropFile;
-    }
-
-    /**
-     * Sets the env property file name in string form.
-     *
-     * @param envPropFile contains the list of env variables to set while
-     * running a command using this application.
-     */
-    public void setEnvPropFile(final String envPropFile) {
-        this.envPropFile = envPropFile;
-    }
-
-    /**
      * Get all the commands associated with this application.
      *
      * @return The commands
@@ -294,23 +320,35 @@ public class Application extends Auditable implements Serializable {
                     "No application passed in. Unable to validate.");
         }
 
-        final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(application.getUser())) {
-            messages.add("User name is missing and is required. Unable to create.\n");
+        validate(application.getName(), application.getUser(), application.getStatus());
+    }
+
+    /**
+     * Helper method for checking the validity of required parameters.
+     *
+     * @param name The name of the application
+     * @param user The user who created the application
+     * @param status The status of the application
+     * @throws CloudServiceException
+     */
+    private static void validate(
+            final String name,
+            final String user,
+            final ApplicationStatus status)
+            throws CloudServiceException {
+        final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isBlank(user)) {
+            builder.append("User name is missing and is required.\n");
         }
-        if (StringUtils.isEmpty(application.getName())) {
-            messages.add("Application name is missing and is required. Unable to create.\n");
+        if (StringUtils.isBlank(name)) {
+            builder.append("Application name is missing and is required.\n");
         }
-        if (application.getStatus() == null) {
-            messages.add("No application status entered. Required to create\n");
+        if (status == null) {
+            builder.append("No application status entered and is required.\n");
         }
 
-        if (!messages.isEmpty()) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Application configuration errors:\n");
-            for (final String message : messages) {
-                builder.append(message);
-            }
+        if (builder.length() != 0) {
+            builder.insert(0, "Application configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);

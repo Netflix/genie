@@ -21,12 +21,11 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -68,15 +67,22 @@ public class Command extends Auditable implements Serializable {
     private String name;
 
     /**
+     * User who created this command.
+     */
+    @Basic(optional = false)
+    private String user;
+
+    /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
+    @Basic(optional = false)
     @Enumerated(EnumType.STRING)
     private CommandStatus status;
 
     /**
      * Location of the executable for this command.
      */
-    @Basic
+    @Basic(optional = false)
     private String executable;
 
     /**
@@ -84,6 +90,19 @@ public class Command extends Auditable implements Serializable {
      */
     @Basic
     private String envPropFile;
+
+    /**
+     * Job type of the command. eg: hive, pig , hadoop etc.
+     */
+    @Basic
+    private String jobType;
+
+    /**
+     * Version number for this command.
+     */
+    @Basic
+    @Column(name = "columnVersion")
+    private String version;
 
     /**
      * Reference to all the configuration (xml's) needed for this command.
@@ -110,29 +129,32 @@ public class Command extends Auditable implements Serializable {
     private Set<Cluster> clusters = new HashSet<Cluster>();
 
     /**
-     * User who created this command.
-     */
-    @Basic(optional = false)
-    private String user;
-
-    /**
-     * Job type of the command. eg: hive, pig , hadoop etc.
-     */
-    @Basic
-    //TODO: Do we still need this field?
-    private String jobType;
-
-    /**
-     * Version number for this command.
-     */
-    @Basic
-    private String version;
-
-    /**
      * Default Constructor.
      */
-    public Command() {
+    protected Command() {
         super();
+    }
+
+    /**
+     * Construct a new Command with all required parameters.
+     *
+     * @param name The name of the command. Not null/empty/blank.
+     * @param user The user who created the command. Not null/empty/blank.
+     * @param status The status of the command. Not null.
+     * @param executable The executable of the command. Not null/empty/blank.
+     * @throws CloudServiceException
+     */
+    public Command(
+            final String name,
+            final String user,
+            final CommandStatus status,
+            final String executable) throws CloudServiceException {
+        super();
+        validate(name, user, status, executable);
+        this.name = name;
+        this.user = user;
+        this.status = status;
+        this.executable = executable;
     }
 
     /**
@@ -147,10 +169,32 @@ public class Command extends Auditable implements Serializable {
     /**
      * Sets the name for this command.
      *
-     * @param name unique id for this cluster
+     * @param name unique id for this cluster. Not null/empty/blank.
+     * @throws CloudServiceException
      */
-    public void setName(final String name) {
+    public void setName(final String name) throws CloudServiceException {
+        validate(name, this.user, this.status, this.executable);
         this.name = name;
+    }
+
+    /**
+     * Gets the user that created this command.
+     *
+     * @return user
+     */
+    public String getUser() {
+        return this.user;
+    }
+
+    /**
+     * Sets the user who created this command.
+     *
+     * @param user user who created this command. Not null/empty/blank.
+     * @throws CloudServiceException
+     */
+    public void setUser(final String user) throws CloudServiceException {
+        validate(this.name, user, this.status, this.executable);
+        this.user = user;
     }
 
     /**
@@ -166,10 +210,12 @@ public class Command extends Auditable implements Serializable {
     /**
      * Sets the status for this application.
      *
-     * @param status The new status
+     * @param status The new status. Not null.
+     * @throws CloudServiceException
      * @see CommandStatus
      */
-    public void setStatus(final CommandStatus status) {
+    public void setStatus(final CommandStatus status) throws CloudServiceException {
+        validate(this.name, this.user, status, this.executable);
         this.status = status;
     }
 
@@ -185,10 +231,67 @@ public class Command extends Auditable implements Serializable {
     /**
      * Sets the executable for this command.
      *
-     * @param executable Full path of the executable on the node
+     * @param executable Full path of the executable on the node. Not null/empty/blank.
+     * @throws CloudServiceException
      */
-    public void setExecutable(final String executable) {
+    public void setExecutable(final String executable) throws CloudServiceException {
+        validate(this.name, this.user, this.status, this.executable);
         this.executable = executable;
+    }
+
+    /**
+     * Gets the envPropFile name.
+     *
+     * @return envPropFile - file name containing environment variables.
+     */
+    public String getEnvPropFile() {
+        return this.envPropFile;
+    }
+
+    /**
+     * Sets the env property file name in string form.
+     *
+     * @param envPropFile contains the list of env variables to set while
+     * running this command.
+     */
+    public void setEnvPropFile(final String envPropFile) {
+        this.envPropFile = envPropFile;
+    }
+
+    /**
+     * Gets the type of the command.
+     *
+     * @return jobType --- for eg: hive, pig, presto
+     */
+    public String getJobType() {
+        return this.jobType;
+    }
+
+    /**
+     * Sets the job type for this command.
+     *
+     * @param jobType job type for this command
+     */
+    public void setJobType(final String jobType) {
+        this.jobType = jobType;
+    }
+
+    /**
+     * Gets the version of this command.
+     *
+     * @return version
+     */
+    public String getVersion() {
+        return this.version;
+    }
+
+    /**
+     * Sets the version for this command.
+     *
+     * @param version version number for this command
+     */
+    public void setVersion(final String version) {
+        this.version = version;
     }
 
     /**
@@ -246,79 +349,6 @@ public class Command extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the user that created this command.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Sets the user who created this command.
-     *
-     * @param user user who created this command
-     */
-    public void setUser(final String user) {
-        this.user = user;
-    }
-
-    /**
-     * Gets the type of the command.
-     *
-     * @return jobType --- for eg: hive, pig, presto
-     */
-    public String getJobType() {
-        return this.jobType;
-    }
-
-    /**
-     * Sets the job type for this command.
-     *
-     * @param jobType job type for this command
-     */
-    public void setJobType(final String jobType) {
-        this.jobType = jobType;
-    }
-
-    /**
-     * Gets the version of this command.
-     *
-     * @return version
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Sets the version for this command.
-     *
-     * @param version version number for this command
-     */
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    /**
-     * Gets the envPropFile name.
-     *
-     * @return envPropFile - file name containing environment variables.
-     */
-    public String getEnvPropFile() {
-        return this.envPropFile;
-    }
-
-    /**
-     * Sets the env property file name in string form.
-     *
-     * @param envPropFile contains the list of env variables to set while
-     * running this command.
-     */
-    public void setEnvPropFile(final String envPropFile) {
-        this.envPropFile = envPropFile;
-    }
-
-    /**
      * Get the clusters this command is available on.
      *
      * @return The clusters.
@@ -354,24 +384,43 @@ public class Command extends Auditable implements Serializable {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command entered to validate");
         }
+        validate(
+                command.getName(),
+                command.getUser(),
+                command.getStatus(),
+                command.getExecutable());
+    }
 
-        final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(command.getUser())) {
-            messages.add("User name is missing and required.\n");
+    /**
+     * Helper method for checking the validity of required parameters.
+     *
+     * @param name The name of the command
+     * @param user The user who created the command
+     * @param status The status of the command
+     * @throws CloudServiceException
+     */
+    private static void validate(
+            final String name,
+            final String user,
+            final CommandStatus status,
+            final String executable)
+            throws CloudServiceException {
+        final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isBlank(user)) {
+            builder.append("User name is missing and is required.\n");
         }
-        if (StringUtils.isEmpty(command.getName())) {
-            messages.add("The command name is empty but is required.\n");
+        if (StringUtils.isBlank(name)) {
+            builder.append("Command name is missing and is required.\n");
         }
-        if (command.getStatus() == null) {
-            messages.add("The command status is null and is required.\n");
+        if (status == null) {
+            builder.append("No command status entered and is required.\n");
+        }
+        if (StringUtils.isBlank(executable)) {
+            builder.append("No executable entered for command and is required.\n");
         }
 
-        if (!messages.isEmpty()) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Command configuration errors:\n");
-            for (final String message : messages) {
-                builder.append(message);
-            }
+        if (builder.length() != 0) {
+            builder.insert(0, "Command configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);

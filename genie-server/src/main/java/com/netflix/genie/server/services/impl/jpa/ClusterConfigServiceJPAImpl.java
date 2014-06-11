@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.services.impl;
+package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
@@ -54,10 +54,10 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-public class PersistentClusterConfigImpl implements ClusterConfigService {
+public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(PersistentClusterConfigImpl.class);
+            .getLogger(ClusterConfigServiceJPAImpl.class);
 
     private final PersistenceManager<Cluster> pm;
 
@@ -66,7 +66,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
      *
      * @throws CloudServiceException
      */
-    public PersistentClusterConfigImpl() throws CloudServiceException {
+    public ClusterConfigServiceJPAImpl() throws CloudServiceException {
         // instantiate PersistenceManager
         this.pm = new PersistenceManager<Cluster>();
     }

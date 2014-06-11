@@ -21,6 +21,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
@@ -75,9 +76,18 @@ public final class ExecutionServiceSampleClient {
         }
 
         System.out.println("Running Hive job");
-        Job jobInfo = new Job();
-        jobInfo.setUserName(userName);
-        jobInfo.setDescription("This is a test");
+        final Set<String> criteriaTags = new HashSet<String>();
+        criteriaTags.add("prod");
+        final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
+        final Set<ClusterCriteria> criterias = new HashSet<ClusterCriteria>();
+        criterias.add(criteria);
+        Job job = new Job(
+                userName, 
+                CommandServiceSampleClient.ID, 
+                null, 
+                "-f hive.q", 
+                criterias);
+        job.setDescription("This is a test");
         // send the query as an attachment
         File query = File.createTempFile("hive", ".q");
         PrintWriter pw = new PrintWriter(query, "UTF-8");
@@ -89,26 +99,25 @@ public final class ExecutionServiceSampleClient {
         // Ensure that file exists, because the FileDataSource constructor doesn't
         attachment.setData(new DataHandler(new FileDataSource(query.getAbsolutePath())));
         attachments.add(attachment);
-        jobInfo.setAttachments(attachments);
-        jobInfo.setCmdArgs("-f hive.q");
-        jobInfo = client.submitJob(jobInfo);
+        job.setAttachments(attachments);
+        job = client.submitJob(job);
 
-        String jobID = jobInfo.getId();
-        String outputURI = jobInfo.getOutputURI();
+        String jobID = job.getId();
+        String outputURI = job.getOutputURI();
         System.out.println("Job ID: " + jobID);
         System.out.println("Output URL: " + outputURI);
 
         System.out.println("Getting jobInfo by jobID");
-        jobInfo = client.getJob(jobID);
-        System.out.println("Job status: " + jobInfo.getStatus());
+        job = client.getJob(jobID);
+        System.out.println("Job status: " + job.getStatus());
 
         System.out.println("Waiting for job to finish");
-        jobInfo = client.waitForCompletion(jobID, 600000, 5000);
-        System.out.println("Job status: " + jobInfo.getStatus());
+        job = client.waitForCompletion(jobID, 600000, 5000);
+        System.out.println("Job status: " + job.getStatus());
 
         System.out.println("Killing jobs using jobID");
-        Job job = client.killJob(jobID);
-        System.out.println("Job status: " + job.getStatus());
+        Job killedJob = client.killJob(jobID);
+        System.out.println("Job status: " + killedJob.getStatus());
 
         System.out.println("Done");
     }

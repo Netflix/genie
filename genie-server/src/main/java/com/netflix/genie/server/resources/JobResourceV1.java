@@ -92,7 +92,6 @@ public class JobResourceV1 {
         // set the clientHost, if it is not overridden already
         if (StringUtils.isEmpty(clientHost)) {
             job.setClientHost(clientHost);
-            job.setClusterCriteriaString(job.getClusterCriteria());
         }
 
         return this.xs.submitJob(job);

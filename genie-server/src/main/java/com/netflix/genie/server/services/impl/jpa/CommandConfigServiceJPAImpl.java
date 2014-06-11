@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.services.impl;
+package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
@@ -46,17 +46,17 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-public class PersistentCommandConfigImpl implements CommandConfigService {
+public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(PersistentCommandConfigImpl.class);
+            .getLogger(CommandConfigServiceJPAImpl.class);
 
     private final PersistenceManager<Command> pm;
 
     /**
      * Default constructor.
      */
-    public PersistentCommandConfigImpl() {
+    public CommandConfigServiceJPAImpl() {
         // instantiate PersistenceManager
         this.pm = new PersistenceManager<Command>();
     }
