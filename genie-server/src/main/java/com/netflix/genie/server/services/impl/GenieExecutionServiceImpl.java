@@ -211,8 +211,26 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
             // update entity in DB
             jInfo.setUpdateTime(System.currentTimeMillis());
-            pm.updateEntity(jInfo);
-
+            
+            // At this stage the job is successfully init'ed in the db and also launched successfully by the job manager.
+            // The call below is just trying to set the status in the DB as RUNNING and update the updateTime.
+            // We add retries to this updateEntity call, as since the job is launched we do not want to throw a false error 
+            // of job not running due to transient db connection issues.
+            int attemptNum = 1;
+            while (true) {
+                try {
+                    pm.updateEntity(jInfo);
+                    break;
+                } catch (RollbackException e) {
+                    if (attemptNum == 3) {
+                        throw(e);
+                    } else {
+                        attemptNum++;
+                        continue;
+                    }
+                }
+            }
+            
             // verification
             jInfo = pm.getEntity(jInfo.getJobID(), JobInfoElement.class);
 

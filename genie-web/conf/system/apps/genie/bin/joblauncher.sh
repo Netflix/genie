@@ -32,7 +32,7 @@ function copyFiles {
     DESTINATION=$2
 
     # use hadoop for s3 copying
-    S3CP="$HADOOP_HOME/bin/hadoop fs $HADOOP_S3CP_OPTS -cp"
+    S3CP="$HADOOP_HOME/bin/hadoop fs $HADOOP_S3CP_OPTS -cp $FORCE_COPY_FLAG "
     
     # number of retries for s3cp
     NUM_RETRIES=5
@@ -209,6 +209,7 @@ echo "HADOOP_HOME = $HADOOP_HOME"
 echo "HIVE_HOME = $HIVE_HOME"
 echo "PIG_HOME = $PIG_HOME"
 echo "HADOOP_S3CP_TIMEOUT = $HADOOP_S3CP_TIMEOUT"
+echo "FORCE_COPY_FLAG = $FORCE_COPY_FLAG"
 
 echo "Creating job conf dir: $CURRENT_JOB_CONF_DIR"
 mkdir -p $CURRENT_JOB_CONF_DIR 

@@ -118,6 +118,36 @@ def populateCluster():
     '''
     restclient.put(serviceUrl=serviceUrl, payload=payload, contentType='application/xml')
        
+def populateCluster2():
+    serviceUrl = baseUrl + 'v0/config/cluster/cluster2conf-sample'
+    payload = '''
+    <request>
+      <clusterConfig>
+        <name>clusterconf2-sample</name>
+        <test>true</test>
+        <prod>true</prod>
+        <adHoc>true</adHoc>
+        <bonus>true</bonus>
+        <sla>true</sla>
+        <s3MapredSiteXml>file:///PATH/TO/MAPRED-SITE.XML</s3MapredSiteXml>
+        <s3CoreSiteXml>file:///PATH/TO/CORE-SITE.XML</s3CoreSiteXml>
+        <s3HdfsSiteXml>file:///PATH/TO/HDFS-SITE.XML</s3HdfsSiteXml>
+        <s3YarnSiteXml>file:///PATH/TO/YARN-SITE.XML</s3YarnSiteXml>
+        <user>testuser</user>
+        <testHiveConfigId>hiveconf-testhive-sample</testHiveConfigId>
+        <prodHiveConfigId>hiveconf-prodhive-sample</prodHiveConfigId>
+        <testPigConfigId>pigconf-testpig-sample</testPigConfigId>
+        <prodPigConfigId>pigconf-prodpig-sample</prodPigConfigId>
+        <hadoopVersion>2.4.0</hadoopVersion>
+        <status>UP</status>
+        <hasStats>false</hasStats>
+        <jobFlowId>j-18EQGLSSWPOMG</jobFlowId>
+        <gatewayJobFlowIds>j-31E6N85M87U3U</gatewayJobFlowIds>
+      </clusterConfig>
+    </request>
+    '''
+    restclient.put(serviceUrl=serviceUrl, payload=payload, contentType='application/xml')
+
 # driver method for populating configs     
 if __name__ == "__main__":
     
@@ -137,5 +167,6 @@ if __name__ == "__main__":
    print "Adding config for cluster:\n"
    populateCluster()
    print "################################"
-   
-   
+   print "Adding config for cluster2:\n"
+   populateCluster2()
+   print "################################"
