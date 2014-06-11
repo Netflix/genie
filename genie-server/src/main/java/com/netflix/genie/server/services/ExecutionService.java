@@ -86,9 +86,9 @@ public interface ExecutionService {
             final String id,
             final String jobName,
             final String userName,
-            final String status,
+            final JobStatus status,
             final String clusterName,
             final String clusterId,
-            final Integer limit,
-            final Integer page) throws CloudServiceException;
+            final int limit,
+            final int page) throws CloudServiceException;
 }

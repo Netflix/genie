@@ -22,7 +22,6 @@ import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -140,8 +139,7 @@ public class Job extends Auditable implements Serializable {
      * in the DB for space reasons.
      */
     @Transient
-    //TODO: Why array and not collection?s
-    private FileAttachment[] attachments;
+    private Set<FileAttachment> attachments = new HashSet<FileAttachment>();
 
     /**
      * Whether to disable archive logs or not - default is false.
@@ -466,12 +464,8 @@ public class Job extends Auditable implements Serializable {
      *
      * @return The attachments
      */
-    public FileAttachment[] getAttachments() {
-        if (this.attachments != null) {
-            return Arrays.copyOf(this.attachments, this.attachments.length);
-        } else {
-            return new FileAttachment[0];
-        }
+    public Set<FileAttachment> getAttachments() {
+        return this.attachments;
     }
 
     /**
@@ -480,9 +474,9 @@ public class Job extends Auditable implements Serializable {
      * @param attachments The attachments to set
      * @throws CloudServiceException
      */
-    public void setAttachments(final FileAttachment[] attachments) throws CloudServiceException {
+    public void setAttachments(final Set<FileAttachment> attachments) throws CloudServiceException {
         if (attachments != null) {
-            this.attachments = Arrays.copyOf(attachments, attachments.length);
+            this.attachments = attachments;
         } else {
             final String msg = "No attachments passed in to set. Unable to continue.";
             LOG.error(msg);

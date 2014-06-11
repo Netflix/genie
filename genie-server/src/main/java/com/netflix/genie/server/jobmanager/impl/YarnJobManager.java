@@ -168,8 +168,8 @@ public class YarnJobManager implements JobManager {
         pb.directory(userJobDir);
 
         // copy over the attachments if they exist
-        if ((ji.getAttachments() != null) && (ji.getAttachments().length > 0)) {
-            for (FileAttachment attachment : ji.getAttachments()) {
+        if (ji.getAttachments() != null) {
+            for (final FileAttachment attachment : ji.getAttachments()) {
                 // basic error checking
                 if ((attachment.getName() == null) || (attachment.getName().isEmpty())) {
                     String msg = "File attachment is missing required parameter name";

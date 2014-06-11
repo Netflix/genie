@@ -27,16 +27,24 @@ import com.netflix.discovery.DiscoveryManager;
 import com.netflix.discovery.shared.Application;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.util.NetUtil;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  * Utility class to get number of jobs running on this instance.
  *
  * @author skrishnan
+ * @author tgianos
  */
 public final class JobCountManager {
 
@@ -83,7 +91,9 @@ public final class JobCountManager {
      * @return number of running jobs between the specified times
      * @throws CloudServiceException if there is an error
      */
-    public static int getNumInstanceJobs(Long minStartTime, Long maxStartTime)
+    public static int getNumInstanceJobs(
+            final Long minStartTime,
+            final Long maxStartTime)
             throws CloudServiceException {
         LOG.debug("called");
 
@@ -100,46 +110,45 @@ public final class JobCountManager {
      * @return number of running jobs matching specified critiera
      * @throws CloudServiceException if there is an error
      */
-    public static int getNumInstanceJobs(String hostName, Long minStartTime,
-            Long maxStartTime) throws CloudServiceException {
+    public static int getNumInstanceJobs(
+            String hostName,
+            final Long minStartTime,
+            final Long maxStartTime) throws CloudServiceException {
         LOG.debug("called");
 
         // initialize host name
         if (hostName == null) {
             hostName = NetUtil.getHostName();
         }
-
-        final StringBuilder builder = new StringBuilder();
-        builder.append("SELECT COUNT(j)");
-        builder.append(" FROM Job j ");
-        builder.append(" WHERE j.hostName = :hostName");
-        builder.append(" AND (j.status = :running OR j.status = :init)");
-        if (minStartTime != null) {
-            builder.append(" AND j.startTime >= :minStartTime");
-        }
-        if (maxStartTime != null) {
-            builder.append(" AND j.startTime < :maxStartTime");
-        }
         if (pm == null) {
             init();
         }
         final EntityManager em = pm.createEntityManager();
         try {
-            final Query query = em.createQuery(builder.toString())
-                    .setParameter("hostName", hostName)
-                    .setParameter("running", JobStatus.RUNNING)
-                    .setParameter("init", JobStatus.INIT);
+            final CriteriaBuilder cb = em.getCriteriaBuilder();
+            final CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+            final Root<Job> j = cq.from(Job.class);
+            cq.select(cb.count(j));
+//            final SingularAttribute<Job, JobStatus> attr = Job_.status;
+//            Path<JobStatus> status = j.get(Job_.status);
+            final Predicate runningStatus = cb.equal(j.get(Job_.status), JobStatus.RUNNING);
+            final Predicate initStatus = cb.equal(j.get(Job_.status), JobStatus.INIT);
+            final List<Predicate> predicates = new ArrayList<Predicate>();
+            predicates.add(cb.equal(j.get(Job_.hostName), hostName));
+            predicates.add(cb.or(runningStatus, initStatus));
             if (minStartTime != null) {
-                query.setParameter("minStartTime", minStartTime);
+                predicates.add(cb.ge(j.get(Job_.startTime), minStartTime));
             }
             if (maxStartTime != null) {
-                query.setParameter("maxStartTime", maxStartTime);
+                predicates.add(cb.lt(j.get(Job_.startTime), maxStartTime));
             }
-            //TODO: This is read only not sure if need transaction. Spring read only would be convenient
-            //        final EntityTransaction trans = em.getTransaction();
-            //        trans.begin();
-            return ((Number) query.getSingleResult()).intValue();
-            //        trans.commit();
+            //documentation says that by default predicate array is conjuncted together
+            cq.where(predicates.toArray(new Predicate[0]));
+            final TypedQuery<Long> query = em.createQuery(cq);
+            //Downgrading to an int since all the code seems to want ints
+            //Don't feel like changing everthing right now can figure out later
+            //if need be
+            return query.getSingleResult().intValue();
         } finally {
             em.close();
         }
@@ -153,7 +162,8 @@ public final class JobCountManager {
      * @return host name of most idle Genie instance
      * @throws CloudServiceException if there is any error
      */
-    public static String getIdleInstance(int minJobThreshold)
+    public static String getIdleInstance(
+            final long minJobThreshold)
             throws CloudServiceException {
         LOG.debug("called");
         String localhost = NetUtil.getHostName();
@@ -183,7 +193,7 @@ public final class JobCountManager {
             // if instance is UP, check if job can be forwarded to it
             String hostName = instance.getHostName();
             LOG.debug("Trying host name: " + hostName);
-            int numInstanceJobs = getNumInstanceJobs(hostName, null, null);
+            final int numInstanceJobs = getNumInstanceJobs(hostName, null, null);
             if (numInstanceJobs <= minJobThreshold) {
                 LOG.info("Returning idle host: " + hostName + ", who has "
                         + numInstanceJobs + " jobs running");

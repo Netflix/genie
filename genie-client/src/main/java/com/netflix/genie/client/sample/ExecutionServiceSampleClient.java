@@ -26,6 +26,8 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
@@ -81,11 +83,12 @@ public final class ExecutionServiceSampleClient {
         PrintWriter pw = new PrintWriter(query, "UTF-8");
         pw.println("select count(*) from counters where dateint=20120430 and hour=10;");
         pw.close();
-        FileAttachment[] attachments = new FileAttachment[1];
-        attachments[0] = new FileAttachment();
-        attachments[0].setName("hive.q");
+        final Set<FileAttachment> attachments = new HashSet<FileAttachment>();
+        final FileAttachment attachment = new FileAttachment();
+        attachment.setName("hive.q");
         // Ensure that file exists, because the FileDataSource constructor doesn't
-        attachments[0].setData(new DataHandler(new FileDataSource(query.getAbsolutePath())));
+        attachment.setData(new DataHandler(new FileDataSource(query.getAbsolutePath())));
+        attachments.add(attachment);
         jobInfo.setAttachments(attachments);
         jobInfo.setCmdArgs("-f hive.q");
         jobInfo = client.submitJob(jobInfo);

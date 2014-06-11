@@ -19,9 +19,10 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -100,13 +101,15 @@ public class ClusterConfigResourceV1 {
             @QueryParam("limit") @DefaultValue("1024") int limit)
             throws CloudServiceException {
         LOG.debug("called");
-        if (page < 0) {
-            page = PersistenceManager.DEFAULT_PAGE_NUMBER;
+        //Create this conversion internal in case someone uses lower case by accident?
+        List<ClusterStatus> enumStatuses = null;
+        if (statuses != null) {
+            enumStatuses = new ArrayList<ClusterStatus>();
+            for (final String status : statuses) {
+                enumStatuses.add(ClusterStatus.parse(status));
+            }
         }
-        if (limit < 0) {
-            limit = PersistenceManager.DEFAULT_PAGE_SIZE;
-        }
-        return this.ccs.getClusterConfigs(name, statuses, tags, minUpdateTime, maxUpdateTime, limit, page);
+        return this.ccs.getClusterConfigs(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, limit, page);
     }
 
     /**

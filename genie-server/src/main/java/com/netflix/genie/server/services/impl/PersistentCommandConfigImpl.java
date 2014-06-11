@@ -20,6 +20,7 @@ package com.netflix.genie.server.services.impl;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
@@ -31,6 +32,10 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,35 +103,22 @@ public class PersistentCommandConfigImpl implements CommandConfigService {
 
         final EntityManager em = this.pm.createEntityManager();
         try {
-            final StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT c FROM Command c");
-            if (StringUtils.isNotEmpty(name) || StringUtils.isNotEmpty(userName)) {
-                queryString.append(" WHERE ");
-                final List<String> clauses = new ArrayList<String>();
-                if (StringUtils.isNotEmpty(name)) {
-                    clauses.add("c.name = :name");
-                }
-                if (StringUtils.isNotEmpty(userName)) {
-                    clauses.add("c.user = :userName");
-                }
-                boolean wroteClause = false;
-                for (final String clause : clauses) {
-                    if (wroteClause) {
-                        queryString.append(" AND ");
-                    }
-                    queryString.append(clause);
-                    wroteClause = true;
-                }
-            }
-            final TypedQuery<Command> query = em.createQuery(queryString.toString(), Command.class);
+            final CriteriaBuilder cb = em.getCriteriaBuilder();
+            final CriteriaQuery<Command> cq = cb.createQuery(Command.class);
+            final Root<Command> c = cq.from(Command.class);
+            final List<Predicate> predicates = new ArrayList<Predicate>();
             if (StringUtils.isNotEmpty(name)) {
-                query.setParameter("name", name);
+                predicates.add(cb.equal(c.get(Command_.name), name));
             }
             if (StringUtils.isNotEmpty(userName)) {
-                query.setParameter("userName", userName);
+                predicates.add(cb.equal(c.get(Command_.user), userName));
             }
-            query.setFirstResult(page * limit);
-            query.setMaxResults(limit);
+            cq.where(cb.and(predicates.toArray(new Predicate[0])));
+            final TypedQuery<Command> query = em.createQuery(cq);
+            final int finalPage = page < 0 ? PersistenceManager.DEFAULT_PAGE_NUMBER : page;
+            final int finalLimit = limit < 0 ? PersistenceManager.DEFAULT_PAGE_SIZE : limit;
+            query.setMaxResults(finalLimit);
+            query.setFirstResult(finalLimit * finalPage);
             return query.getResultList();
         } finally {
             em.close();

@@ -24,6 +24,7 @@ import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
@@ -45,6 +46,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.RollbackException;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -252,79 +257,43 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             final String id,
             final String jobName,
             final String userName,
-            final String status,
+            final JobStatus status,
             final String clusterName,
             final String clusterId,
-            final Integer limit,
-            final Integer page) throws CloudServiceException {
+            final int limit,
+            final int page) throws CloudServiceException {
         LOG.debug("called");
-
-        final StringBuilder builder = new StringBuilder();
-        builder.append("Select j");
-        builder.append(" FROM Job j");
-
-        final List<String> clauses = new ArrayList<String>();
-        if (!StringUtils.isEmpty(id)) {
-            clauses.add("j.jobID LIKE :jobId");
-        }
-        if (!StringUtils.isEmpty(jobName)) {
-            clauses.add("j.jobName LIKE :jobName");
-        }
-        if (!StringUtils.isEmpty(userName)) {
-            clauses.add("j.userName = :userName");
-        }
-        if (!StringUtils.isEmpty(status)) {
-            clauses.add("j.status = :status");
-        }
-        if (!StringUtils.isEmpty(clusterName)) {
-            clauses.add("j.clusterName = :clusterName");
-        }
-        if (!StringUtils.isEmpty(clusterId)) {
-            clauses.add("j.clusterId = :clusterId");
-        }
-
-        if (!clauses.isEmpty()) {
-            builder.append(" WHERE");
-        }
-        boolean addAnd = false;
-        for (final String clause : clauses) {
-            if (addAnd) {
-                builder.append(" AND");
-            }
-            builder.append(" ").append(clause);
-            addAnd = true;
-        }
 
         final EntityManager em = pm.createEntityManager();
         try {
-            final TypedQuery<Job> query = em.createQuery(builder.toString(), Job.class);
-            if (!StringUtils.isEmpty(id)) {
-                query.setParameter("jobId", id);
+            final CriteriaBuilder cb = em.getCriteriaBuilder();
+            final CriteriaQuery<Job> cq = cb.createQuery(Job.class);
+            final Root<Job> j = cq.from(Job.class);
+            final List<Predicate> predicates = new ArrayList<Predicate>();
+            if (StringUtils.isNotEmpty(userName)) {
+                predicates.add(cb.like(j.get(Job_.id), id));
             }
-            if (!StringUtils.isEmpty(jobName)) {
-                query.setParameter("jobName", jobName);
+            if (StringUtils.isNotEmpty(jobName)) {
+                predicates.add(cb.like(j.get(Job_.jobName), jobName));
             }
-            if (!StringUtils.isEmpty(userName)) {
-                query.setParameter("userName", userName);
+            if (StringUtils.isNotEmpty(userName)) {
+                predicates.add(cb.equal(j.get(Job_.userName), userName));
             }
-            if (!StringUtils.isEmpty(status)) {
-                query.setParameter("status", JobStatus.parse(status));
+            if (status != null) {
+                predicates.add(cb.equal(j.get(Job_.status), status));
             }
-            if (!StringUtils.isEmpty(clusterName)) {
-                query.setParameter("clusterName", clusterName);
+            if (StringUtils.isNotEmpty(clusterName)) {
+                predicates.add(cb.equal(j.get(Job_.executionClusterName), clusterName));
             }
-            if (!StringUtils.isEmpty(clusterId)) {
-                query.setParameter("clusterId", clusterId);
+            if (StringUtils.isNotEmpty(clusterId)) {
+                predicates.add(cb.equal(j.get(Job_.executionClusterId), clusterId));
             }
-
-            //Limit the number of results and what page they want if requested
-            if (limit != null) {
-                query.setMaxResults(limit);
-                if (page != null) {
-                    query.setFirstResult(limit * page);
-                }
-            }
-
+            cq.where(cb.and(predicates.toArray(new Predicate[0])));
+            final TypedQuery<Job> query = em.createQuery(cq);
+            final int finalPage = page < 0 ? PersistenceManager.DEFAULT_PAGE_NUMBER : page;
+            final int finalLimit = limit < 0 ? PersistenceManager.DEFAULT_PAGE_SIZE : limit;
+            query.setMaxResults(finalLimit);
+            query.setFirstResult(finalLimit * finalPage);
             return query.getResultList();
         } finally {
             em.close();

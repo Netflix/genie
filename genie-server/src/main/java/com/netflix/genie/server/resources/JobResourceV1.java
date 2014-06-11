@@ -20,7 +20,6 @@ package com.netflix.genie.server.resources;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.ExecutionServiceFactory;
 import java.net.HttpURLConnection;
@@ -156,13 +155,15 @@ public class JobResourceV1 {
             @QueryParam("limit") @DefaultValue("1024") int limit)
             throws CloudServiceException {
         LOG.debug("Called");
-        if (page < 0) {
-            page = PersistenceManager.DEFAULT_PAGE_NUMBER;
-        }
-        if (limit < 0) {
-            limit = PersistenceManager.DEFAULT_PAGE_SIZE;
-        }
-        return this.xs.getJobs(id, jobName, userName, status, clusterName, clusterId, limit, page);
+        return this.xs.getJobs(
+                id,
+                jobName,
+                userName,
+                JobStatus.parse(status),
+                clusterName,
+                clusterId,
+                limit,
+                page);
     }
 
     /**

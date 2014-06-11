@@ -18,14 +18,19 @@
 package com.netflix.genie.server.services.impl;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
+import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ClusterConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +38,11 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +107,7 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
     @Override
     public List<Cluster> getClusterConfigs(
             final String name,
-            final List<String> statuses, //TODO: Why can't this be the ENUM already?
+            final List<ClusterStatus> statuses,
             final List<String> tags,
             final Long minUpdateTime,
             final Long maxUpdateTime,
@@ -107,54 +117,43 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
 
         final EntityManager em = this.pm.createEntityManager();
         try {
-            final StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append("SELECT c FROM Cluster c");
-
-            final List<String> criterias = new ArrayList<String>();
+            final CriteriaBuilder cb = em.getCriteriaBuilder();
+            final CriteriaQuery<Cluster> cq = cb.createQuery(Cluster.class);
+            final Root<Cluster> c = cq.from(Cluster.class);
+            final List<Predicate> predicates = new ArrayList<Predicate>();
             if (StringUtils.isNotEmpty(name)) {
-                criterias.add("c.name LIKE \"" + name + "\"");
+                predicates.add(cb.like(c.get(Cluster_.name), name));
             }
             if (minUpdateTime != null) {
-                criterias.add("c.updated >= " + minUpdateTime);
+                predicates.add(cb.greaterThanOrEqualTo(c.get(Cluster_.updated), new Date(minUpdateTime)));
             }
             if (maxUpdateTime != null) {
-                criterias.add("c.updated <= " + maxUpdateTime);
+                predicates.add(cb.lessThan(c.get(Cluster_.updated), new Date(maxUpdateTime)));
             }
             if (tags != null) {
                 for (final String tag : tags) {
-                    criterias.add("\"" + tag + "\" MEMBER OF c.tags");
+                    predicates.add(cb.isMember(tag, c.get(Cluster_.tags)));
                 }
             }
 
             if (statuses != null && !statuses.isEmpty()) {
-                final StringBuilder statusBuilder = new StringBuilder();
-                boolean addedStatus = false;
-                for (final String status : statuses) {
-                    if (addedStatus) {
-                        statusBuilder.append(" OR ");
-                    }
-                    statusBuilder.append("c.status = \"").append(ClusterStatus.parse(status)).append("\"");
-                    addedStatus = true;
+                //Could optimize this as we know size could use native array
+                final List<Predicate> orPredicates = new ArrayList<Predicate>();
+                for (final ClusterStatus status : statuses) {
+                    orPredicates.add(cb.equal(c.get(Cluster_.status), status));
                 }
-                if (statusBuilder.length() != 0) {
-                    criterias.add("(" + statusBuilder.toString() + ")");
-                }
+                predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
             }
-            
-            if (!criterias.isEmpty()) {
-                queryBuilder.append(" WHERE ");
-            }
-            boolean addedCriteria = false;
-            for (final String criteria : criterias) {
-                if (addedCriteria) {
-                    queryBuilder.append(" AND ");
-                }
-                queryBuilder.append(criteria);
-            }
-            
-            final TypedQuery<Cluster> query = em.createQuery(queryBuilder.toString(), Cluster.class);
-            query.setFirstResult(limit * page);
-            query.setMaxResults(limit);
+
+            cq.where(predicates.toArray(new Predicate[0]));
+            final TypedQuery<Cluster> query = em.createQuery(cq);
+            final int finalPage = page < 0 ? PersistenceManager.DEFAULT_PAGE_NUMBER : page;
+            final int finalLimit = limit < 0 ? PersistenceManager.DEFAULT_PAGE_SIZE : limit;
+            query.setMaxResults(finalLimit);
+            query.setFirstResult(finalLimit * finalPage);
+
+            //If you want to debug query:
+            //LOG.debug(query.unwrap(org.apache.openjpa.persistence.QueryImpl.class).getQueryString());
             return query.getResultList();
         } finally {
             em.close();
@@ -171,58 +170,43 @@ public class PersistentClusterConfigImpl implements ClusterConfigService {
             final String commandId,
             final String commandName,
             final Set<ClusterCriteria> clusterCriterias) {
-        //TODO: Do we want to log out anything else here?
         LOG.debug("Called");
 
         final EntityManager em = this.pm.createEntityManager();
         try {
             for (final ClusterCriteria cc : clusterCriterias) {
-                final StringBuilder builder = new StringBuilder();
-                builder.append("SELECT distinct cstr FROM Cluster cstr, IN(cstr.commands) cmds ");
+                final CriteriaBuilder cb = em.getCriteriaBuilder();
+                final CriteriaQuery<Cluster> cq = cb.createQuery(Cluster.class);
+                final Root<Cluster> c = cq.from(Cluster.class);
+                final List<Predicate> predicates = new ArrayList<Predicate>();
 
-                if (StringUtils.isNotEmpty(applicationId)) {
-                    builder.append(", IN(cmds.applications) apps ");
-                } else if (StringUtils.isNotEmpty(applicationName)) {
-                    builder.append(", IN(cmds.applications) apps ");
-                }
-
-                builder.append(" WHERE ");
-
-                if (cc.getTags() != null) {
-                    for (int i = 0; i < cc.getTags().size(); i++) {
-                        if (i != 0) {
-                            builder.append(" AND ");
+                cq.distinct(true);
+              
+                if (StringUtils.isNotEmpty(commandId) || StringUtils.isNotEmpty(commandName)) {
+                    final Join<Cluster, Command> commands = c.join(Cluster_.commands);
+                    if (StringUtils.isNotEmpty(commandId)) {
+                        predicates.add(cb.equal(commands.get(Command_.id), commandId));
+                    } else {
+                        predicates.add(cb.equal(commands.get(Command_.name), commandName));
+                    }
+                    if (StringUtils.isNotEmpty(applicationId) || StringUtils.isNotEmpty(applicationName)) {
+                        final Join<Command, Application> apps = commands.join(Command_.applications);
+                        if (StringUtils.isNotEmpty(applicationId)) {
+                            predicates.add(cb.equal(apps.get(Application_.id), applicationId));
+                        } else {
+                            predicates.add(cb.equal(apps.get(Application_.name), applicationName));
                         }
-
-                        builder.append(":tag").append(i).append(" member of cstr.tags ");
                     }
                 }
-
-                if (StringUtils.isNotEmpty(commandId)) {
-                    builder.append(" AND cmds.id = \"").append(commandId).append("\" ");
-                } else if (StringUtils.isNotEmpty(commandName)) {
-                    builder.append(" AND cmds.name = \"").append(commandName).append("\" ");
-                }
-
-                if ((applicationId != null) && (!applicationId.isEmpty())) {
-                    builder.append(" AND apps.id = \"").append(applicationId).append("\" ");
-                } else if ((applicationName != null) && (!applicationName.isEmpty())) {
-                    builder.append(" AND apps.name = \"").append(applicationName).append("\" ");
-                }
-
-                final String queryString = builder.toString();
-                LOG.debug("Query is " + queryString);
-
-                final TypedQuery<Cluster> query = em.createQuery(queryString, Cluster.class);
-
+                
                 if (cc.getTags() != null) {
-                    int tagNum = 0;
                     for (final String tag : cc.getTags()) {
-                        query.setParameter("tag" + tagNum, tag);
-                        tagNum++;
+                        predicates.add(cb.isMember(tag, c.get(Cluster_.tags)));
                     }
                 }
-
+                
+                cq.where(predicates.toArray(new Predicate[0]));
+                final TypedQuery<Cluster> query = em.createQuery(cq);
                 final List<Cluster> clusters = query.getResultList();
 
                 if (!clusters.isEmpty()) {

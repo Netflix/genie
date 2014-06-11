@@ -20,6 +20,7 @@ package com.netflix.genie.server.services;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
+import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.util.List;
 import java.util.Set;
 
@@ -59,7 +60,7 @@ public interface ClusterConfigService {
     //TODO: Combine the two getAlls into one if possible
     List<Cluster> getClusterConfigs(
             final String name,
-            final List<String> statuses,
+            final List<ClusterStatus> statuses,
             final List<String> tags,
             final Long minUpdateTime,
             final Long maxUpdateTime,
