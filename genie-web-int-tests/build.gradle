@@ -1,5 +1,3 @@
-apply plugin: 'java'
-
 // dummy test - since integration tests are run by build task
 task test(overwrite:true)
 

@@ -9,13 +9,6 @@ buildscript {
     apply from: file('gradle/buildscript.gradle'), to: buildscript
 }
 
-allprojects {
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-}
-
 apply from: file('gradle/convention.gradle')
 apply from: file('gradle/maven.gradle')
 apply from: file('gradle/check.gradle')
@@ -23,6 +16,19 @@ apply from: file('gradle/license.gradle')
 apply from: file('gradle/release.gradle')
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'java'
+
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    clean {
+        delete 'genie-db'
+        delete 'derby.log'
+    }
+}
 
 subprojects {
     group = "com.netflix.${githubProjectName}" // set to organization of project
