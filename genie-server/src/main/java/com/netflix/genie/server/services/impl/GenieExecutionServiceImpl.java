@@ -216,13 +216,15 @@ public class GenieExecutionServiceImpl implements ExecutionService {
             // The call below is just trying to set the status in the DB as RUNNING and update the updateTime.
             // We add retries to this updateEntity call, as since the job is launched we do not want to throw a false error 
             // of job not running due to transient db connection issues.
+            int maxDBTransactionRetries = conf.getInt(
+                    "netflix.genie.server.max.db.transaction.retries", 3);
             int attemptNum = 1;
             while (true) {
                 try {
                     pm.updateEntity(jInfo);
                     break;
                 } catch (RollbackException e) {
-                    if (attemptNum == 3) {
+                    if (attemptNum == maxDBTransactionRetries) {
                         throw(e);
                     } else {
                         attemptNum++;
