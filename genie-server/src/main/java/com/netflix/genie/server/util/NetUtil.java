@@ -149,6 +149,7 @@ public final class NetUtil {
      */
     private static String httpGet(String uri) throws IOException {
         String response = null;
+        //TODO: Use one of other http clients to remove dependency
         HttpClient client = new HttpClient();
         HttpMethod method = new GetMethod(uri);
         client.executeMethod(method);

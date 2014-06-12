@@ -1,20 +1,30 @@
 apply plugin: 'java'
 
+dependencies {
+    compile 'org.apache.openjpa:openjpa:2.3.0'
+}
+
+task buildMetaModel << {
+    println "Building metamodel"
+}
+
+
 task enhance << {
     ant.taskdef(
-        name      : 'openjpaenhancer',
+        name      : 'openJPAEnhancer',
         classpath : project.runtimeClasspath.asPath,
         classname : 'org.apache.openjpa.ant.PCEnhancerTask'
     )
 
-    ant.openjpaenhancer(
-        classpath : project.runtimeClasspath.asPath)
+    ant.openJPAEnhancer(
+        classpath : project.runtimeClasspath.asPath
+    )
+}
+
+compileJava {
+    dependsOn("buildMetaModel")
 }
 
 jar {
-    it.dependsOn enhance
-}
-
-test {
-    it.dependsOn enhance
+    dependsOn enhance
 }

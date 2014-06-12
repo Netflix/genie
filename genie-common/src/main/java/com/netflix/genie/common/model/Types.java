@@ -21,7 +21,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Common enums used by other model objects.
