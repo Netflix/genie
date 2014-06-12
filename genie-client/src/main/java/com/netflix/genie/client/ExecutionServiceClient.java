@@ -143,10 +143,11 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws CloudServiceException on service errors
      * @throws InterruptedException on timeout/thread errors
      */
-    //TODO: Use Future? See:
-    //https://github.com/Netflix/ribbon/blob/master/ribbon-examples/src/main/java/com/netflix/ribbon/examples/GetWithDeserialization.java
     public Job waitForCompletion(final String id, final long blockTimeout)
             throws CloudServiceException, InterruptedException {
+        //Should we use Future? See:
+        //https://github.com/Netflix/ribbon/blob/master/ribbon-examples
+        ///src/main/java/com/netflix/ribbon/examples/GetWithDeserialization.java
         final long pollTime = 10000;
         return waitForCompletion(id, blockTimeout, pollTime);
     }

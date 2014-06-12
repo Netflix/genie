@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -231,7 +231,8 @@ public class Command extends Auditable implements Serializable {
     /**
      * Sets the executable for this command.
      *
-     * @param executable Full path of the executable on the node. Not null/empty/blank.
+     * @param executable Full path of the executable on the node. Not
+     * null/empty/blank.
      * @throws CloudServiceException
      */
     public void setExecutable(final String executable) throws CloudServiceException {
@@ -315,8 +316,6 @@ public class Command extends Auditable implements Serializable {
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        //TODO: This leaves external components able to modify internal state
-        //      tried a few solutions but need to revisit in all collections
         this.configs = configs;
     }
 
@@ -326,8 +325,6 @@ public class Command extends Auditable implements Serializable {
      * @return applications
      */
     public Set<Application> getApplications() {
-        //TODO: This leaves external components able to modify internal state
-        //      tried a few solutions but need to revisit in all collections
         return this.applications;
     }
 
@@ -338,12 +335,10 @@ public class Command extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setApplications(final Set<Application> applications) throws CloudServiceException {
-        //TODO: Utility method for logging errors and throwsing exception
-        //      to get rid of all this repetitive code
         if (applications == null) {
-            final String msg = "No applications passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No applications passed in to set. Unable to continue.");
         }
         this.applications = applications;
     }

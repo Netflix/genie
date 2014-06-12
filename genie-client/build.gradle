@@ -1,11 +1,5 @@
 apply plugin: 'java'
 
-// we are doing this to include genie-common classes in client's javadocs
-sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
-//sourceSets.main.java.srcDirs += new File(project.parent.project(':genie-common').projectDir, 'src/main/java')
-//sourceSets.main.java.srcDirs += project.parent.project(':genie-common').sourceSets.main.java.srcDirs
-
 dependencies {
-    compile 'commons-configuration:commons-configuration:1.8'
-    compile 'org.apache.commons:commons-lang3:3.3.2'
+    compile project.parent.childProjects.get('genie-common')
 }

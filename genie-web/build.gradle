@@ -1,7 +1,6 @@
 apply plugin: 'war'
 
 dependencies {
-    compile 'com.netflix.karyon:karyon-admin-web:1.0.22'
-    compile 'com.sun.jersey:jersey-servlet:1.11'
-    compile project(':genie-server')
+    runtime 'com.netflix.karyon:karyon-admin-web:1.0.22'
+    runtime project(':genie-server')
 }

@@ -52,9 +52,9 @@ public class PersistenceManager<T> {
      * The maximum number of entries to be returned.
      */
     public static final int DEFAULT_PAGE_SIZE = 1024;
-    
+
     /**
-     * The default page number for range queries
+     * The default page number for range queries.
      */
     public static final int DEFAULT_PAGE_NUMBER = 0;
 
@@ -118,7 +118,7 @@ public class PersistenceManager<T> {
             return entityManagerFactory.createEntityManager();
         }
     }
-    
+
     /**
      * Get an entity from the database.
      *

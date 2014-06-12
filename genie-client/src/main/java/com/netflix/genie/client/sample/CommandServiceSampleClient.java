@@ -41,7 +41,15 @@ import org.slf4j.LoggerFactory;
 public final class CommandServiceSampleClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandServiceSampleClient.class);
+
+    /**
+     * Unique id for the sample command.
+     */
     protected static final String ID = "pig13_mr2";
+
+    /**
+     * Name for the sample command.
+     */
     protected static final String NAME = "pig";
 
     private CommandServiceSampleClient() {
@@ -138,7 +146,9 @@ public final class CommandServiceSampleClient {
      * @return The pig example command
      * @throws CloudServiceException
      */
-    public static Command createSampleCommand(final String id, final Set<Application> apps) throws CloudServiceException {
+    public static Command createSampleCommand(
+            final String id,
+            final Set<Application> apps) throws CloudServiceException {
         final Command command = new Command(
                 NAME,
                 "tgianos",

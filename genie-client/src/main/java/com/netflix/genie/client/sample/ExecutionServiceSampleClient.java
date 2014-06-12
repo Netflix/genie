@@ -45,8 +45,8 @@ public final class ExecutionServiceSampleClient {
     }
 
     /**
-     * Main for running client code
-     * .
+     * Main for running client code .
+     *
      * @param args
      * @throws java.lang.Exception
      */
@@ -55,7 +55,6 @@ public final class ExecutionServiceSampleClient {
         // Initialize Eureka, if it is being used
         // System.out.println("Initializing Eureka");
         // ExecutionServiceClient.initEureka("test");
-
         System.out.println("Initializing list of Genie servers");
         ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
                 "localhost:7001");
@@ -82,10 +81,10 @@ public final class ExecutionServiceSampleClient {
         final Set<ClusterCriteria> criterias = new HashSet<ClusterCriteria>();
         criterias.add(criteria);
         Job job = new Job(
-                userName, 
-                CommandServiceSampleClient.ID, 
-                null, 
-                "-f hive.q", 
+                userName,
+                CommandServiceSampleClient.ID,
+                null,
+                "-f hive.q",
                 criterias);
         job.setDescription("This is a test");
         // send the query as an attachment

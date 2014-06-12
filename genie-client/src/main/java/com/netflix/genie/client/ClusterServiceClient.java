@@ -24,7 +24,7 @@ import com.netflix.genie.common.model.Cluster;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

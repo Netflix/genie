@@ -50,7 +50,7 @@ public interface CommandConfigService {
      * @return All the commands matching the specified criteria
      */
     List<Command> getCommandConfigs(
-            final String name, 
+            final String name,
             final String userName,
             final int page,
             final int limit);

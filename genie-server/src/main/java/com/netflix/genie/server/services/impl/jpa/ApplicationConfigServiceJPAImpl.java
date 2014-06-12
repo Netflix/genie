@@ -17,7 +17,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +93,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             if (StringUtils.isNotEmpty(userName)) {
                 predicates.add(cb.equal(a.get(Application_.user), userName));
             }
-            cq.where(cb.and(predicates.toArray(new Predicate[0])));
+            cq.where(predicates.toArray(new Predicate[0]));
             final TypedQuery<Application> query = em.createQuery(cq);
             final int finalPage = page < 0 ? PersistenceManager.DEFAULT_PAGE_NUMBER : page;
             final int finalLimit = limit < 0 ? PersistenceManager.DEFAULT_PAGE_SIZE : limit;

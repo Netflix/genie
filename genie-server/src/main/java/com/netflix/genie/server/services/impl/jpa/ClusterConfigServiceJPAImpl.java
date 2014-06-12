@@ -43,7 +43,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,7 +181,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 final List<Predicate> predicates = new ArrayList<Predicate>();
 
                 cq.distinct(true);
-              
+
                 if (StringUtils.isNotEmpty(commandId) || StringUtils.isNotEmpty(commandName)) {
                     final Join<Cluster, Command> commands = c.join(Cluster_.commands);
                     if (StringUtils.isNotEmpty(commandId)) {
@@ -198,13 +198,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                         }
                     }
                 }
-                
+
                 if (cc.getTags() != null) {
                     for (final String tag : cc.getTags()) {
                         predicates.add(cb.isMember(tag, c.get(Cluster_.tags)));
                     }
                 }
-                
+
                 cq.where(predicates.toArray(new Predicate[0]));
                 final TypedQuery<Cluster> query = em.createQuery(cq);
                 final List<Cluster> clusters = query.getResultList();

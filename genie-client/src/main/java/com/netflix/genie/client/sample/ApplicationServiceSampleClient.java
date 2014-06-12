@@ -39,9 +39,20 @@ import org.slf4j.LoggerFactory;
 public final class ApplicationServiceSampleClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationServiceSampleClient.class);
+
+    /**
+     * The id for the sample application.
+     */
     protected static final String ID = "mr2";
+
+    /**
+     * The name for the sample application.
+     */
     protected static final String APP_NAME = "MapReduce2";
 
+    /**
+     * Private.
+     */
     private ApplicationServiceSampleClient() {
         // never called
     }
