@@ -45,7 +45,15 @@ import org.slf4j.LoggerFactory;
 public final class ClusterServiceSampleClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterServiceSampleClient.class);
+
+    /**
+     * ID for the sample cluster.
+     */
     protected static final String ID = "bdp_hquery_20140505_185527";
+
+    /**
+     * Name for the sample cluster.
+     */
     protected static final String NAME = "h2query";
 
     private ClusterServiceSampleClient() {
@@ -154,7 +162,17 @@ public final class ClusterServiceSampleClient {
         LOG.info("Done");
     }
 
-    public static Cluster createSampleCluster(final String id, final Set<Command> commands) throws CloudServiceException {
+    /**
+     * Create a cluster from the input parameters.
+     *
+     * @param id The ID to use. If null or empty one will be created.
+     * @param commands The commands to use for this cluster or null/empty.
+     * @return A cluster object
+     * @throws CloudServiceException
+     */
+    public static Cluster createSampleCluster(
+            final String id,
+            final Set<Command> commands) throws CloudServiceException {
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
@@ -165,7 +183,7 @@ public final class ClusterServiceSampleClient {
                 ClusterStatus.OUT_OF_SERVICE,
                 "com.netflix.genie.server.jobmanager.impl.YarnJobManager",
                 configs);
-        if (StringUtils.isNotEmpty(id)) {
+        if (StringUtils.isNotBlank(id)) {
             cluster.setId(id);
         }
         final Set<String> tags = new HashSet<String>();

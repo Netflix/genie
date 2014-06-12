@@ -2,6 +2,9 @@ apply plugin: 'java'
 
 def metaModelIgnorePattern = '**/com/netflix/genie/common/model/*_.java'
 
+//TODO: Get it to work so that the generated code is dumped into a
+//      generated sources directory and we don't have to worry about putting
+//      it directly in the main source code
 //sourceSets {
 //    generated {
 //        java {

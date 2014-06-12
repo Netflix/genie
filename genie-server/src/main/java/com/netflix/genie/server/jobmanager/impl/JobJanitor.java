@@ -63,7 +63,7 @@ public class JobJanitor extends Thread {
      */
     public int markZombies() throws Exception {
         // the equivalent query is as follows:
-        // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code, 
+        // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
         // statusMsg='Job has been marked as a zombie'
         // where updateTime < $min and (status='RUNNING' or status='INIT')"
         long currentTime = System.currentTimeMillis();

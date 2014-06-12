@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Exception mapper for CloudServiceExceptions
+ * Exception mapper for CloudServiceExceptions.
  *
  * @author tgianos
  */
