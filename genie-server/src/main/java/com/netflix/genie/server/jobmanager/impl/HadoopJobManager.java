@@ -89,6 +89,8 @@ public class HadoopJobManager implements JobManager {
      */
     protected static final String NFLX_ENV = "netflix.environment";
 
+    private static final String HADOOP2_VERSION_PREFIX = "2";
+
     /**
      * The value of the environment to be passed to jobs.
      */
@@ -435,6 +437,13 @@ public class HadoopJobManager implements JobManager {
         ji.setClusterName(cluster.getName());
         ji.setClusterId(cluster.getId());
 
+        // If the cluster version starts with 2* we set the environment variable for force copying. This is 
+        // because in hadoop2 (unlike hadoop1) copying fails if file already exists unless the "-f" flag is specified.
+        // The same flag does not work in hadoop1 and hence the code to check the version before setting it.
+        if (cluster.getHadoopVersion().startsWith(HADOOP2_VERSION_PREFIX)) {
+            hEnv.put("FORCE_COPY_FLAG","-f");
+        }
+        
         // put the user name for hadoop to use
         hEnv.put("HADOOP_USER_NAME", ji.getUserName());
 
