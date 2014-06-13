@@ -16,7 +16,6 @@ dependencies {
     compile 'org.apache.openjpa:openjpa:2.2.1'
     compile ('com.wordnik:swagger-jersey-jaxrs_2.10:1.3.0') {
         exclude group: 'com.sun.jersey'
-        exclude group: 'jackson-core'
     }
 }
 

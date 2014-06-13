@@ -308,6 +308,7 @@ public class Job extends Auditable implements Serializable {
      */
     @PrePersist
     protected void onCreateJob() throws CloudServiceException {
+        validate(this.user, this.commandId, this.commandName, this.commandArgs, this.clusterCriteria);
         this.clusterCriteriaString = criteriaToString(this.clusterCriteria);
     }
 
@@ -363,7 +364,11 @@ public class Job extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setUser(final String user) throws CloudServiceException {
-        validate(user, this.commandId, this.commandName, this.commandArgs, this.clusterCriteria);
+        if (StringUtils.isBlank(user)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No user entered.");
+        }
         this.user = user;
     }
 
@@ -459,7 +464,11 @@ public class Job extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setClusterCriteria(final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
-        validate(this.user, this.commandId, this.commandName, this.commandArgs, clusterCriteria);
+        if (clusterCriteria == null || clusterCriteria.isEmpty()) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No user entered.");
+        }
         this.clusterCriteria = clusterCriteria;
         this.clusterCriteriaString = criteriaToString(clusterCriteria);
     }
@@ -477,11 +486,16 @@ public class Job extends Auditable implements Serializable {
      * Parameters specified to be run and fed as command line arguments to the
      * job run.
      *
-     * @param commandArgs Arguments to be used to run the command with.
+     * @param commandArgs Arguments to be used to run the command with. Not
+     * null/empty/blank.
      * @throws CloudServiceException
      */
     public void setCommandArgs(final String commandArgs) throws CloudServiceException {
-        validate(this.user, this.commandId, this.commandName, commandArgs, this.clusterCriteria);
+        if (StringUtils.isBlank(commandArgs)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command args entered.");
+        }
         this.commandArgs = commandArgs;
     }
 
@@ -619,7 +633,11 @@ public class Job extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setCommandName(final String commandName) throws CloudServiceException {
-        validate(this.user, this.commandId, commandName, this.commandArgs, this.clusterCriteria);
+        if (StringUtils.isBlank(commandName)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command name entered.");
+        }
         this.commandName = commandName;
     }
 
@@ -639,7 +657,11 @@ public class Job extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setCommandId(final String commandId) throws CloudServiceException {
-        validate(this.user, commandId, this.commandName, this.commandArgs, this.clusterCriteria);
+        if (StringUtils.isBlank(commandId)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered.");
+        }
         this.commandId = commandId;
     }
 

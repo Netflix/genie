@@ -34,6 +34,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -163,6 +164,16 @@ public class Application extends Auditable implements Serializable {
     }
 
     /**
+     * Check to make sure everything is OK before persisting.
+     *
+     * @throws CloudServiceException
+     */
+    @PrePersist
+    protected void onCreateApplication() throws CloudServiceException {
+        validate(this.name, this.user, this.status);
+    }
+
+    /**
      * Gets the name for this application.
      *
      * @return name
@@ -175,10 +186,8 @@ public class Application extends Auditable implements Serializable {
      * Sets the name for this application.
      *
      * @param name the new name of this application. Not null/empty/blank
-     * @throws CloudServiceException
      */
-    public void setName(final String name) throws CloudServiceException {
-        validate(name, this.user, this.status);
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -195,10 +204,8 @@ public class Application extends Auditable implements Serializable {
      * Sets the user who created this application.
      *
      * @param user user who created this application
-     * @throws CloudServiceException
      */
-    public void setUser(final String user) throws CloudServiceException {
-        validate(this.name, user, this.status);
+    public void setUser(final String user) {
         this.user = user;
     }
 
@@ -216,10 +223,8 @@ public class Application extends Auditable implements Serializable {
      * Sets the status for this application.
      *
      * @param status One of the possible statuses
-     * @throws CloudServiceException
      */
-    public void setStatus(final ApplicationStatus status) throws CloudServiceException {
-        validate(this.name, this.user, status);
+    public void setStatus(final ApplicationStatus status) {
         this.status = status;
     }
 
