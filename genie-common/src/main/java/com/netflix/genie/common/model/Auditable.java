@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.common.model;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
@@ -46,6 +48,7 @@ import org.slf4j.LoggerFactory;
 @MappedSuperclass
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@ApiModel(value = "An auditable item")
 public class Auditable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Auditable.class);
@@ -60,6 +63,9 @@ public class Auditable {
      * Unique ID.
      */
     @Id
+    @ApiModelProperty(
+            value = "id",
+            notes = "The unique id of this resource. If one is not provided it is set internally.")
     private String id;
 
     /**
@@ -67,6 +73,10 @@ public class Auditable {
      */
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "created",
+            notes = "When this resource was created.",
+            dataType = "date")
     private Date created = new Date();
 
     /**
@@ -74,6 +84,10 @@ public class Auditable {
      */
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "updated",
+            notes = "When this resource was last updated.",
+            dataType = "date")
     private Date updated = new Date();
 
     /**

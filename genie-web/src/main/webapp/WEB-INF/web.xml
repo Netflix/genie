@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee ">
 
     <servlet>
-        <servlet-name>Jersey REST Service</servlet-name>
+        <servlet-name>jersey</servlet-name>
         <servlet-class>
             com.sun.jersey.spi.container.servlet.ServletContainer
         </servlet-class>
@@ -13,7 +13,7 @@
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>com.netflix.genie.server, com.netflix.appinfo</param-value>
+            <param-value>com.netflix.genie.server, com.netflix.appinfo, com.wordnik.swagger.jersey.listing</param-value>
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
@@ -21,9 +21,23 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    
+    <servlet>
+        <servlet-name>JerseyJaxrsConfig</servlet-name>
+        <servlet-class>com.wordnik.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>
+        <init-param>
+            <param-name>api.version</param-name>
+            <param-value>1.0.0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>swagger.api.basepath</param-name>
+            <param-value>http://localhost:7001/genie</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
 
     <servlet-mapping>
-        <servlet-name>Jersey REST Service</servlet-name>
+        <servlet-name>jersey</servlet-name>
         <url-pattern>/genie/*</url-pattern>
     </servlet-mapping>
 

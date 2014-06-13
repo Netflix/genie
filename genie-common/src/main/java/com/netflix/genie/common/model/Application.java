@@ -19,6 +19,8 @@ package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ApplicationStatus;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
@@ -55,6 +57,7 @@ import org.slf4j.LoggerFactory;
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@ApiModel(value = "An application")
 public class Application extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -64,12 +67,20 @@ public class Application extends Auditable implements Serializable {
      * Name of this application - e.g. mapreduce1, mapreduce2, tez etc.
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "Name",
+            notes = "Name of this application - e.g. mapreduce1, mapreduce2, tez etc.",
+            required = true)
     private String name;
 
     /**
      * User who created this application.
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "User",
+            notes = "User who created this application.",
+            required = true)
     private String user;
 
     /**
@@ -77,6 +88,10 @@ public class Application extends Auditable implements Serializable {
      */
     @Basic(optional = false)
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(
+            value = "Status",
+            notes = "The current status of this application.",
+            required = true)
     private ApplicationStatus status;
 
     /**
@@ -84,12 +99,18 @@ public class Application extends Auditable implements Serializable {
      */
     @Basic
     @Column(name = "appVersion")
+    @ApiModelProperty(
+            value = "Version",
+            notes = "The version number of for this application.")
     private String version;
 
     /**
      * Users can specify a property file location with environment variables.
      */
     @Basic
+    @ApiModelProperty(
+            value = "envPropFile",
+            notes = "Users can specify a property file location with environment variables.")
     private String envPropFile;
 
     /**
@@ -98,6 +119,9 @@ public class Application extends Auditable implements Serializable {
     @XmlElementWrapper(name = "configs")
     @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "configs",
+            notes = "Reference to all the configurations needed for this application.")
     private Set<String> configs = new HashSet<String>();
 
     /**
