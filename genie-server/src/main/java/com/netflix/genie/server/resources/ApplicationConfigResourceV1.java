@@ -37,7 +37,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,13 +52,19 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v1/config/applications")
-@Api(value = "/v1/config/applications", description = "Operations about applications")
+@Api(value = "/v1/config/applications", description = "Manage the available applicationss")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ApplicationConfigResourceV1 {
 
     private final ApplicationConfigService acs;
     private static final Logger LOG = LoggerFactory
             .getLogger(ApplicationConfigResourceV1.class);
+
+    /**
+     * Uri info for gathering information on the request
+     */
+    @Context
+    private UriInfo uriInfo;
 
     /**
      * Default constructor.
@@ -76,11 +85,12 @@ public class ApplicationConfigResourceV1 {
     @GET
     @Path("/{id}")
     @ApiOperation(
-            value = "Find an application by ID",
+            value = "Find an application by id",
             notes = "More notes about this method",
             response = Application.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 200, message = "OK", response = Application.class),
+        @ApiResponse(code = 400, message = "Invalid id supplied"),
         @ApiResponse(code = 404, message = "Application not found")
     })
     public Application getApplicationConfig(
@@ -99,7 +109,6 @@ public class ApplicationConfigResourceV1 {
      * @param page The page to start one (optional)
      * @param limit the max number of results to return per page (optional)
      * @return All applications matching the criteria
-     * @throws CloudServiceException
      */
     @GET
     @ApiOperation(
@@ -108,9 +117,7 @@ public class ApplicationConfigResourceV1 {
             response = Application.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Application not found")
-    })
+        @ApiResponse(code = 200, message = "OK", response = Application.class)})
     public List<Application> getApplicationConfigs(
             @ApiParam(value = "Name of the application.", required = false)
             @QueryParam("name")
@@ -123,8 +130,7 @@ public class ApplicationConfigResourceV1 {
             @DefaultValue("0") int page,
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit")
-            @DefaultValue("1024") int limit)
-            throws CloudServiceException {
+            @DefaultValue("1024") int limit) {
         LOG.debug("called");
         return this.acs.getApplicationConfigs(name, userName, page, limit);
     }
@@ -143,14 +149,19 @@ public class ApplicationConfigResourceV1 {
             notes = "Create an application from the supplied information.",
             response = Application.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Application not found")
+        @ApiResponse(code = 201, message = "Created", response = Application.class),
+        @ApiResponse(code = 400, message = "Invalid required parameter supplied"),
+        @ApiResponse(code = 409, message = "An application with the supplied id already exists")
     })
-    public Application createApplicationConfig(
+    public Response createApplicationConfig(
             @ApiParam(value = "The application to create.", required = true)
             final Application app) throws CloudServiceException {
         LOG.debug("Called to create new application");
-        return this.acs.createApplicationConfig(app);
+        final Application createdApp = this.acs.createApplicationConfig(app);
+        return Response.created(
+                this.uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
+                entity(createdApp).
+                build();
     }
 
     /**
@@ -169,14 +180,15 @@ public class ApplicationConfigResourceV1 {
             notes = "Update an application from the supplied information.",
             response = Application.class)
     @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Application.class),
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Application not found")
+        @ApiResponse(code = 404, message = "Application to update not found")
     })
     public Application updateApplicationConfig(
             @ApiParam(value = "Id of the application to update.", required = true)
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The application to update.", required = true)
+            @ApiParam(value = "The application information to update.", required = true)
             final Application updateApp) throws CloudServiceException {
         LOG.debug("called to update application config with info " + updateApp.toString());
         return this.acs.updateApplicationConfig(id, updateApp);
@@ -196,6 +208,7 @@ public class ApplicationConfigResourceV1 {
             notes = "Delete an application with the supplied id.",
             response = Application.class)
     @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Application.class),
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Application not found")
     })

@@ -68,8 +68,7 @@ public class Application extends Auditable implements Serializable {
      */
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "Name",
-            notes = "Name of this application - e.g. mapreduce1, mapreduce2, tez etc.",
+            value = "Name of this application - e.g. mapreduce1, mapreduce2, tez etc",
             required = true)
     private String name;
 
@@ -78,8 +77,7 @@ public class Application extends Auditable implements Serializable {
      */
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "User",
-            notes = "User who created this application.",
+            value = "User who created this application",
             required = true)
     private String user;
 
@@ -89,8 +87,7 @@ public class Application extends Auditable implements Serializable {
     @Basic(optional = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
-            value = "Status",
-            notes = "The current status of this application.",
+            value = "The current status of this application",
             required = true)
     private ApplicationStatus status;
 
@@ -100,8 +97,7 @@ public class Application extends Auditable implements Serializable {
     @Basic
     @Column(name = "appVersion")
     @ApiModelProperty(
-            value = "Version",
-            notes = "The version number of for this application.")
+            value = "The version number for this application")
     private String version;
 
     /**
@@ -109,8 +105,7 @@ public class Application extends Auditable implements Serializable {
      */
     @Basic
     @ApiModelProperty(
-            value = "envPropFile",
-            notes = "Users can specify a property file location with environment variables.")
+            value = "Users can specify a property file location with environment variables")
     private String envPropFile;
 
     /**
@@ -120,8 +115,7 @@ public class Application extends Auditable implements Serializable {
     @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "configs",
-            notes = "Reference to all the configurations needed for this application.")
+            value = "All the configuration files needed for this application")
     private Set<String> configs = new HashSet<String>();
 
     /**
@@ -130,6 +124,8 @@ public class Application extends Auditable implements Serializable {
     @XmlElementWrapper(name = "jars")
     @XmlElement(name = "jar")
     @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Any jars needed to run this application")
     private Set<String> jars = new HashSet<String>();
 
     /**
