@@ -37,8 +37,8 @@ subprojects {
         compile 'com.netflix.ribbon:ribbon-core:0.3.12'
         compile 'com.netflix.ribbon:ribbon-eureka:0.3.12'
         compile 'com.netflix.ribbon:ribbon-httpclient:0.3.12'
-        compile 'org.apache.commons:commons-lang3:3.3.2'
-        compile 'org.slf4j:slf4j-log4j12:1.7.7'
+        compile 'org.apache.commons:commons-lang3:3.2.1'
+        compile 'org.slf4j:slf4j-log4j12:1.7.0'
         
         testCompile 'junit:junit:4.+'
         testCompile "org.mockito:mockito-core:1.+"

@@ -5,7 +5,7 @@ dependencies {
     compile 'com.netflix.archaius:archaius-core:0.5.8'
     compile 'com.netflix.karyon:karyon-extensions:1.0.22'
     compile 'com.netflix.servo:servo-core:0.4.34'
-    compile 'javax.mail:mail:1.4.7'
+    compile 'javax.mail:mail:1.4.4'
 
     runtime 'com.google.inject.extensions:guice-servlet:3.0'
     runtime 'com.sun.jersey.contribs:jersey-guice:1.11'
