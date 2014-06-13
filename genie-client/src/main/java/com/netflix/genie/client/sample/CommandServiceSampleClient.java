@@ -141,7 +141,7 @@ public final class CommandServiceSampleClient {
     /**
      * Create a sample command and attach the the supplied applications.
      *
-     * @param id The id to use or null if want one created.ß
+     * @param id The id to use or null if want one created.
      * @param apps The apps to add to this command or null/empty for none.
      * @return The pig example command
      * @throws CloudServiceException
