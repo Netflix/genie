@@ -32,6 +32,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -158,6 +159,16 @@ public class Command extends Auditable implements Serializable {
     }
 
     /**
+     * Check to make sure everything is OK before persisting.
+     *
+     * @throws CloudServiceException
+     */
+    @PrePersist
+    protected void onCreateCommand() throws CloudServiceException {
+        validate(this.name, this.user, this.status, this.executable);
+    }
+
+    /**
      * Gets the name for this command.
      *
      * @return name
@@ -173,7 +184,11 @@ public class Command extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setName(final String name) throws CloudServiceException {
-        validate(name, this.user, this.status, this.executable);
+        if (StringUtils.isBlank(name)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No name entered.");
+        }
         this.name = name;
     }
 
@@ -193,7 +208,11 @@ public class Command extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setUser(final String user) throws CloudServiceException {
-        validate(this.name, user, this.status, this.executable);
+        if (StringUtils.isBlank(user)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No user entered.");
+        }
         this.user = user;
     }
 
@@ -215,7 +234,11 @@ public class Command extends Auditable implements Serializable {
      * @see CommandStatus
      */
     public void setStatus(final CommandStatus status) throws CloudServiceException {
-        validate(this.name, this.user, status, this.executable);
+        if (status == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No status entered.");
+        }
         this.status = status;
     }
 
@@ -236,7 +259,11 @@ public class Command extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setExecutable(final String executable) throws CloudServiceException {
-        validate(this.name, this.user, this.status, this.executable);
+        if (StringUtils.isBlank(executable)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No executable entered.");
+        }
         this.executable = executable;
     }
 

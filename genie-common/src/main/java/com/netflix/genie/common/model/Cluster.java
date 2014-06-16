@@ -32,6 +32,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -158,13 +159,27 @@ public class Cluster extends Auditable implements Serializable {
     }
 
     /**
+     * Check to make sure everything is OK before persisting.
+     *
+     * @throws CloudServiceException
+     */
+    @PrePersist
+    protected void onCreateCluster() throws CloudServiceException {
+        validate(this.name, this.user, this.status, this.jobManager, this.configs);
+    }
+
+    /**
      * Sets the name for this cluster.
      *
      * @param name name for this cluster. Not null/empty/blank.
      * @throws CloudServiceException
      */
     public void setName(final String name) throws CloudServiceException {
-        validate(name, this.user, this.status, this.jobManager, this.configs);
+        if (StringUtils.isBlank(name)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No name Entered.");
+        }
         this.name = name;
     }
 
@@ -184,7 +199,11 @@ public class Cluster extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setUser(final String user) throws CloudServiceException {
-        validate(this.name, user, this.status, this.jobManager, this.configs);
+        if (StringUtils.isBlank(user)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No user Entered.");
+        }
         this.user = user;
     }
 
@@ -205,7 +224,11 @@ public class Cluster extends Auditable implements Serializable {
      * @see ClusterStatus
      */
     public void setStatus(final ClusterStatus status) throws CloudServiceException {
-        validate(this.name, this.user, status, this.jobManager, this.configs);
+        if (status == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No Status Entered.");
+        }
         this.status = status;
     }
 
@@ -225,7 +248,11 @@ public class Cluster extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setJobManager(final String jobManager) throws CloudServiceException {
-        validate(this.name, this.user, this.status, jobManager, this.configs);
+        if (StringUtils.isBlank(jobManager)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No jobManager Entered.");
+        }
         this.jobManager = jobManager;
     }
 
@@ -288,7 +315,11 @@ public class Cluster extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setConfigs(final Set<String> configs) throws CloudServiceException {
-        validate(this.name, this.user, this.status, this.jobManager, configs);
+        if (configs == null || configs.isEmpty()) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "At least one config required.");
+        }
         this.configs = configs;
     }
 

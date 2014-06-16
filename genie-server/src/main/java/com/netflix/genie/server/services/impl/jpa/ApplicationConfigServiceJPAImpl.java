@@ -60,7 +60,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final Application app = em.find(Application.class, id);
             if (app == null) {
                 throw new CloudServiceException(
-                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        HttpURLConnection.HTTP_NOT_FOUND,
                         "No application with id " + id);
             } else {
                 return app;
@@ -120,7 +120,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             trans.begin();
             if (em.contains(app)) {
                 throw new CloudServiceException(
-                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        HttpURLConnection.HTTP_CONFLICT,
                         "An application with id " + app.getId() + " already exists");
             }
             em.persist(app);

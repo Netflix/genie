@@ -19,9 +19,13 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
-import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -33,7 +37,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +52,19 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v1/config/applications")
+@Api(value = "/v1/config/applications", description = "Manage the available applicationss")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ApplicationConfigResourceV1 {
 
     private final ApplicationConfigService acs;
     private static final Logger LOG = LoggerFactory
             .getLogger(ApplicationConfigResourceV1.class);
+
+    /**
+     * Uri info for gathering information on the request
+     */
+    @Context
+    private UriInfo uriInfo;
 
     /**
      * Default constructor.
@@ -70,8 +84,19 @@ public class ApplicationConfigResourceV1 {
      */
     @GET
     @Path("/{id}")
-    public Application getApplicationConfig(@PathParam("id") final String id)
-            throws CloudServiceException {
+    @ApiOperation(
+            value = "Find an application by id",
+            notes = "More notes about this method",
+            response = Application.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Application.class),
+        @ApiResponse(code = 400, message = "Invalid id supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Application getApplicationConfig(
+            @ApiParam(value = "ID of the application to get.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
         LOG.debug("Called");
         return this.acs.getApplicationConfig(id);
     }
@@ -84,22 +109,29 @@ public class ApplicationConfigResourceV1 {
      * @param page The page to start one (optional)
      * @param limit the max number of results to return per page (optional)
      * @return All applications matching the criteria
-     * @throws CloudServiceException
      */
     @GET
+    @ApiOperation(
+            value = "Find applications",
+            notes = "Find applications by the submitted criteria.",
+            response = Application.class,
+            responseContainer = "List")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Application.class)})
     public List<Application> getApplicationConfigs(
-            @QueryParam("name") final String name,
-            @QueryParam("userName") final String userName,
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("limit") @DefaultValue("1024") int limit)
-            throws CloudServiceException {
+            @ApiParam(value = "Name of the application.", required = false)
+            @QueryParam("name")
+            final String name,
+            @ApiParam(value = "User who created the application.", required = false)
+            @QueryParam("userName")
+            final String userName,
+            @ApiParam(value = "The page to start on.", required = false)
+            @QueryParam("page")
+            @DefaultValue("0") int page,
+            @ApiParam(value = "Max number of results per page.", required = false)
+            @QueryParam("limit")
+            @DefaultValue("1024") int limit) {
         LOG.debug("called");
-        if (page < 0) {
-            page = PersistenceManager.DEFAULT_PAGE_NUMBER;
-        }
-        if (limit < 0) {
-            limit = PersistenceManager.DEFAULT_PAGE_SIZE;
-        }
         return this.acs.getApplicationConfigs(name, userName, page, limit);
     }
 
@@ -112,9 +144,24 @@ public class ApplicationConfigResourceV1 {
      */
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Application createApplicationConfig(final Application app) throws CloudServiceException {
+    @ApiOperation(
+            value = "Create an application",
+            notes = "Create an application from the supplied information.",
+            response = Application.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Created", response = Application.class),
+        @ApiResponse(code = 400, message = "Invalid required parameter supplied"),
+        @ApiResponse(code = 409, message = "An application with the supplied id already exists")
+    })
+    public Response createApplicationConfig(
+            @ApiParam(value = "The application to create.", required = true)
+            final Application app) throws CloudServiceException {
         LOG.debug("Called to create new application");
-        return this.acs.createApplicationConfig(app);
+        final Application createdApp = this.acs.createApplicationConfig(app);
+        return Response.created(
+                this.uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
+                entity(createdApp).
+                build();
     }
 
     /**
@@ -128,8 +175,20 @@ public class ApplicationConfigResourceV1 {
     @PUT
     @Path("/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @ApiOperation(
+            value = "Update an application",
+            notes = "Update an application from the supplied information.",
+            response = Application.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Application.class),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application to update not found")
+    })
     public Application updateApplicationConfig(
-            @PathParam("id") final String id,
+            @ApiParam(value = "Id of the application to update.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The application information to update.", required = true)
             final Application updateApp) throws CloudServiceException {
         LOG.debug("called to update application config with info " + updateApp.toString());
         return this.acs.updateApplicationConfig(id, updateApp);
@@ -144,8 +203,19 @@ public class ApplicationConfigResourceV1 {
      */
     @DELETE
     @Path("/{id}")
-    public Application deleteApplicationConfig(@PathParam("id") final String id)
-            throws CloudServiceException {
+    @ApiOperation(
+            value = "Delete an application",
+            notes = "Delete an application with the supplied id.",
+            response = Application.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Application.class),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Application deleteApplicationConfig(
+            @ApiParam(value = "Id of the application to delete.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
         LOG.debug("called");
         return this.acs.deleteApplicationConfig(id);
     }
