@@ -1,1 +1,76 @@
-apply plugin: 'java'
+def metaModelIgnorePattern = '**/com/netflix/genie/common/model/*_.java'
+
+//TODO: Get it to work so that the generated code is dumped into a
+//      generated sources directory and we don't have to worry about putting
+//      it directly in the main source code
+//sourceSets {
+//    generated {
+//        java {
+//            srcDirs = ['src/generated-sources/java']
+//        }
+//        compileClasspath += sourceSets.main.allJava
+//    }
+//}
+
+dependencies {
+    compile 'org.apache.openjpa:openjpa:2.2.1'
+    compile ('com.wordnik:swagger-jersey-jaxrs_2.10:1.3.0') {
+        exclude group: 'com.sun.jersey'
+    }
+}
+
+task genJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA metamodels') {
+    source = sourceSets.main.java
+    classpath = configurations.compile
+    options.compilerArgs = [
+        "-proc:only",
+        "-Aopenjpa.metamodel=true"
+    ]
+    //destinationDir = sourceSets.generated.java.srcDirs.iterator().next()
+    destinationDir = sourceSets.main.java.srcDirs.iterator().next()
+    dependencyCacheDir = compileJava.dependencyCacheDir
+}
+
+task enhance(description: "Enhance model classes for use with JPA") << {
+    ant.taskdef(
+        name      : 'openJPAEnhancer',
+        classpath : project.runtimeClasspath.asPath,
+        classname : 'org.apache.openjpa.ant.PCEnhancerTask'
+    )
+
+    ant.openJPAEnhancer(
+        classpath : project.runtimeClasspath.asPath
+    )
+}
+
+compileJava {
+    dependsOn genJPAMetaModel
+    //source += sourceSets.generated.java
+}
+
+jar {
+    dependsOn enhance
+}
+
+clean {
+    //delete 'src/generated-sources'
+    //delete 'src/main/java/com/netflix/genie/common/model/*_.java'
+    delete sourceSets.main.allJava.matching {
+        include metaModelIgnorePattern
+    }
+}
+
+//Ignore the generated classes from all our style/coverage/bug finding tools
+tasks.withType(Checkstyle) {
+    exclude metaModelIgnorePattern
+}
+
+tasks.withType(FindBugs) {
+    classes = classes.filter {
+        !it.path.contains("_")
+    }
+}
+
+tasks.withType(Pmd) {
+    exclude metaModelIgnorePattern
+}

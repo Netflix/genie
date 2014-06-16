@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.exceptions;
 
 /**
- * The common exception class that represents a service failure.
- * It includes an HTTP error code and a human-readable error message.
+ * The common exception class that represents a service failure. It includes an
+ * HTTP error code and a human-readable error message.
  *
  * @author skrishnan
  */
@@ -34,12 +33,9 @@ public class CloudServiceException extends Exception {
     /**
      * Constructor.
      *
-     * @param errorCode
-     *            the HTTP status code for this exception
-     * @param msg
-     *            human readable message
-     * @param cause
-     *            reason for this exception
+     * @param errorCode the HTTP status code for this exception
+     * @param msg human readable message
+     * @param cause reason for this exception
      */
     public CloudServiceException(int errorCode, String msg, Throwable cause) {
         super(msg, cause);
@@ -49,10 +45,8 @@ public class CloudServiceException extends Exception {
     /**
      * Constructor.
      *
-     * @param errorCode
-     *            the HTTP status code for this exception
-     * @param cause
-     *            reason for this exception
+     * @param errorCode the HTTP status code for this exception
+     * @param cause reason for this exception
      */
     public CloudServiceException(int errorCode, Throwable cause) {
         super(cause);
@@ -62,10 +56,8 @@ public class CloudServiceException extends Exception {
     /**
      * Constructor.
      *
-     * @param errorCode
-     *            the HTTP status code for this exception
-     * @param msg
-     *            human readable message
+     * @param errorCode the HTTP status code for this exception
+     * @param msg human readable message
      */
     public CloudServiceException(int errorCode, String msg) {
         super(msg);

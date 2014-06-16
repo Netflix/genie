@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.persistence;
 
-import java.util.UUID;
-
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Test;
-
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test case for the persistence manager.
@@ -34,113 +36,56 @@ import com.netflix.genie.common.model.Types.JobStatus;
  */
 public class TestPersistenceManager {
 
+    private Set<ClusterCriteria> criterias;
+
+    /**
+     * Setup the tests.
+     *
+     * @throws CloudServiceException
+     */
+    @Before
+    public void setup() throws CloudServiceException {
+        final Set<String> criteriaTags = new HashSet<String>();
+        criteriaTags.add("prod");
+        final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
+        this.criterias = new HashSet<ClusterCriteria>();
+        this.criterias.add(criteria);
+    }
+
     /**
      * Test entity create and get after create.
+     *
+     * @throws CloudServiceException
      */
     @Test
-    public void testCreateAndGetEntity() {
+    public void testCreateAndGetEntity() throws CloudServiceException {
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
-        Job initial = new Job();
-        UUID uuid = UUID.randomUUID();
-        initial.setJobName("My test job");
-        initial.setId(uuid.toString());
-        initial.setUserName("myUserName");
-        initial.setCmdArgs("commandArg");
+        Job initial = new Job("someUser", "commandId", null, "someArg", this.criterias);
+        final String id = UUID.randomUUID().toString();
+        initial.setName("My test job");
+        initial.setId(id);
         pm.createEntity(initial);
-        Job result = pm.getEntity(uuid.toString(),
-                Job.class);
+        Job result = pm.getEntity(id, Job.class);
         Assert.assertEquals(initial.getId(), result.getId());
     }
 
     /**
-     * Test entity deletes.
-     */
-    @Test
-    public void testDeleteEntity() {
-        PersistenceManager<Job> pm = new PersistenceManager<Job>();
-        Job initial = new Job();
-        UUID uuid = UUID.randomUUID();
-        initial.setId(uuid.toString());
-        initial.setUserName("myUserName");
-        initial.setCmdArgs("commandArg");
-        pm.createEntity(initial);
-        Job deleted = pm.deleteEntity(uuid.toString(),
-                Job.class);
-        Assert.assertNotNull(deleted);
-    }
-
-    /**
      * Test updating single entity.
+     *
+     * @throws CloudServiceException
      */
     @Test
-    public void testUpdateEntity() {
+    public void testUpdateEntity() throws CloudServiceException {
         PersistenceManager<Job> pm = new PersistenceManager<Job>();
-        Job initial = new Job();
-        UUID uuid = UUID.randomUUID();
-        initial.setId(uuid.toString());
-        initial.setUserName("myUserName");
-        initial.setCmdArgs("commandArg");
+        Job initial = new Job("someUser", "commandId", null, "someArg", this.criterias);
+        final String id = UUID.randomUUID().toString();
+        initial.setId(id);
+        initial.setUser("myUserName");
+        initial.setCommandArgs("commandArg");
         pm.createEntity(initial);
         initial.setJobStatus(JobStatus.FAILED);
         Job updated = pm.updateEntity(initial);
         Assert.assertEquals(JobStatus.FAILED, updated.getStatus());
-    }
-
-    /**
-     * Test updating multiple entities.
-     *
-     * @throws Exception if there is anything wrong with the test
-     */
-    @Test
-    public void testUpdateEntities() throws Exception {
-        PersistenceManager<Job> pm = new PersistenceManager<Job>();
-        Job one = new Job();
-        one.setJobName("UPDATE_TEST");
-        one.setId(UUID.randomUUID().toString());
-        one.setUserName("myUserName");
-        one.setCmdArgs("commandArg");
-        pm.createEntity(one);
-        Job two = new Job();
-        two.setJobName("UPDATE_TEST");
-        two.setId(UUID.randomUUID().toString());
-        two.setUserName("myUserName2");
-        two.setCmdArgs("commandArg2");
-        pm.createEntity(two);
-        ClauseBuilder setCriteria = new ClauseBuilder(ClauseBuilder.COMMA);
-        setCriteria.append("jobName='TEST_UPDATE'");
-        ClauseBuilder queryCriteria = new ClauseBuilder(ClauseBuilder.AND);
-        queryCriteria.append("jobName='UPDATE_TEST'");
-        QueryBuilder qb = new QueryBuilder().table("Job")
-                .set(setCriteria.toString()).clause(queryCriteria.toString());
-        int numRows = pm.update(qb);
-        System.out.println("Number of rows updated: " + numRows);
-        Assert.assertEquals(numRows > 0, true);
-    }
-
-    /**
-     * Test select query.
-     *
-     * @throws Exception if there is any error in the select
-     */
-    @Test
-    public void testQuery() throws Exception {
-        PersistenceManager<Job> pm = new PersistenceManager<Job>();
-        Job initial = new Job();
-        UUID uuid = UUID.randomUUID();
-        initial.setId(uuid.toString());
-        initial.setJobName("My test job");
-        initial.setJobStatus(JobStatus.FAILED);
-        initial.setUserName("myUserName");
-        initial.setCmdArgs("commandArg");
-        pm.createEntity(initial);
-        ClauseBuilder cb = new ClauseBuilder(ClauseBuilder.AND);
-        cb.append("id='" + initial.getId() + "'");
-        cb.append("userName='myUserName'");
-        QueryBuilder qb = new QueryBuilder().table("Job").clause(
-                cb.toString());
-        Object[] results = pm.query(qb);
-        Assert.assertEquals(1, results.length);
-        Assert.assertEquals(results[0] instanceof Job, true);
     }
 
     /**

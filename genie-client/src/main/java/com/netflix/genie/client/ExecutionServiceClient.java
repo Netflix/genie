@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,14 +20,9 @@ package com.netflix.genie.client;
 import com.google.common.collect.Multimap;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.JobRequest;
-import com.netflix.genie.common.messages.JobResponse;
-import com.netflix.genie.common.messages.JobStatusResponse;
 import com.netflix.genie.common.model.Job;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -84,27 +79,15 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public Job submitJob(final Job job) throws CloudServiceException {
-        checkErrorConditions(job);
+        Job.validate(job);
 
-        final JobRequest request = new JobRequest();
-        request.setJobInfo(job);
-
-        final JobResponse ji = executeRequest(
+        return executeRequestForSingleEntity(
                 Verb.POST,
                 BASE_EXECUTION_REST_URI,
                 null,
                 null,
-                request,
-                JobResponse.class);
-
-        if (ji.getJobs() == null || ji.getJobs().length == 0) {
-            final String msg = "Unable to parse job info from response";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // return the first (only) jobInfo
-        return ji.getJobs()[0];
+                job,
+                Job.class);
     }
 
     /**
@@ -121,22 +104,13 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final JobResponse ji = executeRequest(
+        return executeRequestForSingleEntity(
                 Verb.GET,
                 BASE_EXECUTION_REST_URI,
                 id,
                 null,
                 null,
-                JobResponse.class);
-
-        if (ji.getJobs() == null || ji.getJobs().length == 0) {
-            final String msg = "Unable to parse job info from response";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // return the first (only) jobInfo
-        return ji.getJobs()[0];
+                Job.class);
     }
 
     /**
@@ -150,24 +124,13 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public List<Job> getJobs(final Multimap<String, String> params) throws CloudServiceException {
-        final JobResponse ji = executeRequest(
+        return executeRequestForListOfEntities(
                 Verb.GET,
                 BASE_EXECUTION_REST_URI,
                 null,
                 params,
                 null,
-                JobResponse.class);
-
-        // this will only happen if 200 is returned, and parsing fails for some
-        // reason
-        if (ji.getJobs() == null || ji.getJobs().length == 0) {
-            final String msg = "Unable to parse job info from response";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // if we get here, there are non-zero jobInfos - return all
-        return Arrays.asList(ji.getJobs());
+                Job.class);
     }
 
     /**
@@ -182,6 +145,9 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      */
     public Job waitForCompletion(final String id, final long blockTimeout)
             throws CloudServiceException, InterruptedException {
+        //Should we use Future? See:
+        //https://github.com/Netflix/ribbon/blob/master/ribbon-examples
+        ///src/main/java/com/netflix/ribbon/examples/GetWithDeserialization.java
         final long pollTime = 10000;
         return waitForCompletion(id, blockTimeout, pollTime);
     }
@@ -234,7 +200,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @return the final job status for this job
      * @throws CloudServiceException
      */
-    public JobStatusResponse killJob(final String id) throws CloudServiceException {
+    public Job killJob(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -243,51 +209,12 @@ public final class ExecutionServiceClient extends BaseGenieClient {
 
         // this assumes that the service will forward the delete to the right
         // instance
-        return executeRequest(
+        return executeRequestForSingleEntity(
                 Verb.DELETE,
                 BASE_EXECUTION_REST_URI,
                 id,
                 null,
                 null,
-                JobStatusResponse.class);
-    }
-
-    /**
-     * Check to make sure that the required parameters exist.
-     *
-     * @param config The configuration to check
-     * @throws CloudServiceException
-     */
-    private void checkErrorConditions(final Job job) throws CloudServiceException {
-        if (job == null) {
-            final String msg = "Required parameter job can't be NULL";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-
-        final List<String> messages = new ArrayList<String>();
-        if (StringUtils.isEmpty(job.getUserName())) {
-            messages.add("User name is missing.\n");
-        }
-        if (StringUtils.isEmpty(job.getCommandId()) && StringUtils.isEmpty(job.getCommandName())) {
-            messages.add("Need one of command id or command name in order to run a job\n");
-        }
-        if (StringUtils.isEmpty(job.getCmdArgs())) {
-            messages.add("Command arguments are required\n");
-        }
-        if (job.getClusterCriteriaList().isEmpty()) {
-            messages.add("At least one cluster criteria is required in order to figure out where to run this job.\n");
-        }
-
-        if (!messages.isEmpty()) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Job configuration errors:\n");
-            for (final String message : messages) {
-                builder.append(message);
-            }
-            final String msg = builder.toString();
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
+                Job.class);
     }
 }

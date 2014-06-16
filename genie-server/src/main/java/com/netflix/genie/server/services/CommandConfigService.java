@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,56 +17,71 @@
  */
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.messages.CommandConfigRequest;
-import com.netflix.genie.common.messages.CommandConfigResponse;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Command;
+import java.util.List;
 
 /**
  * Abstraction layer to encapsulate CommandConfig functionality.<br>
  * Classes implementing this abstraction layer must be thread-safe.
  *
  * @author amsharma
+ * @author tgianos
  */
 public interface CommandConfigService {
 
     /**
      * Gets command configuration for given id.
      *
-     * @param id unique id for command configuration to get
-     * @return successful response, or one with HTTP error code
+     * @param id unique id for command configuration to get. Not null/empty.
+     * @return The command configuration
+     * @throws CloudServiceException
      */
-    CommandConfigResponse getCommandConfig(String id);
+    Command getCommandConfig(final String id) throws CloudServiceException;
 
     /**
-     * Get command configuration for given filter criteria.
+     * Get command configurations for given filter criteria.
      *
-     * @param id unique id for command config (can be null)
      * @param name name of command config (can be null)
-     * @return successful response, or one with HTTP error code
+     * @param userName the name of the user who created the configuration (can
+     * be null)
+     * @param page Page number to start results on
+     * @param limit Max number of results per page
+     * @return All the commands matching the specified criteria
      */
-    CommandConfigResponse getCommandConfig(String id, String name);
+    List<Command> getCommandConfigs(
+            final String name,
+            final String userName,
+            final int page,
+            final int limit);
 
     /**
      * Create new command configuration.
      *
-     * @param request encapsulates the command config element to create
-     * @return successful response, or one with HTTP error code
+     * @param command encapsulates the command configuration information to
+     * create
+     * @return The command created
+     * @throws CloudServiceException
      */
-    CommandConfigResponse createCommandConfig(CommandConfigRequest request);
+    Command createCommandConfig(final Command command) throws CloudServiceException;
 
     /**
      * Update command configuration.
      *
-     * @param request encapsulates the command config element to upsert, must
-     * contain valid id
-     * @return successful response, or one with HTTP error code
+     * @param id The id of the command configuration to update. Not null or
+     * empty.
+     * @param updateCommand contains the information to update the command with
+     * @return The updated command
+     * @throws CloudServiceException
      */
-    CommandConfigResponse updateCommandConfig(CommandConfigRequest request);
+    Command updateCommandConfig(final String id, final Command updateCommand) throws CloudServiceException;
 
     /**
      * Delete a command configuration from database.
      *
-     * @param id unique if of command configuration to delete
-     * @return successful response, or one with HTTP error code
+     * @param id unique if of the command configuration to delete
+     * @return The deleted command configuration
+     * @throws CloudServiceException
      */
-    CommandConfigResponse deleteCommandConfig(String id);
+    Command deleteCommandConfig(final String id) throws CloudServiceException;
 }

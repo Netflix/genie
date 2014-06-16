@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,15 +15,12 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.util;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import java.net.HttpURLConnection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
 
 /**
  * Utility class to parse string (for command-line arguments, versions, etc).
@@ -31,7 +28,8 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  * @author skrishnan
  */
 public final class StringUtil {
-    private static Logger logger = LoggerFactory.getLogger(StringUtil.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(StringUtil.class);
 
     /**
      * The argument delimiter, which is set to white space.
@@ -46,15 +44,14 @@ public final class StringUtil {
      * Mimics bash command-line parsing as close as possible.<br>
      * Caveat - only supports double quotes, not single quotes.
      *
-     * @param input
-     *            command-line arguments as a string
+     * @param input command-line arguments as a string
      * @return argument array that is split using (as to close to) bash rules as
-     *         possible
+     * possible
      * @throws CloudServiceException
      */
     public static String[] splitCmdLine(String input)
             throws CloudServiceException {
-        logger.debug("Command line: " + input);
+        LOG.debug("Command line: " + input);
         if (input == null) {
             return new String[0];
         }
@@ -66,7 +63,7 @@ public final class StringUtil {
                     + "]+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
         } catch (Exception e) {
             String msg = "Invalid argument: " + input;
-            logger.error(msg, e);
+            LOG.error(msg, e);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
@@ -77,7 +74,7 @@ public final class StringUtil {
             if ((output[i].startsWith("\"") && (output[i].endsWith("\"")))) {
                 output[i] = output[i].replaceAll("(^\")|(\"$)", "");
             }
-            logger.debug(i + ": " + output[i]);
+            LOG.debug(i + ": " + output[i]);
         }
         return output;
     }
@@ -87,12 +84,11 @@ public final class StringUtil {
      * X.Y.Z.<br>
      * 0.8.1.4 -> 0.8.1, 0.8.2 -> 0.8.2, 0.8 -> 0.8.
      *
-     * @param fullVersion
-     *            input version number
+     * @param fullVersion input version number
      * @return trimmed version number as documented
      */
     public static String trimVersion(String fullVersion) {
-        logger.debug("Returning canonical version for " + fullVersion);
+        LOG.debug("Returning canonical version for " + fullVersion);
         if (fullVersion == null) {
             return null;
         }
@@ -109,7 +105,7 @@ public final class StringUtil {
                 break;
             }
         }
-        logger.debug("Canonical version for " + fullVersion + " is "
+        LOG.debug("Canonical version for " + fullVersion + " is "
                 + trimmedVersion.toString());
 
         return trimmedVersion.toString();

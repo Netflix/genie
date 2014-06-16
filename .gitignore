@@ -8,6 +8,15 @@
 *.so
 *.pyc
 
+# Per Build Generated Sources #
+###############################
+**/com/netflix/genie/common/model/*_.java
+/genie-common/src/main/java/com/netflix/genie/common/model/Application_.java
+/genie-common/src/main/java/com/netflix/genie/common/model/Auditable_.java
+/genie-common/src/main/java/com/netflix/genie/common/model/Cluster_.java
+/genie-common/src/main/java/com/netflix/genie/common/model/Command_.java
+/genie-common/src/main/java/com/netflix/genie/common/model/Job_.java
+
 # Packages #
 ############
 # it's better to unpack these files and commit the raw source
@@ -41,17 +50,20 @@ Thumbs.db
 ################
 .gradle
 
-# Derby files
+# Derby files #
+###############
 *-db
 
-# Build output directies
+# Build output directories #
+############################
 /target
 */target
 /build
 */build
 #
 
-# IntelliJ specific files/directories
+# IntelliJ specific files/directories #
+#######################################
 out
 .idea
 *.ipr
@@ -59,13 +71,15 @@ out
 *.iml
 atlassian-ide-plugin.xml
 
-# Eclipse specific files/directories
+# Eclipse specific files/directories #
+######################################
 .classpath
 .project
 .settings
 .metadata
 
-# NetBeans specific files/directories
+# NetBeans specific files/directories #
+#######################################
 .nbattrs
 .nb-gradle-properties
 .nb-gradle/

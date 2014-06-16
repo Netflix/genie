@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Netflix, Inc.
+ * Copyright 2014 Netflix, Inc.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -13,14 +13,12 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.genie.server.health;
 
 import com.netflix.karyon.spi.HealthCheckHandler;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Custom health check for Genie goes here - although it is quite non-custom
@@ -41,12 +39,14 @@ public class HealthCheck implements HealthCheckHandler {
     }
 
     /**
-     * Should return custom status based on actual health - currently it always returns 200 (HTTP_OK).
+     * Should return custom status based on actual health - currently it always
+     * returns 200 (HTTP_OK).
+     *
      * @return HTTP health status
      */
     @Override
     public int getStatus() {
-        // Custom health check logic goes here
+        //TODO: Custom health check logic goes here
         LOG.debug("Health check invoked.");
         return 200;
     }

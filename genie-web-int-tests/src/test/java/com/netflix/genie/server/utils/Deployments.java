@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Netflix, Inc.
+ * Copyright 2014 Netflix, Inc.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -13,20 +13,19 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.genie.server.utils;
 
+import java.io.File;
+import java.io.FileFilter;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.importer.ZipImporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 
-import java.io.File;
-import java.io.FileFilter;
-
 /**
- * An example test case that demonstrates injection of a simple component into a test case.
+ * An example test case that demonstrates injection of a simple component into a
+ * test case.
  *
  * @author Jakub Narloch (jmnarloch@gmail.com)
  */
@@ -60,7 +59,8 @@ public final class Deployments {
     }
 
     /**
-     * Resolves the path to the genie-web war, that need to be build prior executing this test.
+     * Resolves the path to the genie-web war, that need to be build prior
+     * executing this test.
      *
      * @param rootProjectPath the root project path of the genie-web module
      *

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,18 +15,15 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.metrics;
-
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.junit.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.server.persistence.PersistenceManager;
+import java.util.concurrent.atomic.AtomicLong;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Test case for GenieNodeStatistics.
@@ -56,7 +53,7 @@ public class TestGenieNodeStatistics {
         stats.incrGenie2xxCount();
         stats.incrGenie2xxCount();
         System.out.println("Received: " + stats.getGenie2xxCount().longValue());
-        Assert.assertEquals(stats.getGenie2xxCount().longValue(), 2L);
+        Assert.assertEquals(2L, stats.getGenie2xxCount().longValue());
     }
 
     /**
@@ -71,7 +68,7 @@ public class TestGenieNodeStatistics {
         stats.incrGenie4xxCount();
         stats.incrGenie4xxCount();
         System.out.println("Received: " + stats.getGenie4xxCount().longValue());
-        Assert.assertEquals(stats.getGenie4xxCount().longValue(), 4L);
+        Assert.assertEquals(4L, stats.getGenie4xxCount().longValue());
     }
 
     /**
@@ -87,7 +84,7 @@ public class TestGenieNodeStatistics {
         stats.incrGenie5xxCount();
         stats.incrGenie5xxCount();
         System.out.println("Received: " + stats.getGenie5xxCount().longValue());
-        Assert.assertEquals(stats.getGenie5xxCount().longValue(), 5L);
+        Assert.assertEquals(5L, stats.getGenie5xxCount().longValue());
     }
 
     /**
@@ -98,7 +95,7 @@ public class TestGenieNodeStatistics {
         // incr job submissions once
         stats.setGenieJobSubmissions(new AtomicLong(0));
         stats.incrGenieJobSubmissions();
-        Assert.assertEquals(stats.getGenieJobSubmissions().longValue(), 1L);
+        Assert.assertEquals(1L, stats.getGenieJobSubmissions().longValue());
     }
 
     /**
@@ -109,7 +106,7 @@ public class TestGenieNodeStatistics {
         // incr failed jobs once
         stats.setGenieFailedJobs(new AtomicLong(0));
         stats.incrGenieFailedJobs();
-        Assert.assertEquals(stats.getGenieFailedJobs().longValue(), 1L);
+        Assert.assertEquals(1L, stats.getGenieFailedJobs().longValue());
     }
 
     /**
@@ -121,7 +118,7 @@ public class TestGenieNodeStatistics {
         stats.setGenieKilledJobs(new AtomicLong(0));
         stats.incrGenieKilledJobs();
         stats.incrGenieKilledJobs();
-        Assert.assertEquals(stats.getGenieKilledJobs().longValue(), 2L);
+        Assert.assertEquals(2L, stats.getGenieKilledJobs().longValue());
     }
 
     /**
@@ -134,7 +131,7 @@ public class TestGenieNodeStatistics {
         stats.incrGenieSuccessfulJobs();
         stats.incrGenieSuccessfulJobs();
         stats.incrGenieSuccessfulJobs();
-        Assert.assertEquals(stats.getGenieSuccessfulJobs().longValue(), 3L);
+        Assert.assertEquals(3L, stats.getGenieSuccessfulJobs().longValue());
     }
 
     /**
@@ -146,7 +143,7 @@ public class TestGenieNodeStatistics {
     @Test
     public void testRunningJobs() throws InterruptedException, CloudServiceException {
         stats.setGenieRunningJobs(0);
-        Assert.assertEquals(stats.getGenieRunningJobs().intValue(), 0);
+        Assert.assertEquals(0, stats.getGenieRunningJobs().intValue());
     }
 
     /**

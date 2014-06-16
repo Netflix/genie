@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.messages.JobRequest;
-import com.netflix.genie.common.messages.JobResponse;
-import com.netflix.genie.common.messages.JobStatusResponse;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.Types.JobStatus;
+import java.util.List;
 
 /**
  * Interface for the Execution Service.<br>
@@ -27,45 +28,50 @@ import com.netflix.genie.common.messages.JobStatusResponse;
  *
  * @author skrishnan
  * @author amsharma
+ * @author tgianos
  */
 public interface ExecutionService {
 
     /**
      * Submit a new job.
      *
-     * @param request request object containing job info element for new job
-     * @return successful response, or one with HTTP error code
+     * @param job the job to submit
+     * @return The job that was submitted
+     * @throws CloudServiceException
      */
-    JobResponse submitJob(JobRequest request);
+    Job submitJob(final Job job) throws CloudServiceException;
 
     /**
      * Get job information for given job id.
      *
-     * @param jobId id for job to look up
-     * @return successful response, or one with HTTP error code
+     * @param id id of job to look up
+     * @return the job
+     * @throws CloudServiceException
      */
-    JobResponse getJobInfo(String jobId);
+    Job getJobInfo(final String id) throws CloudServiceException;
 
     /**
      * Get job status for give job id.
      *
-     * @param jobId id for job to look up
+     * @param id id for job to look up
      * @return successful response, or one with HTTP error code
+     * @throws CloudServiceException
      */
-    JobStatusResponse getJobStatus(String jobId);
+    JobStatus getJobStatus(final String id) throws CloudServiceException;
 
     /**
      * Kill job based on given job iD.
      *
-     * @param jobId id for job to kill
-     * @return successful response, or one with HTTP error code
+     * @param id id for job to kill
+     * @return The killed job
+     * @throws CloudServiceException
      */
-    JobStatusResponse killJob(String jobId);
+    Job killJob(final String id) throws CloudServiceException;
 
     /**
      * Get job info for given filter criteria.
      *
-     * @param jobId id for job
+     * @param id id for job
      * @param jobName name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName user who submitted job
      * @param status status of job - possible types Type.JobStatus
@@ -73,8 +79,16 @@ public interface ExecutionService {
      * @param clusterId id of cluster for job
      * @param limit max number of jobs to return
      * @param page page number for job
-     * @return successful response, or one with HTTP error code
+     * @return All jobs which match the criteria
+     * @throws CloudServiceException
      */
-    JobResponse getJobs(String jobId, String jobName, String userName,
-            String status, String clusterName, String clusterId, Integer limit, Integer page);
+    List<Job> getJobs(
+            final String id,
+            final String jobName,
+            final String userName,
+            final JobStatus status,
+            final String clusterName,
+            final String clusterId,
+            final int limit,
+            final int page) throws CloudServiceException;
 }

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,13 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -38,25 +42,28 @@ public class TestJobJanitor {
     /**
      * Test whether the janitor cleans up zombie jobs correctly.
      *
-     * @throws Exception if there is any error in cleaning up.
+     * @throws CloudServiceException
+     * @throws Exception
      */
     @Test
-    public void testJobJanitor() throws Exception {
+    //TODO: Mock and when move to Spring use data set to save creating
+    public void testJobJanitor() throws CloudServiceException, Exception {
+        final Set<String> criteriaTags = new HashSet<String>();
+        criteriaTags.add("prod");
+        final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
+        final Set<ClusterCriteria> criterias = new HashSet<ClusterCriteria>();
+        criterias.add(criteria);
         // create two old jobs
-        PersistenceManager<Job> pm = new PersistenceManager<Job>();
-        Job one = new Job();
+        final PersistenceManager<Job> pm = new PersistenceManager<Job>();
+        final Job one = new Job("someUser", "commandId", null, "someArg", criterias);
         one.setId(UUID.randomUUID().toString());
-        one.setJobName("UPDATE_TEST");
+        one.setName("UPDATE_TEST");
         one.setStatus(JobStatus.RUNNING);
-        one.setUserName("someUser");
-        one.setCmdArgs("someArgs");
         pm.createEntity(one);
-        Job two = new Job();
+        final Job two = new Job("someUser2", null, "commandName", "someArg2", criterias);
         two.setId(UUID.randomUUID().toString());
-        two.setJobName("UPDATE_TEST");
+        two.setName("UPDATE_TEST");
         two.setStatus(JobStatus.INIT);
-        two.setUserName("some other user name");
-        two.setCmdArgs("someArgs2");
         pm.createEntity(two);
 
         // ensure that more than two jobs have been cleaned up

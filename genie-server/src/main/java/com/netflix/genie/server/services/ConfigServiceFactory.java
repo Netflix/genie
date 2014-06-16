@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.server.services;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
 
 /**
  * Factory class to instantiate implementation of the various services.
@@ -28,6 +27,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
  * @author skrishnan
  * @author amsharma
  */
+//TODO: Get rid of this for some DI framework
 public final class ConfigServiceFactory extends BaseServiceFactory {
 
     private static final  Logger LOG = LoggerFactory

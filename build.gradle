@@ -1,18 +1,12 @@
 // Establish version and status
-ext.githubProjectName = rootProject.name // Change if github project name is not the same as the root project's name
+// Change if github project name is not the same as the root project's name
+ext.githubProjectName = rootProject.name
 
 buildscript {
     repositories {
-        mavenCentral() // maven { url 'http://jcenter.bintray.com' }
+        mavenCentral()
     }
     apply from: file('gradle/buildscript.gradle'), to: buildscript
-}
-
-allprojects {
-    repositories {
-        mavenCentral() // maven { url: 'http://jcenter.bintray.com' }
-        mavenLocal()
-    }
 }
 
 apply from: file('gradle/convention.gradle')
@@ -22,19 +16,31 @@ apply from: file('gradle/license.gradle')
 apply from: file('gradle/release.gradle')
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'java'
+
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    clean {
+        delete 'genie-db'
+        delete 'derby.log'
+    }
+}
 
 subprojects {
     group = "com.netflix.${githubProjectName}" // set to organization of project
     dependencies {
-        compile 'javax.ws.rs:jsr311-api:1.1.1'
-        compile 'com.sun.jersey:jersey-json:1.11'
-        compile 'org.apache.openjpa:openjpa:2.2.1'
-        compile 'org.slf4j:slf4j-log4j12:1.6.1'
-        compile 'com.netflix.ribbon:ribbon-core:0.3.4'
-        compile 'com.netflix.ribbon:ribbon-eureka:0.3.4'
-        compile 'com.netflix.ribbon:ribbon-httpclient:0.3.4'
-        compile 'com.netflix.eureka:eureka-client:1.1.123'
+        compile 'com.netflix.eureka:eureka-client:1.1.134'
+        compile 'com.netflix.ribbon:ribbon-core:0.3.12'
+        compile 'com.netflix.ribbon:ribbon-eureka:0.3.12'
+        compile 'com.netflix.ribbon:ribbon-httpclient:0.3.12'
+        compile 'org.apache.commons:commons-lang3:3.2.1'
+        compile 'org.slf4j:slf4j-log4j12:1.7.0'
         
-        testCompile 'junit:junit:4.10'
+        testCompile 'junit:junit:4.+'
+        testCompile "org.mockito:mockito-core:1.+"
     }
 }

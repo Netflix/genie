@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@
 package com.netflix.genie.server.jobmanager;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.ClusterConfigResponse;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import java.net.HttpURLConnection;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,14 +108,14 @@ public final class JobManagerFactory {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final ClusterConfigResponse ccr = this.ccs.getClusterConfig(
+        final List<Cluster> clusters = this.ccs.getClusterConfigs(
                 job.getApplicationId(),
                 job.getApplicationName(),
                 job.getCommandId(),
                 job.getCommandName(),
-                job.getClusterCriteriaList());
+                job.getClusterCriteria());
 
         // return selected instance
-        return clb.selectCluster(ccr.getClusterConfigs());
+        return this.clb.selectCluster(clusters);
     }
 }

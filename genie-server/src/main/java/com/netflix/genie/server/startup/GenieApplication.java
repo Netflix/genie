@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,21 +15,17 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.startup;
-
-import com.netflix.karyon.spi.Application;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.server.jobmanager.impl.JobJanitor;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.karyon.spi.Application;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides custom initialization for Genie during startup.
@@ -39,7 +35,7 @@ import com.netflix.genie.server.persistence.PersistenceManager;
 @Application
 public class GenieApplication {
 
-    private static Logger logger = LoggerFactory.getLogger(GenieApplication.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenieApplication.class);
 
     private JobJanitor janitor;
 
@@ -49,16 +45,16 @@ public class GenieApplication {
      */
     @PostConstruct
     public void initialize() throws Exception {
-        logger.info("called");
+        LOG.info("called");
 
         // hack to ensure that a DB connection is made correctly for the first time
         // work-around for: https://issues.apache.org/jira/browse/OPENJPA-2139
         JobCountManager.getNumInstanceJobs();
-        logger.info("JobCountManager has been initialized successfully");
+        LOG.info("JobCountManager has been initialized successfully");
 
         // register the servo metrics
         GenieNodeStatistics.register();
-        logger.info("Custom servo metrics have been registered");
+        LOG.info("Custom servo metrics have been registered");
 
         // initialize and start the job janitor
         janitor = new JobJanitor();
@@ -71,13 +67,13 @@ public class GenieApplication {
      */
     @PreDestroy
     public void shutdown() {
-        logger.info("called");
+        LOG.info("called");
 
         // shut down dependencies cleanly
         janitor.setStop(true);
         GenieNodeStatistics.getInstance().shutdown();
         PersistenceManager.shutdown();
 
-        logger.info("done");
+        LOG.info("done");
     }
 }

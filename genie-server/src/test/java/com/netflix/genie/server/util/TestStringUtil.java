@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.util;
 
 import org.junit.Assert;
@@ -47,27 +46,27 @@ public class TestStringUtil {
                 + "-p survey_date=20120919 -p now_epoch_ts=1348125009 "
                 + "-p rap_comment='/**/' -p no_rap_comment='--'";
         output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 12);
+        Assert.assertEquals(12, output.length);
 
         System.out.println("Test for spaces within quotes");
         input = "-f pig.q -p endDateTS=\"foo bar\" ";
         output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 4);
+        Assert.assertEquals(4, output.length);
 
         System.out.println("Test for spaces at the beginning and end");
         input = " -f pig.q -p bar ";
         output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 4);
+        Assert.assertEquals(4, output.length);
 
         System.out.println("Test for extra spaces in the middle");
         input = "-f device_sum_step1.pig -p from_date=20120915     -p to_date=20120918  -p batchid=1347998107";
         output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 8);
+        Assert.assertEquals(8, output.length);
 
         System.out.println("Test for spaces and equals in the middle");
         input = "-f hooks.q -d \"setCommandsHook=set hive.exec.reducers.bytes.per.reducer=67108864;\"";
         output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 4);
+        Assert.assertEquals(4, output.length);
 
         System.out.println("Testing for commas in arguments");
         input = "jar searchagg.jar searchevents "
@@ -76,7 +75,7 @@ public class TestStringUtil {
                 + "US,CA,GB "
                 + "20 false false";
         output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 10);
+        Assert.assertEquals(10, output.length);
         System.out.println();
     }
 
@@ -90,27 +89,27 @@ public class TestStringUtil {
         input = "0.8.1.3.2";
         System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0.8.1");
+        Assert.assertEquals("0.8.1", version);
 
         input = "0.8.2";
         System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0.8.2");
+        Assert.assertEquals("0.8.2", version);
 
         input = "0.8";
         System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0.8");
+        Assert.assertEquals("0.8", version);
 
         input = "0.8.";
         System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0.8");
+        Assert.assertEquals("0.8", version);
 
         input = "0";
         System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0");
+        Assert.assertEquals("0", version);
 
         input = null;
         System.out.println("Testing for version " + input);

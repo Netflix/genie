@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2013 Netflix, Inc.
+#  Copyright 2014 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -33,21 +33,18 @@ def addCommandConfigProdhive11Mr1():
     print "Adding Command prodhive11_mr1"
     ID = "prodhive11_mr1"
     configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
-    apps = json.dumps(['mr1'])
+    apps = json.dumps([{"id":"mr1"}])
     payload = '''
     {
-        "commandConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "prodhive", 
-            "status" : "active",
-            "executable": "/apps/hive/0.11/bin/hive",
-            "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/envFile.sh",
-            "user" : "amsharma", 
-            "version" : "0.11",
-            "configs": ''' + configs + ''',
-            "appIds": ''' + apps + ''' 
-        }
+        "id":"''' + ID +'''",
+        "name": "prodhive", 
+        "status" : "ACTIVE",
+        "executable": "/apps/hive/0.11/bin/hive",
+        "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/envFile.sh",
+        "user" : "amsharma", 
+        "version" : "0.11",
+        "configs": ''' + configs + ''',
+        "applications": ''' + apps + '''
     }
     '''
     print payload
@@ -57,19 +54,16 @@ def addCommandConfigProdhive11Mr1():
 def addCommandConfigHadoop103():
     print "Adding Command hadoop103"
     ID = "hadoop103"
-    apps = json.dumps(['mr1'])
+    apps = json.dumps([{"id":"mr1"}])
     payload = '''
     {
-        "commandConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "hadoop", 
-            "status" : "active",
-            "executable": "/apps/hadoop/1.0.3/bin/hadoop",
-            "user" : "amsharma", 
-            "version" : "1.0.3",
-            "appIds": ''' + apps + ''' 
-        }
+        "id":"''' + ID +'''",
+        "name": "hadoop", 
+        "status" : "ACTIVE",
+        "executable": "/apps/hadoop/1.0.3/bin/hadoop",
+        "user" : "amsharma", 
+        "version" : "1.0.3",
+        "applications": ''' + apps + '''
     }
     '''
 
@@ -81,21 +75,18 @@ def addCommandConfigProdhive11Mr2():
     print "Adding Command prodhive11_mr2"
     ID = "prodhive11_mr2"
     configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
-    apps = json.dumps(['mr2'])
+    apps = json.dumps([{"id":"mr2"}])
     payload = '''
     {
-        "commandConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "prodhive", 
-            "status" : "active",
-            "executable": "/apps/hive/0.11/bin/hive",
-            "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr2/envFile.sh",
-            "user" : "amsharma", 
-            "version" : "0.11",
-            "configs": ''' + configs + ''',
-            "appIds": ''' + apps + ''' 
-        }
+        "id":"''' + ID +'''",
+        "name": "prodhive", 
+        "status" : "ACTIVE",
+        "executable": "/apps/hive/0.11/bin/hive",
+        "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr2/envFile.sh",
+        "user" : "amsharma", 
+        "version" : "0.11",
+        "configs": ''' + configs + ''',
+        "applications": ''' + apps + '''
     }
     '''
 
@@ -106,20 +97,17 @@ def addCommandConfigProdhive11Mr2():
 def addCommandConfigPig11Mr1():
     print "Adding Command pig11_mr1"
     ID = "pig11_mr1"
-    apps = json.dumps(['mr1'])
+    apps = json.dumps([{"id":"mr1"}])
     payload = '''
     {
-        "commandConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "pig", 
-            "status" : "active",
-            "executable": "/apps/pig/0.11/bin/pig",
-            "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr1/envFile.sh",
-            "user" : "amsharma", 
-            "version" : "0.11",
-            "appIds": ''' + apps + ''' 
-        }
+        "id":"''' + ID +'''",
+        "name": "pig", 
+        "status" : "ACTIVE",
+        "executable": "/apps/pig/0.11/bin/pig",
+        "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr1/envFile.sh",
+        "user" : "amsharma", 
+        "version" : "0.11",
+        "applications": ''' + apps + '''
     }
     '''
     print payload
@@ -129,20 +117,17 @@ def addCommandConfigPig11Mr1():
 def addCommandConfigPig11Mr2():
     print "Adding Command pig11_mr2"
     ID = "pig11_mr2"
-    apps = json.dumps(['mr2'])
+    apps = json.dumps([{"id":"mr2"}])
     payload = '''
     {
-        "commandConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "pig", 
-            "status" : "active",
-            "executable": "/apps/pig/0.11-h2/bin/pig",
-            "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr2/envFile.sh",
-            "user" : "amsharma", 
-            "version" : "0.11-h2",
-            "appIds": ''' + apps + ''' 
-        }
+        "id":"''' + ID +'''",
+        "name": "pig", 
+        "status" : "ACTIVE",
+        "executable": "/apps/pig/0.11-h2/bin/pig",
+        "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr2/envFile.sh",
+        "user" : "amsharma", 
+        "version" : "0.11-h2",
+        "applications": ''' + apps + '''
     }
     '''
     print payload
@@ -152,19 +137,17 @@ def addCommandConfigPig11Mr2():
 def addCommandConfigPig13Mr2():
     print "Adding Command pig13_mr2"
     ID = "pig13_mr2"
-    apps = json.dumps(['mr2'])
+    apps = json.dumps([{"id":"mr2"}])
     payload = '''
     {
-        "commandConfig":
-        {
-            "id":"''' + ID +'''",
-            "name": "pig", 
-            "status" : "active",
-            "executable": "/apps/pig/0.13/bin/pig",
-            "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh",
-            "user" : "amsharma", 
-            "version" : "0.13"
-        }
+        "id":"''' + ID +'''",
+        "name": "pig", 
+        "status" : "ACTIVE",
+        "executable": "/apps/pig/0.13/bin/pig",
+        "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh",
+        "user" : "amsharma", 
+        "version" : "0.13",
+        "applications": ''' + apps + '''
     }
     '''
     print payload

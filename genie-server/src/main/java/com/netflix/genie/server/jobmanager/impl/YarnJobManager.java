@@ -1,3 +1,20 @@
+/*
+ *
+ *  Copyright 2014 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.config.ConfigurationManager;
@@ -16,11 +33,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.activation.DataHandler;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,8 +168,8 @@ public class YarnJobManager implements JobManager {
         pb.directory(userJobDir);
 
         // copy over the attachments if they exist
-        if ((ji.getAttachments() != null) && (ji.getAttachments().length > 0)) {
-            for (FileAttachment attachment : ji.getAttachments()) {
+        if (ji.getAttachments() != null) {
+            for (final FileAttachment attachment : ji.getAttachments()) {
                 // basic error checking
                 if ((attachment.getName() == null) || (attachment.getName().isEmpty())) {
                     String msg = "File attachment is missing required parameter name";
@@ -331,9 +349,9 @@ public class YarnJobManager implements JobManager {
         }
 
         // set the hadoop-related conf files
-        ArrayList<String> clusterConfigList = this.cluster.getConfigs();
+        Set<String> clusterConfigs = this.cluster.getConfigs();
 
-        hEnv.put("S3_CLUSTER_CONF_FILES", convertListToCSV(clusterConfigList));
+        hEnv.put("S3_CLUSTER_CONF_FILES", convertCollectionToCSV(clusterConfigs));
 
         Command command = null;
         Application application = null;
@@ -422,11 +440,11 @@ public class YarnJobManager implements JobManager {
             ji2.setApplicationName(application.getName());
 
             if ((application.getConfigs() != null) && (!application.getConfigs().isEmpty())) {
-                hEnv.put("S3_APPLICATION_CONF_FILES", convertListToCSV(application.getConfigs()));
+                hEnv.put("S3_APPLICATION_CONF_FILES", convertCollectionToCSV(application.getConfigs()));
             }
 
             if ((application.getJars() != null) && (!application.getJars().isEmpty())) {
-                hEnv.put("S3_APPLICATION_JAR_FILES", convertListToCSV(application.getJars()));
+                hEnv.put("S3_APPLICATION_JAR_FILES", convertCollectionToCSV(application.getJars()));
             }
 
             if ((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
@@ -436,7 +454,7 @@ public class YarnJobManager implements JobManager {
 
         //Command ce = pmCommand.getEntity(cmdId, Command.class);
         if ((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
-            hEnv.put("S3_COMMAND_CONF_FILES", convertListToCSV(command.getConfigs()));
+            hEnv.put("S3_COMMAND_CONF_FILES", convertCollectionToCSV(command.getConfigs()));
         }
 
         //TODO: cannot be null in config. check while creating
@@ -456,16 +474,16 @@ public class YarnJobManager implements JobManager {
         }
 
         // put the user name for hadoop to use
-        hEnv.put("HADOOP_USER_NAME", ji2.getUserName());
+        hEnv.put("HADOOP_USER_NAME", ji2.getUser());
 
         // this is for the generic joblauncher.sh to use to create username
         // on the machine if needed
-        hEnv.put("USER_NAME", ji2.getUserName());
+        hEnv.put("USER_NAME", ji2.getUser());
 
         // add the group name
         String groupName = HADOOP_GROUP_NAME;
-        if (ji2.getGroupName() != null) {
-            groupName = ji2.getGroupName();
+        if (ji2.getGroup() != null) {
+            groupName = ji2.getGroup();
             hEnv.put("GROUP_NAME", groupName);
         }
         hEnv.put("HADOOP_GROUP_NAME", groupName);
@@ -584,7 +602,7 @@ public class YarnJobManager implements JobManager {
      * @param list ArrayList object contains the strings
      * @return a string containing the other strings as csv
      */
-    protected String convertListToCSV(final ArrayList<String> list) {
+    protected String convertCollectionToCSV(final Collection<String> list) {
         return StringUtils.join(list, ",");
     }
 
@@ -599,7 +617,7 @@ public class YarnJobManager implements JobManager {
 
         LOG.info("called");
 
-        String[] cmdArgs = StringUtil.splitCmdLine(ji2.getCmdArgs());
+        String[] cmdArgs = StringUtil.splitCmdLine(ji2.getCommandArgs());
 
         String[] hArgs;
         hArgs = new String[cmdArgs.length + 2];

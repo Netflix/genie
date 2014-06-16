@@ -1,12 +1,8 @@
-apply plugin: 'java'
-
 // dummy test - since integration tests are run by build task
 task test(overwrite:true)
 
 dependencies {
-    compile project(':genie-web')
-
-    testCompile 'com.sun.jersey:jersey-servlet:1.11'
+    testCompile project(':genie-web')
     testCompile 'com.netflix.karyon:karyon-extensions-testsuite:1.0.22'
     testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.1.0.Final'
     testCompile 'org.jboss.shrinkwrap:shrinkwrap-impl-base:1.1.2'

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,22 +15,21 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
 
 /**
  * Factory class to instantiate the ExecutionService.
  *
  * @author skrishnan
  */
+//TODO: Get rid of this for some sort of DI framework
 public final class ExecutionServiceFactory extends BaseServiceFactory {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(ExecutionServiceFactory.class);
 
     // instances of the possible implementations
@@ -45,7 +44,7 @@ public final class ExecutionServiceFactory extends BaseServiceFactory {
     public static synchronized ExecutionService getExecutionServiceImpl()
             throws CloudServiceException {
         if (execService == null) {
-            logger.info("Instantiating execution service impl");
+            LOG.info("Instantiating execution service impl");
             execService = (ExecutionService) instantiateFromProperty("netflix.genie.server.executionServiceImpl");
         }
         return execService;

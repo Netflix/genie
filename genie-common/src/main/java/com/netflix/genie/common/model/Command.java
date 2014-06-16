@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,34 +17,48 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.net.HttpURLConnection;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Representation of the state of the Command Object.
  *
  * @author amsharma
+ * @author tgianos
  */
 @Entity
 @Table(schema = "genie")
 @Cacheable(false)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Command extends Auditable implements Serializable {
 
     private static final long serialVersionUID = -6106046473373305992L;
+    private static final Logger LOG = LoggerFactory.getLogger(Command.class);
 
     /**
      * Name of this command - e.g. prodhive, pig, hadoop etc.
@@ -53,15 +67,22 @@ public class Command extends Auditable implements Serializable {
     private String name;
 
     /**
+     * User who created this command.
+     */
+    @Basic(optional = false)
+    private String user;
+
+    /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
+    @Basic(optional = false)
     @Enumerated(EnumType.STRING)
     private CommandStatus status;
 
     /**
      * Location of the executable for this command.
      */
-    @Basic
+    @Basic(optional = false)
     private String executable;
 
     /**
@@ -69,33 +90,6 @@ public class Command extends Auditable implements Serializable {
      */
     @Basic
     private String envPropFile;
-
-    /**
-     * Reference to all the config (xml's) needed for this command.
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
-    private ArrayList<String> configs;
-
-    /*
-     * A list of id's of all the Applications that this command supports. This is needed
-     * to fetch each application from the database in the entity manager context so that it
-     * can be added to the command object before persistence.
-     */
-    @Transient
-    private ArrayList<String> appIds;
-
-    /**
-     * Set of applications that can run this command - foreign key in database,
-     * implemented by openjpa using join table CommandConfig_ApplicationConfig.
-     */
-    @ManyToMany(targetEntity = Application.class, fetch = FetchType.EAGER)
-    private ArrayList<Application> applications;
-
-    /**
-     * User who created this command.
-     */
-    @Basic(optional = false)
-    private String user;
 
     /**
      * Job type of the command. eg: hive, pig , hadoop etc.
@@ -107,7 +101,32 @@ public class Command extends Auditable implements Serializable {
      * Version number for this command.
      */
     @Basic
+    @Column(name = "columnVersion")
     private String version;
+
+    /**
+     * Reference to all the configuration (xml's) needed for this command.
+     */
+    @XmlElementWrapper(name = "configs")
+    @XmlElement(name = "config")
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> configs;
+
+    /**
+     * Set of applications that can run this command.
+     */
+    @XmlElementWrapper(name = "applications")
+    @XmlElement(name = "application")
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Application> applications;
+
+    /**
+     * The clusters this command is available on.
+     */
+    @XmlTransient
+    @JsonIgnore
+    @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
+    private Set<Cluster> clusters;
 
     /**
      * Default Constructor.
@@ -117,21 +136,82 @@ public class Command extends Auditable implements Serializable {
     }
 
     /**
+     * Construct a new Command with all required parameters.
+     *
+     * @param name The name of the command. Not null/empty/blank.
+     * @param user The user who created the command. Not null/empty/blank.
+     * @param status The status of the command. Not null.
+     * @param executable The executable of the command. Not null/empty/blank.
+     * @throws CloudServiceException
+     */
+    public Command(
+            final String name,
+            final String user,
+            final CommandStatus status,
+            final String executable) throws CloudServiceException {
+        super();
+        this.name = name;
+        this.user = user;
+        this.status = status;
+        this.executable = executable;
+    }
+
+    /**
+     * Check to make sure everything is OK before persisting.
+     *
+     * @throws CloudServiceException
+     */
+    @PrePersist
+    protected void onCreateCommand() throws CloudServiceException {
+        validate(this.name, this.user, this.status, this.executable);
+    }
+
+    /**
      * Gets the name for this command.
      *
      * @return name
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
      * Sets the name for this command.
      *
-     * @param name unique id for this cluster
+     * @param name unique id for this cluster. Not null/empty/blank.
+     * @throws CloudServiceException
      */
-    public void setName(String name) {
+    public void setName(final String name) throws CloudServiceException {
+        if (StringUtils.isBlank(name)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No name entered.");
+        }
         this.name = name;
+    }
+
+    /**
+     * Gets the user that created this command.
+     *
+     * @return user
+     */
+    public String getUser() {
+        return this.user;
+    }
+
+    /**
+     * Sets the user who created this command.
+     *
+     * @param user user who created this command. Not null/empty/blank.
+     * @throws CloudServiceException
+     */
+    public void setUser(final String user) throws CloudServiceException {
+        if (StringUtils.isBlank(user)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No user entered.");
+        }
+        this.user = user;
     }
 
     /**
@@ -141,16 +221,22 @@ public class Command extends Auditable implements Serializable {
      * @see CommandStatus
      */
     public CommandStatus getStatus() {
-        return status;
+        return this.status;
     }
 
     /**
      * Sets the status for this application.
      *
-     * @param status The new status
+     * @param status The new status. Not null.
+     * @throws CloudServiceException
      * @see CommandStatus
      */
-    public void setStatus(final CommandStatus status) {
+    public void setStatus(final CommandStatus status) throws CloudServiceException {
+        if (status == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No status entered.");
+        }
         this.status = status;
     }
 
@@ -160,72 +246,42 @@ public class Command extends Auditable implements Serializable {
      * @return executable -- full path on the node
      */
     public String getExecutable() {
-        return executable;
+        return this.executable;
     }
 
     /**
      * Sets the executable for this command.
      *
-     * @param executable Full path of the executable on the node
+     * @param executable Full path of the executable on the node. Not
+     * null/empty/blank.
+     * @throws CloudServiceException
      */
-    public void setExecutable(String executable) {
+    public void setExecutable(final String executable) throws CloudServiceException {
+        if (StringUtils.isBlank(executable)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No executable entered.");
+        }
         this.executable = executable;
     }
 
     /**
-     * Gets the configs for this command.
+     * Gets the envPropFile name.
      *
-     * @return configs
+     * @return envPropFile - file name containing environment variables.
      */
-    public ArrayList<String> getConfigs() {
-        return configs;
+    public String getEnvPropFile() {
+        return this.envPropFile;
     }
 
     /**
-     * Sets the configs for this command.
+     * Sets the env property file name in string form.
      *
-     * @param configs The config files that this command needs
+     * @param envPropFile contains the list of env variables to set while
+     * running this command.
      */
-    public void setConfigs(ArrayList<String> configs) {
-        this.configs = configs;
-    }
-
-    /**
-     * Gets the applications that this command supports.
-     *
-     * @return applications Not supposed to be exposed in request/response hence
-     * marked transient.
-     */
-    @XmlTransient
-    public ArrayList<Application> getApplications() {
-        return applications;
-    }
-
-    /**
-     * Sets the applications for this command.
-     *
-     * @param applications The applications that this command supports
-     */
-    public void setApplications(ArrayList<Application> applications) {
-        this.applications = applications;
-    }
-
-    /**
-     * Gets the user that created this command.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return user;
-    }
-
-    /**
-     * Sets the user who created this command.
-     *
-     * @param user user who created this command
-     */
-    public void setUser(String user) {
-        this.user = user;
+    public void setEnvPropFile(final String envPropFile) {
+        this.envPropFile = envPropFile;
     }
 
     /**
@@ -234,7 +290,7 @@ public class Command extends Auditable implements Serializable {
      * @return jobType --- for eg: hive, pig, presto
      */
     public String getJobType() {
-        return jobType;
+        return this.jobType;
     }
 
     /**
@@ -242,7 +298,7 @@ public class Command extends Auditable implements Serializable {
      *
      * @param jobType job type for this command
      */
-    public void setJobType(String jobType) {
+    public void setJobType(final String jobType) {
         this.jobType = jobType;
     }
 
@@ -252,7 +308,7 @@ public class Command extends Auditable implements Serializable {
      * @return version
      */
     public String getVersion() {
-        return version;
+        return this.version;
     }
 
     /**
@@ -260,52 +316,128 @@ public class Command extends Auditable implements Serializable {
      *
      * @param version version number for this command
      */
-    public void setVersion(String version) {
+    public void setVersion(final String version) {
         this.version = version;
     }
 
     /**
-     * Gets the application id's supported by this command.
+     * Gets the configurations for this command.
      *
-     * @return appIds - a list of all application id's supported by this command
+     * @return the configurations
      */
-    @XmlElement
-    public ArrayList<String> getAppIds() {
-        if (this.applications != null) {
-            appIds = new ArrayList<String>();
-            Iterator<Application> it = this.applications.iterator();
-            while (it.hasNext()) {
-                appIds.add(((Application) it.next()).getId());
-            }
+    public Set<String> getConfigs() {
+        return this.configs;
+    }
+
+    /**
+     * Sets the configurations for this command.
+     *
+     * @param configs The configuration files that this command needs
+     * @throws CloudServiceException
+     */
+    public void setConfigs(final Set<String> configs) throws CloudServiceException {
+        if (configs == null) {
+            final String msg = "No configurations passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        return appIds;
+        this.configs = configs;
     }
 
     /**
-     * Sets the application id's for this command in string form.
+     * Gets the applications that this command supports.
      *
-     * @param appIds list of application id's for this command
+     * @return applications
      */
-    public void setAppIds(ArrayList<String> appIds) {
-        this.appIds = appIds;
+    public Set<Application> getApplications() {
+        return this.applications;
     }
 
     /**
-     * Gets the envPropFile name.
+     * Sets the applications for this command.
      *
-     * @return envPropFile - file name containing environment variables.
+     * @param applications The applications that this command supports
      */
-    public String getEnvPropFile() {
-        return envPropFile;
+    public void setApplications(final Set<Application> applications) {
+        this.applications = applications;
     }
 
     /**
-     * Sets the env property file name in string form.
+     * Get the clusters this command is available on.
      *
-     * @param envPropFile contains the list of env variables to set while
-     * running this command.
+     * @return The clusters.
      */
-    public void setEnvPropFile(String envPropFile) {
-        this.envPropFile = envPropFile;
+    public Set<Cluster> getClusters() {
+        return this.clusters;
+    }
+
+    /**
+     * Set the clusters this command is available on.
+     *
+     * @param clusters the clusters
+     * @throws CloudServiceException
+     */
+    public void setClusters(Set<Cluster> clusters) throws CloudServiceException {
+        if (clusters == null) {
+            final String msg = "No clusters passed in to set. Unable to continue.";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        this.clusters = clusters;
+    }
+
+    /**
+     * Check to make sure that the required parameters exist.
+     *
+     * @param command The configuration to check
+     * @throws CloudServiceException
+     */
+    public static void validate(final Command command) throws CloudServiceException {
+        if (command == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command entered to validate");
+        }
+        validate(
+                command.getName(),
+                command.getUser(),
+                command.getStatus(),
+                command.getExecutable());
+    }
+
+    /**
+     * Helper method for checking the validity of required parameters.
+     *
+     * @param name The name of the command
+     * @param user The user who created the command
+     * @param status The status of the command
+     * @throws CloudServiceException
+     */
+    private static void validate(
+            final String name,
+            final String user,
+            final CommandStatus status,
+            final String executable)
+            throws CloudServiceException {
+        final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isBlank(user)) {
+            builder.append("User name is missing and is required.\n");
+        }
+        if (StringUtils.isBlank(name)) {
+            builder.append("Command name is missing and is required.\n");
+        }
+        if (status == null) {
+            builder.append("No command status entered and is required.\n");
+        }
+        if (StringUtils.isBlank(executable)) {
+            builder.append("No executable entered for command and is required.\n");
+        }
+
+        if (builder.length() != 0) {
+            builder.insert(0, "Command configuration errors:\n");
+            final String msg = builder.toString();
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
     }
 }

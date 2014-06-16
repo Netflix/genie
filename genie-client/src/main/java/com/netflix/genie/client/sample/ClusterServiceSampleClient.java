@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,17 +20,41 @@ package com.netflix.genie.client.sample;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
+import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.client.ClusterServiceClient;
+import com.netflix.genie.client.CommandServiceClient;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.ClusterStatus;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A sample client demonstrating usage of the Execution Service Client.
+ * A sample client demonstrating usage of the Cluster Configuration Service
+ * Client.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
 public final class ClusterServiceSampleClient {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterServiceSampleClient.class);
+
+    /**
+     * ID for the sample cluster.
+     */
+    protected static final String ID = "bdp_hquery_20140505_185527";
+
+    /**
+     * Name for the sample cluster.
+     */
+    protected static final String NAME = "h2query";
 
     private ClusterServiceSampleClient() {
         // never called
@@ -42,71 +66,135 @@ public final class ClusterServiceSampleClient {
      * @param args
      * @throws java.lang.Exception
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
 
         // Initialize Eureka, if it is being used
-        // System.out.println("Initializing Eureka");
+        // LOG.info("Initializing Eureka");
         // ClusterServiceClient.initEureka("test");
-
-        System.out.println("Initializing list of Genie servers");
+        LOG.info("Initializing list of Genie servers");
         ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
                 "localhost:7001");
 
-        System.out.println("Initializing ClusterConfigServiceClient");
-        ClusterServiceClient client = ClusterServiceClient.getInstance();
+        LOG.info("Initializing ApplicationServiceClient");
+        final ApplicationServiceClient appClient = ApplicationServiceClient.getInstance();
 
-        String userName = "genietest";
-        String name = "MY_TEST_CLUSTER_CONFIG";
+        final Application app1 = appClient.createApplication(
+                ApplicationServiceSampleClient.getSampleApplication(
+                        ApplicationServiceSampleClient.ID
+                ));
+        LOG.info("Created application:");
+        LOG.info(app1.toString());
 
-//        System.out.println("Creating new config for cluster");
-//        HiveConfigElement hiveConfigElement = new HiveConfigElement();
-//        hiveConfigElement.setUser(userName);
-//        String hiveConfigName = "MY_TEST_HIVE_CONFIG";
-//        hiveConfigElement.setName(hiveConfigName);
-//        hiveConfigElement.setType(Types.Configuration.TEST.name());
-//        hiveConfigElement.setStatus(Types.ConfigStatus.INACTIVE.name());
-//        hiveConfigElement.setS3HiveSiteXml("s3://BUCKET/PATH/TO/HIVE-SITE.XML");
-//        HiveConfigServiceClient hiveConfigClient = HiveConfigServiceClient.getInstance();
-//        hiveConfigElement = hiveConfigClient.createHiveConfig(hiveConfigElement);
-//        String hiveConfigId = hiveConfigElement.getId();
-//        System.out.println("Hive config created with id: " + hiveConfigId);
+        final Application app2 = appClient.createApplication(
+                ApplicationServiceSampleClient.getSampleApplication(
+                        ApplicationServiceSampleClient.ID + "2"
+                ));
+        LOG.info("Created application:");
+        LOG.info(app2.toString());
+        LOG.info("Initializing CommandServiceClient");
+        final CommandServiceClient commandClient = CommandServiceClient.getInstance();
 
-        System.out.println("Creating new cluster config");
-        Cluster cluster = new Cluster();
-        cluster.setUser(userName);
-        cluster.setName(name);
-        cluster.setStatus(ClusterStatus.OUT_OF_SERVICE);
+        LOG.info("Creating command pig13_mr2");
+        final Set<Application> apps = new HashSet<Application>();
+        apps.add(app1);
+        apps.add(app2);
+        final Command command1 = commandClient.createCommand(
+                CommandServiceSampleClient.createSampleCommand(
+                        CommandServiceSampleClient.ID, apps));
+        LOG.info("Created command:");
+        LOG.info(command1.toString());
+        final Set<Command> commands = new HashSet<Command>();
+        commands.add(command1);
 
-        cluster = client.createCluster(cluster);
-        String id = cluster.getId();
-        System.out.println("Cluster config created with id: " + id);
+        LOG.info("Initializing ClusterConfigServiceClient");
+        final ClusterServiceClient clusterClient = ClusterServiceClient.getInstance();
 
-        System.out.println("Getting clusterConfigs using specified filter criteria");
-        Multimap<String, String> params = ArrayListMultimap.create();
-        params.put("name", name);
+        LOG.info("Creating new cluster configuration");
+        final Cluster cluster1 = clusterClient.createCluster(createSampleCluster(ID, commands));
+        LOG.info("Cluster config created with id: " + cluster1.getId());
+        LOG.info(cluster1.toString());
+
+        LOG.info("Getting cluster config by id");
+        final Cluster cluster2 = clusterClient.getCluster(cluster1.getId());
+        LOG.info(cluster2.toString());
+
+        LOG.info("Getting clusterConfigs using specified filter criteria");
+        final Multimap<String, String> params = ArrayListMultimap.create();
+        params.put("name", NAME);
         params.put("adHoc", "false");
         params.put("test", "true");
         params.put("limit", "3");
-        for (Cluster hce : client.getClusterConfigs(params)) {
-            System.out.println("Cluster Configs: {id, status, updateTime} - {"
-                    + hce.getId() + ", " + hce.getStatus() + ", "
-                    + hce.getUpdated().toString() + "}");
+        final List<Cluster> clusters = clusterClient.getClusterConfigs(params);
+        if (clusters != null && !clusters.isEmpty()) {
+            for (final Cluster cluster : clusters) {
+                LOG.info(cluster.toString());
+            }
+        } else {
+            LOG.info("No clusters found for parameters");
         }
 
-        System.out.println("Getting cluster config by id");
-        cluster = client.getCluster(id);
-        System.out.println("Cluster config status: " + cluster.getStatus());
+        LOG.info("Updating existing cluster config");
+        cluster2.setStatus(ClusterStatus.TERMINATED);
+        final Cluster cluster3 = clusterClient.updateCluster(cluster2.getId(), cluster2);
+        LOG.info("Cluster updated:");
+        LOG.info(cluster3.toString());
 
-        System.out.println("Updating existing cluster config");
-        cluster.setStatus(ClusterStatus.TERMINATED);
-        cluster = client.updateCluster(id, cluster);
-        System.out.println("Updated status: " + cluster.getStatus()
-                + " at time: " + cluster.getUpdated().toString());
+        LOG.info("Deleting cluster config using id");
+        final Cluster cluster4 = clusterClient.deleteClusterConfig(cluster1.getId());
+        LOG.info("Deleted cluster config with id: " + cluster1.getId());
+        LOG.info(cluster4.toString());
 
-        System.out.println("Deleting cluster config using id");
-        cluster = client.deleteClusterConfig(id);
-        System.out.println("Deleted cluster config with id: " + cluster.getId());
+        LOG.info("Deleting command config using id");
+        final Command command5 = commandClient.deleteCommand(command1.getId());
+        LOG.info("Deleted command config with id: " + command1.getId());
+        LOG.info(command5.toString());
 
-        System.out.println("Done");
+        LOG.info("Deleting application config using id");
+        final Application app3 = appClient.deleteApplication(app1.getId());
+        LOG.info("Deleted application config with id: " + app1.getId());
+        LOG.info(app3.toString());
+
+        LOG.info("Deleting application config using id");
+        final Application app4 = appClient.deleteApplication(app2.getId());
+        LOG.info("Deleted application config with id: " + app2.getId());
+        LOG.info(app4.toString());
+
+        LOG.info("Done");
+    }
+
+    /**
+     * Create a cluster from the input parameters.
+     *
+     * @param id The ID to use. If null or empty one will be created.
+     * @param commands The commands to use for this cluster or null/empty.
+     * @return A cluster object
+     * @throws CloudServiceException
+     */
+    public static Cluster createSampleCluster(
+            final String id,
+            final Set<Command> commands) throws CloudServiceException {
+        final Set<String> configs = new HashSet<String>();
+        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
+        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
+        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/yarn-site.xml");
+        final Cluster cluster = new Cluster(
+                NAME,
+                "tgianos",
+                ClusterStatus.OUT_OF_SERVICE,
+                "com.netflix.genie.server.jobmanager.impl.YarnJobManager",
+                configs);
+        if (StringUtils.isNotBlank(id)) {
+            cluster.setId(id);
+        }
+        final Set<String> tags = new HashSet<String>();
+        tags.add("adhoc");
+        tags.add("h2query");
+        tags.add(cluster.getId());
+        cluster.setTags(tags);
+        cluster.setVersion("2.4.0");
+        if (commands != null && !commands.isEmpty()) {
+            cluster.setCommands(commands);
+        }
+        return cluster;
     }
 }

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.metrics;
 
 import org.slf4j.Logger;
@@ -50,8 +49,7 @@ public class JobCountMonitor extends Thread {
      * Get number of jobs running on this instance.
      *
      * @return number of running jobs
-     * @throws CloudServiceException
-     *             if there is any error
+     * @throws CloudServiceException if there is any error
      */
     public int getNumInstanceJobs() throws CloudServiceException {
         LOG.debug("called");
@@ -62,8 +60,7 @@ public class JobCountMonitor extends Thread {
      * Get number of running jobs on this instance running for > 15 mins.
      *
      * @return number of running jobs with runtime > 15 mins
-     * @throws CloudServiceException
-     *             if there is any error
+     * @throws CloudServiceException if there is any error
      */
     public int getNumInstanceJobs15Mins() throws CloudServiceException {
         LOG.debug("called");
@@ -75,8 +72,7 @@ public class JobCountMonitor extends Thread {
      * Get number of running jobs with 15m < runtime < 2 hours.
      *
      * @return Number of running jobs with 15m < runtime < 2 hours
-     * @throws CloudServiceException
-     *             if there is any error
+     * @throws CloudServiceException if there is any error
      */
     public int getNumInstanceJobs2Hrs() throws CloudServiceException {
         LOG.debug("called");
@@ -90,7 +86,6 @@ public class JobCountMonitor extends Thread {
      *
      * @return Number of running jobs with 2h < runtime < 8 hours
      * @throws CloudServiceException
-     *             if there is any error
      */
     public int getNumInstanceJobs8Hrs() throws CloudServiceException {
         LOG.debug("called");
@@ -103,8 +98,7 @@ public class JobCountMonitor extends Thread {
      * Get number of running jobs with runtime > 8h.
      *
      * @return Number of running jobs with runtime > 8h
-     * @throws CloudServiceException
-     *             if there is any error
+     * @throws CloudServiceException if there is any error
      */
     public int getNumInstanceJobs8HrsPlus() throws CloudServiceException {
         LOG.debug("called");
@@ -158,11 +152,9 @@ public class JobCountMonitor extends Thread {
             } catch (InterruptedException e) {
                 // log error and move on
                 LOG.warn("Interrupted exception caught", e);
-                continue;
             } catch (CloudServiceException e) {
                 // log error and move on
                 LOG.warn("Exception while setting number of running jobs", e);
-                continue;
             }
         }
     }
@@ -170,8 +162,7 @@ public class JobCountMonitor extends Thread {
     /**
      * Tell the monitor thread to stop running at next iteration.
      *
-     * @param stop
-     *            true if the thread should stop running
+     * @param stop true if the thread should stop running
      */
     public void setStop(boolean stop) {
         this.stop = stop;
