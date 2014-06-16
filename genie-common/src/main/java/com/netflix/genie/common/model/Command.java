@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -111,7 +110,7 @@ public class Command extends Auditable implements Serializable {
     @XmlElementWrapper(name = "configs")
     @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> configs = new HashSet<String>();
+    private Set<String> configs;
 
     /**
      * Set of applications that can run this command.
@@ -119,7 +118,7 @@ public class Command extends Auditable implements Serializable {
     @XmlElementWrapper(name = "applications")
     @XmlElement(name = "application")
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Application> applications = new HashSet<Application>();
+    private Set<Application> applications;
 
     /**
      * The clusters this command is available on.
@@ -127,12 +126,12 @@ public class Command extends Auditable implements Serializable {
     @XmlTransient
     @JsonIgnore
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
-    private Set<Cluster> clusters = new HashSet<Cluster>();
+    private Set<Cluster> clusters;
 
     /**
      * Default Constructor.
      */
-    protected Command() {
+    public Command() {
         super();
     }
 
@@ -151,7 +150,6 @@ public class Command extends Auditable implements Serializable {
             final CommandStatus status,
             final String executable) throws CloudServiceException {
         super();
-        validate(name, user, status, executable);
         this.name = name;
         this.user = user;
         this.status = status;
@@ -359,14 +357,8 @@ public class Command extends Auditable implements Serializable {
      * Sets the applications for this command.
      *
      * @param applications The applications that this command supports
-     * @throws CloudServiceException
      */
-    public void setApplications(final Set<Application> applications) throws CloudServiceException {
-        if (applications == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No applications passed in to set. Unable to continue.");
-        }
+    public void setApplications(final Set<Application> applications) {
         this.applications = applications;
     }
 

@@ -19,6 +19,7 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.wordnik.swagger.annotations.Api;
@@ -27,6 +28,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
+import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -52,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v1/config/applications")
-@Api(value = "/v1/config/applications", description = "Manage the available applicationss")
+@Api(value = "/v1/config/applications", description = "Manage the available applications")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ApplicationConfigResourceV1 {
 
@@ -76,67 +78,7 @@ public class ApplicationConfigResourceV1 {
     }
 
     /**
-     * Get Application configuration for given id.
-     *
-     * @param id unique id for application configuration
-     * @return The application configuration
-     * @throws CloudServiceException
-     */
-    @GET
-    @Path("/{id}")
-    @ApiOperation(
-            value = "Find an application by id",
-            notes = "More notes about this method",
-            response = Application.class)
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Application.class),
-        @ApiResponse(code = 400, message = "Invalid id supplied"),
-        @ApiResponse(code = 404, message = "Application not found")
-    })
-    public Application getApplicationConfig(
-            @ApiParam(value = "ID of the application to get.", required = true)
-            @PathParam("id")
-            final String id) throws CloudServiceException {
-        LOG.debug("Called");
-        return this.acs.getApplicationConfig(id);
-    }
-
-    /**
-     * Get Application configuration based on user parameters.
-     *
-     * @param name name for configuration (optional)
-     * @param userName the user who created the application (optional)
-     * @param page The page to start one (optional)
-     * @param limit the max number of results to return per page (optional)
-     * @return All applications matching the criteria
-     */
-    @GET
-    @ApiOperation(
-            value = "Find applications",
-            notes = "Find applications by the submitted criteria.",
-            response = Application.class,
-            responseContainer = "List")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Application.class)})
-    public List<Application> getApplicationConfigs(
-            @ApiParam(value = "Name of the application.", required = false)
-            @QueryParam("name")
-            final String name,
-            @ApiParam(value = "User who created the application.", required = false)
-            @QueryParam("userName")
-            final String userName,
-            @ApiParam(value = "The page to start on.", required = false)
-            @QueryParam("page")
-            @DefaultValue("0") int page,
-            @ApiParam(value = "Max number of results per page.", required = false)
-            @QueryParam("limit")
-            @DefaultValue("1024") int limit) {
-        LOG.debug("called");
-        return this.acs.getApplicationConfigs(name, userName, page, limit);
-    }
-
-    /**
-     * Create an Application configuration.
+     * Create an Application.
      *
      * @param app The application to create
      * @return The created application configuration
@@ -153,11 +95,11 @@ public class ApplicationConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid required parameter supplied"),
         @ApiResponse(code = 409, message = "An application with the supplied id already exists")
     })
-    public Response createApplicationConfig(
+    public Response createApplication(
             @ApiParam(value = "The application to create.", required = true)
             final Application app) throws CloudServiceException {
         LOG.debug("Called to create new application");
-        final Application createdApp = this.acs.createApplicationConfig(app);
+        final Application createdApp = this.acs.createApplication(app);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
                 entity(createdApp).
@@ -165,7 +107,68 @@ public class ApplicationConfigResourceV1 {
     }
 
     /**
-     * Update application configuration.
+     * Get Application for given id.
+     *
+     * @param id unique id for application configuration
+     * @return The application configuration
+     * @throws CloudServiceException
+     */
+    @GET
+    @Path("/{id}")
+    @ApiOperation(
+            value = "Find an application by id",
+            notes = "More notes about this method",
+            response = Application.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Application.class),
+        @ApiResponse(code = 400, message = "Invalid id supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Application getApplication(
+            @ApiParam(value = "ID of the application to get.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called");
+        return this.acs.getApplication(id);
+    }
+
+    /**
+     * Get Applications based on user parameters.
+     *
+     * @param name name for configuration (optional)
+     * @param userName the user who created the application (optional)
+     * @param page The page to start one (optional)
+     * @param limit the max number of results to return per page (optional)
+     * @return All applications matching the criteria
+     */
+    @GET
+    @ApiOperation(
+            value = "Find applications",
+            notes = "Find applications by the submitted criteria.",
+            response = Application.class,
+            responseContainer = "List")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Application.class)
+    })
+    public List<Application> getApplications(
+            @ApiParam(value = "Name of the application.", required = false)
+            @QueryParam("name")
+            final String name,
+            @ApiParam(value = "User who created the application.", required = false)
+            @QueryParam("userName")
+            final String userName,
+            @ApiParam(value = "The page to start on.", required = false)
+            @QueryParam("page")
+            @DefaultValue("0") int page,
+            @ApiParam(value = "Max number of results per page.", required = false)
+            @QueryParam("limit")
+            @DefaultValue("1024") int limit) {
+        LOG.debug("called");
+        return this.acs.getApplications(name, userName, page, limit);
+    }
+
+    /**
+     * Update application.
      *
      * @param id unique id for configuration to update
      * @param updateApp contains the application information to update
@@ -184,14 +187,36 @@ public class ApplicationConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Application to update not found")
     })
-    public Application updateApplicationConfig(
+    public Application updateApplication(
             @ApiParam(value = "Id of the application to update.", required = true)
             @PathParam("id")
             final String id,
             @ApiParam(value = "The application information to update.", required = true)
             final Application updateApp) throws CloudServiceException {
         LOG.debug("called to update application config with info " + updateApp.toString());
-        return this.acs.updateApplicationConfig(id, updateApp);
+        return this.acs.updateApplication(id, updateApp);
+    }
+
+    /**
+     * Delete all applications from database.
+     *
+     * @return All The deleted applications
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @ApiOperation(
+            value = "Delete an application",
+            notes = "Delete an application with the supplied id.",
+            response = Response.class,
+            responseContainer = "List")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public List<Application> deleteAllApplications() throws CloudServiceException {
+        LOG.debug("called");
+        return this.acs.deleteAllApplications();
     }
 
     /**
@@ -212,11 +237,352 @@ public class ApplicationConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Application not found")
     })
-    public Application deleteApplicationConfig(
+    public Application deleteApplication(
             @ApiParam(value = "Id of the application to delete.", required = true)
             @PathParam("id")
             final String id) throws CloudServiceException {
         LOG.debug("called");
-        return this.acs.deleteApplicationConfig(id);
+        return this.acs.deleteApplication(id);
+    }
+
+    /**
+     * Add new configuration files to a given application.
+     *
+     * @param id The id of the application to add the configuration file to. Not
+     * null/empty/blank.
+     * @param configs The configuration files to add. Not null/empty/blank.
+     * @return The active configurations for this application.
+     * @throws CloudServiceException
+     */
+    @POST
+    @Path("/{id}/configs")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Add new configuration files to an application",
+            notes = "Add the supplied configuration files to the applicaiton with the supplied id.",
+            response = Response.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> addApplicationConfigs(
+            @ApiParam(value = "Id of the application to add configuration to.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The configuration files to add.", required = true)
+            final Set<String> configs) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and config " + configs);
+        return this.acs.addApplicationConfigs(id, configs);
+    }
+
+    /**
+     * Get all the configuration files for a given application.
+     *
+     * @param id The id of the application to get the configuration files for.
+     * Not NULL/empty/blank.
+     * @return The active set of configuration files.
+     * @throws CloudServiceException
+     */
+    @GET
+    @Path("/{id}/configs")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Get the configuration files for an application",
+            notes = "Get the configuration files for the application with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> getApplicationConfigs(
+            @ApiParam(value = "Id of the application to get configurations for.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.acs.getApplicationConfigs(id);
+    }
+
+    /**
+     * Update the configuration files for a given application.
+     *
+     * @param id The id of the application to update the configuration files
+     * for. Not null/empty/blank.
+     * @param configs The configuration files to replace existing configuration
+     * files with. Not null/empty/blank.
+     * @return The new set of application configurations.
+     * @throws CloudServiceException
+     */
+    @PUT
+    @Path("/{id}/configs")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Update configuration files for an application",
+            notes = "Replace the existing configuration files for application with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> updateApplicationConfigs(
+            @ApiParam(value = "Id of the application to update configurations for.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The configuration files to replace existing with.", required = true)
+            final Set<String> configs) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and configs " + configs);
+        return this.acs.updateApplicationConfigs(id, configs);
+    }
+
+    /**
+     * Delete the all configuration files from a given application.
+     *
+     * @param id The id of the application to delete the configuration files
+     * from. Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/configs")
+    @ApiOperation(
+            value = "Remove all jar files from an application",
+            notes = "Remove all the jar files from the application with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> removeAllApplicationConfigs(
+            @ApiParam(value = "Id of the application to delete from.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.acs.removeAllApplicationConfigs(id);
+    }
+
+    /**
+     * Delete the configuration file from a given application.
+     *
+     * @param id The id of the application to delete the configuration file
+     * from. Not null/empty/blank.
+     * @param config The configuration file to remove.
+     * @return The active set of application configurations.
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/configs/{config}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Remove a configuration file from an application",
+            notes = "Remove the given configuration file from the application with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> removeApplicationConfig(
+            @ApiParam(value = "Id of the application to delete from.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The configuration file to delete.", required = true)
+            @PathParam("config")
+            final String config) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and config " + config);
+        return this.acs.removeApplicationConfig(id, config);
+    }
+
+    /**
+     * Add new jar files for a given application.
+     *
+     * @param id The id of the application to add the jar file to. Not
+     * null/empty/blank.
+     * @param jars The jar files to add. Not null.
+     * @return The active set of application jars.
+     * @throws CloudServiceException
+     */
+    @POST
+    @Path("/{id}/jars")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Add new jar files to an application",
+            notes = "Add the supplied jar files to the applicaiton with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> addApplicationJar(
+            @ApiParam(value = "Id of the application to add jar to.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The jar files to add.", required = true)
+            final Set<String> jars) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and jars " + jars);
+        return this.acs.addApplicationJars(id, jars);
+    }
+
+    /**
+     * Get all the jar files for a given application.
+     *
+     * @param id The id of the application to get the jar files for. Not
+     * NULL/empty/blank.
+     * @return The set of jar files.
+     * @throws CloudServiceException
+     */
+    @GET
+    @Path("/{id}/jars")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Get the jars for an application",
+            notes = "Get the jars for the application with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> getApplicationJars(
+            @ApiParam(value = "Id of the application to get the jars for.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.acs.getApplicationJars(id);
+    }
+
+    /**
+     * Update the jar files for a given application.
+     *
+     * @param id The id of the application to update the jar files for. Not
+     * null/empty/blank.
+     * @param jars The jar files to replace existing jar files with. Not
+     * null/empty/blank.
+     * @return The active set of application jars
+     * @throws CloudServiceException
+     */
+    @PUT
+    @Path("/{id}/jars")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Update jar files for an application",
+            notes = "Replace the existing jar files for application with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> updateApplicationJars(
+            @ApiParam(value = "Id of the application to update configurations for.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The jar files to replace existing with.", required = true)
+            final Set<String> jars) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and jars " + jars);
+        return this.acs.updateApplicationJars(id, jars);
+    }
+
+    /**
+     * Delete the all jar files from a given application.
+     *
+     * @param id The id of the application to delete the jar files from. Not
+     * null/empty/blank.
+     * @return Empty set if successful
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/jars")
+    @ApiOperation(
+            value = "Remove all jar files from an application",
+            notes = "Remove all the jar files from the application with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<String> removeAllApplicationJars(
+            @ApiParam(value = "Id of the application to delete from.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.acs.removeAllApplicationJars(id);
+    }
+
+    /**
+     * Delete the jar file from a given application.
+     *
+     * @param id The id of the application to delete the jar file from. Not
+     * null/empty/blank.
+     * @param jar The jar file to remove.
+     * @return The set of active jars for the application.
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/jars/{jar}")
+    @ApiOperation(
+            value = "Remove a jar file from an application",
+            notes = "Remove the given jar file from the application with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Response removeApplicationJar(
+            @ApiParam(value = "Id of the application to delete from.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The jar file to delete.", required = true)
+            @PathParam("jar")
+            final String jar) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and jar " + jar);
+        this.acs.removeApplicationJar(id, jar);
+        return Response.ok().build();
+    }
+
+    /**
+     * Get all the commands this application is associated with.
+     *
+     * @param id The id of the application to get the commands for. Not
+     * NULL/empty/blank.
+     * @return The set of commands.
+     * @throws CloudServiceException
+     */
+    @GET
+    @Path("/{id}/commands")
+    @ApiOperation(
+            value = "Get the commands this application is associated with",
+            notes = "Get the commands which this application supports.",
+            response = Command.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Application not found")
+    })
+    public Set<Command> getCommandsForApplication(
+            @ApiParam(value = "Id of the application to get the commands for.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.acs.getCommandsForApplication(id);
     }
 }

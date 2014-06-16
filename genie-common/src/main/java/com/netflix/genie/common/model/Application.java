@@ -23,7 +23,6 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -117,7 +116,7 @@ public class Application extends Auditable implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "All the configuration files needed for this application")
-    private Set<String> configs = new HashSet<String>();
+    private Set<String> configs;
 
     /**
      * Set of jars required for this application.
@@ -127,7 +126,7 @@ public class Application extends Auditable implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Any jars needed to run this application")
-    private Set<String> jars = new HashSet<String>();
+    private Set<String> jars;
 
     /**
      * The commands this application is associated with.
@@ -135,12 +134,12 @@ public class Application extends Auditable implements Serializable {
     @XmlTransient
     @JsonIgnore
     @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
-    private Set<Command> commands = new HashSet<Command>();
+    private Set<Command> commands;
 
     /**
      * Default constructor.
      */
-    protected Application() {
+    public Application() {
         super();
     }
 
@@ -157,7 +156,6 @@ public class Application extends Auditable implements Serializable {
             final String user,
             final ApplicationStatus status) throws CloudServiceException {
         super();
-        validate(name, user, status);
         this.name = name;
         this.user = user;
         this.status = status;

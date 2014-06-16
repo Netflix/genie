@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -98,7 +97,7 @@ public class Cluster extends Auditable implements Serializable {
     @XmlElementWrapper(name = "configs")
     @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> configs = new HashSet<String>();
+    private Set<String> configs;
 
     /**
      * Set of tags for scheduling - e.g. adhoc, sla, vpc etc.
@@ -106,7 +105,7 @@ public class Cluster extends Auditable implements Serializable {
     @XmlElementWrapper(name = "tags")
     @XmlElement(name = "tag")
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> tags = new HashSet<String>();
+    private Set<String> tags;
 
     /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
@@ -114,12 +113,12 @@ public class Cluster extends Auditable implements Serializable {
     @XmlElementWrapper(name = "commands")
     @XmlElement(name = "command")
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Command> commands = new HashSet<Command>();
+    private Set<Command> commands;
 
     /**
      * Default Constructor.
      */
-    protected Cluster() {
+    public Cluster() {
         super();
     }
 
@@ -141,21 +140,11 @@ public class Cluster extends Auditable implements Serializable {
             final String jobManager,
             final Set<String> configs) throws CloudServiceException {
         super();
-        validate(name, user, status, jobManager, configs);
         this.name = name;
         this.user = user;
         this.status = status;
         this.jobManager = jobManager;
         this.configs = configs;
-    }
-
-    /**
-     * Gets the name for this cluster.
-     *
-     * @return name
-     */
-    public String getName() {
-        return this.name;
     }
 
     /**
@@ -166,6 +155,15 @@ public class Cluster extends Auditable implements Serializable {
     @PrePersist
     protected void onCreateCluster() throws CloudServiceException {
         validate(this.name, this.user, this.status, this.jobManager, this.configs);
+    }
+
+    /**
+     * Gets the name for this cluster.
+     *
+     * @return name
+     */
+    public String getName() {
+        return this.name;
     }
 
     /**

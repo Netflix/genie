@@ -183,44 +183,17 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered. Unable to update.");
         }
-        if (updateCommand == null) {
+        if (StringUtils.isBlank(updateCommand.getId()) || !id.equals(updateCommand.getId())) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command info entered. Unable to update.");
+                    "Command id either not entered or inconsistent with id passed in.");
         }
         LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
         final EntityManager em = pm.createEntityManager();
         final EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command == null) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists to update.");
-            }
-            if (StringUtils.isNotEmpty(updateCommand.getName())) {
-                command.setName(updateCommand.getName());
-            }
-            if (StringUtils.isNotEmpty(updateCommand.getEnvPropFile())) {
-                command.setEnvPropFile(updateCommand.getEnvPropFile());
-            }
-            if (StringUtils.isNotEmpty(updateCommand.getExecutable())) {
-                command.setExecutable(updateCommand.getExecutable());
-            }
-            if (StringUtils.isNotEmpty(updateCommand.getJobType())) {
-                command.setJobType(updateCommand.getJobType());
-            }
-            if (StringUtils.isNotEmpty(updateCommand.getUser())) {
-                command.setUser(updateCommand.getUser());
-            }
-            if (StringUtils.isNotEmpty(updateCommand.getVersion())) {
-                command.setVersion(updateCommand.getVersion());
-            }
-            if (updateCommand.getStatus() != null
-                    && updateCommand.getStatus() != command.getStatus()) {
-                command.setStatus(updateCommand.getStatus());
-            }
+            final Command command = em.merge(updateCommand);
             Command.validate(command);
             trans.commit();
             return command;

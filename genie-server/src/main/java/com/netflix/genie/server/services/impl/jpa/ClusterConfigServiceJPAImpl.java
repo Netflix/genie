@@ -278,38 +278,17 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to update.");
         }
-        if (updateCluster == null) {
+        if (StringUtils.isBlank(updateCluster.getId()) || !id.equals(updateCluster.getId())) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No cluster information entered. Unable to update.");
+                    "Cluster id either not entered or inconsistent with id passed in.");
         }
         LOG.debug("Called with cluster " + updateCluster.toString());
         final EntityManager em = this.pm.createEntityManager();
         final EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
-            final Cluster cluster = em.find(Cluster.class, id);
-            if (cluster == null) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No application with id " + id + " exists to update.");
-            }
-            if (StringUtils.isNotEmpty(updateCluster.getJobManager())) {
-                cluster.setJobManager(updateCluster.getJobManager());
-            }
-            if (StringUtils.isNotEmpty(updateCluster.getName())) {
-                cluster.setName(updateCluster.getName());
-            }
-            if (StringUtils.isNotEmpty(updateCluster.getUser())) {
-                cluster.setUser(updateCluster.getUser());
-            }
-            if (StringUtils.isNotEmpty(updateCluster.getVersion())) {
-                cluster.setVersion(updateCluster.getVersion());
-            }
-            if (updateCluster.getStatus() != null
-                    && updateCluster.getStatus() != cluster.getStatus()) {
-                cluster.setStatus(updateCluster.getStatus());
-            }
+            final Cluster cluster = em.merge(updateCluster);
             Cluster.validate(cluster);
             trans.commit();
             return cluster;

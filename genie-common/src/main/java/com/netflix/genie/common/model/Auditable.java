@@ -59,7 +59,7 @@ public class Auditable {
     /**
      * Default constructor.
      */
-    protected Auditable() {
+    public Auditable() {
     }
 
     /**

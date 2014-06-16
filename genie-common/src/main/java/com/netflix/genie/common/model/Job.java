@@ -146,7 +146,7 @@ public class Job extends Auditable implements Serializable {
      * in the DB for space reasons.
      */
     @Transient
-    private Set<FileAttachment> attachments = new HashSet<FileAttachment>();
+    private Set<FileAttachment> attachments;
 
     /**
      * Whether to disable archive logs or not - default is false.
@@ -270,7 +270,7 @@ public class Job extends Auditable implements Serializable {
     /**
      * Default Constructor.
      */
-    protected Job() {
+    public Job() {
         super();
     }
 
@@ -293,7 +293,6 @@ public class Job extends Auditable implements Serializable {
             final String commandName,
             final String commandArgs,
             final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
-        validate(user, commandId, commandName, commandArgs, clusterCriteria);
         this.user = user;
         this.commandId = commandId;
         this.commandName = commandName;
