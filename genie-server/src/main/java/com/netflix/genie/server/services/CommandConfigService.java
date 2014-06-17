@@ -18,8 +18,11 @@
 package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Abstraction layer to encapsulate CommandConfig functionality.<br>
@@ -37,7 +40,7 @@ public interface CommandConfigService {
      * @return The command configuration
      * @throws CloudServiceException
      */
-    Command getCommandConfig(final String id) throws CloudServiceException;
+    Command getCommand(final String id) throws CloudServiceException;
 
     /**
      * Get command configurations for given filter criteria.
@@ -49,7 +52,7 @@ public interface CommandConfigService {
      * @param limit Max number of results per page
      * @return All the commands matching the specified criteria
      */
-    List<Command> getCommandConfigs(
+    List<Command> getCommands(
             final String name,
             final String userName,
             final int page,
@@ -63,7 +66,7 @@ public interface CommandConfigService {
      * @return The command created
      * @throws CloudServiceException
      */
-    Command createCommandConfig(final Command command) throws CloudServiceException;
+    Command createCommand(final Command command) throws CloudServiceException;
 
     /**
      * Update command configuration.
@@ -74,7 +77,17 @@ public interface CommandConfigService {
      * @return The updated command
      * @throws CloudServiceException
      */
-    Command updateCommandConfig(final String id, final Command updateCommand) throws CloudServiceException;
+    Command updateCommand(
+            final String id,
+            final Command updateCommand) throws CloudServiceException;
+
+    /**
+     * Delete all commands from database.
+     *
+     * @return The deleted commands
+     * @throws CloudServiceException
+     */
+    List<Command> deleteAllCommands() throws CloudServiceException;
 
     /**
      * Delete a command configuration from database.
@@ -83,5 +96,138 @@ public interface CommandConfigService {
      * @return The deleted command configuration
      * @throws CloudServiceException
      */
-    Command deleteCommandConfig(final String id) throws CloudServiceException;
+    Command deleteCommand(final String id) throws CloudServiceException;
+
+    /**
+     * Add a configuration files to the command.
+     *
+     * @param id The id of the command to add the configuration file to. Not
+     * null/empty/blank.
+     * @param configs The configuration files to add. Not null/empty.
+     * @return The active set of configurations
+     * @throws CloudServiceException
+     */
+    Set<String> addConfigsForCommand(
+            final String id,
+            final Set<String> configs) throws CloudServiceException;
+
+    /**
+     * Get the set of configuration files associated with the command with given
+     * id.
+     *
+     * @param id The id of the command to get the configuration files for. Not
+     * null/empty/blank.
+     * @return The set of configuration files as paths
+     * @throws CloudServiceException
+     */
+    Set<String> getConfigsForCommand(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Update the set of configuration files associated with the command with
+     * given id.
+     *
+     * @param id The id of the command to update the configuration files for.
+     * Not null/empty/blank.
+     * @param configs The configuration files to replace existing configurations
+     * with. Not null/empty.
+     * @return The active set of configurations
+     * @throws CloudServiceException
+     */
+    Set<String> updateConfigsForCommand(
+            final String id,
+            final Set<String> configs) throws CloudServiceException;
+
+    /**
+     * Remove all configuration files from the command.
+     *
+     * @param id The id of the command to remove the configuration file from.
+     * Not null/empty/blank.
+     * @return The active set of configurations
+     * @throws CloudServiceException
+     */
+    Set<String> removeAllConfigsForCommand(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Remove a configuration file from the command.
+     *
+     * @param id The id of the command to remove the configuration file from.
+     * Not null/empty/blank.
+     * @param config The configuration file to remove. Not null/empty/blank.
+     * @return The active set of configurations
+     * @throws CloudServiceException
+     */
+    Set<String> removeConfigForCommand(
+            final String id,
+            final String config) throws CloudServiceException;
+
+    /**
+     * Add applications to the command.
+     *
+     * @param id The id of the command to add the application file to. Not
+     * null/empty/blank.
+     * @param applications The applications to add. Not null/empty.
+     * @return The active set of applications
+     * @throws CloudServiceException
+     */
+    Set<Application> addApplicationsForCommand(
+            final String id,
+            final Set<Application> applications) throws CloudServiceException;
+
+    /**
+     * Get the set of applications associated with the command with given id.
+     *
+     * @param id The id of the command to get the applications for. Not
+     * null/empty/blank.
+     * @return The set of applications
+     * @throws CloudServiceException
+     */
+    Set<Application> getApplicationsForCommand(final String id) throws CloudServiceException;
+
+    /**
+     * Update the set of application files associated with the command with
+     * given id.
+     *
+     * @param id The id of the command to update the application files for. Not
+     * null/empty/blank.
+     * @param applications The application files to replace existing
+     * applications with. Not null/empty.
+     * @return The active set of applications
+     * @throws CloudServiceException
+     */
+    Set<Application> updateApplicationsForCommand(
+            final String id,
+            final Set<Application> applications) throws CloudServiceException;
+
+    /**
+     * Remove all applications from the command.
+     *
+     * @param id The id of the command to remove the applications from. Not
+     * null/empty/blank.
+     * @return The active set of applications
+     * @throws CloudServiceException
+     */
+    Set<Application> removeAllApplicationsForCommand(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Remove a application from the command.
+     *
+     * @param id The id of the command to remove the application from. Not
+     * null/empty/blank.
+     * @param appId The id of the application to remove. Not null/empty/blank.
+     * @return The active set of applications
+     * @throws CloudServiceException
+     */
+    Set<Application> removeApplicationForCommand(final String id, final String appId) throws CloudServiceException;
+
+    /**
+     * Get all the clusters the command with given id is associated with.
+     *
+     * @param id The id of the command to get the clusters for.
+     * @return The clusters the command is available on.
+     * @throws CloudServiceException
+     */
+    Set<Cluster> getClustersForCommand(final String id) throws CloudServiceException;
 }

@@ -19,6 +19,7 @@ package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.server.persistence.PersistenceManager;
@@ -67,7 +68,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Command getCommandConfig(final String id) throws CloudServiceException {
+    public Command getCommand(final String id) throws CloudServiceException {
         LOG.debug("called");
         if (StringUtils.isEmpty(id)) {
             throw new CloudServiceException(
@@ -94,7 +95,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
-    public List<Command> getCommandConfigs(
+    public List<Command> getCommands(
             final String name,
             final String userName,
             final int page,
@@ -131,7 +132,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Command createCommandConfig(final Command command) throws CloudServiceException {
+    public Command createCommand(final Command command) throws CloudServiceException {
         Command.validate(command);
         LOG.debug("Called to create command " + command.toString());
         final EntityManager em = this.pm.createEntityManager();
@@ -175,7 +176,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Command updateCommandConfig(
+    public Command updateCommand(
             final String id,
             final Command updateCommand) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
@@ -211,7 +212,33 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Command deleteCommandConfig(final String id) throws CloudServiceException {
+    public List<Command> deleteAllCommands() throws CloudServiceException {
+        LOG.debug("Called to delete all commands");
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final List<Command> commands = this.getCommands(null, null, 0, Integer.MAX_VALUE);
+            for (final Command command : commands) {
+                this.deleteCommand(command.getId());
+            }
+            trans.commit();
+            return commands;
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Command deleteCommand(final String id) throws CloudServiceException {
         LOG.debug("Called to delete command config with id " + id);
         final EntityManager em = this.pm.createEntityManager();
         final EntityTransaction trans = em.getTransaction();
@@ -240,6 +267,407 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             if (trans.isActive()) {
                 trans.rollback();
             }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> addConfigsForCommand(
+            final String id,
+            final Set<String> configs) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to add configurations.");
+        }
+        if (configs == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No configuration files entered.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                command.getConfigs().addAll(configs);
+                trans.commit();
+                return command.getConfigs();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> getConfigsForCommand(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to get configs.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final Command command = em.find(Command.class, id);
+        if (command != null) {
+            return command.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> updateConfigsForCommand(
+            final String id,
+            final Set<String> configs) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to update configurations.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                command.setConfigs(configs);
+                trans.commit();
+                return command.getConfigs();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> removeAllConfigsForCommand(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove jars.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                command.getConfigs().clear();
+                trans.commit();
+                return command.getConfigs();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> removeConfigForCommand(
+            final String id,
+            final String config) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove configuration.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                if (StringUtils.isNotBlank(config)) {
+                    command.getConfigs().remove(config);
+                }
+                trans.commit();
+                return command.getConfigs();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<Application> addApplicationsForCommand(
+            final String id,
+            final Set<Application> applications) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to add applications.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                for (final Application detached : applications) {
+                    final Application app
+                            = em.find(Application.class, detached.getId());
+                    if (app != null) {
+                        command.getApplications().add(app);
+                        app.getCommands().add(command);
+                    }
+                }
+                trans.commit();
+                return command.getApplications();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<Application> getApplicationsForCommand(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to get applications.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        try {
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                return command.getApplications();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<Application> updateApplicationsForCommand(
+            final String id,
+            final Set<Application> applications) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to update applications.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                final Set<Application> apps = new HashSet<Application>();
+                for (final Application detached : applications) {
+                    final Application app
+                            = em.find(Application.class, detached.getId());
+                    if (app != null) {
+                        apps.add(app);
+                        app.getCommands().add(command);
+                    }
+                }
+                command.setApplications(apps);
+                trans.commit();
+                return command.getApplications();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<Application> removeAllApplicationsForCommand(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove applications.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                for (final Application app : command.getApplications()) {
+                    app.getCommands().remove(command);
+                }
+                command.getApplications().clear();
+                trans.commit();
+                return command.getApplications();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<Application> removeApplicationForCommand(
+            final String id,
+            final String appId) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove application.");
+        }
+        if (StringUtils.isBlank(appId)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to remove application.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        final EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                final Application app = em.find(Application.class, appId);
+                if (app != null) {
+                    app.getCommands().remove(command);
+                    command.getApplications().remove(app);
+                }
+                trans.commit();
+                return command.getApplications();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<Cluster> getClustersForCommand(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to get clusters.");
+        }
+        final EntityManager em = this.pm.createEntityManager();
+        try {
+            final Command command = em.find(Command.class, id);
+            if (command != null) {
+                return command.getClusters();
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + id + " exists.");
+            }
+        } finally {
             em.close();
         }
     }

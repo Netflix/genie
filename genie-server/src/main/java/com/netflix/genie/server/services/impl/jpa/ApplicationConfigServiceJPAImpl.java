@@ -64,7 +64,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Application getApplication(final String id) throws CloudServiceException {
+    public Application getApplication(
+            final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             //Messages will be logged by exception mapper at resource level
             throw new CloudServiceException(
@@ -128,7 +129,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Application createApplication(final Application app) throws CloudServiceException {
+    public Application createApplication(
+            final Application app) throws CloudServiceException {
         Application.validate(app);
         LOG.debug("Called with application: " + app.toString());
         final EntityManager em = this.pm.createEntityManager();
@@ -157,7 +159,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Application updateApplication(final String id, final Application updateApp) throws CloudServiceException {
+    public Application updateApplication(
+            final String id,
+            final Application updateApp) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -223,7 +227,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Application deleteApplication(final String id) throws CloudServiceException {
+    public Application deleteApplication(
+            final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -266,7 +271,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> addApplicationConfigs(final String id, final Set<String> configs) throws CloudServiceException {
+    public Set<String> addConfigsToApplication(
+            final String id,
+            final Set<String> configs) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -305,7 +312,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> updateApplicationConfigs(final String id, final Set<String> configs) throws CloudServiceException {
+    public Set<String> updateConfigsForApplication(
+            final String id,
+            final Set<String> configs) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -339,7 +348,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> getApplicationConfigs(final String id) throws CloudServiceException {
+    public Set<String> getConfigsForApplication(
+            final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -362,7 +372,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> removeAllApplicationConfigs(final String id) throws CloudServiceException {
+    public Set<String> removeAllConfigsForApplication(
+            final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -396,7 +407,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> removeApplicationConfig(final String id, final String config) throws CloudServiceException {
+    public Set<String> removeApplicationConfig(
+            final String id,
+            final String config) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -432,7 +445,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> addApplicationJars(final String id, final Set<String> jars) throws CloudServiceException {
+    public Set<String> addJarsForApplication(
+            final String id,
+            final Set<String> jars) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -472,7 +487,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      */
     @Override
     //TODO: Code is repetetive with configs. Refactor for reuse
-    public Set<String> getApplicationJars(final String id) throws CloudServiceException {
+    public Set<String> getJarsForApplication(
+            final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -495,7 +511,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> updateApplicationJars(final String id, final Set<String> jars) throws CloudServiceException {
+    public Set<String> updateJarsForApplication(
+            final String id,
+            final Set<String> jars) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -529,7 +547,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> removeAllApplicationJars(final String id) throws CloudServiceException {
+    public Set<String> removeAllJarsForApplication(
+            final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -563,7 +582,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<String> removeApplicationJar(final String id, final String jar) throws CloudServiceException {
+    public Set<String> removeJarForApplication(
+            final String id,
+            final String jar) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -599,7 +620,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    public Set<Command> getCommandsForApplication(final String id) throws CloudServiceException {
+    public Set<Command> getCommandsForApplication(
+            final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,

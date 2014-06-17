@@ -19,6 +19,8 @@ package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.CommandStatus;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.Set;
@@ -55,6 +57,7 @@ import org.slf4j.LoggerFactory;
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@ApiModel(value = "A Command")
 public class Command extends Auditable implements Serializable {
 
     private static final long serialVersionUID = -6106046473373305992L;
@@ -64,12 +67,18 @@ public class Command extends Auditable implements Serializable {
      * Name of this command - e.g. prodhive, pig, hadoop etc.
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "Name of this command - e.g. prodhive, pig, hadoop etc.",
+            required = true)
     private String name;
 
     /**
      * User who created this command.
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "User who created this command",
+            required = true)
     private String user;
 
     /**
@@ -77,31 +86,44 @@ public class Command extends Auditable implements Serializable {
      */
     @Basic(optional = false)
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(
+            value = "If it is in use - ACTIVE, DEPRECATED, INACTIVE",
+            required = true)
     private CommandStatus status;
 
     /**
      * Location of the executable for this command.
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "Location of the executable for this command",
+            required = true)
     private String executable;
 
     /**
      * Users can specify a property file location with environment variables.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Users can specify a property file"
+                    + " location with environment variables")
     private String envPropFile;
 
     /**
      * Job type of the command. eg: hive, pig , hadoop etc.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Job type of the command. eg: hive, pig , hadoop etc")
     private String jobType;
 
     /**
      * Version number for this command.
      */
     @Basic
-    @Column(name = "columnVersion")
+    @Column(name = "commandVersion")
+    @ApiModelProperty(
+            value = "Version number for this command")
     private String version;
 
     /**
@@ -110,6 +132,9 @@ public class Command extends Auditable implements Serializable {
     @XmlElementWrapper(name = "configs")
     @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the configuration"
+                    + " files needed for this command")
     private Set<String> configs;
 
     /**
@@ -118,6 +143,8 @@ public class Command extends Auditable implements Serializable {
     @XmlElementWrapper(name = "applications")
     @XmlElement(name = "application")
     @ManyToMany(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Set of applications that can run this command")
     private Set<Application> applications;
 
     /**

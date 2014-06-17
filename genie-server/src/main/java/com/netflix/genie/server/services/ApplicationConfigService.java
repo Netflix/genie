@@ -62,7 +62,8 @@ public interface ApplicationConfigService {
      * @return The application that was created
      * @throws CloudServiceException
      */
-    Application createApplication(final Application app) throws CloudServiceException;
+    Application createApplication(
+            final Application app) throws CloudServiceException;
 
     /**
      * Update an application.
@@ -103,7 +104,9 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws CloudServiceException
      */
-    Set<String> addApplicationConfigs(final String id, final Set<String> configs) throws CloudServiceException;
+    Set<String> addConfigsToApplication(
+            final String id,
+            final Set<String> configs) throws CloudServiceException;
 
     /**
      * Get the set of configuration files associated with the application with
@@ -114,7 +117,8 @@ public interface ApplicationConfigService {
      * @return The set of configuration files as paths
      * @throws CloudServiceException
      */
-    Set<String> getApplicationConfigs(final String id) throws CloudServiceException;
+    Set<String> getConfigsForApplication(
+            final String id) throws CloudServiceException;
 
     /**
      * Update the set of configuration files associated with the application
@@ -127,7 +131,9 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws CloudServiceException
      */
-    Set<String> updateApplicationConfigs(final String id, final Set<String> configs) throws CloudServiceException;
+    Set<String> updateConfigsForApplication(
+            final String id,
+            final Set<String> configs) throws CloudServiceException;
 
     /**
      * Remove all configuration files from the application.
@@ -137,7 +143,8 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws CloudServiceException
      */
-    Set<String> removeAllApplicationConfigs(final String id) throws CloudServiceException;
+    Set<String> removeAllConfigsForApplication(
+            final String id) throws CloudServiceException;
 
     /**
      * Remove a configuration file from the application.
@@ -148,7 +155,9 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws CloudServiceException
      */
-    Set<String> removeApplicationConfig(final String id, final String config) throws CloudServiceException;
+    Set<String> removeApplicationConfig(
+            final String id,
+            final String config) throws CloudServiceException;
 
     /**
      * Add a jar file to the application.
@@ -159,7 +168,9 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws CloudServiceException
      */
-    Set<String> addApplicationJars(final String id, final Set<String> jars) throws CloudServiceException;
+    Set<String> addJarsForApplication(
+            final String id,
+            final Set<String> jars) throws CloudServiceException;
 
     /**
      * Get the set of jar files associated with the application with given id.
@@ -169,7 +180,8 @@ public interface ApplicationConfigService {
      * @return The set of jar files as paths
      * @throws CloudServiceException
      */
-    Set<String> getApplicationJars(final String id) throws CloudServiceException;
+    Set<String> getJarsForApplication(
+            final String id) throws CloudServiceException;
 
     /**
      * Update the set of jar files associated with the application with given
@@ -181,7 +193,9 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws CloudServiceException
      */
-    Set<String> updateApplicationJars(final String id, final Set<String> jars) throws CloudServiceException;
+    Set<String> updateJarsForApplication(
+            final String id,
+            final Set<String> jars) throws CloudServiceException;
 
     /**
      * Remove all jar files from the application.
@@ -191,7 +205,8 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws CloudServiceException
      */
-    Set<String> removeAllApplicationJars(final String id) throws CloudServiceException;
+    Set<String> removeAllJarsForApplication(
+            final String id) throws CloudServiceException;
 
     /**
      * Remove a jar file from the application.
@@ -202,7 +217,9 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws CloudServiceException
      */
-    Set<String> removeApplicationJar(final String id, final String jar) throws CloudServiceException;
+    Set<String> removeJarForApplication(
+            final String id,
+            final String jar) throws CloudServiceException;
 
     /**
      * Get all the commands the application with given id is associated with.
@@ -211,5 +228,6 @@ public interface ApplicationConfigService {
      * @return The commands the application is a part of.
      * @throws CloudServiceException
      */
-    Set<Command> getCommandsForApplication(final String id) throws CloudServiceException;
+    Set<Command> getCommandsForApplication(
+            final String id) throws CloudServiceException;
 }

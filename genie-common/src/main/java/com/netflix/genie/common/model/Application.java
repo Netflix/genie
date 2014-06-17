@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@ApiModel(value = "An application")
+@ApiModel(value = "An Application")
 public class Application extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
