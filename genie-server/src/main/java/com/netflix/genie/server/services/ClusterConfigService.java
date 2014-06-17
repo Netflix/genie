@@ -82,7 +82,7 @@ public interface ClusterConfigService {
             final String applicationName,
             final String commandId,
             final String commandName,
-            final Set<ClusterCriteria> clusterCriterias);
+            final List<ClusterCriteria> clusterCriterias);
 
     /**
      * Create new cluster configuration.

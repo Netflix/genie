@@ -171,7 +171,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final String applicationName,
             final String commandId,
             final String commandName,
-            final Set<ClusterCriteria> clusterCriterias) {
+            final List<ClusterCriteria> clusterCriterias) {
         LOG.debug("Called");
 
         final EntityManager em = this.pm.createEntityManager();

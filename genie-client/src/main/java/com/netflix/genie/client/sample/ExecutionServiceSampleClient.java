@@ -27,7 +27,9 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -78,7 +80,7 @@ public final class ExecutionServiceSampleClient {
         final Set<String> criteriaTags = new HashSet<String>();
         criteriaTags.add("prod");
         final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
-        final Set<ClusterCriteria> criterias = new HashSet<ClusterCriteria>();
+        final List<ClusterCriteria> criterias = new ArrayList<ClusterCriteria>();
         criterias.add(criteria);
         Job job = new Job(
                 userName,

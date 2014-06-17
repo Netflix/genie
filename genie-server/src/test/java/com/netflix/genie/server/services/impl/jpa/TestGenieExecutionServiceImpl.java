@@ -23,7 +23,10 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ExecutionService;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.AfterClass;
@@ -40,7 +43,7 @@ import org.junit.Test;
 public class TestGenieExecutionServiceImpl {
 
     private static ExecutionService xs;
-    private Set<ClusterCriteria> criterias;
+    private List<ClusterCriteria> criterias;
 
     /**
      * Initialize stats object before any tests are run.
@@ -60,7 +63,7 @@ public class TestGenieExecutionServiceImpl {
         final Set<String> criteriaTags = new HashSet<String>();
         criteriaTags.add("prod");
         final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
-        this.criterias = new HashSet<ClusterCriteria>();
+        this.criterias = new ArrayList<ClusterCriteria>();
         this.criterias.add(criteria);
     }
 

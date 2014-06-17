@@ -22,7 +22,10 @@ import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Test;
@@ -51,7 +54,7 @@ public class TestJobJanitor {
         final Set<String> criteriaTags = new HashSet<String>();
         criteriaTags.add("prod");
         final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
-        final Set<ClusterCriteria> criterias = new HashSet<ClusterCriteria>();
+        final List<ClusterCriteria> criterias = new ArrayList<ClusterCriteria>();
         criterias.add(criteria);
         // create two old jobs
         final PersistenceManager<Job> pm = new PersistenceManager<Job>();

@@ -21,7 +21,9 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.JobStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -123,7 +125,7 @@ public class Job extends Auditable implements Serializable {
      * Set of tags to use for scheduling (REQUIRED).
      */
     @Transient
-    private Set<ClusterCriteria> clusterCriteria;
+    private List<ClusterCriteria> clusterCriteria;
 
     /**
      * String representation of the the cluster criteria array list object
@@ -292,7 +294,7 @@ public class Job extends Auditable implements Serializable {
             final String commandId,
             final String commandName,
             final String commandArgs,
-            final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
+            final List<ClusterCriteria> clusterCriteria) throws CloudServiceException {
         this.user = user;
         this.commandId = commandId;
         this.commandName = commandName;
@@ -452,7 +454,7 @@ public class Job extends Auditable implements Serializable {
      *
      * @return clusterCriteria
      */
-    public Set<ClusterCriteria> getClusterCriteria() {
+    public List<ClusterCriteria> getClusterCriteria() {
         return this.clusterCriteria;
     }
 
@@ -462,7 +464,7 @@ public class Job extends Auditable implements Serializable {
      * @param clusterCriteria The criteria list
      * @throws CloudServiceException
      */
-    public void setClusterCriteria(final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
+    public void setClusterCriteria(final List<ClusterCriteria> clusterCriteria) throws CloudServiceException {
         if (clusterCriteria == null || clusterCriteria.isEmpty()) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -989,7 +991,7 @@ public class Job extends Auditable implements Serializable {
             final String commandId,
             final String commandName,
             final String commandArgs,
-            final Set<ClusterCriteria> criteria) throws CloudServiceException {
+            final List<ClusterCriteria> criteria) throws CloudServiceException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isBlank(user)) {
             builder.append("User name is missing.\n");
@@ -1015,17 +1017,17 @@ public class Job extends Auditable implements Serializable {
     /**
      * Helper method for building the cluster criteria string.
      *
-     * @param clusterCriteria The criteria to build up from
+     * @param clusterCriteria2 The criteria to build up from
      * @return The cluster criteria string
      */
-    private String criteriaToString(final Set<ClusterCriteria> clusterCriteria) throws CloudServiceException {
-        if (clusterCriteria == null || clusterCriteria.isEmpty()) {
+    private String criteriaToString(final List<ClusterCriteria> clusterCriteria2) throws CloudServiceException {
+        if (clusterCriteria2 == null || clusterCriteria2.isEmpty()) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster criteria entered unable to create string");
         }
         final StringBuilder builder = new StringBuilder();
-        for (final ClusterCriteria cc : clusterCriteria) {
+        for (final ClusterCriteria cc : clusterCriteria2) {
             if (builder.length() != 0) {
                 builder.append(CRITERIA_SET_DELIMITER);
             }
@@ -1041,9 +1043,9 @@ public class Job extends Auditable implements Serializable {
      * @return The set of ClusterCriteria
      * @throws CloudServiceException
      */
-    private Set<ClusterCriteria> stringToCriteria(final String criteriaString) throws CloudServiceException {
+    private List<ClusterCriteria> stringToCriteria(final String criteriaString) throws CloudServiceException {
         //Rebuild the cluster criteria objects
-        final Set<ClusterCriteria> cc = new HashSet<ClusterCriteria>();
+        final List<ClusterCriteria> cc = new ArrayList<ClusterCriteria>();
         final String[] criteriaSets = StringUtils.split(criteriaString, CRITERIA_SET_DELIMITER);
         if (criteriaSets == null || criteriaSets.length == 0) {
             throw new CloudServiceException(

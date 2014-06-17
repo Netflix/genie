@@ -21,7 +21,10 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.AfterClass;
@@ -36,7 +39,7 @@ import org.junit.Test;
  */
 public class TestPersistenceManager {
 
-    private Set<ClusterCriteria> criterias;
+    private List<ClusterCriteria> criterias;
 
     /**
      * Setup the tests.
@@ -48,7 +51,7 @@ public class TestPersistenceManager {
         final Set<String> criteriaTags = new HashSet<String>();
         criteriaTags.add("prod");
         final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
-        this.criterias = new HashSet<ClusterCriteria>();
+        this.criterias = new ArrayList<ClusterCriteria>();
         this.criterias.add(criteria);
     }
 
