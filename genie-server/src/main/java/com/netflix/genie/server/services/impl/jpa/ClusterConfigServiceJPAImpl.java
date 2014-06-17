@@ -25,7 +25,9 @@ import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.common.model.Types.ApplicationStatus;
 import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.netflix.genie.common.model.Types.CommandStatus;
 import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.services.ClusterConfigService;
 import java.net.HttpURLConnection;
@@ -189,6 +191,8 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     } else {
                         predicates.add(cb.equal(commands.get(Command_.name), commandName));
                     }
+                    predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
+                    predicates.add(cb.equal(c.get(Cluster_.status), ClusterStatus.UP));
                     if (StringUtils.isNotEmpty(applicationId) || StringUtils.isNotEmpty(applicationName)) {
                         final Join<Command, Application> apps = commands.join(Command_.applications);
                         if (StringUtils.isNotEmpty(applicationId)) {
@@ -196,6 +200,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                         } else {
                             predicates.add(cb.equal(apps.get(Application_.name), applicationName));
                         }
+                        predicates.add(cb.equal(apps.get(Application_.status), ApplicationStatus.ACTIVE));
                     }
                 }
 

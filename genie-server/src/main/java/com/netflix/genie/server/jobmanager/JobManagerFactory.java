@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.server.jobmanager;
 
+import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author skrishnan
  * @author tgianos
+ * @author amsharma
  */
 public final class JobManagerFactory {
 
@@ -71,7 +73,8 @@ public final class JobManagerFactory {
         LOG.info("called");
 
         final Cluster cluster = getCluster(job);
-        final String className = cluster.getJobManager();
+        final String className =  ConfigurationManager.getConfigInstance()
+                .getString("netflix.genie.server." + cluster.getClusterType() + ".JobManagerImpl");
 
         try {
             final Class jobManagerClass = Class.forName(className);

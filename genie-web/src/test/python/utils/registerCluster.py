@@ -47,7 +47,7 @@ def addClusterConfigCprod1():
         "configs": ''' + config + ''',
         "tags": ''' + tags + ''',
         "commands": ''' + cmds + ''',
-        "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager" 
+        "clusterType": "yarn"
     }
     '''
     print payload
@@ -71,7 +71,7 @@ def addClusterConfigCquery1():
         "configs": ''' + config + ''',
         "tags": ''' + tags + ''',
         "commands": ''' + cmds + ''',
-        "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager"
+        "clusterType": "yarn"
     }
     '''
     print payload
@@ -94,7 +94,7 @@ def addClusterConfigH2query():
         "configs": ''' + config + ''',
         "tags": ''' + tags + ''',
         "commands": ''' + cmds + ''',
-        "jobManager": "com.netflix.genie.server.jobmanager.impl.YarnJobManager"
+        "clusterType": "yarn"
     }
     '''
     print payload

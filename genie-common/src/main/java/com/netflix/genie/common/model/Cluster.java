@@ -79,10 +79,12 @@ public class Cluster extends Auditable implements Serializable {
     private ClusterStatus status;
 
     /**
-     * The class to use as the job manager for this cluster.
+     * The type of the cluster to use to figure out the job manager for this cluster.
+     * eg: yarn, presto, mesos etc. The mapping JobManager will be specified using 
+     * the property:  netflix.genie.server.<clusterType>.JobManagerImpl
      */
     @Basic(optional = false)
-    private String jobManager;
+    private String clusterType;
 
     /**
      * Version of this cluster.
@@ -128,7 +130,7 @@ public class Cluster extends Auditable implements Serializable {
      * @param name The name of the cluster. Not null/empty/blank.
      * @param user The user who created the cluster. Not null/empty/blank.
      * @param status The status of the cluster. Not null.
-     * @param jobManager The job manager for the cluster. Not null/empty/blank.
+     * @param clusterType The type of the cluster. Not null/empty/blank.
      * @param configs The configuration files for the cluster. Not null or
      * empty.
      * @throws CloudServiceException
@@ -137,13 +139,13 @@ public class Cluster extends Auditable implements Serializable {
             final String name,
             final String user,
             final ClusterStatus status,
-            final String jobManager,
+            final String clusterType,
             final Set<String> configs) throws CloudServiceException {
         super();
         this.name = name;
         this.user = user;
         this.status = status;
-        this.jobManager = jobManager;
+        this.clusterType = clusterType;
         this.configs = configs;
     }
 
@@ -154,7 +156,7 @@ public class Cluster extends Auditable implements Serializable {
      */
     @PrePersist
     protected void onCreateCluster() throws CloudServiceException {
-        validate(this.name, this.user, this.status, this.jobManager, this.configs);
+        validate(this.name, this.user, this.status, this.clusterType, this.configs);
     }
 
     /**
@@ -231,27 +233,27 @@ public class Cluster extends Auditable implements Serializable {
     }
 
     /**
-     * Get the job manager class to use for this cluster.
+     * Get the clusterType for this cluster.
      *
-     * @return The class to use
+     * @return clusterType: The type of the cluster like yarn, presto, mesos etc. 
      */
-    public String getJobManager() {
-        return this.jobManager;
+    public String getClusterType() {
+        return clusterType;
     }
 
     /**
-     * Set the job manager class to use for this cluster.
+     * Set the type for this cluster.
      *
-     * @param jobManager The job manager class to use. Not null/empty/blank.
+     * @param clusterType The type of this cluster. Not null/empty/blank.
      * @throws CloudServiceException
      */
-    public void setJobManager(final String jobManager) throws CloudServiceException {
-        if (StringUtils.isBlank(jobManager)) {
+    public void setClusterType(String clusterType) throws CloudServiceException {
+        if (StringUtils.isBlank(clusterType)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No jobManager Entered.");
+                    "No cluster type Entered.");
         }
-        this.jobManager = jobManager;
+        this.clusterType = clusterType;
     }
 
     /**
@@ -362,7 +364,7 @@ public class Cluster extends Auditable implements Serializable {
                 cluster.getName(),
                 cluster.getUser(),
                 cluster.getStatus(),
-                cluster.getJobManager(),
+                cluster.getClusterType(),
                 cluster.getConfigs());
     }
 
@@ -372,7 +374,7 @@ public class Cluster extends Auditable implements Serializable {
      * @param name The name of the cluster
      * @param user The user who created the cluster
      * @param status The status of the cluster
-     * @param jobManager The job manager for the cluster
+     * @param clusterType The type of cluster
      * @param configs The configuration files for the cluster
      * @throws CloudServiceException
      */
@@ -380,7 +382,7 @@ public class Cluster extends Auditable implements Serializable {
             final String name,
             final String user,
             final ClusterStatus status,
-            final String jobManager,
+            final String clusterType,
             final Set<String> configs) throws CloudServiceException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isBlank(name)) {
@@ -392,8 +394,8 @@ public class Cluster extends Auditable implements Serializable {
         if (status == null) {
             builder.append("No cluster status entered and is required.\n");
         }
-        if (StringUtils.isBlank(jobManager)) {
-            builder.append("No cluster job manager entered and is required.\n");
+        if (StringUtils.isBlank(clusterType)) {
+            builder.append("No cluster type entered and is required.\n");
         }
         if (configs == null || configs.isEmpty()) {
             builder.append("At least one configuration file is required for the cluster.\n");
