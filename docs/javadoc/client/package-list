@@ -1,0 +1,5 @@
+com.netflix.genie.client
+com.netflix.genie.client.sample
+com.netflix.genie.common.exceptions
+com.netflix.genie.common.messages
+com.netflix.genie.common.model
