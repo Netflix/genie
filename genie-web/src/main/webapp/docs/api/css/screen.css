@@ -1158,15 +1158,15 @@
   cursor: pointer;
 }
 .swagger-section #header {
-  background-color: #000000;
+  background-color: #b9090b;
   padding: 14px;
 }
 .swagger-section #header a#logo {
   font-size: 1.5em;
   font-weight: bold;
   text-decoration: none;
-  background: transparent url(../../../img/netflix_logo_v7.png) no-repeat left center;
-  padding: 20px 0 20px 150px;
+  background: transparent url(../../../img/Netflix_OSS_Logo.jpg) no-repeat left center;
+  padding: 20px 0 20px 224px;
   color: white;
 }
 .swagger-section #header form#api_selector {
