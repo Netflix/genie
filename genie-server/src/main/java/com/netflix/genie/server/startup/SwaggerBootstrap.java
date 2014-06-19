@@ -35,10 +35,13 @@ public class SwaggerBootstrap extends HttpServlet {
 
     static {
         final Option<ApiInfo> info = Option.apply(new ApiInfo(
-                "Genie", /* title */
-                "See <a href=\"http://netflix.github.io/genie\">GitHub</a> for more information.",
+                "Genie REST API", /* title */
+                "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more information."
+                        + "<br/>Post to our <a href=\"https://groups.google.com/d/forum/genie-hadoop\">Google Group</a> with any questions.<br/>"
+                        + "Post issues any issues found <a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>"
+                        + "For more documentation see the <a href=\"https://github.com/Netflix/genie/wiki\">wiki</a>.<br/>",
                 null, /* TOS URL */
-                "bigdataplatform@netflix.com", /* Contact */
+                null, /* Contact */
                 "Apache 2.0", /* license */
                 "http://www.apache.org/licenses/LICENSE-2.0" /* license URL */
         ));
