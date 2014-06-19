@@ -289,7 +289,8 @@ function program6(depth0,data) {
 function program8(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n        , <span style=\"font-variant: small-caps\">api version</span>: ";
+//  buffer += "\n        , <span style=\"font-variant: small-caps\">api version</span>: ";
+  buffer += "\n        <span style=\"font-variant: small-caps\">api version</span>: ";
   if (stack1 = helpers.apiVersion) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.apiVersion; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
