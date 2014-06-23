@@ -177,7 +177,8 @@ public final class CommandServiceSampleClient {
         }
 
         LOG.info("Deleting the application from the command with id " + ID + "something");
-        final Set<Application> applications4 = commandClient.removeApplicationForCommand(command1.getId(), ID + "something");
+        final Set<Application> applications4 = commandClient.
+                removeApplicationForCommand(command1.getId(), ID + "something");
         for (final Application application : applications4) {
             LOG.info("Application = " + application);
         }

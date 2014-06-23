@@ -42,7 +42,7 @@ public class ClusterCriteria implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterCriteria.class);
 
     private Set<String> tags = new HashSet<String>();
-    
+
     /**
      * Default Constructor.
      */
@@ -51,6 +51,7 @@ public class ClusterCriteria implements Serializable {
 
     /**
      * Create a cluster criteria object with the included tags.
+     *
      * @param tags The tags to add
      * @throws CloudServiceException
      */
@@ -65,6 +66,7 @@ public class ClusterCriteria implements Serializable {
 
     /**
      * Get the tags for this cluster criteria.
+     *
      * @return The tags for this criteria as unmodifiable list
      */
     public Set<String> getTags() {

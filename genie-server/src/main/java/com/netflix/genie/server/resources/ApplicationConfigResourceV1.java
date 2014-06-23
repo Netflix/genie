@@ -60,7 +60,7 @@ public class ApplicationConfigResourceV1 {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(ApplicationConfigResourceV1.class);
-    
+
     /**
      * The application service.
      */

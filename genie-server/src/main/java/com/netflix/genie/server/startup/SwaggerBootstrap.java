@@ -17,11 +17,9 @@
  */
 package com.netflix.genie.server.startup;
 
-import com.wordnik.swagger.config.*;
+import com.wordnik.swagger.config.ConfigFactory;
 import com.wordnik.swagger.model.ApiInfo;
 import javax.servlet.http.HttpServlet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import scala.Option;
 
 /**
@@ -30,8 +28,6 @@ import scala.Option;
  * @author tgianos
  */
 public class SwaggerBootstrap extends HttpServlet {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SwaggerBootstrap.class);
 
     static {
         final Option<ApiInfo> info = Option.apply(new ApiInfo(

@@ -13,10 +13,9 @@ def metaModelIgnorePattern = '**/com/netflix/genie/common/model/*_.java'
 //}
 
 dependencies {
-    compile 'org.apache.openjpa:openjpa:2.2.1'
-    compile ('com.wordnik:swagger-jersey-jaxrs_2.10:1.3.0') {
-        exclude group: 'com.sun.jersey'
-    }
+    compile ('com.sun.jersey:jersey-json:1.13')
+    compile ('com.wordnik:swagger-jersey-jaxrs_2.10:1.3.0')
+    compile ('org.apache.openjpa:openjpa:2.2.1')
 }
 
 task genJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA metamodels') {

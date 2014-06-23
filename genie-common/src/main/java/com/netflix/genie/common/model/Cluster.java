@@ -79,9 +79,10 @@ public class Cluster extends Auditable implements Serializable {
     private ClusterStatus status;
 
     /**
-     * The type of the cluster to use to figure out the job manager for this cluster.
-     * eg: yarn, presto, mesos etc. The mapping JobManager will be specified using 
-     * the property:  netflix.genie.server.<clusterType>.JobManagerImpl
+     * The type of the cluster to use to figure out the job manager for this
+     * cluster. eg: yarn, presto, mesos etc. The mapping JobManager will be
+     * specified using the property:
+     * netflix.genie.server.<clusterType>.JobManagerImpl
      */
     @Basic(optional = false)
     private String clusterType;
@@ -235,7 +236,8 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Get the clusterType for this cluster.
      *
-     * @return clusterType: The type of the cluster like yarn, presto, mesos etc. 
+     * @return clusterType: The type of the cluster like yarn, presto, mesos
+     * etc.
      */
     public String getClusterType() {
         return clusterType;

@@ -57,9 +57,9 @@ public class GenieApplication {
         LOG.info("Custom servo metrics have been registered");
 
         // initialize and start the job janitor
-        janitor = new JobJanitor();
-        janitor.setDaemon(true);
-        janitor.start();
+        this.janitor = new JobJanitor();
+        this.janitor.setDaemon(true);
+        this.janitor.start();
     }
 
     /**
@@ -70,7 +70,7 @@ public class GenieApplication {
         LOG.info("called");
 
         // shut down dependencies cleanly
-        janitor.setStop(true);
+        this.janitor.setStop(true);
         GenieNodeStatistics.getInstance().shutdown();
         PersistenceManager.shutdown();
 
