@@ -1,3 +1,10 @@
+configurations {
+    compile {
+        exclude group: "org.codehaus.jettison"
+    }
+}
+
 dependencies {
     compile project.parent.childProjects.get('genie-common')
+    compile 'com.sun.jersey:jersey-json:1.11'
 }

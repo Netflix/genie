@@ -290,11 +290,6 @@ public class Cluster extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setTags(final Set<String> tags) throws CloudServiceException {
-        if (tags == null) {
-            final String msg = "No tags passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
         this.tags = tags;
     }
 
@@ -340,11 +335,6 @@ public class Cluster extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setCommands(final Set<Command> commands) throws CloudServiceException {
-        if (commands == null) {
-            final String msg = "No commands passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
         this.commands = commands;
     }
 
