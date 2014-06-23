@@ -280,11 +280,6 @@ public class Application extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setConfigs(final Set<String> configs) throws CloudServiceException {
-        if (configs == null || configs.isEmpty()) {
-            final String msg = "No configs passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
         this.configs = configs;
     }
 
@@ -304,11 +299,6 @@ public class Application extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setJars(final Set<String> jars) throws CloudServiceException {
-        if (jars == null) {
-            final String msg = "No jars passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
         this.jars = jars;
     }
 

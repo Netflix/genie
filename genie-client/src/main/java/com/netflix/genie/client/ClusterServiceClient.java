@@ -18,6 +18,7 @@
 package com.netflix.genie.client;
 
 import com.google.common.collect.Multimap;
+import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
@@ -35,13 +36,15 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
+//TODO: Can probably templetize the config clients or part of them as
+//     much of the code is the same
 public final class ClusterServiceClient extends BaseGenieClient {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(ClusterServiceClient.class);
 
-    private static final String BASE_CONFIG_CLUSTER_REST_URI
-            = BASE_REST_URI + "config/clusters";
+    private static final String BASE_CONFIG_CLUSTER_REST_URL
+            = BASE_REST_URL + "config/clusters";
 
     // reference to the instance object
     private static ClusterServiceClient instance;
@@ -81,14 +84,12 @@ public final class ClusterServiceClient extends BaseGenieClient {
     public Cluster createCluster(final Cluster cluster)
             throws CloudServiceException {
         Cluster.validate(cluster);
-
-        return executeRequestForSingleEntity(
+        final HttpRequest request = this.buildRequest(
                 Verb.POST,
-                BASE_CONFIG_CLUSTER_REST_URI,
+                BASE_CONFIG_CLUSTER_REST_URL,
                 null,
-                null,
-                cluster,
-                Cluster.class);
+                cluster);
+        return (Cluster) this.executeRequest(request, null, Cluster.class);
     }
 
     /**
@@ -105,20 +106,21 @@ public final class ClusterServiceClient extends BaseGenieClient {
             final String id,
             final Cluster cluster)
             throws CloudServiceException {
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtils.isBlank(id)) {
             String msg = "Required parameter id can't be null or empty.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        Cluster.validate(cluster);
 
-        return executeRequestForSingleEntity(
+        final HttpRequest request = this.buildRequest(
                 Verb.PUT,
-                BASE_CONFIG_CLUSTER_REST_URI,
-                id,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id},
+                        SLASH),
                 null,
-                cluster,
-                Cluster.class);
+                cluster);
+        return (Cluster) this.executeRequest(request, null, Cluster.class);
     }
 
     /**
@@ -129,19 +131,20 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public Cluster getCluster(final String id) throws CloudServiceException {
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        return executeRequestForSingleEntity(
+        final HttpRequest request = this.buildRequest(
                 Verb.GET,
-                BASE_CONFIG_CLUSTER_REST_URI,
-                id,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id},
+                        SLASH),
                 null,
-                null,
-                Cluster.class);
+                null);
+        return (Cluster) this.executeRequest(request, null, Cluster.class);
     }
 
     /**
@@ -156,13 +159,27 @@ public final class ClusterServiceClient extends BaseGenieClient {
      */
     public List<Cluster> getClusterConfigs(final Multimap<String, String> params)
             throws CloudServiceException {
-        return executeRequestForListOfEntities(
+        final HttpRequest request = this.buildRequest(
                 Verb.GET,
-                BASE_CONFIG_CLUSTER_REST_URI,
-                null,
+                BASE_CONFIG_CLUSTER_REST_URL,
                 params,
+                null);
+        return (List<Cluster>) this.executeRequest(request, List.class, Cluster.class);
+    }
+
+    /**
+     * Delete all the clusters in the database.
+     *
+     * @return the should be empty set.
+     * @throws CloudServiceException
+     */
+    public List<Cluster> deleteAllClusters() throws CloudServiceException {
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                BASE_CONFIG_CLUSTER_REST_URL,
                 null,
-                Cluster.class);
+                null);
+        return (List<Cluster>) this.executeRequest(request, List.class, Cluster.class);
     }
 
     /**
@@ -179,12 +196,13 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        return executeRequestForSingleEntity(
+        final HttpRequest request = this.buildRequest(
                 Verb.DELETE,
-                BASE_CONFIG_CLUSTER_REST_URI,
-                id,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id},
+                        SLASH),
                 null,
-                null,
-                Cluster.class);
+                null);
+        return (Cluster) this.executeRequest(request, null, Cluster.class);
     }
 }
