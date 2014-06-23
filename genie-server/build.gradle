@@ -9,7 +9,7 @@ dependencies {
     compile 'javax.mail:mail:1.4.4'
     
     //Spring
-    compile 'org.springframework:spring-context:4.0.5.RELEASE'
+    compile 'org.springframework:spring-context:3.2.0.RELEASE'
 
     runtime 'com.google.inject.extensions:guice-servlet:3.0'
     runtime 'com.sun.jersey.contribs:jersey-guice:1.11'
