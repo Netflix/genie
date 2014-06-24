@@ -18,6 +18,7 @@
 
 package com.netflix.genie.server.jobmanager.impl;
 
+import java.util.Random;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,12 +114,23 @@ public class JobJanitor extends Thread {
                 logger.error(e.getMessage());
             }
 
-            // sleep for the configured timeout
-            long sleepTime = conf.getLong(
-                    "netflix.genie.server.janitor.sleep.ms", 5000);
-            logger.info("Job janitor daemon going to sleep");
+            // get min sleep time
+            long minSleepTime = conf.getLong(
+                    "netflix.genie.server.janitor.min.sleep.ms", 300000);
+
+            // get max sleep time
+            long maxSleepTime = conf.getLong(
+                    "netflix.genie.server.janitor.max.sleep.ms", 600000);
+
+            // calculate a random number of seconds between min and max to sleep.
+            // This is done to stagger the janitor threads across multiple instances
+            Random randomGenerator = new Random();
+            // Since its a few seconds the long to int cast is fine
+            long randomSleepTime = randomGenerator.nextInt((int) (maxSleepTime - minSleepTime)) + minSleepTime;
+
+            logger.info("Job janitor daemon going to sleep for " + randomSleepTime / 1000 + " seconds.");
             try {
-                Thread.sleep(sleepTime);
+                Thread.sleep(randomSleepTime);
             } catch (InterruptedException e) {
                 logger.warn(e.getMessage());
                 continue;

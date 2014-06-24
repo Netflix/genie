@@ -88,6 +88,9 @@ public final class GenieNodeStatistics {
     @Monitor(name = "Failed_Email_Count", type = DataSourceType.COUNTER)
     private AtomicLong failedEmailCount = new AtomicLong(0);
 
+    @Monitor(name = "Job_Submission_Retry_Count", type = DataSourceType.COUNTER)
+    private AtomicLong jobSubmissionRetryCount = new AtomicLong(0);
+    
     /**
      * Private constructor for singleton.
      */
@@ -190,6 +193,24 @@ public final class GenieNodeStatistics {
     public void incrGenieJobSubmissions() {
         logger.debug("called");
         genieJobSubmissions.incrementAndGet();
+    }
+
+    /**
+     * Get number of successful email sent from this instance.
+     *
+     * @return number of successful email sent from this instance
+     */
+    public AtomicLong getJobSubmissionRetryCount() {
+        logger.debug("called");
+        return successEmailCount;
+    }
+
+    /**
+     * Increment successful email sent from this instance atomically.
+     */
+    public void incrJobSubmissionRetryCount() {
+        logger.debug("called");
+        successEmailCount.incrementAndGet();
     }
 
     /**

@@ -211,11 +211,11 @@ public class GenieExecutionServiceImpl implements ExecutionService {
 
             // update entity in DB
             jInfo.setUpdateTime(System.currentTimeMillis());
-            
+
             // At this stage the job is successfully init'ed in the db and also launched successfully by the job manager.
             // The call below is just trying to set the status in the DB as RUNNING and update the updateTime.
-            // We add retries to this updateEntity call, as since the job is launched we do not want to throw a false error 
-            // of job not running due to transient db connection issues.
+            // We add retries to this updateEntity call, as since the job is launched we do not want to throw a false 
+            // error of job not running due to transient db connection issues.
             int maxDBTransactionRetries = conf.getInt(
                     "netflix.genie.server.max.db.transaction.retries", 3);
             int attemptNum = 1;
@@ -227,12 +227,13 @@ public class GenieExecutionServiceImpl implements ExecutionService {
                     if (attemptNum == maxDBTransactionRetries) {
                         throw(e);
                     } else {
+                        stats.incrJobSubmissionRetryCount();
                         attemptNum++;
                         continue;
                     }
                 }
             }
-            
+
             // verification
             jInfo = pm.getEntity(jInfo.getJobID(), JobInfoElement.class);
 
