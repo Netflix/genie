@@ -33,10 +33,10 @@ allprojects {
 subprojects {
     group = "com.netflix.${githubProjectName}" // set to organization of project
     dependencies {
-        compile 'org.apache.commons:commons-lang3:3.2.1'
-        compile 'org.slf4j:slf4j-log4j12:1.7.0'
+        compile ('org.apache.commons:commons-lang3:3.2.1')
+        compile ('org.slf4j:slf4j-log4j12:1.7.0')
         
-        testCompile 'junit:junit:4.+'
-        testCompile "org.mockito:mockito-core:1.+"
+        testCompile ('junit:junit:4.+')
+        testCompile ('org.mockito:mockito-core:1.+')
     }
 }

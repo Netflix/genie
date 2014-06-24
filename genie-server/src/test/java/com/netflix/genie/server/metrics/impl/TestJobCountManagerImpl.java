@@ -14,12 +14,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.netflix.genie.server.metrics;
+package com.netflix.genie.server.metrics.impl;
 
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.server.metrics.JobCountManager;
+import com.netflix.genie.server.repository.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
 
 import java.util.ArrayList;
@@ -27,16 +28,35 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.junit.AfterClass;
+import javax.inject.Inject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Basic tests for the JobCountManager.
  *
  * @author skrishnan
+ * @author tgianos
  */
-public class TestJobCountManager {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:application-test.xml")
+@Transactional
+public class TestJobCountManagerImpl {
+    
+    @Inject
+    private JobRepository jobRepo;
+    
+    private JobCountManager manager;
+    
+    @Before
+    public void setup() {
+        this.manager = new JobCountManagerImpl();
+    }
 
     /**
      * Test getting number of running jobs on one instance.
@@ -47,7 +67,6 @@ public class TestJobCountManager {
     public void testNumInstanceJobs() throws Exception {
 
         // setup
-        PersistenceManager<Job> pm = new PersistenceManager<Job>();
         final Set<String> criteriaTags = new HashSet<String>();
         criteriaTags.add("prod");
         final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
@@ -59,31 +78,15 @@ public class TestJobCountManager {
         job.setStatus(JobStatus.RUNNING);
         job.setHostName(NetUtil.getHostName());
         job.setStartTime(1L);
-        pm.createEntity(job);
+        job = this.jobRepo.save(job);
 
         // number of running jobs - should be > 0
-        int numJobs = JobCountManager.getNumInstanceJobs();
-        Assert.assertEquals(numJobs > 0, true);
+        Assert.assertTrue(0 < this.manager.getNumInstanceJobs());
 
         // number of running jobs between 0 and now - should be > 0
-        numJobs = JobCountManager.getNumInstanceJobs(0L,
-                System.currentTimeMillis());
-        Assert.assertEquals(numJobs > 0, true);
+        Assert.assertTrue(0 < this.manager.getNumInstanceJobs(0L, System.currentTimeMillis()));
 
         // number of running jobs between 0 and 0 - should be none
-        numJobs = JobCountManager.getNumInstanceJobs(0L, 0L);
-        Assert.assertEquals(numJobs == 0, true);
-
-        // cleanup
-        job.setStatus(JobStatus.SUCCEEDED);
-        pm.updateEntity(job);
-    }
-
-    /**
-     * Shut down cleanly after test.
-     */
-    @AfterClass
-    public static void shutdown() {
-        PersistenceManager.shutdown();
+        Assert.assertTrue(0 == this.manager.getNumInstanceJobs(0L, 0L));
     }
 }

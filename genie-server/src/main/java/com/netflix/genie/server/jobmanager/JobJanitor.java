@@ -15,25 +15,30 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.startup;
+package com.netflix.genie.server.jobmanager;
 
 /**
- * This class provides custom initialization for Genie during startup.
+ * Janitor thread that marks jobs as zombies if status hasn't been updated for
+ * the configured timeout.
  *
  * @author skrishnan
  * @author tgianos
  */
-public interface GenieApplication {
+public interface JobJanitor extends Runnable {
 
     /**
-     * Initialize the application here - db connections, daemon threads, etc.
+     * Mark jobs as zombies if status hasn't been updated for
+     * netflix.genie.server.janitor.zombie.delta.ms.
      *
-     * @throws Exception
+     * @return Number of jobs marked as zombies
+     * @throws Exception if there is any error during the process
      */
-    public void initialize() throws Exception;
+    int markZombies() throws Exception;
 
     /**
-     * Cleanup/shutdown when context is destroyed.
+     * Tell the janitor thread to stop running at next iteration.
+     *
+     * @param stop true if the thread should stop running
      */
-    void shutdown();
+    void setStop(final boolean stop);
 }

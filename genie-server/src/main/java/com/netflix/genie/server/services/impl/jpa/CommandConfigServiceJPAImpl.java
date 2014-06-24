@@ -22,7 +22,8 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
-import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.server.repository.ApplicationRepository;
+import com.netflix.genie.server.repository.CommandRepository;
 import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -30,8 +31,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -40,6 +43,7 @@ import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the CommandConfigService interface.
@@ -47,19 +51,30 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
+@Named
+@Transactional(rollbackFor = CloudServiceException.class)
 public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(CommandConfigServiceJPAImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CommandConfigServiceJPAImpl.class);
 
-    private final PersistenceManager<Command> pm;
+    @PersistenceContext
+    private EntityManager em;
+
+    private final CommandRepository commandRepo;
+    private final ApplicationRepository appRepo;
 
     /**
      * Default constructor.
+     *
+     * @param commandRepo the command repository to use
+     * @param appRepo the application repository to use
      */
-    public CommandConfigServiceJPAImpl() {
-        // instantiate PersistenceManager
-        this.pm = new PersistenceManager<Command>();
+    @Inject
+    public CommandConfigServiceJPAImpl(
+            final CommandRepository commandRepo,
+            final ApplicationRepository appRepo) {
+        this.commandRepo = commandRepo;
+        this.appRepo = appRepo;
     }
 
     /**
@@ -68,6 +83,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
+    @Transactional(readOnly = true)
     public Command getCommand(final String id) throws CloudServiceException {
         LOG.debug("called");
         if (StringUtils.isEmpty(id)) {
@@ -75,19 +91,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Id can't be null or empty.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            //No need for a transation for a get
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                return command;
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            return command;
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -95,6 +105,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Command> getCommands(
             final String name,
             final String userName,
@@ -102,28 +113,24 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final int limit) {
         LOG.debug("Called");
 
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            final CriteriaBuilder cb = em.getCriteriaBuilder();
-            final CriteriaQuery<Command> cq = cb.createQuery(Command.class);
-            final Root<Command> c = cq.from(Command.class);
-            final List<Predicate> predicates = new ArrayList<Predicate>();
-            if (StringUtils.isNotEmpty(name)) {
-                predicates.add(cb.equal(c.get(Command_.name), name));
-            }
-            if (StringUtils.isNotEmpty(userName)) {
-                predicates.add(cb.equal(c.get(Command_.user), userName));
-            }
-            cq.where(cb.and(predicates.toArray(new Predicate[0])));
-            final TypedQuery<Command> query = em.createQuery(cq);
-            final int finalPage = page < 0 ? PersistenceManager.DEFAULT_PAGE_NUMBER : page;
-            final int finalLimit = limit < 0 ? PersistenceManager.DEFAULT_PAGE_SIZE : limit;
-            query.setMaxResults(finalLimit);
-            query.setFirstResult(finalLimit * finalPage);
-            return query.getResultList();
-        } finally {
-            em.close();
+        //TODO: Switch to this in the CommandRepository
+        final CriteriaBuilder cb = this.em.getCriteriaBuilder();
+        final CriteriaQuery<Command> cq = cb.createQuery(Command.class);
+        final Root<Command> c = cq.from(Command.class);
+        final List<Predicate> predicates = new ArrayList<Predicate>();
+        if (StringUtils.isNotEmpty(name)) {
+            predicates.add(cb.equal(c.get(Command_.name), name));
         }
+        if (StringUtils.isNotEmpty(userName)) {
+            predicates.add(cb.equal(c.get(Command_.user), userName));
+        }
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+        final TypedQuery<Command> query = this.em.createQuery(cq);
+        final int finalPage = page < 0 ? 0 : page;
+        final int finalLimit = limit < 0 ? 1024 : limit;
+        query.setMaxResults(finalLimit);
+        query.setFirstResult(finalLimit * finalPage);
+        return query.getResultList();
     }
 
     /**
@@ -135,39 +142,27 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     public Command createCommand(final Command command) throws CloudServiceException {
         Command.validate(command);
         LOG.debug("Called to create command " + command.toString());
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            if (StringUtils.isEmpty(command.getId())) {
-                command.setId(UUID.randomUUID().toString());
-            }
-            if (em.contains(command)) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_BAD_REQUEST,
-                        "A command with id " + command.getId() + " already exists");
-            }
-            final Set<Application> detachedApps = command.getApplications();
-            final Set<Application> attachedApps = new HashSet<Application>();
-            if (detachedApps != null) {
-                for (final Application detached : detachedApps) {
-                    final Application app = em.find(Application.class, detached.getId());
-                    if (app != null) {
-                        app.getCommands().add(command);
-                        attachedApps.add(app);
-                    }
+        if (StringUtils.isEmpty(command.getId())) {
+            command.setId(UUID.randomUUID().toString());
+        }
+        if (this.commandRepo.exists(command.getId())) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "A command with id " + command.getId() + " already exists");
+        }
+        final Set<Application> detachedApps = command.getApplications();
+        final Set<Application> attachedApps = new HashSet<Application>();
+        if (detachedApps != null) {
+            for (final Application detached : detachedApps) {
+                final Application app = this.appRepo.findOne(detached.getId());
+                if (app != null) {
+                    app.getCommands().add(command);
+                    attachedApps.add(app);
                 }
             }
-            command.setApplications(attachedApps);
-            em.persist(command);
-            trans.commit();
-            return command;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
         }
+        command.setApplications(attachedApps);
+        return this.commandRepo.save(command);
     }
 
     /**
@@ -190,20 +185,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     "Command id either not entered or inconsistent with id passed in.");
         }
         LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
-        final EntityManager em = pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.merge(updateCommand);
-            Command.validate(command);
-            trans.commit();
-            return command;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
-        }
+        final Command command = this.em.merge(updateCommand);
+        Command.validate(command);
+        return command;
     }
 
     /**
@@ -214,22 +198,12 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     @Override
     public List<Command> deleteAllCommands() throws CloudServiceException {
         LOG.debug("Called to delete all commands");
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final List<Command> commands = this.getCommands(null, null, 0, Integer.MAX_VALUE);
-            for (final Command command : commands) {
-                this.deleteCommand(command.getId());
-            }
-            trans.commit();
-            return commands;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        final Iterable<Command> commands = this.commandRepo.findAll();
+        final List<Command> returnCommands = new ArrayList<Command>();
+        for (final Command command : commands) {
+            returnCommands.add(this.deleteCommand(command.getId()));
         }
+        return returnCommands;
     }
 
     /**
@@ -240,35 +214,24 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     @Override
     public Command deleteCommand(final String id) throws CloudServiceException {
         LOG.debug("Called to delete command config with id " + id);
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command == null) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists to delete.");
-            }
-            //Remove the command from the associated Application references
-            final Set<Application> apps = command.getApplications();
-            if (apps != null) {
-                for (final Application app : apps) {
-                    final Set<Command> commands = app.getCommands();
-                    if (commands != null) {
-                        commands.remove(command);
-                    }
+        final Command command = this.commandRepo.findOne(id);
+        if (command == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists to delete.");
+        }
+        //Remove the command from the associated Application references
+        final Set<Application> apps = command.getApplications();
+        if (apps != null) {
+            for (final Application app : apps) {
+                final Set<Command> commands = app.getCommands();
+                if (commands != null) {
+                    commands.remove(command);
                 }
             }
-            em.remove(command);
-            trans.commit();
-            return command;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
         }
+        this.commandRepo.delete(command);
+        return command;
     }
 
     /**
@@ -290,25 +253,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No configuration files entered.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                command.getConfigs().addAll(configs);
-                trans.commit();
-                return command.getConfigs();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getConfigs().addAll(configs);
+            return command.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -318,6 +270,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
+    @Transactional(readOnly = true)
     public Set<String> getConfigsForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
@@ -325,8 +278,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to get configs.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final Command command = em.find(Command.class, id);
+        final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command.getConfigs();
         } else {
@@ -350,25 +302,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to update configurations.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                command.setConfigs(configs);
-                trans.commit();
-                return command.getConfigs();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.setConfigs(configs);
+            return command.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -385,25 +326,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove jars.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                command.getConfigs().clear();
-                trans.commit();
-                return command.getConfigs();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getConfigs().clear();
+            return command.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -421,27 +351,16 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove configuration.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                if (StringUtils.isNotBlank(config)) {
-                    command.getConfigs().remove(config);
-                }
-                trans.commit();
-                return command.getConfigs();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            if (StringUtils.isNotBlank(config)) {
+                command.getConfigs().remove(config);
             }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+            return command.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -459,32 +378,20 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to add applications.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                for (final Application detached : applications) {
-                    final Application app
-                            = em.find(Application.class, detached.getId());
-                    if (app != null) {
-                        command.getApplications().add(app);
-                        app.getCommands().add(command);
-                    }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            for (final Application detached : applications) {
+                final Application app = this.appRepo.findOne(detached.getId());
+                if (app != null) {
+                    command.getApplications().add(app);
+                    app.getCommands().add(command);
                 }
-                trans.commit();
-                return command.getApplications();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
             }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+            return command.getApplications();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -494,6 +401,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
+    @Transactional(readOnly = true)
     public Set<Application> getApplicationsForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
@@ -501,18 +409,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to get applications.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                return command.getApplications();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            return command.getApplications();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -530,34 +433,22 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to update applications.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                final Set<Application> apps = new HashSet<Application>();
-                for (final Application detached : applications) {
-                    final Application app
-                            = em.find(Application.class, detached.getId());
-                    if (app != null) {
-                        apps.add(app);
-                        app.getCommands().add(command);
-                    }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            final Set<Application> apps = new HashSet<Application>();
+            for (final Application detached : applications) {
+                final Application app = this.appRepo.findOne(detached.getId());
+                if (app != null) {
+                    apps.add(app);
+                    app.getCommands().add(command);
                 }
-                command.setApplications(apps);
-                trans.commit();
-                return command.getApplications();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
             }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+            command.setApplications(apps);
+            return command.getApplications();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -574,28 +465,17 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove applications.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                for (final Application app : command.getApplications()) {
-                    app.getCommands().remove(command);
-                }
-                command.getApplications().clear();
-                trans.commit();
-                return command.getApplications();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            for (final Application app : command.getApplications()) {
+                app.getCommands().remove(command);
             }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+            command.getApplications().clear();
+            return command.getApplications();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -618,29 +498,18 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to remove application.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                final Application app = em.find(Application.class, appId);
-                if (app != null) {
-                    app.getCommands().remove(command);
-                    command.getApplications().remove(app);
-                }
-                trans.commit();
-                return command.getApplications();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            final Application app = this.appRepo.findOne(appId);
+            if (app != null) {
+                app.getCommands().remove(command);
+                command.getApplications().remove(app);
             }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+            return command.getApplications();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -650,6 +519,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
+    @Transactional(readOnly = true)
     public Set<Cluster> getClustersForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
@@ -657,18 +527,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to get clusters.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                return command.getClusters();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            return command.getClusters();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 }

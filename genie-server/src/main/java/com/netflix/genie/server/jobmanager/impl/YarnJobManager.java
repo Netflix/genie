@@ -26,7 +26,6 @@ import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
-import com.netflix.genie.server.persistence.PersistenceManager;
 import com.netflix.genie.server.util.StringUtil;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,9 +37,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.activation.DataHandler;
+import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of job manager for Yarn Jobs.
@@ -48,80 +52,98 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author skrishnan
  * @author bmundlapudi
+ * @author tgianos
  */
+@Named("YarnJobManager")
+@Scope("prototype")
 public class YarnJobManager implements JobManager {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(YarnJobManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(YarnJobManager.class);
 
-    private final PersistenceManager<Command> pmCommand;
+    @PersistenceContext
+    private EntityManager em;
+    
+    private final JobMonitor jobMonitor;
 
     /**
      * The name of the Genie job id property to be passed to all jobs.
      */
-    protected static final String GENIE_JOB_ID = "genie.job.id";
+    private static final String GENIE_JOB_ID = "genie.job.id";
 
     /**
      * The value of the Genie job id property to pass to jobs.
      */
-    protected String genieJobIDProp;
+    private String genieJobIDProp;
 
     /**
      * The name of the Environment (test/prod) property to be passed to all
      * jobs.
      */
-    protected static final String NFLX_ENV = "netflix.environment";
+    private static final String NFLX_ENV = "netflix.environment";
 
     /**
      * The value of the environment to be passed to jobs.
      */
-    protected String netflixEnvProp;
+    private String netflixEnvProp;
 
     /**
      * The value for the Lipstick job ID, if needed.
      */
-    protected String lipstickUuidProp;
+    private String lipstickUuidProp;
 
     /**
      * The environment variables for this job.
      */
-    protected Map<String, String> env;
+    private Map<String, String> env;
 
     /**
-     * Reference to the cluster config element to run the job on.
+     * Reference to the cluster configuration element to run the job on.
      */
-    protected Cluster cluster;
+    private Cluster cluster;
 
     /**
      * Default group name for job submissions.
      */
-    protected static final String HADOOP_GROUP_NAME = "hadoop";
+    private static final String HADOOP_GROUP_NAME = "hadoop";
 
     /**
      * The command-line arguments for this job.
      */
-    protected String[] args;
+    private String[] args;
 
     /**
      * The job info for this job, which is persisted to the database.
      */
-    protected Job ji;
+    private Job ji;
 
     /**
      * Actual command to run determined from the Command selected.
      */
-    protected String executable;
+    private String executable;
 
     /**
      * Default constructor - initializes cluster configuration and load
      * balancer.
      *
-     * @param cluster The cluster this job manager will be working with
+     * @param jobMonitor The job monitor object to use.
      * @throws CloudServiceException if there is any error in initialization
      */
-    public YarnJobManager(final Cluster cluster) throws CloudServiceException {
+    public YarnJobManager(final JobMonitor jobMonitor) throws CloudServiceException {
+        this.jobMonitor = jobMonitor;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public void setCluster(final Cluster cluster) throws CloudServiceException {
+        if (cluster == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, "No cluster entered.");
+        }
         this.cluster = cluster;
-        this.pmCommand = new PersistenceManager<Command>();
     }
 
     /**
@@ -131,14 +153,14 @@ public class YarnJobManager implements JobManager {
      * @throws CloudServiceException if there is any error in the job launch
      */
     @Override
-    public void launch(Job jInfo) throws CloudServiceException {
+    public void launch(final Job jInfo) throws CloudServiceException {
         LOG.info("called");
 
         // initialize all the arguments and environment
         init(jInfo);
 
         // create the ProcessBuilder for this process
-        ProcessBuilder pb = new ProcessBuilder(args);
+        ProcessBuilder pb = new ProcessBuilder(this.args);
 
         // set current working directory for the process
         String cWorkingDir = env.get("BASE_USER_WORKING_DIR") + File.separator
@@ -226,14 +248,16 @@ public class YarnJobManager implements JobManager {
         int pid;
         try {
             // launch job, and get process handle
-            Process proc = pb.start();
+            final Process proc = pb.start();
             pid = getProcessId(proc);
-            ji.setProcessHandle(pid);
+            this.ji.setProcessHandle(pid);
 
             // set off monitor thread for the job
-            JobMonitor jobMonitorThread = new JobMonitor(ji, cWorkingDir, proc);
-            jobMonitorThread.start();
-            ji.setJobStatus(JobStatus.RUNNING, "Job is running");
+            this.jobMonitor.setJob(this.ji);
+            this.jobMonitor.setProcess(proc);
+            this.jobMonitor.setWorkingDir(cWorkingDir);
+            this.jobMonitor.start();
+            this.ji.setJobStatus(JobStatus.RUNNING, "Job is running");
         } catch (IOException e) {
             String msg = "Failed to launch the job";
             LOG.error(msg, e);
@@ -338,6 +362,7 @@ public class YarnJobManager implements JobManager {
      * @return a map containing environment variables for this job
      * @throws CloudServiceException if there is any error in initialization
      */
+    @Transactional(readOnly = true)
     protected Map<String, String> initEnv(Job ji2) throws CloudServiceException {
         LOG.info("called");
 
@@ -364,7 +389,7 @@ public class YarnJobManager implements JobManager {
         if ((ji2.getCommandId() != null) && (!(ji2.getCommandId().isEmpty()))) {
             String cmdId = ji2.getCommandId();
 
-            command = pmCommand.getEntity(cmdId, Command.class);
+            command = this.em.find(Command.class, cmdId);
             for (final Application ace : command.getApplications()) {
                 // If appid is specified check against it. If matches set It and break
                 if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {

@@ -17,10 +17,21 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
+import com.netflix.config.ConfigurationManager;
+import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.Types;
+import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.Types.SubprocessStatus;
+import com.netflix.genie.server.jobmanager.JobManager;
+import com.netflix.genie.server.metrics.GenieNodeStatistics;
+import com.netflix.genie.server.util.NetUtil;
 import java.io.File;
+import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.Properties;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -29,35 +40,35 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types;
-import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.common.model.Types.SubprocessStatus;
-import com.netflix.genie.server.jobmanager.JobManagerFactory;
-import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import com.netflix.genie.server.persistence.PersistenceManager;
-import com.netflix.genie.server.util.NetUtil;
-import java.util.Date;
+import org.springframework.context.annotation.Scope;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The monitor thread that gets launched for each job.
  *
  * @author skrishnan
  * @author amsharma
+ * @author tgianos
  */
+@Named
+@Scope("prototype")
 public class JobMonitor extends Thread {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobMonitor.class);
 
-    private final Job job;
-    private final PersistenceManager<Job> pm;
+    private Job job;
+
+    private JobManager jobManager;
+
+    private final GenieNodeStatistics genieNodeStatistics;
+
+    @PersistenceContext
+    private EntityManager em;
 
     // interval to poll for process status
     private static final int JOB_WAIT_TIME_MS = 5000;
@@ -69,10 +80,10 @@ public class JobMonitor extends Thread {
     private long lastUpdatedTimeMS;
 
     // the handle to the process for the running job
-    private final Process proc;
+    private Process proc;
 
     // the working directory for this job
-    private final String workingDir;
+    private String workingDir;
 
     // the stdout for this job
     private File stdOutFile;
@@ -87,22 +98,143 @@ public class JobMonitor extends Thread {
     private final AbstractConfiguration config;
 
     /**
-     * Initialize this monitor thread with the process for the running job.
+     * Constructor.
      *
-     * @param ji the job info object for this running job
-     * @param workingDir the working directory for this job
-     * @param proc process handle for running job
+     * @param genieNodeStatistics The statistics object to use
      */
-    public JobMonitor(Job ji, String workingDir, Process proc) {
-        this.job = ji;
+    @Inject
+    public JobMonitor(final GenieNodeStatistics genieNodeStatistics) {
+        this.genieNodeStatistics = genieNodeStatistics;
         this.config = ConfigurationManager.getConfigInstance();
+        this.maxStdoutSize = this.config.getLong("netflix.genie.job.max.stdout.size", null);
+
+        this.job = null;
+        this.workingDir = null;
+        this.proc = null;
+        this.stdOutFile = null;
+    }
+
+    /**
+     * Set the job for this to monitor.
+     *
+     * @param job The job to monitor. Not null.
+     * @throws CloudServiceException
+     */
+    public void setJob(final Job job) throws CloudServiceException {
+        if (job == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, "No job entered.");
+        }
+        this.job = job;
+    }
+
+    /**
+     * Set the working directory for this job.
+     *
+     * @param workingDir The working directory to use for this job
+     */
+    public void setWorkingDir(final String workingDir) {
         this.workingDir = workingDir;
         if (this.workingDir != null) {
-            stdOutFile = new File(this.workingDir + File.separator + "stdout.log");
+            this.stdOutFile = new File(this.workingDir + File.separator + "stdout.log");
+        }
+    }
+
+    /**
+     * Set the process handle for this job.
+     *
+     * @param proc The process handle for the job. Not null.
+     * @throws CloudServiceException
+     */
+    public void setProcess(final Process proc) throws CloudServiceException {
+        if (proc == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, "No process entered.");
         }
         this.proc = proc;
-        this.pm = new PersistenceManager<Job>();
-        this.maxStdoutSize = config.getLong("netflix.genie.job.max.stdout.size", null);
+    }
+
+    /**
+     * Set the job manager for this monitor to use.
+     *
+     * @param jobManager The job manager to use. Not Null.
+     * @throws CloudServiceException
+     */
+    public void setJobManager(final JobManager jobManager) throws CloudServiceException {
+        if (jobManager == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, "No job manager entered.");
+        }
+        this.jobManager = jobManager;
+    }
+
+    /**
+     * The main run method for this thread - wait till it finishes, and manage
+     * job state in DB.
+     */
+    @Override
+    public void run() {
+        // flag to track if the job is killed. Used to determine status of email sent.
+        boolean killed = false;
+
+        // wait for process to complete
+        int exitCode = waitForExit();
+        this.job.setExitCode(exitCode);
+
+        final Job dbJI = this.em.find(Job.class, this.job.getId());
+
+        // only update status if not KILLED
+        if (dbJI.getStatus() != null && dbJI.getStatus() != JobStatus.KILLED) {
+            if (exitCode != SubprocessStatus.SUCCESS.code()) {
+                // all other failures except s3 log archival failure
+                LOG.error("Failed to execute job, exit code: "
+                        + exitCode);
+                String errMsg = Types.SubprocessStatus.message(exitCode);
+                if ((errMsg == null) || (errMsg.isEmpty())) {
+                    errMsg = "Please look at job's stderr for more details";
+                }
+                this.job.setJobStatus(JobStatus.FAILED,
+                        "Failed to execute job, Error Message: " + errMsg);
+                // incr counter for failed jobs
+                this.genieNodeStatistics.incrGenieFailedJobs();
+            } else {
+                // success
+                this.job.setJobStatus(JobStatus.SUCCEEDED,
+                        "Job finished successfully");
+                // incr counter for successful jobs
+                this.genieNodeStatistics.incrGenieSuccessfulJobs();
+            }
+
+            // set the archive location - if needed
+            if (!this.job.isDisableLogArchival()) {
+                this.job.setArchiveLocation(NetUtil.getArchiveURI(this.job.getId()));
+            }
+
+            // update the job status
+            this.job.setUpdated(new Date());
+            this.em.merge(this.job);
+        } else {
+            // if job status is killed, the kill thread will update status
+            LOG.debug("Job has been killed - will not update DB: " + job.getId());
+            killed = true;
+        }
+
+        // Check if user email address is specified. If so
+        // send an email to user about job completion.
+        final String emailTo = this.job.getEmail();
+
+        if (emailTo != null) {
+            LOG.info("User email address: " + emailTo);
+
+            if (sendEmail(emailTo, killed)) {
+                // Email sent successfully. Update success email counter
+                this.genieNodeStatistics.incrSuccessfulEmailCount();
+            } else {
+                // Failed to send email. Update email failed counter
+                LOG.warn("Failed to send email.");
+                this.genieNodeStatistics.incrFailedEmailCount();
+            }
+        }
     }
 
     /**
@@ -139,8 +271,9 @@ public class JobMonitor extends Thread {
      *
      * @return exit code for the job after it finishes
      */
+    @Transactional
     private int waitForExit() {
-        lastUpdatedTimeMS = System.currentTimeMillis();
+        this.lastUpdatedTimeMS = System.currentTimeMillis();
         while (isRunning()) {
             try {
                 Thread.sleep(JOB_WAIT_TIME_MS);
@@ -154,43 +287,36 @@ public class JobMonitor extends Thread {
             if (shouldUpdateJob()) {
                 LOG.debug("Updating db for job: " + job.getId());
 
-                lastUpdatedTimeMS = System.currentTimeMillis();
-                job.setJobStatus(JobStatus.RUNNING, "Job is running");
-                job.setUpdated(new Date(lastUpdatedTimeMS));
+                this.lastUpdatedTimeMS = System.currentTimeMillis();
+                this.job.setJobStatus(JobStatus.RUNNING, "Job is running");
+                this.job.setUpdated(new Date(this.lastUpdatedTimeMS));
 
-                // only update DB if it is not KILLED already
-                ReentrantReadWriteLock rwl = PersistenceManager.getDbLock();
                 try {
-                    rwl.writeLock().lock();
-                    Job dbJI = pm.getEntity(job.getId(),
-                            Job.class);
+                    final Job dbJI = this.em.find(Job.class, this.job.getId());
                     if ((dbJI.getStatus() != null)
                             && dbJI.getStatus() != JobStatus.KILLED) {
-                        pm.updateEntity(job);
+                        this.job.setUpdated(new Date());
+                        this.em.merge(this.job);
                     }
                 } catch (Exception e) {
                     LOG.error(
                             "Exception while trying to update status for job: "
-                            + job.getId(), e);
+                            + this.job.getId(), e);
                     // continue - as we shouldn't terminate this thread until
                     // job is running
-                } finally {
-                    // ensure that we always unlock
-                    if (rwl.writeLock().isHeldByCurrentThread()) {
-                        rwl.writeLock().unlock();
-                    }
                 }
 
                 // kill the job if it is writing out more than the max stdout limit
                 // if it has been terminated already, move on and wait for it to clean up after itself
-                if ((stdOutFile != null) && (stdOutFile.exists())
-                        && (maxStdoutSize != null) && (stdOutFile.length() > maxStdoutSize)
-                        && (!terminated)) {
-                    LOG.warn("Killing job " + job.getId() + " as its stdout is greater than limit");
+                if (this.stdOutFile != null
+                        && this.stdOutFile.exists()
+                        && this.maxStdoutSize != null
+                        && this.stdOutFile.length() > this.maxStdoutSize
+                        && !this.terminated) {
+                    LOG.warn("Killing job " + this.job.getId() + " as its stdout is greater than limit");
                     // kill the job - no need to update status, as it will be updated during next iteration
                     try {
-                        final JobManagerFactory factory = new JobManagerFactory();
-                        factory.getJobManager(this.job).kill(this.job);
+                        this.jobManager.kill(this.job);
                         this.terminated = true;
                     } catch (CloudServiceException e) {
                         LOG.error("Can't kill job " + this.job.getId()
@@ -201,95 +327,7 @@ public class JobMonitor extends Thread {
             }
         }
 
-        return proc.exitValue();
-    }
-
-    /**
-     * The main run method for this thread - wait till it finishes, and manage
-     * job state in DB.
-     */
-    @Override
-    public void run() {
-        GenieNodeStatistics stats = GenieNodeStatistics.getInstance();
-
-        // flag to track if the job is killed. Used to determine status of email sent.
-        boolean killed = false;
-
-        // wait for process to complete
-        int exitCode = waitForExit();
-        job.setExitCode(exitCode);
-
-        ReentrantReadWriteLock rwl = PersistenceManager.getDbLock();
-        try {
-            // get job status from the DB to ensure it was not killed
-            // acquire a write lock first
-            rwl.writeLock().lock();
-
-            Job dbJI = pm.getEntity(job.getId(),
-                    Job.class);
-
-            // only update status if not KILLED
-            if ((dbJI.getStatus() != null)
-                    && dbJI.getStatus() != JobStatus.KILLED) {
-
-                if (exitCode != SubprocessStatus.SUCCESS.code()) {
-                    // all other failures except s3 log archival failure
-                    LOG.error("Failed to execute job, exit code: "
-                            + exitCode);
-                    String errMsg = Types.SubprocessStatus.message(exitCode);
-                    if ((errMsg == null) || (errMsg.isEmpty())) {
-                        errMsg = "Please look at job's stderr for more details";
-                    }
-                    job.setJobStatus(JobStatus.FAILED,
-                            "Failed to execute job, Error Message: " + errMsg);
-                    // incr counter for failed jobs
-                    stats.incrGenieFailedJobs();
-                } else {
-                    // success
-                    job.setJobStatus(JobStatus.SUCCEEDED,
-                            "Job finished successfully");
-                    // incr counter for successful jobs
-                    stats.incrGenieSuccessfulJobs();
-                }
-
-                // set the archive location - if needed
-                if (!job.isDisableLogArchival()) {
-                    job.setArchiveLocation(NetUtil.getArchiveURI(job.getId()));
-                }
-
-                // update the job status
-                pm.updateEntity(job);
-                rwl.writeLock().unlock();
-            } else {
-                // if job status is killed, the kill thread will update status
-                LOG.debug("Job has been killed - will not update DB: "
-                        + job.getId());
-                killed = true;
-                rwl.writeLock().unlock();
-            }
-        } finally {
-            // ensure that we always unlock
-            if (rwl.writeLock().isHeldByCurrentThread()) {
-                rwl.writeLock().unlock();
-            }
-        }
-
-        // Check if user email address is specified. If so
-        // send an email to user about job completion.
-        String emailTo = job.getEmail();
-
-        if (emailTo != null) {
-            LOG.info("User email address: " + emailTo);
-
-            if (sendEmail(emailTo, killed)) {
-                // Email sent successfully. Update success email counter
-                stats.incrSuccessfulEmailCount();
-            } else {
-                // Failed to send email. Update email failed counter
-                LOG.warn("Failed to send email.");
-                stats.incrFailedEmailCount();
-            }
-        }
+        return this.proc.exitValue();
     }
 
     /**
@@ -302,18 +340,18 @@ public class JobMonitor extends Thread {
     private boolean sendEmail(String emailTo, boolean killed) {
         LOG.debug("called");
 
-        if (!config.getBoolean("netflix.genie.server.mail.enable", false)) {
+        if (!this.config.getBoolean("netflix.genie.server.mail.enable", false)) {
             LOG.warn("Email is disabled but user has specified an email address.");
             return false;
         }
 
         // Sender's email ID
-        String fromEmail = config.getString("netflix.genie.server.mail.smpt.from", "no-reply-genie@geniehost.com");
+        String fromEmail = this.config.getString("netflix.genie.server.mail.smpt.from", "no-reply-genie@geniehost.com");
         LOG.info("From email address to use to send email: "
                 + fromEmail);
 
         // Set the smtp server hostname. Use localhost as default
-        String smtpHost = config.getString("netflix.genie.server.mail.smtp.host", "localhost");
+        String smtpHost = this.config.getString("netflix.genie.server.mail.smtp.host", "localhost");
         LOG.debug("Email smtp server: "
                 + smtpHost);
 
@@ -326,7 +364,7 @@ public class JobMonitor extends Thread {
         // check whether authentication should be turned on
         Authenticator auth = null;
 
-        if (config.getBoolean("netflix.genie.server.mail.smtp.auth", false)) {
+        if (this.config.getBoolean("netflix.genie.server.mail.smtp.auth", false)) {
             LOG.debug("Email Authentication Enabled");
 
             properties.put("mail.smtp.starttls.enable", "true");

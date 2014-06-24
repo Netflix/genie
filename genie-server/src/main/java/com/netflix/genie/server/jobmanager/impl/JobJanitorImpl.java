@@ -18,17 +18,20 @@
 package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
-import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.server.jobmanager.JobJanitor;
 import java.util.Date;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Janitor thread that marks jobs as zombies if status hasn't been updated for
@@ -37,46 +40,48 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
-public class JobJanitor extends Thread {
+@Named
+@Scope("prototype")
+public class JobJanitorImpl implements JobJanitor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobJanitor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobJanitorImpl.class);
 
-    private final PersistenceManager<Job> pm;
     private final AbstractConfiguration conf;
     private boolean stop;
+    
+    @PersistenceContext
+    private EntityManager em;
 
     /**
      * Default constructor - initializes members correctly in order.
      */
-    public JobJanitor() {
-        conf = ConfigurationManager.getConfigInstance();
-        pm = new PersistenceManager<Job>();
-        stop = false;
+    public JobJanitorImpl() {
+        this.conf = ConfigurationManager.getConfigInstance();
+        this.stop = false;
     }
 
     /**
-     * Mark jobs as zombies if status hasn't been updated for
-     * netflix.genie.server.janitor.zombie.delta.ms.
-     *
-     * @return Number of jobs marked as zombies
-     * @throws Exception if there is any error during the process
+     * {@inheritDoc}
+     * @throws Exception 
      */
+    @Override
+    @Transactional
     public int markZombies() throws Exception {
         // the equivalent query is as follows:
         // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
         // statusMsg='Job has been marked as a zombie'
         // where updateTime < $min and (status='RUNNING' or status='INIT')"
         long currentTime = System.currentTimeMillis();
-        long zombieTime = conf.getLong(
+        long zombieTime = this.conf.getLong(
                 "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
 
         final StringBuilder builder = new StringBuilder();
+        //TODO: Replace with criteria query
         builder.append("UPDATE Job j ");
         builder.append("SET j.status = :failed, j.finishTime = :currentTime, j.exitCode = :exitCode, j.statusMsg = :statusMessage ");
         builder.append("WHERE j.updated < :updated AND (j.status = :running OR j.status = :init)");
-        final EntityManager em = pm.createEntityManager();
         try {
-            final Query query = em.createQuery(builder.toString())
+            final Query query = this.em.createQuery(builder.toString())
                     .setParameter("failed", JobStatus.FAILED)
                     .setParameter("currentTime", currentTime)
                     .setParameter("exitCode", SubprocessStatus.ZOMBIE_JOB.code())
@@ -102,7 +107,7 @@ public class JobJanitor extends Thread {
     public void run() {
         while (true) {
             LOG.info("Job janitor daemon waking up");
-            if (stop) {
+            if (this.stop) {
                 LOG.info("Job janitor stopping as per request");
                 return;
             }
@@ -116,7 +121,7 @@ public class JobJanitor extends Thread {
             }
 
             // sleep for the configured timeout
-            long sleepTime = conf.getLong(
+            long sleepTime = this.conf.getLong(
                     "netflix.genie.server.janitor.sleep.ms", 5000);
             LOG.info("Job janitor daemon going to sleep");
             try {
@@ -128,11 +133,10 @@ public class JobJanitor extends Thread {
     }
 
     /**
-     * Tell the janitor thread to stop running at next iteration.
-     *
-     * @param stop true if the thread should stop running
+     * {@inheritDoc}
      */
-    public void setStop(boolean stop) {
+    @Override
+    public void setStop(final boolean stop) {
         this.stop = stop;
     }
 }

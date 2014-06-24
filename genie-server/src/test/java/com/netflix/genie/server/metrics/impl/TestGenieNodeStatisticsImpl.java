@@ -15,32 +15,42 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.metrics;
+package com.netflix.genie.server.metrics.impl;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import java.util.concurrent.atomic.AtomicLong;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Test case for GenieNodeStatistics.
  *
  * @author skrishnan
+ * @author tgianos
  */
-public class TestGenieNodeStatistics {
+public class TestGenieNodeStatisticsImpl {
 
-    private static GenieNodeStatistics stats;
+    private GenieNodeStatistics stats;
 
     /**
      * Initialize stats object before any tests are run.
      */
-    @BeforeClass
-    public static void init() {
-        GenieNodeStatistics.register();
-        stats = GenieNodeStatistics.getInstance();
+    @Before
+    public void setup() {
+        this.stats = new GenieNodeStatisticsImpl();
+        this.stats.register();
+    }
+
+    /**
+     * Shutdown stats object after test is done.
+     */
+    @After
+    public void tearDown() {
+        // shut down cleanly
+        this.stats.shutdown();
     }
 
     /**
@@ -144,15 +154,5 @@ public class TestGenieNodeStatistics {
     public void testRunningJobs() throws InterruptedException, CloudServiceException {
         stats.setGenieRunningJobs(0);
         Assert.assertEquals(0, stats.getGenieRunningJobs().intValue());
-    }
-
-    /**
-     * Shutdown stats object after test is done.
-     */
-    @AfterClass
-    public static void shutdown() {
-        // shut down cleanly
-        stats.shutdown();
-        PersistenceManager.shutdown();
     }
 }

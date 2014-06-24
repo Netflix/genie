@@ -30,7 +30,7 @@ import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
-import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.server.repository.JobRepository;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.NetUtil;
 import com.netflix.niws.client.http.RestClient;
@@ -40,10 +40,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
+import javax.persistence.PersistenceContext;
 import javax.persistence.RollbackException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -54,17 +56,20 @@ import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the Genie Execution Service API that uses a local job
  * launcher (via the job manager implementation), and uses OpenJPA for
- * peristence.
+ * persistence.
  *
  * @author skrishnan
  * @author bmundlapudi
  * @author amsharma
  * @author tgianos
  */
+@Named
+@Transactional(rollbackFor = CloudServiceException.class)
 public class ExecutionServiceJPAImpl implements ExecutionService {
 
     private static final Logger LOG = LoggerFactory
@@ -79,11 +84,17 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     private static final String JOB_RESOURCE_PREFIX;
 
     // per-instance variables
-    private final PersistenceManager<Job> pm;
     private final GenieNodeStatistics stats;
+    private final JobRepository jobRepo;
+    private final JobCountManager jobCountManager;
+    private final JobManagerFactory jobManagerFactory;
+
+    @PersistenceContext
+    private EntityManager em;
 
     // initialize static variables
     static {
+        //TODO: Seem to remember something about injecting configuration using governator
         CONF = ConfigurationManager.getConfigInstance();
         SERVER_PORT = CONF.getInt("netflix.appinfo.port", 7001);
         JOB_DIR_PREFIX = CONF.getString("netflix.genie.server.job.dir.prefix",
@@ -95,10 +106,22 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * Default constructor - initializes persistence manager, and other utility
      * classes.
+     *
+     * @param jobRepo The job repository to use.
+     * @param stats the GenieNodeStatistics object
+     * @param jobCountManager the job count manager to use
+     * @param jobManagerFactory The the job manager factory to use
      */
-    public ExecutionServiceJPAImpl() {
-        this.pm = new PersistenceManager<Job>();
-        this.stats = GenieNodeStatistics.getInstance();
+    @Inject
+    public ExecutionServiceJPAImpl(
+            final JobRepository jobRepo,
+            final GenieNodeStatistics stats,
+            final JobCountManager jobCountManager,
+            final JobManagerFactory jobManagerFactory) {
+        this.jobRepo = jobRepo;
+        this.stats = stats;
+        this.jobCountManager = jobCountManager;
+        this.jobManagerFactory = jobManagerFactory;
     }
 
     /**
@@ -132,7 +155,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         final int idleHostThresholdDelta = CONF.getInt(
                 "netflix.genie.server.idle.host.threshold.delta", 0);
         synchronized (this) {
-            final int numRunningJobs = JobCountManager.getNumInstanceJobs();
+            final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
             LOG.info("Number of running jobs: " + numRunningJobs);
 
             // find an instance with fewer than (numRunningJobs -
@@ -151,8 +174,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             // (set in properties file)
             if (numRunningJobs >= jobForwardThreshold && !job.isForwarded()) {
                 LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
-                final String idleHost = JobCountManager
-                        .getIdleInstance(idleHostThreshold);
+                final String idleHost = this.jobCountManager.getIdleInstance(idleHostThreshold);
                 if (!idleHost.equals(NetUtil.getHostName())) {
                     job.setForwarded(true);
                     this.stats.incrGenieForwardedJobs();
@@ -177,7 +199,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             // init state in DB - return if job already exists
             try {
                 // TODO add retries to avoid deadlock issue
-                this.pm.createEntity(job);
+                this.jobRepo.save(job);
             } catch (final RollbackException e) {
                 LOG.error("Can't create entity in the database", e);
                 if (e.getCause() instanceof EntityExistsException) {
@@ -199,18 +221,16 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         // try to run the job - return success or error
         try {
-            final JobManagerFactory factory = new JobManagerFactory();
-            factory.getJobManager(job).launch(job);
+            this.jobManagerFactory.getJobManager(job).launch(job);
 
             // update entity in DB
             job.setUpdated(new Date());
-            this.pm.updateEntity(job);
-            return job;
+            return this.em.merge(job);
         } catch (final CloudServiceException e) {
             LOG.error("Failed to submit job: ", e);
             // update db
             job.setJobStatus(JobStatus.FAILED, e.getMessage());
-            this.pm.updateEntity(job);
+            this.em.merge(job);
             // increment counter for failed jobs
             this.stats.incrGenieFailedJobs();
             // if it is a known exception, handle differently
@@ -224,6 +244,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @throws CloudServiceException
      */
     @Override
+    @Transactional(readOnly = true)
     public Job getJobInfo(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             throw new CloudServiceException(
@@ -232,18 +253,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         }
         LOG.debug("called for jobId: " + id);
 
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            final Job job = em.find(Job.class, id);
-            if (job != null) {
-                return job;
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No job exists for id " + id + ". Unable to retrieve.");
-            }
-        } finally {
-            em.close();
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            return job;
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job exists for id " + id + ". Unable to retrieve.");
         }
     }
 
@@ -253,6 +269,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @throws CloudServiceException
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Job> getJobs(
             final String id,
             final String jobName,
@@ -264,40 +281,35 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final int page) throws CloudServiceException {
         LOG.debug("called");
 
-        final EntityManager em = pm.createEntityManager();
-        try {
-            final CriteriaBuilder cb = em.getCriteriaBuilder();
-            final CriteriaQuery<Job> cq = cb.createQuery(Job.class);
-            final Root<Job> j = cq.from(Job.class);
-            final List<Predicate> predicates = new ArrayList<Predicate>();
-            if (StringUtils.isNotEmpty(userName)) {
-                predicates.add(cb.like(j.get(Job_.id), id));
-            }
-            if (StringUtils.isNotEmpty(jobName)) {
-                predicates.add(cb.like(j.get(Job_.name), jobName));
-            }
-            if (StringUtils.isNotEmpty(userName)) {
-                predicates.add(cb.equal(j.get(Job_.user), userName));
-            }
-            if (status != null) {
-                predicates.add(cb.equal(j.get(Job_.status), status));
-            }
-            if (StringUtils.isNotEmpty(clusterName)) {
-                predicates.add(cb.equal(j.get(Job_.executionClusterName), clusterName));
-            }
-            if (StringUtils.isNotEmpty(clusterId)) {
-                predicates.add(cb.equal(j.get(Job_.executionClusterId), clusterId));
-            }
-            cq.where(cb.and(predicates.toArray(new Predicate[0])));
-            final TypedQuery<Job> query = em.createQuery(cq);
-            final int finalPage = page < 0 ? PersistenceManager.DEFAULT_PAGE_NUMBER : page;
-            final int finalLimit = limit < 0 ? PersistenceManager.DEFAULT_PAGE_SIZE : limit;
-            query.setMaxResults(finalLimit);
-            query.setFirstResult(finalLimit * finalPage);
-            return query.getResultList();
-        } finally {
-            em.close();
+        final CriteriaBuilder cb = this.em.getCriteriaBuilder();
+        final CriteriaQuery<Job> cq = cb.createQuery(Job.class);
+        final Root<Job> j = cq.from(Job.class);
+        final List<Predicate> predicates = new ArrayList<Predicate>();
+        if (StringUtils.isNotEmpty(userName)) {
+            predicates.add(cb.like(j.get(Job_.id), id));
         }
+        if (StringUtils.isNotEmpty(jobName)) {
+            predicates.add(cb.like(j.get(Job_.name), jobName));
+        }
+        if (StringUtils.isNotEmpty(userName)) {
+            predicates.add(cb.equal(j.get(Job_.user), userName));
+        }
+        if (status != null) {
+            predicates.add(cb.equal(j.get(Job_.status), status));
+        }
+        if (StringUtils.isNotEmpty(clusterName)) {
+            predicates.add(cb.equal(j.get(Job_.executionClusterName), clusterName));
+        }
+        if (StringUtils.isNotEmpty(clusterId)) {
+            predicates.add(cb.equal(j.get(Job_.executionClusterId), clusterId));
+        }
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+        final TypedQuery<Job> query = this.em.createQuery(cq);
+        final int finalPage = page < 0 ? 0 : page;
+        final int finalLimit = limit < 0 ? 1024 : limit;
+        query.setMaxResults(finalLimit);
+        query.setFirstResult(finalLimit * finalPage);
+        return query.getResultList();
     }
 
     /**
@@ -306,6 +318,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @throws CloudServiceException
      */
     @Override
+    @Transactional(readOnly = true)
     public JobStatus getJobStatus(final String id) throws CloudServiceException {
         return getJobInfo(id).getStatus();
     }
@@ -323,90 +336,65 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     "No id entered unable to kill job.");
         }
         LOG.debug("called for jobId: " + id);
+        final Job job = this.jobRepo.findOne(id);
 
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Job job = em.find(Job.class, id);
-
-            // do some basic error handling
-            if (job == null) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No job exists for id " + id + ". Unable to kill.");
-            }
-
-            // check if it is done already
-            if (job.getStatus() == JobStatus.SUCCEEDED
-                    || job.getStatus() == JobStatus.KILLED
-                    || job.getStatus() == JobStatus.FAILED) {
-                // job already exited, return status to user
-                return job;
-            } else if (job.getStatus() == JobStatus.INIT
-                    || (job.getProcessHandle() == -1)) {
-                // can't kill a job if it is still initializing
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        "Unable to kill job as it is still initializing");
-            }
-
-            // if we get here, job is still running - and can be killed
-            // redirect to the right node if killURI points to a different node
-            final String killURI = job.getKillURI();
-            if (StringUtils.isEmpty(killURI)) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        "Failed to get killURI for jobID: " + id);
-            }
-            final String localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + id;
-
-            if (!killURI.equals(localURI)) {
-                LOG.debug("forwarding kill request to: " + killURI);
-                return forwardJobKill(killURI);
-            }
-
-            // if we get here, killURI == localURI, and job should be killed here
-            LOG.debug("killing job on same instance: " + id);
-            final JobManagerFactory factory = new JobManagerFactory();
-            factory.getJobManager(job).kill(job);
-
-            job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
-            job.setExitCode(SubprocessStatus.JOB_KILLED.code());
-
-            // increment counter for killed jobs
-            this.stats.incrGenieKilledJobs();
-
-            // update final status in DB
-            final ReentrantReadWriteLock rwl = PersistenceManager.getDbLock();
-            try {
-                LOG.debug("updating job status to KILLED for: " + id);
-                // acquire write lock first, and then update status
-                // if job status changed between when it was read and now,
-                // this thread will simply overwrite it - final state will be KILLED
-                rwl.writeLock().lock();
-                if (!job.isDisableLogArchival()) {
-                    job.setArchiveLocation(NetUtil.getArchiveURI(id));
-                }
-                trans.commit();
-            } catch (final Exception e) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        e.getMessage());
-            } finally {
-                if (rwl.writeLock().isHeldByCurrentThread()) {
-                    rwl.writeLock().unlock();
-                }
-            }
-
-            // all good - return results
-            return job;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        // do some basic error handling
+        if (job == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job exists for id " + id + ". Unable to kill.");
         }
+
+        // check if it is done already
+        if (job.getStatus() == JobStatus.SUCCEEDED
+                || job.getStatus() == JobStatus.KILLED
+                || job.getStatus() == JobStatus.FAILED) {
+            // job already exited, return status to user
+            return job;
+        } else if (job.getStatus() == JobStatus.INIT
+                || (job.getProcessHandle() == -1)) {
+            // can't kill a job if it is still initializing
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    "Unable to kill job as it is still initializing");
+        }
+
+        // if we get here, job is still running - and can be killed
+        // redirect to the right node if killURI points to a different node
+        final String killURI = job.getKillURI();
+        if (StringUtils.isEmpty(killURI)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    "Failed to get killURI for jobID: " + id);
+        }
+        final String localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + id;
+
+        if (!killURI.equals(localURI)) {
+            LOG.debug("forwarding kill request to: " + killURI);
+            return forwardJobKill(killURI);
+        }
+
+        // if we get here, killURI == localURI, and job should be killed here
+        LOG.debug("killing job on same instance: " + id);
+        this.jobManagerFactory.getJobManager(job).kill(job);
+
+        job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
+        job.setExitCode(SubprocessStatus.JOB_KILLED.code());
+
+        // increment counter for killed jobs
+        this.stats.incrGenieKilledJobs();
+
+        LOG.debug("updating job status to KILLED for: " + id);
+        // acquire write lock first, and then update status
+        // if job status changed between when it was read and now,
+        // this thread will simply overwrite it - final state will be KILLED
+        this.em.lock(job, LockModeType.PESSIMISTIC_WRITE);
+        if (!job.isDisableLogArchival()) {
+            job.setArchiveLocation(NetUtil.getArchiveURI(id));
+        }
+
+        // all good - return results
+        return job;
     }
 
     private void buildJobURIs(final Job job) throws CloudServiceException {

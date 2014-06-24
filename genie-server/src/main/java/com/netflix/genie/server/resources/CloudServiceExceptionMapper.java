@@ -19,6 +19,8 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -32,9 +34,20 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Provider
+@Named
 public class CloudServiceExceptionMapper implements ExceptionMapper<CloudServiceException> {
     private static final Logger LOG = LoggerFactory.getLogger(CloudServiceExceptionMapper.class);
-    private static final GenieNodeStatistics STATS = GenieNodeStatistics.getInstance();
+    private final GenieNodeStatistics genieNodeStatistics;
+    
+    /**
+     * Public constructor.
+     * 
+     * @param genieNodeStatistics The statistics object to use
+     */
+    @Inject
+    public CloudServiceExceptionMapper(final GenieNodeStatistics genieNodeStatistics) {
+        this.genieNodeStatistics = genieNodeStatistics;
+    }
 
     /**
      * Create a response object from the exception.
@@ -47,9 +60,9 @@ public class CloudServiceExceptionMapper implements ExceptionMapper<CloudService
         final int code = cse.getErrorCode();
         final String errorMessage = cse.getLocalizedMessage();
         if (code >= 400 && code < 500) {
-            STATS.incrGenie4xxCount();
+            this.genieNodeStatistics.incrGenie4xxCount();
         } else { // 5xx codes
-            STATS.incrGenie5xxCount();
+            this.genieNodeStatistics.incrGenie5xxCount();
         }
         LOG.error("Error code: " + code + " Error Message: " + errorMessage, cse);
         return Response.status(code).entity(errorMessage).type(MediaType.TEXT_PLAIN).build();

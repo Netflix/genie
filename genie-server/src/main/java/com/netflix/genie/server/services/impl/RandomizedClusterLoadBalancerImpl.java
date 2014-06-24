@@ -23,6 +23,7 @@ import com.netflix.genie.server.services.ClusterLoadBalancer;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Random;
+import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
+@Named
 public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
 
     private static final Logger LOG = LoggerFactory

@@ -21,37 +21,39 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.server.repository.JobRepository;
 import com.netflix.genie.server.services.ExecutionService;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.junit.AfterClass;
+import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Test for the Genie execution service class.
  *
  * @author skrishnan
+ * @author tgianos
  */
-public class TestGenieExecutionServiceImpl {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:application-test.xml")
+@Transactional
+public class TestExecutionServiceJPAImpl {
 
-    private static ExecutionService xs;
     private List<ClusterCriteria> criterias;
-
-    /**
-     * Initialize stats object before any tests are run.
-     */
-    @BeforeClass
-    public static void init() {
-        xs = new ExecutionServiceJPAImpl();
-    }
+    
+    @Inject
+    private ExecutionService xs;
+    @Inject
+    private JobRepository jobRepo;
 
     /**
      * Setup the tests.
@@ -75,23 +77,14 @@ public class TestGenieExecutionServiceImpl {
     @Test
     public void testOptimizedJobKill() throws Exception {
         // add a successful job with a bogus killURI
-        PersistenceManager<Job> pm = new PersistenceManager<Job>();
-        final Job job = new Job("someUser", "commandId", null, "someArg", this.criterias);
+        Job job = new Job("someUser", "commandId", null, "someArg", this.criterias);
         job.setId(UUID.randomUUID().toString());
         job.setKillURI("http://DOES/NOT/EXIST");
         job.setStatus(JobStatus.SUCCEEDED);
-        pm.createEntity(job);
+        job = this.jobRepo.save(job);
 
         // should return immediately despite bogus killURI
-        Job status = xs.killJob(job.getId());
-        Assert.assertEquals(JobStatus.SUCCEEDED, status.getStatus());
-    }
-
-    /**
-     * Shutdown after tests are complete.
-     */
-    @AfterClass
-    public static void shutdown() {
-        PersistenceManager.shutdown();
+        job = this.xs.killJob(job.getId());
+        Assert.assertEquals(JobStatus.SUCCEEDED, job.getStatus());
     }
 }
