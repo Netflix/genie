@@ -115,11 +115,11 @@ public class JobJanitor extends Thread {
             }
 
             // get min sleep time
-            long minSleepTime = conf.getLong(
+            final long minSleepTime = conf.getLong(
                     "netflix.genie.server.janitor.min.sleep.ms", 300000);
 
             // get max sleep time
-            long maxSleepTime = conf.getLong(
+            final long maxSleepTime = conf.getLong(
                     "netflix.genie.server.janitor.max.sleep.ms", 600000);
 
             // calculate a random number of seconds between min and max to sleep.
