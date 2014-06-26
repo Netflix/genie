@@ -363,11 +363,6 @@ public class Command extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setConfigs(final Set<String> configs) throws CloudServiceException {
-        if (configs == null) {
-            final String msg = "No configurations passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
         this.configs = configs;
     }
 
@@ -405,11 +400,6 @@ public class Command extends Auditable implements Serializable {
      * @throws CloudServiceException
      */
     public void setClusters(Set<Cluster> clusters) throws CloudServiceException {
-        if (clusters == null) {
-            final String msg = "No clusters passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
         this.clusters = clusters;
     }
 

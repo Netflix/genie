@@ -374,39 +374,6 @@ public class CommandConfigResourceV1 {
     }
 
     /**
-     * Delete the configuration file from a given command.
-     *
-     * @param id The id of the command to delete the configuration file from.
-     * Not null/empty/blank.
-     * @param config The configuration file to remove.
-     * @return The active set of command configurations.
-     * @throws CloudServiceException
-     */
-    @DELETE
-    @Path("/{id}/configs/{config}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(
-            value = "Remove a configuration file from an command",
-            notes = "Remove the given configuration file from the command with given id.",
-            response = String.class,
-            responseContainer = "Set")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
-    })
-    public Set<String> removeConfigForCommand(
-            @ApiParam(value = "Id of the command to delete from.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The configuration file to delete.", required = true)
-            @PathParam("config")
-            final String config) throws CloudServiceException {
-        LOG.debug("Called with id " + id + " and config " + config);
-        return this.ccs.removeConfigForCommand(id, config);
-    }
-
-    /**
      * Add new applications to the given command.
      *
      * @param id The id of the command to add the applications to. Not

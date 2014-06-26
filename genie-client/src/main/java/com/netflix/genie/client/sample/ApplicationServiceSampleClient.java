@@ -23,6 +23,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.ApplicationStatus;
 import java.util.HashSet;
 import java.util.List;
@@ -102,9 +103,75 @@ public final class ApplicationServiceSampleClient {
         final Application app3 = appClient.updateApplication(app1.getId(), app2);
         LOG.info(app3.toString());
 
-        LOG.info("Deleting application config using id");
+        LOG.info("Configurations for application with id " + app1.getId());
+        final Set<String> configs = appClient.getConfigsForApplication(app1.getId());
+        for (final String config : configs) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Adding configurations to application with id " + app1.getId());
+        final Set<String> newConfigs = new HashSet<String>();
+        newConfigs.add("someNewConfigFile");
+        newConfigs.add("someOtherNewConfigFile");
+        final Set<String> configs2 = appClient.addConfigsToApplication(app1.getId(), newConfigs);
+        for (final String config : configs2) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Updating set of configuration files associated with id " + app1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> configs3 = appClient.updateConfigsForApplication(app1.getId(), newConfigs);
+        for (final String config : configs3) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Deleting all the configuration files from the application with id " + app1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> configs4 = appClient.removeAllConfigsForApplication(app1.getId());
+        for (final String config : configs4) {
+            //Shouldn't print anything
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Jars for application with id " + app1.getId());
+        final Set<String> jars = appClient.getJarsForApplication(app1.getId());
+        for (final String jar : jars) {
+            LOG.info("jar = " + jar);
+        }
+        
+        LOG.info("Adding jars to application with id " + app1.getId());
+        final Set<String> newJars = new HashSet<String>();
+        newJars.add("someNewJarFile.jar");
+        newJars.add("someOtherNewJarFile.jar");
+        final Set<String> jars2 = appClient.addJarsToApplication(app1.getId(), newJars);
+        for (final String jar : jars2) {
+            LOG.info("jar = " + jar);
+        }
+        
+        LOG.info("Updating set of jars associated with id " + app1.getId());
+        //This should remove the original jar leaving only the two in this set
+        final Set<String> jars3 = appClient.updateJarsForApplication(app1.getId(), newJars);
+        for (final String jar : jars3) {
+            LOG.info("jar = " + jar);
+        }
+        
+        LOG.info("Deleting all the jars from the application with id " + app1.getId());
+            //This should remove the original jar leaving only the two in this set
+        final Set<String> jars4 = appClient.removeAllJarsForApplication(app1.getId());
+        for (final String jar : jars4) {
+            //Shouldn't print anything
+            LOG.info("jar = " + jar);
+        }
+        
+        LOG.info("Getting the commands associated with id " + app1.getId());
+        final Set<Command> commands = appClient.getCommandsForApplication(app1.getId());
+        for (final Command command : commands) {
+            LOG.info("Command: " + command.toString());
+        }
+        
+        LOG.info("Deleting application using id");
         final Application app4 = appClient.deleteApplication(app1.getId());
-        LOG.info("Deleted application config with id: " + app4.getId());
+        LOG.info("Deleted application with id: " + app4.getId());
         LOG.info(app4.toString());
 
         LOG.info("Done");

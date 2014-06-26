@@ -18,6 +18,7 @@
 package com.netflix.genie.client;
 
 import com.google.common.collect.Multimap;
+import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
@@ -40,7 +41,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     private static final Logger LOG = LoggerFactory
             .getLogger(ExecutionServiceClient.class);
 
-    private static final String BASE_EXECUTION_REST_URI = BASE_REST_URI + "jobs";
+    private static final String BASE_EXECUTION_REST_URL = BASE_REST_URL + "jobs";
 
     // reference to the instance object
     private static ExecutionServiceClient instance;
@@ -80,14 +81,12 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      */
     public Job submitJob(final Job job) throws CloudServiceException {
         Job.validate(job);
-
-        return executeRequestForSingleEntity(
+        final HttpRequest request = this.buildRequest(
                 Verb.POST,
-                BASE_EXECUTION_REST_URI,
+                BASE_EXECUTION_REST_URL,
                 null,
-                null,
-                job,
-                Job.class);
+                job);
+        return (Job) this.executeRequest(request, null, Job.class);
     }
 
     /**
@@ -98,19 +97,21 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public Job getJob(final String id) throws CloudServiceException {
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        return executeRequestForSingleEntity(
+        final HttpRequest request = this.buildRequest(
                 Verb.GET,
-                BASE_EXECUTION_REST_URI,
-                id,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id},
+                        SLASH),
                 null,
-                null,
-                Job.class);
+                null);
+        return (Job) this.executeRequest(request, null, Job.class);
     }
 
     /**
@@ -124,13 +125,12 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public List<Job> getJobs(final Multimap<String, String> params) throws CloudServiceException {
-        return executeRequestForListOfEntities(
+        final HttpRequest request = this.buildRequest(
                 Verb.GET,
-                BASE_EXECUTION_REST_URI,
-                null,
+                BASE_EXECUTION_REST_URL,
                 params,
-                null,
-                Job.class);
+                null);
+        return (List<Job>) this.executeRequest(request, List.class, Job.class);
     }
 
     /**
@@ -168,7 +168,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         if (StringUtils.isEmpty(id)) {
             final String msg = "Missing required parameter: id.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final long startTime = System.currentTimeMillis();
@@ -201,20 +202,22 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws CloudServiceException
      */
     public Job killJob(final String id) throws CloudServiceException {
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         // this assumes that the service will forward the delete to the right
         // instance
-        return executeRequestForSingleEntity(
+        final HttpRequest request = this.buildRequest(
                 Verb.DELETE,
-                BASE_EXECUTION_REST_URI,
-                id,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id},
+                        SLASH),
                 null,
-                null,
-                Job.class);
+                null);
+        return (Job) this.executeRequest(request, null, Job.class);
     }
 }

@@ -374,39 +374,6 @@ public class ApplicationConfigResourceV1 {
     }
 
     /**
-     * Delete the configuration file from a given application.
-     *
-     * @param id The id of the application to delete the configuration file
-     * from. Not null/empty/blank.
-     * @param config The configuration file to remove.
-     * @return The active set of application configurations.
-     * @throws CloudServiceException
-     */
-    @DELETE
-    @Path("/{id}/configs/{config}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(
-            value = "Remove a configuration file from an application",
-            notes = "Remove the given configuration file from the application with given id.",
-            response = String.class,
-            responseContainer = "Set")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Application not found")
-    })
-    public Set<String> removeConfigForApplication(
-            @ApiParam(value = "Id of the application to delete from.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The configuration file to delete.", required = true)
-            @PathParam("config")
-            final String config) throws CloudServiceException {
-        LOG.debug("Called with id " + id + " and config " + config);
-        return this.acs.removeApplicationConfig(id, config);
-    }
-
-    /**
      * Add new jar files for a given application.
      *
      * @param id The id of the application to add the jar file to. Not
@@ -429,7 +396,7 @@ public class ApplicationConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Application not found")
     })
-    public Set<String> addJarForApplication(
+    public Set<String> addJarsForApplication(
             @ApiParam(value = "Id of the application to add jar to.", required = true)
             @PathParam("id")
             final String id,
@@ -528,38 +495,6 @@ public class ApplicationConfigResourceV1 {
             final String id) throws CloudServiceException {
         LOG.debug("Called with id " + id);
         return this.acs.removeAllJarsForApplication(id);
-    }
-
-    /**
-     * Delete the jar file from a given application.
-     *
-     * @param id The id of the application to delete the jar file from. Not
-     * null/empty/blank.
-     * @param jar The jar file to remove.
-     * @return The set of active jars for the application.
-     * @throws CloudServiceException
-     */
-    @DELETE
-    @Path("/{id}/jars/{jar}")
-    @ApiOperation(
-            value = "Remove a jar file from an application",
-            notes = "Remove the given jar file from the application with given id.",
-            response = String.class,
-            responseContainer = "Set")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Application not found")
-    })
-    public Set<String> removeJarForApplication(
-            @ApiParam(value = "Id of the application to delete from.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The jar file to delete.", required = true)
-            @PathParam("jar")
-            final String jar) throws CloudServiceException {
-        LOG.debug("Called with id " + id + " and jar " + jar);
-        return this.acs.removeJarForApplication(id, jar);
     }
 
     /**

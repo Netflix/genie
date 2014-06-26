@@ -24,6 +24,7 @@ import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.client.CommandServiceClient;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import java.util.HashSet;
@@ -52,6 +53,9 @@ public final class CommandServiceSampleClient {
      */
     protected static final String NAME = "pig";
 
+    /**
+     * Private constructor.
+     */
     private CommandServiceSampleClient() {
         // never called
     }
@@ -101,13 +105,13 @@ public final class CommandServiceSampleClient {
         LOG.info("Getting Commands using specified filter criteria name =  " + NAME);
         final Multimap<String, String> params = ArrayListMultimap.create();
         params.put("name", NAME);
-        final List<Command> commandResponses = commandClient.getCommands(params);
-        if (commandResponses.isEmpty()) {
+        final List<Command> commands = commandClient.getCommands(params);
+        if (commands.isEmpty()) {
             LOG.info("No commands found for specified criteria.");
         } else {
             LOG.info("Commands found:");
-            for (final Command commandResponse : commandResponses) {
-                LOG.info(commandResponse.toString());
+            for (final Command command : commands) {
+                LOG.info(command.toString());
             }
         }
 
@@ -120,20 +124,86 @@ public final class CommandServiceSampleClient {
         final Command command4 = commandClient.updateCommand(ID, command3);
         LOG.info(command4.toString());
 
+        LOG.info("Configurations for command with id " + command1.getId());
+        final Set<String> configs = commandClient.getConfigsForCommand(command1.getId());
+        for (final String config : configs) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Adding configurations to command with id " + command1.getId());
+        final Set<String> newConfigs = new HashSet<String>();
+        newConfigs.add("someNewConfigFile");
+        newConfigs.add("someOtherNewConfigFile");
+        final Set<String> configs2 = commandClient.addConfigsToCommand(command1.getId(), newConfigs);
+        for (final String config : configs2) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Updating set of configuration files associated with id " + command1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> configs3 = commandClient.updateConfigsForCommand(command1.getId(), newConfigs);
+        for (final String config : configs3) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Deleting all the configuration files from the command with id " + command1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> configs4 = commandClient.removeAllConfigsForCommand(command1.getId());
+        for (final String config : configs4) {
+            //Shouldn't print anything
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Applications for command with id " + command1.getId());
+        final Set<Application> applications = commandClient.getApplicationsForCommand(command1.getId());
+        for (final Application application : applications) {
+            LOG.info("Application = " + application);
+        }
+
+        LOG.info("Adding applications to command with id " + command1.getId());
+        final Set<Application> newApps = new HashSet<Application>();
+        newApps.add(ApplicationServiceSampleClient.getSampleApplication(ID + "something"));
+        newApps.add(ApplicationServiceSampleClient.getSampleApplication(null));
+        final Set<Application> applications2 = commandClient.addApplicationsToCommand(command1.getId(), newApps);
+        for (final Application application : applications2) {
+            LOG.info("Application = " + application);
+        }
+
+        LOG.info("Updating set of configuration files associated with id " + command1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<Application> applications3 = commandClient.updateApplicationsForCommand(command1.getId(), newApps);
+        for (final Application application : applications3) {
+            LOG.info("Application = " + application);
+        }
+
+        LOG.info("Deleting the application from the command with id " + ID + "something");
+        final Set<Application> applications4 = commandClient.removeApplicationForCommand(command1.getId(), ID + "something");
+        for (final Application application : applications4) {
+            LOG.info("Application = " + application);
+        }
+
+        LOG.info("Deleting all the applications from the command with id " + command1.getId());
+        final Set<Application> applications5 = commandClient.removeAllApplicationsForCommand(command1.getId());
+        for (final Application application : applications5) {
+            //Shouldn't print anything
+            LOG.info("Application = " + application);
+        }
+
+        LOG.info("Getting all the clusters for command with id  " + command1.getId());
+        final Set<Cluster> clusters = commandClient.getClustersForCommand(command1.getId());
+        for (final Cluster cluster : clusters) {
+            LOG.info("Cluster = " + cluster);
+        }
+
         LOG.info("Deleting command config using id");
         final Command command5 = commandClient.deleteCommand(ID);
         LOG.info("Deleted command config with id: " + ID);
         LOG.info(command5.toString());
 
-        LOG.info("Deleting application config using id");
-        final Application app3 = appClient.deleteApplication(app1.getId());
-        LOG.info("Deleted application config with id: " + app1.getId());
-        LOG.info(app3.toString());
-
-        LOG.info("Deleting application config using id");
-        final Application app4 = appClient.deleteApplication(app2.getId());
-        LOG.info("Deleted application config with id: " + app2.getId());
-        LOG.info(app4.toString());
+        LOG.info("Deleting all applications");
+        final List<Application> deletedApps = appClient.deleteAllApplications();
+        LOG.info("Deleted all applications");
+        LOG.info(deletedApps.toString());
 
         LOG.info("Done");
     }

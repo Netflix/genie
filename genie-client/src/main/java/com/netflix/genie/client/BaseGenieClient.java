@@ -21,7 +21,6 @@ import com.google.common.collect.Multimap;
 import com.netflix.appinfo.CloudInstanceConfig;
 import com.netflix.appinfo.EurekaInstanceConfig;
 import com.netflix.appinfo.MyDataCenterInstanceConfig;
-import com.netflix.client.ClientException;
 import com.netflix.client.ClientFactory;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
@@ -30,24 +29,26 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.discovery.DefaultEurekaClientConfig;
 import com.netflix.discovery.DiscoveryManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Auditable;
 import com.netflix.niws.client.http.RestClient;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map.Entry;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.CollectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract REST client class that is extended to implement specific clients.
+ * REST client class that is extended to implement specific clients.
  *
  * @author skrishnan
  * @author tgianos
@@ -72,7 +73,17 @@ public class BaseGenieClient {
     /**
      * Standard root for all rest services.
      */
-    protected static final String BASE_REST_URI = "/genie/v1/";
+    protected static final String BASE_REST_URL = "/genie/v1/";
+
+    /**
+     * Reusable String for /.
+     */
+    protected static final String SLASH = "/";
+
+    /**
+     * The rest client to use for all requests.
+     */
+    private final RestClient client;
 
     /**
      * Protected constructor for singleton class.
@@ -81,6 +92,16 @@ public class BaseGenieClient {
      */
     protected BaseGenieClient() throws IOException {
         ConfigurationManager.loadPropertiesFromResources(NIWS_CLIENT_NAME_GENIE + ".properties");
+
+        // execute an HTTP request on Genie using load balancer
+        this.client = (RestClient) ClientFactory
+                .getNamedClient(NIWS_CLIENT_NAME_GENIE);
+
+        //Force jersey to properly serialize JSON
+        final ClientConfig clientConfig = new DefaultClientConfig();
+        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+        final Client jerseyClient = Client.create(clientConfig);
+        this.client.setJerseyClient(jerseyClient);
     }
 
     /**
@@ -106,206 +127,66 @@ public class BaseGenieClient {
                 new DefaultEurekaClientConfig());
     }
 
-    /**
-     * Executes HTTP request based on user parameters, and performs
-     * marshaling/un-marshaling for an expected single result.
-     *
-     * @param <T> The entity type for this request
-     * @param verb GET, POST or DELETE
-     * @param baseRestUri the base Uri to use in the request, e.g. genie/v0/jobs
-     * @param id the id to append to the baseRestUri, if any (e.g. job ID)
-     * @param params HTTP query parameters (e.g. userName="foo")
-     * @param entity Genie resource entity if applicable (for POST), null
-     * otherwise
-     * @param entityClass class name of expected response to be used for
-     * un-marshaling
-     *
-     * @return extracted and un-marshaled response entity from Genie
-     * @throws CloudServiceException
-     */
-    protected <T extends Auditable> T executeRequestForSingleEntity(
+    protected HttpRequest buildRequest(
             final Verb verb,
-            final String baseRestUri,
-            final String id,
+            final String requestUri,
             final Multimap<String, String> params,
-            final T entity,
-            final Class<T> entityClass)
-            throws CloudServiceException {
-        return (T) executeRequest(verb, baseRestUri, id, params, entity, entityClass, false);
-    }
-
-    /**
-     * Executes HTTP request based on user parameters, and performs
-     * marshaling/un-marshaling for an expected list of results.
-     *
-     * @param <T> The entity type for this request
-     * @param verb GET, POST or DELETE
-     * @param baseRestUri the base Uri to use in the request, e.g. genie/v0/jobs
-     * @param id the id to append to the baseRestUri, if any (e.g. job ID)
-     * @param params HTTP query parameters (e.g. userName="foo")
-     * @param entity Genie resource entity if applicable (for POST), null
-     * otherwise
-     * @param entityClass class name of expected response to be used for
-     * un-marshaling
-     *
-     * @return extracted and un-marshaled response entity from Genie
-     * @throws CloudServiceException
-     */
-    protected <T extends Auditable> List<T> executeRequestForListOfEntities(
-            final Verb verb,
-            final String baseRestUri,
-            final String id,
-            final Multimap<String, String> params,
-            final T entity,
-            final Class<T> entityClass)
-            throws CloudServiceException {
-        return (List<T>) executeRequest(verb, baseRestUri, id, params, entity, entityClass, true);
-    }
-
-    /**
-     * Executes HTTP request based on user parameters, and performs
-     * marshaling/un-marshaling.
-     *
-     * @param <T> The entity type for this request
-     * @param verb GET, POST or DELETE
-     * @param baseRestUri the base Uri to use in the request, e.g. genie/v0/jobs
-     * @param id the id to append to the baseRestUri, if any (e.g. job ID)
-     * @param params HTTP query parameters (e.g. userName="foo")
-     * @param entity Genie resource entity if applicable (for POST), null
-     * otherwise
-     * @param entityClass class name of expected response to be used for
-     * un-marshaling
-     * @param isList Whether a list is expected as the result
-     *
-     * @return extracted and un-marshaled response entity from Genie
-     * @throws CloudServiceException
-     */
-    private <T extends Auditable> Object executeRequest(
-            final Verb verb,
-            final String baseRestUri,
-            final String id,
-            final Multimap<String, String> params,
-            final Object entity,
-            final Class<T> entityClass,
-            final boolean isList)
-            throws CloudServiceException {
-        HttpResponse response = null;
-        final String requestUri = buildRequestUri(baseRestUri, id);
+            final Object entity) throws CloudServiceException {
         try {
-            // execute an HTTP request on Genie using load balancer
-            final RestClient genieClient = (RestClient) ClientFactory
-                    .getNamedClient(NIWS_CLIENT_NAME_GENIE);
             final HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .verb(verb)
-                    //                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                    //                    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML)
-                    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                     .uri(new URI(requestUri)).entity(entity);
             if (params != null) {
                 for (final Entry<String, String> param : params.entries()) {
                     builder.queryParams(param.getKey(), param.getValue());
                 }
             }
-            final HttpRequest req = builder.build();
-            response = genieClient.executeWithLoadBalancer(req);
-
-            // extract/cast/unmarshal and return entity
-            return extractEntityFromClientResponse(response, isList, entityClass);
-        } catch (URISyntaxException e) {
-            LOG.error("Exception caught while executing request", e);
+            return builder.build();
+        } catch (final URISyntaxException use) {
+            LOG.error(use.getMessage(), use);
             throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, e);
-        } catch (ClientException e) {
-            LOG.error("Exception caught while executing request", e);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, e);
-        } finally {
-            // release resources after we are done
-            // this is really really important - or we run out of connections
-            if (response != null) {
-                response.close();
-            }
+                    HttpURLConnection.HTTP_BAD_REQUEST, use);
         }
     }
 
-    /**
-     * Converts a response to a specific response object which must extend
-     * BaseResponse.
-     *
-     * @param response response from REST service
-     * @param isList Whether the entity is expected to be a list or not
-     * @param entityClass class name of expected response
-     * @return specific response class extracted
-     */
-    private <T extends Auditable> Object extractEntityFromClientResponse(
-            final HttpResponse response,
-            final boolean isList,
-            final Class<T> entityClass)
-            throws CloudServiceException {
-        if (response == null) {
-            final String msg = "Received null response from Genie Service";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
+    protected <C extends Collection> Object executeRequest(
+            final HttpRequest request,
+            final Class<C> collectionClass,
+            final Class entityClass) throws CloudServiceException {
+        HttpResponse response = null;
         try {
-            final int status = response.getStatus();
-            LOG.debug("Response Status:" + status);
-            if (!response.isSuccess()) {
-                throw new CloudServiceException(status, response.getEntity(String.class));
-            }
-            // check if entity exists within response
-            if (!response.hasEntity()) {
-                // assuming no Genie bug, this should only happen if the request
-                // didn't get to Genie
-                final String msg = "Received status " + status
-                        + " for Genie/NIWS call, but no entity/body";
-                LOG.error(msg);
-                throw new CloudServiceException(
-                        (status != HttpURLConnection.HTTP_OK) ? status
-                        : HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-            }
-            if (isList) {
-                final Class clazz = Array.newInstance(entityClass, 0).getClass();
-                final T[] collection = (T[]) response.getEntity(clazz);
-                return Arrays.asList(collection);
+            response = this.client.executeWithLoadBalancer(request);
+            if (response.isSuccess()) {
+                if (collectionClass != null) {
+                    final ObjectMapper mapper = new ObjectMapper();
+                    final CollectionType type = mapper.getTypeFactory().constructCollectionType(collectionClass, entityClass);
+                    return mapper.readValue(response.getInputStream(), type);
+                } else if (entityClass != null) {
+                    return response.getEntity(entityClass);
+                } else {
+                    throw new CloudServiceException(
+                            HttpURLConnection.HTTP_BAD_REQUEST,
+                            "No return type entered.");
+                }
             } else {
-                return response.getEntity(entityClass);
+                throw new CloudServiceException(
+                        response.getStatus(),
+                        response.getEntity(String.class));
             }
-//            return response.getEntity(entityClass);
-//            if (isList) {
-//                return response.getEntity(new TypeToken<List<Application>>() {
-//                });
-//            } else {
-//                return response.getEntity(entityClass);
-//            }
         } catch (final Exception e) {
             if (e instanceof CloudServiceException) {
                 throw (CloudServiceException) e;
             } else {
+                LOG.error(e.getMessage(), e);
                 throw new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, e);
             }
-        }
-    }
-
-    /**
-     * Given a urlPath such as genie/v1/jobs and a uuid, constructs the request
-     * uri.
-     *
-     * @param baseRestUri e.g. genie/v1/jobs
-     * @param uuid the uuid for the REST resource, if it exists
-     * @return request URI for the service
-     */
-    private String buildRequestUri(final String baseRestUri, final String uuid) {
-        if (StringUtils.isEmpty(uuid)) {
-            return baseRestUri;
-        } else {
-            final StringBuilder builder = new StringBuilder();
-            builder.append(baseRestUri).append("/").append(uuid);
-            return builder.toString();
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 }
