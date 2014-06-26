@@ -178,7 +178,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
                     "Application id either not entered or inconsistent with id passed in.");
         }
         LOG.debug("Called with app " + updateApp.toString());
-        //TODO: What to do about sets like jars, etc?
+        // #TODO: What to do about sets like jars, etc?
         final EntityManager em = this.pm.createEntityManager();
         final EntityTransaction trans = em.getTransaction();
         try {
@@ -486,7 +486,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
-    //TODO: Code is repetetive with configs. Refactor for reuse
+    // #TODO: Code is repetetive with configs. Refactor for reuse
     public Set<String> getJarsForApplication(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {

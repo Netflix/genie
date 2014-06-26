@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v1/jobs")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class JobResourceV1 {
 
     private final ExecutionService xs;
@@ -71,7 +71,7 @@ public class JobResourceV1 {
      * @throws CloudServiceException
      */
     @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Job submitJob(
             final Job job,
             @Context final HttpServletRequest hsr) throws CloudServiceException {

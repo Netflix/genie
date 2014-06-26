@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author amsharma
  */
-//TODO: Get rid of this for some DI framework
+// TODO: Get rid of this for some DI framework
 public final class ConfigServiceFactory extends BaseServiceFactory {
 
     private static final  Logger LOG = LoggerFactory
@@ -64,7 +64,8 @@ public final class ConfigServiceFactory extends BaseServiceFactory {
             synchronized (ConfigServiceFactory.class) {
                 // double-checked locking
                 if (clusterConfigService == null) {
-                    clusterConfigService = (ClusterConfigService) instantiateFromProperty("netflix.genie.server.clusterConfigImpl");
+                    clusterConfigService = (ClusterConfigService) 
+                                instantiateFromProperty("netflix.genie.server.clusterConfigImpl");
                 }
             }
         }

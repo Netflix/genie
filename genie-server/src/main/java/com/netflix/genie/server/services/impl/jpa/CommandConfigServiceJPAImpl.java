@@ -383,7 +383,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered. Unable to remove jars.");
+                    "No command id entered. Unable to remove configs.");
         }
         final EntityManager em = this.pm.createEntityManager();
         final EntityTransaction trans = em.getTransaction();
