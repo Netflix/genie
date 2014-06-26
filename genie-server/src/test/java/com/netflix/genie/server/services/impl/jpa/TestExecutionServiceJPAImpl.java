@@ -49,9 +49,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class TestExecutionServiceJPAImpl {
 
     private List<ClusterCriteria> criterias;
-    
+
     @Inject
     private ExecutionService xs;
+
     @Inject
     private JobRepository jobRepo;
 

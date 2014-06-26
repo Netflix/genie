@@ -15,11 +15,7 @@
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
-                <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(SchemaAction='add')"/>
-                <property name="openjpa.DynamicEnhancementAgent" value="false"/>
-                <property name="openjpa.RuntimeUnenhancedClasses" value="unsupported"/>
-            </bean>
+            <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter" />
         </property>
         <property name="persistenceUnitName" value="com.netflix.genie.persistence"/>
     </bean>
@@ -28,40 +24,50 @@
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
     
-    <bean id="dataSource" class = "com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <!--        <property name="driverClass" value="${jdbc.driverClassName}" />
-        <property name="jdbcUrl" value="${jdbc.url}" />
-        <property name="user" value="${jdbc.username}" />
-        <property name="password" value="${jdbc.password}" />-->
+    <!-- For MySQL uncomment this bean definition -->
+<!--    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
         <property name="driverClass" value="com.mysql.jdbc.Driver" />
         <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1/genie?autoReconnect=true" />
         <property name="user" value="root" />
         <property name="password" value="" />
 
-        <!-- these are C3P0 properties -->
-        <!--        <property name="acquireIncrement" value="${c3p0.acquireIncrement}" />
-        <property name="minPoolSize" value="${c3p0.minPoolSize}" />
-        <property name="maxPoolSize" value="${c3p0.maxPoolSize}" />
-        <property name="maxIdleTime" value="${c3p0.maxIdleTime}" />-->
-        <property name="aquireRetryAttempts" value="3" />
+        <property name="acquireRetryAttempts" value="3" />
         <property name="minPoolSize" value="5" />
         <property name="maxPoolSize" value="20" />
         <property name="preferredTestQuery" value="SELECT 1" />
         <property name="testConnectionOnCheckout" value="true" />
-    </bean>
-
-    <!--    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-        <property name="url" value="jdbc:hsqldb:mem:spring"/>
-        <property name="username" value="sa"/>
-        <property name="password" value=""/>
     </bean>-->
     
-<!--    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://localhost:3306/mkyongjava" />
-        <property name="username" value="root" />
-        <property name="password" value="password" />
+    <!-- For Derby use this bean -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
+        <property name="url" value="jdbc:derby:genie-db;create=true" />
+        <property name="username" value="me" />
+        <property name="password" value="mine" />
+        
+        <property name="minIdle" value="5" />
+        <property name="maxIdle" value="20" />
+        <property name="maxActive" value="20" />
+    </bean>
+    
+    <!-- For HSQLDB use this datasource above -->
+    <!--<jdbc:embedded-database id="dataSource" type="HSQL"/>-->
+    
+    <!-- For Derby embedded use this bean -->
+    <!-- Doesn't work right now -->
+    <!--<jdbc:embedded-database id="dataSource" type="DERBY"/>-->
+    
+    <!-- Generalized Data Source -->
+<!--    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClassName}" />
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="user" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+
+        <property name="acquireIncrement" value="${c3p0.acquireIncrement}" />
+        <property name="minPoolSize" value="${c3p0.minPoolSize}" />
+        <property name="maxPoolSize" value="${c3p0.maxPoolSize}" />
+        <property name="maxIdleTime" value="${c3p0.maxIdleTime}" />
     </bean>-->
     
     <jpa:repositories base-package="com.netflix.genie.server.repository"/>

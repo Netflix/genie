@@ -22,7 +22,6 @@ import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.repository.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +29,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -47,17 +45,13 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = "classpath:application-test.xml")
 @Transactional
 public class TestJobCountManagerImpl {
-    
+
     @Inject
     private JobRepository jobRepo;
-    
+
+    @Inject
     private JobCountManager manager;
     
-    @Before
-    public void setup() {
-        this.manager = new JobCountManagerImpl();
-    }
-
     /**
      * Test getting number of running jobs on one instance.
      *
@@ -78,7 +72,7 @@ public class TestJobCountManagerImpl {
         job.setStatus(JobStatus.RUNNING);
         job.setHostName(NetUtil.getHostName());
         job.setStartTime(1L);
-        job = this.jobRepo.save(job);
+        this.jobRepo.save(job);
 
         // number of running jobs - should be > 0
         Assert.assertTrue(0 < this.manager.getNumInstanceJobs());

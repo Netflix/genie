@@ -150,19 +150,27 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "A command with id " + command.getId() + " already exists");
         }
-        final Set<Application> detachedApps = command.getApplications();
-        final Set<Application> attachedApps = new HashSet<Application>();
-        if (detachedApps != null) {
+        
+        final Set<Application> detachedApps = new HashSet<Application>();
+        if (command.getApplications() != null && !command.getApplications().isEmpty()) {
+            detachedApps.addAll(command.getApplications());
+            command.getApplications().clear();
+        }
+        
+        final Command persistedCommand = this.commandRepo.save(command);
+        
+        if (!detachedApps.isEmpty()) {
+            final Set<Application> attachedApps = new HashSet<Application>();
             for (final Application detached : detachedApps) {
                 final Application app = this.appRepo.findOne(detached.getId());
                 if (app != null) {
-                    app.getCommands().add(command);
                     attachedApps.add(app);
                 }
             }
+            //Handles both sides of relationship
+            persistedCommand.setApplications(attachedApps);
         }
-        command.setApplications(attachedApps);
-        return this.commandRepo.save(command);
+        return persistedCommand;
     }
 
     /**
@@ -383,8 +391,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             for (final Application detached : applications) {
                 final Application app = this.appRepo.findOne(detached.getId());
                 if (app != null) {
-                    command.getApplications().add(app);
-                    app.getCommands().add(command);
+                    command.addApplication(app);
                 }
             }
             return command.getApplications();
@@ -440,7 +447,6 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                 final Application app = this.appRepo.findOne(detached.getId());
                 if (app != null) {
                     apps.add(app);
-                    app.getCommands().add(command);
                 }
             }
             command.setApplications(apps);
@@ -467,10 +473,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            for (final Application app : command.getApplications()) {
-                app.getCommands().remove(command);
-            }
-            command.getApplications().clear();
+            command.removeAllApplications();
             return command.getApplications();
         } else {
             throw new CloudServiceException(
@@ -502,8 +505,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (command != null) {
             final Application app = this.appRepo.findOne(appId);
             if (app != null) {
-                app.getCommands().remove(command);
-                command.getApplications().remove(app);
+                command.removeApplication(app);
             }
             return command.getApplications();
         } else {

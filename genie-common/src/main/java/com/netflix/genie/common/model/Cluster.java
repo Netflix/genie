@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -334,10 +335,94 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the commands for this cluster.
      *
      * @param commands The commands that this cluster supports
+     */
+    public void setCommands(final Set<Command> commands) {
+        //Clear references to this cluster in existing commands
+        if (this.commands != null) {
+            for (final Command command : this.commands) {
+                if (command.getClusters() != null) {
+                    command.getClusters().remove(this);
+                }
+            }
+        }
+        //set the commands for this command
+        this.commands = commands;
+
+        //Add the referse reference in the new commands
+        if (this.commands != null) {
+            for (final Command command : this.commands) {
+                Set<Cluster> clusters = command.getClusters();
+                if (clusters == null) {
+                    clusters = new HashSet<Cluster>();
+                    command.setClusters(clusters);
+                }
+                if (!clusters.contains(this)) {
+                    clusters.add(this);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add a new command to this cluster. Manages both sides of relationship.
+     *
+     * @param command The command to add. Not null.
      * @throws CloudServiceException
      */
-    public void setCommands(final Set<Command> commands) throws CloudServiceException {
-        this.commands = commands;
+    public void addCommand(final Command command)
+            throws CloudServiceException {
+        if (command == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command entered unable to add.");
+        }
+
+        if (this.commands == null) {
+            this.commands = new HashSet<Command>();
+        }
+        this.commands.add(command);
+
+        Set<Cluster> clusters = command.getClusters();
+        if (clusters == null) {
+            clusters = new HashSet<Cluster>();
+            command.setClusters(clusters);
+        }
+        clusters.add(this);
+    }
+
+    /**
+     * Remove an command from this command. Manages both sides of relationship.
+     *
+     * @param command The command to remove. Not null.
+     * @throws CloudServiceException
+     */
+    public void removeCommand(final Command command)
+            throws CloudServiceException {
+        if (command == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command entered unable to remove.");
+        }
+
+        if (this.commands != null) {
+            this.commands.remove(command);
+        }
+        if (command.getClusters() != null) {
+            command.getClusters().remove(this);
+        }
+    }
+
+    /**
+     * Remove all the commands from this application.
+     *
+     * @throws CloudServiceException
+     */
+    public void removeAllCommands() throws CloudServiceException {
+        if (this.commands != null) {
+            for (final Command command : this.commands) {
+                this.removeCommand(command);
+            }
+        }
     }
 
     /**

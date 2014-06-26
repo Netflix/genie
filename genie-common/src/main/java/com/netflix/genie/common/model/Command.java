@@ -23,6 +23,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -106,7 +107,7 @@ public class Command extends Auditable implements Serializable {
     @Basic
     @ApiModelProperty(
             value = "Users can specify a property file"
-                    + " location with environment variables")
+            + " location with environment variables")
     private String envPropFile;
 
     /**
@@ -134,7 +135,7 @@ public class Command extends Auditable implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the configuration"
-                    + " files needed for this command")
+            + " files needed for this command")
     private Set<String> configs;
 
     /**
@@ -360,9 +361,8 @@ public class Command extends Auditable implements Serializable {
      * Sets the configurations for this command.
      *
      * @param configs The configuration files that this command needs
-     * @throws CloudServiceException
      */
-    public void setConfigs(final Set<String> configs) throws CloudServiceException {
+    public void setConfigs(final Set<String> configs) {
         this.configs = configs;
     }
 
@@ -381,7 +381,94 @@ public class Command extends Auditable implements Serializable {
      * @param applications The applications that this command supports
      */
     public void setApplications(final Set<Application> applications) {
+        //Clear references to this command in existing applications
+        if (this.applications != null) {
+            for (final Application app : this.applications) {
+                if (app.getCommands() != null) {
+                    app.getCommands().remove(this);
+                }
+            }
+        }
+        //set the applications for this command
         this.applications = applications;
+
+        //Add the referse reference in the new applications
+        if (this.applications != null) {
+            for (final Application app : this.applications) {
+                Set<Command> commands = app.getCommands();
+                if (commands == null) {
+                    commands = new HashSet<Command>();
+                    app.setCommands(commands);
+                }
+                if (!commands.contains(this)) {
+                    commands.add(this);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add a new application to this command. Manages both sides of
+     * relationship.
+     *
+     * @param application The application to add. Not null.
+     * @throws CloudServiceException
+     */
+    public void addApplication(final Application application)
+            throws CloudServiceException {
+        if (application == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application entered unable to add.");
+        }
+
+        if (this.applications == null) {
+            this.applications = new HashSet<Application>();
+        }
+        this.applications.add(application);
+
+        Set<Command> commands = application.getCommands();
+        if (commands == null) {
+            commands = new HashSet<Command>();
+            application.setCommands(commands);
+        }
+        commands.add(this);
+    }
+
+    /**
+     * Remove an application from this command. Manages both sides of
+     * relationship.
+     *
+     * @param application The application to remove. Not null.
+     * @throws CloudServiceException
+     */
+    public void removeApplication(final Application application)
+            throws CloudServiceException {
+        if (application == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application entered unable to remove.");
+        }
+
+        if (this.applications != null) {
+            this.applications.remove(application);
+        }
+        if (application.getCommands() != null) {
+            application.getCommands().remove(this);
+        }
+    }
+
+    /**
+     * Remove all applications from this command.
+     *
+     * @throws CloudServiceException
+     */
+    public void removeAllApplications() throws CloudServiceException {
+        if (this.applications != null) {
+            for (final Application app : this.applications) {
+                this.removeApplication(app);
+            }
+        }
     }
 
     /**
@@ -397,9 +484,8 @@ public class Command extends Auditable implements Serializable {
      * Set the clusters this command is available on.
      *
      * @param clusters the clusters
-     * @throws CloudServiceException
      */
-    public void setClusters(Set<Cluster> clusters) throws CloudServiceException {
+    protected void setClusters(final Set<Cluster> clusters) {
         this.clusters = clusters;
     }
 

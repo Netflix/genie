@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
-@Named
+@Named("GenieNodeStatisticsImpl")
 public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenieNodeStatisticsImpl.class);

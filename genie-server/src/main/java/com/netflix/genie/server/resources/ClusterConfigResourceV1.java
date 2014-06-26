@@ -21,9 +21,10 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.server.services.ClusterConfigService;
-import com.netflix.genie.server.services.ConfigServiceFactory;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -47,20 +48,13 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v1/config/clusters")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Named
 public class ClusterConfigResourceV1 {
-
-    private final ClusterConfigService ccs;
     private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigResourceV1.class);
 
-    /**
-     * Default constructor.
-     *
-     * @throws CloudServiceException if there is any error
-     */
-    public ClusterConfigResourceV1() throws CloudServiceException {
-        this.ccs = ConfigServiceFactory.getClusterConfigImpl();
-    }
+    @Inject
+    private ClusterConfigService ccs;
 
     /**
      * Get cluster configuration from unique id.

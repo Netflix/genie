@@ -46,6 +46,7 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.RollbackException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -395,6 +396,39 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         // all good - return results
         return job;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    public int markZombies() throws Exception {
+        LOG.debug("called");
+        // the equivalent query is as follows:
+        // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
+        // statusMsg='Job has been marked as a zombie'
+        // where updateTime < $min and (status='RUNNING' or status='INIT')"
+        final long currentTime = System.currentTimeMillis();
+        final long zombieTime = CONF.getLong(
+                "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
+
+        final StringBuilder builder = new StringBuilder();
+        //TODO: Replace with criteria query
+        builder.append("UPDATE Job j ");
+        builder.append("SET j.status = :failed, j.finishTime = :currentTime, j.exitCode = :exitCode, j.statusMsg = :statusMessage ");
+        builder.append("WHERE j.updated < :updated AND (j.status = :running OR j.status = :init)");
+        final Query query = this.em.createQuery(builder.toString())
+                .setParameter("failed", JobStatus.FAILED)
+                .setParameter("currentTime", currentTime)
+                .setParameter("exitCode", SubprocessStatus.ZOMBIE_JOB.code())
+                .setParameter("statusMessage", SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()))
+                .setParameter("updated", new Date((currentTime - zombieTime)))
+                .setParameter("running", JobStatus.RUNNING)
+                .setParameter("init", JobStatus.INIT);
+        return query.executeUpdate();
     }
 
     private void buildJobURIs(final Job job) throws CloudServiceException {

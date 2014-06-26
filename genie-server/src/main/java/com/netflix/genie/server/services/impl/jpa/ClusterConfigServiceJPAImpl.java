@@ -242,19 +242,26 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "A cluster with id " + cluster.getId() + " already exists");
         }
-        final Set<Command> detachedCommands = cluster.getCommands();
-        final Set<Command> attachedCommands = new HashSet<Command>();
-        if (detachedCommands != null) {
+        final Set<Command> detachedCommands = new HashSet<Command>();
+        if (cluster.getCommands() != null && !cluster.getCommands().isEmpty()) {
+            detachedCommands.addAll(cluster.getCommands());
+            cluster.getCommands().clear();
+        }
+        
+        final Cluster persistedCluster = this.clusterRepo.save(cluster);
+        
+        if (!detachedCommands.isEmpty()) {
+            final Set<Command> attachedCommands = new HashSet<Command>();
             for (final Command detached : detachedCommands) {
                 final Command command = this.commandRepo.findOne(detached.getId());
                 if (command != null) {
-                    command.getClusters().add(cluster);
                     attachedCommands.add(command);
                 }
             }
+            //Handles both sides of relationship
+            persistedCluster.setCommands(attachedCommands);
         }
-        cluster.setCommands(attachedCommands);
-        return this.clusterRepo.save(cluster);
+        return persistedCluster;
     }
 
     /**

@@ -1,11 +1,23 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee ">
+ 
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:application.xml</param-value>
+    </context-param>
+ 
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
 
     <servlet>
         <servlet-name>jersey</servlet-name>
         <servlet-class>
-            com.sun.jersey.spi.container.servlet.ServletContainer
+            <!-- com.sun.jersey.spi.container.servlet.ServletContainer -->
+            com.sun.jersey.spi.spring.container.servlet.SpringServlet
         </servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
@@ -38,7 +50,7 @@
     
     <servlet>
         <servlet-name>SwaggerBootstrap</servlet-name>
-        <servlet-class>com.netflix.genie.server.startup.SwaggerBootstrap</servlet-class>
+        <servlet-class>com.netflix.genie.server.startup.GenieSwaggerBootstrap</servlet-class>
         <load-on-startup>3</load-on-startup>
     </servlet>
 

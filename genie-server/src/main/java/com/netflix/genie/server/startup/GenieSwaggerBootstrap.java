@@ -27,7 +27,7 @@ import scala.Option;
  *
  * @author tgianos
  */
-public class SwaggerBootstrap extends HttpServlet {
+public class GenieSwaggerBootstrap extends HttpServlet {
 
     static {
         final Option<ApiInfo> info = Option.apply(new ApiInfo(

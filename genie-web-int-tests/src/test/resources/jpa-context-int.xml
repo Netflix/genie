@@ -17,7 +17,7 @@
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter" />
         </property>
-        <property name="persistenceUnitName" value="com.netflix.genie.persistence"/>
+        <property name="persistenceUnitName" value="com.netflix.genie.persistence.test.int"/>
     </bean>
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

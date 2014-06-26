@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.server.jobmanager.JobJanitor;
 import com.netflix.genie.server.repository.JobRepository;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,9 +49,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class TestJobJanitorImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestJobJanitorImpl.class);
-    
+
     @Inject
     private JobRepository jobRepo;
+
+    @Inject
+    private JobJanitor janitor;
 
     /**
      * Test whether the janitor cleans up zombie jobs correctly.
@@ -78,8 +82,7 @@ public class TestJobJanitorImpl {
         two = this.jobRepo.save(two);
 
         // ensure that more than two jobs have been cleaned up
-        JobJanitorImpl janitor = new JobJanitorImpl();
-        int numRows = janitor.markZombies();
+        int numRows = this.janitor.markZombies();
         LOG.info("Number of rows marked as zombies: " + numRows);
 
         // TODO: make the test work. Need to delay time or force update time older.

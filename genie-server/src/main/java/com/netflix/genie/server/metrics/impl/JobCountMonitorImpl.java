@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Scope;
  *
  * @author skrishnan
  */
-@Named
+@Named("JobCountMonitorImpl")
 @Scope("prototype")
 public class JobCountMonitorImpl implements JobCountMonitor {
 

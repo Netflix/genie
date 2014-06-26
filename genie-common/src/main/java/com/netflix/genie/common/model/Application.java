@@ -316,7 +316,7 @@ public class Application extends Auditable implements Serializable {
      *
      * @param commands The commands to set.
      */
-    public void setCommands(final Set<Command> commands) {
+    protected void setCommands(final Set<Command> commands) {
         this.commands = commands;
     }
 

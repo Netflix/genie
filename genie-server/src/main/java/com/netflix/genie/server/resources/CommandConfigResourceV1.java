@@ -22,7 +22,6 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.services.CommandConfigService;
-import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -30,6 +29,8 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -56,6 +57,7 @@ import org.slf4j.LoggerFactory;
 @Path("/v1/config/commands")
 @Api(value = "/v1/config/commands", description = "Manage the available commands")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Named
 public class CommandConfigResourceV1 {
 
     private static final Logger LOG = LoggerFactory
@@ -64,22 +66,14 @@ public class CommandConfigResourceV1 {
     /**
      * The command service.
      */
-    private final CommandConfigService ccs;
+    @Inject
+    private CommandConfigService ccs;
 
     /**
      * Uri info for gathering information on the request
      */
     @Context
     private UriInfo uriInfo;
-
-    /**
-     * Default constructor.
-     *
-     * @throws CloudServiceException if there is any error
-     */
-    public CommandConfigResourceV1() throws CloudServiceException {
-        this.ccs = ConfigServiceFactory.getCommandConfigImpl();
-    }
 
     /**
      * Create a Command configuration.

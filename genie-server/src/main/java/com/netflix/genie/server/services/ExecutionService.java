@@ -91,4 +91,13 @@ public interface ExecutionService {
             final String clusterId,
             final int limit,
             final int page) throws CloudServiceException;
+    
+    /**
+     * Mark jobs as zombies if status hasn't been updated for
+     * netflix.genie.server.janitor.zombie.delta.ms.
+     *
+     * @return Number of jobs marked as zombies
+     * @throws CloudServiceException if there is any error during the process
+     */
+    int markZombies() throws Exception;
 }

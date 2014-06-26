@@ -21,9 +21,10 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
-import com.netflix.genie.server.services.ExecutionServiceFactory;
 import java.net.HttpURLConnection;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -48,19 +49,12 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v1/jobs")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Named
 public class JobResourceV1 {
-
-    private final ExecutionService xs;
     private static final Logger LOG = LoggerFactory.getLogger(JobResourceV1.class);
 
-    /**
-     * Default constructor.
-     *
-     * @throws CloudServiceException
-     */
-    public JobResourceV1() throws CloudServiceException {
-        xs = ExecutionServiceFactory.getExecutionServiceImpl();
-    }
+    @Inject
+    private ExecutionService xs;
 
     /**
      * Submit a new job.

@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.services.ApplicationConfigService;
-import com.netflix.genie.server.services.ConfigServiceFactory;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -29,6 +28,8 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -56,6 +57,7 @@ import org.slf4j.LoggerFactory;
 @Path("/v1/config/applications")
 @Api(value = "/v1/config/applications", description = "Manage the available applications")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Named
 public class ApplicationConfigResourceV1 {
 
     private static final Logger LOG = LoggerFactory
@@ -64,22 +66,14 @@ public class ApplicationConfigResourceV1 {
     /**
      * The application service.
      */
-    private final ApplicationConfigService acs;
+    @Inject
+    private ApplicationConfigService acs;
 
     /**
      * Uri info for gathering information on the request
      */
     @Context
     private UriInfo uriInfo;
-
-    /**
-     * Default constructor.
-     *
-     * @throws CloudServiceException if there is any error
-     */
-    public ApplicationConfigResourceV1() throws CloudServiceException {
-        this.acs = ConfigServiceFactory.getApplicationConfigImpl();
-    }
 
     /**
      * Create an Application.

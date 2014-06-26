@@ -127,6 +127,16 @@ public class BaseGenieClient {
                 new DefaultEurekaClientConfig());
     }
 
+    /**
+     * Build a HTTP request from the given parameters.
+     *
+     * @param verb The type of HTTP request to use.
+     * @param requestUri The URI to send the request to.
+     * @param params Any query parameters to send along with the request.
+     * @param entity An entity if required to add to the request.
+     * @return The HTTP request.
+     * @throws CloudServiceException
+     */
     protected HttpRequest buildRequest(
             final Verb verb,
             final String requestUri,
@@ -151,6 +161,17 @@ public class BaseGenieClient {
         }
     }
 
+    /**
+     * Execute a HTTP request.
+     *
+     * @param <C> The collection class if a collection is the expected response
+     * entity.
+     * @param request The request to send
+     * @param collectionClass The collection class. Null if none expected.
+     * @param entityClass The entity class. Not null.
+     * @return The response entity.
+     * @throws CloudServiceException
+     */
     protected <C extends Collection> Object executeRequest(
             final HttpRequest request,
             final Class<C> collectionClass,

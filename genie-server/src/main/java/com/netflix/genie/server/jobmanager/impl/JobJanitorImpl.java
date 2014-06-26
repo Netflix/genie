@@ -18,20 +18,14 @@
 package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.jobmanager.JobJanitor;
-import java.util.Date;
+import com.netflix.genie.server.services.ExecutionService;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Janitor thread that marks jobs as zombies if status hasn't been updated for
@@ -40,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author skrishnan
  * @author tgianos
  */
-@Named
+@Named("JobJanitorImpl")
 @Scope("prototype")
 public class JobJanitorImpl implements JobJanitor {
 
@@ -49,54 +43,28 @@ public class JobJanitorImpl implements JobJanitor {
     private final AbstractConfiguration conf;
     private boolean stop;
     
-    @PersistenceContext
-    private EntityManager em;
+    private final ExecutionService xs;
 
     /**
      * Default constructor - initializes members correctly in order.
+     * 
+     * @param xs The execution service to use.
      */
-    public JobJanitorImpl() {
+    @Inject
+    public JobJanitorImpl(final ExecutionService xs) {
+        this.xs = xs;
         this.conf = ConfigurationManager.getConfigInstance();
         this.stop = false;
     }
 
     /**
      * {@inheritDoc}
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Override
-    @Transactional
     public int markZombies() throws Exception {
-        // the equivalent query is as follows:
-        // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
-        // statusMsg='Job has been marked as a zombie'
-        // where updateTime < $min and (status='RUNNING' or status='INIT')"
-        long currentTime = System.currentTimeMillis();
-        long zombieTime = this.conf.getLong(
-                "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
-
-        final StringBuilder builder = new StringBuilder();
-        //TODO: Replace with criteria query
-        builder.append("UPDATE Job j ");
-        builder.append("SET j.status = :failed, j.finishTime = :currentTime, j.exitCode = :exitCode, j.statusMsg = :statusMessage ");
-        builder.append("WHERE j.updated < :updated AND (j.status = :running OR j.status = :init)");
-        try {
-            final Query query = this.em.createQuery(builder.toString())
-                    .setParameter("failed", JobStatus.FAILED)
-                    .setParameter("currentTime", currentTime)
-                    .setParameter("exitCode", SubprocessStatus.ZOMBIE_JOB.code())
-                    .setParameter("statusMessage", SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()))
-                    .setParameter("updated", new Date((currentTime - zombieTime)))
-                    .setParameter("running", JobStatus.RUNNING)
-                    .setParameter("init", JobStatus.INIT);
-            final EntityTransaction trans = em.getTransaction();
-            trans.begin();
-            final int rowsUpdated = query.executeUpdate();
-            trans.commit();
-            return rowsUpdated;
-        } finally {
-            em.close();
-        }
+        return this.xs.markZombies();
     }
 
     /**
@@ -117,7 +85,7 @@ public class JobJanitorImpl implements JobJanitor {
                 LOG.info("Total jobs marked as zombies: " + numRowsUpdated);
             } catch (Exception e) {
                 // log error message and move on to next iteration
-                LOG.error(e.getMessage());
+                LOG.error(e.getMessage(), e);
             }
 
             // sleep for the configured timeout

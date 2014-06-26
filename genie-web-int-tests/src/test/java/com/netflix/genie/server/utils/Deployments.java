@@ -54,6 +54,9 @@ public final class Deployments {
         archive.setWebXML("web.xml");
         // adds the archaius configuration
         archive.addAsResource("config.properties");
+        archive.addAsResource("persistence.xml");
+        archive.addAsResource("application-int.xml");
+        archive.addAsResource("jpa-context-int.xml");
 
         return archive;
     }
