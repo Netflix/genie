@@ -18,10 +18,17 @@
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.ExecutionServiceFactory;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
+
 import java.net.HttpURLConnection;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v1/jobs")
+@Api(value = "/v1/jobs", description = "Manage the jobs")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class JobResourceV1 {
 
@@ -72,8 +80,17 @@ public class JobResourceV1 {
      */
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @ApiOperation(
+            value = "Submit a job",
+            notes = "Submit a new job to run to genie",
+            response = Job.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Job.class)
+    })
     public Job submitJob(
+            @ApiParam(value = "Job object to run.", required = true)
             final Job job,
+            @ApiParam(value = "Http Servlet request object", required = true)
             @Context final HttpServletRequest hsr) throws CloudServiceException {
         // get client's host from the context
         String clientHost = hsr.getHeader("X-Forwarded-For");
@@ -106,8 +123,19 @@ public class JobResourceV1 {
      */
     @GET
     @Path("/{id}")
-    public Job getJobInfo(
-            @PathParam("id") final String id) throws CloudServiceException {
+    @ApiOperation(
+            value = "Find a job by id",
+            notes = "Get the job by id if it exists",
+            response = Job.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Job.class),
+        @ApiResponse(code = 400, message = "Invalid id supplied"),
+        @ApiResponse(code = 404, message = "Job not found")
+    })
+    public Job getJob(
+            @ApiParam(value = "Id of the job to get.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
         LOG.debug("called for jobID: " + id);
         return this.xs.getJobInfo(id);
     }
@@ -121,9 +149,20 @@ public class JobResourceV1 {
      */
     @GET
     @Path("/{id}/status")
+    @ApiOperation(
+            value = "Get the status of the job ",
+            notes = "Get the status of job whose id is sent",
+            response = Job.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Job.class),
+        @ApiResponse(code = 400, message = "Invalid id supplied"),
+        @ApiResponse(code = 404, message = "Job not found")
+    })
     @Produces(MediaType.APPLICATION_JSON)
     public JobStatus getJobStatus(
-            @PathParam("id") final String id) throws CloudServiceException {
+            @ApiParam(value = "Id of the job.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
         LOG.debug("called for jobID" + id);
         return this.xs.getJobStatus(id);
     }
@@ -143,15 +182,39 @@ public class JobResourceV1 {
      * @throws CloudServiceException
      */
     @GET
+    @ApiOperation(
+            value = "Find jobs",
+            notes = "Find jobs by the submitted criteria.",
+            response = Job.class,
+            responseContainer = "List")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Job.class)
+    })
     public List<Job> getJobs(
-            @QueryParam("id") final String id,
-            @QueryParam("jobName") final String jobName,
-            @QueryParam("userName") final String userName,
-            @QueryParam("status") final String status,
-            @QueryParam("clusterName") final String clusterName,
-            @QueryParam("clusterId") final String clusterId,
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("limit") @DefaultValue("1024") int limit)
+            @ApiParam(value = "Id of the job.", required = false)
+            @QueryParam("id")
+            final String id,
+            @ApiParam(value = "Name of the job.", required = false)
+            @QueryParam("jobName")
+            final String jobName,
+            @ApiParam(value = "Name of the user who submitted the job.", required = false)
+            @QueryParam("userName")
+            final String userName,
+            @ApiParam(value = "Status of the jobs to fetch.", required = false)
+            @QueryParam("status")
+            final String status,
+            @ApiParam(value = "Name of the cluster on which the job ran.", required = false)
+            @QueryParam("clusterName")
+            final String clusterName,
+            @ApiParam(value = "Id of the cluster on which the job ran.", required = false)
+            @QueryParam("clusterId")
+            final String clusterId,
+            @ApiParam(value = "The page to start on.", required = false)
+            @QueryParam("page") @DefaultValue("0")
+            int page,
+            @ApiParam(value = "Max number of results per page.", required = false)
+            @QueryParam("limit") @DefaultValue("1024")
+            int limit)
             throws CloudServiceException {
         LOG.debug("Called");
         return this.xs.getJobs(
@@ -174,7 +237,17 @@ public class JobResourceV1 {
      */
     @DELETE
     @Path("/{id}")
-    public Job killJob(@PathParam("id") final String id) throws CloudServiceException {
+    @ApiOperation(
+            value = "Delete a job",
+            notes = "Delete the jobs by the id specified.",
+            response = Job.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Job.class)
+    })
+    public Job killJob(
+            @PathParam("id")
+            @ApiParam(value = "Id of the job.", required = true)
+            final String id) throws CloudServiceException {
         LOG.debug("called for jobID: " + id);
         return this.xs.killJob(id);
     }
