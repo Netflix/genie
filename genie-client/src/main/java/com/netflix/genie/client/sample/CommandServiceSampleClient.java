@@ -26,6 +26,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.Types.ApplicationStatus;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * A sample client demonstrating usage of the Command Service Client.
  *
  * @author tgianos
+ * @author amsharma
  */
 public final class CommandServiceSampleClient {
 
@@ -51,7 +53,7 @@ public final class CommandServiceSampleClient {
     /**
      * Name for the sample command.
      */
-    protected static final String NAME = "pig";
+    protected static final String CMD_NAME = "pig";
 
     /**
      * Private constructor.
@@ -102,9 +104,9 @@ public final class CommandServiceSampleClient {
         LOG.info("Created command:");
         LOG.info(command1.toString());
 
-        LOG.info("Getting Commands using specified filter criteria name =  " + NAME);
+        LOG.info("Getting Commands using specified filter criteria name =  " + CMD_NAME);
         final Multimap<String, String> params = ArrayListMultimap.create();
-        params.put("name", NAME);
+        params.put("name", CMD_NAME);
         final List<Command> commands = commandClient.getCommands(params);
         if (commands.isEmpty()) {
             LOG.info("No commands found for specified criteria.");
@@ -169,7 +171,7 @@ public final class CommandServiceSampleClient {
             LOG.info("Application = " + application);
         }
 
-        LOG.info("Updating set of configuration files associated with id " + command1.getId());
+        LOG.info("Updating set of applications files associated with id " + command1.getId());
         //This should remove the original config leaving only the two in this set
         final Set<Application> applications3 = commandClient.updateApplicationsForCommand(command1.getId(), newApps);
         for (final Application application : applications3) {
@@ -220,7 +222,7 @@ public final class CommandServiceSampleClient {
             final String id,
             final Set<Application> apps) throws CloudServiceException {
         final Command command = new Command(
-                NAME,
+                CMD_NAME,
                 "tgianos",
                 CommandStatus.ACTIVE,
                 "/apps/pig/0.13/bin/pig");
@@ -233,5 +235,19 @@ public final class CommandServiceSampleClient {
             command.setApplications(apps);
         }
         return command;
+    }
+
+    public static Command getSampleCommand(
+            final String id) 
+                    throws CloudServiceException {
+        final Command cmd = new Command(CMD_NAME, "amsharma", CommandStatus.ACTIVE,"/foo/exec.sh");
+        if (StringUtils.isNotEmpty(id)) {
+            cmd.setId(id);
+        }
+        cmd.setVersion("2.4.0");
+        final Set<String> configs = new HashSet<String>();
+        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml");
+        cmd.setConfigs(configs);
+        return cmd;
     }
 }

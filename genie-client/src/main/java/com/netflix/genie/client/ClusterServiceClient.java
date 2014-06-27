@@ -22,9 +22,13 @@ import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.Command;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author skrishnan
  * @author tgianos
+ * @author amsharma
  */
 //TODO: Can probably templetize the config clients or part of them as
 //     much of the code is the same
@@ -157,7 +162,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @return List of cluster configuration elements that match the filter
      * @throws CloudServiceException
      */
-    public List<Cluster> getClusterConfigs(final Multimap<String, String> params)
+    public List<Cluster> getClusters(final Multimap<String, String> params)
             throws CloudServiceException {
         final HttpRequest request = this.buildRequest(
                 Verb.GET,
@@ -189,7 +194,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @return the deleted cluster cluster
      * @throws CloudServiceException
      */
-    public Cluster deleteClusterConfig(final String id) throws CloudServiceException {
+    public Cluster deleteCluster(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -204,5 +209,283 @@ public final class ClusterServiceClient extends BaseGenieClient {
                 null,
                 null);
         return (Cluster) this.executeRequest(request, null, Cluster.class);
+    }
+    
+    /**
+     * Add some more configuration files to a given cluster.
+     *
+     * @param id The id of the cluster to add configurations to. Not
+     * Null/empty/blank.
+     * @param configs The configuration files to add. Not null or empty.
+     * @return The new set of configuration files for the given command.
+     * @throws CloudServiceException
+     */
+    public Set<String> addConfigsToCluster(
+            final String id,
+            final Set<String> configs) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (configs == null || configs.isEmpty()) {
+            final String msg = "Missing required parameter: configs";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.POST,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "configs"},
+                        SLASH),
+                null,
+                configs);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+    
+    /**
+     * Get the active set of configuration files for the given cluster.
+     *
+     * @param id The id of the cluster to get configurations for. Not
+     * Null/empty/blank.
+     * @return The set of configuration files for the given cluster.
+     * @throws CloudServiceException
+     */
+    public Set<String> getConfigsForCluster(final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.GET,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "configs"},
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+    
+    /**
+     * Update the configuration files for a given cluster.
+     *
+     * @param id The id of the cluster to update the configuration files for.
+     * Not null/empty/blank.
+     * @param configs The configuration files to replace existing configuration
+     * files with. Not null.
+     * @return The new set of cluster configurations.
+     * @throws CloudServiceException
+     */
+    public Set<String> updateConfigsForCluster(
+            final String id,
+            final Set<String> configs) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (configs == null) {
+            final String msg = "Missing required parameter: configs";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.PUT,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "configs"},
+                        SLASH),
+                null,
+                configs);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+    
+    /**
+     * Delete all the configuration files from a given cluster.
+     *
+     * @param id The id of the cluster to delete the configuration files from.
+     * Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws CloudServiceException
+     */
+    public Set<String> removeAllConfigsForCluster(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "configs"},
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+    
+    /**
+     * Add some more commands to a given cluster.
+     *
+     * @param id The id of the cluster to add commands to. Not
+     * Null/empty/blank.
+     * @param commands The commands to add. Not null or empty.
+     * @return The new set of commands for the given cluster.
+     * @throws CloudServiceException
+     */
+    public Set<Command> addCommandsToCluster(
+            final String id,
+            final Set<Command> commands) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (commands == null || commands.isEmpty()) {
+            final String msg = "Missing required parameter: commands";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.POST,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands"},
+                        SLASH),
+                null,
+                commands);
+        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+    }
+
+    /**
+     * Get the active set of commands for the given cluster.
+     *
+     * @param id The id of the cluster to get commands for. Not
+     * Null/empty/blank.
+     * @return The set of command files for the given cluster.
+     * @throws CloudServiceException
+     */
+    public Set<Command> getCommandsForCluster(final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.GET,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands"},
+                        SLASH),
+                null,
+                null);
+        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+    }
+
+    /**
+     * Update the commands for a given cluster.
+     *
+     * @param id The id of the cluster to update the command files for. Not
+     * null/empty/blank.
+     * @param commands The commands to replace existing command
+     * files with. Not null.
+     * @return The new set of cluster commands.
+     * @throws CloudServiceException
+     */
+    public Set<Command> updateCommandsForCluster(
+            final String id,
+            final Set<Command> commands) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (commands == null) {
+            final String msg = "Missing required parameter: commands";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.PUT,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands"},
+                        SLASH),
+                null,
+                commands);
+        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+    }
+
+    /**
+     * Delete all the commands from a given cluster.
+     *
+     * @param id The id of the cluster to delete the commands from. Not
+     * null/empty/blank.
+     * @return Empty set if successful
+     * @throws CloudServiceException
+     */
+    public Set<Command> removeAllCommandsForCluster(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands"},
+                        SLASH),
+                null,
+                null);
+        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+    }
+
+    /**
+     * Remove an command from a given cluster.
+     *
+     * @param id The id of the cluster to delete the command from. Not
+     * null/empty/blank.
+     * @param appId The id of the command to remove. Not null/empty/blank.
+     * @return The active set of commands for the cluster.
+     * @throws CloudServiceException
+     */
+    public Set<Command> removeCommandForCluster(
+            final String id,
+            final String cmdId) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (StringUtils.isBlank(cmdId)) {
+            final String msg = "Missing required parameter: cmdId";
+            LOG.error(msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands", cmdId},
+                        SLASH),
+                null,
+                null);
+        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
     }
 }

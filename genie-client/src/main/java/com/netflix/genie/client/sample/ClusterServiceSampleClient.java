@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author skrishnan
  * @author tgianos
+ * @author amsharma
  */
 public final class ClusterServiceSampleClient {
 
@@ -124,7 +125,7 @@ public final class ClusterServiceSampleClient {
         params.put("adHoc", "false");
         params.put("test", "true");
         params.put("limit", "3");
-        final List<Cluster> clusters = clusterClient.getClusterConfigs(params);
+        final List<Cluster> clusters = clusterClient.getClusters(params);
         if (clusters != null && !clusters.isEmpty()) {
             for (final Cluster cluster : clusters) {
                 LOG.info(cluster.toString());
@@ -133,6 +134,71 @@ public final class ClusterServiceSampleClient {
             LOG.info("No clusters found for parameters");
         }
 
+        LOG.info("Configurations for cluster with id " + cluster1.getId());
+        final Set<String> configs = clusterClient.getConfigsForCluster(cluster1.getId());
+        for (final String config : configs) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Adding configurations to cluster with id " + cluster1.getId());
+        final Set<String> newConfigs = new HashSet<String>();
+        newConfigs.add("someNewConfigFile");
+        newConfigs.add("someOtherNewConfigFile");
+        final Set<String> configs2 = clusterClient.addConfigsToCluster(cluster1.getId(), newConfigs);
+        for (final String config : configs2) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Updating set of configuration files associated with id " + cluster1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> configs3 = clusterClient.updateConfigsForCluster(cluster1.getId(), newConfigs);
+        for (final String config : configs3) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Deleting all the configuration files from the cluster with id " + cluster1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> configs4 = clusterClient.removeAllConfigsForCluster(cluster1.getId());
+        for (final String config : configs4) {
+            //Shouldn't print anything
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Commands for cluster with id " + cluster1.getId());
+        final Set<Command> commands1 = clusterClient.getCommandsForCluster(cluster1.getId());
+        for (final Command  command : commands1) {
+            LOG.info("Command = " + command);
+        }
+
+        LOG.info("Adding commands to cluster with id " + cluster1.getId());
+        final Set<Command> newCmds = new HashSet<Command>();
+        newCmds.add(CommandServiceSampleClient.getSampleCommand(ID + "something"));
+        newCmds.add(CommandServiceSampleClient.getSampleCommand(null));
+        final Set<Command> commands2 = clusterClient.addCommandsToCluster(cluster1.getId(), newCmds);
+        for (final Command command : commands2) {
+            LOG.info("Command = " + command);
+        }
+
+        LOG.info("Updating set of commands files associated with id " + cluster1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<Command> commands3 = clusterClient.updateCommandsForCluster(cluster1.getId(), newCmds);
+        for (final Command command : commands3) {
+            LOG.info("Command = " + command);
+        }
+
+        LOG.info("Deleting the command from the command with id " + ID + "something");
+        final Set<Command> commands4 = clusterClient.removeCommandForCluster(cluster1.getId(), ID + "something");
+        for (final Command command : commands4) {
+            LOG.info("Command = " + command);
+        }
+
+        LOG.info("Deleting all the commands from the command with id " + command1.getId());
+        final Set<Command> commands5 = clusterClient.removeAllCommandsForCluster(cluster1.getId());
+        for (final Command command : commands5) {
+            //Shouldn't print anything
+            LOG.info("Command = " + command);
+        }
+        
         LOG.info("Updating existing cluster config");
         cluster2.setStatus(ClusterStatus.TERMINATED);
         final Cluster cluster3 = clusterClient.updateCluster(cluster2.getId(), cluster2);
@@ -140,7 +206,7 @@ public final class ClusterServiceSampleClient {
         LOG.info(cluster3.toString());
 
         LOG.info("Deleting cluster config using id");
-        final Cluster cluster4 = clusterClient.deleteClusterConfig(cluster1.getId());
+        final Cluster cluster4 = clusterClient.deleteCluster(cluster1.getId());
         LOG.info("Deleted cluster config with id: " + cluster1.getId());
         LOG.info(cluster4.toString());
 
