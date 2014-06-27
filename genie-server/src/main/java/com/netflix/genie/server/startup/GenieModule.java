@@ -17,12 +17,12 @@
  */
 package com.netflix.genie.server.startup;
 
-import com.google.inject.servlet.ServletModule;
 import com.google.inject.spring.SpringIntegration;
 import com.netflix.genie.server.jobmanager.JobJanitor;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.metrics.JobCountMonitor;
+import com.sun.jersey.guice.JerseyServletModule;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -32,7 +32,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author tgianos
  */
-public class GenieModule extends ServletModule {
+public class GenieModule extends JerseyServletModule {
 
     /**
      * Configure the Guice bindings
