@@ -23,7 +23,6 @@ dependencies {
 
     runtime ('commons-dbcp:commons-dbcp:1.4')
     runtime ('com.google.inject.extensions:guice-servlet:3.0')
-    runtime ('com.mchange:c3p0:0.9.2')
     runtime ('com.mchange:mchange-commons-java:0.2.3.3')
     runtime ('mysql:mysql-connector-java:5.1.16')
     runtime ('org.apache.derby:derby:10.2.2.0')

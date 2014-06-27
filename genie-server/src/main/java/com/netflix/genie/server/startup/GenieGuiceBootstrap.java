@@ -34,6 +34,6 @@ public class GenieGuiceBootstrap extends ServerBootstrap {
      */
     @Override
     protected void beforeInjectorCreation(final LifecycleInjectorBuilder builderToBeUsed) {
-        builderToBeUsed.withAdditionalModules(new GenieModule());
+//        builderToBeUsed.withAdditionalModules(new GenieModule());
     }
 }

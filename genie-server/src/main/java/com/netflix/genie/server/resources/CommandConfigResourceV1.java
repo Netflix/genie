@@ -49,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Code for CommandConfigResource
+ * Code for CommandConfigResourceV1.
  *
  * @author amsharma
  * @author tgianos
@@ -70,7 +70,7 @@ public class CommandConfigResourceV1 {
     private CommandConfigService ccs;
 
     /**
-     * Uri info for gathering information on the request
+     * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;

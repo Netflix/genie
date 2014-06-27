@@ -55,12 +55,12 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
     @PersistenceContext
     private EntityManager em;
-    
+
     private final ApplicationRepository applicationRepo;
 
     /**
      * Default constructor.
-     * 
+     *
      * @param applicationRepo The application repository to use
      */
     @Inject

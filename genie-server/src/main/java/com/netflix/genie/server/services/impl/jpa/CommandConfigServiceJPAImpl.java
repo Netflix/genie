@@ -150,15 +150,15 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "A command with id " + command.getId() + " already exists");
         }
-        
+
         final Set<Application> detachedApps = new HashSet<Application>();
         if (command.getApplications() != null && !command.getApplications().isEmpty()) {
             detachedApps.addAll(command.getApplications());
             command.getApplications().clear();
         }
-        
+
         final Command persistedCommand = this.commandRepo.save(command);
-        
+
         if (!detachedApps.isEmpty()) {
             final Set<Application> attachedApps = new HashSet<Application>();
             for (final Application detached : detachedApps) {

@@ -57,13 +57,14 @@ public class JobCountManagerImpl implements JobCountManager {
     private EntityManager em;
 
     /**
-     * Default Constructor
+     * Default Constructor.
      */
     public JobCountManagerImpl() {
     }
 
     /**
      * {@inheritDoc}
+     *
      * @throws CloudServiceException
      */
     @Override
@@ -72,9 +73,10 @@ public class JobCountManagerImpl implements JobCountManager {
 
         return getNumInstanceJobs(null, null, null);
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @throws CloudServiceException
      */
     @Override
@@ -89,6 +91,7 @@ public class JobCountManagerImpl implements JobCountManager {
 
     /**
      * {@inheritDoc}
+     *
      * @throws CloudServiceException
      */
     @Override
@@ -126,9 +129,10 @@ public class JobCountManagerImpl implements JobCountManager {
         //if need be
         return query.getSingleResult().intValue();
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @throws CloudServiceException
      */
     @Override

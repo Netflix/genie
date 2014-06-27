@@ -22,7 +22,6 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Abstraction layer to encapsulate data ClusterConfig functionality.<br>

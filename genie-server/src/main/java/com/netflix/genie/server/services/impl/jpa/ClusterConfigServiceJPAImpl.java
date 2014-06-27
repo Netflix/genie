@@ -65,7 +65,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceJPAImpl.class);
-    
+
     @PersistenceContext
     private EntityManager em;
 
@@ -74,7 +74,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * Default constructor - initialize all required dependencies.
-     * 
+     *
      * @param clusterRepo The cluster repository to use.
      * @param commandRepo the command repository to use.
      */
@@ -247,9 +247,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             detachedCommands.addAll(cluster.getCommands());
             cluster.getCommands().clear();
         }
-        
+
         final Cluster persistedCluster = this.clusterRepo.save(cluster);
-        
+
         if (!detachedCommands.isEmpty()) {
             final Set<Command> attachedCommands = new HashSet<Command>();
             for (final Command detached : detachedCommands) {

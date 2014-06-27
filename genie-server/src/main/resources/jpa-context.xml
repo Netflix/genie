@@ -25,17 +25,15 @@
     </bean>
     
     <!-- For MySQL uncomment this bean definition -->
-<!--    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <property name="driverClass" value="com.mysql.jdbc.Driver" />
-        <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1/genie?autoReconnect=true" />
-        <property name="user" value="root" />
+<!--    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://127.0.0.1/genie?autoReconnect=true" />
+        <property name="username" value="root" />
         <property name="password" value="" />
-
-        <property name="acquireRetryAttempts" value="3" />
-        <property name="minPoolSize" value="5" />
-        <property name="maxPoolSize" value="20" />
-        <property name="preferredTestQuery" value="SELECT 1" />
-        <property name="testConnectionOnCheckout" value="true" />
+        
+        <property name="minIdle" value="5" />
+        <property name="maxIdle" value="20" />
+        <property name="maxActive" value="20" />
     </bean>-->
     
     <!-- For Derby use this bean -->
@@ -50,24 +48,19 @@
         <property name="maxActive" value="20" />
     </bean>
     
-    <!-- For HSQLDB use this datasource above -->
+    <!-- For HSQLDB use this bean -->
     <!--<jdbc:embedded-database id="dataSource" type="HSQL"/>-->
     
-    <!-- For Derby embedded use this bean -->
-    <!-- Doesn't work right now -->
-    <!--<jdbc:embedded-database id="dataSource" type="DERBY"/>-->
-    
     <!-- Generalized Data Source -->
-<!--    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <property name="driverClass" value="${jdbc.driverClassName}" />
-        <property name="jdbcUrl" value="${jdbc.url}" />
-        <property name="user" value="${jdbc.username}" />
+<!--    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
         <property name="password" value="${jdbc.password}" />
-
-        <property name="acquireIncrement" value="${c3p0.acquireIncrement}" />
-        <property name="minPoolSize" value="${c3p0.minPoolSize}" />
-        <property name="maxPoolSize" value="${c3p0.maxPoolSize}" />
-        <property name="maxIdleTime" value="${c3p0.maxIdleTime}" />
+        
+        <property name="minIdle" value="${dbcp.minIdle}" />
+        <property name="maxIdle" value="${dbcp.maxIdle}" />
+        <property name="maxActive" value="${dbcp.maxActive}" />
     </bean>-->
     
     <jpa:repositories base-package="com.netflix.genie.server.repository"/>

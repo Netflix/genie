@@ -17,9 +17,11 @@
  */
 package com.netflix.genie.server.metrics.impl;
 
-import com.netflix.genie.server.metrics.*;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.server.metrics.GenieNodeStatistics;
+import com.netflix.genie.server.metrics.JobCountManager;
+import com.netflix.genie.server.metrics.JobCountMonitor;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.slf4j.Logger;
@@ -53,20 +55,22 @@ public class JobCountMonitorImpl implements JobCountMonitor {
         this.stats = stats;
         this.stop = false;
     }
-    
+
     /**
      * {@inheritDoc}
-     * @throws CloudServiceException 
+     *
+     * @throws CloudServiceException
      */
     @Override
     public int getNumInstanceJobs() throws CloudServiceException {
         LOG.debug("called");
         return this.jobCountManager.getNumInstanceJobs();
     }
-    
+
     /**
      * {@inheritDoc}
-     * @throws CloudServiceException 
+     *
+     * @throws CloudServiceException
      */
     @Override
     public int getNumInstanceJobs15Mins() throws CloudServiceException {
@@ -74,10 +78,11 @@ public class JobCountMonitorImpl implements JobCountMonitor {
         long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 15 * 60 * 1000, null);
     }
-    
+
     /**
      * {@inheritDoc}
-     * @throws CloudServiceException 
+     *
+     * @throws CloudServiceException
      */
     @Override
     public int getNumInstanceJobs2Hrs() throws CloudServiceException {
@@ -86,10 +91,11 @@ public class JobCountMonitorImpl implements JobCountMonitor {
         return this.jobCountManager.getNumInstanceJobs(time - 2 * 60 * 60 * 1000,
                 time - 15 * 60 * 1000);
     }
-    
+
     /**
      * {@inheritDoc}
-     * @throws CloudServiceException 
+     *
+     * @throws CloudServiceException
      */
     @Override
     public int getNumInstanceJobs8Hrs() throws CloudServiceException {
@@ -98,10 +104,11 @@ public class JobCountMonitorImpl implements JobCountMonitor {
         return this.jobCountManager.getNumInstanceJobs(time - 8 * 60 * 60 * 1000,
                 time - 2 * 60 * 60 * 1000);
     }
-    
+
     /**
      * {@inheritDoc}
-     * @throws CloudServiceException 
+     *
+     * @throws CloudServiceException
      */
     @Override
     public int getNumInstanceJobs8HrsPlus() throws CloudServiceException {
@@ -162,7 +169,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */

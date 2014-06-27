@@ -42,12 +42,12 @@ public class JobJanitorImpl implements JobJanitor {
 
     private final AbstractConfiguration conf;
     private boolean stop;
-    
+
     private final ExecutionService xs;
 
     /**
      * Default constructor - initializes members correctly in order.
-     * 
+     *
      * @param xs The execution service to use.
      */
     @Inject

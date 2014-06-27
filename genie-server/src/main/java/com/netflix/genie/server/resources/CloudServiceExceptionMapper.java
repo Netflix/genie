@@ -36,9 +36,10 @@ import org.slf4j.LoggerFactory;
 @Provider
 @Named
 public class CloudServiceExceptionMapper implements ExceptionMapper<CloudServiceException> {
+
     private static final Logger LOG = LoggerFactory
             .getLogger(CloudServiceExceptionMapper.class);
-    
+
     @Inject
     private GenieNodeStatistics genieNodeStatistics;
 

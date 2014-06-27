@@ -70,7 +70,7 @@ public class ApplicationConfigResourceV1 {
     private ApplicationConfigService acs;
 
     /**
-     * Uri info for gathering information on the request
+     * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;

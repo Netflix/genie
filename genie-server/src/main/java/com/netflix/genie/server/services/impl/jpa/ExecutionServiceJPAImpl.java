@@ -46,7 +46,6 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.RollbackException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -415,20 +414,23 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         final long zombieTime = CONF.getLong(
                 "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
 
-        final StringBuilder builder = new StringBuilder();
-        //TODO: Replace with criteria query
-        builder.append("UPDATE Job j ");
-        builder.append("SET j.status = :failed, j.finishTime = :currentTime, j.exitCode = :exitCode, j.statusMsg = :statusMessage ");
-        builder.append("WHERE j.updated < :updated AND (j.status = :running OR j.status = :init)");
-        final Query query = this.em.createQuery(builder.toString())
-                .setParameter("failed", JobStatus.FAILED)
-                .setParameter("currentTime", currentTime)
-                .setParameter("exitCode", SubprocessStatus.ZOMBIE_JOB.code())
-                .setParameter("statusMessage", SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()))
-                .setParameter("updated", new Date((currentTime - zombieTime)))
-                .setParameter("running", JobStatus.RUNNING)
-                .setParameter("init", JobStatus.INIT);
-        return query.executeUpdate();
+        final CriteriaBuilder cb = this.em.getCriteriaBuilder();
+        final CriteriaQuery<Job> cq = cb.createQuery(Job.class);
+        final Root<Job> j = cq.from(Job.class);
+        final List<Predicate> predicates = new ArrayList<Predicate>();
+        predicates.add(cb.lessThan(j.get(Job_.updated), new Date(currentTime - zombieTime)));
+        final Predicate orPredicate1 = cb.equal(j.get(Job_.status), JobStatus.RUNNING);
+        final Predicate orPredicate2 = cb.equal(j.get(Job_.status), JobStatus.INIT);
+        predicates.add(cb.or(orPredicate1, orPredicate2));
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+        final List<Job> jobs = this.em.createQuery(cq).getResultList();
+        for (final Job job : jobs) {
+            job.setStatus(JobStatus.FAILED);
+            job.setFinishTime(currentTime);
+            job.setExitCode(SubprocessStatus.ZOMBIE_JOB.code());
+            job.setStatusMsg(SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()));
+        }
+        return jobs.size();
     }
 
     private void buildJobURIs(final Job job) throws CloudServiceException {

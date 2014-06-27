@@ -62,7 +62,7 @@ public class YarnJobManager implements JobManager {
 
     @PersistenceContext
     private EntityManager em;
-    
+
     private final JobMonitor jobMonitor;
 
     /**
