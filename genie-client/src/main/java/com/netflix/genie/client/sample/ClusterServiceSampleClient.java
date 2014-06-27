@@ -28,6 +28,8 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.ClusterStatus;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,7 +98,7 @@ public final class ClusterServiceSampleClient {
         final CommandServiceClient commandClient = CommandServiceClient.getInstance();
 
         LOG.info("Creating command pig13_mr2");
-        final Set<Application> apps = new HashSet<Application>();
+        final List<Application> apps = new ArrayList<Application>();
         apps.add(app1);
         apps.add(app2);
         final Command command1 = commandClient.createCommand(
@@ -104,7 +106,7 @@ public final class ClusterServiceSampleClient {
                         CommandServiceSampleClient.ID, apps));
         LOG.info("Created command:");
         LOG.info(command1.toString());
-        final Set<Command> commands = new HashSet<Command>();
+        final List<Command> commands = new ArrayList<Command>();
         commands.add(command1);
 
         LOG.info("Initializing ClusterConfigServiceClient");
@@ -198,7 +200,7 @@ public final class ClusterServiceSampleClient {
             //Shouldn't print anything
             LOG.info("Command = " + command);
         }
-        
+
         LOG.info("Updating existing cluster config");
         cluster2.setStatus(ClusterStatus.TERMINATED);
         final Cluster cluster3 = clusterClient.updateCluster(cluster2.getId(), cluster2);
@@ -238,7 +240,7 @@ public final class ClusterServiceSampleClient {
      */
     public static Cluster createSampleCluster(
             final String id,
-            final Set<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws CloudServiceException {
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");

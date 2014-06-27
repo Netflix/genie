@@ -26,8 +26,9 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.ApplicationStatus;
 import com.netflix.genie.common.model.Types.CommandStatus;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -97,7 +98,7 @@ public final class CommandServiceSampleClient {
         final CommandServiceClient commandClient = CommandServiceClient.getInstance();
 
         LOG.info("Creating command pig13_mr2");
-        final Set<Application> apps = new HashSet<Application>();
+        final List<Application> apps = new ArrayList<Application>();
         apps.add(app1);
         apps.add(app2);
         final Command command1 = commandClient.createCommand(createSampleCommand(ID, apps));
@@ -179,7 +180,8 @@ public final class CommandServiceSampleClient {
         }
 
         LOG.info("Deleting the application from the command with id " + ID + "something");
-        final Set<Application> applications4 = commandClient.removeApplicationForCommand(command1.getId(), ID + "something");
+        final Set<Application> applications4 =
+                commandClient.removeApplicationForCommand(command1.getId(), ID + "something");
         for (final Application application : applications4) {
             LOG.info("Application = " + application);
         }
@@ -220,7 +222,7 @@ public final class CommandServiceSampleClient {
      */
     public static Command createSampleCommand(
             final String id,
-            final Set<Application> apps) throws CloudServiceException {
+            final List<Application> apps) throws CloudServiceException {
         final Command command = new Command(
                 CMD_NAME,
                 "tgianos",
@@ -237,10 +239,17 @@ public final class CommandServiceSampleClient {
         return command;
     }
 
+    /**
+     * Create a sample command.
+     *
+     * @param id The id to use or null if want one created.
+     * @return An example command
+     * @throws CloudServiceException
+     */
     public static Command getSampleCommand(
-            final String id) 
+            final String id)
                     throws CloudServiceException {
-        final Command cmd = new Command(CMD_NAME, "amsharma", CommandStatus.ACTIVE,"/foo/exec.sh");
+        final Command cmd = new Command(CMD_NAME, "amsharma", CommandStatus.ACTIVE, "/foo/exec.sh");
         if (StringUtils.isNotEmpty(id)) {
             cmd.setId(id);
         }

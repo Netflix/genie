@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  * @author amsharma
  */
-//TODO: Can probably templetize the config clients or part of them as
+// TODO: Can probably templetize the config clients or part of them as
 //     much of the code is the same
 public final class ClusterServiceClient extends BaseGenieClient {
 
@@ -210,7 +210,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                 null);
         return (Cluster) this.executeRequest(request, null, Cluster.class);
     }
-    
+
     /**
      * Add some more configuration files to a given cluster.
      *
@@ -243,7 +243,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                 configs);
         return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
-    
+
     /**
      * Get the active set of configuration files for the given cluster.
      *
@@ -268,7 +268,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                 null);
         return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
-    
+
     /**
      * Update the configuration files for a given cluster.
      *
@@ -304,7 +304,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                 configs);
         return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
-    
+
     /**
      * Delete all the configuration files from a given cluster.
      *
@@ -331,7 +331,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                 null);
         return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
-    
+
     /**
      * Add some more commands to a given cluster.
      *
@@ -459,7 +459,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *
      * @param id The id of the cluster to delete the command from. Not
      * null/empty/blank.
-     * @param appId The id of the command to remove. Not null/empty/blank.
+     * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active set of commands for the cluster.
      * @throws CloudServiceException
      */

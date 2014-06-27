@@ -248,7 +248,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final Set<Command> commands = app.getCommands();
             if (commands != null) {
                 for (final Command command : commands) {
-                    final Set<Application> apps = command.getApplications();
+                    final List<Application> apps = command.getApplications();
                     if (apps != null) {
                         apps.remove(app);
                     }

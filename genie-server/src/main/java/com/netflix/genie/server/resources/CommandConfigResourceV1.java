@@ -396,12 +396,12 @@ public class CommandConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Command not found")
     })
-    public Set<Application> addApplicationsForCommand(
+    public List<Application> addApplicationsForCommand(
             @ApiParam(value = "Id of the command to add applications to.", required = true)
             @PathParam("id")
             final String id,
             @ApiParam(value = "The applications to add.", required = true)
-            final Set<Application> applications) throws CloudServiceException {
+            final List<Application> applications) throws CloudServiceException {
         LOG.debug("Called with id " + id + " and applications " + applications);
         return this.ccs.addApplicationsForCommand(id, applications);
     }
@@ -426,7 +426,7 @@ public class CommandConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Command not found")
     })
-    public Set<Application> getApplicationsForCommand(
+    public List<Application> getApplicationsForCommand(
             @ApiParam(value = "Id of the command to get configurations for.", required = true)
             @PathParam("id")
             final String id) throws CloudServiceException {
@@ -457,13 +457,13 @@ public class CommandConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Command not found")
     })
-    public Set<Application> updateApplicationsForCommand(
+    public List<Application> updateApplicationsForCommand(
             @ApiParam(value = "Id of the command to update configurations for.", required = true)
             @PathParam("id")
             final String id,
             @ApiParam(value = "The applications to replace existing with. Should already be created",
                     required = true)
-            final Set<Application> applications) throws CloudServiceException {
+            final List<Application> applications) throws CloudServiceException {
         LOG.debug("Called with id " + id + " and configs " + applications);
         return this.ccs.updateApplicationsForCommand(id, applications);
     }
@@ -488,7 +488,7 @@ public class CommandConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid Id supplied"),
         @ApiResponse(code = 404, message = "Command not found")
     })
-    public Set<Application> removeAllApplicationsForCommand(
+    public List<Application> removeAllApplicationsForCommand(
             @ApiParam(value = "Id of the command to delete from.", required = true)
             @PathParam("id")
             final String id) throws CloudServiceException {
@@ -517,7 +517,7 @@ public class CommandConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Command not found")
     })
-    public Set<Application> removeApplicationForCommand(
+    public List<Application> removeApplicationForCommand(
             @ApiParam(value = "Id of the command to delete from.", required = true)
             @PathParam("id")
             final String id,

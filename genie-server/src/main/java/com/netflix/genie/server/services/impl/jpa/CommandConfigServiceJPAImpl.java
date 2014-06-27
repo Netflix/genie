@@ -147,8 +147,8 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                         HttpURLConnection.HTTP_BAD_REQUEST,
                         "A command with id " + command.getId() + " already exists");
             }
-            final Set<Application> detachedApps = command.getApplications();
-            final Set<Application> attachedApps = new HashSet<Application>();
+            final List<Application> detachedApps = command.getApplications();
+            final List<Application> attachedApps = new ArrayList<Application>();
             if (detachedApps != null) {
                 for (final Application detached : detachedApps) {
                     final Application app = em.find(Application.class, detached.getId());
@@ -251,7 +251,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                         "No command with id " + id + " exists to delete.");
             }
             //Remove the command from the associated Application references
-            final Set<Application> apps = command.getApplications();
+            final List<Application> apps = command.getApplications();
             if (apps != null) {
                 for (final Application app : apps) {
                     final Set<Command> commands = app.getCommands();
@@ -451,9 +451,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> addApplicationsForCommand(
+    public List<Application> addApplicationsForCommand(
             final String id,
-            final Set<Application> applications) throws CloudServiceException {
+            final List<Application> applications) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -471,6 +471,10 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     if (app != null) {
                         command.getApplications().add(app);
                         app.getCommands().add(command);
+                    } else {
+                        throw new CloudServiceException(
+                                HttpURLConnection.HTTP_NOT_FOUND,
+                                "No application with id " + detached.getId() + " exists.");
                     }
                 }
                 trans.commit();
@@ -494,7 +498,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> getApplicationsForCommand(
+    public List<Application> getApplicationsForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
@@ -522,9 +526,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> updateApplicationsForCommand(
+    public List<Application> updateApplicationsForCommand(
             final String id,
-            final Set<Application> applications) throws CloudServiceException {
+            final List<Application> applications) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -536,13 +540,17 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             trans.begin();
             final Command command = em.find(Command.class, id);
             if (command != null) {
-                final Set<Application> apps = new HashSet<Application>();
+                final List<Application> apps = new ArrayList<Application>();
                 for (final Application detached : applications) {
                     final Application app
                             = em.find(Application.class, detached.getId());
                     if (app != null) {
                         apps.add(app);
                         app.getCommands().add(command);
+                    } else { 
+                        throw new CloudServiceException(
+                                HttpURLConnection.HTTP_NOT_FOUND,
+                                "No application with id " + detached.getId() + " exists.");
                     }
                 }
                 command.setApplications(apps);
@@ -567,7 +575,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> removeAllApplicationsForCommand(
+    public List<Application> removeAllApplicationsForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
@@ -605,7 +613,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> removeApplicationForCommand(
+    public List<Application> removeApplicationForCommand(
             final String id,
             final String appId) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {

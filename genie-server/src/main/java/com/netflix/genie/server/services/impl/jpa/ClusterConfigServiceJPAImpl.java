@@ -247,18 +247,18 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                         HttpURLConnection.HTTP_BAD_REQUEST,
                         "A cluster with id " + cluster.getId() + " already exists");
             }
-            final Set<Command> detachedCommands = cluster.getCommands();
-            final Set<Command> attachedCommands = new HashSet<Command>();
-            if (detachedCommands != null) {
-                for (final Command detached : detachedCommands) {
-                    final Command command = em.find(Command.class, detached.getId());
-                    if (command != null) {
-                        command.getClusters().add(cluster);
-                        attachedCommands.add(command);
-                    }
-                }
-            }
-            cluster.setCommands(attachedCommands);
+//            final Set<Command> detachedCommands = cluster.getCommands();
+//            final Set<Command> attachedCommands = new HashSet<Command>();
+//            if (detachedCommands != null) {
+//                for (final Command detached : detachedCommands) {
+//                    final Command command = em.find(Command.class, detached.getId());
+//                    if (command != null) {
+//                        command.getClusters().add(cluster);
+//                        attachedCommands.add(command);
+//                    }
+//                }
+//            }
+//            cluster.setCommands(attachedCommands);
             em.persist(cluster);
             trans.commit();
             return cluster;
@@ -328,7 +328,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                         HttpURLConnection.HTTP_NOT_FOUND,
                         "No cluster with id " + id + " exists to delete.");
             }
-            final Set<Command> commands = cluster.getCommands();
+            final List<Command> commands = cluster.getCommands();
             if (commands != null) {
                 for (final Command command : commands) {
                     final Set<Cluster> clusters = command.getClusters();
@@ -558,9 +558,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Command> addCommandsForCluster(
+    public List<Command> addCommandsForCluster(
             final String id,
-            final Set<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -578,6 +578,10 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     if (cmd != null) {
                         cluster.getCommands().add(cmd);
                         cmd.getClusters().add(cluster);
+                    } else {
+                        throw new CloudServiceException(
+                                HttpURLConnection.HTTP_NOT_FOUND,
+                                "No command with id " + detached.getId() + " exists.");
                     }
                 }
                 trans.commit();
@@ -601,7 +605,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Command> getCommandsForCluster(
+    public List<Command> getCommandsForCluster(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
@@ -629,9 +633,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Command> updateCommandsForCluster(
+    public List<Command> updateCommandsForCluster(
             final String id,
-            final Set<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -643,13 +647,17 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             trans.begin();
             final Cluster cluster = em.find(Cluster.class, id);
             if (cluster != null) {
-                final Set<Command> cmds = new HashSet<Command>();
+                final List<Command> cmds = new ArrayList<Command>();
                 for (final Command detached : commands) {
                     final Command cmd
                             = em.find(Command.class, detached.getId());
                     if (cmd != null) {
                         cmds.add(cmd);
                         cmd.getClusters().add(cluster);
+                    } else {
+                        throw new CloudServiceException(
+                                HttpURLConnection.HTTP_NOT_FOUND,
+                                "No command with id " + detached.getId() + " exists.");
                     }
                 }
                 cluster.setCommands(cmds);
@@ -674,7 +682,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Command> removeAllCommandsForCluster(
+    public List<Command> removeAllCommandsForCluster(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
@@ -712,7 +720,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Command> removeCommandForCluster(
+    public List<Command> removeCommandForCluster(
             final String id,
             final String cmdId) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {

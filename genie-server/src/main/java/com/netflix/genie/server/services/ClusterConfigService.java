@@ -193,22 +193,22 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to add the command file to. Not
      * null/empty/blank.
      * @param commands The commands to add. Not null/empty.
-     * @return The active set of commands
+     * @return The active list of commands
      * @throws CloudServiceException
      */
-    Set<Command> addCommandsForCluster(
+    List<Command> addCommandsForCluster(
             final String id,
-            final Set<Command> commands) throws CloudServiceException;
+            final List<Command> commands) throws CloudServiceException;
 
     /**
      * Get the set of commands associated with the cluster with given id.
      *
      * @param id The id of the cluster to get the commands for. Not
      * null/empty/blank.
-     * @return The set of commands
+     * @return The list of commands
      * @throws CloudServiceException
      */
-    Set<Command> getCommandsForCluster(final String id) throws CloudServiceException;
+    List<Command> getCommandsForCluster(final String id) throws CloudServiceException;
 
     /**
      * Update the set of command files associated with the cluster with
@@ -218,22 +218,22 @@ public interface ClusterConfigService {
      * null/empty/blank.
      * @param commands The command files to replace existing
      * commands with. Not null/empty.
-     * @return The active set of commands
+     * @return The active list of commands
      * @throws CloudServiceException
      */
-    Set<Command> updateCommandsForCluster(
+    List<Command> updateCommandsForCluster(
             final String id,
-            final Set<Command> commands) throws CloudServiceException;
+            final List<Command> commands) throws CloudServiceException;
 
     /**
      * Remove all commands from the cluster.
      *
      * @param id The id of the cluster to remove the commands from. Not
      * null/empty/blank.
-     * @return The active set of commands
+     * @return The active list of commands
      * @throws CloudServiceException
      */
-    Set<Command> removeAllCommandsForCluster(
+    List<Command> removeAllCommandsForCluster(
             final String id) throws CloudServiceException;
 
     /**
@@ -242,8 +242,8 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to remove the command from. Not
      * null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
-     * @return The active set of commands
+     * @return The active list of commands
      * @throws CloudServiceException
      */
-    Set<Command> removeCommandForCluster(final String id, final String cmdId) throws CloudServiceException;
+    List<Command> removeCommandForCluster(final String id, final String cmdId) throws CloudServiceException;
 }

@@ -449,12 +449,12 @@ public class ClusterConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "cluster not found")
     })
-    public Set<Command> addCommandsForcluster(
+    public List<Command> addCommandsForcluster(
             @ApiParam(value = "Id of the cluster to add commands to.", required = true)
             @PathParam("id")
             final String id,
             @ApiParam(value = "The commands to add.", required = true)
-            final Set<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws CloudServiceException {
         LOG.debug("Called with id " + id + " and commands " + commands);
         return this.ccs.addCommandsForCluster(id, commands);
     }
@@ -479,7 +479,7 @@ public class ClusterConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Cluster not found")
     })
-    public Set<Command> getCommandsForCluster(
+    public List<Command> getCommandsForCluster(
             @ApiParam(value = "Id of the cluster to get commands for.", required = true)
             @PathParam("id")
             final String id) throws CloudServiceException {
@@ -510,13 +510,13 @@ public class ClusterConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Cluster not found")
     })
-    public Set<Command> updateCommandsForCluster(
+    public List<Command> updateCommandsForCluster(
             @ApiParam(value = "Id of the cluster to update commands for.", required = true)
             @PathParam("id")
             final String id,
             @ApiParam(value = "The commands to replace existing with. Should already be created",
                     required = true)
-            final Set<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws CloudServiceException {
         LOG.debug("Called with id " + id + " and configs " + commands);
         return this.ccs.updateCommandsForCluster(id, commands);
     }
@@ -541,7 +541,7 @@ public class ClusterConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid Id supplied"),
         @ApiResponse(code = 404, message = "Cluster not found")
     })
-    public Set<Command> removeAllCommandsForCluster(
+    public List<Command> removeAllCommandsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
             @PathParam("id")
             final String id) throws CloudServiceException {
@@ -570,7 +570,7 @@ public class ClusterConfigResourceV1 {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Cluster not found")
     })
-    public Set<Command> removeCommandForCluster(
+    public List<Command> removeCommandForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
             @PathParam("id")
             final String id,

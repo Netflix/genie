@@ -161,7 +161,8 @@ public class BaseGenieClient {
             if (response.isSuccess()) {
                 if (collectionClass != null) {
                     final ObjectMapper mapper = new ObjectMapper();
-                    final CollectionType type = mapper.getTypeFactory().constructCollectionType(collectionClass, entityClass);
+                    final CollectionType type = 
+                            mapper.getTypeFactory().constructCollectionType(collectionClass, entityClass);
                     return mapper.readValue(response.getInputStream(), type);
                 } else if (entityClass != null) {
                     return response.getEntity(entityClass);
