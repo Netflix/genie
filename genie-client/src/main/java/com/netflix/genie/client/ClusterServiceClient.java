@@ -338,12 +338,12 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to add commands to. Not
      * Null/empty/blank.
      * @param commands The commands to add. Not null or empty.
-     * @return The new set of commands for the given cluster.
+     * @return The new list of commands for the given cluster.
      * @throws CloudServiceException
      */
-    public Set<Command> addCommandsToCluster(
+    public List<Command> addCommandsToCluster(
             final String id,
-            final Set<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -362,7 +362,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 commands);
-        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+        return (List<Command>) this.executeRequest(request, List.class, Command.class);
     }
 
     /**
@@ -370,10 +370,10 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *
      * @param id The id of the cluster to get commands for. Not
      * Null/empty/blank.
-     * @return The set of command files for the given cluster.
+     * @return The list of command files for the given cluster.
      * @throws CloudServiceException
      */
-    public Set<Command> getCommandsForCluster(final String id) throws CloudServiceException {
+    public List<Command> getCommandsForCluster(final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -388,7 +388,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+        return (List<Command>) this.executeRequest(request, List.class, Command.class);
     }
 
     /**
@@ -398,12 +398,12 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * null/empty/blank.
      * @param commands The commands to replace existing command
      * files with. Not null.
-     * @return The new set of cluster commands.
+     * @return The new list of cluster commands.
      * @throws CloudServiceException
      */
-    public Set<Command> updateCommandsForCluster(
+    public List<Command> updateCommandsForCluster(
             final String id,
-            final Set<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -424,7 +424,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 commands);
-        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+        return (List<Command>) this.executeRequest(request, List.class, Command.class);
     }
 
     /**
@@ -432,10 +432,10 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *
      * @param id The id of the cluster to delete the commands from. Not
      * null/empty/blank.
-     * @return Empty set if successful
+     * @return Empty list if successful
      * @throws CloudServiceException
      */
-    public Set<Command> removeAllCommandsForCluster(
+    public List<Command> removeAllCommandsForCluster(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
@@ -451,7 +451,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+        return (List<Command>) this.executeRequest(request, List.class, Command.class);
     }
 
     /**
