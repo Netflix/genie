@@ -23,6 +23,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -33,6 +34,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -140,12 +142,15 @@ public class Command extends Auditable implements Serializable {
     /**
      * Set of applications that can run this command.
      */
-    @XmlElementWrapper(name = "applications")
-    @XmlElement(name = "application")
+    //@XmlElementWrapper(name = "applications")
+    //@XmlElement(name = "application")
     @ManyToMany(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Set of applications that can run this command")
-    private Set<Application> applications;
+    @XmlTransient
+    @JsonIgnore
+    @OrderColumn
+    private List<Application> applications;
 
     /**
      * The clusters this command is available on.
@@ -371,7 +376,7 @@ public class Command extends Auditable implements Serializable {
      *
      * @return applications
      */
-    public Set<Application> getApplications() {
+    public List<Application> getApplications() {
         return this.applications;
     }
 
@@ -380,7 +385,7 @@ public class Command extends Auditable implements Serializable {
      *
      * @param applications The applications that this command supports
      */
-    public void setApplications(final Set<Application> applications) {
+    public void setApplications(final List<Application> applications) {
         this.applications = applications;
     }
 

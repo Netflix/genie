@@ -332,12 +332,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to add applications to. Not
      * Null/empty/blank.
      * @param applications The applications to add. Not null or empty.
-     * @return The new set of application files for the given command.
+     * @return The new list of application files for the given command.
      * @throws CloudServiceException
      */
-    public Set<Application> addApplicationsToCommand(
+    public List<Application> addApplicationsToCommand(
             final String id,
-            final Set<Application> applications) throws CloudServiceException {
+            final List<Application> applications) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -356,7 +356,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 applications);
-        return (Set<Application>) this.executeRequest(request, Set.class, Application.class);
+        return (List<Application>) this.executeRequest(request, List.class, Application.class);
     }
 
     /**
@@ -364,10 +364,10 @@ public final class CommandServiceClient extends BaseGenieClient {
      *
      * @param id The id of the command to get applications for. Not
      * Null/empty/blank.
-     * @return The set of application files for the given command.
+     * @return The list of application files for the given command.
      * @throws CloudServiceException
      */
-    public Set<Application> getApplicationsForCommand(final String id) throws CloudServiceException {
+    public List<Application> getApplicationsForCommand(final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -382,7 +382,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<Application>) this.executeRequest(request, Set.class, Application.class);
+        return (List<Application>) this.executeRequest(request, List.class, Application.class);
     }
 
     /**
@@ -392,12 +392,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * null/empty/blank.
      * @param applications The applications to replace existing application
      * files with. Not null.
-     * @return The new set of command applications.
+     * @return The new list of command applications.
      * @throws CloudServiceException
      */
-    public Set<Application> updateApplicationsForCommand(
+    public List<Application> updateApplicationsForCommand(
             final String id,
-            final Set<Application> applications) throws CloudServiceException {
+            final List<Application> applications) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -418,7 +418,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 applications);
-        return (Set<Application>) this.executeRequest(request, Set.class, Application.class);
+        return (List<Application>) this.executeRequest(request, List.class, Application.class);
     }
 
     /**
@@ -429,7 +429,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @return Empty set if successful
      * @throws CloudServiceException
      */
-    public Set<Application> removeAllApplicationsForCommand(
+    public List<Application> removeAllApplicationsForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
@@ -445,7 +445,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<Application>) this.executeRequest(request, Set.class, Application.class);
+        return (List<Application>) this.executeRequest(request, List.class, Application.class);
     }
 
     /**
@@ -457,7 +457,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @return The active set of applications for the command.
      * @throws CloudServiceException
      */
-    public Set<Application> removeApplicationForCommand(
+    public List<Application> removeApplicationForCommand(
             final String id,
             final String appId) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
@@ -480,7 +480,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<Application>) this.executeRequest(request, Set.class, Application.class);
+        return (List<Application>) this.executeRequest(request, List.class, Application.class);
     }
 
     /**

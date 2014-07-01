@@ -58,7 +58,7 @@ public class ClusterConfigResourceV1TestCase {
      */
     @Test(expected = CloudServiceException.class)
     public void shouldRetrieveConfigs() throws CloudServiceException {
-        this.resource.getClusterConfig(null);
+        this.resource.getCluster(null);
 
 //        // then
 //        assertNotNull("The response entity was null.", response);

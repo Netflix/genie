@@ -28,6 +28,8 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.ClusterStatus;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +43,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author skrishnan
  * @author tgianos
+ * @author amsharma
  */
 public final class ClusterServiceSampleClient {
 
@@ -91,26 +94,32 @@ public final class ClusterServiceSampleClient {
                 ));
         LOG.info("Created application:");
         LOG.info(app2.toString());
+        
         LOG.info("Initializing CommandServiceClient");
         final CommandServiceClient commandClient = CommandServiceClient.getInstance();
 
         LOG.info("Creating command pig13_mr2");
-        final Set<Application> apps = new HashSet<Application>();
+        final List<Application> apps = new ArrayList<Application>();
         apps.add(app1);
         apps.add(app2);
         final Command command1 = commandClient.createCommand(
                 CommandServiceSampleClient.createSampleCommand(
-                        CommandServiceSampleClient.ID, apps));
+                        CommandServiceSampleClient.ID));
+        
+        commandClient.addApplicationsToCommand(command1.getId(), apps);
+        
         LOG.info("Created command:");
         LOG.info(command1.toString());
-        final Set<Command> commands = new HashSet<Command>();
+        final List<Command> commands = new ArrayList<Command>();
         commands.add(command1);
 
         LOG.info("Initializing ClusterConfigServiceClient");
         final ClusterServiceClient clusterClient = ClusterServiceClient.getInstance();
 
         LOG.info("Creating new cluster configuration");
-        final Cluster cluster1 = clusterClient.createCluster(createSampleCluster(ID, commands));
+        final Cluster cluster1 = clusterClient.createCluster(createSampleCluster(ID));
+        clusterClient.addCommandsToCluster(cluster1.getId(), commands);
+        
         LOG.info("Cluster config created with id: " + cluster1.getId());
         LOG.info(cluster1.toString());
 
@@ -124,13 +133,78 @@ public final class ClusterServiceSampleClient {
         params.put("adHoc", "false");
         params.put("test", "true");
         params.put("limit", "3");
-        final List<Cluster> clusters = clusterClient.getClusterConfigs(params);
+        final List<Cluster> clusters = clusterClient.getClusters(params);
         if (clusters != null && !clusters.isEmpty()) {
             for (final Cluster cluster : clusters) {
                 LOG.info(cluster.toString());
             }
         } else {
             LOG.info("No clusters found for parameters");
+        }
+
+        LOG.info("Configurations for cluster with id " + cluster1.getId());
+        final Set<String> configs = clusterClient.getConfigsForCluster(cluster1.getId());
+        for (final String config : configs) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Adding configurations to cluster with id " + cluster1.getId());
+        final Set<String> newConfigs = new HashSet<String>();
+        newConfigs.add("someNewConfigFile");
+        newConfigs.add("someOtherNewConfigFile");
+        final Set<String> configs2 = clusterClient.addConfigsToCluster(cluster1.getId(), newConfigs);
+        for (final String config : configs2) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Updating set of configuration files associated with id " + cluster1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> configs3 = clusterClient.updateConfigsForCluster(cluster1.getId(), newConfigs);
+        for (final String config : configs3) {
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Deleting all the configuration files from the cluster with id " + cluster1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> configs4 = clusterClient.removeAllConfigsForCluster(cluster1.getId());
+        for (final String config : configs4) {
+            //Shouldn't print anything
+            LOG.info("Config = " + config);
+        }
+
+        LOG.info("Commands for cluster with id " + cluster1.getId());
+        final List<Command> commands1 = clusterClient.getCommandsForCluster(cluster1.getId());
+        for (final Command  command : commands1) {
+            LOG.info("Command = " + command);
+        }
+
+        LOG.info("Adding commands to cluster with id " + cluster1.getId());
+        final List<Command> newCmds = new ArrayList<Command>();
+        newCmds.add(CommandServiceSampleClient.getSampleCommand(ID + "something"));
+        newCmds.add(CommandServiceSampleClient.getSampleCommand(null));
+        final List<Command> commands2 = clusterClient.addCommandsToCluster(cluster1.getId(), newCmds);
+        for (final Command command : commands2) {
+            LOG.info("Command = " + command);
+        }
+
+        LOG.info("Updating set of commands files associated with id " + cluster1.getId());
+        //This should remove the original config leaving only the two in this set
+        final List<Command> commands3 = clusterClient.updateCommandsForCluster(cluster1.getId(), newCmds);
+        for (final Command command : commands3) {
+            LOG.info("Command = " + command);
+        }
+
+        LOG.info("Deleting the command from the command with id " + ID + "something");
+        final Set<Command> commands4 = clusterClient.removeCommandForCluster(cluster1.getId(), ID + "something");
+        for (final Command command : commands4) {
+            LOG.info("Command = " + command);
+        }
+
+        LOG.info("Deleting all the commands from the command with id " + command1.getId());
+        final List<Command> commands5 = clusterClient.removeAllCommandsForCluster(cluster1.getId());
+        for (final Command command : commands5) {
+            //Shouldn't print anything
+            LOG.info("Command = " + command);
         }
 
         LOG.info("Updating existing cluster config");
@@ -140,7 +214,7 @@ public final class ClusterServiceSampleClient {
         LOG.info(cluster3.toString());
 
         LOG.info("Deleting cluster config using id");
-        final Cluster cluster4 = clusterClient.deleteClusterConfig(cluster1.getId());
+        final Cluster cluster4 = clusterClient.deleteCluster(cluster1.getId());
         LOG.info("Deleted cluster config with id: " + cluster1.getId());
         LOG.info(cluster4.toString());
 
@@ -171,8 +245,7 @@ public final class ClusterServiceSampleClient {
      * @throws CloudServiceException
      */
     public static Cluster createSampleCluster(
-            final String id,
-            final Set<Command> commands) throws CloudServiceException {
+            final String id) throws CloudServiceException {
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
@@ -192,9 +265,7 @@ public final class ClusterServiceSampleClient {
         tags.add(cluster.getId());
         cluster.setTags(tags);
         cluster.setVersion("2.4.0");
-        if (commands != null && !commands.isEmpty()) {
-            cluster.setCommands(commands);
-        }
+        
         return cluster;
     }
 }

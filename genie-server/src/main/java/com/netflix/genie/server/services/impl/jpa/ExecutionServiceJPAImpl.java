@@ -176,7 +176,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
             // init state in DB - return if job already exists
             try {
-                // TODO add retries to avoid deadlock issue
+                //  #TODO add retries to avoid deadlock issue
                 this.pm.createEntity(job);
             } catch (final RollbackException e) {
                 LOG.error("Can't create entity in the database", e);

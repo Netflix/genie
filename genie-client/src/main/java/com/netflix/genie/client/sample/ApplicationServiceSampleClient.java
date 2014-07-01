@@ -138,7 +138,7 @@ public final class ApplicationServiceSampleClient {
         for (final String jar : jars) {
             LOG.info("jar = " + jar);
         }
-        
+
         LOG.info("Adding jars to application with id " + app1.getId());
         final Set<String> newJars = new HashSet<String>();
         newJars.add("someNewJarFile.jar");
@@ -147,14 +147,14 @@ public final class ApplicationServiceSampleClient {
         for (final String jar : jars2) {
             LOG.info("jar = " + jar);
         }
-        
+
         LOG.info("Updating set of jars associated with id " + app1.getId());
         //This should remove the original jar leaving only the two in this set
         final Set<String> jars3 = appClient.updateJarsForApplication(app1.getId(), newJars);
         for (final String jar : jars3) {
             LOG.info("jar = " + jar);
         }
-        
+
         LOG.info("Deleting all the jars from the application with id " + app1.getId());
             //This should remove the original jar leaving only the two in this set
         final Set<String> jars4 = appClient.removeAllJarsForApplication(app1.getId());
@@ -162,13 +162,13 @@ public final class ApplicationServiceSampleClient {
             //Shouldn't print anything
             LOG.info("jar = " + jar);
         }
-        
+
         LOG.info("Getting the commands associated with id " + app1.getId());
         final Set<Command> commands = appClient.getCommandsForApplication(app1.getId());
         for (final Command command : commands) {
             LOG.info("Command: " + command.toString());
         }
-        
+
         LOG.info("Deleting application using id");
         final Application app4 = appClient.deleteApplication(app1.getId());
         LOG.info("Deleted application with id: " + app4.getId());

@@ -43,8 +43,7 @@ def addCommandConfigProdhive11Mr1():
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/envFile.sh",
         "user" : "amsharma", 
         "version" : "0.11",
-        "configs": ''' + configs + ''',
-        "applications": ''' + apps + '''
+        "configs": ''' + configs + '''
     }
     '''
     print payload
@@ -62,8 +61,7 @@ def addCommandConfigHadoop103():
         "status" : "ACTIVE",
         "executable": "/apps/hadoop/1.0.3/bin/hadoop",
         "user" : "amsharma", 
-        "version" : "1.0.3",
-        "applications": ''' + apps + '''
+        "version" : "1.0.3"
     }
     '''
 
@@ -85,8 +83,7 @@ def addCommandConfigProdhive11Mr2():
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr2/envFile.sh",
         "user" : "amsharma", 
         "version" : "0.11",
-        "configs": ''' + configs + ''',
-        "applications": ''' + apps + '''
+        "configs": ''' + configs + '''
     }
     '''
 
@@ -106,8 +103,7 @@ def addCommandConfigPig11Mr1():
         "executable": "/apps/pig/0.11/bin/pig",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr1/envFile.sh",
         "user" : "amsharma", 
-        "version" : "0.11",
-        "applications": ''' + apps + '''
+        "version" : "0.11"
     }
     '''
     print payload
@@ -126,8 +122,7 @@ def addCommandConfigPig11Mr2():
         "executable": "/apps/pig/0.11-h2/bin/pig",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr2/envFile.sh",
         "user" : "amsharma", 
-        "version" : "0.11-h2",
-        "applications": ''' + apps + '''
+        "version" : "0.11-h2"
     }
     '''
     print payload
@@ -146,8 +141,7 @@ def addCommandConfigPig13Mr2():
         "executable": "/apps/pig/0.13/bin/pig",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh",
         "user" : "amsharma", 
-        "version" : "0.13",
-        "applications": ''' + apps + '''
+        "version" : "0.13"
     }
     '''
     print payload
