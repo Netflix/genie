@@ -144,11 +144,9 @@ public class Command extends Auditable implements Serializable {
     /**
      * Set of applications that can run this command.
      */
-    //@XmlElementWrapper(name = "applications")
-    //@XmlElement(name = "application")
     @ManyToMany(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "Set of applications that can run this command")
+            value = "List of applications that can run this command")
     @XmlTransient
     @JsonIgnore
     @OrderColumn

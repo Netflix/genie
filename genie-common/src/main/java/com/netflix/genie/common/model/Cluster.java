@@ -19,6 +19,9 @@ package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -60,6 +63,7 @@ import org.slf4j.LoggerFactory;
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@ApiModel(value = "A Cluster")
 public class Cluster extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 8046582926818942370L;
@@ -69,12 +73,18 @@ public class Cluster extends Auditable implements Serializable {
      * Name for this cluster, e.g. cquery.
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "Name of this cluster - e.g. cquery, cprod, cbonus etc.",
+            required = true)
     private String name;
 
     /**
      * User who created this cluster.
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "User who created this cluster",
+            required = true)
     private String user;
 
     /**
@@ -82,6 +92,9 @@ public class Cluster extends Auditable implements Serializable {
      */
     @Basic(optional = false)
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(
+            value = "If it is in use - UP, OUT_OF_SERVICE, TERMINATED",
+            required = true)
     private ClusterStatus status;
 
     /**
@@ -91,13 +104,19 @@ public class Cluster extends Auditable implements Serializable {
      * netflix.genie.server.<clusterType>.JobManagerImpl
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "Type of the cluster - e.g. yarn",
+            required = true)
     private String clusterType;
 
     /**
      * Version of this cluster.
      */
-    @Basic
+    @Basic(optional = false)
     @Column(name = "clusterVersion")
+    @ApiModelProperty(
+            value = "Version number for this cluster",
+            required = true)
     private String version;
 
     /**
@@ -106,6 +125,9 @@ public class Cluster extends Auditable implements Serializable {
     @XmlElementWrapper(name = "configs")
     @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the configuration"
+                    + " files needed for this cluster")
     private Set<String> configs;
 
     /**
@@ -114,17 +136,20 @@ public class Cluster extends Auditable implements Serializable {
     @XmlElementWrapper(name = "tags")
     @XmlElement(name = "tag")
     @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the tags"
+                    + " associated for this cluster")
     private Set<String> tags;
 
     /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
      */
-    //@XmlElementWrapper(name = "commands")
-    //@XmlElement(name = "command")
     @ManyToMany(fetch = FetchType.EAGER)
     @OrderColumn
     @XmlTransient
     @JsonIgnore
+    @ApiModelProperty(
+            value = "List of commands that this cluster can run")
     private List<Command> commands;
 
     /**
@@ -166,7 +191,7 @@ public class Cluster extends Auditable implements Serializable {
      */
     @PrePersist
     protected void onCreateCluster() throws CloudServiceException {
-        validate(this.name, this.user, this.status, this.clusterType, this.configs);
+        validate(this.name, this.user, this.status, this.clusterType, this.version, this.configs);
     }
 
     /**
@@ -450,6 +475,7 @@ public class Cluster extends Auditable implements Serializable {
                 cluster.getUser(),
                 cluster.getStatus(),
                 cluster.getClusterType(),
+                cluster.getVersion(),
                 cluster.getConfigs());
     }
 
@@ -468,6 +494,7 @@ public class Cluster extends Auditable implements Serializable {
             final String user,
             final ClusterStatus status,
             final String clusterType,
+            final String clusterVersion,
             final Set<String> configs) throws CloudServiceException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isBlank(name)) {
@@ -481,6 +508,9 @@ public class Cluster extends Auditable implements Serializable {
         }
         if (StringUtils.isBlank(clusterType)) {
             builder.append("No cluster type entered and is required.\n");
+        }
+        if(StringUtils.isBlank(clusterVersion)) {
+            builder.append("No cluster version entered and is required");
         }
         if (configs == null || configs.isEmpty()) {
             builder.append("At least one configuration file is required for the cluster.\n");

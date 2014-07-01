@@ -19,6 +19,8 @@ package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.JobStatus;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -69,6 +71,9 @@ public class Job extends Auditable implements Serializable {
      * User who submitted the job (REQUIRED).
      */
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "User who submitted this job",
+            required = true)
     private String user;
 
     /**
@@ -76,18 +81,25 @@ public class Job extends Auditable implements Serializable {
      */
     @Lob
     @Basic(optional = false)
+    @ApiModelProperty(
+            value = "Command line arguments for the job",
+            required = true)
     private String commandArgs;
 
     /**
      * User-specified or system-generated job name.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Name specified for the job")
     private String name;
 
     /**
      * Human readable description.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Description specified for the job")
     private String description;
 
     /**
@@ -95,36 +107,48 @@ public class Job extends Auditable implements Serializable {
      */
     @Basic
     @Column(name = "groupName")
+    @ApiModelProperty(
+            value = "group name of the user who submitted this job")
     private String group;
 
     /**
      * Client - UC4, Ab Initio, Search.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Client from where the job was submitted")
     private String client;
 
     /**
      * Alias - Cluster Name of the cluster selected to run the job.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Name of the cluster where the job is run")
     private String executionClusterName;
 
     /**
      * ID for the cluster that was selected to run the job .
      */
     @Basic
+    @ApiModelProperty(
+            value = "Id of the cluster where the job is run")
     private String executionClusterId;
 
     /**
      * Users can specify a property file location with environment variables.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Path to a shell file which is sourced before job is run.")
     private String envPropFile;
 
     /**
      * Set of tags to use for scheduling (REQUIRED).
      */
     @Transient
+    @ApiModelProperty(
+            value = "List of criteria containing tags to use to pick a cluster to run this job")
     private List<ClusterCriteria> clusterCriteria;
 
     /**
@@ -141,6 +165,8 @@ public class Job extends Auditable implements Serializable {
      * File dependencies.
      */
     @Lob
+    @ApiModelProperty(
+            value = "Dependent files for this job to run.")
     private String fileDependencies;
 
     /**
@@ -148,12 +174,16 @@ public class Job extends Auditable implements Serializable {
      * in the DB for space reasons.
      */
     @Transient
+    @ApiModelProperty(
+            value = "Attachments sent as a part of job request.")
     private Set<FileAttachment> attachments;
 
     /**
      * Whether to disable archive logs or not - default is false.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Boolean variable to decide whether job should be archived after it finishes.")
     private boolean disableLogArchival;
 
     /**
@@ -161,6 +191,8 @@ public class Job extends Auditable implements Serializable {
      * the Genie job completes.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Email address to send notifications to on job completion.")
     private String email;
 
     // ------------------------------------------------------------------------
@@ -170,18 +202,24 @@ public class Job extends Auditable implements Serializable {
      * Application name - e.g. mapreduce, tez
      */
     @Basic
+    @ApiModelProperty(
+            value = "Name of the application that this job should use to run.")
     private String applicationName;
 
     /**
      * Application Id to pin to specific application id e.g. mr1
      */
     @Basic
+    @ApiModelProperty(
+            value = "Id of the application that this job should use to run.")
     private String applicationId;
 
     /**
      * Command name to run - e.g. prodhive, testhive, prodpig, testpig.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Name of the command that this job should run.")
     private String commandName;
 
     /**
@@ -189,6 +227,8 @@ public class Job extends Auditable implements Serializable {
      * prodhive11_mr1
      */
     @Basic
+    @ApiModelProperty(
+            value = "Id of the command that this job should run.")
     private String commandId;
 
     // ------------------------------------------------------------------------
