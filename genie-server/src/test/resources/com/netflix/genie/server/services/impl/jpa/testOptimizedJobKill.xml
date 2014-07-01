@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <Job id="job1" 
+         created="2014-01-02 01:45:00" 
+         updated="2014-01-02 01:50:00" 
+         user="tgianos" 
+         commandId="15" 
+         commandName="pig" 
+         status="SUCCEEDED" 
+         name="one" 
+         commandArgs="-tez"
+         killURI="http://DOES/NOT/EXIST"/>
+</dataset>

@@ -26,7 +26,7 @@
          user="tgianos"
          commandId="15"
          commandName="pig"
-         status="RUNNING"
+         status="SUCCEEDED"
          name="one"
          commandArgs="-tez"/>
 </dataset>

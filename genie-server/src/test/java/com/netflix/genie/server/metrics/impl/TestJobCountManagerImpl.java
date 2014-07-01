@@ -17,17 +17,13 @@
 package com.netflix.genie.server.metrics.impl;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.netflix.genie.common.model.ClusterCriteria;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,32 +62,21 @@ public class TestJobCountManagerImpl {
     /**
      * Test getting number of running jobs on one instance.
      *
-     * @throws Exception if there is any error during this test
+     * @throws CloudServiceException if there is any error during this test
      */
     @Test
-    public void testNumInstanceJobs() throws Exception {
+    @DatabaseSetup("testNumInstanceJobs.xml")
+    public void testNumInstanceJobs() throws CloudServiceException {
+        //Force the hostname of the jobs to be the machine running the build
+        final List<Job> jobs = this.jobRepo.findAll();
+        for (final Job job : jobs) {
+            job.setHostName(NetUtil.getHostName());
+        }
+        this.jobRepo.flush();
 
-        // setup
-        final Set<String> criteriaTags = new HashSet<String>();
-        criteriaTags.add("prod");
-        final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
-        final List<ClusterCriteria> criterias = new ArrayList<ClusterCriteria>();
-        criterias.add(criteria);
-        Job job = new Job("someUser", "commandId", null, "someArg", criterias);
-        job.setId(UUID.randomUUID().toString());
-        job.setName("My test job");
-        job.setStatus(JobStatus.RUNNING);
-        job.setHostName(NetUtil.getHostName());
-        job.setStartTime(1L);
-        this.jobRepo.save(job);
-
-        // number of running jobs - should be > 0
-        Assert.assertTrue(0 < this.manager.getNumInstanceJobs());
-
-        // number of running jobs between 0 and now - should be > 0
-        Assert.assertTrue(0 < this.manager.getNumInstanceJobs(0L, System.currentTimeMillis()));
-
-        // number of running jobs between 0 and 0 - should be none
+        Assert.assertTrue(2 == this.manager.getNumInstanceJobs());
+        Assert.assertTrue(2 == this.manager.getNumInstanceJobs(0L, System.currentTimeMillis()));
+        Assert.assertTrue(1 == this.manager.getNumInstanceJobs(1404257258340L, 1404257258341L));
         Assert.assertTrue(0 == this.manager.getNumInstanceJobs(0L, 0L));
     }
 }

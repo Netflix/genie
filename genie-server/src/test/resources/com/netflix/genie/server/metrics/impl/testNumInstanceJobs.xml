@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <Job id="job1" 
+         created="2013-06-01 16:02:00" 
+         updated="2013-06-01 16:02:00" 
+         user="tgianos" 
+         commandId="15" 
+         commandName="pig" 
+         status="INIT" 
+         name="one" 
+         commandArgs="-tez"
+         startTime="1404257258339"/>
+    
+    <Job id="job2" 
+         created="2013-06-01 16:03:00" 
+         updated="2013-06-01 16:03:00" 
+         user="tgianos" 
+         commandId="15" 
+         commandName="pig" 
+         status="RUNNING" 
+         name="two" 
+         commandArgs="-tez"
+         startTime="1404257258340"/>
+    
+    <Job id="job3" 
+         created="2013-06-01 16:04:00" 
+         updated="2013-06-01 16:04:00" 
+         user="tgianos" 
+         commandId="15" 
+         commandName="pig" 
+         status="SUCCEEDED" 
+         name="three" 
+         commandArgs="-tez"
+         startTime="1404257258341"/>
+    
+    <Job id="job4" 
+         created="2013-06-01 16:05:00" 
+         updated="2013-06-01 16:05:00" 
+         user="tgianos" 
+         commandId="15" 
+         commandName="pig" 
+         status="KILLED" 
+         name="four" 
+         commandArgs="-tez"
+         startTime="1404257258342"/>
+    
+    <Job id="job5" 
+         created="2013-06-01 16:06:00" 
+         updated="2013-06-01 16:06:00" 
+         user="tgianos" 
+         commandId="15" 
+         commandName="pig" 
+         status="FAILED" 
+         name="five" 
+         commandArgs="-tez"
+         startTime="1404257258343"/>
+</dataset>

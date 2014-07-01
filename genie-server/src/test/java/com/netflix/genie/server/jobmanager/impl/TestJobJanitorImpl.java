@@ -60,11 +60,8 @@ public class TestJobJanitorImpl {
      * @throws Exception
      */
     @Test
-    @DatabaseSetup("TestJobJanitorImpl-testJobJanitor.xml")
-    public void testJobJanitor() throws CloudServiceException, Exception {
-        // ensure that more than two jobs have been cleaned up
-        int numRows = this.janitor.markZombies();
-
-        Assert.assertTrue(numRows == 3);
+    @DatabaseSetup("testMarkZombies.xml")
+    public void testMarkZombies() throws CloudServiceException, Exception {
+        Assert.assertTrue(2 == this.janitor.markZombies());
     }
 }

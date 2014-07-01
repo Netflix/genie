@@ -127,7 +127,7 @@ public class Cluster extends Auditable implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the configuration"
-                    + " files needed for this cluster")
+            + " files needed for this cluster")
     private Set<String> configs;
 
     /**
@@ -138,7 +138,7 @@ public class Cluster extends Auditable implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"
-                    + " associated for this cluster")
+            + " associated for this cluster")
     private Set<String> tags;
 
     /**
@@ -509,7 +509,7 @@ public class Cluster extends Auditable implements Serializable {
         if (StringUtils.isBlank(clusterType)) {
             builder.append("No cluster type entered and is required.\n");
         }
-        if(StringUtils.isBlank(clusterVersion)) {
+        if (StringUtils.isBlank(clusterVersion)) {
             builder.append("No cluster version entered and is required");
         }
         if (configs == null || configs.isEmpty()) {
