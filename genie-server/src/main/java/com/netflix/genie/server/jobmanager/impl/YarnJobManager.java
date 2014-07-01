@@ -229,7 +229,7 @@ public class YarnJobManager implements JobManager {
                         } catch (final IOException ioe) {
                             final String msg = "Unable to close the output stream for the attachment";
                             LOG.error(msg, ioe);
-                            //TODO: Rethrow as CloudServiceException?
+                            // #TODO: Rethrow as CloudServiceException?
                         }
                     }
                 }

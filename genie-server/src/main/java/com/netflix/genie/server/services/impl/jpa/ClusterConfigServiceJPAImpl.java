@@ -28,13 +28,12 @@ import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.common.model.Types.ApplicationStatus;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.common.model.Types.CommandStatus;
-import com.netflix.genie.server.repository.ClusterRepository;
-import com.netflix.genie.server.repository.CommandRepository;
+import com.netflix.genie.server.repository.jpa.ClusterRepository;
+import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -92,8 +91,29 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
+    public Cluster createCluster(final Cluster cluster) throws CloudServiceException {
+        Cluster.validate(cluster);
+        LOG.debug("Called to create cluster " + cluster.toString());
+        if (StringUtils.isEmpty(cluster.getId())) {
+            cluster.setId(UUID.randomUUID().toString());
+        }
+        if (this.clusterRepo.exists(cluster.getId())) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "A cluster with id " + cluster.getId() + " already exists");
+        }
+
+        return this.clusterRepo.save(cluster);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
     @Transactional(readOnly = true)
-    public Cluster getClusterConfig(final String id) throws CloudServiceException {
+    public Cluster getCluster(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -117,7 +137,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Cluster> getClusterConfigs(
+    public List<Cluster> getClusters(
             final String name,
             final List<ClusterStatus> statuses,
             final List<String> tags,
@@ -171,7 +191,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Cluster> getClusterConfigs(
+    public List<Cluster> getClusters(
             final String applicationId,
             final String applicationName,
             final String commandId,
@@ -231,46 +251,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Cluster createClusterConfig(final Cluster cluster) throws CloudServiceException {
-        Cluster.validate(cluster);
-        LOG.debug("Called to create cluster " + cluster.toString());
-        if (StringUtils.isEmpty(cluster.getId())) {
-            cluster.setId(UUID.randomUUID().toString());
-        }
-        if (this.clusterRepo.exists(cluster.getId())) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "A cluster with id " + cluster.getId() + " already exists");
-        }
-        final Set<Command> detachedCommands = new HashSet<Command>();
-        if (cluster.getCommands() != null && !cluster.getCommands().isEmpty()) {
-            detachedCommands.addAll(cluster.getCommands());
-            cluster.getCommands().clear();
-        }
-
-        final Cluster persistedCluster = this.clusterRepo.save(cluster);
-
-        if (!detachedCommands.isEmpty()) {
-            final Set<Command> attachedCommands = new HashSet<Command>();
-            for (final Command detached : detachedCommands) {
-                final Command command = this.commandRepo.findOne(detached.getId());
-                if (command != null) {
-                    attachedCommands.add(command);
-                }
-            }
-            //Handles both sides of relationship
-            persistedCluster.setCommands(attachedCommands);
-        }
-        return persistedCluster;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
-     */
-    @Override
-    public Cluster updateClusterConfig(final String id,
+    public Cluster updateCluster(final String id,
             final Cluster updateCluster) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             throw new CloudServiceException(
@@ -294,7 +275,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Cluster deleteClusterConfig(final String id) throws CloudServiceException {
+    public Cluster deleteCluster(final String id) throws CloudServiceException {
         if (StringUtils.isEmpty(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -307,7 +288,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists to delete.");
         }
-        final Set<Command> commands = cluster.getCommands();
+        final List<Command> commands = cluster.getCommands();
         if (commands != null) {
             for (final Command command : commands) {
                 final Set<Cluster> clusters = command.getClusters();
@@ -318,5 +299,283 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
         this.clusterRepo.delete(cluster);
         return cluster;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public List<Cluster> deleteAllClusters() throws CloudServiceException {
+        LOG.debug("Called to delete all clusters");
+        final List<Cluster> clusters = this.clusterRepo.findAll();
+        for (final Cluster cluster : clusters) {
+            this.deleteCluster(cluster.getId());
+        }
+        return clusters;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> addConfigsForCluster(
+            final String id,
+            final Set<String> configs) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to add configurations.");
+        }
+        if (configs == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No configuration files entered.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            cluster.getConfigs().addAll(configs);
+            return cluster.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getConfigsForCluster(
+            final String id)
+            throws CloudServiceException {
+
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id sent. Cannot retrieve configurations.");
+        }
+
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            return cluster.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> updateConfigsForCluster(
+            final String id,
+            final Set<String> configs) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to update configurations.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            cluster.setConfigs(configs);
+            return cluster.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> removeAllConfigsForCluster(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to remove configs.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            cluster.getConfigs().clear();
+            return cluster.getConfigs();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public List<Command> addCommandsForCluster(
+            final String id,
+            final List<Command> commands) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to add commands.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            for (final Command detached : commands) {
+                final Command cmd = this.commandRepo.findOne(detached.getId());
+                if (cmd != null) {
+                    cluster.addCommand(cmd);
+                } else {
+                    throw new CloudServiceException(
+                            HttpURLConnection.HTTP_NOT_FOUND,
+                            "No command with id " + detached.getId() + " exists.");
+                }
+            }
+            return cluster.getCommands();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Command> getCommandsForCluster(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to get commands.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            return cluster.getCommands();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public List<Command> updateCommandsForCluster(
+            final String id,
+            final List<Command> commands) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to update commands.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            final List<Command> cmds = new ArrayList<Command>();
+            for (final Command detached : commands) {
+                final Command cmd = this.commandRepo.findOne(detached.getId());
+                if (cmd != null) {
+                    cmds.add(cmd);
+                } else {
+                    throw new CloudServiceException(
+                            HttpURLConnection.HTTP_NOT_FOUND,
+                            "No command with id " + detached.getId() + " exists.");
+                }
+            }
+            cluster.setCommands(cmds);
+            return cluster.getCommands();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public List<Command> removeAllCommandsForCluster(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to remove commands.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            for (final Command cmd : cluster.getCommands()) {
+                cluster.removeCommand(cmd);
+            }
+            return cluster.getCommands();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public List<Command> removeCommandForCluster(
+            final String id,
+            final String cmdId) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to remove command.");
+        }
+        if (StringUtils.isBlank(cmdId)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove command.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            final Command cmd = this.commandRepo.findOne(cmdId);
+            if (cmd != null) {
+                cluster.removeCommand(cmd);
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + cmdId + " exists.");
+            }
+            return cluster.getCommands();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
     }
 }

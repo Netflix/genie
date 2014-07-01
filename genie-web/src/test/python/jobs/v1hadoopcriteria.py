@@ -32,33 +32,26 @@ GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/jobs'
-inner = json.dumps(['sla','adhoc'])
-#lst = json.dumps([['sla','adhoc'],['prod','adhoc']])
-#lst = json.dumps({"criteria" :{"id": "test"}})
-#lst = json.dumps(cclist)
 # works
 #lst = json.dumps([{"id": "t1"},{"id":"t2"}])
-lst = json.dumps([{"tags" : ['adhoc','test'] },{"tags": ['sla','prod']}])
+#lst = json.dumps([{"tags" : ['adhoc','test'] },{"tags": ['sla','prod']}])
+#lst = json.dumps([{"tags" : ['adhoc','test'] }])
+lst = json.dumps([{"tags" : ['adhoc','h2query'] }])
 print lst
 
 def testJsonSubmitjob():
     print "Running testJsonSubmitjob "
     payload = '''
-    {
-        "jobInfo":
         {
-            "jobID":"''' + jobID +'''",
-            "jobName": "HADOOP-JOB-TEST", 
-            "clusterCriteriaList" : ''' + lst + ''',
-            "userName" : "genietest", 
-            "groupName" : "hadoop", 
-            "userAgent" : "laptop",
-            "jobType": "yarn", 
-            "schedule": "adHoc",
-            "cmdArgs":"jar hadoop-examples.jar sleep -m 1 -mt 1", 
+            "id":"''' + jobID +'''",
+            "name": "HADOOP-JOB-TEST", 
+            "clusterCriteria" : ''' + lst + ''',
+            "user" : "genietest", 
+            "group" : "hadoop", 
+            "commandArgs" : "jar hadoop-examples.jar sleep -m 1 -mt 1", 
+            "commandName" : "pig",
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hadoop-examples.jar"
         }
-    }
     '''
     print payload
     print "\n"

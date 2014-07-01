@@ -13,16 +13,16 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.server.repository;
+package com.netflix.genie.server.repository.jpa;
 
-import com.netflix.genie.common.model.Job;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import com.netflix.genie.common.model.Application;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Job repository.
+ * Application repository.
  *
  * @author tgianos
  */
-public interface JobRepository extends PagingAndSortingRepository<Job, String> {
+public interface ApplicationRepository extends JpaRepository<Application, String> {
 
 }

@@ -22,12 +22,11 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
-import com.netflix.genie.server.repository.ApplicationRepository;
-import com.netflix.genie.server.repository.CommandRepository;
+import com.netflix.genie.server.repository.jpa.ApplicationRepository;
+import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -75,6 +74,27 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final ApplicationRepository appRepo) {
         this.commandRepo = commandRepo;
         this.appRepo = appRepo;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Command createCommand(final Command command) throws CloudServiceException {
+        Command.validate(command);
+        LOG.debug("Called to create command " + command.toString());
+        if (StringUtils.isEmpty(command.getId())) {
+            command.setId(UUID.randomUUID().toString());
+        }
+        if (this.commandRepo.exists(command.getId())) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "A command with id " + command.getId() + " already exists");
+        }
+
+        return this.commandRepo.save(command);
     }
 
     /**
@@ -139,46 +159,6 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Command createCommand(final Command command) throws CloudServiceException {
-        Command.validate(command);
-        LOG.debug("Called to create command " + command.toString());
-        if (StringUtils.isEmpty(command.getId())) {
-            command.setId(UUID.randomUUID().toString());
-        }
-        if (this.commandRepo.exists(command.getId())) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "A command with id " + command.getId() + " already exists");
-        }
-
-        final Set<Application> detachedApps = new HashSet<Application>();
-        if (command.getApplications() != null && !command.getApplications().isEmpty()) {
-            detachedApps.addAll(command.getApplications());
-            command.getApplications().clear();
-        }
-
-        final Command persistedCommand = this.commandRepo.save(command);
-
-        if (!detachedApps.isEmpty()) {
-            final Set<Application> attachedApps = new HashSet<Application>();
-            for (final Application detached : detachedApps) {
-                final Application app = this.appRepo.findOne(detached.getId());
-                if (app != null) {
-                    attachedApps.add(app);
-                }
-            }
-            //Handles both sides of relationship
-            persistedCommand.setApplications(attachedApps);
-        }
-        return persistedCommand;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
-     */
-    @Override
     public Command updateCommand(
             final String id,
             final Command updateCommand) throws CloudServiceException {
@@ -229,7 +209,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     "No command with id " + id + " exists to delete.");
         }
         //Remove the command from the associated Application references
-        final Set<Application> apps = command.getApplications();
+        final List<Application> apps = command.getApplications();
         if (apps != null) {
             for (final Application app : apps) {
                 final Set<Command> commands = app.getCommands();
@@ -332,7 +312,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered. Unable to remove jars.");
+                    "No command id entered. Unable to remove configs.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
@@ -378,9 +358,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> addApplicationsForCommand(
+    public List<Application> addApplicationsForCommand(
             final String id,
-            final Set<Application> applications) throws CloudServiceException {
+            final List<Application> applications) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -392,6 +372,10 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                 final Application app = this.appRepo.findOne(detached.getId());
                 if (app != null) {
                     command.addApplication(app);
+                } else {
+                    throw new CloudServiceException(
+                            HttpURLConnection.HTTP_NOT_FOUND,
+                            "No application with id " + detached.getId() + " exists.");
                 }
             }
             return command.getApplications();
@@ -409,7 +393,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<Application> getApplicationsForCommand(
+    public List<Application> getApplicationsForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
@@ -432,9 +416,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> updateApplicationsForCommand(
+    public List<Application> updateApplicationsForCommand(
             final String id,
-            final Set<Application> applications) throws CloudServiceException {
+            final List<Application> applications) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -442,7 +426,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            final Set<Application> apps = new HashSet<Application>();
+            final List<Application> apps = new ArrayList<Application>();
             for (final Application detached : applications) {
                 final Application app = this.appRepo.findOne(detached.getId());
                 if (app != null) {
@@ -464,7 +448,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> removeAllApplicationsForCommand(
+    public List<Application> removeAllApplicationsForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
@@ -488,7 +472,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public Set<Application> removeApplicationForCommand(
+    public List<Application> removeApplicationForCommand(
             final String id,
             final String appId) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {

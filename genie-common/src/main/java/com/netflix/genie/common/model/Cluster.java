@@ -21,7 +21,9 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -32,6 +34,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -39,7 +42,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,10 +119,13 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
      */
-    @XmlElementWrapper(name = "commands")
-    @XmlElement(name = "command")
+    //@XmlElementWrapper(name = "commands")
+    //@XmlElement(name = "command")
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Command> commands;
+    @OrderColumn
+    @XmlTransient
+    @JsonIgnore
+    private List<Command> commands;
 
     /**
      * Default Constructor.
@@ -327,7 +335,7 @@ public class Cluster extends Auditable implements Serializable {
      * @return commands Not supposed to be exposed in request/response messages
      * hence marked transient.
      */
-    public Set<Command> getCommands() {
+    public List<Command> getCommands() {
         return this.commands;
     }
 
@@ -336,7 +344,7 @@ public class Cluster extends Auditable implements Serializable {
      *
      * @param commands The commands that this cluster supports
      */
-    public void setCommands(final Set<Command> commands) {
+    public void setCommands(final List<Command> commands) {
         //Clear references to this cluster in existing commands
         if (this.commands != null) {
             for (final Command command : this.commands) {
@@ -378,7 +386,7 @@ public class Cluster extends Auditable implements Serializable {
         }
 
         if (this.commands == null) {
-            this.commands = new HashSet<Command>();
+            this.commands = new ArrayList<Command>();
         }
         this.commands.add(command);
 

@@ -22,7 +22,7 @@ import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.jobmanager.JobJanitor;
-import com.netflix.genie.server.repository.JobRepository;
+import com.netflix.genie.server.repository.jpa.JobRepository;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

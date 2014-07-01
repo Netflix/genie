@@ -46,7 +46,6 @@ def addClusterConfigCprod1():
         "version" : "1.0.3",
         "configs": ''' + config + ''',
         "tags": ''' + tags + ''',
-        "commands": ''' + cmds + ''',
         "clusterType": "yarn"
     }
     '''
@@ -70,7 +69,6 @@ def addClusterConfigCquery1():
         "version" : "1.0.3",
         "configs": ''' + config + ''',
         "tags": ''' + tags + ''',
-        "commands": ''' + cmds + ''',
         "clusterType": "yarn"
     }
     '''
@@ -93,7 +91,6 @@ def addClusterConfigH2query():
         "version" : "1.0.3",
         "configs": ''' + config + ''',
         "tags": ''' + tags + ''',
-        "commands": ''' + cmds + ''',
         "clusterType": "yarn"
     }
     '''

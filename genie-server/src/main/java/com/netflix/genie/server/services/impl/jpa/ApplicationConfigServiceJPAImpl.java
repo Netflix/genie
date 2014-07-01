@@ -21,7 +21,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.server.repository.ApplicationRepository;
+import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -212,7 +212,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         final Set<Command> commands = app.getCommands();
         if (commands != null) {
             for (final Command command : commands) {
-                final Set<Application> apps = command.getApplications();
+                final List<Application> apps = command.getApplications();
                 if (apps != null) {
                     apps.remove(app);
                 }

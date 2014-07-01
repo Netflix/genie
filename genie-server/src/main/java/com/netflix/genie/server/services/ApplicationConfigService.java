@@ -33,6 +33,16 @@ import java.util.Set;
 public interface ApplicationConfigService {
 
     /**
+     * Create new application.
+     *
+     * @param app The application configuration to create
+     * @return The application that was created
+     * @throws CloudServiceException
+     */
+    Application createApplication(
+            final Application app) throws CloudServiceException;
+
+    /**
      * Gets application for given id.
      *
      * @param id unique id for application configuration to get. Not null/empty.
@@ -54,16 +64,6 @@ public interface ApplicationConfigService {
             final String userName,
             final int page,
             final int limit);
-
-    /**
-     * Create new application.
-     *
-     * @param app The application configuration to create
-     * @return The application that was created
-     * @throws CloudServiceException
-     */
-    Application createApplication(
-            final Application app) throws CloudServiceException;
 
     /**
      * Update an application.

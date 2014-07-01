@@ -30,7 +30,7 @@ import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
-import com.netflix.genie.server.repository.JobRepository;
+import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.NetUtil;
 import com.netflix.niws.client.http.RestClient;

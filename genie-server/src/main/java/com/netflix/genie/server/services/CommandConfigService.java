@@ -34,6 +34,16 @@ import java.util.Set;
 public interface CommandConfigService {
 
     /**
+     * Create new command configuration.
+     *
+     * @param command encapsulates the command configuration information to
+     * create
+     * @return The command created
+     * @throws CloudServiceException
+     */
+    Command createCommand(final Command command) throws CloudServiceException;
+
+    /**
      * Gets command configuration for given id.
      *
      * @param id unique id for command configuration to get. Not null/empty.
@@ -57,16 +67,6 @@ public interface CommandConfigService {
             final String userName,
             final int page,
             final int limit);
-
-    /**
-     * Create new command configuration.
-     *
-     * @param command encapsulates the command configuration information to
-     * create
-     * @return The command created
-     * @throws CloudServiceException
-     */
-    Command createCommand(final Command command) throws CloudServiceException;
 
     /**
      * Update command configuration.
@@ -168,37 +168,37 @@ public interface CommandConfigService {
      * @param id The id of the command to add the application file to. Not
      * null/empty/blank.
      * @param applications The applications to add. Not null/empty.
-     * @return The active set of applications
+     * @return The active list of applications
      * @throws CloudServiceException
      */
-    Set<Application> addApplicationsForCommand(
+    List<Application> addApplicationsForCommand(
             final String id,
-            final Set<Application> applications) throws CloudServiceException;
+            final List<Application> applications) throws CloudServiceException;
 
     /**
-     * Get the set of applications associated with the command with given id.
+     * Get the list of applications associated with the command with given id.
      *
      * @param id The id of the command to get the applications for. Not
      * null/empty/blank.
-     * @return The set of applications
+     * @return The list of applications
      * @throws CloudServiceException
      */
-    Set<Application> getApplicationsForCommand(final String id) throws CloudServiceException;
+    List<Application> getApplicationsForCommand(final String id) throws CloudServiceException;
 
     /**
-     * Update the set of application files associated with the command with
+     * Update the list of application files associated with the command with
      * given id.
      *
      * @param id The id of the command to update the application files for. Not
      * null/empty/blank.
      * @param applications The application files to replace existing
      * applications with. Not null/empty.
-     * @return The active set of applications
+     * @return The active list of applications
      * @throws CloudServiceException
      */
-    Set<Application> updateApplicationsForCommand(
+    List<Application> updateApplicationsForCommand(
             final String id,
-            final Set<Application> applications) throws CloudServiceException;
+            final List<Application> applications) throws CloudServiceException;
 
     /**
      * Remove all applications from the command.
@@ -208,7 +208,7 @@ public interface CommandConfigService {
      * @return The active set of applications
      * @throws CloudServiceException
      */
-    Set<Application> removeAllApplicationsForCommand(
+     List<Application> removeAllApplicationsForCommand(
             final String id) throws CloudServiceException;
 
     /**
@@ -217,10 +217,10 @@ public interface CommandConfigService {
      * @param id The id of the command to remove the application from. Not
      * null/empty/blank.
      * @param appId The id of the application to remove. Not null/empty/blank.
-     * @return The active set of applications
+     * @return The active list of applications
      * @throws CloudServiceException
      */
-    Set<Application> removeApplicationForCommand(final String id, final String appId) throws CloudServiceException;
+    List<Application> removeApplicationForCommand(final String id, final String appId) throws CloudServiceException;
 
     /**
      * Get all the clusters the command with given id is associated with.

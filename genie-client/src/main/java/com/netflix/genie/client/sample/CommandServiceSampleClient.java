@@ -27,6 +27,7 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.CommandStatus;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * A sample client demonstrating usage of the Command Service Client.
  *
  * @author tgianos
+ * @author amsharma
  */
 public final class CommandServiceSampleClient {
 
@@ -51,7 +53,7 @@ public final class CommandServiceSampleClient {
     /**
      * Name for the sample command.
      */
-    protected static final String NAME = "pig";
+    protected static final String CMD_NAME = "pig";
 
     /**
      * Private constructor.
@@ -95,16 +97,17 @@ public final class CommandServiceSampleClient {
         final CommandServiceClient commandClient = CommandServiceClient.getInstance();
 
         LOG.info("Creating command pig13_mr2");
-        final Set<Application> apps = new HashSet<Application>();
+        final List<Application> apps = new ArrayList<Application>();
         apps.add(app1);
         apps.add(app2);
-        final Command command1 = commandClient.createCommand(createSampleCommand(ID, apps));
+        final Command command1 = commandClient.createCommand(createSampleCommand(ID));
+        commandClient.addApplicationsToCommand(command1.getId(), apps);
         LOG.info("Created command:");
         LOG.info(command1.toString());
 
-        LOG.info("Getting Commands using specified filter criteria name =  " + NAME);
+        LOG.info("Getting Commands using specified filter criteria name =  " + CMD_NAME);
         final Multimap<String, String> params = ArrayListMultimap.create();
-        params.put("name", NAME);
+        params.put("name", CMD_NAME);
         final List<Command> commands = commandClient.getCommands(params);
         if (commands.isEmpty()) {
             LOG.info("No commands found for specified criteria.");
@@ -155,36 +158,36 @@ public final class CommandServiceSampleClient {
         }
 
         LOG.info("Applications for command with id " + command1.getId());
-        final Set<Application> applications = commandClient.getApplicationsForCommand(command1.getId());
+        final List<Application> applications = commandClient.getApplicationsForCommand(command1.getId());
         for (final Application application : applications) {
             LOG.info("Application = " + application);
         }
 
         LOG.info("Adding applications to command with id " + command1.getId());
-        final Set<Application> newApps = new HashSet<Application>();
+        final List<Application> newApps = new ArrayList<Application>();
         newApps.add(ApplicationServiceSampleClient.getSampleApplication(ID + "something"));
         newApps.add(ApplicationServiceSampleClient.getSampleApplication(null));
-        final Set<Application> applications2 = commandClient.addApplicationsToCommand(command1.getId(), newApps);
+        final List<Application> applications2 = commandClient.addApplicationsToCommand(command1.getId(), newApps);
         for (final Application application : applications2) {
             LOG.info("Application = " + application);
         }
 
-        LOG.info("Updating set of configuration files associated with id " + command1.getId());
+        LOG.info("Updating set of applications files associated with id " + command1.getId());
         //This should remove the original config leaving only the two in this set
-        final Set<Application> applications3 = commandClient.updateApplicationsForCommand(command1.getId(), newApps);
+        final List<Application> applications3 = commandClient.updateApplicationsForCommand(command1.getId(), newApps);
         for (final Application application : applications3) {
             LOG.info("Application = " + application);
         }
 
         LOG.info("Deleting the application from the command with id " + ID + "something");
-        final Set<Application> applications4 = commandClient.
-                removeApplicationForCommand(command1.getId(), ID + "something");
+        final List<Application> applications4 =
+                commandClient.removeApplicationForCommand(command1.getId(), ID + "something");
         for (final Application application : applications4) {
             LOG.info("Application = " + application);
         }
 
         LOG.info("Deleting all the applications from the command with id " + command1.getId());
-        final Set<Application> applications5 = commandClient.removeAllApplicationsForCommand(command1.getId());
+        final List<Application> applications5 = commandClient.removeAllApplicationsForCommand(command1.getId());
         for (final Application application : applications5) {
             //Shouldn't print anything
             LOG.info("Application = " + application);
@@ -213,15 +216,13 @@ public final class CommandServiceSampleClient {
      * Create a sample command and attach the the supplied applications.
      *
      * @param id The id to use or null if want one created.
-     * @param apps The apps to add to this command or null/empty for none.
      * @return The pig example command
      * @throws CloudServiceException
      */
     public static Command createSampleCommand(
-            final String id,
-            final Set<Application> apps) throws CloudServiceException {
+            final String id) throws CloudServiceException {
         final Command command = new Command(
-                NAME,
+                CMD_NAME,
                 "tgianos",
                 CommandStatus.ACTIVE,
                 "/apps/pig/0.13/bin/pig");
@@ -230,9 +231,6 @@ public final class CommandServiceSampleClient {
         }
         command.setEnvPropFile("s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh");
         command.setVersion("0.13");
-        if (apps != null && !apps.isEmpty()) {
-            command.setApplications(apps);
-        }
         return command;
     }
 }

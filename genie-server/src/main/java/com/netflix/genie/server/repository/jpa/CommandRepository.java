@@ -13,16 +13,16 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.server.repository;
+package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Command;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Command repository.
  *
  * @author tgianos
  */
-public interface CommandRepository extends PagingAndSortingRepository<Command, String> {
+public interface CommandRepository extends JpaRepository<Command, String> {
 
 }

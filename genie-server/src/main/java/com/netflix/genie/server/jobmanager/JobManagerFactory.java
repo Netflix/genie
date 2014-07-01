@@ -127,7 +127,7 @@ public final class JobManagerFactory implements ApplicationContextAware {
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final List<Cluster> clusters = this.ccs.getClusterConfigs(
+        final List<Cluster> clusters = this.ccs.getClusters(
                 job.getApplicationId(),
                 job.getApplicationName(),
                 job.getCommandId(),

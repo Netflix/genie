@@ -20,8 +20,10 @@ package com.netflix.genie.server.services;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Abstraction layer to encapsulate data ClusterConfig functionality.<br>
@@ -34,13 +36,22 @@ import java.util.List;
 public interface ClusterConfigService {
 
     /**
+     * Create new cluster configuration.
+     *
+     * @param cluster The cluster to create
+     * @return The created cluster
+     * @throws CloudServiceException
+     */
+    Cluster createCluster(final Cluster cluster) throws CloudServiceException;
+
+    /**
      * Get the cluster configuration by id.
      *
      * @param id unique id of cluster configuration to return
      * @return The cluster configuration
      * @throws CloudServiceException
      */
-    Cluster getClusterConfig(final String id) throws CloudServiceException;
+    Cluster getCluster(final String id) throws CloudServiceException;
 
     /**
      * Get cluster info for various parameters. Null or empty parameters are
@@ -57,7 +68,7 @@ public interface ClusterConfigService {
      * @throws CloudServiceException
      */
     //TODO: Combine the two getAlls into one if possible
-    List<Cluster> getClusterConfigs(
+    List<Cluster> getClusters(
             final String name,
             final List<ClusterStatus> statuses,
             final List<String> tags,
@@ -76,21 +87,12 @@ public interface ClusterConfigService {
      * @param clusterCriterias List of cluster criteria
      * @return successful response, or one with HTTP error code
      */
-    List<Cluster> getClusterConfigs(
+    List<Cluster> getClusters(
             final String applicationId,
             final String applicationName,
             final String commandId,
             final String commandName,
             final List<ClusterCriteria> clusterCriterias);
-
-    /**
-     * Create new cluster configuration.
-     *
-     * @param cluster The cluster to create
-     * @return The created cluster
-     * @throws CloudServiceException
-     */
-    Cluster createClusterConfig(final Cluster cluster) throws CloudServiceException;
 
     /**
      * Update a cluster configuration.
@@ -100,9 +102,17 @@ public interface ClusterConfigService {
      * @return the updated cluster
      * @throws CloudServiceException
      */
-    Cluster updateClusterConfig(
+    Cluster updateCluster(
             final String id,
             final Cluster updateCluster) throws CloudServiceException;
+
+    /**
+     * Delete all clusters from database.
+     *
+     * @return The deleted clusters
+     * @throws CloudServiceException
+     */
+    List<Cluster> deleteAllClusters() throws CloudServiceException;
 
     /**
      * Delete a cluster configuration by id.
@@ -111,5 +121,116 @@ public interface ClusterConfigService {
      * @return the deleted cluster
      * @throws CloudServiceException
      */
-    Cluster deleteClusterConfig(final String id) throws CloudServiceException;
+    Cluster deleteCluster(final String id) throws CloudServiceException;
+
+    /**
+     * Add configuration files to the cluster.
+     *
+     * @param id The id of the cluster to add the configuration file to. Not
+     * null/empty/blank.
+     * @param configs The configuration files to add. Not null/empty.
+     * @return The active set of configurations
+     * @throws CloudServiceException
+     */
+    Set<String> addConfigsForCluster(
+            final String id,
+            final Set<String> configs) throws CloudServiceException;
+
+    /**
+     * Get the set of configuration files associated with the cluster with given
+     * id.
+     *
+     * @param id The id of the cluster to get the configuration files for. Not
+     * null/empty/blank.
+     * @return The set of configuration files as paths
+     * @throws CloudServiceException
+     */
+    Set<String> getConfigsForCluster(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Update the set of configuration files associated with the cluster with
+     * given id.
+     *
+     * @param id The id of the cluster to update the configuration files for.
+     * Not null/empty/blank.
+     * @param configs The configuration files to replace existing configurations
+     * with. Not null/empty.
+     * @return The active set of configurations
+     * @throws CloudServiceException
+     */
+    Set<String> updateConfigsForCluster(
+            final String id,
+            final Set<String> configs) throws CloudServiceException;
+
+    /**
+     * Remove all configuration files from the cluster.
+     *
+     * @param id The id of the cluster to remove the configuration file from.
+     * Not null/empty/blank.
+     * @return The active set of configurations
+     * @throws CloudServiceException
+     */
+    Set<String> removeAllConfigsForCluster(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Add commands to the cluster.
+     *
+     * @param id The id of the cluster to add the command file to. Not
+     * null/empty/blank.
+     * @param commands The commands to add. Not null/empty.
+     * @return The active list of commands
+     * @throws CloudServiceException
+     */
+    List<Command> addCommandsForCluster(
+            final String id,
+            final List<Command> commands) throws CloudServiceException;
+
+    /**
+     * Get the set of commands associated with the cluster with given id.
+     *
+     * @param id The id of the cluster to get the commands for. Not
+     * null/empty/blank.
+     * @return The list of commands
+     * @throws CloudServiceException
+     */
+    List<Command> getCommandsForCluster(final String id) throws CloudServiceException;
+
+    /**
+     * Update the set of command files associated with the cluster with
+     * given id.
+     *
+     * @param id The id of the cluster to update the command files for. Not
+     * null/empty/blank.
+     * @param commands The command files to replace existing
+     * commands with. Not null/empty.
+     * @return The active list of commands
+     * @throws CloudServiceException
+     */
+    List<Command> updateCommandsForCluster(
+            final String id,
+            final List<Command> commands) throws CloudServiceException;
+
+    /**
+     * Remove all commands from the cluster.
+     *
+     * @param id The id of the cluster to remove the commands from. Not
+     * null/empty/blank.
+     * @return The active list of commands
+     * @throws CloudServiceException
+     */
+    List<Command> removeAllCommandsForCluster(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Remove a command from the cluster.
+     *
+     * @param id The id of the cluster to remove the command from. Not
+     * null/empty/blank.
+     * @param cmdId The id of the command to remove. Not null/empty/blank.
+     * @return The active list of commands
+     * @throws CloudServiceException
+     */
+    List<Command> removeCommandForCluster(final String id, final String cmdId) throws CloudServiceException;
 }
