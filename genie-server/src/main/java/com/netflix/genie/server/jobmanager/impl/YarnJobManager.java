@@ -26,6 +26,7 @@ import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
+import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.genie.server.util.StringUtil;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.activation.DataHandler;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -54,7 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author bmundlapudi
  * @author tgianos
  */
-@Named("YarnJobManager")
+@Named
 @Scope("prototype")
 public class YarnJobManager implements JobManager {
 
@@ -64,6 +66,7 @@ public class YarnJobManager implements JobManager {
     private EntityManager em;
 
     private final JobMonitor jobMonitor;
+    private final Thread jobMonitorThread;
 
     /**
      * The name of the Genie job id property to be passed to all jobs.
@@ -128,8 +131,10 @@ public class YarnJobManager implements JobManager {
      * @param jobMonitor The job monitor object to use.
      * @throws CloudServiceException if there is any error in initialization
      */
+    @Inject
     public YarnJobManager(final JobMonitor jobMonitor) throws CloudServiceException {
         this.jobMonitor = jobMonitor;
+        this.jobMonitorThread = new Thread(this.jobMonitor);
     }
 
     /**
@@ -256,7 +261,7 @@ public class YarnJobManager implements JobManager {
             this.jobMonitor.setJob(this.ji);
             this.jobMonitor.setProcess(proc);
             this.jobMonitor.setWorkingDir(cWorkingDir);
-            this.jobMonitor.start();
+            this.jobMonitorThread.start();
             this.ji.setJobStatus(JobStatus.RUNNING, "Job is running");
         } catch (IOException e) {
             String msg = "Failed to launch the job";
@@ -272,15 +277,15 @@ public class YarnJobManager implements JobManager {
      * Kill the job pointed to by the job info - this only kills the Yarn job
      * shell.
      *
-     * @param ji the jobInfo object for the job to be killed
+     * @param job the jobInfo object for the job to be killed
      * @throws CloudServiceException if there is any error in job killing
      */
     @Override
-    public void kill(Job ji) throws CloudServiceException {
+    public void kill(final Job job) throws CloudServiceException {
         LOG.info("called");
 
         // basic error checking
-        if (ji == null) {
+        if (job == null) {
             String msg = "JobInfo object is null";
             LOG.error(msg);
             throw new CloudServiceException(
@@ -289,8 +294,8 @@ public class YarnJobManager implements JobManager {
 
         // check to ensure that the process id is actually set (which means job
         // was launched)
-        this.ji = ji;
-        int processId = ji.getProcessHandle();
+        this.ji = job;
+        int processId = job.getProcessHandle();
         if (processId > 0) {
             LOG.info("Attempting to kill the process " + processId);
             try {
@@ -303,12 +308,12 @@ public class YarnJobManager implements JobManager {
                 }
                 Runtime.getRuntime().exec(
                         genieHome + File.separator + "jobkill.sh " + processId);
-            } catch (CloudServiceException e) {
+            } catch (final CloudServiceException e) {
                 String msg = "Failed to kill the job";
                 LOG.error(msg, e);
                 throw new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 String msg = "Failed to kill the job";
                 LOG.error(msg, e);
                 throw new CloudServiceException(
@@ -326,13 +331,13 @@ public class YarnJobManager implements JobManager {
      * Initializes the object with the job information and environment prior to
      * job launch This method must be called before job is launched.
      *
-     * @param ji2 the JobInfo object passed by the user
+     * @param job the JobInfo object passed by the user
      * @throws CloudServiceException if there is an error during initialization
      */
-    protected void init(Job ji2) throws CloudServiceException {
+    protected void init(final Job job) throws CloudServiceException {
         LOG.info("called");
 
-        genieJobIDProp = GENIE_JOB_ID + "=" + ji2.getId();
+        genieJobIDProp = GENIE_JOB_ID + "=" + job.getId();
         netflixEnvProp = NFLX_ENV + "="
                 + ConfigurationManager.getConfigInstance().getString(
                         "netflix.environment");
@@ -346,13 +351,13 @@ public class YarnJobManager implements JobManager {
         }
 
         // construct the environment variables
-        this.env = initEnv(ji2);
+        this.env = initEnv(job);
 
         // construct command-line args
-        this.args = initArgs(ji2);
+        this.args = initArgs(job);
 
         // save/init args, environment and jobinfo
-        this.ji = ji2;
+        this.ji = job;
     }
 
     /**
@@ -482,7 +487,6 @@ public class YarnJobManager implements JobManager {
             hEnv.put("S3_COMMAND_CONF_FILES", convertCollectionToCSV(command.getConfigs()));
         }
 
-        //TODO: cannot be null in config. check while creating
         this.executable = command.getExecutable();
 
         // save the cluster name and id
@@ -533,7 +537,7 @@ public class YarnJobManager implements JobManager {
         // if the cluster version is provided, overwrite the HADOOP_HOME
         // environment variable
         String hadoopHome;
-        if (cluster.getVersion() != null) {
+        if (this.cluster.getVersion() != null) {
             String hadoopVersion = cluster.getVersion();
             LOG.debug("Hadoop Version of the cluster: " + hadoopVersion);
 

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
+import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
@@ -57,9 +58,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Named
 @Scope("prototype")
-public class JobMonitor extends Thread {
+public class JobMonitorImpl implements JobMonitor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobMonitor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobMonitorImpl.class);
 
     private Job job;
 
@@ -103,7 +104,7 @@ public class JobMonitor extends Thread {
      * @param genieNodeStatistics The statistics object to use
      */
     @Inject
-    public JobMonitor(final GenieNodeStatistics genieNodeStatistics) {
+    public JobMonitorImpl(final GenieNodeStatistics genieNodeStatistics) {
         this.genieNodeStatistics = genieNodeStatistics;
         this.config = ConfigurationManager.getConfigInstance();
         this.maxStdoutSize = this.config.getLong("netflix.genie.job.max.stdout.size", null);
@@ -120,6 +121,7 @@ public class JobMonitor extends Thread {
      * @param job The job to monitor. Not null.
      * @throws CloudServiceException
      */
+    @Override
     public void setJob(final Job job) throws CloudServiceException {
         if (job == null) {
             throw new CloudServiceException(
@@ -133,6 +135,7 @@ public class JobMonitor extends Thread {
      *
      * @param workingDir The working directory to use for this job
      */
+    @Override
     public void setWorkingDir(final String workingDir) {
         this.workingDir = workingDir;
         if (this.workingDir != null) {
@@ -146,6 +149,7 @@ public class JobMonitor extends Thread {
      * @param proc The process handle for the job. Not null.
      * @throws CloudServiceException
      */
+    @Override
     public void setProcess(final Process proc) throws CloudServiceException {
         if (proc == null) {
             throw new CloudServiceException(
@@ -160,6 +164,7 @@ public class JobMonitor extends Thread {
      * @param jobManager The job manager to use. Not Null.
      * @throws CloudServiceException
      */
+    @Override
     public void setJobManager(final JobManager jobManager) throws CloudServiceException {
         if (jobManager == null) {
             throw new CloudServiceException(

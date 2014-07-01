@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Scope;
  * @author skrishnan
  * @author tgianos
  */
-@Named("JobJanitorImpl")
+@Named
 @Scope("prototype")
 public class JobJanitorImpl implements JobJanitor {
 
