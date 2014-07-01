@@ -23,6 +23,8 @@ import com.netflix.servo.annotations.Monitor;
 import com.netflix.servo.monitor.Monitors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,10 +95,20 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      * {@inheritDoc}
      */
     @Override
+    @PostConstruct
     public void register() {
-        LOG.debug("called");
         LOG.info("Registering Servo Monitor");
         Monitors.registerObject(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @PreDestroy
+    public void shutdown() {
+        LOG.info("Shutting down Servo monitor");
+        Monitors.unregisterObject(this);
     }
 
     /**
@@ -421,14 +433,5 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
     @Override
     public void setGenieRunningJobs8hPlus(int genieRunningJobs8hPlus) {
         this.genieRunningJobs8hPlus.set(genieRunningJobs8hPlus);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void shutdown() {
-        LOG.info("Shutting down Servo monitor");
-        Monitors.unregisterObject(this);
     }
 }

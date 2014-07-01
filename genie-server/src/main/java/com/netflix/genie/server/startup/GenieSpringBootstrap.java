@@ -40,7 +40,6 @@ public class GenieSpringBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(GenieSpringBootstrap.class);
 
     private final JobJanitor jobJanitor;
-    private final GenieNodeStatistics genieNodeStatistics;
     private final JobCountManager jobCountManager;
     private final JobCountMonitor jobCountMonitor;
 
@@ -62,7 +61,6 @@ public class GenieSpringBootstrap {
             final JobCountManager jobCountManager,
             final JobCountMonitor jobCountMonitor) {
         this.jobJanitor = janitor;
-        this.genieNodeStatistics = genieNodeStatistics;
         this.jobCountManager = jobCountManager;
         this.jobCountMonitor = jobCountMonitor;
         this.jobCountMonitorThread = new Thread(this.jobCountMonitor);
@@ -83,10 +81,6 @@ public class GenieSpringBootstrap {
         this.jobCountManager.getNumInstanceJobs();
         LOG.info("JobCountManager has been initialized successfully");
 
-        // register the servo metrics
-        this.genieNodeStatistics.register();
-        LOG.info("Custom servo metrics have been registered");
-
         // initialize and start the job janitor
         this.jobJanitorThread.setDaemon(true);
         this.jobJanitorThread.start();
@@ -106,7 +100,6 @@ public class GenieSpringBootstrap {
         // shut down dependencies cleanly
         this.jobJanitor.setStop(true);
         this.jobCountMonitor.setStop(true);
-        this.genieNodeStatistics.shutdown();
 
         LOG.info("done");
     }

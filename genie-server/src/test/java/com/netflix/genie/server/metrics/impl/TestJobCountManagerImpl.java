@@ -51,7 +51,7 @@ public class TestJobCountManagerImpl {
 
     @Inject
     private JobCountManager manager;
-    
+
     /**
      * Test getting number of running jobs on one instance.
      *
