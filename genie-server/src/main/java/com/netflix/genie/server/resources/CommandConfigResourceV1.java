@@ -56,7 +56,10 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v1/config/commands")
 @Api(value = "/v1/config/commands", description = "Manage the available commands")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
+})
 @Named
 public class CommandConfigResourceV1 {
 
@@ -83,7 +86,10 @@ public class CommandConfigResourceV1 {
      * @throws CloudServiceException
      */
     @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Create a command",
             notes = "Create a command from the supplied information.",
@@ -175,7 +181,10 @@ public class CommandConfigResourceV1 {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Update a command",
             notes = "Update a command from the supplied information.",
@@ -378,7 +387,10 @@ public class CommandConfigResourceV1 {
      */
     @POST
     @Path("/{id}/applications")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Add new applications to a command",
             notes = "Add the supplied applications to the command with the supplied id."
@@ -440,7 +452,9 @@ public class CommandConfigResourceV1 {
      */
     @PUT
     @Path("/{id}/applications")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Update the applications for an command",
             notes = "Replace the existing application files for command with given id.",

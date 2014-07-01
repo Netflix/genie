@@ -56,7 +56,10 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v1/config/applications")
 @Api(value = "/v1/config/applications", description = "Manage the available applications")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
+})
 @Named
 public class ApplicationConfigResourceV1 {
 
@@ -83,7 +86,10 @@ public class ApplicationConfigResourceV1 {
      * @throws CloudServiceException
      */
     @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Create an application",
             notes = "Create an application from the supplied information.",
@@ -175,7 +181,10 @@ public class ApplicationConfigResourceV1 {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Update an application",
             notes = "Update an application from the supplied information.",

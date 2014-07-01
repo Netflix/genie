@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <Job id="job1" 
+         created="2014-01-02 01:45:00" 
+         updated="2014-01-02 01:50:00" 
+         user="tgianos" 
+         commandId="15" 
+         commandName="pig" 
+         status="RUNNING" 
+         name="one" 
+         commandArgs="-tez"/>
+    
+    <Job id="job2" 
+         created="2014-01-05 01:45:00" 
+         updated="2014-01-06 01:50:00" 
+         user="tgianos" 
+         commandId="16" 
+         commandName="hive" 
+         status="INIT" 
+         name="two" 
+         commandArgs="-tez"/>
+    
+    <Job id="job3"
+         created="2014-06-01 15:00:00"
+         updated="2014-06-01 15:00:00"
+         user="tgianos"
+         commandId="15"
+         commandName="pig"
+         status="RUNNING"
+         name="one"
+         commandArgs="-tez"/>
+</dataset>

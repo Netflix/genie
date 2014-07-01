@@ -20,18 +20,10 @@
              version="2.0"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
     <persistence-unit name="com.netflix.genie.persistence" transaction-type="RESOURCE_LOCAL">
-
         <class>com.netflix.genie.common.model.Job</class>
         <class>com.netflix.genie.common.model.Cluster</class>
         <class>com.netflix.genie.common.model.Command</class>
         <class>com.netflix.genie.common.model.Application</class>
         <class>com.netflix.genie.common.model.Auditable</class>
-	
-        <properties>
-            <!-- common properties -->
-            <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(SchemaAction='add')"/>       
-            <property name="openjpa.DynamicEnhancementAgent" value="false"/>
-            <property name="openjpa.RuntimeUnenhancedClasses" value="unsupported"/>
-        </properties>
     </persistence-unit>
 </persistence>

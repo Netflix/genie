@@ -25,8 +25,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test for the cluster load balancer.
@@ -34,9 +38,12 @@ import org.junit.Test;
  * @author skrishnan
  * @author tgianos
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:application-test.xml")
 public class TestRandomizedClusterLoadBalancerImpl {
 
-    private final ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
+    @Inject
+    private ClusterLoadBalancer clb;
 
     /**
      * Test whether a cluster is returned from a set of candidates.

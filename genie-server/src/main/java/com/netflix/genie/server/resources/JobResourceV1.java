@@ -54,9 +54,13 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v1/jobs")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
+})
 @Named
 public class JobResourceV1 {
+
     private static final Logger LOG = LoggerFactory.getLogger(JobResourceV1.class);
 
     @Inject
@@ -77,7 +81,10 @@ public class JobResourceV1 {
      * @throws CloudServiceException
      */
     @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Submit a job",
             notes = "Submit a new job to run to genie",
@@ -109,7 +116,7 @@ public class JobResourceV1 {
             job.setClientHost(clientHost);
         }
 
-        final Job createdJob =  this.xs.submitJob(job);
+        final Job createdJob = this.xs.submitJob(job);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
                 entity(createdJob).
@@ -212,11 +219,9 @@ public class JobResourceV1 {
             @QueryParam("clusterId")
             final String clusterId,
             @ApiParam(value = "The page to start on.", required = false)
-            @QueryParam("page") @DefaultValue("0")
-            int page,
+            @QueryParam("page") @DefaultValue("0") int page,
             @ApiParam(value = "Max number of results per page.", required = false)
-            @QueryParam("limit") @DefaultValue("1024")
-            int limit)
+            @QueryParam("limit") @DefaultValue("1024") int limit)
             throws CloudServiceException {
         LOG.debug("Called");
         return this.xs.getJobs(
