@@ -63,7 +63,7 @@
         <property name="maxActive" value="${dbcp.maxActive}" />
     </bean>-->
     
-    <jpa:repositories base-package="com.netflix.genie.server.repository"/>
+    <jpa:repositories base-package="com.netflix.genie.server.repository.jpa"/>
     
     <tx:annotation-driven transaction-manager="transactionManager" />
 </beans>
