@@ -4,7 +4,12 @@
  
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:application.xml</param-value>
+        <param-value>classpath*:genie-application.xml</param-value>
+    </context-param>
+    
+    <context-param>
+        <param-name>spring.profiles.default</param-name>
+        <param-value>dev</param-value>
     </context-param>
  
     <listener>
@@ -15,10 +20,7 @@
 
     <servlet>
         <servlet-name>jersey</servlet-name>
-        <servlet-class>
-            <!-- com.sun.jersey.spi.container.servlet.ServletContainer -->
-            com.sun.jersey.spi.spring.container.servlet.SpringServlet
-        </servlet-class>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
             <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>

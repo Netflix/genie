@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author tgianos
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:application-test.xml")
+@ContextConfiguration(locations = "classpath:genie-application-test.xml")
 @TestExecutionListeners({
     DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class,

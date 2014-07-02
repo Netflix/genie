@@ -44,6 +44,11 @@ public class TestStringUtil {
         Assert.assertTrue(12 == output.length);
     }
 
+    /**
+     * Test spaces within quotes.
+     *
+     * @throws CloudServiceException
+     */
     @Test
     public void testSplitCmdLineSpacesWithinQuotes() throws CloudServiceException {
         final String input = "-f pig.q -p endDateTS=\"foo bar\" ";
@@ -51,6 +56,11 @@ public class TestStringUtil {
         Assert.assertTrue(4 == output.length);
     }
 
+    /**
+     * Test spaces at beginning and end.
+     *
+     * @throws CloudServiceException
+     */
     @Test
     public void testSplitCmdLineSpacesAtBeginningAndEnd() throws CloudServiceException {
         final String input = " -f pig.q -p bar ";
@@ -58,6 +68,11 @@ public class TestStringUtil {
         Assert.assertTrue(4 == output.length);
     }
 
+    /**
+     * Test extra spaces in the middle.
+     *
+     * @throws CloudServiceException
+     */
     @Test
     public void testSplitCmdLineExtraSpacesInMiddle() throws CloudServiceException {
         final String input = "-f device_sum_step1.pig -p from_date=20120915     "
@@ -66,6 +81,11 @@ public class TestStringUtil {
         Assert.assertTrue(8 == output.length);
     }
 
+    /**
+     * Test spaces and equals in middle.
+     *
+     * @throws CloudServiceException
+     */
     @Test
     public void testSplitCmdLineSpacesAndEqualsInMiddle() throws CloudServiceException {
         final String input = "-f hooks.q -d \"setCommandsHook=set hive.exec.reducers.bytes.per.reducer=67108864;\"";
@@ -73,6 +93,11 @@ public class TestStringUtil {
         Assert.assertTrue(4 == output.length);
     }
 
+    /**
+     * Test commas in arguments.
+     *
+     * @throws CloudServiceException
+     */
     @Test
     public void testSplitCmdLineCommasInArguments() throws CloudServiceException {
         final String input = "jar searchagg.jar searchevents "

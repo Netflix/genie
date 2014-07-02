@@ -31,47 +31,34 @@
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
     
-    <!-- For MySQL uncomment this bean definition -->
-<!--    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://127.0.0.1/genie?autoReconnect=true" />
-        <property name="username" value="root" />
-        <property name="password" value="" />
-        
-        <property name="minIdle" value="5" />
-        <property name="maxIdle" value="20" />
-        <property name="maxActive" value="20" />
-    </bean>-->
-    
-    <!-- For Derby use this bean -->
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
-        <property name="url" value="jdbc:derby:genie-db;create=true" />
-        <property name="username" value="me" />
-        <property name="password" value="mine" />
-        
-        <property name="minIdle" value="5" />
-        <property name="maxIdle" value="20" />
-        <property name="maxActive" value="20" />
-    </bean>
-    
-    <!-- For HSQLDB use this bean -->
-    <!--<jdbc:embedded-database id="dataSource" type="HSQL"/>-->
-    
-    <!-- Generalized Data Source -->
-<!--    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${jdbc.driverClassName}" />
-        <property name="url" value="${jdbc.url}" />
-        <property name="username" value="${jdbc.username}" />
-        <property name="password" value="${jdbc.password}" />
-        
-        <property name="minIdle" value="${dbcp.minIdle}" />
-        <property name="maxIdle" value="${dbcp.maxIdle}" />
-        <property name="maxActive" value="${dbcp.maxActive}" />
-    </bean>-->
+    <tx:annotation-driven transaction-manager="transactionManager" />
     
     <jpa:repositories base-package="com.netflix.genie.server.repository.jpa"/>
     
-    <tx:annotation-driven transaction-manager="transactionManager" />
-</beans>
+    <!-- Different data sources for different profiles -->
+    <beans profile="dev">
+        <jdbc:embedded-database id="dataSource" type="HSQL"/>
+    </beans>
+    
+    <beans profile="test">
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+            <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
+            <property name="url" value="jdbc:derby:genie-db;create=true" />
+            <property name="username" value="me" />
+            <property name="password" value="mine" />
+        </bean>
+    </beans>
+    
+    <beans profile="prod">
+        <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+            <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+            <property name="url" value="jdbc:mysql://127.0.0.1/genie?autoReconnect=true"/>
+            <property name="username" value="root"/>
+            <property name="password" value=""/>
 
+            <property name="minIdle" value="5"/>
+            <property name="maxIdle" value="20"/>
+            <property name="maxActive" value="20"/>
+        </bean>
+    </beans>
+</beans>
