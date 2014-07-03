@@ -2,7 +2,7 @@
 
 ##
 #
-#  Copyright 2013 Netflix, Inc.
+#  Copyright 2014 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -25,5 +25,5 @@ hadoop fs -chmod -R 777 /
 
 # Register EMR cluster
 export SERVICE_BASE_URL=http://localhost:7001
-cd $HOME/genie/genie-web/src/test/python/utils
+cd ${HOME}/genie/genie-web/src/test/python/utils
 python populateEMRConfigs.py

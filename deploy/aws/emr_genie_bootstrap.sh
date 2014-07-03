@@ -2,7 +2,7 @@
 
 ##
 #
-#  Copyright 2013 Netflix, Inc.
+#  Copyright 2014 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ export CATALINA_OPTS="-Darchaius.deployment.applicationId=genie -Dnetflix.datace
 
 # Set up directories needed
 mkdir -p /mnt/tomcat/genie-jobs;
-ln -fs /mnt/tomcat/genie-jobs $CATALINA_HOME/webapps
+ln -fs /mnt/tomcat/genie-jobs ${CATALINA_HOME}/webapps
 mkdir -p /home/hadoop/.versions/pig-0.11.1/conf; touch /home/hadoop/.versions/pig-0.11.1/conf/pig.properties
 
 # Set up genie - get the latest from GitHub
@@ -49,4 +49,4 @@ cd $HOME/genie; ./gradlew clean build -x test
 cd $HOME/genie; ./local_deploy.sh
 
 # Start Tomcat
-cd $CATALINA_HOME/logs; $CATALINA_HOME/bin/startup.sh;
+cd ${CATALINA_HOME}/logs; ${CATALINA_HOME}/bin/startup.sh;
