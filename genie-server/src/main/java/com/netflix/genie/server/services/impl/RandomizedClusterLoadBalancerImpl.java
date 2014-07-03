@@ -52,7 +52,7 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
         if (clusters == null || clusters.isEmpty()) {
             final String msg = "No cluster configuration found to match user params";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_NOT_FOUND, msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_PRECON_FAILED, msg);
         }
 
         // return a random one

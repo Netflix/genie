@@ -509,7 +509,7 @@ public class Cluster extends Auditable implements Serializable {
         if (StringUtils.isBlank(clusterType)) {
             builder.append("No cluster type entered and is required.\n");
         }
-        if(StringUtils.isBlank(clusterVersion)) {
+        if (StringUtils.isBlank(clusterVersion)) {
             builder.append("No cluster version entered and is required");
         }
         if (configs == null || configs.isEmpty()) {

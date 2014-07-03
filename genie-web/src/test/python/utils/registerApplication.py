@@ -31,7 +31,7 @@ import restclient
 GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/applications'
+serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/applications'
 
 
 def addApplicationConfigMr1():

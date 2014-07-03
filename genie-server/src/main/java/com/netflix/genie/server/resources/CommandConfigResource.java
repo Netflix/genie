@@ -49,19 +49,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Code for CommandConfigResourceV1.
+ * Code for CommandConfigResource.
  *
  * @author amsharma
  * @author tgianos
  */
-@Path("/v1/config/commands")
-@Api(value = "/v1/config/commands", description = "Manage the available commands")
+@Path("/v2/config/commands")
+@Api(value = "/v2/config/commands", description = "Manage the available commands")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Named
-public class CommandConfigResourceV1 {
+public class CommandConfigResource {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(CommandConfigResourceV1.class);
+            .getLogger(CommandConfigResource.class);
 
     /**
      * The command service.

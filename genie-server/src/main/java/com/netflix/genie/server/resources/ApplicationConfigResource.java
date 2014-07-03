@@ -54,14 +54,14 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-@Path("/v1/config/applications")
-@Api(value = "/v1/config/applications", description = "Manage the available applications")
+@Path("/v2/config/applications")
+@Api(value = "/v2/config/applications", description = "Manage the available applications")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Named
-public class ApplicationConfigResourceV1 {
+public class ApplicationConfigResource {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(ApplicationConfigResourceV1.class);
+            .getLogger(ApplicationConfigResource.class);
 
     /**
      * The application service.

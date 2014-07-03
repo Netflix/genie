@@ -26,50 +26,14 @@
         </div>
         <div class="span12">
             <div class="row">
-                <div class="span2"><strong>Hadoop Version:</strong></div>
-                <div class="span6" data-bind="text: $data.hadoopVersion"></div>
-            </div>
-        </div>
-        <div class="span12">
-            <div class="row">
-                <div class="span2"><strong>Schedules:</strong></div>
-                <div class="span6">
-		            <form>
-		                <label class="checkbox inline">
-		                    <input type="checkbox" data-bind="checked: adHoc()==='true'" disabled> adHoc
-		                </label>
-		                <label class="checkbox inline">
-		                    <input type="checkbox" data-bind="checked: bonus()==='true'" disabled> bonus
-		                </label>
-		                <label class="checkbox inline">
-		                    <input type="checkbox" data-bind="checked: sla()==='true'" disabled> sla
-		                </label>
-		            </form>
-                </div>
-            </div>
-        </div>
-        <div class="span12">
-            <div class="row">
-                <div class="span2"><strong>Configurations:</strong></div>
-                <div class="span6">
-		            <form>                       
-		                <label class="checkbox inline">
-		                    <input type="checkbox" data-bind="checked: prod()==='true'" disabled> prod
-		                </label>
-		                <label class="checkbox inline">
-		                    <input type="checkbox" data-bind="checked: test()==='true'" disabled> test
-		                </label>
-		                <label class="checkbox inline">
-		                    <input type="checkbox" data-bind="checked: unitTest()==='true'" disabled> unitTest
-		                </label>
-		            </form>
-	            </div>
+                <div class="span2"><strong>Version:</strong></div>
+                <div class="span6" data-bind="text: $data.version"></div>
             </div>
         </div>
         <div class="span12">
             <div class="row">
                 <div class="span2"><strong>Details:</strong></div>
-                <div class="span3"><a data-bind="attr: {href: 'genie/v0/config/cluster/'+$data.id()}" target="_blank">XML</a></div>
+                <div class="span3"><a data-bind="attr: {href: 'genie/v2/config/clusters/'+$data.id()}" target="_blank">XML</a></div>
             </div>
         </div>
         <div class="span12">

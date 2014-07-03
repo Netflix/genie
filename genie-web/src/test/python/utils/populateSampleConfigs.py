@@ -25,7 +25,7 @@ import eureka
 baseUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/'
 
 def populateTestHive():
-    serviceUrl = baseUrl + 'v0/config/hive/hiveconf-testhive-sample'
+    serviceUrl = baseUrl + 'v2/config/hive/hiveconf-testhive-sample'
     payload = '''
     <request>
       <hiveConfig>
@@ -41,7 +41,7 @@ def populateTestHive():
     restclient.put(serviceUrl=serviceUrl, payload=payload, contentType='application/xml')
         
 def populateProdHive():
-    serviceUrl = baseUrl + 'v0/config/hive/hiveconf-prodhive-sample'
+    serviceUrl = baseUrl + 'v2/config/hive/hiveconf-prodhive-sample'
     payload = '''
     <request>
       <hiveConfig>
@@ -57,7 +57,7 @@ def populateProdHive():
     restclient.put(serviceUrl=serviceUrl, payload=payload, contentType='application/xml')
 
 def populateTestPig():
-    serviceUrl = baseUrl + 'v0/config/pig/pigconf-testpig-sample'
+    serviceUrl = baseUrl + 'v2/config/pig/pigconf-testpig-sample'
     payload = '''
     <request>
       <pigConfig>
@@ -73,7 +73,7 @@ def populateTestPig():
     restclient.put(serviceUrl=serviceUrl, payload=payload, contentType='application/xml')
      
 def populateProdPig():
-    serviceUrl = baseUrl + 'v0/config/pig/pigconf-prodpig-sample'
+    serviceUrl = baseUrl + 'v2/config/pig/pigconf-prodpig-sample'
     payload = '''
     <request>
       <pigConfig>
@@ -89,7 +89,7 @@ def populateProdPig():
     restclient.put(serviceUrl=serviceUrl, payload=payload, contentType='application/xml')
      
 def populateCluster():
-    serviceUrl = baseUrl + 'v0/config/cluster/clusterconf-sample'
+    serviceUrl = baseUrl + 'v2/config/cluster/clusterconf-sample'
     payload = '''
     <request>
       <clusterConfig>

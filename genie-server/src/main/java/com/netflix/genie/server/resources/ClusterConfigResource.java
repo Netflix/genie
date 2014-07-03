@@ -22,6 +22,7 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.server.services.ClusterConfigService;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
@@ -45,22 +46,25 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Code for ClusterConfigResourceV1 - REST end-point for supporting cluster
+ * Code for ClusterConfigResource - REST end-point for supporting cluster
  * configurations.
  *
  * @author amsharma
  * @author tgianos
  */
-@Path("/v1/config/clusters")
+@Path("/v2/config/clusters")
+@Api(value = "/v2/config/clusters", description = "Manage the available clusters")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Named
-public class ClusterConfigResourceV1 {
+public class ClusterConfigResource {
     private static final Logger LOG = LoggerFactory
-            .getLogger(ClusterConfigResourceV1.class);
+            .getLogger(ClusterConfigResource.class);
 
     @Inject
     private ClusterConfigService ccs;
@@ -176,10 +180,12 @@ public class ClusterConfigResourceV1 {
         LOG.debug("called");
         //Create this conversion internal in case someone uses lower case by accident?
         List<ClusterStatus> enumStatuses = null;
-        if (statuses != null) {
+        if (!statuses.isEmpty()) {
             enumStatuses = new ArrayList<ClusterStatus>();
             for (final String status : statuses) {
-                enumStatuses.add(ClusterStatus.parse(status));
+                if (!StringUtils.isBlank(status)) {
+                    enumStatuses.add(ClusterStatus.parse(status));
+                }
             }
         }
         return this.ccs.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, limit, page);
@@ -532,7 +538,7 @@ public class ClusterConfigResourceV1 {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The id of the command to remove.", required = true)
-            @PathParam("appId")
+            @PathParam("cmdId")
             final String cmdId) throws CloudServiceException {
         LOG.debug("Called with id " + id + " and command id " + cmdId);
         return this.ccs.removeCommandForCluster(id, cmdId);

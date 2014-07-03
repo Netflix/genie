@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests the {@link ClusterConfigResourceV1} class.
+ * Tests the {@link ClusterConfigResource} class.
  *
  * @author Jakub Narloch (jmnarloch@gmail.com)
  */
@@ -52,7 +52,7 @@ public class ClusterConfigResourceV1TestCase {
      * The injected {@link HiveConfigResourceV0} class.
      */
     @Inject
-    private ClusterConfigResourceV1 resource;
+    private ClusterConfigResource resource;
 
     /**
      * Test to make sure configuration is right.

@@ -31,7 +31,7 @@ def addApplicationToCommand(commandId,applicationId):
     print "Adding Application [%s] to Command [%s] " % (applicationId, commandId) 
 
     # get the serviceUrl from the eureka client
-    serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/commands/' + commandId + '/applications'
+    serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/commands/' + commandId + '/applications'
     print "Service Url isi %s" % serviceUrl 
     
     #cmds = json.dumps([{'id':'prodhive11_mr1'},{'id':'pig11_mr1'},{'id':'hadoop103'}])

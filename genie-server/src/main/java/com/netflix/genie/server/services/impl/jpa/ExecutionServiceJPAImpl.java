@@ -100,7 +100,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         JOB_DIR_PREFIX = CONF.getString("netflix.genie.server.job.dir.prefix",
                 "genie-jobs");
         JOB_RESOURCE_PREFIX = CONF.getString(
-                "netflix.genie.server.job.resource.prefix", "genie/v1/jobs");
+                "netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
     }
 
     /**

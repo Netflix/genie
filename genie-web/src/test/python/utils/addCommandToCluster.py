@@ -31,7 +31,7 @@ def addCommandToCluster(clusterId,commandId):
     print "Adding Command [%s] to Cluster [%s] " % (clusterId, commandId) 
 
     # get the serviceUrl from the eureka client
-    serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/clusters/' + clusterId + '/commands'
+    serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/clusters/' + clusterId + '/commands'
     print "Service Url isi %s" % serviceUrl 
     
     #cmds = json.dumps([{'id':'prodhive11_mr1'},{'id':'pig11_mr1'},{'id':'hadoop103'}])

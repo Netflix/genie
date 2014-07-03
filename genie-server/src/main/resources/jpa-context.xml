@@ -25,7 +25,7 @@
     </bean>
     
     <!-- For MySQL uncomment this bean definition -->
-<!--    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
         <property name="url" value="jdbc:mysql://127.0.0.1/genie?autoReconnect=true" />
         <property name="username" value="root" />
@@ -34,10 +34,10 @@
         <property name="minIdle" value="5" />
         <property name="maxIdle" value="20" />
         <property name="maxActive" value="20" />
-    </bean>-->
+    </bean>
     
     <!-- For Derby use this bean -->
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
         <property name="url" value="jdbc:derby:genie-db;create=true" />
         <property name="username" value="me" />
@@ -46,7 +46,7 @@
         <property name="minIdle" value="5" />
         <property name="maxIdle" value="20" />
         <property name="maxActive" value="20" />
-    </bean>
+    </bean> -->
     
     <!-- For HSQLDB use this bean -->
     <!--<jdbc:embedded-database id="dataSource" type="HSQL"/>-->

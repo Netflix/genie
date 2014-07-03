@@ -73,7 +73,7 @@ public class BaseGenieClient {
     /**
      * Standard root for all rest services.
      */
-    protected static final String BASE_REST_URL = "/genie/v1/";
+    protected static final String BASE_REST_URL = "/genie/v2/";
 
     /**
      * Reusable String for /.

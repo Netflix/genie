@@ -25,7 +25,7 @@ import eureka
 baseUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/'
 
 def populateProdHive():
-    serviceUrl = baseUrl + 'v0/config/hive/hiveconf-prodhive-emr'
+    serviceUrl = baseUrl + 'v2/config/hive/hiveconf-prodhive-emr'
     payload = '''
     <request>
       <hiveConfig>
@@ -41,7 +41,7 @@ def populateProdHive():
     restclient.put(serviceUrl=serviceUrl, payload=payload, contentType='application/xml')
 
 def populateProdPig():
-    serviceUrl = baseUrl + 'v0/config/pig/pigconf-prodpig-emr'
+    serviceUrl = baseUrl + 'v2/config/pig/pigconf-prodpig-emr'
     payload = '''
     <request>
       <pigConfig>
@@ -57,7 +57,7 @@ def populateProdPig():
     restclient.put(serviceUrl=serviceUrl, payload=payload, contentType='application/xml')
      
 def populateCluster():
-    serviceUrl = baseUrl + 'v0/config/cluster/clusterconf-emr'
+    serviceUrl = baseUrl + 'v2/config/cluster/clusterconf-emr'
     payload = '''
     <request>
       <clusterConfig>

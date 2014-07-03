@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
@@ -53,11 +54,12 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-@Path("/v1/jobs")
+@Path("/v2/jobs")
+@Api(value = "/v2/jobs", description = "Manage the available jobs")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Named
-public class JobResourceV1 {
-    private static final Logger LOG = LoggerFactory.getLogger(JobResourceV1.class);
+public class JobResource {
+    private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
 
     @Inject
     private ExecutionService xs;
@@ -223,7 +225,7 @@ public class JobResourceV1 {
                 id,
                 jobName,
                 userName,
-                JobStatus.parse(status),
+                ((status == null) || (status.isEmpty()) ? null : JobStatus.parse(status)),
                 clusterName,
                 clusterId,
                 limit,

@@ -179,8 +179,9 @@ public final class ClusterServiceSampleClient {
 
         LOG.info("Adding commands to cluster with id " + cluster1.getId());
         final List<Command> newCmds = new ArrayList<Command>();
-        newCmds.add(CommandServiceSampleClient.createSampleCommand(ID + "something"));
-        newCmds.add(CommandServiceSampleClient.createSampleCommand(null));
+        newCmds.add(commandClient.createCommand(CommandServiceSampleClient.createSampleCommand(ID + "something")));
+        newCmds.add(commandClient.createCommand(CommandServiceSampleClient.createSampleCommand(null)));
+        
         final List<Command> commands2 = clusterClient.addCommandsToCluster(cluster1.getId(), newCmds);
         for (final Command command : commands2) {
             LOG.info("Command = " + command);
