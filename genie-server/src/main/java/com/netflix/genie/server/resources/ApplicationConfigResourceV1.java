@@ -69,14 +69,23 @@ public class ApplicationConfigResourceV1 {
     /**
      * The application service.
      */
-    @Inject
-    private ApplicationConfigService acs;
+    private final ApplicationConfigService acs;
 
     /**
      * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;
+
+    /**
+     * Constructor.
+     *
+     * @param acs The application configuration service to use.
+     */
+    @Inject
+    public ApplicationConfigResourceV1(final ApplicationConfigService acs) {
+        this.acs = acs;
+    }
 
     /**
      * Create an Application.

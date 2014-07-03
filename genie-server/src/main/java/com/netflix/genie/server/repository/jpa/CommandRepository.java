@@ -28,9 +28,9 @@ public interface CommandRepository extends JpaRepository<Command, String> {
 
     /**
      * Find commands by name.
-     * 
+     *
      * @param name The name of the command to find
      * @return The commands matching the name.
      */
-    public List<Command> findByName(final String name);
+    List<Command> findByName(final String name);
 }

@@ -66,14 +66,26 @@ public class ClusterConfigResourceV1 {
     private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigResourceV1.class);
 
-    @Inject
-    private ClusterConfigService ccs;
+    /**
+     * The Cluster Configuration Service.
+     */
+    private final ClusterConfigService ccs;
 
     /**
      * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;
+    
+    /**
+     * Constructor.
+     * 
+     * @param ccs The cluster configuration service to use.
+     */
+    @Inject
+    public ClusterConfigResourceV1(final ClusterConfigService ccs) {
+        this.ccs = ccs;
+    }
 
     /**
      * Create cluster configuration.

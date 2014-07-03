@@ -210,7 +210,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
-        
+
         if (app.getCommands() != null) {
             final Set<Command> commands = new HashSet<Command>();
             commands.addAll(app.getCommands());

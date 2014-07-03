@@ -63,14 +63,26 @@ public class JobResourceV1 {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobResourceV1.class);
 
-    @Inject
-    private ExecutionService xs;
+    /**
+     * The execution service.
+     */
+    private final ExecutionService xs;
 
     /**
      * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;
+    
+    /**
+     * Constructor.
+     * 
+     * @param xs The execution service to use.
+     */
+    @Inject
+    public JobResourceV1(final ExecutionService xs) {
+        this.xs = xs;
+    }
 
     /**
      * Submit a new job.

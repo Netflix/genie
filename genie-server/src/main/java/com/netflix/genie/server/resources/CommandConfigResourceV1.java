@@ -79,10 +79,10 @@ public class CommandConfigResourceV1 {
      */
     @Context
     private UriInfo uriInfo;
-    
+
     /**
-     * Constructor
-     * 
+     * Constructor.
+     *
      * @param ccs The command configuration service to use.
      */
     @Inject
