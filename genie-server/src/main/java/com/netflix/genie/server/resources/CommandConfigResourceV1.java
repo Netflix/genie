@@ -55,7 +55,10 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v1/config/commands")
-@Api(value = "/v1/config/commands", description = "Manage the available commands")
+@Api(
+        value = "/v1/config/commands",
+        description = "Manage the available commands"
+)
 @Produces({
     MediaType.APPLICATION_XML,
     MediaType.APPLICATION_JSON
@@ -69,14 +72,23 @@ public class CommandConfigResourceV1 {
     /**
      * The command service.
      */
-    @Inject
-    private CommandConfigService ccs;
+    private final CommandConfigService ccs;
 
     /**
      * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;
+    
+    /**
+     * Constructor
+     * 
+     * @param ccs The command configuration service to use.
+     */
+    @Inject
+    public CommandConfigResourceV1(final CommandConfigService ccs) {
+        this.ccs = ccs;
+    }
 
     /**
      * Create a Command configuration.
@@ -93,14 +105,28 @@ public class CommandConfigResourceV1 {
     @ApiOperation(
             value = "Create a command",
             notes = "Create a command from the supplied information.",
-            response = Command.class)
+            response = Command.class
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Created", response = Command.class),
-        @ApiResponse(code = 400, message = "Invalid required parameter supplied"),
-        @ApiResponse(code = 409, message = "A command with the supplied id already exists")
+        @ApiResponse(
+                code = 201,
+                message = "Created",
+                response = Command.class
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid required parameter supplied"
+        ),
+        @ApiResponse(
+                code = 409,
+                message = "A command with the supplied id already exists"
+        )
     })
     public Response createCommand(
-            @ApiParam(value = "The command to create.", required = true)
+            @ApiParam(
+                    value = "The command to create.",
+                    required = true
+            )
             final Command command) throws CloudServiceException {
         LOG.debug("called to create new command configuration " + command.toString());
         final Command createdCommand = this.ccs.createCommand(command);
@@ -122,16 +148,29 @@ public class CommandConfigResourceV1 {
     @ApiOperation(
             value = "Find a command by id",
             notes = "Get the command by id if it exists",
-            response = Command.class)
+            response = Command.class
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Command.class),
-        @ApiResponse(code = 400, message = "Invalid id supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK",
+                response = Command.class
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid id supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
     public Command getCommand(
-            @ApiParam(value = "Id of the command to get.", required = true)
-            @PathParam("id")
-            final String id) throws CloudServiceException {
+            @ApiParam(
+                    value = "Id of the command to get.",
+                    required = true
+            )
+            @PathParam("id") final String id) throws CloudServiceException {
         LOG.debug("Called");
         return this.ccs.getCommand(id);
     }
@@ -152,19 +191,33 @@ public class CommandConfigResourceV1 {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Command.class)
+        @ApiResponse(
+                code = 200,
+                message = "OK",
+                response = Command.class
+        )
     })
     public List<Command> getCommands(
-            @ApiParam(value = "Name of the command.", required = false)
-            @QueryParam("name")
-            final String name,
-            @ApiParam(value = "User who created the command.", required = false)
-            @QueryParam("userName")
-            final String userName,
-            @ApiParam(value = "The page to start on.", required = false)
+            @ApiParam(
+                    value = "Name of the command.",
+                    required = false
+            )
+            @QueryParam("name") final String name,
+            @ApiParam(
+                    value = "User who created the command.",
+                    required = false
+            )
+            @QueryParam("userName") final String userName,
+            @ApiParam(
+                    value = "The page to start on.",
+                    required = false
+            )
             @QueryParam("page")
             @DefaultValue("0") int page,
-            @ApiParam(value = "Max number of results per page.", required = false)
+            @ApiParam(
+                    value = "Max number of results per page.",
+                    required = false
+            )
             @QueryParam("limit")
             @DefaultValue("1024") int limit) {
         LOG.debug("Called");
@@ -188,17 +241,33 @@ public class CommandConfigResourceV1 {
     @ApiOperation(
             value = "Update a command",
             notes = "Update a command from the supplied information.",
-            response = Command.class)
+            response = Command.class
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Command.class),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Command to update not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK",
+                response = Command.class
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid Id supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command to update not found"
+        )
     })
     public Command updateCommand(
-            @ApiParam(value = "Id of the command to update.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The command information to update.", required = true)
+            @ApiParam(
+                    value = "Id of the command to update.",
+                    required = true
+            )
+            @PathParam("id") final String id,
+            @ApiParam(
+                    value = "The command information to update.",
+                    required = true
+            )
             final Command updateCommand) throws CloudServiceException {
         LOG.debug("Called to create/update comamnd config");
         return this.ccs.updateCommand(id, updateCommand);
@@ -215,11 +284,22 @@ public class CommandConfigResourceV1 {
             value = "Delete all commands",
             notes = "Delete all available commands and get them back.",
             response = Command.class,
-            responseContainer = "List")
+            responseContainer = "List"
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK",
+                response = Command.class
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid Id supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
     public List<Command> deleteAllCommands() throws CloudServiceException {
         LOG.debug("called");
@@ -238,16 +318,29 @@ public class CommandConfigResourceV1 {
     @ApiOperation(
             value = "Delete an comamnd",
             notes = "Delete an command with the supplied id.",
-            response = Command.class)
+            response = Command.class
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Command.class),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK",
+                response = Command.class
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid Id supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
     public Command deleteCommand(
-            @ApiParam(value = "Id of the command to delete.", required = true)
-            @PathParam("id")
-            final String id) throws CloudServiceException {
+            @ApiParam(
+                    value = "Id of the command to delete.",
+                    required = true
+            )
+            @PathParam("id") final String id) throws CloudServiceException {
         LOG.debug("Called");
         return this.ccs.deleteCommand(id);
     }
@@ -269,17 +362,32 @@ public class CommandConfigResourceV1 {
             value = "Add new configuration files to a command",
             notes = "Add the supplied configuration files to the command with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK"
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid ID supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
     public Set<String> addConfigsForCommand(
-            @ApiParam(value = "Id of the command to add configuration to.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The configuration files to add.", required = true)
+            @ApiParam(
+                    value = "Id of the command to add configuration to.",
+                    required = true
+            )
+            @PathParam("id") final String id,
+            @ApiParam(
+                    value = "The configuration files to add.",
+                    required = true
+            )
             final Set<String> configs) throws CloudServiceException {
         LOG.debug("Called with id " + id + " and config " + configs);
         return this.ccs.addConfigsForCommand(id, configs);
@@ -300,16 +408,28 @@ public class CommandConfigResourceV1 {
             value = "Get the configuration files for a command",
             notes = "Get the configuration files for the command with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK"
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid ID supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
     public Set<String> getConfigsForCommand(
-            @ApiParam(value = "Id of the command to get configurations for.", required = true)
-            @PathParam("id")
-            final String id) throws CloudServiceException {
+            @ApiParam(
+                    value = "Id of the command to get configurations for.",
+                    required = true
+            )
+            @PathParam("id") final String id) throws CloudServiceException {
         LOG.debug("Called with id " + id);
         return this.ccs.getConfigsForCommand(id);
     }
@@ -332,17 +452,32 @@ public class CommandConfigResourceV1 {
             value = "Update configuration files for an command",
             notes = "Replace the existing configuration files for command with given id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK"
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid ID supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
     public Set<String> updateConfigsForCommand(
-            @ApiParam(value = "Id of the command to update configurations for.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The configuration files to replace existing with.", required = true)
+            @ApiParam(
+                    value = "Id of the command to update configurations for.",
+                    required = true
+            )
+            @PathParam("id") final String id,
+            @ApiParam(
+                    value = "The configuration files to replace existing with.",
+                    required = true
+            )
             final Set<String> configs) throws CloudServiceException {
         LOG.debug("Called with id " + id + " and configs " + configs);
         return this.ccs.updateConfigsForCommand(id, configs);
@@ -362,178 +497,161 @@ public class CommandConfigResourceV1 {
             value = "Remove all configuration files from an command",
             notes = "Remove all the configuration files from the command with given id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK"
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid Id supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
     public Set<String> removeAllConfigsForCommand(
-            @ApiParam(value = "Id of the command to delete from.", required = true)
-            @PathParam("id")
-            final String id) throws CloudServiceException {
+            @ApiParam(
+                    value = "Id of the command to delete from.",
+                    required = true
+            )
+            @PathParam("id") final String id) throws CloudServiceException {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllConfigsForCommand(id);
     }
 
     /**
-     * Add new applications to the given command.
+     * Set the application for the given command.
      *
      * @param id The id of the command to add the applications to. Not
      * null/empty/blank.
-     * @param applications The applications to add. Not null.
+     * @param application The application to set. Not null.
      * @return The active applications for this command.
      * @throws CloudServiceException
      */
     @POST
-    @Path("/{id}/applications")
+    @Path("/{id}/application")
     @Consumes({
         MediaType.APPLICATION_XML,
         MediaType.APPLICATION_JSON
     })
     @ApiOperation(
-            value = "Add new applications to a command",
-            notes = "Add the supplied applications to the command with the supplied id."
-            + " Applications should already have been created.",
-            response = Application.class,
-            responseContainer = "Set")
+            value = "Set the application for a command",
+            notes = "Set the supplied application to the command "
+            + "with the supplied id. Applications should already "
+            + "have been created.",
+            response = Application.class
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK"
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid ID supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
-    public List<Application> addApplicationsForCommand(
-            @ApiParam(value = "Id of the command to add applications to.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The applications to add.", required = true)
-            final List<Application> applications) throws CloudServiceException {
-        LOG.debug("Called with id " + id + " and applications " + applications);
-        return this.ccs.addApplicationsForCommand(id, applications);
+    public Application setApplicationForCommand(
+            @ApiParam(
+                    value = "Id of the command to set application for.",
+                    required = true
+            )
+            @PathParam("id") final String id,
+            @ApiParam(
+                    value = "The application to add.",
+                    required = true
+            )
+            final Application application) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and application " + application);
+        return this.ccs.setApplicationForCommand(id, application);
     }
 
     /**
-     * Get all the applications configured for a given command.
+     * Get the application configured for a given command.
      *
      * @param id The id of the command to get the application files for. Not
      * NULL/empty/blank.
-     * @return The active set of applications for the command.
+     * @return The active application for the command.
      * @throws CloudServiceException
      */
     @GET
-    @Path("/{id}/applications")
+    @Path("/{id}/application")
     @ApiOperation(
-            value = "Get the applications for a command",
-            notes = "Get the applications for the command with the supplied id.",
-            response = Application.class,
-            responseContainer = "Set")
+            value = "Get the application for a command",
+            notes = "Get the application for the command with the supplied id.",
+            response = Application.class
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK",
+                response = Application.class
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid ID supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
-    public List<Application> getApplicationsForCommand(
-            @ApiParam(value = "Id of the command to get configurations for.", required = true)
-            @PathParam("id")
-            final String id) throws CloudServiceException {
+    public Application getApplicationForCommand(
+            @ApiParam(
+                    value = "Id of the command to get the application for.",
+                    required = true
+            )
+            @PathParam("id") final String id) throws CloudServiceException {
         LOG.debug("Called with id " + id);
-        return this.ccs.getApplicationsForCommand(id);
+        return this.ccs.getApplicationForCommand(id);
     }
 
     /**
-     * Update the applications for a given command.
-     *
-     * @param id The id of the command to update the configuration files for.
-     * Not null/empty/blank.
-     * @param applications The applications to replace existing applications
-     * with. Not null/empty/blank.
-     * @return The new set of applications for the command.
-     * @throws CloudServiceException
-     */
-    @PUT
-    @Path("/{id}/applications")
-    @Consumes({
-        MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
-    })
-    @ApiOperation(
-            value = "Update the applications for an command",
-            notes = "Replace the existing application files for command with given id.",
-            response = Application.class,
-            responseContainer = "Set")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
-    })
-    public List<Application> updateApplicationsForCommand(
-            @ApiParam(value = "Id of the command to update configurations for.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The applications to replace existing with. Should already be created",
-                    required = true)
-            final List<Application> applications) throws CloudServiceException {
-        LOG.debug("Called with id " + id + " and configs " + applications);
-        return this.ccs.updateApplicationsForCommand(id, applications);
-    }
-
-    /**
-     * Remove the all applications from a given command.
-     *
-     * @param id The id of the command to delete the applications from. Not
-     * null/empty/blank.
-     * @return Empty set if successful
-     * @throws CloudServiceException
-     */
-    @DELETE
-    @Path("/{id}/applications")
-    @ApiOperation(
-            value = "Remove all applications from an command",
-            notes = "Remove all the applications from the command with given id.",
-            response = Application.class,
-            responseContainer = "Set")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
-    })
-    public List<Application> removeAllApplicationsForCommand(
-            @ApiParam(value = "Id of the command to delete from.", required = true)
-            @PathParam("id")
-            final String id) throws CloudServiceException {
-        LOG.debug("Called with id " + id);
-        return this.ccs.removeAllApplicationsForCommand(id);
-    }
-
-    /**
-     * Remove an application from a given command.
+     * Remove the application from a given command.
      *
      * @param id The id of the command to delete the application from. Not
      * null/empty/blank.
-     * @param appId The id of the application to remove. Not null/empty/blank.
      * @return The active set of applications for the command.
      * @throws CloudServiceException
      */
     @DELETE
-    @Path("/{id}/applications/{appId}")
+    @Path("/{id}/application")
     @ApiOperation(
-            value = "Remove a configuration file from an command",
-            notes = "Remove the given configuration file from the command with given id.",
-            response = String.class,
-            responseContainer = "Set")
+            value = "Remove an application from a command",
+            notes = "Remove the application from the command with given id.",
+            response = Application.class
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK",
+                response = Application.class
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid ID supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
-    public List<Application> removeApplicationForCommand(
-            @ApiParam(value = "Id of the command to delete from.", required = true)
-            @PathParam("id")
-            final String id,
-            @ApiParam(value = "The id of the application to remove.", required = true)
-            @PathParam("appId")
-            final String appId) throws CloudServiceException {
-        LOG.debug("Called with id " + id + " and application id " + appId);
-        return this.ccs.removeApplicationForCommand(id, appId);
+    public Application removeApplicationForCommand(
+            @ApiParam(
+                    value = "Id of the command to delete from.",
+                    required = true
+            )
+            @PathParam("id") final String id) throws CloudServiceException {
+        LOG.debug("Called with id '" + id + "'.");
+        return this.ccs.removeApplicationForCommand(id);
     }
 
     /**
@@ -550,16 +668,28 @@ public class CommandConfigResourceV1 {
             value = "Get the clusters this command is associated with",
             notes = "Get the clusters which this command exists on supports.",
             response = Cluster.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid id supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+        @ApiResponse(
+                code = 200,
+                message = "OK"
+        ),
+        @ApiResponse(
+                code = 400,
+                message = "Invalid id supplied"
+        ),
+        @ApiResponse(
+                code = 404,
+                message = "Command not found"
+        )
     })
     public Set<Cluster> getClustersForCommand(
-            @ApiParam(value = "Id of the command to get the clusters for.", required = true)
-            @PathParam("id")
-            final String id) throws CloudServiceException {
+            @ApiParam(
+                    value = "Id of the command to get the clusters for.",
+                    required = true
+            )
+            @PathParam("id") final String id) throws CloudServiceException {
         LOG.debug("Called with id " + id);
         return this.ccs.getClustersForCommand(id);
     }

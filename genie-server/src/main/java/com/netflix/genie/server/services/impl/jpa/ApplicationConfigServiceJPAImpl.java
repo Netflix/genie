@@ -25,6 +25,7 @@ import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -209,13 +210,12 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
-        final Set<Command> commands = app.getCommands();
-        if (commands != null) {
+        
+        if (app.getCommands() != null) {
+            final Set<Command> commands = new HashSet<Command>();
+            commands.addAll(app.getCommands());
             for (final Command command : commands) {
-                final List<Application> apps = command.getApplications();
-                if (apps != null) {
-                    apps.remove(app);
-                }
+                command.setApplication(null);
             }
         }
         this.applicationRepo.delete(app);

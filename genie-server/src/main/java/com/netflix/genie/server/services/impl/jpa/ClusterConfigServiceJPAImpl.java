@@ -216,7 +216,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
                 predicates.add(cb.equal(c.get(Cluster_.status), ClusterStatus.UP));
                 if (StringUtils.isNotEmpty(applicationId) || StringUtils.isNotEmpty(applicationName)) {
-                    final Join<Command, Application> apps = commands.join(Command_.applications);
+                    final Join<Command, Application> apps = commands.join(Command_.application);
                     if (StringUtils.isNotEmpty(applicationId)) {
                         predicates.add(cb.equal(apps.get(Application_.id), applicationId));
                     } else {

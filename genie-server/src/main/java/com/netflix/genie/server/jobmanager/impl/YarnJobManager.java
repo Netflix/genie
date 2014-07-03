@@ -27,6 +27,7 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobMonitor;
+import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.util.StringUtil;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,8 +41,6 @@ import java.util.Set;
 import javax.activation.DataHandler;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,9 +61,7 @@ public class YarnJobManager implements JobManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(YarnJobManager.class);
 
-    @PersistenceContext
-    private EntityManager em;
-
+    private final CommandRepository commandRepo;
     private final JobMonitor jobMonitor;
     private final Thread jobMonitorThread;
 
@@ -97,7 +94,7 @@ public class YarnJobManager implements JobManager {
     /**
      * The environment variables for this job.
      */
-    private Map<String, String> env;
+    private final Map<String, String> env = new HashMap<String, String>();
 
     /**
      * Reference to the cluster configuration element to run the job on.
@@ -129,12 +126,16 @@ public class YarnJobManager implements JobManager {
      * balancer.
      *
      * @param jobMonitor The job monitor object to use.
+     * @param commandRepo The command repository to use.
      * @throws CloudServiceException if there is any error in initialization
      */
     @Inject
-    public YarnJobManager(final JobMonitor jobMonitor) throws CloudServiceException {
+    public YarnJobManager(
+            final JobMonitor jobMonitor,
+            final CommandRepository commandRepo) throws CloudServiceException {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
+        this.commandRepo = commandRepo;
     }
 
     /**
@@ -154,36 +155,37 @@ public class YarnJobManager implements JobManager {
     /**
      * Initialize, and launch the job once it has been initialized.
      *
-     * @param jInfo the JobInfo object for the job to be launched
+     * @param job the JobInfo object for the job to be launched
      * @throws CloudServiceException if there is any error in the job launch
      */
     @Override
-    public void launch(final Job jInfo) throws CloudServiceException {
+    public void launch(final Job job) throws CloudServiceException {
         LOG.info("called");
 
         // initialize all the arguments and environment
-        init(jInfo);
+        init(job);
 
         // create the ProcessBuilder for this process
-        ProcessBuilder pb = new ProcessBuilder(this.args);
+        final ProcessBuilder pb = new ProcessBuilder(this.args);
 
         // set current working directory for the process
-        String cWorkingDir = env.get("BASE_USER_WORKING_DIR") + File.separator
-                + ji.getId();
-        File userJobDir = new File(cWorkingDir);
+        final String cWorkingDir = this.env.get("BASE_USER_WORKING_DIR")
+                + File.separator
+                + this.ji.getId();
+        final File userJobDir = new File(cWorkingDir);
 
         // check if working directory already exists
         if (userJobDir.exists()) {
-            String msg = "User staging directory already exists";
-            ji.setJobStatus(JobStatus.FAILED, msg);
-            LOG.error(ji.getStatusMsg() + ": "
+            final String msg = "User staging directory already exists";
+            this.ji.setJobStatus(JobStatus.FAILED, msg);
+            LOG.error(this.ji.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
         // create the working directory
-        boolean resMkDir = userJobDir.mkdirs();
+        final boolean resMkDir = userJobDir.mkdirs();
         if (!resMkDir) {
             String msg = "User staging directory can't be created";
             ji.setJobStatus(JobStatus.FAILED, msg);
@@ -195,17 +197,17 @@ public class YarnJobManager implements JobManager {
         pb.directory(userJobDir);
 
         // copy over the attachments if they exist
-        if (ji.getAttachments() != null) {
+        if (this.ji.getAttachments() != null) {
             for (final FileAttachment attachment : ji.getAttachments()) {
                 // basic error checking
                 if ((attachment.getName() == null) || (attachment.getName().isEmpty())) {
-                    String msg = "File attachment is missing required parameter name";
+                    final String msg = "File attachment is missing required parameter name";
                     LOG.error(msg);
                     throw new CloudServiceException(
                             HttpURLConnection.HTTP_BAD_REQUEST, msg);
                 }
                 if (attachment.getData() == null) {
-                    String msg = "File attachment is missing required parameter data";
+                    final String msg = "File attachment is missing required parameter data";
                     LOG.error(msg);
                     throw new CloudServiceException(
                             HttpURLConnection.HTTP_BAD_REQUEST, msg);
@@ -215,10 +217,10 @@ public class YarnJobManager implements JobManager {
                 FileOutputStream output = null;
                 try {
                     output = new FileOutputStream(cWorkingDir + File.separator + attachment.getName());
-                    DataHandler inputHandler = attachment.getData();
+                    final DataHandler inputHandler = attachment.getData();
                     inputHandler.writeTo(output);
-                } catch (IOException e) {
-                    String msg = "Unable to copy attachment correctly: " + attachment.getName();
+                } catch (final IOException e) {
+                    final String msg = "Unable to copy attachment correctly: " + attachment.getName();
                     LOG.error(msg);
                     throw new CloudServiceException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
@@ -237,24 +239,24 @@ public class YarnJobManager implements JobManager {
         }
 
         // set environment variables for the process
-        Map<String, String> penv = pb.environment();
+        final Map<String, String> pEnv = pb.environment();
 
-        penv.putAll(env);
+        pEnv.putAll(this.env);
 
         LOG.info("Setting job working dir , conf dir and jar dir");
         // setup env for current job, conf and jar directories directories
-        penv.put("CURRENT_JOB_WORKING_DIR", cWorkingDir);
-        penv.put("CURRENT_JOB_CONF_DIR", cWorkingDir + "/conf");
-        penv.put("CURRENT_JOB_JAR_DIR", cWorkingDir + "/jars");
+        pEnv.put("CURRENT_JOB_WORKING_DIR", cWorkingDir);
+        pEnv.put("CURRENT_JOB_CONF_DIR", cWorkingDir + "/conf");
+        pEnv.put("CURRENT_JOB_JAR_DIR", cWorkingDir + "/jars");
 
         // setup the HADOOP_CONF_DIR
-        penv.put("HADOOP_CONF_DIR", cWorkingDir + "/conf");
+        pEnv.put("HADOOP_CONF_DIR", cWorkingDir + "/conf");
 
         int pid;
         try {
             // launch job, and get process handle
             final Process proc = pb.start();
-            pid = getProcessId(proc);
+            pid = this.getProcessId(proc);
             this.ji.setProcessHandle(pid);
 
             // set off monitor thread for the job
@@ -263,10 +265,10 @@ public class YarnJobManager implements JobManager {
             this.jobMonitor.setWorkingDir(cWorkingDir);
             this.jobMonitorThread.start();
             this.ji.setJobStatus(JobStatus.RUNNING, "Job is running");
-        } catch (IOException e) {
-            String msg = "Failed to launch the job";
+        } catch (final IOException e) {
+            final String msg = "Failed to launch the job";
             LOG.error(msg, e);
-            ji.setJobStatus(JobStatus.FAILED, msg);
+            this.ji.setJobStatus(JobStatus.FAILED, msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
@@ -351,7 +353,7 @@ public class YarnJobManager implements JobManager {
         }
 
         // construct the environment variables
-        this.env = initEnv(job);
+        initEnv(job);
 
         // construct command-line args
         this.args = initArgs(job);
@@ -363,186 +365,138 @@ public class YarnJobManager implements JobManager {
     /**
      * Set/initialize environment variables for this job.
      *
-     * @param ji2 job info object for this job
-     * @return a map containing environment variables for this job
+     * @param job job info object for this job
      * @throws CloudServiceException if there is any error in initialization
      */
     @Transactional(readOnly = true)
-    protected Map<String, String> initEnv(Job ji2) throws CloudServiceException {
+    protected void initEnv(final Job job) throws CloudServiceException {
         LOG.info("called");
 
-        Map<String, String> hEnv = new HashMap<String, String>();
-
-        if ((ji2.getFileDependencies() != null)
-                && (!ji2.getFileDependencies().isEmpty())) {
-            hEnv.put("CURRENT_JOB_FILE_DEPENDENCIES", ji2.getFileDependencies());
+        if (job.getFileDependencies() != null
+                && !job.getFileDependencies().isEmpty()) {
+            this.env.put("CURRENT_JOB_FILE_DEPENDENCIES", job.getFileDependencies());
         }
 
         // set the hadoop-related conf files
-        Set<String> clusterConfigs = this.cluster.getConfigs();
+        final Set<String> clusterConfigs = this.cluster.getConfigs();
 
-        hEnv.put("S3_CLUSTER_CONF_FILES", convertCollectionToCSV(clusterConfigs));
+        this.env.put("S3_CLUSTER_CONF_FILES", convertCollectionToCSV(clusterConfigs));
 
         Command command = null;
-        Application application = null;
-        boolean done = false;
 
         // If Command Id is specified use directly.
-        //If command Name is specified iterate through the commands in the cluster to get the Id that matches.
-        // To select a command you also have to iterate through the applications if specified to find the one
-        // that will be matched to execute the command.
-        if ((ji2.getCommandId() != null) && (!(ji2.getCommandId().isEmpty()))) {
-            String cmdId = ji2.getCommandId();
-
-            command = this.em.find(Command.class, cmdId);
-            for (final Application ace : command.getApplications()) {
-                // If appid is specified check against it. If matches set It and break
-                if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {
-                    if (ace.getId().equals(ji2.getApplicationId())) {
-                        application = ace;
-                        break;
-                    }
-                    // If appName is specified check the name. if matches set it and break
-                } else if ((ji2.getApplicationName() != null) && ((!ji2.getApplicationName().isEmpty()))) {
-                    if (ace.getName().equals(ji2.getApplicationName())) {
-                        application = ace;
-                        break;
-                    }
-                    // If appName and appId are not specified use the first app for the command as default value
-                } else {
-                    //appId = ace.getId();
-                    application = ace;
-                    break;
-                }
-            }
-        } else if ((ji2.getCommandName() != null) && (!(ji2.getCommandName().isEmpty()))) {
+        // If command Name is specified iterate through the commands in the cluster to get the Id that matches.
+        if (StringUtils.isNotBlank(job.getCommandId())) {
+            command = this.commandRepo.findOne(job.getCommandId());
+        } else if (StringUtils.isNoneBlank(job.getCommandName())) {
             // Iterate through the commands the cluster supports and find the command that matches.
             // There has to be one that matches, else the getCluster wouldn't have.
-            // Check the applications as well
-            for (final Command cce : cluster.getCommands()) {
-                if (cce.getName().equals(ji2.getCommandName())) {
-                    // Name matches. Check Application Details
-                    for (final Application ace : cce.getApplications()) {
-                        // If appid is specified check against it. If matches set It and break
-                        if ((ji2.getApplicationId() != null) && ((!ji2.getApplicationId().isEmpty()))) {
-                            if (ace.getId().equals(ji2.getApplicationId())) {
-                                command = cce;
-                                application = ace;
-                                done = true;
-                                break;
-                            }
-                            // If appName is specified check the name. if matches set it and break
-                        } else if ((ji2.getApplicationName() != null) && ((!ji2.getApplicationName().isEmpty()))) {
-                            if (ace.getName().equals(ji2.getApplicationName())) {
-                                command = cce;
-                                application = ace;
-                                done = true;
-                                break;
-                            }
-                            // If appName and appId are not specified use the first app for the command as default value
-                        } else {
-                            command = cce;
-                            application = ace;
-                            done = true;
-                            break;
-                        }
-                    }
-                    if (done) {
-                        break;
-                    }
+            //TODO: Optimize via query
+            for (final Command cce : this.cluster.getCommands()) {
+                if (cce.getName().equals(job.getCommandName())) {
+                    command = cce;
+                    break;
                 }
             }
         }
 
         //Avoiding NPE
         if (command == null) {
-            final String msg = "No command found. Unable to continue.";
+            final String msg = "No command found for params. Unable to continue.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    msg);
         }
 
         // save the command name, application id and application name
-        ji2.setCommandId(command.getId());
-        ji2.setCommandName(command.getName());
+        job.setCommandId(command.getId());
+        job.setCommandName(command.getName());
 
+        final Application application = command.getApplication();
         if (application != null) {
-            ji2.setApplicationId(application.getId());
-            ji2.setApplicationName(application.getName());
+            job.setApplicationId(application.getId());
+            job.setApplicationName(application.getName());
 
-            if ((application.getConfigs() != null) && (!application.getConfigs().isEmpty())) {
-                hEnv.put("S3_APPLICATION_CONF_FILES", convertCollectionToCSV(application.getConfigs()));
+            if (application.getConfigs() != null && !application.getConfigs().isEmpty()) {
+                this.env.put("S3_APPLICATION_CONF_FILES", convertCollectionToCSV(application.getConfigs()));
             }
 
-            if ((application.getJars() != null) && (!application.getJars().isEmpty())) {
-                hEnv.put("S3_APPLICATION_JAR_FILES", convertCollectionToCSV(application.getJars()));
+            if (application.getJars() != null && !application.getJars().isEmpty()) {
+                this.env.put("S3_APPLICATION_JAR_FILES", convertCollectionToCSV(application.getJars()));
             }
 
-            if ((application.getEnvPropFile() != null) && (!application.getEnvPropFile().isEmpty())) {
-                hEnv.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
+            if (StringUtils.isNotBlank(application.getEnvPropFile())) {
+                this.env.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
             }
         }
 
         //Command ce = pmCommand.getEntity(cmdId, Command.class);
-        if ((command.getConfigs() != null) && (!command.getConfigs().isEmpty())) {
-            hEnv.put("S3_COMMAND_CONF_FILES", convertCollectionToCSV(command.getConfigs()));
+        if (command.getConfigs() != null && !command.getConfigs().isEmpty()) {
+            this.env.put("S3_COMMAND_CONF_FILES", convertCollectionToCSV(command.getConfigs()));
         }
 
         this.executable = command.getExecutable();
 
         // save the cluster name and id
-        ji2.setExecutionClusterName(cluster.getName());
-        ji2.setExecutionClusterId(cluster.getId());
+        job.setExecutionClusterName(cluster.getName());
+        job.setExecutionClusterId(cluster.getId());
 
         // Get envPropertyFile for command and job and set env variable
-        if ((command.getEnvPropFile() != null) && (!command.getEnvPropFile().isEmpty())) {
-            hEnv.put("COMMAND_ENV_FILE", command.getEnvPropFile());
+        if (StringUtils.isNotBlank(command.getEnvPropFile())) {
+            this.env.put("COMMAND_ENV_FILE", command.getEnvPropFile());
         }
 
-        if ((ji2.getEnvPropFile() != null) && (!ji2.getEnvPropFile().isEmpty())) {
-            hEnv.put("JOB_ENV_FILE", ji2.getEnvPropFile());
+        if (StringUtils.isNotBlank(job.getEnvPropFile())) {
+            this.env.put("JOB_ENV_FILE", job.getEnvPropFile());
         }
 
         // put the user name for hadoop to use
-        hEnv.put("HADOOP_USER_NAME", ji2.getUser());
+        this.env.put("HADOOP_USER_NAME", job.getUser());
 
         // this is for the generic joblauncher.sh to use to create username
         // on the machine if needed
-        hEnv.put("USER_NAME", ji2.getUser());
+        this.env.put("USER_NAME", job.getUser());
 
         // add the group name
         String groupName = HADOOP_GROUP_NAME;
-        if (ji2.getGroup() != null) {
-            groupName = ji2.getGroup();
-            hEnv.put("GROUP_NAME", groupName);
+        if (job.getGroup() != null) {
+            groupName = job.getGroup();
+            this.env.put("GROUP_NAME", groupName);
         }
-        hEnv.put("HADOOP_GROUP_NAME", groupName);
+        this.env.put("HADOOP_GROUP_NAME", groupName);
 
         // set the java home
-        String javaHome = ConfigurationManager.getConfigInstance().
-                getString("netflix.genie.server.java.home");
-        if ((javaHome != null) && (!javaHome.isEmpty())) {
-            hEnv.put("JAVA_HOME", javaHome);
+        final String javaHome = ConfigurationManager
+                .getConfigInstance()
+                .getString("netflix.genie.server.java.home");
+        if (StringUtils.isNotBlank(javaHome)) {
+            this.env.put("JAVA_HOME", javaHome);
         }
 
         // set the genie home
-        String genieHome = ConfigurationManager.getConfigInstance()
+        final String genieHome = ConfigurationManager
+                .getConfigInstance()
                 .getString("netflix.genie.server.sys.home");
-        if ((genieHome == null) || genieHome.isEmpty()) {
-            String msg = "Property netflix.genie.server.sys.home is not set correctly";
+        if (StringUtils.isBlank(genieHome)) {
+            final String msg = "Property netflix.genie.server.sys.home is not set correctly";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    msg);
         }
-        hEnv.put("XS_SYSTEM_HOME", genieHome);
+        this.env.put("XS_SYSTEM_HOME", genieHome);
 
         // if the cluster version is provided, overwrite the HADOOP_HOME
         // environment variable
         String hadoopHome;
         if (this.cluster.getVersion() != null) {
-            String hadoopVersion = cluster.getVersion();
+            String hadoopVersion = this.cluster.getVersion();
             LOG.debug("Hadoop Version of the cluster: " + hadoopVersion);
 
             // try exact version first
-            hadoopHome = ConfigurationManager.getConfigInstance()
+            hadoopHome = ConfigurationManager
+                    .getConfigInstance()
                     .getString(
                             "netflix.genie.server.hadoop." + hadoopVersion
                             + ".home");
@@ -555,7 +509,7 @@ public class YarnJobManager implements JobManager {
                                 + ".home");
             }
 
-            if ((hadoopHome == null) || (!new File(hadoopHome).exists())) {
+            if (hadoopHome == null || !new File(hadoopHome).exists()) {
                 String msg = "This genie instance doesn't support Hadoop version: "
                         + hadoopVersion;
                 LOG.error(msg);
@@ -565,71 +519,76 @@ public class YarnJobManager implements JobManager {
 
             LOG.info("Overriding HADOOP_HOME from cluster config to: "
                     + hadoopHome);
-            hEnv.put("HADOOP_HOME", hadoopHome);
+            this.env.put("HADOOP_HOME", hadoopHome);
         } else {
             // set the default hadoop home
-            hadoopHome = ConfigurationManager.getConfigInstance().
-                    getString("netflix.genie.server.hadoop.home");
-            if ((hadoopHome == null) || (!new File(hadoopHome).exists())) {
-                String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
+            hadoopHome = ConfigurationManager
+                    .getConfigInstance()
+                    .getString("netflix.genie.server.hadoop.home");
+            if (hadoopHome == null || !new File(hadoopHome).exists()) {
+                final String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
                 LOG.error(msg);
                 throw new CloudServiceException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
             }
-            hEnv.put("HADOOP_HOME", hadoopHome);
+            this.env.put("HADOOP_HOME", hadoopHome);
         }
 
         // populate the CP timeout and other options. Yarn jobs would use
         // hadoop fs -cp to copy files. Prepare the copy command with the combination
         // and set the COPY_COMMAND environment variable
-        hEnv.put("CP_TIMEOUT",
+        this.env.put("CP_TIMEOUT",
                 ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
 
-        String cpOpts;
-        cpOpts = ConfigurationManager.getConfigInstance()
+        final String cpOpts = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server.hadoop.s3cp.opts", "");
 
-        String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp";
-        hEnv.put("COPY_COMMAND", copyCommand);
+        final String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp";
+        this.env.put("COPY_COMMAND", copyCommand);
 
-        String mkdirCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -mkdir";
-        hEnv.put("MKDIR_COMMAND", mkdirCommand);
+        final String mkdirCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -mkdir";
+        this.env.put("MKDIR_COMMAND", mkdirCommand);
 
         // set the base working directory
-        String baseUserWorkingDir = ConfigurationManager.getConfigInstance().
-                getString("netflix.genie.server.user.working.dir");
-        if ((baseUserWorkingDir == null) || (baseUserWorkingDir.isEmpty())) {
-            String msg = "Property netflix.genie.server.user.working.dir is not set";
+        final String baseUserWorkingDir = ConfigurationManager
+                .getConfigInstance()
+                .getString("netflix.genie.server.user.working.dir");
+        if (StringUtils.isBlank(baseUserWorkingDir)) {
+            final String msg = "Property netflix.genie.server.user.working.dir is not set";
             LOG.error(msg);
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         } else {
-            hEnv.put("BASE_USER_WORKING_DIR", baseUserWorkingDir);
+            this.env.put("BASE_USER_WORKING_DIR", baseUserWorkingDir);
         }
 
         // set the archive location
         // unless user has explicitly requested for it to be disabled
-        if (!ji2.isDisableLogArchival()) {
-            String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
+        if (!job.isDisableLogArchival()) {
+            final String s3ArchiveLocation = ConfigurationManager
+                    .getConfigInstance()
                     .getString("netflix.genie.server.s3.archive.location");
-            if ((s3ArchiveLocation != null) && (!s3ArchiveLocation.isEmpty())) {
-                hEnv.put("S3_ARCHIVE_LOCATION", s3ArchiveLocation);
+            if (StringUtils.isNotBlank(s3ArchiveLocation)) {
+                this.env.put("S3_ARCHIVE_LOCATION", s3ArchiveLocation);
             }
         }
 
         // set the variables to be added to the core-site xml. Format of this variable is:
         // key1=value1;key2=value2;key3=value3
-        hEnv.put("CORE_SITE_XML_ARGS", genieJobIDProp + ";" + netflixEnvProp + ";" + lipstickUuidProp);
-
-        return hEnv;
+        this.env.put("CORE_SITE_XML_ARGS",
+                this.genieJobIDProp
+                + ";"
+                + this.netflixEnvProp
+                + ";"
+                + this.lipstickUuidProp);
     }
 
     /**
-     * Converts a list of strings to a csv.
+     * Converts a list of strings to a CSV.
      *
      * @param list ArrayList object contains the strings
-     * @return a string containing the other strings as csv
+     * @return a string containing the other strings as CSV
      */
     protected String convertCollectionToCSV(final Collection<String> list) {
         return StringUtils.join(list, ",");
@@ -669,10 +628,22 @@ public class YarnJobManager implements JobManager {
      * @return -D style params including genie job id and netflix environment
      */
     protected String[] getGenieCmdArgs() {
-        if (lipstickUuidProp == null) {
-            return new String[]{"-D", genieJobIDProp, "-D", netflixEnvProp};
+        if (this.lipstickUuidProp == null) {
+            return new String[]{
+                "-D",
+                this.genieJobIDProp,
+                "-D",
+                this.netflixEnvProp
+            };
         } else {
-            return new String[]{"-D", genieJobIDProp, "-D", netflixEnvProp, "-D", lipstickUuidProp};
+            return new String[]{
+                "-D",
+                this.genieJobIDProp,
+                "-D",
+                this.netflixEnvProp,
+                "-D",
+                this.lipstickUuidProp
+            };
         }
     }
 
@@ -683,11 +654,11 @@ public class YarnJobManager implements JobManager {
      * @return pid for this process
      * @throws CloudServiceException if there is an error getting the process id
      */
-    protected int getProcessId(Process proc) throws CloudServiceException {
+    protected int getProcessId(final Process proc) throws CloudServiceException {
         LOG.debug("called");
 
         try {
-            Field f = proc.getClass().getDeclaredField("pid");
+            final Field f = proc.getClass().getDeclaredField("pid");
             f.setAccessible(true);
             return f.getInt(proc);
         } catch (Exception e) {

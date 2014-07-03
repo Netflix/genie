@@ -209,13 +209,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     "No command with id " + id + " exists to delete.");
         }
         //Remove the command from the associated Application references
-        final List<Application> apps = command.getApplications();
-        if (apps != null) {
-            for (final Application app : apps) {
-                final Set<Command> commands = app.getCommands();
-                if (commands != null) {
-                    commands.remove(command);
-                }
+        final Application app = command.getApplication();
+        if (app != null) {
+            final Set<Command> commands = app.getCommands();
+            if (commands != null) {
+                commands.remove(command);
             }
         }
         this.commandRepo.delete(command);
@@ -358,27 +356,30 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public List<Application> addApplicationsForCommand(
+    public Application setApplicationForCommand(
             final String id,
-            final List<Application> applications) throws CloudServiceException {
+            final Application application) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to add applications.");
         }
+        if (application == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application entered. Unable to set application.");
+        }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            for (final Application detached : applications) {
-                final Application app = this.appRepo.findOne(detached.getId());
-                if (app != null) {
-                    command.addApplication(app);
-                } else {
-                    throw new CloudServiceException(
-                            HttpURLConnection.HTTP_NOT_FOUND,
-                            "No application with id " + detached.getId() + " exists.");
-                }
+            final Application app = this.appRepo.findOne(application.getId());
+            if (app != null) {
+                command.setApplication(app);
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No application with id " + application.getId() + " exists.");
             }
-            return command.getApplications();
+            return command.getApplication();
         } else {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,
@@ -393,7 +394,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Application> getApplicationsForCommand(
+    public Application getApplicationForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
@@ -402,39 +403,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            return command.getApplications();
-        } else {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
-     */
-    @Override
-    public List<Application> updateApplicationsForCommand(
-            final String id,
-            final List<Application> applications) throws CloudServiceException {
-        if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered. Unable to update applications.");
-        }
-        final Command command = this.commandRepo.findOne(id);
-        if (command != null) {
-            final List<Application> apps = new ArrayList<Application>();
-            for (final Application detached : applications) {
-                final Application app = this.appRepo.findOne(detached.getId());
-                if (app != null) {
-                    apps.add(app);
-                }
+            final Application app = command.getApplication();
+            if (app != null) {
+                return app;
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No application set for command with id '" + id + "'.");
             }
-            command.setApplications(apps);
-            return command.getApplications();
         } else {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,
@@ -448,50 +424,24 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
-    public List<Application> removeAllApplicationsForCommand(
+    public Application removeApplicationForCommand(
             final String id) throws CloudServiceException {
-        if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered. Unable to remove applications.");
-        }
-        final Command command = this.commandRepo.findOne(id);
-        if (command != null) {
-            command.removeAllApplications();
-            return command.getApplications();
-        } else {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
-     */
-    @Override
-    public List<Application> removeApplicationForCommand(
-            final String id,
-            final String appId) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove application.");
         }
-        if (StringUtils.isBlank(appId)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to remove application.");
-        }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            final Application app = this.appRepo.findOne(appId);
+            final Application app = command.getApplication();
             if (app != null) {
-                command.removeApplication(app);
+                command.setApplication(null);
+                return app;
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No application set for command with id '" + id + "'.");
             }
-            return command.getApplications();
         } else {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,

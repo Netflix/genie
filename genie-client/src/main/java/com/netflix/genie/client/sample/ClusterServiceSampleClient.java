@@ -98,14 +98,11 @@ public final class ClusterServiceSampleClient {
         final CommandServiceClient commandClient = CommandServiceClient.getInstance();
 
         LOG.info("Creating command pig13_mr2");
-        final List<Application> apps = new ArrayList<Application>();
-        apps.add(app1);
-        apps.add(app2);
         final Command command1 = commandClient.createCommand(
                 CommandServiceSampleClient.createSampleCommand(
                         CommandServiceSampleClient.ID));
 
-        commandClient.addApplicationsToCommand(command1.getId(), apps);
+        commandClient.setApplicationForCommand(command1.getId(), app1);
 
         LOG.info("Created command:");
         LOG.info(command1.toString());
