@@ -20,7 +20,6 @@ package com.netflix.genie.client;
 import com.google.common.collect.Multimap;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
-import static com.netflix.genie.client.BaseGenieClient.SLASH;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
@@ -331,20 +330,20 @@ public final class CommandServiceClient extends BaseGenieClient {
      *
      * @param id The id of the command to add applications to. Not
      * Null/empty/blank.
-     * @param applications The applications to add. Not null or empty.
-     * @return The new list of application files for the given command.
+     * @param application The application to set. Not null.
+     * @return The new application for the given command.
      * @throws CloudServiceException
      */
-    public List<Application> addApplicationsToCommand(
+    public Application setApplicationForCommand(
             final String id,
-            final List<Application> applications) throws CloudServiceException {
+            final Application application) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        if (applications == null || applications.isEmpty()) {
-            final String msg = "Missing required parameter: applications";
+        if (application == null) {
+            final String msg = "Missing required parameter: application";
             LOG.error(msg);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
@@ -352,22 +351,27 @@ public final class CommandServiceClient extends BaseGenieClient {
         final HttpRequest request = this.buildRequest(
                 Verb.POST,
                 StringUtils.join(
-                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "applications"},
+                        new String[]{
+                            BASE_CONFIG_COMMAND_REST_URL,
+                            id,
+                            "application"
+                        },
                         SLASH),
                 null,
-                applications);
-        return (List<Application>) this.executeRequest(request, List.class, Application.class);
+                application
+        );
+        return (Application) this.executeRequest(request, null, Application.class);
     }
 
     /**
-     * Get the active set of applications for the given command.
+     * Get the active application for the given command.
      *
-     * @param id The id of the command to get applications for. Not
-     * Null/empty/blank.
-     * @return The list of application files for the given command.
+     * @param id The id of the command to get application for. Not Null.
+     * @return The application for the given command.
      * @throws CloudServiceException
      */
-    public List<Application> getApplicationsForCommand(final String id) throws CloudServiceException {
+    public Application getApplicationForCommand(
+            final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -378,58 +382,26 @@ public final class CommandServiceClient extends BaseGenieClient {
         final HttpRequest request = this.buildRequest(
                 Verb.GET,
                 StringUtils.join(
-                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "applications"},
+                        new String[]{
+                            BASE_CONFIG_COMMAND_REST_URL,
+                            id,
+                            "application"
+                        },
                         SLASH),
                 null,
                 null);
-        return (List<Application>) this.executeRequest(request, List.class, Application.class);
+        return (Application) this.executeRequest(request, null, Application.class);
     }
 
     /**
-     * Update the applications for a given command.
+     * Remove application from a given command.
      *
-     * @param id The id of the command to update the application files for. Not
+     * @param id The id of the command to delete the application from. Not
      * null/empty/blank.
-     * @param applications The applications to replace existing application
-     * files with. Not null.
-     * @return The new list of command applications.
+     * @return The active application for the command.
      * @throws CloudServiceException
      */
-    public List<Application> updateApplicationsForCommand(
-            final String id,
-            final List<Application> applications) throws CloudServiceException {
-        if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-        if (applications == null) {
-            final String msg = "Missing required parameter: applications";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-
-        final HttpRequest request = this.buildRequest(
-                Verb.PUT,
-                StringUtils.join(
-                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "applications"},
-                        SLASH),
-                null,
-                applications);
-        return (List<Application>) this.executeRequest(request, List.class, Application.class);
-    }
-
-    /**
-     * Delete all the applications from a given command.
-     *
-     * @param id The id of the command to delete the applications from. Not
-     * null/empty/blank.
-     * @return Empty set if successful
-     * @throws CloudServiceException
-     */
-    public List<Application> removeAllApplicationsForCommand(
+    public Application removeApplicationForCommand(
             final String id) throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
@@ -441,46 +413,15 @@ public final class CommandServiceClient extends BaseGenieClient {
         final HttpRequest request = this.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
-                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "applications"},
+                        new String[]{
+                            BASE_CONFIG_COMMAND_REST_URL,
+                            id,
+                            "application"
+                        },
                         SLASH),
                 null,
                 null);
-        return (List<Application>) this.executeRequest(request, List.class, Application.class);
-    }
-
-    /**
-     * Remove an application from a given command.
-     *
-     * @param id The id of the command to delete the application from. Not
-     * null/empty/blank.
-     * @param appId The id of the application to remove. Not null/empty/blank.
-     * @return The active set of applications for the command.
-     * @throws CloudServiceException
-     */
-    public List<Application> removeApplicationForCommand(
-            final String id,
-            final String appId) throws CloudServiceException {
-        if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-        if (StringUtils.isBlank(appId)) {
-            final String msg = "Missing required parameter: appId";
-            LOG.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-
-        final HttpRequest request = this.buildRequest(
-                Verb.DELETE,
-                StringUtils.join(
-                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "applications", appId},
-                        SLASH),
-                null,
-                null);
-        return (List<Application>) this.executeRequest(request, List.class, Application.class);
+        return (Application) this.executeRequest(request, null, Application.class);
     }
 
     /**

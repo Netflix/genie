@@ -31,6 +31,8 @@ dependencies {
     provided ('javax.servlet:servlet-api:2.5')
     
     testCompile ('org.springframework:spring-test:3.2.9.RELEASE')
+    testCompile ('org.dbunit:dbunit:2.4.9')
+    testCompile ('com.github.springtestdbunit:spring-test-dbunit:1.0.1')
 }
 
 //test {

@@ -14,5 +14,5 @@
     <context:component-scan base-package="com.netflix.genie"/>
     
     <!-- Broken up context for clarity of purpose" -->
-    <import resource="jpa-context-test.xml"/>
+    <import resource="genie-jpa-test.xml"/>
 </beans>

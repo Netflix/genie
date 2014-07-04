@@ -127,7 +127,7 @@ public class Cluster extends Auditable implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the configuration"
-                    + " files needed for this cluster")
+            + " files needed for this cluster")
     private Set<String> configs;
 
     /**
@@ -138,7 +138,7 @@ public class Cluster extends Auditable implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"
-                    + " associated for this cluster")
+            + " associated for this cluster")
     private Set<String> tags;
 
     /**

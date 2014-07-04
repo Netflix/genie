@@ -66,14 +66,26 @@ public class ClusterConfigResource {
     private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigResource.class);
 
-    @Inject
-    private ClusterConfigService ccs;
+    /**
+     * The Cluster Configuration Service.
+     */
+    private final ClusterConfigService ccs;
 
     /**
      * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;
+    
+    /**
+     * Constructor.
+     * 
+     * @param ccs The cluster configuration service to use.
+     */
+    @Inject
+    public ClusterConfigResourceV1(final ClusterConfigService ccs) {
+        this.ccs = ccs;
+    }
 
     /**
      * Create cluster configuration.
@@ -83,7 +95,10 @@ public class ClusterConfigResource {
      * @throws CloudServiceException
      */
     @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Create a cluster",
             notes = "Create a cluster from the supplied information.",
@@ -96,7 +111,7 @@ public class ClusterConfigResource {
     public Response createCluster(
             @ApiParam(value = "The cluster to create.", required = true)
             final Cluster cluster)
-                    throws CloudServiceException {
+            throws CloudServiceException {
         LOG.debug("called to create new cluster");
         final Cluster createdCluster = this.ccs.createCluster(cluster);
         return Response.created(
@@ -201,7 +216,10 @@ public class ClusterConfigResource {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Update a cluster",
             notes = "Update a cluster from the supplied information.",
@@ -215,7 +233,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to update.", required = true)
             @PathParam("id")
             final String id,
-                final Cluster updateCluster) throws CloudServiceException {
+            final Cluster updateCluster) throws CloudServiceException {
         LOG.debug("called to create/update cluster");
         return this.ccs.updateCluster(id, updateCluster);
     }
@@ -400,7 +418,10 @@ public class ClusterConfigResource {
      */
     @POST
     @Path("/{id}/commands")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Add new commands to a cluster",
             notes = "Add the supplied commands to the cluster with the supplied id."
@@ -455,14 +476,17 @@ public class ClusterConfigResource {
      *
      * @param id The id of the cluster to update the configuration files for.
      * Not null/empty/blank.
-     * @param commands The commands to replace existing applications
-     * with. Not null/empty/blank.
+     * @param commands The commands to replace existing applications with. Not
+     * null/empty/blank.
      * @return The new set of commands for the cluster.
      * @throws CloudServiceException
      */
     @PUT
     @Path("/{id}/commands")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Update the commands for an cluster",
             notes = "Replace the existing commands for cluster with given id.",

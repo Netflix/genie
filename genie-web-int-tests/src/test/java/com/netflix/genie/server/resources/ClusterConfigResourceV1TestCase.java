@@ -49,7 +49,7 @@ public class ClusterConfigResourceV1TestCase {
     }
 
     /**
-     * The injected {@link HiveConfigResourceV0} class.
+     * The injected {@link ClusterConfigResourceV1} class.
      */
     @Inject
     private ClusterConfigResource resource;

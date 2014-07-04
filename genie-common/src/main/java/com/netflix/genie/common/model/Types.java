@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Common enums used by other model objects.
+ * Common enumerations used by other model objects.
  *
  * @author skrishnan
  * @author tgianos

@@ -23,9 +23,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -36,7 +34,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
-import javax.persistence.OrderColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -144,13 +142,12 @@ public class Command extends Auditable implements Serializable {
     /**
      * Set of applications that can run this command.
      */
-    @ManyToMany(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "List of applications that can run this command")
+            value = "The application this command uses.")
     @XmlTransient
     @JsonIgnore
-    @OrderColumn
-    private List<Application> applications;
+    @ManyToOne
+    private Application application;
 
     /**
      * The clusters this command is available on.
@@ -371,106 +368,37 @@ public class Command extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the applications that this command supports.
+     * Gets the application that this command uses.
      *
-     * @return applications
+     * @return application
      */
-    public List<Application> getApplications() {
-        return this.applications;
+    public Application getApplication() {
+        return this.application;
     }
 
     /**
-     * Sets the applications for this command.
+     * Sets the application for this command.
      *
-     * @param applications The applications that this command supports
+     * @param application The application that this command uses
      */
-    public void setApplications(final List<Application> applications) {
+    public void setApplication(final Application application) {
         //Clear references to this command in existing applications
-        if (this.applications != null) {
-            for (final Application app : this.applications) {
-                if (app.getCommands() != null) {
-                    app.getCommands().remove(this);
-                }
+        if (this.application != null
+                && this.application.getCommands() != null) {
+            this.application.getCommands().remove(this);
+        }
+        //set the application for this command
+        this.application = application;
+
+        //Add the reverse reference in the new applications
+        if (this.application != null) {
+            Set<Command> commands = this.application.getCommands();
+            if (commands == null) {
+                commands = new HashSet<Command>();
+                this.application.setCommands(commands);
             }
-        }
-        //set the applications for this command
-        this.applications = applications;
-
-        //Add the referse reference in the new applications
-        if (this.applications != null) {
-            for (final Application app : this.applications) {
-                Set<Command> commands = app.getCommands();
-                if (commands == null) {
-                    commands = new HashSet<Command>();
-                    app.setCommands(commands);
-                }
-                if (!commands.contains(this)) {
-                    commands.add(this);
-                }
-            }
-        }
-    }
-
-    /**
-     * Add a new application to this command. Manages both sides of
-     * relationship.
-     *
-     * @param application The application to add. Not null.
-     * @throws CloudServiceException
-     */
-    public void addApplication(final Application application)
-            throws CloudServiceException {
-        if (application == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application entered unable to add.");
-        }
-
-        if (this.applications == null) {
-            this.applications = new ArrayList<Application>();
-        }
-        this.applications.add(application);
-
-        Set<Command> commands = application.getCommands();
-        if (commands == null) {
-            commands = new HashSet<Command>();
-            application.setCommands(commands);
-        }
-        commands.add(this);
-    }
-
-    /**
-     * Remove an application from this command. Manages both sides of
-     * relationship.
-     *
-     * @param application The application to remove. Not null.
-     * @throws CloudServiceException
-     */
-    public void removeApplication(final Application application)
-            throws CloudServiceException {
-        if (application == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application entered unable to remove.");
-        }
-
-        if (this.applications != null) {
-            this.applications.remove(application);
-        }
-        if (application.getCommands() != null) {
-            application.getCommands().remove(this);
-        }
-    }
-
-    /**
-     * Remove all applications from this command.
-     *
-     * @throws CloudServiceException
-     */
-    public void removeAllApplications() throws CloudServiceException {
-        if (this.applications != null) {
-            for (final Application app : this.applications) {
-                this.removeApplication(app);
+            if (!commands.contains(this)) {
+                commands.add(this);
             }
         }
     }

@@ -17,7 +17,14 @@
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter" />
         </property>
-        <property name="persistenceUnitName" value="com.netflix.genie.persistence.test.int"/>
+        <property name="persistenceUnitName" value="com.netflix.genie.persistence"/>
+        <property name="jpaProperties">
+            <props>
+                <prop key="openjpa.jdbc.SynchronizeMappings">buildSchema(SchemaAction='add')</prop>       
+                <prop key="openjpa.DynamicEnhancementAgent">false</prop> 
+                <prop key="openjpa.RuntimeUnenhancedClasses">unsupported</prop> 
+            </props>
+        </property>
     </bean>
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
@@ -26,7 +33,7 @@
     
     <jdbc:embedded-database id="dataSource" type="HSQL"/>
     
-    <jpa:repositories base-package="com.netflix.genie.server.repository"/>
+    <jpa:repositories base-package="com.netflix.genie.server.repository.jpa"/>
     
     <tx:annotation-driven transaction-manager="transactionManager" />
 </beans>

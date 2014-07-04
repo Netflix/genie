@@ -20,10 +20,12 @@ package com.netflix.genie.server.metrics.impl;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import java.util.concurrent.atomic.AtomicLong;
-import org.junit.After;
+import javax.inject.Inject;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test case for GenieNodeStatistics.
@@ -31,27 +33,12 @@ import org.junit.Test;
  * @author skrishnan
  * @author tgianos
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:genie-application-test.xml")
 public class TestGenieNodeStatisticsImpl {
 
+    @Inject
     private GenieNodeStatistics stats;
-
-    /**
-     * Initialize stats object before any tests are run.
-     */
-    @Before
-    public void setup() {
-        this.stats = new GenieNodeStatisticsImpl();
-        this.stats.register();
-    }
-
-    /**
-     * Shutdown stats object after test is done.
-     */
-    @After
-    public void tearDown() {
-        // shut down cleanly
-        this.stats.shutdown();
-    }
 
     /**
      * Test the counter that increments 200 error codes (success).
@@ -59,11 +46,10 @@ public class TestGenieNodeStatisticsImpl {
     @Test
     public void test2xxCounter() {
         // incr 2xx count twice
-        stats.setGenie2xxCount(new AtomicLong(0));
-        stats.incrGenie2xxCount();
-        stats.incrGenie2xxCount();
-        System.out.println("Received: " + stats.getGenie2xxCount().longValue());
-        Assert.assertEquals(2L, stats.getGenie2xxCount().longValue());
+        this.stats.setGenie2xxCount(new AtomicLong(0));
+        this.stats.incrGenie2xxCount();
+        this.stats.incrGenie2xxCount();
+        Assert.assertEquals(2L, this.stats.getGenie2xxCount().longValue());
     }
 
     /**
@@ -72,13 +58,12 @@ public class TestGenieNodeStatisticsImpl {
     @Test
     public void test4xxCounter() {
         // incr 4xx count 4 times
-        stats.setGenie4xxCount(new AtomicLong(0));
-        stats.incrGenie4xxCount();
-        stats.incrGenie4xxCount();
-        stats.incrGenie4xxCount();
-        stats.incrGenie4xxCount();
-        System.out.println("Received: " + stats.getGenie4xxCount().longValue());
-        Assert.assertEquals(4L, stats.getGenie4xxCount().longValue());
+        this.stats.setGenie4xxCount(new AtomicLong(0));
+        this.stats.incrGenie4xxCount();
+        this.stats.incrGenie4xxCount();
+        this.stats.incrGenie4xxCount();
+        this.stats.incrGenie4xxCount();
+        Assert.assertEquals(4L, this.stats.getGenie4xxCount().longValue());
     }
 
     /**
@@ -87,14 +72,13 @@ public class TestGenieNodeStatisticsImpl {
     @Test
     public void test5xxCounter() {
         // incr 5xx count 5 times
-        stats.setGenie5xxCount(new AtomicLong(0));
-        stats.incrGenie5xxCount();
-        stats.incrGenie5xxCount();
-        stats.incrGenie5xxCount();
-        stats.incrGenie5xxCount();
-        stats.incrGenie5xxCount();
-        System.out.println("Received: " + stats.getGenie5xxCount().longValue());
-        Assert.assertEquals(5L, stats.getGenie5xxCount().longValue());
+        this.stats.setGenie5xxCount(new AtomicLong(0));
+        this.stats.incrGenie5xxCount();
+        this.stats.incrGenie5xxCount();
+        this.stats.incrGenie5xxCount();
+        this.stats.incrGenie5xxCount();
+        this.stats.incrGenie5xxCount();
+        Assert.assertEquals(5L, this.stats.getGenie5xxCount().longValue());
     }
 
     /**
@@ -103,9 +87,9 @@ public class TestGenieNodeStatisticsImpl {
     @Test
     public void testJobSubCounter() {
         // incr job submissions once
-        stats.setGenieJobSubmissions(new AtomicLong(0));
-        stats.incrGenieJobSubmissions();
-        Assert.assertEquals(1L, stats.getGenieJobSubmissions().longValue());
+        this.stats.setGenieJobSubmissions(new AtomicLong(0));
+        this.stats.incrGenieJobSubmissions();
+        Assert.assertEquals(1L, this.stats.getGenieJobSubmissions().longValue());
     }
 
     /**
@@ -114,9 +98,9 @@ public class TestGenieNodeStatisticsImpl {
     @Test
     public void testFailedJobCounter() {
         // incr failed jobs once
-        stats.setGenieFailedJobs(new AtomicLong(0));
-        stats.incrGenieFailedJobs();
-        Assert.assertEquals(1L, stats.getGenieFailedJobs().longValue());
+        this.stats.setGenieFailedJobs(new AtomicLong(0));
+        this.stats.incrGenieFailedJobs();
+        Assert.assertEquals(1L, this.stats.getGenieFailedJobs().longValue());
     }
 
     /**
@@ -125,10 +109,10 @@ public class TestGenieNodeStatisticsImpl {
     @Test
     public void testKilledJobCounter() {
         // incr killed jobs twice
-        stats.setGenieKilledJobs(new AtomicLong(0));
-        stats.incrGenieKilledJobs();
-        stats.incrGenieKilledJobs();
-        Assert.assertEquals(2L, stats.getGenieKilledJobs().longValue());
+        this.stats.setGenieKilledJobs(new AtomicLong(0));
+        this.stats.incrGenieKilledJobs();
+        this.stats.incrGenieKilledJobs();
+        Assert.assertEquals(2L, this.stats.getGenieKilledJobs().longValue());
     }
 
     /**
@@ -137,11 +121,11 @@ public class TestGenieNodeStatisticsImpl {
     @Test
     public void testSuccessJobCounter() {
         // incr successful jobs thrice
-        stats.setGenieSuccessfulJobs(new AtomicLong(0));
-        stats.incrGenieSuccessfulJobs();
-        stats.incrGenieSuccessfulJobs();
-        stats.incrGenieSuccessfulJobs();
-        Assert.assertEquals(3L, stats.getGenieSuccessfulJobs().longValue());
+        this.stats.setGenieSuccessfulJobs(new AtomicLong(0));
+        this.stats.incrGenieSuccessfulJobs();
+        this.stats.incrGenieSuccessfulJobs();
+        this.stats.incrGenieSuccessfulJobs();
+        Assert.assertEquals(3L, this.stats.getGenieSuccessfulJobs().longValue());
     }
 
     /**
@@ -152,7 +136,7 @@ public class TestGenieNodeStatisticsImpl {
      */
     @Test
     public void testRunningJobs() throws InterruptedException, CloudServiceException {
-        stats.setGenieRunningJobs(0);
-        Assert.assertEquals(0, stats.getGenieRunningJobs().intValue());
+        this.stats.setGenieRunningJobs(0);
+        Assert.assertEquals(0, this.stats.getGenieRunningJobs().intValue());
     }
 }

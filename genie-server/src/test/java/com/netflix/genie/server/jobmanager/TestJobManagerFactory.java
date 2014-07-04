@@ -31,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author tgianos
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:application-test.xml")
+@ContextConfiguration(locations = "classpath:genie-application-test.xml")
 public class TestJobManagerFactory {
 
     @Inject

@@ -32,7 +32,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -133,7 +133,7 @@ public class Application extends Auditable implements Serializable {
      */
     @XmlTransient
     @JsonIgnore
-    @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "application", fetch = FetchType.LAZY)
     private Set<Command> commands;
 
     /**

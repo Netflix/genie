@@ -66,14 +66,23 @@ public class ApplicationConfigResource {
     /**
      * The application service.
      */
-    @Inject
-    private ApplicationConfigService acs;
+    private final ApplicationConfigService acs;
 
     /**
      * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;
+
+    /**
+     * Constructor.
+     *
+     * @param acs The application configuration service to use.
+     */
+    @Inject
+    public ApplicationConfigResourceV1(final ApplicationConfigService acs) {
+        this.acs = acs;
+    }
 
     /**
      * Create an Application.
@@ -83,7 +92,10 @@ public class ApplicationConfigResource {
      * @throws CloudServiceException
      */
     @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Create an application",
             notes = "Create an application from the supplied information.",
@@ -175,7 +187,10 @@ public class ApplicationConfigResource {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Update an application",
             notes = "Update an application from the supplied information.",

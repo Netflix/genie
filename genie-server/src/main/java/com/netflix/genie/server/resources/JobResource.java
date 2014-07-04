@@ -61,14 +61,26 @@ import org.slf4j.LoggerFactory;
 public class JobResource {
     private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
 
-    @Inject
-    private ExecutionService xs;
+    /**
+     * The execution service.
+     */
+    private final ExecutionService xs;
 
     /**
      * Uri info for gathering information on the request.
      */
     @Context
     private UriInfo uriInfo;
+    
+    /**
+     * Constructor.
+     * 
+     * @param xs The execution service to use.
+     */
+    @Inject
+    public JobResourceV1(final ExecutionService xs) {
+        this.xs = xs;
+    }
 
     /**
      * Submit a new job.
@@ -79,7 +91,10 @@ public class JobResource {
      * @throws CloudServiceException
      */
     @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes({
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
     @ApiOperation(
             value = "Submit a job",
             notes = "Submit a new job to run to genie",
@@ -111,7 +126,7 @@ public class JobResource {
             job.setClientHost(clientHost);
         }
 
-        final Job createdJob =  this.xs.submitJob(job);
+        final Job createdJob = this.xs.submitJob(job);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
                 entity(createdJob).
@@ -214,11 +229,9 @@ public class JobResource {
             @QueryParam("clusterId")
             final String clusterId,
             @ApiParam(value = "The page to start on.", required = false)
-            @QueryParam("page") @DefaultValue("0")
-            int page,
+            @QueryParam("page") @DefaultValue("0") int page,
             @ApiParam(value = "Max number of results per page.", required = false)
-            @QueryParam("limit") @DefaultValue("1024")
-            int limit)
+            @QueryParam("limit") @DefaultValue("1024") int limit)
             throws CloudServiceException {
         LOG.debug("Called");
         return this.xs.getJobs(
