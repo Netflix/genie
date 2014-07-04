@@ -83,7 +83,7 @@ public class ClusterConfigResource {
      * @param ccs The cluster configuration service to use.
      */
     @Inject
-    public ClusterConfigResourceV1(final ClusterConfigService ccs) {
+    public ClusterConfigResource(final ClusterConfigService ccs) {
         this.ccs = ccs;
     }
 

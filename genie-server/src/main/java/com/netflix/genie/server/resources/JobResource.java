@@ -78,7 +78,7 @@ public class JobResource {
      * @param xs The execution service to use.
      */
     @Inject
-    public JobResourceV1(final ExecutionService xs) {
+    public JobResource(final ExecutionService xs) {
         this.xs = xs;
     }
 

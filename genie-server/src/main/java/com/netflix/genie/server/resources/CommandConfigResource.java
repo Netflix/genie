@@ -80,7 +80,7 @@ public class CommandConfigResource {
      * @param ccs The command configuration service to use.
      */
     @Inject
-    public CommandConfigResourceV1(final CommandConfigService ccs) {
+    public CommandConfigResource(final CommandConfigService ccs) {
         this.ccs = ccs;
     }
 

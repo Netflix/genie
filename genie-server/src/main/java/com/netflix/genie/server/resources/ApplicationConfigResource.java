@@ -80,7 +80,7 @@ public class ApplicationConfigResource {
      * @param acs The application configuration service to use.
      */
     @Inject
-    public ApplicationConfigResourceV1(final ApplicationConfigService acs) {
+    public ApplicationConfigResource(final ApplicationConfigService acs) {
         this.acs = acs;
     }
 

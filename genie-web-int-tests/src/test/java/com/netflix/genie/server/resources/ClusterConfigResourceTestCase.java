@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 @RunInKaryon(applicationId = "genie")
 //TODO: Fix this
 @Ignore
-public class ClusterConfigResourceV1TestCase {
+public class ClusterConfigResourceTestCase {
 
     /**
      * Creates the test deployment.
@@ -49,7 +49,7 @@ public class ClusterConfigResourceV1TestCase {
     }
 
     /**
-     * The injected {@link ClusterConfigResourceV1} class.
+     * The injected {@link ClusterConfigResource} class.
      */
     @Inject
     private ClusterConfigResource resource;
