@@ -60,9 +60,13 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v2/config/clusters")
 @Api(value = "/v2/config/clusters", description = "Manage the available clusters")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
+})
 @Named
 public class ClusterConfigResource {
+
     private static final Logger LOG = LoggerFactory
             .getLogger(ClusterConfigResource.class);
 
@@ -76,10 +80,10 @@ public class ClusterConfigResource {
      */
     @Context
     private UriInfo uriInfo;
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param ccs The cluster configuration service to use.
      */
     @Inject

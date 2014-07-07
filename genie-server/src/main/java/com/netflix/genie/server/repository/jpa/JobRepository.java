@@ -17,12 +17,13 @@ package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Job;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  * Job repository.
  *
  * @author tgianos
  */
-public interface JobRepository extends JpaRepository<Job, String> {
+public interface JobRepository extends JpaRepository<Job, String>, JpaSpecificationExecutor {
 
 }

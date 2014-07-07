@@ -21,9 +21,9 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -34,14 +34,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -133,24 +129,16 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final int limit) {
         LOG.debug("Called");
 
-        //TODO: Switch to this in the CommandRepository
-        final CriteriaBuilder cb = this.em.getCriteriaBuilder();
-        final CriteriaQuery<Command> cq = cb.createQuery(Command.class);
-        final Root<Command> c = cq.from(Command.class);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
-        if (StringUtils.isNotEmpty(name)) {
-            predicates.add(cb.equal(c.get(Command_.name), name));
-        }
-        if (StringUtils.isNotEmpty(userName)) {
-            predicates.add(cb.equal(c.get(Command_.user), userName));
-        }
-        cq.where(cb.and(predicates.toArray(new Predicate[0])));
-        final TypedQuery<Command> query = this.em.createQuery(cq);
-        final int finalPage = page < 0 ? 0 : page;
-        final int finalLimit = limit < 0 ? 1024 : limit;
-        query.setMaxResults(finalLimit);
-        query.setFirstResult(finalLimit * finalPage);
-        return query.getResultList();
+        final PageRequest pageRequest = new PageRequest(
+                page < 0 ? 0 : page,
+                limit < 0 ? 1024 : limit
+        );
+        return this.commandRepo.findAll(
+                CommandSpecs.findByNameAndUser(
+                        name,
+                        userName
+                ),
+                pageRequest).getContent();
     }
 
     /**

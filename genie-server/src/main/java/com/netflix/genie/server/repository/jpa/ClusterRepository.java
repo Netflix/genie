@@ -17,12 +17,13 @@ package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Cluster;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  * Cluster repository.
  *
  * @author tgianos
  */
-public interface ClusterRepository extends JpaRepository<Cluster, String> {
+public interface ClusterRepository extends JpaRepository<Cluster, String>, JpaSpecificationExecutor {
 
 }

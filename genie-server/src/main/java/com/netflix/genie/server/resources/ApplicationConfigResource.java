@@ -56,7 +56,10 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v2/config/applications")
 @Api(value = "/v2/config/applications", description = "Manage the available applications")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
+})
 @Named
 public class ApplicationConfigResource {
 

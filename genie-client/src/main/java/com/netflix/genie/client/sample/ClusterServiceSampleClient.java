@@ -178,7 +178,7 @@ public final class ClusterServiceSampleClient {
         final List<Command> newCmds = new ArrayList<Command>();
         newCmds.add(commandClient.createCommand(CommandServiceSampleClient.createSampleCommand(ID + "something")));
         newCmds.add(commandClient.createCommand(CommandServiceSampleClient.createSampleCommand(null)));
-        
+
         final List<Command> commands2 = clusterClient.addCommandsToCluster(cluster1.getId(), newCmds);
         for (final Command command : commands2) {
             LOG.info("Command = " + command);
@@ -219,12 +219,12 @@ public final class ClusterServiceSampleClient {
         final Command command5 = commandClient.deleteCommand(command1.getId());
         LOG.info("Deleted command config with id: " + command1.getId());
         LOG.info(command5.toString());
-        
+
         LOG.info("Deleting commands in newCmd");
-        for (final Command cmd: newCmds) {
+        for (final Command cmd : newCmds) {
             commandClient.deleteCommand(cmd.getId());
         }
-        
+
         LOG.info("Deleting application config using id");
         final Application app3 = appClient.deleteApplication(app1.getId());
         LOG.info("Deleted application config with id: " + app1.getId());

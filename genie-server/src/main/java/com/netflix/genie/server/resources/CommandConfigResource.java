@@ -56,7 +56,10 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v2/config/commands")
 @Api(value = "/v2/config/commands", description = "Manage the available commands")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
+})
 @Named
 public class CommandConfigResource {
 

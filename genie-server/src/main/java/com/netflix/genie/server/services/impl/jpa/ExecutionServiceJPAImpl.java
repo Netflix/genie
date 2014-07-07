@@ -24,19 +24,18 @@ import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.common.model.Types.JobStatus;
 import com.netflix.genie.common.model.Types.SubprocessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.repository.jpa.JobRepository;
+import com.netflix.genie.server.repository.jpa.JobSpecs;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.NetUtil;
 import com.netflix.niws.client.http.RestClient;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -47,15 +46,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.persistence.RollbackException;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -280,36 +275,19 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final int limit,
             final int page) throws CloudServiceException {
         LOG.debug("called");
-
-        final CriteriaBuilder cb = this.em.getCriteriaBuilder();
-        final CriteriaQuery<Job> cq = cb.createQuery(Job.class);
-        final Root<Job> j = cq.from(Job.class);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
-        if (StringUtils.isNotEmpty(userName)) {
-            predicates.add(cb.like(j.get(Job_.id), id));
-        }
-        if (StringUtils.isNotEmpty(jobName)) {
-            predicates.add(cb.like(j.get(Job_.name), jobName));
-        }
-        if (StringUtils.isNotEmpty(userName)) {
-            predicates.add(cb.equal(j.get(Job_.user), userName));
-        }
-        if (status != null) {
-            predicates.add(cb.equal(j.get(Job_.status), status));
-        }
-        if (StringUtils.isNotEmpty(clusterName)) {
-            predicates.add(cb.equal(j.get(Job_.executionClusterName), clusterName));
-        }
-        if (StringUtils.isNotEmpty(clusterId)) {
-            predicates.add(cb.equal(j.get(Job_.executionClusterId), clusterId));
-        }
-        cq.where(cb.and(predicates.toArray(new Predicate[0])));
-        final TypedQuery<Job> query = this.em.createQuery(cq);
-        final int finalPage = page < 0 ? 0 : page;
-        final int finalLimit = limit < 0 ? 1024 : limit;
-        query.setMaxResults(finalLimit);
-        query.setFirstResult(finalLimit * finalPage);
-        return query.getResultList();
+        final PageRequest pageRequest = new PageRequest(
+                page < 0 ? 0 : page,
+                limit < 0 ? 1024 : limit
+        );
+        return this.jobRepo.findAll(
+                JobSpecs.find(
+                        id,
+                        jobName,
+                        userName,
+                        status,
+                        clusterName,
+                        clusterId),
+                pageRequest).getContent();
     }
 
     /**
@@ -399,12 +377,10 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws Exception
      */
     @Override
     @Transactional
-    public int markZombies() throws Exception {
+    public int markZombies() {
         LOG.debug("called");
         // the equivalent query is as follows:
         // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
@@ -414,21 +390,16 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         final long zombieTime = CONF.getLong(
                 "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
 
-        final CriteriaBuilder cb = this.em.getCriteriaBuilder();
-        final CriteriaQuery<Job> cq = cb.createQuery(Job.class);
-        final Root<Job> j = cq.from(Job.class);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
-        predicates.add(cb.lessThan(j.get(Job_.updated), new Date(currentTime - zombieTime)));
-        final Predicate orPredicate1 = cb.equal(j.get(Job_.status), JobStatus.RUNNING);
-        final Predicate orPredicate2 = cb.equal(j.get(Job_.status), JobStatus.INIT);
-        predicates.add(cb.or(orPredicate1, orPredicate2));
-        cq.where(cb.and(predicates.toArray(new Predicate[0])));
-        final List<Job> jobs = this.em.createQuery(cq).getResultList();
+        final List<Job> jobs = this.jobRepo.findAll(
+                JobSpecs.findZombies(currentTime, zombieTime)
+        );
         for (final Job job : jobs) {
             job.setStatus(JobStatus.FAILED);
             job.setFinishTime(currentTime);
             job.setExitCode(SubprocessStatus.ZOMBIE_JOB.code());
-            job.setStatusMsg(SubprocessStatus.message(SubprocessStatus.ZOMBIE_JOB.code()));
+            job.setStatusMsg(SubprocessStatus.message(
+                    SubprocessStatus.ZOMBIE_JOB.code())
+            );
         }
         return jobs.size();
     }

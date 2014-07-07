@@ -97,7 +97,6 @@ public interface ExecutionService {
      * netflix.genie.server.janitor.zombie.delta.ms.
      *
      * @return Number of jobs marked as zombies
-     * @throws Exception if there is any error during the process
      */
-    int markZombies() throws Exception;
+    int markZombies();
 }

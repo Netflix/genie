@@ -67,15 +67,14 @@ public interface ClusterConfigService {
      * @return All the clusters matching the criteria
      * @throws CloudServiceException
      */
-    //TODO: Combine the two getAlls into one if possible
     List<Cluster> getClusters(
             final String name,
             final List<ClusterStatus> statuses,
             final List<String> tags,
             final Long minUpdateTime,
             final Long maxUpdateTime,
-            final Integer limit,
-            final Integer page) throws CloudServiceException;
+            final int limit,
+            final int page) throws CloudServiceException;
 
     /**
      * Get the cluster configurations for various parameters.

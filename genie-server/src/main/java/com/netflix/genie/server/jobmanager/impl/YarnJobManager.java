@@ -231,7 +231,6 @@ public class YarnJobManager implements JobManager {
                         } catch (final IOException ioe) {
                             final String msg = "Unable to close the output stream for the attachment";
                             LOG.error(msg, ioe);
-                            // #TODO: Rethrow as CloudServiceException?
                         }
                     }
                 }
@@ -391,7 +390,6 @@ public class YarnJobManager implements JobManager {
         } else if (StringUtils.isNoneBlank(job.getCommandName())) {
             // Iterate through the commands the cluster supports and find the command that matches.
             // There has to be one that matches, else the getCluster wouldn't have.
-            //TODO: Optimize via query
             for (final Command cce : this.cluster.getCommands()) {
                 if (cce.getName().equals(job.getCommandName())) {
                     command = cce;

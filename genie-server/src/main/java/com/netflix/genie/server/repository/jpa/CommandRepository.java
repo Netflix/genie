@@ -18,13 +18,14 @@ package com.netflix.genie.server.repository.jpa;
 import com.netflix.genie.common.model.Command;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  * Command repository.
  *
  * @author tgianos
  */
-public interface CommandRepository extends JpaRepository<Command, String> {
+public interface CommandRepository extends JpaRepository<Command, String>, JpaSpecificationExecutor {
 
     /**
      * Find commands by name.

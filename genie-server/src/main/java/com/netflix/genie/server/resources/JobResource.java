@@ -56,9 +56,13 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v2/jobs")
 @Api(value = "/v2/jobs", description = "Manage the available jobs")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
+})
 @Named
 public class JobResource {
+
     private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
 
     /**
@@ -71,10 +75,10 @@ public class JobResource {
      */
     @Context
     private UriInfo uriInfo;
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param xs The execution service to use.
      */
     @Inject
