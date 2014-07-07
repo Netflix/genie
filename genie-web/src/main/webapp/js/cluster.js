@@ -86,6 +86,9 @@ define([
         self.searchResults = ko.observableArray();
         self.searchDateTime = ko.observable();
         self.runningClusters = ko.observableArray();
+        self.allTags = ko.observableArray();
+        self.selectedTags = ko.observableArray();
+        
         self.runningClusterCount = ko.computed(function() {
             return _.reduce(self.runningClusters(), function(sum, obj, index) { return sum + obj.count; }, 0);
         }, self);
@@ -99,13 +102,17 @@ define([
                 headers: {'Accept':'application/json'},
                 url:  'genie/v2/config/clusters?status=UP&status=OUT_OF_SERVICE',
             }).done(function(data) {
-            	console.log(data);
-                if (data instanceof Array) {
+            	if (data instanceof Array) {
                     _.each(data, function(clusterObj, index) {
                         if (!(clusterObj.status in clusterCount)) {
                             clusterCount[clusterObj.status] = 0;
                         }
                         clusterCount[clusterObj.status] += 1;
+                        _.each(clusterObj.tags, function(tag, index) {
+                        	if (self.allTags.indexOf(tag) < 0) {
+                        		self.allTags.push(tag);
+                        	}
+                        });
                     });
                 } else {
                     var clusterObj = data;
@@ -125,19 +132,21 @@ define([
             self.searchResults([]);
             self.status('searching');
             self.searchDateTime(d.toLocaleString());
+            
             var formArray = $('#clusterSearchForm').serializeArray();
             var name     = _.where(formArray, {'name': 'name'})[0].value;
             var status   = _.where(formArray, {'name': 'status'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
+            
             $.ajax({
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v2/config/clusters',
-                data: {limit: limit, name: name, status: status}
+                traditional: true,
+                data: {limit: limit, name: name, status: status, tag: self.selectedTags()}
             }).done(function(data) {
-            	console.log(data);
-                self.searchResults([]);
+            	self.searchResults([]);
                 self.status('results');
                 if (data instanceof Array) {
                     _.each(data, function(clusterObj, index) {

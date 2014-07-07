@@ -18,6 +18,13 @@
         </div>
     </div>
     <div class="control-group">
+   		 <label class="control-label">Tags:</label>
+   		 <div class="controls">
+    		<select name="tags" multiple="true" data-bind="options: Cluster.allTags, selectedOptions:Cluster.selectedTags">
+    	 	</select>
+    	 </div>
+    </div>
+    <div class="control-group">
         <label class="control-label">Number of clusters:</label>
         <div class="controls">
             <input type="text" name="limit" class="input-mini" maxlength=3 value="32">
