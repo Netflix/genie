@@ -26,5 +26,6 @@
         <class>com.netflix.genie.common.model.Command</class>
         <class>com.netflix.genie.common.model.Application</class>
         <class>com.netflix.genie.common.model.Auditable</class>
+        <class>com.netflix.genie.common.model.CommonEntityFields</class>
     </persistence-unit>
 </persistence>

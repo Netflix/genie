@@ -18,16 +18,22 @@
 package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
+import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.common.model.Types.ApplicationStatus;
 import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.netflix.genie.common.model.Types.CommandStatus;
 import com.netflix.genie.server.repository.jpa.ClusterRepository;
-import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -35,10 +41,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -118,7 +129,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     "No cluster with id " + id + " exists.");
         }
     }
-
+    
     /**
      * {@inheritDoc}
      *
@@ -135,18 +146,44 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final int limit,
             final int page) throws CloudServiceException {
         LOG.debug("GENIE: Returning configs for specified params");
-        final PageRequest pageRequest = new PageRequest(
-                page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit
-        );
-        return this.clusterRepo.findAll(
-                ClusterSpecs.findByNameAndStatusesAndTagsAndUpdateTime(
-                        name,
-                        statuses,
-                        tags,
-                        minUpdateTime,
-                        maxUpdateTime),
-                pageRequest).getContent();
+        final CriteriaBuilder cb = this.em.getCriteriaBuilder();
+        final CriteriaQuery<Cluster> cq = cb.createQuery(Cluster.class);
+        final Root<Cluster> c = cq.from(Cluster.class);
+        final List<Predicate> predicates = new ArrayList<Predicate>();
+        if (StringUtils.isNotEmpty(name)) {
+            predicates.add(cb.like(c.get(Cluster_.name), name));
+        }
+        if (minUpdateTime != null) {
+            predicates.add(cb.greaterThanOrEqualTo(c.get(Cluster_.updated), new Date(minUpdateTime)));
+        }
+        if (maxUpdateTime != null) {
+            predicates.add(cb.lessThan(c.get(Cluster_.updated), new Date(maxUpdateTime)));
+        }
+        if (tags != null) {
+            for (final String tag : tags) {
+                predicates.add(cb.isMember(tag, c.get(Cluster_.tags)));
+            }
+        }
+
+        if (statuses != null && !statuses.isEmpty()) {
+            //Could optimize this as we know size could use native array
+            final List<Predicate> orPredicates = new ArrayList<Predicate>();
+            for (final ClusterStatus status : statuses) {
+                orPredicates.add(cb.equal(c.get(Cluster_.status), status));
+            }
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
+        }
+
+        cq.where(predicates.toArray(new Predicate[0]));
+        final TypedQuery<Cluster> query = this.em.createQuery(cq);
+        final int finalPage = page < 0 ? 0 : page;
+        final int finalLimit = limit < 0 ? 1024 : limit;
+        query.setMaxResults(finalLimit);
+        query.setFirstResult(finalLimit * finalPage);
+
+        //If you want to debug query:
+        //LOG.debug(query.unwrap(org.apache.openjpa.persistence.QueryImpl.class).getQueryString());
+        return query.getResultList();
     }
 
     /**
@@ -162,15 +199,42 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final List<ClusterCriteria> clusterCriterias) {
         LOG.debug("Called");
         for (final ClusterCriteria cc : clusterCriterias) {
-            final List<Cluster> clusters = this.clusterRepo.findAll(
-                    ClusterSpecs.findByApplicationAndCommandAndCriteria(
-                            applicationId,
-                            applicationName,
-                            commandId,
-                            commandName,
-                            cc
-                    )
-            );
+            final CriteriaBuilder cb = this.em.getCriteriaBuilder();
+            final CriteriaQuery<Cluster> cq = cb.createQuery(Cluster.class);
+            final Root<Cluster> c = cq.from(Cluster.class);
+            final List<Predicate> predicates = new ArrayList<Predicate>();
+
+            cq.distinct(true);
+
+            if (StringUtils.isNotEmpty(commandId) || StringUtils.isNotEmpty(commandName)) {
+                final Join<Cluster, Command> commands = c.join(Cluster_.commands);
+                if (StringUtils.isNotEmpty(commandId)) {
+                    predicates.add(cb.equal(commands.get(Command_.id), commandId));
+                } else {
+                    predicates.add(cb.equal(commands.get(Command_.name), commandName));
+                }
+                predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
+                predicates.add(cb.equal(c.get(Cluster_.status), ClusterStatus.UP));
+                if (StringUtils.isNotEmpty(applicationId) || StringUtils.isNotEmpty(applicationName)) {
+                    final Join<Command, Application> apps = commands.join(Command_.application);
+                    if (StringUtils.isNotEmpty(applicationId)) {
+                        predicates.add(cb.equal(apps.get(Application_.id), applicationId));
+                    } else {
+                        predicates.add(cb.equal(apps.get(Application_.name), applicationName));
+                    }
+                    predicates.add(cb.equal(apps.get(Application_.status), ApplicationStatus.ACTIVE));
+                }
+            }
+
+            if (cc.getTags() != null) {
+                for (final String tag : cc.getTags()) {
+                    predicates.add(cb.isMember(tag, c.get(Cluster_.tags)));
+                }
+            }
+
+            cq.where(predicates.toArray(new Predicate[0]));
+            final TypedQuery<Cluster> query = this.em.createQuery(cq);
+            final List<Cluster> clusters = query.getResultList();
 
             if (!clusters.isEmpty()) {
                 return clusters;
@@ -473,6 +537,112 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 cluster.removeCommand(cmd);
             }
             return cluster.getCommands();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> addTagsForCluster(
+            final String id,
+            final Set<String> tags) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to add tags.");
+        }
+        if (tags == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tags entered.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            cluster.getTags().addAll(tags);
+            return cluster.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getTagsForCluster(
+            final String id)
+            throws CloudServiceException {
+
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id sent. Cannot retrieve tags.");
+        }
+
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            return cluster.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> updateTagsForCluster(
+            final String id,
+            final Set<String> tags) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to update tags.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            cluster.setTags(tags);
+            return cluster.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> removeAllTagsForCluster(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to remove tags.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            cluster.getTags().clear();
+            return cluster.getTags();
         } else {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,

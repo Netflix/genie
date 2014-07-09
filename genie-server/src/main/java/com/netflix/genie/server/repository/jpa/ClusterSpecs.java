@@ -32,6 +32,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -83,7 +85,7 @@ public final class ClusterSpecs {
                 }
                 if (tags != null) {
                     for (final String tag : tags) {
-                        predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
+                        //predicates.add(cb.isMember(tag, root.get(Cluster_.tags))); //.isMember(tag, root.get(Cluster_.tags)));
                     }
                 }
 
@@ -149,7 +151,7 @@ public final class ClusterSpecs {
 
                 if (cc.getTags() != null) {
                     for (final String tag : cc.getTags()) {
-                        predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
+                        //predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
                     }
                 }
 

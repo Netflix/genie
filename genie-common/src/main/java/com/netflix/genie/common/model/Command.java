@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -36,6 +35,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -60,28 +60,10 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Command")
-public class Command extends Auditable implements Serializable {
+public class Command extends CommonEntityFields implements Serializable {
 
     private static final long serialVersionUID = -6106046473373305992L;
     private static final Logger LOG = LoggerFactory.getLogger(Command.class);
-
-    /**
-     * Name of this command - e.g. prodhive, pig, hadoop etc.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "Name of this command - e.g. prodhive, pig, hadoop etc.",
-            required = true)
-    private String name;
-
-    /**
-     * User who created this command.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "User who created this command",
-            required = true)
-    private String user;
 
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
@@ -120,15 +102,6 @@ public class Command extends Auditable implements Serializable {
     private String jobType;
 
     /**
-     * Version number for this command.
-     */
-    @Basic
-    @Column(name = "commandVersion")
-    @ApiModelProperty(
-            value = "Version number for this command")
-    private String version;
-
-    /**
      * Reference to all the configuration (xml's) needed for this command.
      */
     @XmlElementWrapper(name = "configs")
@@ -158,6 +131,17 @@ public class Command extends Auditable implements Serializable {
     private Set<Cluster> clusters;
 
     /**
+     * Set of tags for a command.
+     */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the tags"
+            + " associated with this command.")
+    private Set<String> tags = new HashSet<String>();
+
+    /**
      * Default Constructor.
      */
     public Command() {
@@ -179,8 +163,8 @@ public class Command extends Auditable implements Serializable {
             final CommandStatus status,
             final String executable) throws CloudServiceException {
         super();
-        this.name = name;
-        this.user = user;
+        this.setName(name);
+        this.setUser(user);
         this.status = status;
         this.executable = executable;
     }
@@ -192,55 +176,18 @@ public class Command extends Auditable implements Serializable {
      */
     @PrePersist
     protected void onCreateCommand() throws CloudServiceException {
-        validate(this.name, this.user, this.status, this.executable);
+        validate(this.getName(), this.getUser(), this.status, this.executable);
+        // Add the id to the tags
+        this.tags.add(this.getId());
     }
 
     /**
-     * Gets the name for this command.
-     *
-     * @return name
+     * On any update to the command will add id to tags.
      */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Sets the name for this command.
-     *
-     * @param name unique id for this cluster. Not null/empty/blank.
-     * @throws CloudServiceException
-     */
-    public void setName(final String name) throws CloudServiceException {
-        if (StringUtils.isBlank(name)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No name entered.");
-        }
-        this.name = name;
-    }
-
-    /**
-     * Gets the user that created this command.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Sets the user who created this command.
-     *
-     * @param user user who created this command. Not null/empty/blank.
-     * @throws CloudServiceException
-     */
-    public void setUser(final String user) throws CloudServiceException {
-        if (StringUtils.isBlank(user)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No user entered.");
-        }
-        this.user = user;
+    @PreUpdate
+    protected void onUpdateCommand() {
+        // Add the id to the tags
+        this.tags.add(this.getId());
     }
 
     /**
@@ -332,24 +279,6 @@ public class Command extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the version of this command.
-     *
-     * @return version
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Sets the version for this command.
-     *
-     * @param version version number for this command
-     */
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    /**
      * Gets the configurations for this command.
      *
      * @return the configurations
@@ -374,6 +303,25 @@ public class Command extends Auditable implements Serializable {
      */
     public Application getApplication() {
         return this.application;
+    }
+
+    /**
+     * Gets the tags allocated to this command.
+     *
+     * @return the tags as an unmodifiable list
+     */
+    public Set<String> getTags() {
+        return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this command.
+     *
+     * @param tags the tags to set. Not Null.
+     * @throws CloudServiceException
+     */
+    public void setTags(final Set<String> tags) throws CloudServiceException {
+        this.tags = tags;
     }
 
     /**

@@ -30,15 +30,20 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +62,7 @@ import org.slf4j.LoggerFactory;
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Job extends Auditable implements Serializable {
+public class Job extends CommonEntityFields implements Serializable {
 
     private static final long serialVersionUID = 2979506788441089067L;
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
@@ -110,14 +115,6 @@ public class Job extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "group name of the user who submitted this job")
     private String group;
-
-    /**
-     * Client - UC4, Ab Initio, Search.
-     */
-    @Basic
-    @ApiModelProperty(
-            value = "Client from where the job was submitted")
-    private String client;
 
     /**
      * Alias - Cluster Name of the cluster selected to run the job.
@@ -194,6 +191,18 @@ public class Job extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "Email address to send notifications to on job completion.")
     private String email;
+
+    /**
+     * Set of tags for a job.
+     */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the tags"
+            + " associated with this job.")
+    private Set<String> tags = new HashSet<String>();
+
 
     // ------------------------------------------------------------------------
     // Genie2 command and application combinations to be specified by the user while running jobs.
@@ -335,7 +344,7 @@ public class Job extends Auditable implements Serializable {
             final String commandName,
             final String commandArgs,
             final List<ClusterCriteria> clusterCriteria) throws CloudServiceException {
-        this.user = user;
+        this.setUser(user);
         this.commandId = commandId;
         this.commandName = commandName;
         this.commandArgs = commandArgs;
@@ -351,6 +360,17 @@ public class Job extends Auditable implements Serializable {
     protected void onCreateJob() throws CloudServiceException {
         validate(this.user, this.commandId, this.commandName, this.commandArgs, this.clusterCriteria);
         this.clusterCriteriaString = criteriaToString(this.clusterCriteria);
+        // Add the id to the tags
+        this.tags.add(this.getId());
+    }
+
+    /**
+     * On any update to the entity will add id to tags.
+     */
+    @PreUpdate
+    protected void onUpdateJob() {
+        // Add the id to the tags
+        this.tags.add(this.getId());
     }
 
     /**
@@ -390,30 +410,6 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the user who submit the job.
-     *
-     * @return the user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Sets the user who submits the job.
-     *
-     * @param user user submitting the job
-     * @throws CloudServiceException
-     */
-    public void setUser(final String user) throws CloudServiceException {
-        if (StringUtils.isBlank(user)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No user entered.");
-        }
-        this.user = user;
-    }
-
-    /**
      * Gets the group name of the user who submitted the job.
      *
      * @return group
@@ -429,26 +425,6 @@ public class Job extends Auditable implements Serializable {
      */
     public void setGroup(final String group) {
         this.group = group;
-    }
-
-    /**
-     * Get the client from which this job is submitted. used for
-     * grouping/identifying the source.
-     *
-     * @return client
-     */
-    public String getClient() {
-        return this.client;
-    }
-
-    /**
-     * Sets the client from which the job is submitted.
-     *
-     * @param client client from which the job is submitted. Used for book
-     * keeping/grouping.
-     */
-    public void setClient(final String client) {
-        this.client = client;
     }
 
     /**
@@ -994,6 +970,25 @@ public class Job extends Auditable implements Serializable {
      */
     public void setEnvPropFile(final String envPropFile) {
         this.envPropFile = envPropFile;
+    }
+
+    /**
+     * Gets the tags allocated to this job.
+     *
+     * @return the tags as an unmodifiable list
+     */
+    public Set<String> getTags() {
+        return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this job.
+     *
+     * @param tags the tags to set. Not Null.
+     * @throws CloudServiceException
+     */
+    public void setTags(final Set<String> tags) throws CloudServiceException {
+        this.tags = tags;
     }
 
     /**

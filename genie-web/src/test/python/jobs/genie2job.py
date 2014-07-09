@@ -36,7 +36,15 @@ serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/jobs'
 #lst = json.dumps([{"id": "t1"},{"id":"t2"}])
 #lst = json.dumps([{"tags" : ['adhoc','test'] },{"tags": ['sla','prod']}])
 #lst = json.dumps([{"tags" : ['adhoc','test'] }])
-lst = json.dumps([{"tags" : ['adhoc','h2query'] }])
+lst = json.dumps([{"tags" : ['adhoc','h2query']}])
+
+jobRuntimeCriteria = json.dumps({"clusterTags": [{"tags" : ['adhoc','h2query']}], "commandTags" : ['hive','prod']})
+print jobRuntimeCriteria
+sys.exit(0)
+print cstrtags
+print "\n"
+print cmdtags
+
 print lst
 
 def testJsonSubmitjob():
@@ -63,6 +71,7 @@ if __name__ == "__main__":
    print "Running unit tests:\n"
    jobID = testJsonSubmitjob()
    print "\n"
+   sys.exit(0)
    while True:
        print jobs.getJobInfo(serviceUrl, jobID)
        print "\n"

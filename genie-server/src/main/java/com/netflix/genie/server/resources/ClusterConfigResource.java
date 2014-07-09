@@ -539,6 +539,130 @@ public class ClusterConfigResource {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllCommandsForCluster(id);
     }
+    
+    /**
+     * Add new tags to a given cluster.
+     *
+     * @param id The id of the cluster to add the tags to. Not
+     * null/empty/blank.
+     * @param tags The tags to add. Not null/empty/blank.
+     * @return The active tags for this cluster.
+     * @throws CloudServiceException
+     */
+    @POST
+    @Path("/{id}/tags")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Add new tags to a cluster",
+            notes = "Add the supplied tags to the cluster with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Cluster not found")
+    })
+    public Set<String> addTagsForCluster(
+            @ApiParam(value = "Id of the cluster to add configuration to.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The tags to add.", required = true)
+            final Set<String> tags) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and config " + tags);
+        return this.ccs.addTagsForCluster(id, tags);
+    }
+
+    /**
+     * Get all the tags for a given cluster.
+     *
+     * @param id The id of the cluster to get the tags for. Not
+     * NULL/empty/blank.
+     * @return The active set of tags.
+     * @throws CloudServiceException
+     */
+    @GET
+    @Path("/{id}/tags")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Get the tags for a cluster",
+            notes = "Get the tags for the cluster with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Cluster not found")
+    })
+    public Set<String> getTagsForCluster(
+            @ApiParam(value = "Id of the cluster to get tags for.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.ccs.getTagsForCluster(id);
+    }
+
+    /**
+     * Update the tags for a given cluster.
+     *
+     * @param id The id of the cluster to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing configuration
+     * files with. Not null/empty/blank.
+     * @return The new set of cluster tags.
+     * @throws CloudServiceException
+     */
+    @PUT
+    @Path("/{id}/tags")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Update tags for a cluster",
+            notes = "Replace the existing tags for cluster with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Cluster not found")
+    })
+    public Set<String> updateTagsForCluster(
+            @ApiParam(value = "Id of the cluster to update tags for.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The tags to replace existing with.", required = true)
+            final Set<String> tags) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and tags " + tags);
+        return this.ccs.updateTagsForCluster(id, tags);
+    }
+
+    /**
+     * Delete the all tags from a given cluster.
+     *
+     * @param id The id of the cluster to delete the tags from.
+     * Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/tags")
+    @ApiOperation(
+            value = "Remove all tags from a cluster",
+            notes = "Remove all the tags from the cluster with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid Id supplied"),
+        @ApiResponse(code = 404, message = "Cluster not found")
+    })
+    public Set<String> removeAllTagsForCluster(
+            @ApiParam(value = "Id of the cluster to delete from.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.ccs.removeAllTagsForCluster(id);
+    }
 
     /**
      * Remove an command from a given cluster.

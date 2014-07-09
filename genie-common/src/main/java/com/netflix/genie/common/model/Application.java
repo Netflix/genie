@@ -23,10 +23,10 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -34,6 +34,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -58,28 +59,10 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "An Application")
-public class Application extends Auditable implements Serializable {
+public class Application extends CommonEntityFields implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
-
-    /**
-     * Name of this application - e.g. mapreduce1, mapreduce2, tez etc.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "Name of this application - e.g. mapreduce1, mapreduce2, tez etc",
-            required = true)
-    private String name;
-
-    /**
-     * User who created this application.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "User who created this application",
-            required = true)
-    private String user;
 
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
@@ -90,15 +73,6 @@ public class Application extends Auditable implements Serializable {
             value = "The current status of this application",
             required = true)
     private ApplicationStatus status;
-
-    /**
-     * Version number for this application.
-     */
-    @Basic
-    @Column(name = "appVersion")
-    @ApiModelProperty(
-            value = "The version number for this application")
-    private String version;
 
     /**
      * Users can specify a property file location with environment variables.
@@ -137,6 +111,17 @@ public class Application extends Auditable implements Serializable {
     private Set<Command> commands;
 
     /**
+     * Set of tags for a application.
+     */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the tags"
+            + " associated with this application.")
+    private Set<String> tags = new HashSet<String>();
+
+    /**
      * Default constructor.
      */
     public Application() {
@@ -156,8 +141,8 @@ public class Application extends Auditable implements Serializable {
             final String user,
             final ApplicationStatus status) throws CloudServiceException {
         super();
-        this.name = name;
-        this.user = user;
+        this.setName(name);
+        this.setUser(user);
         this.status = status;
     }
 
@@ -168,43 +153,18 @@ public class Application extends Auditable implements Serializable {
      */
     @PrePersist
     protected void onCreateApplication() throws CloudServiceException {
-        validate(this.name, this.user, this.status);
+        validate(this.getName(), this.getUser(), this.status);
+     // Add the id to the tags
+        this.tags.add(this.getId());
     }
 
     /**
-     * Gets the name for this application.
-     *
-     * @return name
+     * On any update to the application will add id to tags.
      */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name for this application.
-     *
-     * @param name the new name of this application. Not null/empty/blank
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets the user that created this application.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return user;
-    }
-
-    /**
-     * Sets the user who created this application.
-     *
-     * @param user user who created this application
-     */
-    public void setUser(final String user) {
-        this.user = user;
+    @PreUpdate
+    protected void onUpdateApplication() {
+        // Add the id to the tags
+        this.tags.add(this.getId());
     }
 
     /**
@@ -224,25 +184,6 @@ public class Application extends Auditable implements Serializable {
      */
     public void setStatus(final ApplicationStatus status) {
         this.status = status;
-    }
-
-    /**
-     * Gets the version of this application.
-     *
-     * @return version - like 1.2.3
-     *
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Sets the version for this application.
-     *
-     * @param version version number for this application
-     */
-    public void setVersion(final String version) {
-        this.version = version;
     }
 
     /**
@@ -318,6 +259,25 @@ public class Application extends Auditable implements Serializable {
      */
     protected void setCommands(final Set<Command> commands) {
         this.commands = commands;
+    }
+
+    /**
+     * Gets the tags allocated to this application.
+     *
+     * @return the tags as an unmodifiable list
+     */
+    public Set<String> getTags() {
+        return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this application.
+     *
+     * @param tags the tags to set. Not Null.
+     * @throws CloudServiceException
+     */
+    public void setTags(final Set<String> tags) throws CloudServiceException {
+        this.tags = tags;
     }
 
     /**

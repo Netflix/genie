@@ -221,6 +221,57 @@ public interface ClusterConfigService {
      */
     List<Command> removeAllCommandsForCluster(
             final String id) throws CloudServiceException;
+    
+    /**
+     * Add tags to the cluster.
+     *
+     * @param id The id of the cluster to add the tags to. Not
+     * null/empty/blank.
+     * @param tags The tags to add. Not null/empty.
+     * @return The active set of tagss
+     * @throws CloudServiceException
+     */
+    Set<String> addTagsForCluster(
+            final String id,
+            final Set<String> tags) throws CloudServiceException;
+
+    /**
+     * Get the set of tags associated with the cluster with given
+     * id.
+     *
+     * @param id The id of the cluster to get the tags for. Not
+     * null/empty/blank.
+     * @return The set of tags as paths
+     * @throws CloudServiceException
+     */
+    Set<String> getTagsForCluster(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Update the set of tags associated with the cluster with
+     * given id.
+     *
+     * @param id The id of the cluster to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing tags
+     * with. Not null/empty.
+     * @return The active set of tagss
+     * @throws CloudServiceException
+     */
+    Set<String> updateTagsForCluster(
+            final String id,
+            final Set<String> tags) throws CloudServiceException;
+
+    /**
+     * Remove all tags from the cluster.
+     *
+     * @param id The id of the cluster to remove the tags from.
+     * Not null/empty/blank.
+     * @return The active set of tagss
+     * @throws CloudServiceException
+     */
+    Set<String> removeAllTagsForCluster(
+            final String id) throws CloudServiceException;
 
     /**
      * Remove a command from the cluster.
