@@ -19,8 +19,8 @@ package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.util.List;
 import java.util.Set;
@@ -79,19 +79,11 @@ public interface ClusterConfigService {
     /**
      * Get the cluster configurations for various parameters.
      *
-     * @param applicationId The application id
-     * @param applicationName The application name
-     * @param commandId The command identifier
-     * @param commandName The command name
-     * @param clusterCriterias List of cluster criteria
+     * @param job Job object to run
      * @return successful response, or one with HTTP error code
      */
     List<Cluster> getClusters(
-            final String applicationId,
-            final String applicationName,
-            final String commandId,
-            final String commandName,
-            final List<ClusterCriteria> clusterCriterias);
+            final Job job) throws CloudServiceException;
 
     /**
      * Update a cluster configuration.
@@ -223,6 +215,17 @@ public interface ClusterConfigService {
             final String id) throws CloudServiceException;
     
     /**
+     * Remove a command from the cluster.
+     *
+     * @param id The id of the cluster to remove the command from. Not
+     * null/empty/blank.
+     * @param cmdId The id of the command to remove. Not null/empty/blank.
+     * @return The active list of commands
+     * @throws CloudServiceException
+     */
+    List<Command> removeCommandForCluster(final String id, final String cmdId) throws CloudServiceException;
+    
+    /**
      * Add tags to the cluster.
      *
      * @param id The id of the cluster to add the tags to. Not
@@ -272,15 +275,15 @@ public interface ClusterConfigService {
      */
     Set<String> removeAllTagsForCluster(
             final String id) throws CloudServiceException;
-
+    
     /**
-     * Remove a command from the cluster.
+     * Remove a tag from the cluster.
      *
-     * @param id The id of the cluster to remove the command from. Not
+     * @param id The id of the cluster to remove the tag from. Not
      * null/empty/blank.
-     * @param cmdId The id of the command to remove. Not null/empty/blank.
-     * @return The active list of commands
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags
      * @throws CloudServiceException
      */
-    List<Command> removeCommandForCluster(final String id, final String cmdId) throws CloudServiceException;
+    Set<String> removeTagForCluster(final String id, final String tag) throws CloudServiceException;
 }

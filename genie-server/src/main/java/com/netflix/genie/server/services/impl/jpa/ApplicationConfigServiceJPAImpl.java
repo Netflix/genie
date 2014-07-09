@@ -475,6 +475,112 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws CloudServiceException
      */
     @Override
+    public Set<String> addTagsForApplication(
+            final String id,
+            final Set<String> tags) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to add tags.");
+        }
+        if (tags == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tags entered.");
+        }
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            application.getTags().addAll(tags);
+            return application.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getTagsForApplication(
+            final String id)
+            throws CloudServiceException {
+
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id sent. Cannot retrieve tags.");
+        }
+
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            return application.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> updateTagsForApplication(
+            final String id,
+            final Set<String> tags) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to update tags.");
+        }
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            application.setTags(tags);
+            return application.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> removeAllTagsForApplication(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to remove tags.");
+        }
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            application.getTags().clear();
+            return application.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
     @Transactional(readOnly = true)
     public Set<Command> getCommandsForApplication(
             final String id) throws CloudServiceException {
@@ -486,6 +592,36 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             return app.getCommands();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    @Override
+    public Set<String> removeTagForApplication(String id, String tag)
+            throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to remove tag.");
+        }
+        if (StringUtils.isBlank(tag)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tag entered. Unable to remove tag.");
+        }
+        if (tag.equals(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Cannot delete application id from the tags list.");
+        }
+        
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            application.getTags().remove(tag);
+            return application.getTags();
         } else {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,

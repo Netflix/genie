@@ -28,6 +28,8 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +38,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -271,5 +274,161 @@ public class JobResource {
             final String id) throws CloudServiceException {
         LOG.debug("called for jobID: " + id);
         return this.xs.killJob(id);
+    }
+    
+    /**
+     * Add new tags to a given job.
+     *
+     * @param id The id of the job to add the tags to. Not
+     * null/empty/blank.
+     * @param tags The tags to add. Not null/empty/blank.
+     * @return The active tags for this job.
+     * @throws CloudServiceException
+     */
+    @POST
+    @Path("/{id}/tags")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Add new tags to a job",
+            notes = "Add the supplied tags to the job with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Job not found")
+    })
+    public Set<String> addTagsForJob(
+            @ApiParam(value = "Id of the job to add configuration to.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The tags to add.", required = true)
+            final Set<String> tags) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and config " + tags);
+        return this.xs.addTagsForJob(id, tags);
+    }
+
+    /**
+     * Get all the tags for a given job.
+     *
+     * @param id The id of the job to get the tags for. Not
+     * NULL/empty/blank.
+     * @return The active set of tags.
+     * @throws CloudServiceException
+     */
+    @GET
+    @Path("/{id}/tags")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Get the tags for a job",
+            notes = "Get the tags for the job with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Job not found")
+    })
+    public Set<String> getTagsForJob(
+            @ApiParam(value = "Id of the job to get tags for.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.xs.getTagsForJob(id);
+    }
+
+    /**
+     * Update the tags for a given job.
+     *
+     * @param id The id of the job to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing configuration
+     * files with. Not null/empty/blank.
+     * @return The new set of job tags.
+     * @throws CloudServiceException
+     */
+    @PUT
+    @Path("/{id}/tags")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Update tags for a job",
+            notes = "Replace the existing tags for job with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Job not found")
+    })
+    public Set<String> updateTagsForJob(
+            @ApiParam(value = "Id of the job to update tags for.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The tags to replace existing with.", required = true)
+            final Set<String> tags) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and tags " + tags);
+        return this.xs.updateTagsForJob(id, tags);
+    }
+
+    /**
+     * Delete the all tags from a given job.
+     *
+     * @param id The id of the job to delete the tags from.
+     * Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/tags")
+    @ApiOperation(
+            value = "Remove all tags from a job",
+            notes = "Remove all the tags from the job with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid Id supplied"),
+        @ApiResponse(code = 404, message = "Job not found")
+    })
+    public Set<String> removeAllTagsForJob(
+            @ApiParam(value = "Id of the job to delete from.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.xs.removeAllTagsForJob(id);
+    }
+
+    /**
+     * Remove an tag from a given job.
+     *
+     * @param id The id of the job to delete the tag from. Not
+     * null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags for the job.
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/tags/{tag}")
+    @ApiOperation(
+            value = "Remove a tag from a job",
+            notes = "Remove the given tag from the job with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Job not found")
+    })
+    public Set<String> removeTagForJob(
+            @ApiParam(value = "Id of the job to delete from.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The tag to remove.", required = true)
+            @PathParam("tag")
+            final String tag) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and tag " + tag);
+        return this.xs.removeTagForJob(id, tag);
     }
 }

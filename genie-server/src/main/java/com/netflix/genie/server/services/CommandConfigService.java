@@ -198,6 +198,57 @@ public interface CommandConfigService {
             final String id) throws CloudServiceException;
 
     /**
+     * Add tags to the command.
+     *
+     * @param id The id of the command to add the tags to. Not
+     * null/empty/blank.
+     * @param tags The tags to add. Not null/empty.
+     * @return The active set of tags
+     * @throws CloudServiceException
+     */
+    Set<String> addTagsForCommand(
+            final String id,
+            final Set<String> tags) throws CloudServiceException;
+
+    /**
+     * Get the set of tags associated with the command with given
+     * id.
+     *
+     * @param id The id of the command to get the tags for. Not
+     * null/empty/blank.
+     * @return The set of tags as paths
+     * @throws CloudServiceException
+     */
+    Set<String> getTagsForCommand(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Update the set of tags associated with the command with
+     * given id.
+     *
+     * @param id The id of the command to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing tags
+     * with. Not null/empty.
+     * @return The active set of tags
+     * @throws CloudServiceException
+     */
+    Set<String> updateTagsForCommand(
+            final String id,
+            final Set<String> tags) throws CloudServiceException;
+
+    /**
+     * Remove all tags from the command.
+     *
+     * @param id The id of the command to remove the tags from.
+     * Not null/empty/blank.
+     * @return The active set of tagss
+     * @throws CloudServiceException
+     */
+    Set<String> removeAllTagsForCommand(
+            final String id) throws CloudServiceException;
+
+    /**
      * Get all the clusters the command with given id is associated with.
      *
      * @param id The id of the command to get the clusters for.
@@ -206,4 +257,15 @@ public interface CommandConfigService {
      */
     Set<Cluster> getClustersForCommand(
             final String id) throws CloudServiceException;
+
+    /**
+     * Remove a tag from the command.
+     *
+     * @param id The id of the command to remove the tag from. Not
+     * null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags
+     * @throws CloudServiceException
+     */
+    Set<String> removeTagForCommand(final String id, final String tag) throws CloudServiceException;
 }

@@ -431,7 +431,7 @@ public class ClusterConfigResource {
             notes = "Add the supplied commands to the cluster with the supplied id."
             + " commands should already have been created.",
             response = Command.class,
-            responseContainer = "Set")
+            responseContainer = "List")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
@@ -461,7 +461,7 @@ public class ClusterConfigResource {
             value = "Get the commands for a cluster",
             notes = "Get the commands for the cluster with the supplied id.",
             response = Command.class,
-            responseContainer = "Set")
+            responseContainer = "List")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
@@ -495,7 +495,7 @@ public class ClusterConfigResource {
             value = "Update the commands for an cluster",
             notes = "Replace the existing commands for cluster with given id.",
             response = Command.class,
-            responseContainer = "Set")
+            responseContainer = "List")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
@@ -526,7 +526,7 @@ public class ClusterConfigResource {
             value = "Remove all commands from an cluster",
             notes = "Remove all the commands from the cluster with given id.",
             response = Command.class,
-            responseContainer = "Set")
+            responseContainer = "List")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Invalid Id supplied"),
@@ -538,6 +538,38 @@ public class ClusterConfigResource {
             final String id) throws CloudServiceException {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllCommandsForCluster(id);
+    }
+    
+    /**
+     * Remove an command from a given cluster.
+     *
+     * @param id The id of the cluster to delete the command from. Not
+     * null/empty/blank.
+     * @param cmdId The id of the command to remove. Not null/empty/blank.
+     * @return The active set of commands for the cluster.
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/commands/{cmdId}")
+    @ApiOperation(
+            value = "Remove a command from a cluster",
+            notes = "Remove the given command from the cluster with given id.",
+            response = Command.class,
+            responseContainer = "List")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Cluster not found")
+    })
+    public List<Command> removeCommandForCluster(
+            @ApiParam(value = "Id of the cluster to delete from.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The id of the command to remove.", required = true)
+            @PathParam("cmdId")
+            final String cmdId) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and command id " + cmdId);
+        return this.ccs.removeCommandForCluster(id, cmdId);
     }
     
     /**
@@ -663,36 +695,36 @@ public class ClusterConfigResource {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllTagsForCluster(id);
     }
-
+    
     /**
-     * Remove an command from a given cluster.
+     * Remove an tag from a given cluster.
      *
-     * @param id The id of the cluster to delete the command from. Not
+     * @param id The id of the cluster to delete the tag from. Not
      * null/empty/blank.
-     * @param cmdId The id of the command to remove. Not null/empty/blank.
-     * @return The active set of commands for the cluster.
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags for the cluster.
      * @throws CloudServiceException
      */
     @DELETE
-    @Path("/{id}/commands/{cmdId}")
+    @Path("/{id}/tags/{tag}")
     @ApiOperation(
-            value = "Remove a command from a cluster",
-            notes = "Remove the given command from the cluster with given id.",
-            response = Command.class,
+            value = "Remove a tag from a cluster",
+            notes = "Remove the given tag from the cluster with given id.",
+            response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Cluster not found")
     })
-    public List<Command> removeCommandForCluster(
+    public Set<String> removeTagForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The id of the command to remove.", required = true)
-            @PathParam("cmdId")
-            final String cmdId) throws CloudServiceException {
-        LOG.debug("Called with id " + id + " and command id " + cmdId);
-        return this.ccs.removeCommandForCluster(id, cmdId);
+            @ApiParam(value = "The tag to remove.", required = true)
+            @PathParam("tag")
+            final String tag) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and tag " + tag);
+        return this.ccs.removeTagForCluster(id, tag);
     }
 }

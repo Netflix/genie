@@ -38,6 +38,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -460,6 +461,142 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                 // this is really really important
                 clientResponse.close();
             }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> addTagsForJob(
+            final String id,
+            final Set<String> tags) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job id entered. Unable to add tags.");
+        }
+        if (tags == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tags entered.");
+        }
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.getTags().addAll(tags);
+            return job.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getTagsForJob(
+            final String id)
+            throws CloudServiceException {
+
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job id sent. Cannot retrieve tags.");
+        }
+
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            return job.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> updateTagsForJob(
+            final String id,
+            final Set<String> tags) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job id entered. Unable to update tags.");
+        }
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.setTags(tags);
+            return job.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> removeAllTagsForJob(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job id entered. Unable to remove tags.");
+        }
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.getTags().clear();
+            return job.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job with id " + id + " exists.");
+        }
+    }
+
+    @Override
+    public Set<String> removeTagForJob(String id, String tag)
+            throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job id entered. Unable to remove tag.");
+        }
+        if (StringUtils.isBlank(tag)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tag entered. Unable to remove tag.");
+        }
+        if (tag.equals(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Cannot delete job id from the tags list.");
+        }
+        
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.getTags().remove(tag);
+            return job.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job with id " + id + " exists.");
         }
     }
 }

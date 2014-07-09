@@ -82,7 +82,9 @@ public final class JobManagerFactory implements ApplicationContextAware {
     public JobManager getJobManager(final Job job) throws CloudServiceException {
         LOG.info("called");
 
-        final Cluster cluster = this.getCluster(job);
+        // Figure out a cluster to run this job. Cluster selection is done based on 
+        // ClusterCriteria tags and Command tags specified in the job.
+        final Cluster cluster = this.clb.selectCluster(this.ccs.getClusters(job)) ;
         final String className = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server." + cluster.getClusterType() + ".JobManagerImpl");
 
@@ -107,35 +109,6 @@ public final class JobManagerFactory implements ApplicationContextAware {
             LOG.error(msg, e);
             throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-    }
-
-    /**
-     * Figure out an appropriate cluster to run this job<br>
-     * Cluster selection is done based on tags, command and application.
-     *
-     * @param job job info for this job
-     * @return cluster element to use for running this job
-     * @throws CloudServiceException if there is any error finding a cluster for
-     * this job
-     */
-    private Cluster getCluster(final Job job) throws CloudServiceException {
-        LOG.info("called");
-
-        if (job == null) {
-            final String msg = "No job entered. Unable to continue";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-
-        final List<Cluster> clusters = this.ccs.getClusters(
-                job.getApplicationId(),
-                job.getApplicationName(),
-                job.getCommandId(),
-                job.getCommandName(),
-                job.getClusterCriteria());
-
-        // return selected instance
-        return this.clb.selectCluster(clusters);
     }
 
     /**

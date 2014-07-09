@@ -521,6 +521,130 @@ public class CommandConfigResource {
     }
 
     /**
+     * Add new tags to a given command.
+     *
+     * @param id The id of the command to add the tags to. Not
+     * null/empty/blank.
+     * @param tags The tags to add. Not null/empty/blank.
+     * @return The active tags for this command.
+     * @throws CloudServiceException
+     */
+    @POST
+    @Path("/{id}/tags")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Add new tags to a command",
+            notes = "Add the supplied tags to the command with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Command not found")
+    })
+    public Set<String> addTagsForCommand(
+            @ApiParam(value = "Id of the command to add configuration to.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The tags to add.", required = true)
+            final Set<String> tags) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and config " + tags);
+        return this.ccs.addTagsForCommand(id, tags);
+    }
+
+    /**
+     * Get all the tags for a given command.
+     *
+     * @param id The id of the command to get the tags for. Not
+     * NULL/empty/blank.
+     * @return The active set of tags.
+     * @throws CloudServiceException
+     */
+    @GET
+    @Path("/{id}/tags")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Get the tags for a command",
+            notes = "Get the tags for the command with the supplied id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Command not found")
+    })
+    public Set<String> getTagsForCommand(
+            @ApiParam(value = "Id of the command to get tags for.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.ccs.getTagsForCommand(id);
+    }
+
+    /**
+     * Update the tags for a given command.
+     *
+     * @param id The id of the command to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing configuration
+     * files with. Not null/empty/blank.
+     * @return The new set of command tags.
+     * @throws CloudServiceException
+     */
+    @PUT
+    @Path("/{id}/tags")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Update tags for a command",
+            notes = "Replace the existing tags for command with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Command not found")
+    })
+    public Set<String> updateTagsForCommand(
+            @ApiParam(value = "Id of the command to update tags for.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The tags to replace existing with.", required = true)
+            final Set<String> tags) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and tags " + tags);
+        return this.ccs.updateTagsForCommand(id, tags);
+    }
+
+    /**
+     * Delete the all tags from a given command.
+     *
+     * @param id The id of the command to delete the tags from.
+     * Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/tags")
+    @ApiOperation(
+            value = "Remove all tags from a command",
+            notes = "Remove all the tags from the command with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid Id supplied"),
+        @ApiResponse(code = 404, message = "Command not found")
+    })
+    public Set<String> removeAllTagsForCommand(
+            @ApiParam(value = "Id of the command to delete from.", required = true)
+            @PathParam("id")
+            final String id) throws CloudServiceException {
+        LOG.debug("Called with id " + id);
+        return this.ccs.removeAllTagsForCommand(id);
+    }
+
+    /**
      * Set the application for the given command.
      *
      * @param id The id of the command to add the applications to. Not
@@ -689,5 +813,37 @@ public class CommandConfigResource {
             @PathParam("id") final String id) throws CloudServiceException {
         LOG.debug("Called with id " + id);
         return this.ccs.getClustersForCommand(id);
+    }
+
+    /**
+     * Remove an tag from a given command.
+     *
+     * @param id The id of the command to delete the tag from. Not
+     * null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags for the command.
+     * @throws CloudServiceException
+     */
+    @DELETE
+    @Path("/{id}/tags/{tag}")
+    @ApiOperation(
+            value = "Remove a tag from a command",
+            notes = "Remove the given tag from the command with given id.",
+            response = String.class,
+            responseContainer = "Set")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid ID supplied"),
+        @ApiResponse(code = 404, message = "Command not found")
+    })
+    public Set<String> removeTagForCommand(
+            @ApiParam(value = "Id of the command to delete from.", required = true)
+            @PathParam("id")
+            final String id,
+            @ApiParam(value = "The tag to remove.", required = true)
+            @PathParam("tag")
+            final String tag) throws CloudServiceException {
+        LOG.debug("Called with id " + id + " and tag " + tag);
+        return this.ccs.removeTagForCommand(id, tag);
     }
 }

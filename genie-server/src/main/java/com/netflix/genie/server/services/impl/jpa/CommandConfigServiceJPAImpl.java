@@ -443,6 +443,112 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @throws CloudServiceException
      */
     @Override
+    public Set<String> addTagsForCommand(
+            final String id,
+            final Set<String> tags) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to add tags.");
+        }
+        if (tags == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tags entered.");
+        }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getTags().addAll(tags);
+            return command.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getTagsForCommand(
+            final String id)
+            throws CloudServiceException {
+
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id sent. Cannot retrieve tags.");
+        }
+
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            return command.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> updateTagsForCommand(
+            final String id,
+            final Set<String> tags) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to update tags.");
+        }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.setTags(tags);
+            return command.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public Set<String> removeAllTagsForCommand(
+            final String id) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove tags.");
+        }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getTags().clear();
+            return command.getTags();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
     @Transactional(readOnly = true)
     public Set<Cluster> getClustersForCommand(
             final String id) throws CloudServiceException {
@@ -454,6 +560,36 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command.getClusters();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    @Override
+    public Set<String> removeTagForCommand(String id, String tag)
+            throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove tag.");
+        }
+        if (StringUtils.isBlank(tag)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tag entered. Unable to remove tag.");
+        }
+        if (tag.equals(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Cannot delete command id from the tags list.");
+        }
+        
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getTags().remove(tag);
+            return command.getTags();
         } else {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,

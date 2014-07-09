@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.JobStatus;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for the Execution Service.<br>
@@ -99,4 +100,66 @@ public interface ExecutionService {
      * @return Number of jobs marked as zombies
      */
     int markZombies();
+
+    /**
+     * Add tags to the job.
+     *
+     * @param id The id of the job to add the tags to. Not
+     * null/empty/blank.
+     * @param tags The tags to add. Not null/empty.
+     * @return The active set of tags
+     * @throws CloudServiceException
+     */
+    Set<String> addTagsForJob(
+            final String id,
+            final Set<String> tags) throws CloudServiceException;
+
+    /**
+     * Get the set of tags associated with the job with given
+     * id.
+     *
+     * @param id The id of the job to get the tags for. Not
+     * null/empty/blank.
+     * @return The set of tags as paths
+     * @throws CloudServiceException
+     */
+    Set<String> getTagsForJob(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Update the set of tags associated with the job with
+     * given id.
+     *
+     * @param id The id of the job to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing tags
+     * with. Not null/empty.
+     * @return The active set of tags
+     * @throws CloudServiceException
+     */
+    Set<String> updateTagsForJob(
+            final String id,
+            final Set<String> tags) throws CloudServiceException;
+
+    /**
+     * Remove all tags from the job.
+     *
+     * @param id The id of the job to remove the tags from.
+     * Not null/empty/blank.
+     * @return The active set of tags
+     * @throws CloudServiceException
+     */
+    Set<String> removeAllTagsForJob(
+            final String id) throws CloudServiceException;
+
+    /**
+     * Remove a tag from the job.
+     *
+     * @param id The id of the job to remove the tag from. Not
+     * null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags
+     * @throws CloudServiceException
+     */
+    Set<String> removeTagForJob(final String id, final String tag) throws CloudServiceException;
 }

@@ -179,7 +179,7 @@ public class Cluster extends CommonEntityFields implements Serializable {
         // Add the id to the tags
         this.tags.add(this.getId());
     }
-    
+
     /**
      * Gets the status for this cluster.
      *
@@ -264,7 +264,7 @@ public class Cluster extends CommonEntityFields implements Serializable {
     public List<Command> getCommands() {
         return this.commands;
     }
-    
+
     /**
      * Gets the tags allocated to this cluster.
      *
@@ -273,7 +273,7 @@ public class Cluster extends CommonEntityFields implements Serializable {
     public Set<String> getTags() {
         return this.tags;
     }
-    
+
     /**
      * Sets the tags allocated to this cluster.
      *
@@ -283,7 +283,7 @@ public class Cluster extends CommonEntityFields implements Serializable {
     public void setTags(final Set<String> tags) throws CloudServiceException {
         this.tags = tags;
     }
-    
+
     /**
      * Sets the commands for this cluster.
      *

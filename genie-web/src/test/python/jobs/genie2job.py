@@ -36,14 +36,15 @@ serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/jobs'
 #lst = json.dumps([{"id": "t1"},{"id":"t2"}])
 #lst = json.dumps([{"tags" : ['adhoc','test'] },{"tags": ['sla','prod']}])
 #lst = json.dumps([{"tags" : ['adhoc','test'] }])
-lst = json.dumps([{"tags" : ['adhoc','h2query']}])
+lst = json.dumps([{"tags" : ['x','y']},{"tags" : ['adhoc','h2query']}])
+cmdtags = json.dumps(['tag1','tag2'])
 
-jobRuntimeCriteria = json.dumps({"clusterTags": [{"tags" : ['adhoc','h2query']}], "commandTags" : ['hive','prod']})
-print jobRuntimeCriteria
-sys.exit(0)
-print cstrtags
-print "\n"
-print cmdtags
+#jobRuntimeCriteria = json.dumps({"clusterTags": [{"tags" : ['adhoc','h2query']}], "commandTags" : ['hive','prod']})
+#print jobRuntimeCriteria
+#sys.exit(0)
+#print cstrtags
+#print "\n"
+#print cmdtags
 
 print lst
 
@@ -56,9 +57,10 @@ def testJsonSubmitjob():
             "name": "HADOOP-JOB-TEST", 
             "clusterCriteria" : ''' + lst + ''',
             "user" : "genietest", 
+            "version" : "1",
             "group" : "hadoop", 
             "commandArgs" : "jar hadoop-examples.jar sleep -m 1 -mt 1", 
-            "commandName" : "pig",
+            "commandCriteria" :''' + cmdtags + ''',
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hadoop-examples.jar"
         }
     '''

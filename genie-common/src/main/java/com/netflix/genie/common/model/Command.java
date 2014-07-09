@@ -139,7 +139,7 @@ public class Command extends CommonEntityFields implements Serializable {
     @ApiModelProperty(
             value = "Reference to all the tags"
             + " associated with this command.")
-    private Set<String> tags = new HashSet<String>();
+    private Set<String> tags;
 
     /**
      * Default Constructor.
@@ -178,7 +178,10 @@ public class Command extends CommonEntityFields implements Serializable {
     protected void onCreateCommand() throws CloudServiceException {
         validate(this.getName(), this.getUser(), this.status, this.executable);
         // Add the id to the tags
-        this.tags.add(this.getId());
+        if (this.tags == null) {
+           this.tags = new HashSet<String>();
+           this.tags.add(this.getId());
+        }
     }
 
     /**

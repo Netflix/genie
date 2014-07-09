@@ -73,15 +73,6 @@ public class Job extends CommonEntityFields implements Serializable {
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
     // ------------------------------------------------------------------------
     /**
-     * User who submitted the job (REQUIRED).
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "User who submitted this job",
-            required = true)
-    private String user;
-
-    /**
      * Command line arguments (REQUIRED).
      */
     @Lob
@@ -90,14 +81,6 @@ public class Job extends CommonEntityFields implements Serializable {
             value = "Command line arguments for the job",
             required = true)
     private String commandArgs;
-
-    /**
-     * User-specified or system-generated job name.
-     */
-    @Basic
-    @ApiModelProperty(
-            value = "Name specified for the job")
-    private String name;
 
     /**
      * Human readable description.
@@ -147,6 +130,14 @@ public class Job extends CommonEntityFields implements Serializable {
     @ApiModelProperty(
             value = "List of criteria containing tags to use to pick a cluster to run this job")
     private List<ClusterCriteria> clusterCriteria;
+    
+    /**
+     * Set of tags to use for selecting command (REQUIRED).
+     */
+    @Transient
+    @ApiModelProperty(
+            value = "List of criteria containing tags to use to pick a command to run this job")
+    private Set<String> commandCriteria;
 
     /**
      * String representation of the the cluster criteria array list object
@@ -157,6 +148,26 @@ public class Job extends CommonEntityFields implements Serializable {
     @Lob
     @Basic(optional = false)
     private String clusterCriteriaString;
+    
+    /**
+     * String representation of the the command criteria set object
+     * above.
+     */
+    @XmlTransient
+    @JsonIgnore
+    @Lob
+    @Basic(optional = false)
+    private String commandCriteriaString;
+
+    /**
+     * String representation of the criteria that was successfully
+     * used to select a cluster.
+     */
+    @XmlTransient
+    @JsonIgnore
+    @Lob
+    @Basic(optional = false)
+    private String chosenClusterCriteriaString;
 
     /**
      * File dependencies.
@@ -201,8 +212,7 @@ public class Job extends CommonEntityFields implements Serializable {
     @ApiModelProperty(
             value = "Reference to all the tags"
             + " associated with this job.")
-    private Set<String> tags = new HashSet<String>();
-
+    private Set<String> tags;
 
     // ------------------------------------------------------------------------
     // Genie2 command and application combinations to be specified by the user while running jobs.
@@ -358,10 +368,14 @@ public class Job extends CommonEntityFields implements Serializable {
      */
     @PrePersist
     protected void onCreateJob() throws CloudServiceException {
-        validate(this.user, this.commandId, this.commandName, this.commandArgs, this.clusterCriteria);
-        this.clusterCriteriaString = criteriaToString(this.clusterCriteria);
+        validate(this.getUser(), this.commandCriteria, this.commandArgs, this.clusterCriteria);
+        this.clusterCriteriaString = clusterCriteriaToString(this.clusterCriteria);
+        this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
         // Add the id to the tags
-        this.tags.add(this.getId());
+        if (this.tags == null) {
+            this.tags = new HashSet<String>();
+            this.tags.add(this.getId());
+        }
     }
 
     /**
@@ -371,24 +385,6 @@ public class Job extends CommonEntityFields implements Serializable {
     protected void onUpdateJob() {
         // Add the id to the tags
         this.tags.add(this.getId());
-    }
-
-    /**
-     * Gets the name for this job.
-     *
-     * @return name
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Sets the name for this job.
-     *
-     * @param name name for the job
-     */
-    public void setName(final String name) {
-        this.name = name;
     }
 
     /**
@@ -466,7 +462,7 @@ public class Job extends CommonEntityFields implements Serializable {
     }
 
     /**
-     * Gets the criteria which was specified to pick a cluster to run the job.
+     * Gets the cluster criteria which was specified to pick a cluster to run the job.
      *
      * @return clusterCriteria
      */
@@ -487,7 +483,7 @@ public class Job extends CommonEntityFields implements Serializable {
                     "No user entered.");
         }
         this.clusterCriteria = clusterCriteria;
-        this.clusterCriteriaString = criteriaToString(clusterCriteria);
+        this.clusterCriteriaString = clusterCriteriaToString(clusterCriteria);
     }
 
     /**
@@ -901,12 +897,52 @@ public class Job extends CommonEntityFields implements Serializable {
     }
 
     /**
-     * Get the criteria specified to run this job in string format.
+     * Get the cluster criteria specified to run this job in string format.
      *
      * @return clusterCriteriaString
      */
     protected String getClusterCriteriaString() {
         return this.clusterCriteriaString;
+    }
+
+    /**
+     * Gets the command criteria which was specified to pick a command to run the job.
+     *
+     * @return commandCriteria
+     */
+    public Set<String> getCommandCriteria() {
+        return this.commandCriteria;
+    }
+
+    /**
+     * Sets the set of command criteria specified to pick a command.
+     *
+     * @param commandCriteria The criteria list
+     * @throws CloudServiceException
+     */
+    public void setCommandCriteria(Set<String> commandCriteria) throws CloudServiceException {
+        this.commandCriteria = commandCriteria;
+        this.commandCriteriaString = commandCriteriaToString(commandCriteria);
+    }
+
+    /**
+     * Get the command criteria specified to run this job in string format.
+     *
+     * @return commandCriteriaString
+     */
+    public String getCommandCriteriaString() {
+        return this.commandCriteriaString;
+    }
+
+    /**
+     * Set the command criteria string.
+     *
+     * @param commandCriteriaString A set of command criteria tags
+     * @throws CloudServiceException
+     */
+    public void setCommandCriteriaString(String commandCriteriaString) throws CloudServiceException {
+        this.commandCriteriaString = commandCriteriaString;
+        this.commandCriteria = stringToCommandCriteria(commandCriteriaString); 
     }
 
     /**
@@ -922,7 +958,7 @@ public class Job extends CommonEntityFields implements Serializable {
                     "No clusterCriteriaString passed in to set. Unable to continue.");
         }
         this.clusterCriteriaString = clusterCriteriaString;
-        this.clusterCriteria = stringToCriteria(clusterCriteriaString);
+        this.clusterCriteria = stringToClusterCriteria(clusterCriteriaString);
     }
 
     /**
@@ -992,6 +1028,26 @@ public class Job extends CommonEntityFields implements Serializable {
     }
 
     /**
+     * Gets the criteria used to select a cluster for this job.
+     *
+     * @return the criteria containing tags which was chosen to 
+     * select a cluster to run this job.
+     */
+    public String getChosenClusterCriteriaString() {
+        return chosenClusterCriteriaString;
+    }
+
+    /**
+     * Sets the criteria used to select cluster to run this job.
+     *
+     * @param chosenClusterCriteriaString he criteria used to select cluster to run this job.
+     * @throws CloudServiceException
+     */
+    public void setChosenClusterCriteriaString(String chosenClusterCriteriaString) {
+        this.chosenClusterCriteriaString = chosenClusterCriteriaString;
+    }
+    
+    /**
      * Check to make sure that the required parameters exist.
      *
      * @param job The configuration to check
@@ -1005,8 +1061,7 @@ public class Job extends CommonEntityFields implements Serializable {
         }
         validate(
                 job.getUser(),
-                job.getCommandId(),
-                job.getCommandName(),
+                job.getCommandCriteria(),
                 job.getCommandArgs(),
                 job.getClusterCriteria());
     }
@@ -1023,17 +1078,18 @@ public class Job extends CommonEntityFields implements Serializable {
      */
     private static void validate(
             final String user,
-            final String commandId,
-            final String commandName,
+            final Set<String> commandCriteria,
             final String commandArgs,
             final List<ClusterCriteria> criteria) throws CloudServiceException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isBlank(user)) {
             builder.append("User name is missing.\n");
         }
-        if (StringUtils.isBlank(commandId) && StringUtils.isBlank(commandName)) {
-            builder.append("Need one of command id or command name in order to run a job\n");
+        
+        if (commandCriteria == null || commandCriteria.isEmpty()) {
+            builder.append("Command criteria is mandatory to figure out a command to run the job.\n");
         }
+        
         if (StringUtils.isEmpty(commandArgs)) {
             builder.append("Command arguments are required\n");
         }
@@ -1055,7 +1111,7 @@ public class Job extends CommonEntityFields implements Serializable {
      * @param clusterCriteria2 The criteria to build up from
      * @return The cluster criteria string
      */
-    private String criteriaToString(final List<ClusterCriteria> clusterCriteria2) throws CloudServiceException {
+    private String clusterCriteriaToString(final List<ClusterCriteria> clusterCriteria2) throws CloudServiceException {
         if (clusterCriteria2 == null || clusterCriteria2.isEmpty()) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -1072,13 +1128,49 @@ public class Job extends CommonEntityFields implements Serializable {
     }
 
     /**
+     * Helper method for building the cluster criteria string.
+     *
+     * @param clusterCriteria2 The criteria to build up from
+     * @return The cluster criteria string
+     */
+    private String commandCriteriaToString(final Set<String> commandCriteria2) throws CloudServiceException {
+        if (commandCriteria2 == null || commandCriteria2.isEmpty()) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command criteria entered unable to create string");
+        }
+        return StringUtils.join(commandCriteria,CRITERIA_DELIMITER);
+    }
+    
+    /**
      * Convert a string to cluster criteria objects.
      *
      * @param criteriaString The string to convert
      * @return The set of ClusterCriteria
      * @throws CloudServiceException
      */
-    private List<ClusterCriteria> stringToCriteria(final String criteriaString) throws CloudServiceException {
+    private Set<String> stringToCommandCriteria(final String criteriaString) throws CloudServiceException {
+        final String[] criterias = StringUtils.split(criteriaString, CRITERIA_DELIMITER);
+        if (criterias == null || criterias.length == 0) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command criteria found. Unable to continue.");
+        }
+        final Set<String> c = new HashSet<String>();
+        for (final String criteria : criterias) {
+            c.add(criteria);
+        }
+        return c;
+    }
+    
+    /**
+     * Convert a string to cluster criteria objects.
+     *
+     * @param criteriaString The string to convert
+     * @return The set of ClusterCriteria
+     * @throws CloudServiceException
+     */
+    private List<ClusterCriteria> stringToClusterCriteria(final String criteriaString) throws CloudServiceException {
         //Rebuild the cluster criteria objects
         final List<ClusterCriteria> cc = new ArrayList<ClusterCriteria>();
         final String[] criteriaSets = StringUtils.split(criteriaString, CRITERIA_SET_DELIMITER);

@@ -18,14 +18,12 @@
 package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
-import com.netflix.genie.common.model.Types.ApplicationStatus;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import com.netflix.genie.server.repository.jpa.ClusterRepository;
@@ -70,6 +68,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     private final ClusterRepository clusterRepo;
     private final CommandRepository commandRepo;
+    private static final char CRITERIA_DELIMITER = ',';
 
     /**
      * Default constructor - initialize all required dependencies.
@@ -188,44 +187,40 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
+     * @throws CloudServiceException 
      */
     @Override
     @Transactional(readOnly = true)
     public List<Cluster> getClusters(
-            final String applicationId,
-            final String applicationName,
-            final String commandId,
-            final String commandName,
-            final List<ClusterCriteria> clusterCriterias) {
+            final Job job) throws CloudServiceException {
         LOG.debug("Called");
+        if (job == null) {
+            final String msg = "No job entered. Unable to continue";
+            LOG.error(msg);
+            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        
+        List<ClusterCriteria> clusterCriterias = job.getClusterCriteria();
+        Set<String> commandCriteria = job.getCommandCriteria();
+        
         for (final ClusterCriteria cc : clusterCriterias) {
             final CriteriaBuilder cb = this.em.getCriteriaBuilder();
             final CriteriaQuery<Cluster> cq = cb.createQuery(Cluster.class);
             final Root<Cluster> c = cq.from(Cluster.class);
             final List<Predicate> predicates = new ArrayList<Predicate>();
-
+            final Join<Cluster, Command> commands = c.join(Cluster_.commands);
+            
             cq.distinct(true);
 
-            if (StringUtils.isNotEmpty(commandId) || StringUtils.isNotEmpty(commandName)) {
-                final Join<Cluster, Command> commands = c.join(Cluster_.commands);
-                if (StringUtils.isNotEmpty(commandId)) {
-                    predicates.add(cb.equal(commands.get(Command_.id), commandId));
-                } else {
-                    predicates.add(cb.equal(commands.get(Command_.name), commandName));
-                }
-                predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
-                predicates.add(cb.equal(c.get(Cluster_.status), ClusterStatus.UP));
-                if (StringUtils.isNotEmpty(applicationId) || StringUtils.isNotEmpty(applicationName)) {
-                    final Join<Command, Application> apps = commands.join(Command_.application);
-                    if (StringUtils.isNotEmpty(applicationId)) {
-                        predicates.add(cb.equal(apps.get(Application_.id), applicationId));
-                    } else {
-                        predicates.add(cb.equal(apps.get(Application_.name), applicationName));
-                    }
-                    predicates.add(cb.equal(apps.get(Application_.status), ApplicationStatus.ACTIVE));
+            predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
+            predicates.add(cb.equal(c.get(Cluster_.status), ClusterStatus.UP));
+ 
+            if (commandCriteria != null) {
+                for (final String tag: commandCriteria) {
+                    predicates.add(cb.isMember(tag, commands.get(Command_.tags)));
                 }
             }
-
+            
             if (cc.getTags() != null) {
                 for (final String tag : cc.getTags()) {
                     predicates.add(cb.isMember(tag, c.get(Cluster_.tags)));
@@ -237,6 +232,8 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final List<Cluster> clusters = query.getResultList();
 
             if (!clusters.isEmpty()) {
+                // Add the succesfully criteria to the job object in string form.
+                job.setChosenClusterCriteriaString(StringUtils.join(cc.getTags(), CRITERIA_DELIMITER));
                 return clusters;
             }
         }
@@ -531,7 +528,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
-            ArrayList<Command> cmdList = new ArrayList();
+            ArrayList<Command> cmdList = new ArrayList<Command>();
             cmdList.addAll(cluster.getCommands());
             for (final Command cmd : cmdList) {
                 cluster.removeCommand(cmd);
@@ -544,6 +541,43 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CloudServiceException
+     */
+    @Override
+    public List<Command> removeCommandForCluster(
+            final String id,
+            final String cmdId) throws CloudServiceException {
+        if (StringUtils.isBlank(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster id entered. Unable to remove command.");
+        }
+        if (StringUtils.isBlank(cmdId)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove command.");
+        }
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            final Command cmd = this.commandRepo.findOne(cmdId);
+            if (cmd != null) {
+                cluster.removeCommand(cmd);
+            } else {
+                throw new CloudServiceException(
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        "No command with id " + cmdId + " exists.");
+            }
+            return cluster.getCommands();
+        } else {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No cluster with id " + id + " exists.");
+        }
+    }
+    
     /**
      * {@inheritDoc}
      *
@@ -650,36 +684,29 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
-     */
     @Override
-    public List<Command> removeCommandForCluster(
-            final String id,
-            final String cmdId) throws CloudServiceException {
+    public Set<String> removeTagForCluster(String id, String tag)
+            throws CloudServiceException {
         if (StringUtils.isBlank(id)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No cluster id entered. Unable to remove command.");
+                    "No cluster id entered. Unable to remove tag.");
         }
-        if (StringUtils.isBlank(cmdId)) {
+        if (StringUtils.isBlank(tag)) {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered. Unable to remove command.");
+                    "No tag entered. Unable to remove tag.");
         }
+        if (tag.equals(id)) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Cannot delete cluster id from the tags list.");
+        }
+        
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
-            final Command cmd = this.commandRepo.findOne(cmdId);
-            if (cmd != null) {
-                cluster.removeCommand(cmd);
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + cmdId + " exists.");
-            }
-            return cluster.getCommands();
+            cluster.getTags().remove(tag);
+            return cluster.getTags();
         } else {
             throw new CloudServiceException(
                     HttpURLConnection.HTTP_NOT_FOUND,
