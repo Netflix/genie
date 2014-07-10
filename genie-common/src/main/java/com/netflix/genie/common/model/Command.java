@@ -18,7 +18,6 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.CommandStatus;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -89,7 +88,7 @@ public class Command extends Auditable implements Serializable {
     @Basic(optional = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
-            value = "If it is in use - ACTIVE, DEPRECATED, INACTIVE",
+            value = "The status of the command",
             required = true)
     private CommandStatus status;
 

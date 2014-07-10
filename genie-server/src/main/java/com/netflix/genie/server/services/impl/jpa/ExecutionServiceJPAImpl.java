@@ -24,8 +24,8 @@ import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.common.model.Types.SubprocessStatus;
+import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.model.SubProcessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
@@ -357,7 +357,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         this.jobManagerFactory.getJobManager(job).kill(job);
 
         job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
-        job.setExitCode(SubprocessStatus.JOB_KILLED.code());
+        job.setExitCode(SubProcessStatus.JOB_KILLED.code());
 
         // increment counter for killed jobs
         this.stats.incrGenieKilledJobs();
@@ -396,9 +396,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         for (final Job job : jobs) {
             job.setStatus(JobStatus.FAILED);
             job.setFinishTime(currentTime);
-            job.setExitCode(SubprocessStatus.ZOMBIE_JOB.code());
-            job.setStatusMsg(SubprocessStatus.message(
-                    SubprocessStatus.ZOMBIE_JOB.code())
+            job.setExitCode(SubProcessStatus.ZOMBIE_JOB.code());
+            job.setStatusMsg(SubProcessStatus.message(
+                    SubProcessStatus.ZOMBIE_JOB.code())
             );
         }
         return jobs.size();

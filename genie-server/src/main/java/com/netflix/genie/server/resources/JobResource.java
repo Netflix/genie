@@ -19,7 +19,7 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;

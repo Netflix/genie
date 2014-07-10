@@ -18,7 +18,6 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.ApplicationStatus;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;

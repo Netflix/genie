@@ -20,7 +20,7 @@ package com.netflix.genie.server.services.impl.jpa;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
 import javax.inject.Inject;
 import org.junit.Assert;

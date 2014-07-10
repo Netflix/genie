@@ -18,7 +18,6 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
@@ -93,7 +92,7 @@ public class Cluster extends Auditable implements Serializable {
     @Basic(optional = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
-            value = "If it is in use - UP, OUT_OF_SERVICE, TERMINATED",
+            value = "The status of the cluster",
             required = true)
     private ClusterStatus status;
 

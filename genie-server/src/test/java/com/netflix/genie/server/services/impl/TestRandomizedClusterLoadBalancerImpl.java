@@ -19,7 +19,7 @@ package com.netflix.genie.server.services.impl;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import java.util.ArrayList;
 import java.util.Arrays;

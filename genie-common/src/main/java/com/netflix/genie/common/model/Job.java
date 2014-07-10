@@ -18,9 +18,7 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.JobStatus;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -239,6 +237,8 @@ public class Job extends Auditable implements Serializable {
      * PID for job - updated by the server.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The process handle.")
     private int processHandle = -1;
 
     /**
@@ -246,36 +246,48 @@ public class Job extends Auditable implements Serializable {
      */
     @Basic
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(
+            value = "The current status of the job.")
     private JobStatus status;
 
     /**
      * More verbose status message.
      */
     @Basic
+    @ApiModelProperty(
+            value = "A status message about the job.")
     private String statusMsg;
 
     /**
      * Start time for job - initialized to null.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The start time of the job.")
     private Long startTime;
 
     /**
      * Finish time for job - initialized to zero (for historic reasons).
      */
     @Basic
+    @ApiModelProperty(
+            value = "The end time of the job.")
     private Long finishTime = 0L;
 
     /**
-     * The host/ip address of the client submitting job.
+     * The host/IP address of the client submitting job.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The host of the client submitting the job.")
     private String clientHost;
 
     /**
      * The genie host name on which the job is being run.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The host where the job is being run.")
     private String hostName;
 
     /**
@@ -283,30 +295,40 @@ public class Job extends Auditable implements Serializable {
      * instance.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The URI to use to kill the job.")
     private String killURI;
 
     /**
      * URI to fetch the stdout/err and logs.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The URI where to find job output.")
     private String outputURI;
 
     /**
      * Job exit code.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The exit code of the job.")
     private Integer exitCode;
 
     /**
      * Whether this job was forwarded to new instance or not.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Whether this job was forwared or not.")
     private boolean forwarded;
 
     /**
      * Location of logs being archived to s3.
      */
     @Lob
+    @ApiModelProperty(
+            value = "Where the logs were archived in S3.")
     private String archiveLocation;
 
     /**
@@ -957,11 +979,11 @@ public class Job extends Auditable implements Serializable {
     public void setJobStatus(final JobStatus jobStatus) {
         this.status = jobStatus;
 
-        if (jobStatus == Types.JobStatus.INIT) {
+        if (jobStatus == JobStatus.INIT) {
             setStartTime(System.currentTimeMillis());
-        } else if (jobStatus == Types.JobStatus.SUCCEEDED
-                || jobStatus == Types.JobStatus.KILLED
-                || jobStatus == Types.JobStatus.FAILED) {
+        } else if (jobStatus == JobStatus.SUCCEEDED
+                || jobStatus == JobStatus.KILLED
+                || jobStatus == JobStatus.FAILED) {
             setFinishTime(System.currentTimeMillis());
         }
     }

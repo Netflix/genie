@@ -26,7 +26,7 @@ import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.CommandStatus;
+import com.netflix.genie.common.model.CommandStatus;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

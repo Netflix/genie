@@ -16,14 +16,15 @@
 package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command_;
-import com.netflix.genie.common.model.Types;
-import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -90,7 +91,7 @@ public final class ClusterSpecs {
                 if (statuses != null && !statuses.isEmpty()) {
                     //Could optimize this as we know size could use native array
                     final List<Predicate> orPredicates = new ArrayList<Predicate>();
-                    for (final Types.ClusterStatus status : statuses) {
+                    for (final ClusterStatus status : statuses) {
                         orPredicates.add(cb.equal(root.get(Cluster_.status), status));
                     }
                     predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
@@ -134,7 +135,7 @@ public final class ClusterSpecs {
                     } else {
                         predicates.add(cb.equal(commands.get(Command_.name), commandName));
                     }
-                    predicates.add(cb.equal(commands.get(Command_.status), Types.CommandStatus.ACTIVE));
+                    predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
                     predicates.add(cb.equal(root.get(Cluster_.status), ClusterStatus.UP));
                     if (StringUtils.isNotEmpty(applicationId) || StringUtils.isNotEmpty(applicationName)) {
                         final Join<Command, Application> apps = commands.join(Command_.application);
@@ -143,7 +144,7 @@ public final class ClusterSpecs {
                         } else {
                             predicates.add(cb.equal(apps.get(Application_.name), applicationName));
                         }
-                        predicates.add(cb.equal(apps.get(Application_.status), Types.ApplicationStatus.ACTIVE));
+                        predicates.add(cb.equal(apps.get(Application_.status), ApplicationStatus.ACTIVE));
                     }
                 }
 

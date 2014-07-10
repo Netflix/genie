@@ -16,8 +16,8 @@
 package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.model.Job_;
-import com.netflix.genie.common.model.Types.JobStatus;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

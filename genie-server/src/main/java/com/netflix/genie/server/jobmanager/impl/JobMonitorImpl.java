@@ -21,9 +21,8 @@ import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types;
-import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.common.model.Types.SubprocessStatus;
+import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.model.SubProcessStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.util.NetUtil;
@@ -190,11 +189,11 @@ public class JobMonitorImpl implements JobMonitor {
 
         // only update status if not KILLED
         if (dbJI.getStatus() != null && dbJI.getStatus() != JobStatus.KILLED) {
-            if (exitCode != SubprocessStatus.SUCCESS.code()) {
+            if (exitCode != SubProcessStatus.SUCCESS.code()) {
                 // all other failures except s3 log archival failure
                 LOG.error("Failed to execute job, exit code: "
                         + exitCode);
-                String errMsg = Types.SubprocessStatus.message(exitCode);
+                String errMsg = SubProcessStatus.message(exitCode);
                 if ((errMsg == null) || (errMsg.isEmpty())) {
                     errMsg = "Please look at job's stderr for more details";
                 }

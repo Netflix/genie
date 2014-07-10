@@ -19,7 +19,7 @@ package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.JobStatus;
 import java.util.List;
 
 /**

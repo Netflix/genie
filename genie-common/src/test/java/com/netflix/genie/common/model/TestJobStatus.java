@@ -39,12 +39,12 @@ public class TestJobStatus {
         Assert.assertTrue(0L == job.getFinishTime());
 
         // start time is not zero on INIT, finish time is still 0
-        job.setJobStatus(Types.JobStatus.INIT);
+        job.setJobStatus(JobStatus.INIT);
         Assert.assertNotNull(job.getStartTime());
         Assert.assertTrue(0L == job.getFinishTime());
 
         // finish time is non-zero on completion
-        job.setJobStatus(Types.JobStatus.SUCCEEDED);
+        job.setJobStatus(JobStatus.SUCCEEDED);
         Assert.assertFalse(0L == job.getFinishTime());
     }
 }

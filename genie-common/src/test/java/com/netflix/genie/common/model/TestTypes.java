@@ -18,8 +18,6 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.ClusterStatus;
-import com.netflix.genie.common.model.Types.JobStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,7 +47,7 @@ public class TestTypes {
      */
     @Test(expected = CloudServiceException.class)
     public void testInvalidClusterStatus() throws CloudServiceException {
-        Types.ClusterStatus.parse("DOES_NOT_EXIST");
+        ClusterStatus.parse("DOES_NOT_EXIST");
     }
 
     /**

@@ -24,7 +24,7 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.genie.server.repository.jpa.CommandRepository;

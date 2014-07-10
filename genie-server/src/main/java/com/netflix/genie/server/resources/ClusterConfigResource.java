@@ -19,8 +19,8 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
