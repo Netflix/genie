@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.model.SubProcessStatus;
@@ -118,12 +118,12 @@ public class JobMonitorImpl implements JobMonitor {
      * Set the job for this to monitor.
      *
      * @param job The job to monitor. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public void setJob(final Job job) throws CloudServiceException {
+    public void setJob(final Job job) throws GenieException {
         if (job == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, "No job entered.");
         }
         this.job = job;
@@ -146,12 +146,12 @@ public class JobMonitorImpl implements JobMonitor {
      * Set the process handle for this job.
      *
      * @param proc The process handle for the job. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public void setProcess(final Process proc) throws CloudServiceException {
+    public void setProcess(final Process proc) throws GenieException {
         if (proc == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, "No process entered.");
         }
         this.proc = proc;
@@ -161,12 +161,12 @@ public class JobMonitorImpl implements JobMonitor {
      * Set the job manager for this monitor to use.
      *
      * @param jobManager The job manager to use. Not Null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public void setJobManager(final JobManager jobManager) throws CloudServiceException {
+    public void setJobManager(final JobManager jobManager) throws GenieException {
         if (jobManager == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, "No job manager entered.");
         }
         this.jobManager = jobManager;
@@ -322,7 +322,7 @@ public class JobMonitorImpl implements JobMonitor {
                     try {
                         this.jobManager.kill(this.job);
                         this.terminated = true;
-                    } catch (CloudServiceException e) {
+                    } catch (GenieException e) {
                         LOG.error("Can't kill job " + this.job.getId()
                                 + " after exceeding stdout limit", e);
                         // continue - hoping that it can get cleaned up during next iteration

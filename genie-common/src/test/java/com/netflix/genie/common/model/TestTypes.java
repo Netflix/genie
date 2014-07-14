@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,10 +32,10 @@ public class TestTypes {
     /**
      * Tests whether a valid cluster status is parsed correctly.
      *
-     * @throws com.netflix.genie.common.exceptions.CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test
-    public void testValidClusterStatus() throws CloudServiceException {
+    public void testValidClusterStatus() throws GenieException {
         String status = ClusterStatus.UP.name();
         Assert.assertEquals(ClusterStatus.UP, ClusterStatus.parse(status));
     }
@@ -43,20 +43,20 @@ public class TestTypes {
     /**
      * Tests whether an invalid cluster status returns null.
      *
-     * @throws com.netflix.genie.common.exceptions.CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    @Test(expected = CloudServiceException.class)
-    public void testInvalidClusterStatus() throws CloudServiceException {
+    @Test(expected = GenieException.class)
+    public void testInvalidClusterStatus() throws GenieException {
         ClusterStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
      * Tests whether a valid job status is parsed correctly.
      *
-     * @throws com.netflix.genie.common.exceptions.CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test
-    public void testValidJobStatus() throws CloudServiceException {
+    public void testValidJobStatus() throws GenieException {
         String status = JobStatus.RUNNING.name();
         Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(status));
     }
@@ -64,10 +64,10 @@ public class TestTypes {
     /**
      * Tests whether an invalid job status returns null.
      *
-     * @throws com.netflix.genie.common.exceptions.CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    @Test(expected = CloudServiceException.class)
-    public void testInvalidJobStatus() throws CloudServiceException {
+    @Test(expected = GenieException.class)
+    public void testInvalidJobStatus() throws GenieException {
         JobStatus.parse("DOES_NOT_EXIST");
     }
 }

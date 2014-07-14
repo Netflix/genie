@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -148,12 +148,12 @@ public class Application extends Auditable implements Serializable {
      * @param name The name of the application. Not null/empty/blank.
      * @param user The user who created the application. Not null/empty/blank.
      * @param status The status of the application. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Application(
             final String name,
             final String user,
-            final ApplicationStatus status) throws CloudServiceException {
+            final ApplicationStatus status) throws GenieException {
         super();
         this.name = name;
         this.user = user;
@@ -163,10 +163,10 @@ public class Application extends Auditable implements Serializable {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @PrePersist
-    protected void onCreateApplication() throws CloudServiceException {
+    protected void onCreateApplication() throws GenieException {
         validate(this.name, this.user, this.status);
     }
 
@@ -276,9 +276,9 @@ public class Application extends Auditable implements Serializable {
      * Sets the configurations for this application.
      *
      * @param configs The configuration files that this application needs
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setConfigs(final Set<String> configs) throws CloudServiceException {
+    public void setConfigs(final Set<String> configs) throws GenieException {
         this.configs = configs;
     }
 
@@ -295,9 +295,9 @@ public class Application extends Auditable implements Serializable {
      * Sets the jars needed for this application.
      *
      * @param jars All jars needed for execution of this application
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setJars(final Set<String> jars) throws CloudServiceException {
+    public void setJars(final Set<String> jars) throws GenieException {
         this.jars = jars;
     }
 
@@ -323,11 +323,11 @@ public class Application extends Auditable implements Serializable {
      * Check to make sure that the required parameters exist.
      *
      * @param application The applications to check
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public static void validate(final Application application) throws CloudServiceException {
+    public static void validate(final Application application) throws GenieException {
         if (application == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application passed in. Unable to validate.");
         }
@@ -341,13 +341,13 @@ public class Application extends Auditable implements Serializable {
      * @param name The name of the application
      * @param user The user who created the application
      * @param status The status of the application
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     private static void validate(
             final String name,
             final String user,
             final ApplicationStatus status)
-            throws CloudServiceException {
+            throws GenieException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isBlank(user)) {
             builder.append("User name is missing and is required.\n");
@@ -363,7 +363,7 @@ public class Application extends Auditable implements Serializable {
             builder.insert(0, "Application configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 }

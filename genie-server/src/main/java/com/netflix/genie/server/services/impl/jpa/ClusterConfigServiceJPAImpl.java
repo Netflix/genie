@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.ClusterStatus;
@@ -49,7 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author tgianos
  */
 @Named
-@Transactional(rollbackFor = CloudServiceException.class)
+@Transactional(rollbackFor = GenieException.class)
 public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceJPAImpl.class);
@@ -77,17 +77,17 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public Cluster createCluster(final Cluster cluster) throws CloudServiceException {
+    public Cluster createCluster(final Cluster cluster) throws GenieException {
         Cluster.validate(cluster);
         LOG.debug("Called to create cluster " + cluster.toString());
         if (StringUtils.isEmpty(cluster.getId())) {
             cluster.setId(UUID.randomUUID().toString());
         }
         if (this.clusterRepo.exists(cluster.getId())) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "A cluster with id " + cluster.getId() + " already exists");
         }
@@ -98,13 +98,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
-    public Cluster getCluster(final String id) throws CloudServiceException {
+    public Cluster getCluster(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered.");
         }
@@ -113,7 +113,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         if (cluster != null) {
             return cluster;
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -122,7 +122,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -133,7 +133,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final Long minUpdateTime,
             final Long maxUpdateTime,
             final int limit,
-            final int page) throws CloudServiceException {
+            final int page) throws GenieException {
         LOG.debug("GENIE: Returning configs for specified params");
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
@@ -184,18 +184,18 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Cluster updateCluster(final String id,
-            final Cluster updateCluster) throws CloudServiceException {
+            final Cluster updateCluster) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to update.");
         }
         if (StringUtils.isBlank(updateCluster.getId()) || !id.equals(updateCluster.getId())) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Cluster id either not entered or inconsistent with id passed in.");
         }
@@ -208,19 +208,19 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public Cluster deleteCluster(final String id) throws CloudServiceException {
+    public Cluster deleteCluster(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered unable to delete.");
         }
         LOG.debug("Called");
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists to delete.");
         }
@@ -240,10 +240,10 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public List<Cluster> deleteAllClusters() throws CloudServiceException {
+    public List<Cluster> deleteAllClusters() throws GenieException {
         LOG.debug("Called to delete all clusters");
         final List<Cluster> clusters = this.clusterRepo.findAll();
         for (final Cluster cluster : clusters) {
@@ -255,19 +255,19 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> addConfigsForCluster(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to add configurations.");
         }
         if (configs == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No configuration files entered.");
         }
@@ -276,7 +276,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             cluster.getConfigs().addAll(configs);
             return cluster.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -285,16 +285,16 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForCluster(
             final String id)
-            throws CloudServiceException {
+            throws GenieException {
 
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id sent. Cannot retrieve configurations.");
         }
@@ -303,7 +303,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         if (cluster != null) {
             return cluster.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -312,14 +312,14 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> updateConfigsForCluster(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to update configurations.");
         }
@@ -328,7 +328,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             cluster.setConfigs(configs);
             return cluster.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -337,13 +337,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> removeAllConfigsForCluster(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to remove configs.");
         }
@@ -352,7 +352,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             cluster.getConfigs().clear();
             return cluster.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -361,14 +361,14 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public List<Command> addCommandsForCluster(
             final String id,
-            final List<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to add commands.");
         }
@@ -379,14 +379,14 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 if (cmd != null) {
                     cluster.addCommand(cmd);
                 } else {
-                    throw new CloudServiceException(
+                    throw new GenieException(
                             HttpURLConnection.HTTP_NOT_FOUND,
                             "No command with id " + detached.getId() + " exists.");
                 }
             }
             return cluster.getCommands();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -395,14 +395,14 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public List<Command> getCommandsForCluster(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to get commands.");
         }
@@ -410,7 +410,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         if (cluster != null) {
             return cluster.getCommands();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -419,14 +419,14 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public List<Command> updateCommandsForCluster(
             final String id,
-            final List<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to update commands.");
         }
@@ -438,7 +438,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 if (cmd != null) {
                     cmds.add(cmd);
                 } else {
-                    throw new CloudServiceException(
+                    throw new GenieException(
                             HttpURLConnection.HTTP_NOT_FOUND,
                             "No command with id " + detached.getId() + " exists.");
                 }
@@ -446,7 +446,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             cluster.setCommands(cmds);
             return cluster.getCommands();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -455,13 +455,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public List<Command> removeAllCommandsForCluster(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to remove commands.");
         }
@@ -474,7 +474,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             }
             return cluster.getCommands();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }
@@ -483,19 +483,19 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public List<Command> removeCommandForCluster(
             final String id,
-            final String cmdId) throws CloudServiceException {
+            final String cmdId) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster id entered. Unable to remove command.");
         }
         if (StringUtils.isBlank(cmdId)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove command.");
         }
@@ -505,13 +505,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             if (cmd != null) {
                 cluster.removeCommand(cmd);
             } else {
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_NOT_FOUND,
                         "No command with id " + cmdId + " exists.");
             }
             return cluster.getCommands();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No cluster with id " + id + " exists.");
         }

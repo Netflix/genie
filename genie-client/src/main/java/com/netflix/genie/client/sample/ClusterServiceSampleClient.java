@@ -23,7 +23,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.client.ClusterServiceClient;
 import com.netflix.genie.client.CommandServiceClient;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
@@ -243,10 +243,10 @@ public final class ClusterServiceSampleClient {
      *
      * @param id The ID to use. If null or empty one will be created.
      * @return A cluster object
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public static Cluster createSampleCluster(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");

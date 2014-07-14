@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services.impl;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import java.net.HttpURLConnection;
@@ -42,17 +42,17 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Cluster selectCluster(final List<Cluster> clusters)
-            throws CloudServiceException {
+            throws GenieException {
         LOG.info("called");
 
         if (clusters == null || clusters.isEmpty()) {
             final String msg = "No cluster configuration found to match user params";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_PRECON_FAILED, msg);
+            throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, msg);
         }
 
         // return a random one

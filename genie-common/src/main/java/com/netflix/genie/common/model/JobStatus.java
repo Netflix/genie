@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import java.net.HttpURLConnection;
 import org.apache.commons.lang3.StringUtils;
@@ -56,11 +56,11 @@ public enum JobStatus {
      *
      * @param value string to parse/convert
      * @return INIT, RUNNING, SUCCEEDED, KILLED, FAILED if match
-     * @throws CloudServiceException if invalid value passed in
+     * @throws com.netflix.genie.common.exceptions.GenieException if invalid value passed in
      */
-    public static JobStatus parse(final String value) throws CloudServiceException {
+    public static JobStatus parse(final String value) throws GenieException {
         if (StringUtils.isBlank(value)) {
-            throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+            throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
                     "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed}");
         } else if (value.equalsIgnoreCase("INIT")) {
             return INIT;
@@ -73,7 +73,7 @@ public enum JobStatus {
         } else if (value.equalsIgnoreCase("FAILED")) {
             return FAILED;
         } else {
-            throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+            throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
                     "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed}");
         }
     }

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -39,18 +39,18 @@ public interface CommandConfigService {
      * @param command encapsulates the command configuration information to
      * create
      * @return The command created
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    Command createCommand(final Command command) throws CloudServiceException;
+    Command createCommand(final Command command) throws GenieException;
 
     /**
      * Gets command configuration for given id.
      *
      * @param id unique id for command configuration to get. Not null/empty.
      * @return The command configuration
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    Command getCommand(final String id) throws CloudServiceException;
+    Command getCommand(final String id) throws GenieException;
 
     /**
      * Get command configurations for given filter criteria.
@@ -75,28 +75,28 @@ public interface CommandConfigService {
      * empty.
      * @param updateCommand contains the information to update the command with
      * @return The updated command
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Command updateCommand(
             final String id,
-            final Command updateCommand) throws CloudServiceException;
+            final Command updateCommand) throws GenieException;
 
     /**
      * Delete all commands from database.
      *
      * @return The deleted commands
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    List<Command> deleteAllCommands() throws CloudServiceException;
+    List<Command> deleteAllCommands() throws GenieException;
 
     /**
      * Delete a command configuration from database.
      *
      * @param id unique if of the command configuration to delete
      * @return The deleted command configuration
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    Command deleteCommand(final String id) throws CloudServiceException;
+    Command deleteCommand(final String id) throws GenieException;
 
     /**
      * Add a configuration files to the command.
@@ -105,11 +105,11 @@ public interface CommandConfigService {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Set<String> addConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException;
+            final Set<String> configs) throws GenieException;
 
     /**
      * Get the set of configuration files associated with the command with given
@@ -118,10 +118,10 @@ public interface CommandConfigService {
      * @param id The id of the command to get the configuration files for. Not
      * null/empty/blank.
      * @return The set of configuration files as paths
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Set<String> getConfigsForCommand(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Update the set of configuration files associated with the command with
@@ -132,11 +132,11 @@ public interface CommandConfigService {
      * @param configs The configuration files to replace existing configurations
      * with. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Set<String> updateConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException;
+            final Set<String> configs) throws GenieException;
 
     /**
      * Remove all configuration files from the command.
@@ -144,10 +144,10 @@ public interface CommandConfigService {
      * @param id The id of the command to remove the configuration file from.
      * Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Set<String> removeAllConfigsForCommand(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Remove a configuration file from the command.
@@ -156,11 +156,11 @@ public interface CommandConfigService {
      * Not null/empty/blank.
      * @param config The configuration file to remove. Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Set<String> removeConfigForCommand(
             final String id,
-            final String config) throws CloudServiceException;
+            final String config) throws GenieException;
 
     /**
      * Set the application for the command.
@@ -169,11 +169,11 @@ public interface CommandConfigService {
      * null/empty/blank.
      * @param application The applications to set. Not null.
      * @return The application
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Application setApplicationForCommand(
             final String id,
-            final Application application) throws CloudServiceException;
+            final Application application) throws GenieException;
 
     /**
      * Get the application for a given command.
@@ -181,10 +181,10 @@ public interface CommandConfigService {
      * @param id The id of the command to get the application for. Not
      * null/empty/blank.
      * @return The application or exception if none exists.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Application getApplicationForCommand(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Remove the application from the command.
@@ -192,18 +192,18 @@ public interface CommandConfigService {
      * @param id The id of the command to remove the application from. Not
      * null/empty/blank.
      * @return The removed application
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Application removeApplicationForCommand(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Get all the clusters the command with given id is associated with.
      *
      * @param id The id of the command to get the clusters for.
      * @return The clusters the command is available on.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     Set<Cluster> getClustersForCommand(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 }

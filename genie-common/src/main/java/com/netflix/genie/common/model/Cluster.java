@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
@@ -167,14 +167,14 @@ public class Cluster extends Auditable implements Serializable {
      * @param clusterType The type of the cluster. Not null/empty/blank.
      * @param configs The configuration files for the cluster. Not null or
      * empty.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Cluster(
             final String name,
             final String user,
             final ClusterStatus status,
             final String clusterType,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         super();
         this.name = name;
         this.user = user;
@@ -186,10 +186,10 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @PrePersist
-    protected void onCreateCluster() throws CloudServiceException {
+    protected void onCreateCluster() throws GenieException {
         validate(this.name, this.user, this.status, this.clusterType, this.version, this.configs);
     }
 
@@ -206,11 +206,11 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the name for this cluster.
      *
      * @param name name for this cluster. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setName(final String name) throws CloudServiceException {
+    public void setName(final String name) throws GenieException {
         if (StringUtils.isBlank(name)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No name Entered.");
         }
@@ -230,11 +230,11 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the user who created this cluster.
      *
      * @param user user who created this cluster. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setUser(final String user) throws CloudServiceException {
+    public void setUser(final String user) throws GenieException {
         if (StringUtils.isBlank(user)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No user Entered.");
         }
@@ -254,12 +254,12 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the status for this cluster.
      *
      * @param status The status of the cluster. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      * @see ClusterStatus
      */
-    public void setStatus(final ClusterStatus status) throws CloudServiceException {
+    public void setStatus(final ClusterStatus status) throws GenieException {
         if (status == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No Status Entered.");
         }
@@ -280,11 +280,11 @@ public class Cluster extends Auditable implements Serializable {
      * Set the type for this cluster.
      *
      * @param clusterType The type of this cluster. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setClusterType(String clusterType) throws CloudServiceException {
+    public void setClusterType(String clusterType) throws GenieException {
         if (StringUtils.isBlank(clusterType)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster type Entered.");
         }
@@ -322,9 +322,9 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the tags allocated to this cluster.
      *
      * @param tags the tags to set. Not Null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setTags(final Set<String> tags) throws CloudServiceException {
+    public void setTags(final Set<String> tags) throws GenieException {
         this.tags = tags;
     }
 
@@ -342,11 +342,11 @@ public class Cluster extends Auditable implements Serializable {
      *
      * @param configs The configuration files that this cluster needs. Not
      * null/empty.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setConfigs(final Set<String> configs) throws CloudServiceException {
+    public void setConfigs(final Set<String> configs) throws GenieException {
         if (configs == null || configs.isEmpty()) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "At least one config required.");
         }
@@ -399,12 +399,12 @@ public class Cluster extends Auditable implements Serializable {
      * Add a new command to this cluster. Manages both sides of relationship.
      *
      * @param command The command to add. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public void addCommand(final Command command)
-            throws CloudServiceException {
+            throws GenieException {
         if (command == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command entered unable to add.");
         }
@@ -426,12 +426,12 @@ public class Cluster extends Auditable implements Serializable {
      * Remove an command from this command. Manages both sides of relationship.
      *
      * @param command The command to remove. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public void removeCommand(final Command command)
-            throws CloudServiceException {
+            throws GenieException {
         if (command == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command entered unable to remove.");
         }
@@ -447,9 +447,9 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Remove all the commands from this application.
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void removeAllCommands() throws CloudServiceException {
+    public void removeAllCommands() throws GenieException {
         if (this.commands != null) {
             for (final Command command : this.commands) {
                 this.removeCommand(command);
@@ -461,11 +461,11 @@ public class Cluster extends Auditable implements Serializable {
      * Check to make sure that the required parameters exist.
      *
      * @param cluster The configuration to check
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public static void validate(final Cluster cluster) throws CloudServiceException {
+    public static void validate(final Cluster cluster) throws GenieException {
         if (cluster == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster entered. Unable to validate.");
         }
@@ -486,7 +486,7 @@ public class Cluster extends Auditable implements Serializable {
      * @param status The status of the cluster
      * @param clusterType The type of cluster
      * @param configs The configuration files for the cluster
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     private static void validate(
             final String name,
@@ -494,7 +494,7 @@ public class Cluster extends Auditable implements Serializable {
             final ClusterStatus status,
             final String clusterType,
             final String clusterVersion,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isBlank(name)) {
             builder.append("Cluster name is missing and required.\n");
@@ -519,7 +519,7 @@ public class Cluster extends Auditable implements Serializable {
             builder.insert(0, "Cluster configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 }

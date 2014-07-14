@@ -22,7 +22,7 @@ import com.netflix.appinfo.InstanceInfo.InstanceStatus;
 import com.netflix.discovery.DiscoveryClient;
 import com.netflix.discovery.DiscoveryManager;
 import com.netflix.discovery.shared.Application;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.model.Job_;
@@ -65,10 +65,10 @@ public class JobCountManagerImpl implements JobCountManager {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public int getNumInstanceJobs() throws CloudServiceException {
+    public int getNumInstanceJobs() throws GenieException {
         LOG.debug("called");
 
         return getNumInstanceJobs(null, null, null);
@@ -77,13 +77,13 @@ public class JobCountManagerImpl implements JobCountManager {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public int getNumInstanceJobs(
             final Long minStartTime,
             final Long maxStartTime)
-            throws CloudServiceException {
+            throws GenieException {
         LOG.debug("called");
 
         return getNumInstanceJobs(null, minStartTime, maxStartTime);
@@ -92,14 +92,14 @@ public class JobCountManagerImpl implements JobCountManager {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public int getNumInstanceJobs(
             String hostName,
             final Long minStartTime,
-            final Long maxStartTime) throws CloudServiceException {
+            final Long maxStartTime) throws GenieException {
         LOG.debug("called");
 
         // initialize host name
@@ -133,12 +133,12 @@ public class JobCountManagerImpl implements JobCountManager {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public String getIdleInstance(
             final long minJobThreshold)
-            throws CloudServiceException {
+            throws GenieException {
         LOG.debug("called");
         String localhost = NetUtil.getHostName();
 

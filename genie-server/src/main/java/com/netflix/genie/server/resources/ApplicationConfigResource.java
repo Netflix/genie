@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.services.ApplicationConfigService;
@@ -92,7 +92,7 @@ public class ApplicationConfigResource {
      *
      * @param app The application to create
      * @return The created application configuration
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @POST
     @Consumes({
@@ -110,7 +110,7 @@ public class ApplicationConfigResource {
     })
     public Response createApplication(
             @ApiParam(value = "The application to create.", required = true)
-            final Application app) throws CloudServiceException {
+            final Application app) throws GenieException {
         LOG.debug("Called to create new application");
         final Application createdApp = this.acs.createApplication(app);
         return Response.created(
@@ -124,7 +124,7 @@ public class ApplicationConfigResource {
      *
      * @param id unique id for application configuration
      * @return The application configuration
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @GET
     @Path("/{id}")
@@ -140,7 +140,7 @@ public class ApplicationConfigResource {
     public Application getApplication(
             @ApiParam(value = "Id of the application to get.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called");
         return this.acs.getApplication(id);
     }
@@ -186,7 +186,7 @@ public class ApplicationConfigResource {
      * @param id unique id for configuration to update
      * @param updateApp contains the application information to update
      * @return successful response, or one with an HTTP error code
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @PUT
     @Path("/{id}")
@@ -208,7 +208,7 @@ public class ApplicationConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The application information to update.", required = true)
-            final Application updateApp) throws CloudServiceException {
+            final Application updateApp) throws GenieException {
         LOG.debug("called to update application config with info " + updateApp.toString());
         return this.acs.updateApplication(id, updateApp);
     }
@@ -217,7 +217,7 @@ public class ApplicationConfigResource {
      * Delete all applications from database.
      *
      * @return All The deleted applications
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @DELETE
     @ApiOperation(
@@ -230,7 +230,7 @@ public class ApplicationConfigResource {
         @ApiResponse(code = 400, message = "Invalid ID supplied"),
         @ApiResponse(code = 404, message = "Application not found")
     })
-    public List<Application> deleteAllApplications() throws CloudServiceException {
+    public List<Application> deleteAllApplications() throws GenieException {
         LOG.debug("called");
         return this.acs.deleteAllApplications();
     }
@@ -240,7 +240,7 @@ public class ApplicationConfigResource {
      *
      * @param id unique id of configuration to delete
      * @return The deleted application configuration
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @DELETE
     @Path("/{id}")
@@ -256,7 +256,7 @@ public class ApplicationConfigResource {
     public Application deleteApplication(
             @ApiParam(value = "Id of the application to delete.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("called");
         return this.acs.deleteApplication(id);
     }
@@ -268,7 +268,7 @@ public class ApplicationConfigResource {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this application.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @POST
     @Path("/{id}/configs")
@@ -289,7 +289,7 @@ public class ApplicationConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The configuration files to add.", required = true)
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         LOG.debug("Called with id " + id + " and config " + configs);
         return this.acs.addConfigsToApplication(id, configs);
     }
@@ -300,7 +300,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the configuration files for.
      * Not NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @GET
     @Path("/{id}/configs")
@@ -318,7 +318,7 @@ public class ApplicationConfigResource {
     public Set<String> getConfigsForApplication(
             @ApiParam(value = "Id of the application to get configurations for.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.acs.getConfigsForApplication(id);
     }
@@ -331,7 +331,7 @@ public class ApplicationConfigResource {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of application configurations.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @PUT
     @Path("/{id}/configs")
@@ -352,7 +352,7 @@ public class ApplicationConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The configuration files to replace existing with.", required = true)
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         LOG.debug("Called with id " + id + " and configs " + configs);
         return this.acs.updateConfigsForApplication(id, configs);
     }
@@ -363,7 +363,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to delete the configuration files
      * from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @DELETE
     @Path("/{id}/configs")
@@ -380,7 +380,7 @@ public class ApplicationConfigResource {
     public Set<String> removeAllConfigsForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.acs.removeAllConfigsForApplication(id);
     }
@@ -392,7 +392,7 @@ public class ApplicationConfigResource {
      * null/empty/blank.
      * @param jars The jar files to add. Not null.
      * @return The active set of application jars.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @POST
     @Path("/{id}/jars")
@@ -413,7 +413,7 @@ public class ApplicationConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The jar files to add.", required = true)
-            final Set<String> jars) throws CloudServiceException {
+            final Set<String> jars) throws GenieException {
         LOG.debug("Called with id " + id + " and jars " + jars);
         return this.acs.addJarsForApplication(id, jars);
     }
@@ -424,7 +424,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the jar files for. Not
      * NULL/empty/blank.
      * @return The set of jar files.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @GET
     @Path("/{id}/jars")
@@ -442,7 +442,7 @@ public class ApplicationConfigResource {
     public Set<String> getJarsForApplication(
             @ApiParam(value = "Id of the application to get the jars for.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.acs.getJarsForApplication(id);
     }
@@ -455,7 +455,7 @@ public class ApplicationConfigResource {
      * @param jars The jar files to replace existing jar files with. Not
      * null/empty/blank.
      * @return The active set of application jars
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @PUT
     @Path("/{id}/jars")
@@ -476,7 +476,7 @@ public class ApplicationConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The jar files to replace existing with.", required = true)
-            final Set<String> jars) throws CloudServiceException {
+            final Set<String> jars) throws GenieException {
         LOG.debug("Called with id " + id + " and jars " + jars);
         return this.acs.updateJarsForApplication(id, jars);
     }
@@ -487,7 +487,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to delete the jar files from. Not
      * null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @DELETE
     @Path("/{id}/jars")
@@ -504,7 +504,7 @@ public class ApplicationConfigResource {
     public Set<String> removeAllJarsForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.acs.removeAllJarsForApplication(id);
     }
@@ -515,7 +515,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the commands for. Not
      * NULL/empty/blank.
      * @return The set of commands.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @GET
     @Path("/{id}/commands")
@@ -532,7 +532,7 @@ public class ApplicationConfigResource {
     public Set<Command> getCommandsForApplication(
             @ApiParam(value = "Id of the application to get the commands for.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.acs.getCommandsForApplication(id);
     }

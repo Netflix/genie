@@ -20,7 +20,7 @@ package com.netflix.genie.client;
 import com.google.common.collect.Multimap;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
 import java.io.IOException;
@@ -78,10 +78,10 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * configuration to create
      *
      * @return The application that was created
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Application createApplication(final Application application)
-            throws CloudServiceException {
+            throws GenieException {
         Application.validate(application);
         final HttpRequest request = this.buildRequest(
                 Verb.POST,
@@ -98,16 +98,16 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param application the object encapsulating the new application to create
      *
      * @return extracted application configuration response
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Application updateApplication(
             final String id,
             final Application application)
-            throws CloudServiceException {
+            throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Required parameter id is missing. Unable to update.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -125,13 +125,13 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *
      * @param id the application id to get (can't be null or empty)
      * @return the application for this id
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public Application getApplication(final String id) throws CloudServiceException {
+    public Application getApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Required parameter id is missing. Unable to get.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -152,10 +152,10 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * More details on the parameters can be found on the Genie User Guide on
      * GitHub.
      * @return List of application configuration elements that match the filter
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public List<Application> getApplications(final Multimap<String, String> params)
-            throws CloudServiceException {
+            throws GenieException {
         final HttpRequest request = this.buildRequest(
                 Verb.GET,
                 BASE_CONFIG_APPLICATION_REST_URL,
@@ -168,9 +168,9 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Delete all the applications in the database.
      *
      * @return the should be empty set.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public List<Application> deleteAllApplications() throws CloudServiceException {
+    public List<Application> deleteAllApplications() throws GenieException {
         final HttpRequest request = this.buildRequest(
                 Verb.DELETE,
                 BASE_CONFIG_APPLICATION_REST_URL,
@@ -184,13 +184,13 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *
      * @param id the id for the application to delete
      * @return the deleted application
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public Application deleteApplication(final String id) throws CloudServiceException {
+    public Application deleteApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -210,20 +210,20 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given application.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Set<String> addConfigsToApplication(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         if (configs == null || configs.isEmpty()) {
             final String msg = "Missing required parameter: configs";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -242,13 +242,13 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get configurations for. Not
      * Null/empty/blank.
      * @return The set of configuration files for the given application.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public Set<String> getConfigsForApplication(final String id) throws CloudServiceException {
+    public Set<String> getConfigsForApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -269,21 +269,21 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null.
      * @return The new set of application configurations.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Set<String> updateConfigsForApplication(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         if (configs == null) {
             final String msg = "Missing required parameter: configs";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -303,14 +303,14 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to delete the configuration files
      * from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Set<String> removeAllConfigsForApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -331,20 +331,20 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Null/empty/blank.
      * @param jars The jar files to add. Not null or empty.
      * @return The new set of jar files for the given application.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Set<String> addJarsToApplication(
             final String id,
-            final Set<String> jars) throws CloudServiceException {
+            final Set<String> jars) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         if (jars == null || jars.isEmpty()) {
             final String msg = "Missing required parameter: jars";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -363,13 +363,13 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get jars for. Not
      * Null/empty/blank.
      * @return The set of jar files for the given application.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public Set<String> getJarsForApplication(final String id) throws CloudServiceException {
+    public Set<String> getJarsForApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -390,21 +390,21 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param jars The jar files to replace existing jar
      * files with. Not null.
      * @return The new set of application jars.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Set<String> updateJarsForApplication(
             final String id,
-            final Set<String> jars) throws CloudServiceException {
+            final Set<String> jars) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         if (jars == null) {
             final String msg = "Missing required parameter: jars";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -424,14 +424,14 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to delete the jar files
      * from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Set<String> removeAllJarsForApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -451,14 +451,14 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get the commands for. Not
      * NULL/empty/blank.
      * @return The set of commands.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Set<Command> getCommandsForApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 

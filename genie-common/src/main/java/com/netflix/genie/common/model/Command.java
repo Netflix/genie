@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -170,13 +170,13 @@ public class Command extends Auditable implements Serializable {
      * @param user The user who created the command. Not null/empty/blank.
      * @param status The status of the command. Not null.
      * @param executable The executable of the command. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Command(
             final String name,
             final String user,
             final CommandStatus status,
-            final String executable) throws CloudServiceException {
+            final String executable) throws GenieException {
         super();
         this.name = name;
         this.user = user;
@@ -187,10 +187,10 @@ public class Command extends Auditable implements Serializable {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @PrePersist
-    protected void onCreateCommand() throws CloudServiceException {
+    protected void onCreateCommand() throws GenieException {
         validate(this.name, this.user, this.status, this.executable);
     }
 
@@ -207,11 +207,11 @@ public class Command extends Auditable implements Serializable {
      * Sets the name for this command.
      *
      * @param name unique id for this cluster. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setName(final String name) throws CloudServiceException {
+    public void setName(final String name) throws GenieException {
         if (StringUtils.isBlank(name)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No name entered.");
         }
@@ -231,11 +231,11 @@ public class Command extends Auditable implements Serializable {
      * Sets the user who created this command.
      *
      * @param user user who created this command. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setUser(final String user) throws CloudServiceException {
+    public void setUser(final String user) throws GenieException {
         if (StringUtils.isBlank(user)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No user entered.");
         }
@@ -256,12 +256,12 @@ public class Command extends Auditable implements Serializable {
      * Sets the status for this application.
      *
      * @param status The new status. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      * @see CommandStatus
      */
-    public void setStatus(final CommandStatus status) throws CloudServiceException {
+    public void setStatus(final CommandStatus status) throws GenieException {
         if (status == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No status entered.");
         }
@@ -282,11 +282,11 @@ public class Command extends Auditable implements Serializable {
      *
      * @param executable Full path of the executable on the node. Not
      * null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setExecutable(final String executable) throws CloudServiceException {
+    public void setExecutable(final String executable) throws GenieException {
         if (StringUtils.isBlank(executable)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No executable entered.");
         }
@@ -424,11 +424,11 @@ public class Command extends Auditable implements Serializable {
      * Check to make sure that the required parameters exist.
      *
      * @param command The configuration to check
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public static void validate(final Command command) throws CloudServiceException {
+    public static void validate(final Command command) throws GenieException {
         if (command == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command entered to validate");
         }
@@ -445,14 +445,14 @@ public class Command extends Auditable implements Serializable {
      * @param name The name of the command
      * @param user The user who created the command
      * @param status The status of the command
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     private static void validate(
             final String name,
             final String user,
             final CommandStatus status,
             final String executable)
-            throws CloudServiceException {
+            throws GenieException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isBlank(user)) {
             builder.append("User name is missing and is required.\n");
@@ -471,7 +471,7 @@ public class Command extends Auditable implements Serializable {
             builder.insert(0, "Command configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 }

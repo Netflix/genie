@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import java.net.HttpURLConnection;
 import org.apache.commons.lang3.StringUtils;
@@ -48,11 +48,11 @@ public enum ClusterStatus {
      *
      * @param value string to parse/convert into cluster status
      * @return UP, OUT_OF_SERVICE, TERMINATED if match
-     * @throws CloudServiceException on invalid value
+     * @throws com.netflix.genie.common.exceptions.GenieException on invalid value
      */
-    public static ClusterStatus parse(final String value) throws CloudServiceException {
+    public static ClusterStatus parse(final String value) throws GenieException {
         if (StringUtils.isBlank(value)) {
-            throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+            throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
                     "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}");
         } else if (value.equalsIgnoreCase("UP")) {
             return UP;
@@ -61,7 +61,7 @@ public enum ClusterStatus {
         } else if (value.equalsIgnoreCase("TERMINATED")) {
             return TERMINATED;
         } else {
-            throw new CloudServiceException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+            throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
                     "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}");
         }
     }

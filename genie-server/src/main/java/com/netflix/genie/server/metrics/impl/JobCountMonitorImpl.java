@@ -18,7 +18,7 @@
 package com.netflix.genie.server.metrics.impl;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.metrics.JobCountMonitor;
@@ -59,10 +59,10 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public int getNumInstanceJobs() throws CloudServiceException {
+    public int getNumInstanceJobs() throws GenieException {
         LOG.debug("called");
         return this.jobCountManager.getNumInstanceJobs();
     }
@@ -70,10 +70,10 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public int getNumInstanceJobs15Mins() throws CloudServiceException {
+    public int getNumInstanceJobs15Mins() throws GenieException {
         LOG.debug("called");
         long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 15 * 60 * 1000, null);
@@ -82,10 +82,10 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public int getNumInstanceJobs2Hrs() throws CloudServiceException {
+    public int getNumInstanceJobs2Hrs() throws GenieException {
         LOG.debug("called");
         long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 2 * 60 * 60 * 1000,
@@ -95,10 +95,10 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public int getNumInstanceJobs8Hrs() throws CloudServiceException {
+    public int getNumInstanceJobs8Hrs() throws GenieException {
         LOG.debug("called");
         long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 8 * 60 * 60 * 1000,
@@ -108,10 +108,10 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public int getNumInstanceJobs8HrsPlus() throws CloudServiceException {
+    public int getNumInstanceJobs8HrsPlus() throws GenieException {
         LOG.debug("called");
         long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(null, time - 8 * 60 * 60
@@ -163,7 +163,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
             } catch (InterruptedException e) {
                 // log error and move on
                 LOG.warn("Interrupted exception caught", e);
-            } catch (CloudServiceException e) {
+            } catch (GenieException e) {
                 // log error and move on
                 LOG.warn("Exception while setting number of running jobs", e);
             }

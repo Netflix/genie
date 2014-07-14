@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import java.util.List;
@@ -37,36 +37,36 @@ public interface ExecutionService {
      *
      * @param job the job to submit
      * @return The job that was submitted
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    Job submitJob(final Job job) throws CloudServiceException;
+    Job submitJob(final Job job) throws GenieException;
 
     /**
      * Get job information for given job id.
      *
      * @param id id of job to look up
      * @return the job
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    Job getJobInfo(final String id) throws CloudServiceException;
+    Job getJobInfo(final String id) throws GenieException;
 
     /**
      * Get job status for give job id.
      *
      * @param id id for job to look up
      * @return successful response, or one with HTTP error code
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    JobStatus getJobStatus(final String id) throws CloudServiceException;
+    JobStatus getJobStatus(final String id) throws GenieException;
 
     /**
      * Kill job based on given job iD.
      *
      * @param id id for job to kill
      * @return The killed job
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    Job killJob(final String id) throws CloudServiceException;
+    Job killJob(final String id) throws GenieException;
 
     /**
      * Get job info for given filter criteria.
@@ -80,7 +80,7 @@ public interface ExecutionService {
      * @param limit max number of jobs to return
      * @param page page number for job
      * @return All jobs which match the criteria
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     List<Job> getJobs(
             final String id,
@@ -90,7 +90,7 @@ public interface ExecutionService {
             final String clusterName,
             final String clusterId,
             final int limit,
-            final int page) throws CloudServiceException;
+            final int page) throws GenieException;
 
     /**
      * Mark jobs as zombies if status hasn't been updated for

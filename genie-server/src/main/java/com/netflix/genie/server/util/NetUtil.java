@@ -18,11 +18,12 @@
 package com.netflix.genie.server.util;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -77,9 +78,9 @@ public final class NetUtil {
      * used in the cloud, or InetAddress.getLocalHost() will be used in the DC.
      *
      * @return host name
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public static String getHostName() throws CloudServiceException {
+    public static String getHostName() throws GenieException {
         LOG.debug("called");
 
         // check the fast property first
@@ -101,14 +102,14 @@ public final class NetUtil {
         if ((hostName == null) || (hostName.isEmpty())) {
             String msg = "Can't figure out host name for instance";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
         return hostName;
     }
 
-    private static String getCloudHostName() throws CloudServiceException {
+    private static String getCloudHostName() throws GenieException {
         LOG.debug("called");
 
         if ((cloudHostName != null) && (!cloudHostName.isEmpty())) {
@@ -121,7 +122,7 @@ public final class NetUtil {
         } catch (IOException ioe) {
             String msg = "Unable to get public hostname from instance metadata";
             LOG.error(msg, ioe);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, ioe);
         }
         if ((cloudHostName == null) || (cloudHostName.isEmpty())) {
@@ -130,7 +131,7 @@ public final class NetUtil {
             } catch (IOException ioe) {
                 String msg = "Unable to get local IP from instance metadata";
                 LOG.error(msg, ioe);
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg, ioe);
             }
         }
@@ -160,7 +161,7 @@ public final class NetUtil {
         return response;
     }
 
-    private static String getDCHostName() throws CloudServiceException {
+    private static String getDCHostName() throws GenieException {
         LOG.debug("called");
 
         if ((dcHostName != null) && (!dcHostName.isEmpty())) {
@@ -174,7 +175,7 @@ public final class NetUtil {
         } catch (final UnknownHostException e) {
             String msg = "Unable to get the hostname";
             LOG.error(msg, e);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
 

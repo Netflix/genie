@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author tgianos
  */
 @Named
-@Transactional(rollbackFor = CloudServiceException.class)
+@Transactional(rollbackFor = GenieException.class)
 public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigServiceJPAImpl.class);
@@ -68,22 +68,22 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Application getApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
             //Messages will be logged by exception mapper at resource level
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered. Unable to get");
         }
         LOG.debug("Called with id " + id);
         final Application app = this.applicationRepo.findOne(id);
         if (app == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id);
         } else {
@@ -115,15 +115,15 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Application createApplication(
-            final Application app) throws CloudServiceException {
+            final Application app) throws GenieException {
         Application.validate(app);
         LOG.debug("Called with application: " + app.toString());
         if (app.getId() != null && this.applicationRepo.exists(app.getId())) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_CONFLICT,
                     "An application with id " + app.getId() + " already exists");
         }
@@ -133,24 +133,24 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Application updateApplication(
             final String id,
-            final Application updateApp) throws CloudServiceException {
+            final Application updateApp) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to update.");
         }
         if (updateApp == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application information entered. Unable to update.");
         }
         if (StringUtils.isBlank(updateApp.getId()) || !id.equals(updateApp.getId())) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Application id either not entered or inconsistent with id passed in.");
         }
@@ -163,10 +163,10 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public List<Application> deleteAllApplications() throws CloudServiceException {
+    public List<Application> deleteAllApplications() throws GenieException {
         LOG.debug("Called");
         final Iterable<Application> apps = this.applicationRepo.findAll();
         final List<Application> returnApps = new ArrayList<Application>();
@@ -179,20 +179,20 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Application deleteApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to delete.");
         }
         LOG.debug("Called with id " + id);
         final Application app = this.applicationRepo.findOne(id);
         if (app == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -211,19 +211,19 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> addConfigsToApplication(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to add configurations.");
         }
         if (configs == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No configuration files entered.");
         }
@@ -232,7 +232,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             app.getConfigs().addAll(configs);
             return app.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -241,14 +241,14 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> updateConfigsForApplication(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to update configurations.");
         }
@@ -257,7 +257,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             app.setConfigs(configs);
             return app.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -266,14 +266,14 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to get configs.");
         }
@@ -281,7 +281,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         if (app != null) {
             return app.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -290,13 +290,13 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> removeAllConfigsForApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to remove jars.");
         }
@@ -305,7 +305,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             app.getConfigs().clear();
             return app.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -314,14 +314,14 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> removeApplicationConfig(
             final String id,
-            final String config) throws CloudServiceException {
+            final String config) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to remove configuration.");
         }
@@ -332,7 +332,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             }
             return app.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -341,19 +341,19 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> addJarsForApplication(
             final String id,
-            final Set<String> jars) throws CloudServiceException {
+            final Set<String> jars) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to add jar.");
         }
         if (jars == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No jar entered. Unable to add jars.");
         }
@@ -362,7 +362,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             app.getJars().addAll(jars);
             return app.getJars();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -371,15 +371,15 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
     //TODO: Code is repetetive with configs. Refactor for reuse
     public Set<String> getJarsForApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to get jars.");
         }
@@ -387,7 +387,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         if (app != null) {
             return app.getJars();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -396,14 +396,14 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> updateJarsForApplication(
             final String id,
-            final Set<String> jars) throws CloudServiceException {
+            final Set<String> jars) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to update jars.");
         }
@@ -412,7 +412,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             app.setJars(jars);
             return app.getJars();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -421,13 +421,13 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> removeAllJarsForApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to remove jars.");
         }
@@ -436,7 +436,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             app.getJars().clear();
             return app.getJars();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -445,14 +445,14 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     public Set<String> removeJarForApplication(
             final String id,
-            final String jar) throws CloudServiceException {
+            final String jar) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to remove jar.");
         }
@@ -463,7 +463,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             }
             return app.getJars();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }
@@ -472,14 +472,14 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<Command> getCommandsForApplication(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application id entered. Unable to get commands.");
         }
@@ -487,7 +487,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         if (app != null) {
             return app.getCommands();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id + " exists.");
         }

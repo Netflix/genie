@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.jobmanager;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 
@@ -33,23 +33,23 @@ public interface JobManager {
      * Initialize, and launch the job once it has been initialized.
      *
      * @param job the JobInfo object for the job to be launched
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    void launch(final Job job) throws CloudServiceException;
+    void launch(final Job job) throws GenieException;
 
     /**
      * Kill a job using the job information - no need to initialize this job.
      *
      * @param job the JobInfo object for the job to be killed
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    void kill(final Job job) throws CloudServiceException;
+    void kill(final Job job) throws GenieException;
 
     /**
      * Set the cluster to use for the job.
      *
      * @param cluster The cluster to set. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    void setCluster(final Cluster cluster) throws CloudServiceException;
+    void setCluster(final Cluster cluster) throws GenieException;
 }

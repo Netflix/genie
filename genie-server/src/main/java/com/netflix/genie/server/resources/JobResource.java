@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
@@ -92,7 +92,7 @@ public class JobResource {
      * @param job request object containing job info element for new job
      * @param hsr servlet context
      * @return The submitted job
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @POST
     @Consumes({
@@ -110,7 +110,7 @@ public class JobResource {
             @ApiParam(value = "Job object to run.", required = true)
             final Job job,
             @ApiParam(value = "Http Servlet request object", required = true)
-            @Context final HttpServletRequest hsr) throws CloudServiceException {
+            @Context final HttpServletRequest hsr) throws GenieException {
         // get client's host from the context
         String clientHost = hsr.getHeader("X-Forwarded-For");
         if (clientHost != null) {
@@ -120,7 +120,7 @@ public class JobResource {
         }
         LOG.debug("called from: " + clientHost);
         if (job == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job entered. Unable to submit.");
         }
@@ -142,7 +142,7 @@ public class JobResource {
      *
      * @param id id for job to look up
      * @return the Job
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @GET
     @Path("/{id}")
@@ -158,7 +158,7 @@ public class JobResource {
     public Job getJob(
             @ApiParam(value = "Id of the job to get.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("called for jobID: " + id);
         return this.xs.getJobInfo(id);
     }
@@ -168,7 +168,7 @@ public class JobResource {
      *
      * @param id id for job to look up
      * @return The status of the job
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @GET
     @Path("/{id}/status")
@@ -185,7 +185,7 @@ public class JobResource {
     public JobStatus getJobStatus(
             @ApiParam(value = "Id of the job.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("called for jobID" + id);
         return this.xs.getJobStatus(id);
     }
@@ -202,7 +202,7 @@ public class JobResource {
      * @param page page number for job
      * @param limit max number of jobs to return
      * @return successful response, or one with HTTP error code
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @GET
     @ApiOperation(
@@ -236,7 +236,7 @@ public class JobResource {
             @QueryParam("page") @DefaultValue("0") int page,
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit") @DefaultValue("1024") int limit)
-            throws CloudServiceException {
+            throws GenieException {
         LOG.debug("Called");
         return this.xs.getJobs(
                 id,
@@ -254,7 +254,7 @@ public class JobResource {
      *
      * @param id id for job to kill
      * @return The job that was killed
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @DELETE
     @Path("/{id}")
@@ -268,7 +268,7 @@ public class JobResource {
     public Job killJob(
             @PathParam("id")
             @ApiParam(value = "Id of the job.", required = true)
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("called for jobID: " + id);
         return this.xs.killJob(id);
     }

@@ -22,7 +22,7 @@ import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.client.CommandServiceClient;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -185,10 +185,10 @@ public final class CommandServiceSampleClient {
      *
      * @param id The id to use or null if want one created.
      * @return The pig example command
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public static Command createSampleCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         final Command command = new Command(
                 CMD_NAME,
                 "tgianos",

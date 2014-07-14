@@ -18,7 +18,7 @@
 package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -127,12 +127,12 @@ public class YarnJobManager implements JobManager {
      *
      * @param jobMonitor The job monitor object to use.
      * @param commandRepo The command repository to use.
-     * @throws CloudServiceException if there is any error in initialization
+     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error in initialization
      */
     @Inject
     public YarnJobManager(
             final JobMonitor jobMonitor,
-            final CommandRepository commandRepo) throws CloudServiceException {
+            final CommandRepository commandRepo) throws GenieException {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
         this.commandRepo = commandRepo;
@@ -141,12 +141,12 @@ public class YarnJobManager implements JobManager {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Override
-    public void setCluster(final Cluster cluster) throws CloudServiceException {
+    public void setCluster(final Cluster cluster) throws GenieException {
         if (cluster == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, "No cluster entered.");
         }
         this.cluster = cluster;
@@ -156,10 +156,10 @@ public class YarnJobManager implements JobManager {
      * Initialize, and launch the job once it has been initialized.
      *
      * @param job the JobInfo object for the job to be launched
-     * @throws CloudServiceException if there is any error in the job launch
+     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error in the job launch
      */
     @Override
-    public void launch(final Job job) throws CloudServiceException {
+    public void launch(final Job job) throws GenieException {
         LOG.info("called");
 
         // initialize all the arguments and environment
@@ -180,7 +180,7 @@ public class YarnJobManager implements JobManager {
             this.ji.setJobStatus(JobStatus.FAILED, msg);
             LOG.error(this.ji.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
@@ -191,7 +191,7 @@ public class YarnJobManager implements JobManager {
             ji.setJobStatus(JobStatus.FAILED, msg);
             LOG.error(ji.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
         pb.directory(userJobDir);
@@ -203,13 +203,13 @@ public class YarnJobManager implements JobManager {
                 if ((attachment.getName() == null) || (attachment.getName().isEmpty())) {
                     final String msg = "File attachment is missing required parameter name";
                     LOG.error(msg);
-                    throw new CloudServiceException(
+                    throw new GenieException(
                             HttpURLConnection.HTTP_BAD_REQUEST, msg);
                 }
                 if (attachment.getData() == null) {
                     final String msg = "File attachment is missing required parameter data";
                     LOG.error(msg);
-                    throw new CloudServiceException(
+                    throw new GenieException(
                             HttpURLConnection.HTTP_BAD_REQUEST, msg);
                 }
                 // good to go - copy attachments
@@ -222,7 +222,7 @@ public class YarnJobManager implements JobManager {
                 } catch (final IOException e) {
                     final String msg = "Unable to copy attachment correctly: " + attachment.getName();
                     LOG.error(msg);
-                    throw new CloudServiceException(
+                    throw new GenieException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
                 } finally {
                     if (output != null) {
@@ -268,7 +268,7 @@ public class YarnJobManager implements JobManager {
             final String msg = "Failed to launch the job";
             LOG.error(msg, e);
             this.ji.setJobStatus(JobStatus.FAILED, msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
         LOG.info("Successfully launched the job with PID = " + pid);
@@ -279,17 +279,17 @@ public class YarnJobManager implements JobManager {
      * shell.
      *
      * @param job the jobInfo object for the job to be killed
-     * @throws CloudServiceException if there is any error in job killing
+     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error in job killing
      */
     @Override
-    public void kill(final Job job) throws CloudServiceException {
+    public void kill(final Job job) throws GenieException {
         LOG.info("called");
 
         // basic error checking
         if (job == null) {
             String msg = "JobInfo object is null";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
 
@@ -305,25 +305,25 @@ public class YarnJobManager implements JobManager {
                 if ((genieHome == null) || genieHome.isEmpty()) {
                     String msg = "Property netflix.genie.server.sys.home is not set correctly";
                     LOG.error(msg);
-                    throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                    throw new GenieException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
                 }
                 Runtime.getRuntime().exec(
                         genieHome + File.separator + "jobkill.sh " + processId);
-            } catch (final CloudServiceException e) {
+            } catch (final GenieException e) {
                 String msg = "Failed to kill the job";
                 LOG.error(msg, e);
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
             } catch (final IOException e) {
                 String msg = "Failed to kill the job";
                 LOG.error(msg, e);
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
             }
         } else {
             String msg = "Could not get process id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         }
     }
@@ -333,9 +333,9 @@ public class YarnJobManager implements JobManager {
      * job launch This method must be called before job is launched.
      *
      * @param job the JobInfo object passed by the user
-     * @throws CloudServiceException if there is an error during initialization
+     * @throws com.netflix.genie.common.exceptions.GenieException if there is an error during initialization
      */
-    protected void init(final Job job) throws CloudServiceException {
+    protected void init(final Job job) throws GenieException {
         LOG.info("called");
 
         genieJobIDProp = GENIE_JOB_ID + "=" + job.getId();
@@ -365,10 +365,10 @@ public class YarnJobManager implements JobManager {
      * Set/initialize environment variables for this job.
      *
      * @param job job info object for this job
-     * @throws CloudServiceException if there is any error in initialization
+     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error in initialization
      */
     @Transactional(readOnly = true)
-    protected void initEnv(final Job job) throws CloudServiceException {
+    protected void initEnv(final Job job) throws GenieException {
         LOG.info("called");
 
         if (job.getFileDependencies() != null
@@ -402,7 +402,7 @@ public class YarnJobManager implements JobManager {
         if (command == null) {
             final String msg = "No command found for params. Unable to continue.";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR,
                     msg);
         }
@@ -479,7 +479,7 @@ public class YarnJobManager implements JobManager {
         if (StringUtils.isBlank(genieHome)) {
             final String msg = "Property netflix.genie.server.sys.home is not set correctly";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR,
                     msg);
         }
@@ -511,7 +511,7 @@ public class YarnJobManager implements JobManager {
                 String msg = "This genie instance doesn't support Hadoop version: "
                         + hadoopVersion;
                 LOG.error(msg);
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
             }
 
@@ -526,7 +526,7 @@ public class YarnJobManager implements JobManager {
             if (hadoopHome == null || !new File(hadoopHome).exists()) {
                 final String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
                 LOG.error(msg);
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
             }
             this.env.put("HADOOP_HOME", hadoopHome);
@@ -555,7 +555,7 @@ public class YarnJobManager implements JobManager {
         if (StringUtils.isBlank(baseUserWorkingDir)) {
             final String msg = "Property netflix.genie.server.user.working.dir is not set";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         } else {
             this.env.put("BASE_USER_WORKING_DIR", baseUserWorkingDir);
@@ -597,9 +597,9 @@ public class YarnJobManager implements JobManager {
      *
      * @param ji2 job info for this job
      * @return the parsed command-line arguments as an array
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    protected String[] initArgs(Job ji2) throws CloudServiceException {
+    protected String[] initArgs(Job ji2) throws GenieException {
 
         LOG.info("called");
 
@@ -650,9 +650,9 @@ public class YarnJobManager implements JobManager {
      *
      * @param proc java process object representing the Hadoop job launcher
      * @return pid for this process
-     * @throws CloudServiceException if there is an error getting the process id
+     * @throws com.netflix.genie.common.exceptions.GenieException if there is an error getting the process id
      */
-    protected int getProcessId(final Process proc) throws CloudServiceException {
+    protected int getProcessId(final Process proc) throws GenieException {
         LOG.debug("called");
 
         try {
@@ -662,7 +662,7 @@ public class YarnJobManager implements JobManager {
         } catch (Exception e) {
             String msg = "Can't get process id for job";
             LOG.error(msg, e);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
     }

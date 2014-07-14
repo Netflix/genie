@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services.impl;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
@@ -48,10 +48,10 @@ public class TestRandomizedClusterLoadBalancerImpl {
     /**
      * Test whether a cluster is returned from a set of candidates.
      *
-     * @throws CloudServiceException if anything went wrong with the test.
+     * @throws com.netflix.genie.common.exceptions.GenieException if anything went wrong with the test.
      */
     @Test
-    public void testValidCluster() throws CloudServiceException {
+    public void testValidCluster() throws GenieException {
         final Set<String> configs = new HashSet<String>();
         configs.add("SomeConfig");
         final Cluster cce = new Cluster("name", "tgianos", ClusterStatus.UP, "jobManager", configs);
@@ -61,20 +61,20 @@ public class TestRandomizedClusterLoadBalancerImpl {
     /**
      * Ensure exception is thrown if no cluster is found.
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    @Test(expected = CloudServiceException.class)
-    public void testEmptyList() throws CloudServiceException {
+    @Test(expected = GenieException.class)
+    public void testEmptyList() throws GenieException {
         this.clb.selectCluster(new ArrayList<Cluster>());
     }
 
     /**
      * Ensure exception is thrown if no cluster is found.
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    @Test(expected = CloudServiceException.class)
-    public void testNullList() throws CloudServiceException {
+    @Test(expected = GenieException.class)
+    public void testNullList() throws GenieException {
         this.clb.selectCluster(null);
     }
 }
