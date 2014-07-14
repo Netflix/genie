@@ -22,34 +22,35 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for the JobStatus enum.
+ * Tests for the CommandStatus enum.
  *
  * @author tgianos
  */
-public class TestJobStatus {
+public class TestCommandStatus {
 
     /**
-     * Tests whether a valid job status is parsed correctly.
+     * Tests whether a valid command status is parsed correctly.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test
-    public void testValidJobStatus() throws GenieException {
-        Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.FAILED, JobStatus.parse(JobStatus.FAILED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.KILLED, JobStatus.parse(JobStatus.KILLED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.INIT, JobStatus.parse(JobStatus.INIT.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.SUCCEEDED, JobStatus.parse(JobStatus.SUCCEEDED.name().toLowerCase()));
+    public void testValidCommandStatus() throws GenieException {
+        Assert.assertEquals(CommandStatus.ACTIVE,
+                CommandStatus.parse(CommandStatus.ACTIVE.name().toLowerCase()));
+        Assert.assertEquals(CommandStatus.DEPRECATED,
+                CommandStatus.parse(CommandStatus.DEPRECATED.name().toLowerCase()));
+        Assert.assertEquals(CommandStatus.INACTIVE,
+                CommandStatus.parse(CommandStatus.INACTIVE.name().toLowerCase()));
     }
 
     /**
-     * Tests whether an invalid job status returns null.
+     * Tests whether an invalid command status throws exception.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test(expected = GenieException.class)
-    public void testInvalidJobStatus() throws GenieException {
-        JobStatus.parse("DOES_NOT_EXIST");
+    public void testInvalidCommandStatus() throws GenieException {
+        CommandStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
@@ -58,7 +59,7 @@ public class TestJobStatus {
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test(expected = GenieException.class)
-    public void testBlankJobStatus() throws GenieException {
-        JobStatus.parse(null);
+    public void testBlankCommandStatus() throws GenieException {
+        CommandStatus.parse(null);
     }
 }

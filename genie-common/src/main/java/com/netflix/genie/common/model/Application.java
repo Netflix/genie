@@ -88,7 +88,7 @@ public class Application extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "The current status of this application",
             required = true)
-    private ApplicationStatus status;
+    private ApplicationStatus status = ApplicationStatus.INACTIVE;
 
     /**
      * Version number for this application.
@@ -148,12 +148,11 @@ public class Application extends Auditable implements Serializable {
      * @param name The name of the application. Not null/empty/blank.
      * @param user The user who created the application. Not null/empty/blank.
      * @param status The status of the application. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Application(
             final String name,
             final String user,
-            final ApplicationStatus status) throws GenieException {
+            final ApplicationStatus status) {
         super();
         this.name = name;
         this.user = user;
@@ -163,7 +162,7 @@ public class Application extends Auditable implements Serializable {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PrePersist
     protected void onCreateApplication() throws GenieException {
@@ -276,9 +275,8 @@ public class Application extends Auditable implements Serializable {
      * Sets the configurations for this application.
      *
      * @param configs The configuration files that this application needs
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setConfigs(final Set<String> configs) throws GenieException {
+    public void setConfigs(final Set<String> configs) {
         this.configs = configs;
     }
 
@@ -295,9 +293,8 @@ public class Application extends Auditable implements Serializable {
      * Sets the jars needed for this application.
      *
      * @param jars All jars needed for execution of this application
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setJars(final Set<String> jars) throws GenieException {
+    public void setJars(final Set<String> jars) {
         this.jars = jars;
     }
 

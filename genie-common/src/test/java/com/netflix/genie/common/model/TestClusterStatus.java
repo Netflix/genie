@@ -22,43 +22,44 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for the JobStatus enum.
+ * Tests for the ClusterStatus enum.
  *
  * @author tgianos
  */
-public class TestJobStatus {
+public class TestClusterStatus {
 
     /**
-     * Tests whether a valid job status is parsed correctly.
+     * Tests whether a valid cluster status is parsed correctly.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test
-    public void testValidJobStatus() throws GenieException {
-        Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.FAILED, JobStatus.parse(JobStatus.FAILED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.KILLED, JobStatus.parse(JobStatus.KILLED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.INIT, JobStatus.parse(JobStatus.INIT.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.SUCCEEDED, JobStatus.parse(JobStatus.SUCCEEDED.name().toLowerCase()));
+    public void testValidClusterStatus() throws GenieException {
+        Assert.assertEquals(ClusterStatus.UP,
+                ClusterStatus.parse(ClusterStatus.UP.name().toLowerCase()));
+        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE,
+                ClusterStatus.parse(ClusterStatus.OUT_OF_SERVICE.name().toLowerCase()));
+        Assert.assertEquals(ClusterStatus.TERMINATED,
+                ClusterStatus.parse(ClusterStatus.TERMINATED.name().toLowerCase()));
     }
 
     /**
-     * Tests whether an invalid job status returns null.
+     * Tests whether an invalid cluster status throws exception.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test(expected = GenieException.class)
-    public void testInvalidJobStatus() throws GenieException {
-        JobStatus.parse("DOES_NOT_EXIST");
+    public void testInvalidClusterStatus() throws GenieException {
+        ClusterStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
-     * Tests whether an invalid application status throws exception.
+     * Tests whether an invalid cluster status throws exception.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test(expected = GenieException.class)
-    public void testBlankJobStatus() throws GenieException {
-        JobStatus.parse(null);
+    public void testBlankClusterStatus() throws GenieException {
+        ClusterStatus.parse(null);
     }
 }

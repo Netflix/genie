@@ -22,52 +22,44 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test case for utility methods under Types.
+ * Tests for the ApplicationStatus enum.
  *
- * @author skrishnan
  * @author tgianos
  */
-public class TestTypes {
+public class TestApplicationStatus {
 
     /**
-     * Tests whether a valid cluster status is parsed correctly.
+     * Tests whether a valid application status is parsed correctly.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test
-    public void testValidClusterStatus() throws GenieException {
-        String status = ClusterStatus.UP.name();
-        Assert.assertEquals(ClusterStatus.UP, ClusterStatus.parse(status));
+    public void testValidApplicationStatus() throws GenieException {
+        Assert.assertEquals(ApplicationStatus.ACTIVE,
+                ApplicationStatus.parse(ApplicationStatus.ACTIVE.name().toLowerCase()));
+        Assert.assertEquals(ApplicationStatus.DEPRECATED,
+                ApplicationStatus.parse(ApplicationStatus.DEPRECATED.name().toLowerCase()));
+        Assert.assertEquals(ApplicationStatus.INACTIVE,
+                ApplicationStatus.parse(ApplicationStatus.INACTIVE.name().toLowerCase()));
     }
 
     /**
-     * Tests whether an invalid cluster status returns null.
+     * Tests whether an invalid application status throws exception.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test(expected = GenieException.class)
-    public void testInvalidClusterStatus() throws GenieException {
-        ClusterStatus.parse("DOES_NOT_EXIST");
+    public void testInvalidApplicationStatus() throws GenieException {
+        ApplicationStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
-     * Tests whether a valid job status is parsed correctly.
-     *
-     * @throws com.netflix.genie.common.exceptions.GenieException
-     */
-    @Test
-    public void testValidJobStatus() throws GenieException {
-        String status = JobStatus.RUNNING.name();
-        Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(status));
-    }
-
-    /**
-     * Tests whether an invalid job status returns null.
+     * Tests whether an invalid application status throws exception.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test(expected = GenieException.class)
-    public void testInvalidJobStatus() throws GenieException {
-        JobStatus.parse("DOES_NOT_EXIST");
+    public void testBlankApplicationStatus() throws GenieException {
+        ApplicationStatus.parse(null);
     }
 }
