@@ -62,10 +62,10 @@ tasks.withType(Checkstyle) {
 
 tasks.withType(FindBugs) {
     classes = classes.filter {
-        !it.path.contains(generatedSourcesJava + '/**/*.java')
+        !it.path.contains('_')
     }
 }
 
 tasks.withType(Pmd) {
-    exclude generatedSourcesJava + '/**/*.java'
+    exclude metaModelIgnorePattern
 }
