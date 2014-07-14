@@ -59,7 +59,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs() throws GenieException {
@@ -70,7 +70,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs15Mins() throws GenieException {
@@ -82,7 +82,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs2Hrs() throws GenieException {
@@ -95,7 +95,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs8Hrs() throws GenieException {
@@ -108,7 +108,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs8HrsPlus() throws GenieException {

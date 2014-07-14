@@ -62,7 +62,7 @@ public final class JobManagerFactory implements ApplicationContextAware {
      *
      * @param ccs The cluster config service to use
      * @param clb The clb to use
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Inject
     public JobManagerFactory(
@@ -77,7 +77,7 @@ public final class JobManagerFactory implements ApplicationContextAware {
      *
      * @param job The job this manager will be managing
      * @return instance of the appropriate job manager
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public JobManager getJobManager(final Job job) throws GenieException {
         LOG.info("called");
@@ -115,7 +115,7 @@ public final class JobManagerFactory implements ApplicationContextAware {
      *
      * @param job job info for this job
      * @return cluster element to use for running this job
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error finding a cluster for
+     * @throws GenieException if there is any error finding a cluster for
      * this job
      */
     private Cluster getCluster(final Job job) throws GenieException {

@@ -118,7 +118,7 @@ public class JobMonitorImpl implements JobMonitor {
      * Set the job for this to monitor.
      *
      * @param job The job to monitor. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public void setJob(final Job job) throws GenieException {
@@ -146,7 +146,7 @@ public class JobMonitorImpl implements JobMonitor {
      * Set the process handle for this job.
      *
      * @param proc The process handle for the job. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public void setProcess(final Process proc) throws GenieException {
@@ -161,7 +161,7 @@ public class JobMonitorImpl implements JobMonitor {
      * Set the job manager for this monitor to use.
      *
      * @param jobManager The job manager to use. Not Null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public void setJobManager(final JobManager jobManager) throws GenieException {

@@ -78,7 +78,7 @@ public final class NetUtil {
      * used in the cloud, or InetAddress.getLocalHost() will be used in the DC.
      *
      * @return host name
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public static String getHostName() throws GenieException {
         LOG.debug("called");

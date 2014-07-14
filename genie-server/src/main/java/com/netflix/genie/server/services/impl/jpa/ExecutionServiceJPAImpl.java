@@ -122,7 +122,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Job submitJob(final Job job) throws GenieException {
@@ -236,7 +236,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -261,7 +261,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -293,7 +293,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -304,7 +304,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Job killJob(final String id) throws GenieException {

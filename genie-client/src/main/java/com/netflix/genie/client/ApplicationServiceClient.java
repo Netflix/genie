@@ -78,7 +78,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * configuration to create
      *
      * @return The application that was created
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Application createApplication(final Application application)
             throws GenieException {
@@ -98,7 +98,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param application the object encapsulating the new application to create
      *
      * @return extracted application configuration response
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Application updateApplication(
             final String id,
@@ -125,7 +125,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *
      * @param id the application id to get (can't be null or empty)
      * @return the application for this id
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Application getApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -152,7 +152,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * More details on the parameters can be found on the Genie User Guide on
      * GitHub.
      * @return List of application configuration elements that match the filter
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Application> getApplications(final Multimap<String, String> params)
             throws GenieException {
@@ -168,7 +168,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Delete all the applications in the database.
      *
      * @return the should be empty set.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Application> deleteAllApplications() throws GenieException {
         final HttpRequest request = this.buildRequest(
@@ -184,7 +184,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *
      * @param id the id for the application to delete
      * @return the deleted application
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Application deleteApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -210,7 +210,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given application.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> addConfigsToApplication(
             final String id,
@@ -242,7 +242,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get configurations for. Not
      * Null/empty/blank.
      * @return The set of configuration files for the given application.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> getConfigsForApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -269,7 +269,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null.
      * @return The new set of application configurations.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> updateConfigsForApplication(
             final String id,
@@ -303,7 +303,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to delete the configuration files
      * from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> removeAllConfigsForApplication(
             final String id) throws GenieException {
@@ -331,7 +331,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Null/empty/blank.
      * @param jars The jar files to add. Not null or empty.
      * @return The new set of jar files for the given application.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> addJarsToApplication(
             final String id,
@@ -363,7 +363,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get jars for. Not
      * Null/empty/blank.
      * @return The set of jar files for the given application.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> getJarsForApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -390,7 +390,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param jars The jar files to replace existing jar
      * files with. Not null.
      * @return The new set of application jars.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> updateJarsForApplication(
             final String id,
@@ -424,7 +424,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to delete the jar files
      * from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> removeAllJarsForApplication(
             final String id) throws GenieException {
@@ -451,7 +451,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get the commands for. Not
      * NULL/empty/blank.
      * @return The set of commands.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<Command> getCommandsForApplication(
             final String id) throws GenieException {

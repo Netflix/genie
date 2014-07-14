@@ -92,7 +92,7 @@ public class JobResource {
      * @param job request object containing job info element for new job
      * @param hsr servlet context
      * @return The submitted job
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Consumes({
@@ -142,7 +142,7 @@ public class JobResource {
      *
      * @param id id for job to look up
      * @return the Job
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}")
@@ -168,7 +168,7 @@ public class JobResource {
      *
      * @param id id for job to look up
      * @return The status of the job
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/status")
@@ -202,7 +202,7 @@ public class JobResource {
      * @param page page number for job
      * @param limit max number of jobs to return
      * @return successful response, or one with HTTP error code
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @ApiOperation(
@@ -254,7 +254,7 @@ public class JobResource {
      *
      * @param id id for job to kill
      * @return The job that was killed
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}")

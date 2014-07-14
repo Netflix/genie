@@ -92,7 +92,7 @@ public class ApplicationConfigResource {
      *
      * @param app The application to create
      * @return The created application configuration
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Consumes({
@@ -124,7 +124,7 @@ public class ApplicationConfigResource {
      *
      * @param id unique id for application configuration
      * @return The application configuration
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}")
@@ -186,7 +186,7 @@ public class ApplicationConfigResource {
      * @param id unique id for configuration to update
      * @param updateApp contains the application information to update
      * @return successful response, or one with an HTTP error code
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}")
@@ -217,7 +217,7 @@ public class ApplicationConfigResource {
      * Delete all applications from database.
      *
      * @return All The deleted applications
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @ApiOperation(
@@ -240,7 +240,7 @@ public class ApplicationConfigResource {
      *
      * @param id unique id of configuration to delete
      * @return The deleted application configuration
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}")
@@ -268,7 +268,7 @@ public class ApplicationConfigResource {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this application.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/configs")
@@ -300,7 +300,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the configuration files for.
      * Not NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/configs")
@@ -331,7 +331,7 @@ public class ApplicationConfigResource {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of application configurations.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/configs")
@@ -363,7 +363,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to delete the configuration files
      * from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/configs")
@@ -392,7 +392,7 @@ public class ApplicationConfigResource {
      * null/empty/blank.
      * @param jars The jar files to add. Not null.
      * @return The active set of application jars.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/jars")
@@ -424,7 +424,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the jar files for. Not
      * NULL/empty/blank.
      * @return The set of jar files.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/jars")
@@ -455,7 +455,7 @@ public class ApplicationConfigResource {
      * @param jars The jar files to replace existing jar files with. Not
      * null/empty/blank.
      * @return The active set of application jars
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/jars")
@@ -487,7 +487,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to delete the jar files from. Not
      * null/empty/blank.
      * @return Empty set if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/jars")
@@ -515,7 +515,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the commands for. Not
      * NULL/empty/blank.
      * @return The set of commands.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/commands")

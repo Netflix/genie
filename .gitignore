@@ -12,12 +12,7 @@ genie-web/bin/
 
 # Per Build Generated Sources #
 ###############################
-**/com/netflix/genie/common/model/*_.java
-/genie-common/src/main/java/com/netflix/genie/common/model/Application_.java
-/genie-common/src/main/java/com/netflix/genie/common/model/Auditable_.java
-/genie-common/src/main/java/com/netflix/genie/common/model/Cluster_.java
-/genie-common/src/main/java/com/netflix/genie/common/model/Command_.java
-/genie-common/src/main/java/com/netflix/genie/common/model/Job_.java
+**/generated-sources
 
 # Packages #
 ############

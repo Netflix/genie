@@ -37,7 +37,7 @@ public interface ExecutionService {
      *
      * @param job the job to submit
      * @return The job that was submitted
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Job submitJob(final Job job) throws GenieException;
 
@@ -46,7 +46,7 @@ public interface ExecutionService {
      *
      * @param id id of job to look up
      * @return the job
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Job getJobInfo(final String id) throws GenieException;
 
@@ -55,7 +55,7 @@ public interface ExecutionService {
      *
      * @param id id for job to look up
      * @return successful response, or one with HTTP error code
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     JobStatus getJobStatus(final String id) throws GenieException;
 
@@ -64,7 +64,7 @@ public interface ExecutionService {
      *
      * @param id id for job to kill
      * @return The killed job
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Job killJob(final String id) throws GenieException;
 
@@ -80,7 +80,7 @@ public interface ExecutionService {
      * @param limit max number of jobs to return
      * @param page page number for job
      * @return All jobs which match the criteria
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     List<Job> getJobs(
             final String id,

@@ -31,7 +31,7 @@ public interface JobCountMonitor extends Runnable {
      * Get number of jobs running on this instance.
      *
      * @return number of running jobs
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error
+     * @throws GenieException if there is any error
      */
     int getNumInstanceJobs() throws GenieException;
 
@@ -39,7 +39,7 @@ public interface JobCountMonitor extends Runnable {
      * Get number of running jobs on this instance running for > 15 mins.
      *
      * @return number of running jobs with runtime > 15 mins
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error
+     * @throws GenieException if there is any error
      */
     int getNumInstanceJobs15Mins() throws GenieException;
 
@@ -47,7 +47,7 @@ public interface JobCountMonitor extends Runnable {
      * Get number of running jobs with 15m < runtime < 2 hours.
      *
      * @return Number of running jobs with 15m < runtime < 2 hours
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error
+     * @throws GenieException if there is any error
      */
     int getNumInstanceJobs2Hrs() throws GenieException;
 
@@ -55,7 +55,7 @@ public interface JobCountMonitor extends Runnable {
      * Get number of running jobs with 2h < runtime < 8 hours.
      *
      * @return Number of running jobs with 2h < runtime < 8 hours
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     int getNumInstanceJobs8Hrs() throws GenieException;
 
@@ -63,7 +63,7 @@ public interface JobCountMonitor extends Runnable {
      * Get number of running jobs with runtime > 8h.
      *
      * @return Number of running jobs with runtime > 8h
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error
+     * @throws GenieException if there is any error
      */
     int getNumInstanceJobs8HrsPlus() throws GenieException;
 

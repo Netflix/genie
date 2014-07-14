@@ -135,7 +135,7 @@ public class BaseGenieClient {
      * @param params Any query parameters to send along with the request.
      * @param entity An entity if required to add to the request.
      * @return The HTTP request.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     protected HttpRequest buildRequest(
             final Verb verb,
@@ -170,7 +170,7 @@ public class BaseGenieClient {
      * @param collectionClass The collection class. Null if none expected.
      * @param entityClass The entity class. Not null.
      * @return The response entity.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     protected <C extends Collection> Object executeRequest(
             final HttpRequest request,

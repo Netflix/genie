@@ -35,7 +35,7 @@ public interface ClusterLoadBalancer {
      *
      * @param clusters The list of available clusters to choose from
      * @return the "best" cluster to run job on
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error
+     * @throws GenieException if there is any error
      */
     Cluster selectCluster(final List<Cluster> clusters) throws GenieException;
 }

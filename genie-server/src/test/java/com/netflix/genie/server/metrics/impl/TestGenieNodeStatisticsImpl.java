@@ -132,7 +132,7 @@ public class TestGenieNodeStatisticsImpl {
      * Test the counter that sets running job.
      *
      * @throws InterruptedException
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test
     public void testRunningJobs() throws InterruptedException, GenieException {

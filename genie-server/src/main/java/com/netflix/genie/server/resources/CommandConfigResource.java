@@ -92,7 +92,7 @@ public class CommandConfigResource {
      *
      * @param command The command configuration to create
      * @return The command created
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Consumes({
@@ -138,7 +138,7 @@ public class CommandConfigResource {
      *
      * @param id unique id for command configuration
      * @return The command configuration
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}")
@@ -227,7 +227,7 @@ public class CommandConfigResource {
      * @param id unique id for the configuration to update.
      * @param updateCommand the information to update the command with
      * @return The updated command
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}")
@@ -274,7 +274,7 @@ public class CommandConfigResource {
      * Delete all applications from database.
      *
      * @return All The deleted comamnd
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @ApiOperation(
@@ -308,7 +308,7 @@ public class CommandConfigResource {
      *
      * @param id unique id for configuration to delete
      * @return The deleted configuration
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}")
@@ -349,7 +349,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this command.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/configs")
@@ -396,7 +396,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the configuration files for. Not
      * NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/configs")
@@ -439,7 +439,7 @@ public class CommandConfigResource {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of command configurations.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/configs")
@@ -486,7 +486,7 @@ public class CommandConfigResource {
      * @param id The id of the command to delete the configuration files from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/configs")
@@ -527,7 +527,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param application The application to set. Not null.
      * @return The active applications for this command.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/application")
@@ -577,7 +577,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the application files for. Not
      * NULL/empty/blank.
      * @return The active application for the command.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/application")
@@ -617,7 +617,7 @@ public class CommandConfigResource {
      * @param id The id of the command to delete the application from. Not
      * null/empty/blank.
      * @return The active set of applications for the command.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/application")
@@ -657,7 +657,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the clusters for. Not
      * NULL/empty/blank.
      * @return The set of clusters.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/clusters")

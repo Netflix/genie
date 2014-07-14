@@ -84,7 +84,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * create
      *
      * @return extracted cluster configuration response
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Cluster createCluster(final Cluster cluster)
             throws GenieException {
@@ -105,7 +105,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * create
      *
      * @return extracted cluster configuration response
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Cluster updateCluster(
             final String id,
@@ -133,7 +133,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *
      * @param id the cluster configuration id to get (can't be null or empty)
      * @return the cluster configuration for this id
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Cluster getCluster(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -160,7 +160,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * More details on the parameters can be found on the Genie User Guide on
      * GitHub.
      * @return List of cluster configuration elements that match the filter
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Cluster> getClusters(final Multimap<String, String> params)
             throws GenieException {
@@ -176,7 +176,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Delete all the clusters in the database.
      *
      * @return the should be empty set.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Cluster> deleteAllClusters() throws GenieException {
         final HttpRequest request = this.buildRequest(
@@ -192,7 +192,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *
      * @param id the id for the cluster cluster to delete
      * @return the deleted cluster cluster
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Cluster deleteCluster(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
@@ -218,7 +218,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given command.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> addConfigsToCluster(
             final String id,
@@ -250,7 +250,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to get configurations for. Not
      * Null/empty/blank.
      * @return The set of configuration files for the given cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> getConfigsForCluster(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -277,7 +277,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null.
      * @return The new set of cluster configurations.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> updateConfigsForCluster(
             final String id,
@@ -311,7 +311,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to delete the configuration files from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<String> removeAllConfigsForCluster(
             final String id) throws GenieException {
@@ -339,7 +339,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Null/empty/blank.
      * @param commands The commands to add. Not null or empty.
      * @return The new list of commands for the given cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Command> addCommandsToCluster(
             final String id,
@@ -371,7 +371,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to get commands for. Not
      * Null/empty/blank.
      * @return The list of command files for the given cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Command> getCommandsForCluster(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -399,7 +399,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param commands The commands to replace existing command
      * files with. Not null.
      * @return The new list of cluster commands.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Command> updateCommandsForCluster(
             final String id,
@@ -433,7 +433,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to delete the commands from. Not
      * null/empty/blank.
      * @return Empty list if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Command> removeAllCommandsForCluster(
             final String id) throws GenieException {
@@ -461,7 +461,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active set of commands for the cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Set<Command> removeCommandForCluster(
             final String id,

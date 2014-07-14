@@ -31,7 +31,7 @@ public interface JobCountManager {
      * Get number of running jobs running on this instance.
      *
      * @return number of running jobs on this instance
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is an error
+     * @throws GenieException if there is an error
      */
     int getNumInstanceJobs() throws GenieException;
 
@@ -43,7 +43,7 @@ public interface JobCountManager {
      * @param minStartTime min start time in ms
      * @param maxStartTime max start time in ms
      * @return number of running jobs between the specified times
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is an error
+     * @throws GenieException if there is an error
      */
     int getNumInstanceJobs(
             final Long minStartTime,
@@ -58,7 +58,7 @@ public interface JobCountManager {
      * @param minStartTime min start time in ms
      * @param maxStartTime max start time in ms
      * @return number of running jobs matching specified critiera
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is an error
+     * @throws GenieException if there is an error
      */
     int getNumInstanceJobs(
             String hostName,
@@ -71,7 +71,7 @@ public interface JobCountManager {
      *
      * @param minJobThreshold the threshold to use to look for idle instances
      * @return host name of most idle Genie instance
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error
+     * @throws GenieException if there is any error
      */
     String getIdleInstance(final long minJobThreshold) throws GenieException;
 }

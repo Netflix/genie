@@ -39,7 +39,7 @@ public interface CommandConfigService {
      * @param command encapsulates the command configuration information to
      * create
      * @return The command created
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Command createCommand(final Command command) throws GenieException;
 
@@ -48,7 +48,7 @@ public interface CommandConfigService {
      *
      * @param id unique id for command configuration to get. Not null/empty.
      * @return The command configuration
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Command getCommand(final String id) throws GenieException;
 
@@ -75,7 +75,7 @@ public interface CommandConfigService {
      * empty.
      * @param updateCommand contains the information to update the command with
      * @return The updated command
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Command updateCommand(
             final String id,
@@ -85,7 +85,7 @@ public interface CommandConfigService {
      * Delete all commands from database.
      *
      * @return The deleted commands
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     List<Command> deleteAllCommands() throws GenieException;
 
@@ -94,7 +94,7 @@ public interface CommandConfigService {
      *
      * @param id unique if of the command configuration to delete
      * @return The deleted command configuration
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Command deleteCommand(final String id) throws GenieException;
 
@@ -105,7 +105,7 @@ public interface CommandConfigService {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
      * @return The active set of configurations
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Set<String> addConfigsForCommand(
             final String id,
@@ -118,7 +118,7 @@ public interface CommandConfigService {
      * @param id The id of the command to get the configuration files for. Not
      * null/empty/blank.
      * @return The set of configuration files as paths
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Set<String> getConfigsForCommand(
             final String id) throws GenieException;
@@ -132,7 +132,7 @@ public interface CommandConfigService {
      * @param configs The configuration files to replace existing configurations
      * with. Not null/empty.
      * @return The active set of configurations
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Set<String> updateConfigsForCommand(
             final String id,
@@ -144,7 +144,7 @@ public interface CommandConfigService {
      * @param id The id of the command to remove the configuration file from.
      * Not null/empty/blank.
      * @return The active set of configurations
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Set<String> removeAllConfigsForCommand(
             final String id) throws GenieException;
@@ -156,7 +156,7 @@ public interface CommandConfigService {
      * Not null/empty/blank.
      * @param config The configuration file to remove. Not null/empty/blank.
      * @return The active set of configurations
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Set<String> removeConfigForCommand(
             final String id,
@@ -169,7 +169,7 @@ public interface CommandConfigService {
      * null/empty/blank.
      * @param application The applications to set. Not null.
      * @return The application
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Application setApplicationForCommand(
             final String id,
@@ -181,7 +181,7 @@ public interface CommandConfigService {
      * @param id The id of the command to get the application for. Not
      * null/empty/blank.
      * @return The application or exception if none exists.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Application getApplicationForCommand(
             final String id) throws GenieException;
@@ -192,7 +192,7 @@ public interface CommandConfigService {
      * @param id The id of the command to remove the application from. Not
      * null/empty/blank.
      * @return The removed application
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Application removeApplicationForCommand(
             final String id) throws GenieException;
@@ -202,7 +202,7 @@ public interface CommandConfigService {
      *
      * @param id The id of the command to get the clusters for.
      * @return The clusters the command is available on.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     Set<Cluster> getClustersForCommand(
             final String id) throws GenieException;

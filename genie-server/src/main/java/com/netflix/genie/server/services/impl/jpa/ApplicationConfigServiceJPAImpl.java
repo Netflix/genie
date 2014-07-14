@@ -68,7 +68,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -115,7 +115,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Application createApplication(
@@ -133,7 +133,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Application updateApplication(
@@ -163,7 +163,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public List<Application> deleteAllApplications() throws GenieException {
@@ -179,7 +179,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Application deleteApplication(
@@ -211,7 +211,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> addConfigsToApplication(
@@ -241,7 +241,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> updateConfigsForApplication(
@@ -266,7 +266,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -290,7 +290,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeAllConfigsForApplication(
@@ -314,7 +314,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeApplicationConfig(
@@ -341,7 +341,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> addJarsForApplication(
@@ -371,7 +371,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -396,7 +396,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> updateJarsForApplication(
@@ -421,7 +421,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeAllJarsForApplication(
@@ -445,7 +445,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeJarForApplication(
@@ -472,7 +472,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)

@@ -65,7 +65,7 @@ public class JobCountManagerImpl implements JobCountManager {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs() throws GenieException {
@@ -77,7 +77,7 @@ public class JobCountManagerImpl implements JobCountManager {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs(
@@ -92,7 +92,7 @@ public class JobCountManagerImpl implements JobCountManager {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -133,7 +133,7 @@ public class JobCountManagerImpl implements JobCountManager {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public String getIdleInstance(

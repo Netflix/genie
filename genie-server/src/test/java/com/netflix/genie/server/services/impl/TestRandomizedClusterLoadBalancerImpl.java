@@ -48,7 +48,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
     /**
      * Test whether a cluster is returned from a set of candidates.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException if anything went wrong with the test.
+     * @throws GenieException if anything went wrong with the test.
      */
     @Test
     public void testValidCluster() throws GenieException {
@@ -61,7 +61,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
     /**
      * Ensure exception is thrown if no cluster is found.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testEmptyList() throws GenieException {
@@ -71,7 +71,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
     /**
      * Ensure exception is thrown if no cluster is found.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testNullList() throws GenieException {

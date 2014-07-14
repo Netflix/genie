@@ -62,7 +62,7 @@ public class TestJobCountManagerImpl {
     /**
      * Test getting number of running jobs on one instance.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error during this test
+     * @throws GenieException if there is any error during this test
      */
     @Test
     @DatabaseSetup("testNumInstanceJobs.xml")

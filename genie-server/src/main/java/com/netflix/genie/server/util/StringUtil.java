@@ -48,7 +48,7 @@ public final class StringUtil {
      * @param input command-line arguments as a string
      * @return argument array that is split using (as to close to) bash rules as
      * possible
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public static String[] splitCmdLine(String input)
             throws GenieException {

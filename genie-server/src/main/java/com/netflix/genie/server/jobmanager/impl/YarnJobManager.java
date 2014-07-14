@@ -127,7 +127,7 @@ public class YarnJobManager implements JobManager {
      *
      * @param jobMonitor The job monitor object to use.
      * @param commandRepo The command repository to use.
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error in initialization
+     * @throws GenieException if there is any error in initialization
      */
     @Inject
     public YarnJobManager(
@@ -141,7 +141,7 @@ public class YarnJobManager implements JobManager {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public void setCluster(final Cluster cluster) throws GenieException {
@@ -156,7 +156,7 @@ public class YarnJobManager implements JobManager {
      * Initialize, and launch the job once it has been initialized.
      *
      * @param job the JobInfo object for the job to be launched
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error in the job launch
+     * @throws GenieException if there is any error in the job launch
      */
     @Override
     public void launch(final Job job) throws GenieException {
@@ -279,7 +279,7 @@ public class YarnJobManager implements JobManager {
      * shell.
      *
      * @param job the jobInfo object for the job to be killed
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error in job killing
+     * @throws GenieException if there is any error in job killing
      */
     @Override
     public void kill(final Job job) throws GenieException {
@@ -333,7 +333,7 @@ public class YarnJobManager implements JobManager {
      * job launch This method must be called before job is launched.
      *
      * @param job the JobInfo object passed by the user
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is an error during initialization
+     * @throws GenieException if there is an error during initialization
      */
     protected void init(final Job job) throws GenieException {
         LOG.info("called");
@@ -365,7 +365,7 @@ public class YarnJobManager implements JobManager {
      * Set/initialize environment variables for this job.
      *
      * @param job job info object for this job
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is any error in initialization
+     * @throws GenieException if there is any error in initialization
      */
     @Transactional(readOnly = true)
     protected void initEnv(final Job job) throws GenieException {
@@ -597,7 +597,7 @@ public class YarnJobManager implements JobManager {
      *
      * @param ji2 job info for this job
      * @return the parsed command-line arguments as an array
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     protected String[] initArgs(Job ji2) throws GenieException {
 
@@ -650,7 +650,7 @@ public class YarnJobManager implements JobManager {
      *
      * @param proc java process object representing the Hadoop job launcher
      * @return pid for this process
-     * @throws com.netflix.genie.common.exceptions.GenieException if there is an error getting the process id
+     * @throws GenieException if there is an error getting the process id
      */
     protected int getProcessId(final Process proc) throws GenieException {
         LOG.debug("called");

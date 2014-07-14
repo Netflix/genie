@@ -77,7 +77,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * More details can be found on the Genie User Guide on GitHub.
      *
      * @return updated jobInfo for submitted job, if there is no error
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Job submitJob(final Job job) throws GenieException {
         Job.validate(job);
@@ -94,7 +94,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      *
      * @param id the Genie jobID (can't be null)
      * @return the jobInfo for this jobID
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Job getJob(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -122,7 +122,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * More details on the parameters can be found on the Genie User Guide on
      * GitHub.
      * @return List of jobs that match the filter
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public List<Job> getJobs(final Multimap<String, String> params) throws GenieException {
         final HttpRequest request = this.buildRequest(
@@ -140,7 +140,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @param blockTimeout the time to block for (in ms), after which a
      * GenieException will be thrown
      * @return the jobInfo for the job after completion
-     * @throws com.netflix.genie.common.exceptions.GenieException on service errors
+     * @throws GenieException on service errors
      * @throws InterruptedException on timeout/thread errors
      */
     public Job waitForCompletion(final String id, final long blockTimeout)
@@ -160,7 +160,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * GenieException will be thrown
      * @param pollTime the time to sleep between polling for job status
      * @return the jobInfo for the job after completion
-     * @throws com.netflix.genie.common.exceptions.GenieException on service errors
+     * @throws GenieException on service errors
      * @throws InterruptedException on timeout/thread errors
      */
     public Job waitForCompletion(final String id, final long blockTimeout, final long pollTime)
@@ -199,7 +199,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      *
      * @param id the Genie jobID for the job to kill
      * @return the final job status for this job
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public Job killJob(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {

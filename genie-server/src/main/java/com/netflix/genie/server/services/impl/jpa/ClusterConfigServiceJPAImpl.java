@@ -77,7 +77,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Cluster createCluster(final Cluster cluster) throws GenieException {
@@ -98,7 +98,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -122,7 +122,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -184,7 +184,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Cluster updateCluster(final String id,
@@ -208,7 +208,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Cluster deleteCluster(final String id) throws GenieException {
@@ -240,7 +240,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public List<Cluster> deleteAllClusters() throws GenieException {
@@ -255,7 +255,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> addConfigsForCluster(
@@ -285,7 +285,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -312,7 +312,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> updateConfigsForCluster(
@@ -337,7 +337,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeAllConfigsForCluster(
@@ -361,7 +361,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public List<Command> addCommandsForCluster(
@@ -395,7 +395,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -419,7 +419,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public List<Command> updateCommandsForCluster(
@@ -455,7 +455,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public List<Command> removeAllCommandsForCluster(
@@ -483,7 +483,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public List<Command> removeCommandForCluster(

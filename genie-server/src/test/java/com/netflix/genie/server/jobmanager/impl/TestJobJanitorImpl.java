@@ -56,7 +56,7 @@ public class TestJobJanitorImpl {
     /**
      * Test whether the janitor cleans up zombie jobs correctly.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      * @throws Exception
      */
     @Test

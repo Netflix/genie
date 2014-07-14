@@ -75,7 +75,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Command createCommand(final Command command) throws GenieException {
@@ -96,7 +96,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -144,7 +144,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Command updateCommand(
@@ -169,7 +169,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public List<Command> deleteAllCommands() throws GenieException {
@@ -185,7 +185,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Command deleteCommand(final String id) throws GenieException {
@@ -211,7 +211,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> addConfigsForCommand(
@@ -241,7 +241,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -265,7 +265,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> updateConfigsForCommand(
@@ -290,7 +290,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeAllConfigsForCommand(
@@ -314,7 +314,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeConfigForCommand(
@@ -341,7 +341,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Application setApplicationForCommand(
@@ -378,7 +378,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -409,7 +409,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Application removeApplicationForCommand(
@@ -440,7 +440,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)

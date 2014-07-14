@@ -96,7 +96,7 @@ public class ClusterConfigResource {
      *
      * @param cluster contains the cluster information to create
      * @return The created cluster
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Consumes({
@@ -129,7 +129,7 @@ public class ClusterConfigResource {
      *
      * @param id id for the cluster
      * @return the cluster
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}")
@@ -162,7 +162,7 @@ public class ClusterConfigResource {
      * @param limit number of entries to return
      * @param page page number
      * @return the Clusters found matching the criteria
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @ApiOperation(
@@ -216,7 +216,7 @@ public class ClusterConfigResource {
      * @param id unique if for cluster to update
      * @param updateCluster contains the cluster information to update
      * @return the updated cluster
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}")
@@ -247,7 +247,7 @@ public class ClusterConfigResource {
      *
      * @param id unique id for cluster to delete
      * @return the deleted cluster
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}")
@@ -269,7 +269,7 @@ public class ClusterConfigResource {
      * Delete all clusters from database.
      *
      * @return All The deleted clusters
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @ApiOperation(
@@ -294,7 +294,7 @@ public class ClusterConfigResource {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/configs")
@@ -326,7 +326,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to get the configuration files for. Not
      * NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/configs")
@@ -357,7 +357,7 @@ public class ClusterConfigResource {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of cluster configurations.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/configs")
@@ -389,7 +389,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to delete the configuration files from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/configs")
@@ -418,7 +418,7 @@ public class ClusterConfigResource {
      * null/empty/blank.
      * @param commands The commands to add. Not null.
      * @return The active commands for this cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/commands")
@@ -453,7 +453,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to get the command files for. Not
      * NULL/empty/blank.
      * @return The active set of commands for the cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/commands")
@@ -483,7 +483,7 @@ public class ClusterConfigResource {
      * @param commands The commands to replace existing applications with. Not
      * null/empty/blank.
      * @return The new set of commands for the cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/commands")
@@ -518,7 +518,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to delete the commands from. Not
      * null/empty/blank.
      * @return Empty set if successful
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/commands")
@@ -547,7 +547,7 @@ public class ClusterConfigResource {
      * null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active set of commands for the cluster.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/commands/{cmdId}")

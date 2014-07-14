@@ -42,7 +42,7 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
     /**
      * {@inheritDoc}
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Override
     public Cluster selectCluster(final List<Cluster> clusters)

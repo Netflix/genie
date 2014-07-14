@@ -33,7 +33,7 @@ public interface JobManager {
      * Initialize, and launch the job once it has been initialized.
      *
      * @param job the JobInfo object for the job to be launched
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     void launch(final Job job) throws GenieException;
 
@@ -41,7 +41,7 @@ public interface JobManager {
      * Kill a job using the job information - no need to initialize this job.
      *
      * @param job the JobInfo object for the job to be killed
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     void kill(final Job job) throws GenieException;
 
@@ -49,7 +49,7 @@ public interface JobManager {
      * Set the cluster to use for the job.
      *
      * @param cluster The cluster to set. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     void setCluster(final Cluster cluster) throws GenieException;
 }
