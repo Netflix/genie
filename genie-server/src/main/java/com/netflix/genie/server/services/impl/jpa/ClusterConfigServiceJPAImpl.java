@@ -27,6 +27,7 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.common.model.Types.CommandStatus;
 import com.netflix.genie.server.repository.jpa.ClusterRepository;
+import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
 import java.net.HttpURLConnection;
@@ -91,7 +92,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public Cluster createCluster(final Cluster cluster) throws CloudServiceException {
-        Cluster.validate(cluster);
+        if (cluster == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster entered. Unable to validate.");
+        }
+        cluster.validate();
+        
         LOG.debug("Called to create cluster " + cluster.toString());
         if (StringUtils.isEmpty(cluster.getId())) {
             cluster.setId(UUID.randomUUID().toString());
@@ -203,41 +210,21 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         List<ClusterCriteria> clusterCriterias = job.getClusterCriteria();
         Set<String> commandCriteria = job.getCommandCriteria();
         
-        for (final ClusterCriteria cc : clusterCriterias) {
-            final CriteriaBuilder cb = this.em.getCriteriaBuilder();
-            final CriteriaQuery<Cluster> cq = cb.createQuery(Cluster.class);
-            final Root<Cluster> c = cq.from(Cluster.class);
-            final List<Predicate> predicates = new ArrayList<Predicate>();
-            final Join<Cluster, Command> commands = c.join(Cluster_.commands);
+        for (final ClusterCriteria clusterCriteria : clusterCriterias) {
+            final List<Cluster> clusters = this.clusterRepo.findAll(
+                    ClusterSpecs.findByClusterAndCommandCriteria(
+                            clusterCriteria,
+                            commandCriteria
+                    )
+            );
             
-            cq.distinct(true);
-
-            predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
-            predicates.add(cb.equal(c.get(Cluster_.status), ClusterStatus.UP));
- 
-            if (commandCriteria != null) {
-                for (final String tag: commandCriteria) {
-                    predicates.add(cb.isMember(tag, commands.get(Command_.tags)));
-                }
-            }
-            
-            if (cc.getTags() != null) {
-                for (final String tag : cc.getTags()) {
-                    predicates.add(cb.isMember(tag, c.get(Cluster_.tags)));
-                }
-            }
-
-            cq.where(predicates.toArray(new Predicate[0]));
-            final TypedQuery<Cluster> query = this.em.createQuery(cq);
-            final List<Cluster> clusters = query.getResultList();
-
             if (!clusters.isEmpty()) {
                 // Add the succesfully criteria to the job object in string form.
-                job.setChosenClusterCriteriaString(StringUtils.join(cc.getTags(), CRITERIA_DELIMITER));
+                job.setChosenClusterCriteriaString(StringUtils.join(clusterCriteria.getTags(), CRITERIA_DELIMITER));
                 return clusters;
             }
         }
-
+     
         //if we've gotten to here no clusters were found so return empty list
         return new ArrayList<Cluster>();
     }
@@ -262,7 +249,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
         LOG.debug("Called with cluster " + updateCluster.toString());
         final Cluster cluster = this.em.merge(updateCluster);
-        Cluster.validate(cluster);
+        cluster.validate();
         return cluster;
     }
 

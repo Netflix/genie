@@ -88,7 +88,12 @@ public final class ClusterServiceClient extends BaseGenieClient {
      */
     public Cluster createCluster(final Cluster cluster)
             throws CloudServiceException {
-        Cluster.validate(cluster);
+        if (cluster == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No cluster entered. Unable to validate.");
+        }
+        cluster.validate();
         final HttpRequest request = this.buildRequest(
                 Verb.POST,
                 BASE_CONFIG_CLUSTER_REST_URL,

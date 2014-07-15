@@ -62,12 +62,13 @@ import org.slf4j.LoggerFactory;
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Job extends CommonEntityFields implements Serializable {
+public class Job extends CommonEntityFields {
 
     private static final long serialVersionUID = 2979506788441089067L;
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
     private static final char CRITERIA_SET_DELIMITER = '|';
     private static final char CRITERIA_DELIMITER = ',';
+    private static final String DEFAULT_VERSION = "-1" ;
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
@@ -350,15 +351,14 @@ public class Job extends CommonEntityFields implements Serializable {
      */
     public Job(
             final String user,
-            final String commandId,
-            final String commandName,
+            final String name,
             final String commandArgs,
+            final Set<String> commandCriteria,
             final List<ClusterCriteria> clusterCriteria) throws CloudServiceException {
-        this.setUser(user);
-        this.commandId = commandId;
-        this.commandName = commandName;
+        super(name, user);
         this.commandArgs = commandArgs;
         this.clusterCriteria = clusterCriteria;
+        this.commandCriteria = commandCriteria;
     }
 
     /**
@@ -368,13 +368,18 @@ public class Job extends CommonEntityFields implements Serializable {
      */
     @PrePersist
     protected void onCreateJob() throws CloudServiceException {
-        validate(this.getUser(), this.commandCriteria, this.commandArgs, this.clusterCriteria);
+        validate(this.getUser(), this.commandCriteria, this.commandArgs, this.clusterCriteria, this.getName());
         this.clusterCriteriaString = clusterCriteriaToString(this.clusterCriteria);
         this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<String>();
             this.tags.add(this.getId());
+        }
+        
+        // Set version to -1 if not specified
+        if (StringUtils.isBlank(this.getVersion())) {
+            this.setVersion(DEFAULT_VERSION);
         }
     }
 
@@ -1053,17 +1058,13 @@ public class Job extends CommonEntityFields implements Serializable {
      * @param job The configuration to check
      * @throws CloudServiceException
      */
-    public static void validate(final Job job) throws CloudServiceException {
-        if (job == null) {
-            final String msg = "Required parameter job can't be NULL";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-        validate(
-                job.getUser(),
-                job.getCommandCriteria(),
-                job.getCommandArgs(),
-                job.getClusterCriteria());
+    public void validate() throws CloudServiceException {
+        this.validate(
+                this.getUser(),
+                this.getCommandCriteria(),
+                this.getCommandArgs(),
+                this.getClusterCriteria(), 
+                this.getName());
     }
 
     /**
@@ -1076,16 +1077,15 @@ public class Job extends CommonEntityFields implements Serializable {
      * @param criteria The cluster criteria for the job
      * @throws CloudServiceException
      */
-    private static void validate(
+    private void validate(
             final String user,
             final Set<String> commandCriteria,
             final String commandArgs,
-            final List<ClusterCriteria> criteria) throws CloudServiceException {
+            final List<ClusterCriteria> criteria,
+            final String name) throws CloudServiceException {
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing.\n");
-        }
         
+        super.validate(builder, name, user);
         if (commandCriteria == null || commandCriteria.isEmpty()) {
             builder.append("Command criteria is mandatory to figure out a command to run the job.\n");
         }

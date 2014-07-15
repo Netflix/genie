@@ -115,9 +115,6 @@ public class Auditable {
         if (this.id == null) {
             this.id = UUID.randomUUID().toString();
         }
-
-        // Add the id to the tags as it may or may not be present.
-        // The id cannot be null at this point.
     }
 
     /**

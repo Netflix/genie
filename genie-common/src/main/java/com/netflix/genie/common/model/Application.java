@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "An Application")
-public class Application extends CommonEntityFields implements Serializable {
+public class Application extends CommonEntityFields {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
@@ -140,9 +140,7 @@ public class Application extends CommonEntityFields implements Serializable {
             final String name,
             final String user,
             final ApplicationStatus status) throws CloudServiceException {
-        super();
-        this.setName(name);
-        this.setUser(user);
+        super(name, user);
         this.status = status;
     }
 
@@ -276,10 +274,10 @@ public class Application extends CommonEntityFields implements Serializable {
     /**
      * Sets the tags allocated to this application.
      *
-     * @param tags the tags to set. Not Null.
+     * @param tags the tags to set.
      * @throws CloudServiceException
      */
-    public void setTags(final Set<String> tags) throws CloudServiceException {
+    public void setTags(final Set<String> tags) {
         this.tags = tags;
     }
 
@@ -289,14 +287,8 @@ public class Application extends CommonEntityFields implements Serializable {
      * @param application The applications to check
      * @throws CloudServiceException
      */
-    public static void validate(final Application application) throws CloudServiceException {
-        if (application == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application passed in. Unable to validate.");
-        }
-
-        validate(application.getName(), application.getUser(), application.getStatus());
+    public void validate() throws CloudServiceException {
+        this.validate(this.getName(), this.getUser(), this.getStatus());
     }
 
     /**
@@ -307,18 +299,13 @@ public class Application extends CommonEntityFields implements Serializable {
      * @param status The status of the application
      * @throws CloudServiceException
      */
-    private static void validate(
+    private void validate(
             final String name,
             final String user,
             final ApplicationStatus status)
             throws CloudServiceException {
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing and is required.\n");
-        }
-        if (StringUtils.isBlank(name)) {
-            builder.append("Application name is missing and is required.\n");
-        }
+        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No application status entered and is required.\n");
         }

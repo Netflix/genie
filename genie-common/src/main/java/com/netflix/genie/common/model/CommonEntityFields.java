@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.model.Types.ApplicationStatus;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
@@ -35,7 +36,21 @@ public class CommonEntityFields extends Auditable {
      */
     public CommonEntityFields () {
     }
-
+    
+    /**
+     * Construct a new CommonEntity Object with all required parameters.
+     *
+     * @param name The name of the application. Not null/empty/blank.
+     * @param user The user who created the application. Not null/empty/blank.
+     * @throws CloudServiceException
+     */
+    public CommonEntityFields (
+            final String name,
+            final String user) throws CloudServiceException {
+        this.name = name;
+        this.user = user;
+    }
+    
     /**
      * Version of this entity.
      */
@@ -65,7 +80,7 @@ public class CommonEntityFields extends Auditable {
     private String name;
 
     /**
-     * Gets the version of this resource.
+     * Gets the version of this entity.
      *
      * @return version
      */
@@ -74,16 +89,16 @@ public class CommonEntityFields extends Auditable {
     }
 
     /**
-     * Sets the version for this resource.
+     * Sets the version for this entity.
      *
-     * @param version version number for this cluster
+     * @param version version number for this entity
      */
     public void setVersion(final String version) {
         this.version = version;
     }
 
     /**
-     * Gets the user that created this cluster.
+     * Gets the user that created this entity.
      *
      * @return user
      */
@@ -92,9 +107,9 @@ public class CommonEntityFields extends Auditable {
     }
 
     /**
-     * Sets the user who created this cluster.
+     * Sets the user who created this entity.
      *
-     * @param user user who created this cluster. Not null/empty/blank.
+     * @param user user who created this entity. Not null/empty/blank.
      * @throws CloudServiceException
      */
     public void setUser(final String user) throws CloudServiceException {
@@ -123,5 +138,26 @@ public class CommonEntityFields extends Auditable {
      */
     public void setName(final String name) {
         this.name = name;
+    }
+    
+    /**
+     * Helper method for checking the validity of required parameters.
+     *
+     * @param name The name of the application
+     * @param user The user who created the application
+     * @param status The status of the application
+     * @throws CloudServiceException
+     */
+    protected void validate(
+            final StringBuilder builder,
+            final String name,
+            final String user)
+            throws CloudServiceException {
+        if (StringUtils.isBlank(user)) {
+            builder.append("User name is missing and is required.\n");
+        }
+        if (StringUtils.isBlank(name)) {
+            builder.append("Name is missing and is required.\n");
+        }
     }
 }

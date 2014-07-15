@@ -385,6 +385,7 @@ public class YarnJobManager implements JobManager {
         for (final Command cmd : this.cluster.getCommands()) {
             if (cmd.getTags().containsAll(job.getCommandCriteria())) {
                 command = cmd;
+                break;
             }
         }
         

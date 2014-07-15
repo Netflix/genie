@@ -24,9 +24,13 @@ import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.common.model.Types;
 import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.netflix.genie.common.model.Types.CommandStatus;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
@@ -106,19 +110,13 @@ public final class ClusterSpecs {
     /**
      * Get all the clusters given the specified parameters.
      *
-     * @param applicationId The application id
-     * @param applicationName The application name
-     * @param commandId The command id
-     * @param commandName The command name
-     * @param cc The cluster criteria
+     * @param clusterCriteria The cluster criteria
+     * @param commandCriteria The command Criteria
      * @return The specification
      */
-    public static Specification<Cluster> findByApplicationAndCommandAndCriteria(
-            final String applicationId,
-            final String applicationName,
-            final String commandId,
-            final String commandName,
-            final ClusterCriteria cc) {
+    public static Specification<Cluster> findByClusterAndCommandCriteria(
+            final ClusterCriteria clusterCriteria,
+            final Set<String> commandCriteria) {
         return new Specification<Cluster>() {
             @Override
             public Predicate toPredicate(
@@ -126,32 +124,22 @@ public final class ClusterSpecs {
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
                 final List<Predicate> predicates = new ArrayList<Predicate>();
-
+                final Join<Cluster, Command> commands = root.join(Cluster_.commands);
+                
                 cq.distinct(true);
 
-                if (StringUtils.isNotBlank(commandId) || StringUtils.isNotBlank(commandName)) {
-                    final Join<Cluster, Command> commands = root.join(Cluster_.commands);
-                    if (StringUtils.isNotEmpty(commandId)) {
-                        predicates.add(cb.equal(commands.get(Command_.id), commandId));
-                    } else {
-                        predicates.add(cb.equal(commands.get(Command_.name), commandName));
-                    }
-                    predicates.add(cb.equal(commands.get(Command_.status), Types.CommandStatus.ACTIVE));
-                    predicates.add(cb.equal(root.get(Cluster_.status), ClusterStatus.UP));
-                    if (StringUtils.isNotEmpty(applicationId) || StringUtils.isNotEmpty(applicationName)) {
-                        final Join<Command, Application> apps = commands.join(Command_.application);
-                        if (StringUtils.isNotEmpty(applicationId)) {
-                            predicates.add(cb.equal(apps.get(Application_.id), applicationId));
-                        } else {
-                            predicates.add(cb.equal(apps.get(Application_.name), applicationName));
-                        }
-                        predicates.add(cb.equal(apps.get(Application_.status), Types.ApplicationStatus.ACTIVE));
+                predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
+                predicates.add(cb.equal(root.get(Cluster_.status), ClusterStatus.UP));
+     
+                if (commandCriteria != null) {
+                    for (final String tag: commandCriteria) {
+                        predicates.add(cb.isMember(tag, commands.get(Command_.tags)));
                     }
                 }
-
-                if (cc.getTags() != null) {
-                    for (final String tag : cc.getTags()) {
-                        //predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
+                
+                if (clusterCriteria.getTags() != null) {
+                    for (final String tag : clusterCriteria.getTags()) {
+                        predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
                     }
                 }
 

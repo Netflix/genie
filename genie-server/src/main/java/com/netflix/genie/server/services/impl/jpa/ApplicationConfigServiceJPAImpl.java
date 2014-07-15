@@ -120,7 +120,12 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     @Override
     public Application createApplication(
             final Application app) throws CloudServiceException {
-        Application.validate(app);
+        if (app == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application entered to create.");
+        }
+        app.validate();
         LOG.debug("Called with application: " + app.toString());
         if (app.getId() != null && this.applicationRepo.exists(app.getId())) {
             throw new CloudServiceException(
@@ -156,7 +161,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         }
         LOG.debug("Called with app " + updateApp.toString());
         final Application app = this.em.merge(updateApp);
-        Application.validate(app);
+        app.validate();
         return app;
     }
 

@@ -129,8 +129,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     public Job submitJob(final Job job) throws CloudServiceException {
         LOG.debug("Called");
 
+        if (job == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job entered to run");
+        }
         // validate parameters
-        Job.validate(job);
+        job.validate();
 
         // generate job id, if need be
         if (StringUtils.isEmpty(job.getId())) {

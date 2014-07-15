@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Command")
-public class Command extends CommonEntityFields implements Serializable {
+public class Command extends CommonEntityFields {
 
     private static final long serialVersionUID = -6106046473373305992L;
     private static final Logger LOG = LoggerFactory.getLogger(Command.class);
@@ -162,9 +162,7 @@ public class Command extends CommonEntityFields implements Serializable {
             final String user,
             final CommandStatus status,
             final String executable) throws CloudServiceException {
-        super();
-        this.setName(name);
-        this.setUser(user);
+        super(name, user);
         this.status = status;
         this.executable = executable;
     }
@@ -378,17 +376,12 @@ public class Command extends CommonEntityFields implements Serializable {
      * @param command The configuration to check
      * @throws CloudServiceException
      */
-    public static void validate(final Command command) throws CloudServiceException {
-        if (command == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command entered to validate");
-        }
-        validate(
-                command.getName(),
-                command.getUser(),
-                command.getStatus(),
-                command.getExecutable());
+    public void validate() throws CloudServiceException {
+        this.validate(
+                this.getName(),
+                this.getUser(),
+                this.getStatus(),
+                this.getExecutable());
     }
 
     /**
@@ -399,19 +392,14 @@ public class Command extends CommonEntityFields implements Serializable {
      * @param status The status of the command
      * @throws CloudServiceException
      */
-    private static void validate(
+    private void validate(
             final String name,
             final String user,
             final CommandStatus status,
             final String executable)
             throws CloudServiceException {
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing and is required.\n");
-        }
-        if (StringUtils.isBlank(name)) {
-            builder.append("Command name is missing and is required.\n");
-        }
+        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No command status entered and is required.\n");
         }

@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Cluster")
-public class Cluster extends CommonEntityFields implements Serializable {
+public class Cluster extends CommonEntityFields {
 
     private static final long serialVersionUID = 8046582926818942370L;
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
@@ -148,9 +148,7 @@ public class Cluster extends CommonEntityFields implements Serializable {
             final ClusterStatus status,
             final String clusterType,
             final Set<String> configs) throws CloudServiceException {
-        super();
-        this.setName(name);
-        this.setUser(user);
+        super(name, user);
         this.status = status;
         this.clusterType = clusterType;
         this.configs = configs;
@@ -384,19 +382,14 @@ public class Cluster extends CommonEntityFields implements Serializable {
      * @param cluster The configuration to check
      * @throws CloudServiceException
      */
-    public static void validate(final Cluster cluster) throws CloudServiceException {
-        if (cluster == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No cluster entered. Unable to validate.");
-        }
-        validate(
-                cluster.getName(),
-                cluster.getUser(),
-                cluster.getStatus(),
-                cluster.getClusterType(),
-                cluster.getVersion(),
-                cluster.getConfigs());
+    public void validate() throws CloudServiceException {
+       this.validate(
+                this.getName(),
+                this.getUser(),
+                this.getStatus(),
+                this.getClusterType(),
+                this.getVersion(),
+                this.getConfigs());
     }
 
     /**
@@ -409,7 +402,7 @@ public class Cluster extends CommonEntityFields implements Serializable {
      * @param configs The configuration files for the cluster
      * @throws CloudServiceException
      */
-    private static void validate(
+    private void validate(
             final String name,
             final String user,
             final ClusterStatus status,
@@ -417,12 +410,7 @@ public class Cluster extends CommonEntityFields implements Serializable {
             final String clusterVersion,
             final Set<String> configs) throws CloudServiceException {
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isBlank(name)) {
-            builder.append("Cluster name is missing and required.\n");
-        }
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing and required.\n");
-        }
+        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No cluster status entered and is required.\n");
         }

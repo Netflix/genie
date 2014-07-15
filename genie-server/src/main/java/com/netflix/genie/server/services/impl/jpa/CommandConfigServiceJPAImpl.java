@@ -79,7 +79,12 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Command createCommand(final Command command) throws CloudServiceException {
-        Command.validate(command);
+        if (command == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command entered to create");
+        }
+        command.validate();
         LOG.debug("Called to create command " + command.toString());
         if (StringUtils.isEmpty(command.getId())) {
             command.setId(UUID.randomUUID().toString());
@@ -162,7 +167,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         }
         LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
         final Command command = this.em.merge(updateCommand);
-        Command.validate(command);
+        command.validate();
         return command;
     }
 

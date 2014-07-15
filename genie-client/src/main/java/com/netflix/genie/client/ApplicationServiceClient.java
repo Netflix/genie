@@ -82,7 +82,13 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      */
     public Application createApplication(final Application application)
             throws CloudServiceException {
-        Application.validate(application);
+        if (application == null) {
+            throw new CloudServiceException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application passed in. Unable to validate.");
+        }
+
+        application.validate();
         final HttpRequest request = this.buildRequest(
                 Verb.POST,
                 BASE_CONFIG_APPLICATION_REST_URL,
