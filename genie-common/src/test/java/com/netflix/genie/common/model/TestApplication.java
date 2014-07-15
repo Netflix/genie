@@ -19,6 +19,7 @@ package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -33,20 +34,29 @@ public class TestApplication {
     private static final String NAME = "pig";
     private static final String USER = "tgianos";
 
+    private Application a;
+
+    /**
+     * Setup the tests.
+     */
+    @Before
+    public void setup() {
+        this.a = new Application();
+    }
+
     /**
      * Test the default Constructor.
      */
     @Test
     public void testDefaultConstructor() {
-        final Application a = new Application();
-        Assert.assertNull(a.getCommands());
-        Assert.assertNull(a.getConfigs());
-        Assert.assertNull(a.getEnvPropFile());
-        Assert.assertEquals(ApplicationStatus.INACTIVE, a.getStatus());
-        Assert.assertNull(a.getJars());
-        Assert.assertNull(a.getName());
-        Assert.assertNull(a.getUser());
-        Assert.assertNull(a.getVersion());
+        Assert.assertNull(this.a.getCommands());
+        Assert.assertNull(this.a.getConfigs());
+        Assert.assertNull(this.a.getEnvPropFile());
+        Assert.assertEquals(ApplicationStatus.INACTIVE, this.a.getStatus());
+        Assert.assertNull(this.a.getJars());
+        Assert.assertNull(this.a.getName());
+        Assert.assertNull(this.a.getUser());
+        Assert.assertNull(this.a.getVersion());
     }
 
     /**
@@ -54,15 +64,15 @@ public class TestApplication {
      */
     @Test
     public void testConstructor() {
-        final Application a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
-        Assert.assertNull(a.getCommands());
-        Assert.assertNull(a.getConfigs());
-        Assert.assertNull(a.getEnvPropFile());
-        Assert.assertEquals(ApplicationStatus.ACTIVE, a.getStatus());
-        Assert.assertNull(a.getJars());
-        Assert.assertEquals(NAME, a.getName());
-        Assert.assertEquals(USER, a.getUser());
-        Assert.assertNull(a.getVersion());
+        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
+        Assert.assertNull(this.a.getCommands());
+        Assert.assertNull(this.a.getConfigs());
+        Assert.assertNull(this.a.getEnvPropFile());
+        Assert.assertEquals(ApplicationStatus.ACTIVE, this.a.getStatus());
+        Assert.assertNull(this.a.getJars());
+        Assert.assertEquals(NAME, this.a.getName());
+        Assert.assertEquals(USER, this.a.getUser());
+        Assert.assertNull(this.a.getVersion());
     }
 
     /**
@@ -71,9 +81,9 @@ public class TestApplication {
      * @throws GenieException
      */
     @Test
-    public void testOnCreateApplication() throws GenieException {
-        final Application a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
-        a.onCreateApplication();
+    public void testOnCreateOrUpdate() throws GenieException {
+        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
+        this.a.onCreateOrUpdate();
     }
 
     /**
@@ -82,9 +92,8 @@ public class TestApplication {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateApplicationWithNothing() throws GenieException {
-        final Application a = new Application();
-        a.onCreateApplication();
+    public void testOnCreateOrUpdateWithNothing() throws GenieException {
+        this.a.onCreateOrUpdate();
     }
 
     /**
@@ -93,9 +102,9 @@ public class TestApplication {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateApplicationNoName() throws GenieException {
-        final Application a = new Application(null, USER, ApplicationStatus.ACTIVE);
-        a.onCreateApplication();
+    public void testOnCreateOrUpdateNoName() throws GenieException {
+        this.a = new Application(null, USER, ApplicationStatus.ACTIVE);
+        this.a.onCreateOrUpdate();
     }
 
     /**
@@ -104,9 +113,9 @@ public class TestApplication {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateApplicationNoUser() throws GenieException {
-        final Application a = new Application(NAME, null, ApplicationStatus.ACTIVE);
-        a.onCreateApplication();
+    public void testOnCreateOrUpdateNoUser() throws GenieException {
+        this.a = new Application(NAME, null, ApplicationStatus.ACTIVE);
+        this.a.onCreateOrUpdate();
     }
 
     /**
@@ -115,9 +124,9 @@ public class TestApplication {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateApplicationNoStatus() throws GenieException {
-        final Application a = new Application(NAME, USER, null);
-        a.onCreateApplication();
+    public void testOnCreateOrUpdateNoStatus() throws GenieException {
+        this.a = new Application(NAME, USER, null);
+        this.a.onCreateOrUpdate();
     }
 
     /**
@@ -127,8 +136,8 @@ public class TestApplication {
      */
     @Test
     public void testValidate() throws GenieException {
-        final Application a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
-        Application.validate(a);
+        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
+        Application.validate(this.a);
     }
 
     /**
@@ -146,10 +155,9 @@ public class TestApplication {
      */
     @Test
     public void testSetName() {
-        final Application a = new Application();
-        Assert.assertNull(a.getName());
-        a.setName(NAME);
-        Assert.assertEquals(NAME, a.getName());
+        Assert.assertNull(this.a.getName());
+        this.a.setName(NAME);
+        Assert.assertEquals(NAME, this.a.getName());
     }
 
     /**
@@ -157,10 +165,9 @@ public class TestApplication {
      */
     @Test
     public void testSetUser() {
-        final Application a = new Application();
-        Assert.assertNull(a.getUser());
-        a.setUser(USER);
-        Assert.assertEquals(USER, a.getUser());
+        Assert.assertNull(this.a.getUser());
+        this.a.setUser(USER);
+        Assert.assertEquals(USER, this.a.getUser());
     }
 
     /**
@@ -168,10 +175,9 @@ public class TestApplication {
      */
     @Test
     public void testSetStatus() {
-        final Application a = new Application();
-        Assert.assertEquals(ApplicationStatus.INACTIVE, a.getStatus());
-        a.setStatus(ApplicationStatus.ACTIVE);
-        Assert.assertEquals(ApplicationStatus.ACTIVE, a.getStatus());
+        Assert.assertEquals(ApplicationStatus.INACTIVE, this.a.getStatus());
+        this.a.setStatus(ApplicationStatus.ACTIVE);
+        Assert.assertEquals(ApplicationStatus.ACTIVE, this.a.getStatus());
     }
 
     /**
@@ -179,11 +185,10 @@ public class TestApplication {
      */
     @Test
     public void testSetVersion() {
-        final Application a = new Application();
-        Assert.assertNull(a.getVersion());
+        Assert.assertNull(this.a.getVersion());
         final String version = "1.2.3";
-        a.setVersion(version);
-        Assert.assertEquals(version, a.getVersion());
+        this.a.setVersion(version);
+        Assert.assertEquals(version, this.a.getVersion());
     }
 
     /**
@@ -191,11 +196,10 @@ public class TestApplication {
      */
     @Test
     public void testSetEnvPropFile() {
-        final Application a = new Application();
-        Assert.assertNull(a.getEnvPropFile());
+        Assert.assertNull(this.a.getEnvPropFile());
         final String propFile = "s3://netflix.propFile";
-        a.setEnvPropFile(propFile);
-        Assert.assertEquals(propFile, a.getEnvPropFile());
+        this.a.setEnvPropFile(propFile);
+        Assert.assertEquals(propFile, this.a.getEnvPropFile());
     }
 
     /**
@@ -203,12 +207,11 @@ public class TestApplication {
      */
     @Test
     public void testSetConfigs() {
-        final Application a = new Application();
-        Assert.assertNull(a.getConfigs());
+        Assert.assertNull(this.a.getConfigs());
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix.configFile");
-        a.setConfigs(configs);
-        Assert.assertEquals(configs, a.getConfigs());
+        this.a.setConfigs(configs);
+        Assert.assertEquals(configs, this.a.getConfigs());
     }
 
     /**
@@ -216,12 +219,11 @@ public class TestApplication {
      */
     @Test
     public void testSetJars() {
-        final Application a = new Application();
-        Assert.assertNull(a.getJars());
+        Assert.assertNull(this.a.getJars());
         final Set<String> jars = new HashSet<String>();
         jars.add("s3://netflix/jars/myJar.jar");
-        a.setJars(jars);
-        Assert.assertEquals(jars, a.getJars());
+        this.a.setJars(jars);
+        Assert.assertEquals(jars, this.a.getJars());
     }
 
     /**
@@ -229,11 +231,10 @@ public class TestApplication {
      */
     @Test
     public void testSetCommands() {
-        final Application a = new Application();
-        Assert.assertNull(a.getCommands());
+        Assert.assertNull(this.a.getCommands());
         final Set<Command> commands = new HashSet<Command>();
         commands.add(new Command());
-        a.setCommands(commands);
-        Assert.assertEquals(commands, a.getCommands());
+        this.a.setCommands(commands);
+        Assert.assertEquals(commands, this.a.getCommands());
     }
 }

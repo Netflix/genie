@@ -35,6 +35,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -90,7 +91,7 @@ public class Command extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "The status of the command",
             required = true)
-    private CommandStatus status;
+    private CommandStatus status = CommandStatus.INACTIVE;
 
     /**
      * Location of the executable for this command.
@@ -170,13 +171,12 @@ public class Command extends Auditable implements Serializable {
      * @param user The user who created the command. Not null/empty/blank.
      * @param status The status of the command. Not null.
      * @param executable The executable of the command. Not null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Command(
             final String name,
             final String user,
             final CommandStatus status,
-            final String executable) throws GenieException {
+            final String executable) {
         super();
         this.name = name;
         this.user = user;
@@ -187,10 +187,11 @@ public class Command extends Auditable implements Serializable {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PrePersist
-    protected void onCreateCommand() throws GenieException {
+    @PreUpdate
+    protected void onCreateOrUpdate() throws GenieException {
         validate(this.name, this.user, this.status, this.executable);
     }
 
@@ -206,15 +207,9 @@ public class Command extends Auditable implements Serializable {
     /**
      * Sets the name for this command.
      *
-     * @param name unique id for this cluster. Not null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @param name the name of this command.
      */
-    public void setName(final String name) throws GenieException {
-        if (StringUtils.isBlank(name)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No name entered.");
-        }
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -230,15 +225,9 @@ public class Command extends Auditable implements Serializable {
     /**
      * Sets the user who created this command.
      *
-     * @param user user who created this command. Not null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @param user user who created this command.
      */
-    public void setUser(final String user) throws GenieException {
-        if (StringUtils.isBlank(user)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No user entered.");
-        }
+    public void setUser(final String user) {
         this.user = user;
     }
 
@@ -255,16 +244,10 @@ public class Command extends Auditable implements Serializable {
     /**
      * Sets the status for this application.
      *
-     * @param status The new status. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @param status The new status.
      * @see CommandStatus
      */
-    public void setStatus(final CommandStatus status) throws GenieException {
-        if (status == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No status entered.");
-        }
+    public void setStatus(final CommandStatus status) {
         this.status = status;
     }
 
@@ -280,16 +263,9 @@ public class Command extends Auditable implements Serializable {
     /**
      * Sets the executable for this command.
      *
-     * @param executable Full path of the executable on the node. Not
-     * null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @param executable Full path of the executable on the node.
      */
-    public void setExecutable(final String executable) throws GenieException {
-        if (StringUtils.isBlank(executable)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No executable entered.");
-        }
+    public void setExecutable(final String executable) {
         this.executable = executable;
     }
 
@@ -424,7 +400,7 @@ public class Command extends Auditable implements Serializable {
      * Check to make sure that the required parameters exist.
      *
      * @param command The configuration to check
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public static void validate(final Command command) throws GenieException {
         if (command == null) {
@@ -445,7 +421,7 @@ public class Command extends Auditable implements Serializable {
      * @param name The name of the command
      * @param user The user who created the command
      * @param status The status of the command
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     private static void validate(
             final String name,

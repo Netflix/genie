@@ -1,5 +1,5 @@
 def metaModelIgnorePattern = '**/com/netflix/genie/common/model/*_.java'
-def generatedSources = 'src/generated-sources'
+def generatedSources = 'src/generated'
 def generatedSourcesJava = generatedSources + '/java'
 
 sourceSets {

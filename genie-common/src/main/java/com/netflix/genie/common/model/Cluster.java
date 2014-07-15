@@ -38,6 +38,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -94,7 +95,7 @@ public class Cluster extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "The status of the cluster",
             required = true)
-    private ClusterStatus status;
+    private ClusterStatus status = ClusterStatus.OUT_OF_SERVICE;
 
     /**
      * The type of the cluster to use to figure out the job manager for this
@@ -167,29 +168,32 @@ public class Cluster extends Auditable implements Serializable {
      * @param clusterType The type of the cluster. Not null/empty/blank.
      * @param configs The configuration files for the cluster. Not null or
      * empty.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @param version The version of the cluster. Not null/empty/blank.
      */
     public Cluster(
             final String name,
             final String user,
             final ClusterStatus status,
             final String clusterType,
-            final Set<String> configs) throws GenieException {
+            final Set<String> configs,
+            final String version) {
         super();
         this.name = name;
         this.user = user;
         this.status = status;
         this.clusterType = clusterType;
         this.configs = configs;
+        this.version = version;
     }
 
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PrePersist
-    protected void onCreateCluster() throws GenieException {
+    @PreUpdate
+    protected void onCreateOrUpdate() throws GenieException {
         validate(this.name, this.user, this.status, this.clusterType, this.version, this.configs);
     }
 
@@ -206,14 +210,8 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the name for this cluster.
      *
      * @param name name for this cluster. Not null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setName(final String name) throws GenieException {
-        if (StringUtils.isBlank(name)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No name Entered.");
-        }
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -230,14 +228,8 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the user who created this cluster.
      *
      * @param user user who created this cluster. Not null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setUser(final String user) throws GenieException {
-        if (StringUtils.isBlank(user)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No user Entered.");
-        }
+    public void setUser(final String user) {
         this.user = user;
     }
 
@@ -254,15 +246,9 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the status for this cluster.
      *
      * @param status The status of the cluster. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
      * @see ClusterStatus
      */
-    public void setStatus(final ClusterStatus status) throws GenieException {
-        if (status == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No Status Entered.");
-        }
+    public void setStatus(final ClusterStatus status) {
         this.status = status;
     }
 
@@ -280,14 +266,8 @@ public class Cluster extends Auditable implements Serializable {
      * Set the type for this cluster.
      *
      * @param clusterType The type of this cluster. Not null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setClusterType(String clusterType) throws GenieException {
-        if (StringUtils.isBlank(clusterType)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No cluster type Entered.");
-        }
+    public void setClusterType(String clusterType) {
         this.clusterType = clusterType;
     }
 
@@ -322,9 +302,8 @@ public class Cluster extends Auditable implements Serializable {
      * Sets the tags allocated to this cluster.
      *
      * @param tags the tags to set. Not Null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setTags(final Set<String> tags) throws GenieException {
+    public void setTags(final Set<String> tags) {
         this.tags = tags;
     }
 
@@ -342,14 +321,8 @@ public class Cluster extends Auditable implements Serializable {
      *
      * @param configs The configuration files that this cluster needs. Not
      * null/empty.
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setConfigs(final Set<String> configs) throws GenieException {
-        if (configs == null || configs.isEmpty()) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "At least one config required.");
-        }
+    public void setConfigs(final Set<String> configs) {
         this.configs = configs;
     }
 
@@ -380,7 +353,7 @@ public class Cluster extends Auditable implements Serializable {
         //set the commands for this command
         this.commands = commands;
 
-        //Add the referse reference in the new commands
+        //Add the reference in the new commands
         if (this.commands != null) {
             for (final Command command : this.commands) {
                 Set<Cluster> clusters = command.getClusters();
@@ -399,7 +372,7 @@ public class Cluster extends Auditable implements Serializable {
      * Add a new command to this cluster. Manages both sides of relationship.
      *
      * @param command The command to add. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public void addCommand(final Command command)
             throws GenieException {
@@ -426,7 +399,7 @@ public class Cluster extends Auditable implements Serializable {
      * Remove an command from this command. Manages both sides of relationship.
      *
      * @param command The command to remove. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public void removeCommand(final Command command)
             throws GenieException {
@@ -447,11 +420,13 @@ public class Cluster extends Auditable implements Serializable {
     /**
      * Remove all the commands from this application.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public void removeAllCommands() throws GenieException {
         if (this.commands != null) {
-            for (final Command command : this.commands) {
+            final List<Command> locCommands = new ArrayList<Command>();
+            locCommands.addAll(this.commands);
+            for (final Command command : locCommands) {
                 this.removeCommand(command);
             }
         }
@@ -461,7 +436,7 @@ public class Cluster extends Auditable implements Serializable {
      * Check to make sure that the required parameters exist.
      *
      * @param cluster The configuration to check
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public static void validate(final Cluster cluster) throws GenieException {
         if (cluster == null) {
@@ -486,7 +461,7 @@ public class Cluster extends Auditable implements Serializable {
      * @param status The status of the cluster
      * @param clusterType The type of cluster
      * @param configs The configuration files for the cluster
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     private static void validate(
             final String name,

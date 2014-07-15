@@ -256,7 +256,8 @@ public final class ClusterServiceSampleClient {
                 "tgianos",
                 ClusterStatus.OUT_OF_SERVICE,
                 "com.netflix.genie.server.jobmanager.impl.YarnJobManager",
-                configs);
+                configs,
+                "2.4.0");
         if (StringUtils.isNotBlank(id)) {
             cluster.setId(id);
         }
@@ -265,7 +266,6 @@ public final class ClusterServiceSampleClient {
         tags.add("h2query");
         tags.add(cluster.getId());
         cluster.setTags(tags);
-        cluster.setVersion("2.4.0");
 
         return cluster;
     }

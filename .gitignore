@@ -12,7 +12,7 @@ genie-web/bin/
 
 # Per Build Generated Sources #
 ###############################
-**/generated-sources
+**/generated
 
 # Packages #
 ############

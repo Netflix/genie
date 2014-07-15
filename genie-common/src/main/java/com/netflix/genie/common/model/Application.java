@@ -33,6 +33,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -165,7 +166,8 @@ public class Application extends Auditable implements Serializable {
      * @throws GenieException
      */
     @PrePersist
-    protected void onCreateApplication() throws GenieException {
+    @PreUpdate
+    protected void onCreateOrUpdate() throws GenieException {
         validate(this.name, this.user, this.status);
     }
 
@@ -320,7 +322,7 @@ public class Application extends Auditable implements Serializable {
      * Check to make sure that the required parameters exist.
      *
      * @param application The applications to check
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public static void validate(final Application application) throws GenieException {
         if (application == null) {
@@ -338,7 +340,7 @@ public class Application extends Auditable implements Serializable {
      * @param name The name of the application
      * @param user The user who created the application
      * @param status The status of the application
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     private static void validate(
             final String name,
