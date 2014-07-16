@@ -18,11 +18,10 @@ subprojects {
         reports.html.enabled true
     }
 
+    // Code Coverage
     apply plugin: 'cobertura'
     cobertura {
-        sourceDirs = sourceSets.main.java.srcDirs
-        format = 'html'
-        includes = ['**/*.java', '**/*.groovy']
-        excludes = []
+        coverageFormats = ['html', 'xml']
+        coverageExcludes = ['.*com.netflix.genie.common.model.*_.*']
     }
 }
