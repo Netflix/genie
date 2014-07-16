@@ -168,6 +168,46 @@ public final class ClusterServiceSampleClient {
             LOG.info("Config = " + config);
         }
 
+        /**************** Begin tests for tag Api's *********************/
+        LOG.info("Get tags for cluster with id " + cluster1.getId());
+        final Set<String> tags = cluster1.getTags();
+        for (final String tag : tags) {
+            LOG.info("Tag = " + tag);
+        }
+        
+        LOG.info("Adding tags to cluster with id " + cluster1.getId());
+        final Set<String> newTags = new HashSet<String>();
+        newTags.add("tag1");
+        newTags.add("tag2");
+        final Set<String> tags2 = clusterClient.addTagsToCluster(cluster1.getId(), newTags);
+        for (final String tag : tags2) {
+            LOG.info("Tag = " + tag);
+        }
+
+        LOG.info("Updating set of tags associated with id " + cluster1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> tags3 = clusterClient.updateTagsForCluster(cluster1.getId(), newTags);
+        for (final String tag : tags3) {
+            LOG.info("Tag = " + tag);
+        }
+
+        LOG.info("Deleting one tag from the cluster with id " + cluster1.getId());
+        //This should remove the "tag3" from the tags
+        final Set<String> tags5 = clusterClient.removeTagForCluster(cluster1.getId(), "tag1");
+        for (final String tag : tags5) {
+            //Shouldn't print anything
+            LOG.info("Tag = " + tag);
+        }
+        
+        LOG.info("Deleting all the tags from the cluster with id " + cluster1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> tags4 = clusterClient.removeAllConfigsForCluster(cluster1.getId());
+        for (final String tag : tags4) {
+            //Shouldn't print anything
+            LOG.info("Config = " + tag);
+        }
+        /********************** End tests for tag Api's **********************/
+        
         LOG.info("Commands for cluster with id " + cluster1.getId());
         final List<Command> commands1 = clusterClient.getCommandsForCluster(cluster1.getId());
         for (final Command command : commands1) {

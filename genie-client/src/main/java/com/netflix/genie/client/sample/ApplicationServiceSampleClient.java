@@ -135,6 +135,46 @@ public final class ApplicationServiceSampleClient {
             LOG.info("Config = " + config);
         }
 
+        /**************** Begin tests for tag Api's *********************/
+        LOG.info("Get tags for application with id " + app1.getId());
+        final Set<String> tags = app1.getTags();
+        for (final String tag : tags) {
+            LOG.info("Tag = " + tag);
+        }
+        
+        LOG.info("Adding tags to application with id " + app1.getId());
+        final Set<String> newTags = new HashSet<String>();
+        newTags.add("tag1");
+        newTags.add("tag2");
+        final Set<String> tags2 = appClient.addTagsToApplication(app1.getId(), newTags);
+        for (final String tag : tags2) {
+            LOG.info("Tag = " + tag);
+        }
+
+        LOG.info("Updating set of tags associated with id " + app1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> tags3 = appClient.updateTagsForApplication(app1.getId(), newTags);
+        for (final String tag : tags3) {
+            LOG.info("Tag = " + tag);
+        }
+
+        LOG.info("Deleting one tag from the application with id " + app1.getId());
+        //This should remove the "tag3" from the tags
+        final Set<String> tags5 = appClient.removeTagForApplication(app1.getId(), "tag1");
+        for (final String tag : tags5) {
+            //Shouldn't print anything
+            LOG.info("Tag = " + tag);
+        }
+        
+        LOG.info("Deleting all the tags from the application with id " + app1.getId());
+        //This should remove the original config leaving only the two in this set
+        final Set<String> tags4 = appClient.removeAllConfigsForApplication(app1.getId());
+        for (final String tag : tags4) {
+            //Shouldn't print anything
+            LOG.info("Config = " + tag);
+        }
+        /********************** End tests for tag Api's **********************/
+        
         LOG.info("Jars for application with id " + app1.getId());
         final Set<String> jars = appClient.getJarsForApplication(app1.getId());
         for (final String jar : jars) {
@@ -195,9 +235,14 @@ public final class ApplicationServiceSampleClient {
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml");
         app.setConfigs(configs);
+        
         final Set<String> jars = new HashSet<String>();
         jars.add("s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar");
         app.setJars(jars);
+        
+        final Set<String> tags = new HashSet<String>();
+        tags.add("tag0");
+        app.setTags(tags);
         return app;
     }
 }

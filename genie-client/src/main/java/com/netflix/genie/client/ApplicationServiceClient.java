@@ -608,7 +608,8 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @throws GenieException
      */
     public Set<String> removeTagForApplication(
-            final String id) throws GenieException {
+            final String id,
+            final String tag) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -622,7 +623,8 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                         new String[]{
                             BASE_CONFIG_APPLICATION_REST_URL,
                             id,
-                            "tags"
+                            "tags",
+                            tag
                         },
                         SLASH),
                 null,

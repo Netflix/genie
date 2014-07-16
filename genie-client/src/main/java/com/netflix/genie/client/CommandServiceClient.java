@@ -586,7 +586,8 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @throws GenieException
      */
     public Set<String> removeTagForCommand(
-            final String id) throws GenieException {
+            final String id,
+            final String tag) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
@@ -600,7 +601,8 @@ public final class CommandServiceClient extends BaseGenieClient {
                         new String[]{
                             BASE_CONFIG_COMMAND_REST_URL,
                             id,
-                            "tags"
+                            "tags",
+                            tag
                         },
                         SLASH),
                 null,
