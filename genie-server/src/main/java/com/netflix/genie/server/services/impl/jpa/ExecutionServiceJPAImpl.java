@@ -226,7 +226,26 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
             // update entity in DB
             job.setUpdated(new Date());
-            return this.em.merge(job);
+            // At this stage the job is successfully init'ed in the db and also launched successfully by the job manager.
+            // The call below is just trying to set the status in the DB as RUNNING and update the updateTime.
+            // We add retries to this updateEntity call, as since the job is launched we do not want to throw a false 
+            // error of job not running due to transient db connection issues.
+            int maxDBTransactionRetries = CONF.getInt(
+                    "netflix.genie.server.max.db.transaction.retries", 3);
+            int attemptNum = 1;
+            while (true) {
+                try {
+                    return this.em.merge(job);
+                } catch (RollbackException e) {
+                    if (attemptNum == maxDBTransactionRetries) {
+                        throw(e);
+                    } else {
+                        stats.incrJobSubmissionRetryCount();
+                        attemptNum++;
+                        continue;
+                    }
+                }
+            }
         } catch (final GenieException e) {
             LOG.error("Failed to submit job: ", e);
             // update db

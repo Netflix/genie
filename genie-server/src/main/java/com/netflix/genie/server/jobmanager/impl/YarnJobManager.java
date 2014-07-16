@@ -551,6 +551,9 @@ public class YarnJobManager implements JobManager {
         final String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp";
         this.env.put("COPY_COMMAND", copyCommand);
 
+        // Force flag to overwrite required in Hadoop2
+        this.env.put("FORCE_COPY_FLAG", "-f");
+        
         final String mkdirCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -mkdir";
         this.env.put("MKDIR_COMMAND", mkdirCommand);
 
