@@ -515,7 +515,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
-            ArrayList<Command> cmdList = new ArrayList<Command>();
+            final List<Command> cmdList = new ArrayList();
             cmdList.addAll(cluster.getCommands());
             for (final Command cmd : cmdList) {
                 cluster.removeCommand(cmd);
