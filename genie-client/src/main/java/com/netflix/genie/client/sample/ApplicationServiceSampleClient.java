@@ -21,10 +21,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.ApplicationStatus;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,6 +50,8 @@ public final class ApplicationServiceSampleClient {
      * The name for the sample application.
      */
     protected static final String APP_NAME = "MapReduce2";
+
+    private static final String APP_VERSION = "1.0";
 
     /**
      * Private.
@@ -182,10 +184,10 @@ public final class ApplicationServiceSampleClient {
      *
      * @param id The id to use or null/empty if want one created.
      * @return A sample application with id MR2
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public static Application getSampleApplication(final String id) throws CloudServiceException {
-        final Application app = new Application(APP_NAME, "tgianos", ApplicationStatus.ACTIVE);
+    public static Application getSampleApplication(final String id) throws GenieException {
+        final Application app = new Application(APP_NAME, "tgianos", ApplicationStatus.ACTIVE, APP_VERSION);
         if (StringUtils.isNotEmpty(id)) {
             app.setId(id);
         }

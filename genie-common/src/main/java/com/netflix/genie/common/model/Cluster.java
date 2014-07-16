@@ -17,8 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
@@ -75,9 +74,9 @@ public class Cluster extends CommonEntityFields {
     @Basic(optional = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
-            value = "If it is in use - UP, OUT_OF_SERVICE, TERMINATED",
+            value = "The status of the cluster",
             required = true)
-    private ClusterStatus status;
+    private ClusterStatus status = ClusterStatus.OUT_OF_SERVICE;
 
     /**
      * The type of the cluster to use to figure out the job manager for this
@@ -140,15 +139,16 @@ public class Cluster extends CommonEntityFields {
      * @param clusterType The type of the cluster. Not null/empty/blank.
      * @param configs The configuration files for the cluster. Not null or
      * empty.
-     * @throws CloudServiceException
+     * @param version The version of the cluster. Not null/empty/blank.
      */
     public Cluster(
             final String name,
             final String user,
             final ClusterStatus status,
             final String clusterType,
-            final Set<String> configs) throws CloudServiceException {
-        super(name, user);
+            final Set<String> configs,
+            final String version) throws GenieException {
+        super(name, user, version);
         this.status = status;
         this.clusterType = clusterType;
         this.configs = configs;
@@ -157,24 +157,15 @@ public class Cluster extends CommonEntityFields {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PrePersist
-    protected void onCreateCluster() throws CloudServiceException {
+    protected void onCreateOrUpdate() throws GenieException {
         validate(this.getName(), this.getUser(), this.status, this.clusterType, this.getVersion(), this.configs);
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<String>();
-            this.tags.add(this.getId());
         }
-    }
-
-    /**
-     * On any update to the cluster will add id to tags.
-     */
-    @PreUpdate
-    protected void onUpdateCluster() {
-        // Add the id to the tags
         this.tags.add(this.getId());
     }
 
@@ -191,15 +182,9 @@ public class Cluster extends CommonEntityFields {
      * Sets the status for this cluster.
      *
      * @param status The status of the cluster. Not null.
-     * @throws CloudServiceException
      * @see ClusterStatus
      */
-    public void setStatus(final ClusterStatus status) throws CloudServiceException {
-        if (status == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No Status Entered.");
-        }
+    public void setStatus(final ClusterStatus status) {
         this.status = status;
     }
 
@@ -217,14 +202,8 @@ public class Cluster extends CommonEntityFields {
      * Set the type for this cluster.
      *
      * @param clusterType The type of this cluster. Not null/empty/blank.
-     * @throws CloudServiceException
      */
-    public void setClusterType(String clusterType) throws CloudServiceException {
-        if (StringUtils.isBlank(clusterType)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No cluster type Entered.");
-        }
+    public void setClusterType(String clusterType) {
         this.clusterType = clusterType;
     }
 
@@ -242,14 +221,8 @@ public class Cluster extends CommonEntityFields {
      *
      * @param configs The configuration files that this cluster needs. Not
      * null/empty.
-     * @throws CloudServiceException
      */
-    public void setConfigs(final Set<String> configs) throws CloudServiceException {
-        if (configs == null || configs.isEmpty()) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "At least one config required.");
-        }
+    public void setConfigs(final Set<String> configs) {
         this.configs = configs;
     }
 
@@ -276,9 +249,9 @@ public class Cluster extends CommonEntityFields {
      * Sets the tags allocated to this cluster.
      *
      * @param tags the tags to set. Not Null.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void setTags(final Set<String> tags) throws CloudServiceException {
+    public void setTags(final Set<String> tags) throws GenieException {
         this.tags = tags;
     }
 
@@ -299,7 +272,7 @@ public class Cluster extends CommonEntityFields {
         //set the commands for this command
         this.commands = commands;
 
-        //Add the referse reference in the new commands
+        //Add the reference in the new commands
         if (this.commands != null) {
             for (final Command command : this.commands) {
                 Set<Cluster> clusters = command.getClusters();
@@ -318,12 +291,12 @@ public class Cluster extends CommonEntityFields {
      * Add a new command to this cluster. Manages both sides of relationship.
      *
      * @param command The command to add. Not null.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public void addCommand(final Command command)
-            throws CloudServiceException {
+            throws GenieException {
         if (command == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command entered unable to add.");
         }
@@ -345,12 +318,12 @@ public class Cluster extends CommonEntityFields {
      * Remove an command from this command. Manages both sides of relationship.
      *
      * @param command The command to remove. Not null.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public void removeCommand(final Command command)
-            throws CloudServiceException {
+            throws GenieException {
         if (command == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command entered unable to remove.");
         }
@@ -366,11 +339,13 @@ public class Cluster extends CommonEntityFields {
     /**
      * Remove all the commands from this application.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void removeAllCommands() throws CloudServiceException {
+    public void removeAllCommands() throws GenieException {
         if (this.commands != null) {
-            for (final Command command : this.commands) {
+            final List<Command> locCommands = new ArrayList<Command>();
+            locCommands.addAll(this.commands);
+            for (final Command command : locCommands) {
                 this.removeCommand(command);
             }
         }
@@ -380,9 +355,9 @@ public class Cluster extends CommonEntityFields {
      * Check to make sure that the required parameters exist.
      *
      * @param cluster The configuration to check
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void validate() throws CloudServiceException {
+    public void validate() throws GenieException {
        this.validate(
                 this.getName(),
                 this.getUser(),
@@ -390,6 +365,7 @@ public class Cluster extends CommonEntityFields {
                 this.getClusterType(),
                 this.getVersion(),
                 this.getConfigs());
+
     }
 
     /**
@@ -400,7 +376,7 @@ public class Cluster extends CommonEntityFields {
      * @param status The status of the cluster
      * @param clusterType The type of cluster
      * @param configs The configuration files for the cluster
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     private void validate(
             final String name,
@@ -408,7 +384,7 @@ public class Cluster extends CommonEntityFields {
             final ClusterStatus status,
             final String clusterType,
             final String clusterVersion,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         final StringBuilder builder = new StringBuilder();
         super.validate(builder, name, user);
         if (status == null) {
@@ -428,7 +404,7 @@ public class Cluster extends CommonEntityFields {
             builder.insert(0, "Cluster configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 }

@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -95,7 +95,7 @@ public class JobResource {
      * @param job request object containing job info element for new job
      * @param hsr servlet context
      * @return The submitted job
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Consumes({
@@ -113,7 +113,7 @@ public class JobResource {
             @ApiParam(value = "Job object to run.", required = true)
             final Job job,
             @ApiParam(value = "Http Servlet request object", required = true)
-            @Context final HttpServletRequest hsr) throws CloudServiceException {
+            @Context final HttpServletRequest hsr) throws GenieException {
         // get client's host from the context
         String clientHost = hsr.getHeader("X-Forwarded-For");
         if (clientHost != null) {
@@ -123,7 +123,7 @@ public class JobResource {
         }
         LOG.debug("called from: " + clientHost);
         if (job == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job entered. Unable to submit.");
         }
@@ -145,7 +145,7 @@ public class JobResource {
      *
      * @param id id for job to look up
      * @return the Job
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}")
@@ -161,7 +161,7 @@ public class JobResource {
     public Job getJob(
             @ApiParam(value = "Id of the job to get.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("called for jobID: " + id);
         return this.xs.getJobInfo(id);
     }
@@ -171,7 +171,7 @@ public class JobResource {
      *
      * @param id id for job to look up
      * @return The status of the job
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/status")
@@ -188,7 +188,7 @@ public class JobResource {
     public JobStatus getJobStatus(
             @ApiParam(value = "Id of the job.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("called for jobID" + id);
         return this.xs.getJobStatus(id);
     }
@@ -205,7 +205,7 @@ public class JobResource {
      * @param page page number for job
      * @param limit max number of jobs to return
      * @return successful response, or one with HTTP error code
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @ApiOperation(
@@ -239,7 +239,7 @@ public class JobResource {
             @QueryParam("page") @DefaultValue("0") int page,
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit") @DefaultValue("1024") int limit)
-            throws CloudServiceException {
+            throws GenieException {
         LOG.debug("Called");
         return this.xs.getJobs(
                 id,
@@ -257,7 +257,7 @@ public class JobResource {
      *
      * @param id id for job to kill
      * @return The job that was killed
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}")
@@ -271,7 +271,7 @@ public class JobResource {
     public Job killJob(
             @PathParam("id")
             @ApiParam(value = "Id of the job.", required = true)
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("called for jobID: " + id);
         return this.xs.killJob(id);
     }
@@ -283,7 +283,7 @@ public class JobResource {
      * null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this job.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/tags")
@@ -304,7 +304,7 @@ public class JobResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The tags to add.", required = true)
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         LOG.debug("Called with id " + id + " and config " + tags);
         return this.xs.addTagsForJob(id, tags);
     }
@@ -315,7 +315,7 @@ public class JobResource {
      * @param id The id of the job to get the tags for. Not
      * NULL/empty/blank.
      * @return The active set of tags.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/tags")
@@ -333,7 +333,7 @@ public class JobResource {
     public Set<String> getTagsForJob(
             @ApiParam(value = "Id of the job to get tags for.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.xs.getTagsForJob(id);
     }
@@ -346,7 +346,7 @@ public class JobResource {
      * @param tags The tags to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of job tags.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/tags")
@@ -367,7 +367,7 @@ public class JobResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The tags to replace existing with.", required = true)
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         LOG.debug("Called with id " + id + " and tags " + tags);
         return this.xs.updateTagsForJob(id, tags);
     }
@@ -378,7 +378,7 @@ public class JobResource {
      * @param id The id of the job to delete the tags from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/tags")
@@ -395,7 +395,7 @@ public class JobResource {
     public Set<String> removeAllTagsForJob(
             @ApiParam(value = "Id of the job to delete from.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.xs.removeAllTagsForJob(id);
     }
@@ -407,7 +407,7 @@ public class JobResource {
      * null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the job.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
@@ -427,7 +427,7 @@ public class JobResource {
             final String id,
             @ApiParam(value = "The tag to remove.", required = true)
             @PathParam("tag")
-            final String tag) throws CloudServiceException {
+            final String tag) throws GenieException {
         LOG.debug("Called with id " + id + " and tag " + tag);
         return this.xs.removeTagForJob(id, tag);
     }

@@ -18,7 +18,7 @@ package com.netflix.genie.server.metrics.impl;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.repository.jpa.JobRepository;
@@ -62,11 +62,11 @@ public class TestJobCountManagerImpl {
     /**
      * Test getting number of running jobs on one instance.
      *
-     * @throws CloudServiceException if there is any error during this test
+     * @throws GenieException if there is any error during this test
      */
     @Test
     @DatabaseSetup("testNumInstanceJobs.xml")
-    public void testNumInstanceJobs() throws CloudServiceException {
+    public void testNumInstanceJobs() throws GenieException {
         //Force the hostname of the jobs to be the machine running the build
         final List<Job> jobs = this.jobRepo.findAll();
         for (final Job job : jobs) {

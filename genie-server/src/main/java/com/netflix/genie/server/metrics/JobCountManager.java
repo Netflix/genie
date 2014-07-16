@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.metrics;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 
 /**
  * Utility class to get number of jobs running on this instance.
@@ -31,9 +31,9 @@ public interface JobCountManager {
      * Get number of running jobs running on this instance.
      *
      * @return number of running jobs on this instance
-     * @throws CloudServiceException if there is an error
+     * @throws GenieException if there is an error
      */
-    int getNumInstanceJobs() throws CloudServiceException;
+    int getNumInstanceJobs() throws GenieException;
 
     /**
      * Get number of running jobs with minStartTime &lt; startTime &gt;
@@ -43,12 +43,12 @@ public interface JobCountManager {
      * @param minStartTime min start time in ms
      * @param maxStartTime max start time in ms
      * @return number of running jobs between the specified times
-     * @throws CloudServiceException if there is an error
+     * @throws GenieException if there is an error
      */
     int getNumInstanceJobs(
             final Long minStartTime,
             final Long maxStartTime)
-            throws CloudServiceException;
+            throws GenieException;
 
     /**
      * Get number of running jobs with minStartTime <= startTime < maxStartTime
@@ -58,12 +58,12 @@ public interface JobCountManager {
      * @param minStartTime min start time in ms
      * @param maxStartTime max start time in ms
      * @return number of running jobs matching specified critiera
-     * @throws CloudServiceException if there is an error
+     * @throws GenieException if there is an error
      */
     int getNumInstanceJobs(
             String hostName,
             final Long minStartTime,
-            final Long maxStartTime) throws CloudServiceException;
+            final Long maxStartTime) throws GenieException;
 
     /**
      * Returns the most idle Genie instance (&lt; minJobThreshold running jobs),
@@ -71,7 +71,7 @@ public interface JobCountManager {
      *
      * @param minJobThreshold the threshold to use to look for idle instances
      * @return host name of most idle Genie instance
-     * @throws CloudServiceException if there is any error
+     * @throws GenieException if there is any error
      */
-    String getIdleInstance(final long minJobThreshold) throws CloudServiceException;
+    String getIdleInstance(final long minJobThreshold) throws GenieException;
 }

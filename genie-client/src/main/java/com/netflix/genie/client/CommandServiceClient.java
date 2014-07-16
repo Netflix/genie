@@ -20,7 +20,7 @@ package com.netflix.genie.client;
 import com.google.common.collect.Multimap;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -79,12 +79,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * create
      *
      * @return extracted command configuration response
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Command createCommand(final Command command)
-            throws CloudServiceException {
+            throws GenieException {
         if (command == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command entered to validate");
         }
@@ -105,14 +105,14 @@ public final class CommandServiceClient extends BaseGenieClient {
      * create
      *
      * @return extracted command configuration response
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Command updateCommand(final String id, final Command command)
-            throws CloudServiceException {
+            throws GenieException {
         if (StringUtils.isBlank(id)) {
             String msg = "Required parameter id can't be null or empty.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -130,13 +130,13 @@ public final class CommandServiceClient extends BaseGenieClient {
      *
      * @param id the command configuration id to get (can't be null or empty)
      * @return the command configuration for this id
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public Command getCommand(final String id) throws CloudServiceException {
+    public Command getCommand(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -157,10 +157,10 @@ public final class CommandServiceClient extends BaseGenieClient {
      * More details on the parameters can be found on the Genie User Guide on
      * GitHub.
      * @return List of command configuration elements that match the filter
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public List<Command> getCommands(final Multimap<String, String> params)
-            throws CloudServiceException {
+            throws GenieException {
         final HttpRequest request = this.buildRequest(
                 Verb.GET,
                 BASE_CONFIG_COMMAND_REST_URL,
@@ -173,9 +173,9 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Delete all the commands in the database.
      *
      * @return the should be empty set.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public List<Command> deleteAllCommands() throws CloudServiceException {
+    public List<Command> deleteAllCommands() throws GenieException {
         final HttpRequest request = this.buildRequest(
                 Verb.DELETE,
                 BASE_CONFIG_COMMAND_REST_URL,
@@ -190,13 +190,13 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id the id for the command configuration to delete. Not null or
      * empty.
      * @return the deleted command configuration
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public Command deleteCommand(final String id) throws CloudServiceException {
+    public Command deleteCommand(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -216,20 +216,20 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Set<String> addConfigsToCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         if (configs == null || configs.isEmpty()) {
             final String msg = "Missing required parameter: configs";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -248,13 +248,13 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to get configurations for. Not
      * Null/empty/blank.
      * @return The set of configuration files for the given command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public Set<String> getConfigsForCommand(final String id) throws CloudServiceException {
+    public Set<String> getConfigsForCommand(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -275,21 +275,21 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null.
      * @return The new set of command configurations.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Set<String> updateConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         if (configs == null) {
             final String msg = "Missing required parameter: configs";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -309,14 +309,14 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to delete the configuration files from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Set<String> removeAllConfigsForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -337,20 +337,20 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Null/empty/blank.
      * @param application The application to set. Not null.
      * @return The new application for the given command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Application setApplicationForCommand(
             final String id,
-            final Application application) throws CloudServiceException {
+            final Application application) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         if (application == null) {
             final String msg = "Missing required parameter: application";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
         final HttpRequest request = this.buildRequest(
@@ -373,14 +373,14 @@ public final class CommandServiceClient extends BaseGenieClient {
      *
      * @param id The id of the command to get application for. Not Null.
      * @return The application for the given command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Application getApplicationForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -404,14 +404,14 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to delete the application from. Not
      * null/empty/blank.
      * @return The active application for the command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Application removeApplicationForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -435,14 +435,14 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to get the clusters for. Not
      * NULL/empty/blank.
      * @return The set of clusters.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public Set<Cluster> getClustersForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 

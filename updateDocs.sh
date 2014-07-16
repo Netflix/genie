@@ -254,6 +254,22 @@ updateAPIDocs() {
         exit 1
     fi
 
+    curl http://localhost:7001/genie/api-docs/v2/config/clusters > /tmp/genie/docs/rest/api-docs/v2/config/clusters
+    if (( $? != 0 ))
+    then
+        echo "Unable to update clusters api docs."
+        cleanup
+        exit 1
+    fi
+
+    curl http://localhost:7001/genie/api-docs/v2/jobs > /tmp/genie/docs/rest/api-docs/v2/jobs
+    if (( $? != 0 ))
+    then
+        echo "Unable to update jobs api docs."
+        cleanup
+        exit 1
+    fi
+
     #Update Git
     pushd /tmp/genie
     git add --all

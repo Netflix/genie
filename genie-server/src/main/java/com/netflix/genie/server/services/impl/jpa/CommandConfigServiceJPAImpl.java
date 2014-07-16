@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -47,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author tgianos
  */
 @Named
-@Transactional(rollbackFor = CloudServiceException.class)
+@Transactional(rollbackFor = GenieException.class)
 public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandConfigServiceJPAImpl.class);
@@ -75,22 +75,23 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public Command createCommand(final Command command) throws CloudServiceException {
+    public Command createCommand(final Command command) throws GenieException {
         if (command == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command entered to create");
         }
         command.validate();
+
         LOG.debug("Called to create command " + command.toString());
         if (StringUtils.isEmpty(command.getId())) {
             command.setId(UUID.randomUUID().toString());
         }
         if (this.commandRepo.exists(command.getId())) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "A command with id " + command.getId() + " already exists");
         }
@@ -101,14 +102,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
-    public Command getCommand(final String id) throws CloudServiceException {
+    public Command getCommand(final String id) throws GenieException {
         LOG.debug("called");
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Id can't be null or empty.");
         }
@@ -116,7 +117,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (command != null) {
             return command;
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -149,19 +150,19 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Command updateCommand(
             final String id,
-            final Command updateCommand) throws CloudServiceException {
+            final Command updateCommand) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered. Unable to update.");
         }
         if (StringUtils.isBlank(updateCommand.getId()) || !id.equals(updateCommand.getId())) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Command id either not entered or inconsistent with id passed in.");
         }
@@ -174,10 +175,10 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public List<Command> deleteAllCommands() throws CloudServiceException {
+    public List<Command> deleteAllCommands() throws GenieException {
         LOG.debug("Called to delete all commands");
         final Iterable<Command> commands = this.commandRepo.findAll();
         final List<Command> returnCommands = new ArrayList<Command>();
@@ -190,14 +191,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public Command deleteCommand(final String id) throws CloudServiceException {
+    public Command deleteCommand(final String id) throws GenieException {
         LOG.debug("Called to delete command config with id " + id);
         final Command command = this.commandRepo.findOne(id);
         if (command == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists to delete.");
         }
@@ -216,19 +217,19 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> addConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to add configurations.");
         }
         if (configs == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No configuration files entered.");
         }
@@ -237,7 +238,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             command.getConfigs().addAll(configs);
             return command.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -246,14 +247,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to get configs.");
         }
@@ -261,7 +262,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (command != null) {
             return command.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -270,14 +271,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> updateConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to update configurations.");
         }
@@ -286,7 +287,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             command.setConfigs(configs);
             return command.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -295,13 +296,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeAllConfigsForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove configs.");
         }
@@ -310,7 +311,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             command.getConfigs().clear();
             return command.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -319,14 +320,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeConfigForCommand(
             final String id,
-            final String config) throws CloudServiceException {
+            final String config) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove configuration.");
         }
@@ -337,7 +338,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             }
             return command.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -346,19 +347,19 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Application setApplicationForCommand(
             final String id,
-            final Application application) throws CloudServiceException {
+            final Application application) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to add applications.");
         }
         if (application == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No application entered. Unable to set application.");
         }
@@ -368,13 +369,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             if (app != null) {
                 command.setApplication(app);
             } else {
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_NOT_FOUND,
                         "No application with id " + application.getId() + " exists.");
             }
             return command.getApplication();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -383,14 +384,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Application getApplicationForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to get applications.");
         }
@@ -400,12 +401,12 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             if (app != null) {
                 return app;
             } else {
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_NOT_FOUND,
                         "No application set for command with id '" + id + "'.");
             }
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -414,13 +415,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Application removeApplicationForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove application.");
         }
@@ -431,12 +432,12 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                 command.setApplication(null);
                 return app;
             } else {
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_NOT_FOUND,
                         "No application set for command with id '" + id + "'.");
             }
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -445,19 +446,19 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> addTagsForCommand(
             final String id,
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to add tags.");
         }
         if (tags == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No tags entered.");
         }
@@ -466,7 +467,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             command.getTags().addAll(tags);
             return command.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -475,16 +476,16 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<String> getTagsForCommand(
             final String id)
-            throws CloudServiceException {
+            throws GenieException {
 
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id sent. Cannot retrieve tags.");
         }
@@ -493,7 +494,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (command != null) {
             return command.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -502,14 +503,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> updateTagsForCommand(
             final String id,
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to update tags.");
         }
@@ -518,7 +519,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             command.setTags(tags);
             return command.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -527,13 +528,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeAllTagsForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove tags.");
         }
@@ -542,7 +543,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             command.getTags().clear();
             return command.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -551,14 +552,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<Cluster> getClustersForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to get clusters.");
         }
@@ -566,7 +567,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (command != null) {
             return command.getClusters();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -574,19 +575,19 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     @Override
     public Set<String> removeTagForCommand(String id, String tag)
-            throws CloudServiceException {
+            throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove tag.");
         }
         if (StringUtils.isBlank(tag)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No tag entered. Unable to remove tag.");
         }
         if (tag.equals(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Cannot delete command id from the tags list.");
         }
@@ -596,7 +597,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             command.getTags().remove(tag);
             return command.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2014 Netflix, Inc.
+\ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -259,6 +257,8 @@ public class Job extends CommonEntityFields {
      * PID for job - updated by the server.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The process handle.")
     private int processHandle = -1;
 
     /**
@@ -266,36 +266,48 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(
+            value = "The current status of the job.")
     private JobStatus status;
 
     /**
      * More verbose status message.
      */
     @Basic
+    @ApiModelProperty(
+            value = "A status message about the job.")
     private String statusMsg;
 
     /**
      * Start time for job - initialized to null.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The start time of the job.")
     private Long startTime;
 
     /**
      * Finish time for job - initialized to zero (for historic reasons).
      */
     @Basic
+    @ApiModelProperty(
+            value = "The end time of the job.")
     private Long finishTime = 0L;
 
     /**
-     * The host/ip address of the client submitting job.
+     * The host/IP address of the client submitting job.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The host of the client submitting the job.")
     private String clientHost;
 
     /**
      * The genie host name on which the job is being run.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The host where the job is being run.")
     private String hostName;
 
     /**
@@ -303,30 +315,40 @@ public class Job extends CommonEntityFields {
      * instance.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The URI to use to kill the job.")
     private String killURI;
 
     /**
      * URI to fetch the stdout/err and logs.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The URI where to find job output.")
     private String outputURI;
 
     /**
      * Job exit code.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The exit code of the job.")
     private Integer exitCode;
 
     /**
      * Whether this job was forwarded to new instance or not.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Whether this job was forwared or not.")
     private boolean forwarded;
 
     /**
      * Location of logs being archived to s3.
      */
     @Lob
+    @ApiModelProperty(
+            value = "Where the logs were archived in S3.")
     private String archiveLocation;
 
     /**
@@ -347,15 +369,18 @@ public class Job extends CommonEntityFields {
      * @param commandArgs The command line arguments for the job. Not
      * null/empty/blank.
      * @param clusterCriteria The cluster criteria for the job. Not null/empty.
-     * @throws CloudServiceException
+     * @param version The version of this job
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Job(
             final String user,
             final String name,
             final String commandArgs,
             final Set<String> commandCriteria,
-            final List<ClusterCriteria> clusterCriteria) throws CloudServiceException {
-        super(name, user);
+            final List<ClusterCriteria> clusterCriteria,
+            final String version) throws GenieException {
+        super(name, user, version);
+
         this.commandArgs = commandArgs;
         this.clusterCriteria = clusterCriteria;
         this.commandCriteria = commandCriteria;
@@ -364,10 +389,10 @@ public class Job extends CommonEntityFields {
     /**
      * Makes sure non-transient fields are set from transient fields.
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @PrePersist
-    protected void onCreateJob() throws CloudServiceException {
+    protected void onCreateJob() throws GenieException {
         validate(this.getUser(), this.commandCriteria, this.commandArgs, this.clusterCriteria, this.getName());
         this.clusterCriteriaString = clusterCriteriaToString(this.clusterCriteria);
         this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
@@ -479,11 +504,11 @@ public class Job extends CommonEntityFields {
      * Sets the list of cluster criteria specified to pick a cluster.
      *
      * @param clusterCriteria The criteria list
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setClusterCriteria(final List<ClusterCriteria> clusterCriteria) throws CloudServiceException {
+    public void setClusterCriteria(final List<ClusterCriteria> clusterCriteria) throws GenieException {
         if (clusterCriteria == null || clusterCriteria.isEmpty()) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No user entered.");
         }
@@ -506,11 +531,11 @@ public class Job extends CommonEntityFields {
      *
      * @param commandArgs Arguments to be used to run the command with. Not
      * null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setCommandArgs(final String commandArgs) throws CloudServiceException {
+    public void setCommandArgs(final String commandArgs) throws GenieException {
         if (StringUtils.isBlank(commandArgs)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command args entered.");
         }
@@ -548,15 +573,15 @@ public class Job extends CommonEntityFields {
      * Set the attachments for this job.
      *
      * @param attachments The attachments to set
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setAttachments(final Set<FileAttachment> attachments) throws CloudServiceException {
+    public void setAttachments(final Set<FileAttachment> attachments) throws GenieException {
         if (attachments != null) {
             this.attachments = attachments;
         } else {
             final String msg = "No attachments passed in to set. Unable to continue.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 
@@ -648,11 +673,11 @@ public class Job extends CommonEntityFields {
      *
      * @param commandName Name of the command if specified on which the job is
      * run
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setCommandName(final String commandName) throws CloudServiceException {
+    public void setCommandName(final String commandName) throws GenieException {
         if (StringUtils.isBlank(commandName)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command name entered.");
         }
@@ -672,11 +697,11 @@ public class Job extends CommonEntityFields {
      * Set command Id with which this job is run.
      *
      * @param commandId Id of the command if specified on which the job is run
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setCommandId(final String commandId) throws CloudServiceException {
+    public void setCommandId(final String commandId) throws GenieException {
         if (StringUtils.isBlank(commandId)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered.");
         }
@@ -923,9 +948,9 @@ public class Job extends CommonEntityFields {
      * Sets the set of command criteria specified to pick a command.
      *
      * @param commandCriteria The criteria list
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void setCommandCriteria(Set<String> commandCriteria) throws CloudServiceException {
+    public void setCommandCriteria(Set<String> commandCriteria) throws GenieException {
         this.commandCriteria = commandCriteria;
         this.commandCriteriaString = commandCriteriaToString(commandCriteria);
     }
@@ -943,9 +968,9 @@ public class Job extends CommonEntityFields {
      * Set the command criteria string.
      *
      * @param commandCriteriaString A set of command criteria tags
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void setCommandCriteriaString(String commandCriteriaString) throws CloudServiceException {
+    public void setCommandCriteriaString(String commandCriteriaString) throws GenieException {
         this.commandCriteriaString = commandCriteriaString;
         this.commandCriteria = stringToCommandCriteria(commandCriteriaString); 
     }
@@ -954,11 +979,11 @@ public class Job extends CommonEntityFields {
      * Set the cluster criteria string.
      *
      * @param clusterCriteriaString A list of cluster criteria objects
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    protected void setClusterCriteriaString(final String clusterCriteriaString) throws CloudServiceException {
+    protected void setClusterCriteriaString(final String clusterCriteriaString) throws GenieException {
         if (StringUtils.isBlank(clusterCriteriaString)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No clusterCriteriaString passed in to set. Unable to continue.");
         }
@@ -974,11 +999,11 @@ public class Job extends CommonEntityFields {
     public void setJobStatus(final JobStatus jobStatus) {
         this.status = jobStatus;
 
-        if (jobStatus == Types.JobStatus.INIT) {
+        if (jobStatus == JobStatus.INIT) {
             setStartTime(System.currentTimeMillis());
-        } else if (jobStatus == Types.JobStatus.SUCCEEDED
-                || jobStatus == Types.JobStatus.KILLED
-                || jobStatus == Types.JobStatus.FAILED) {
+        } else if (jobStatus == JobStatus.SUCCEEDED
+                || jobStatus == JobStatus.KILLED
+                || jobStatus == JobStatus.FAILED) {
             setFinishTime(System.currentTimeMillis());
         }
     }
@@ -1026,9 +1051,9 @@ public class Job extends CommonEntityFields {
      * Sets the tags allocated to this job.
      *
      * @param tags the tags to set. Not Null.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void setTags(final Set<String> tags) throws CloudServiceException {
+    public void setTags(final Set<String> tags) throws GenieException {
         this.tags = tags;
     }
 
@@ -1046,7 +1071,7 @@ public class Job extends CommonEntityFields {
      * Sets the criteria used to select cluster to run this job.
      *
      * @param chosenClusterCriteriaString he criteria used to select cluster to run this job.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public void setChosenClusterCriteriaString(String chosenClusterCriteriaString) {
         this.chosenClusterCriteriaString = chosenClusterCriteriaString;
@@ -1056,9 +1081,9 @@ public class Job extends CommonEntityFields {
      * Check to make sure that the required parameters exist.
      *
      * @param job The configuration to check
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void validate() throws CloudServiceException {
+    public void validate() throws GenieException {
         this.validate(
                 this.getUser(),
                 this.getCommandCriteria(),
@@ -1075,14 +1100,14 @@ public class Job extends CommonEntityFields {
      * @param commandName The name of the command to run for the job
      * @param commandArgs The command line arguments for the job
      * @param criteria The cluster criteria for the job
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     private void validate(
             final String user,
             final Set<String> commandCriteria,
             final String commandArgs,
             final List<ClusterCriteria> criteria,
-            final String name) throws CloudServiceException {
+            final String name) throws GenieException {
         final StringBuilder builder = new StringBuilder();
         
         super.validate(builder, name, user);
@@ -1101,7 +1126,7 @@ public class Job extends CommonEntityFields {
             builder.insert(0, "Job configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 
@@ -1111,9 +1136,9 @@ public class Job extends CommonEntityFields {
      * @param clusterCriteria2 The criteria to build up from
      * @return The cluster criteria string
      */
-    private String clusterCriteriaToString(final List<ClusterCriteria> clusterCriteria2) throws CloudServiceException {
+    private String clusterCriteriaToString(final List<ClusterCriteria> clusterCriteria2) throws GenieException {
         if (clusterCriteria2 == null || clusterCriteria2.isEmpty()) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster criteria entered unable to create string");
         }
@@ -1133,9 +1158,9 @@ public class Job extends CommonEntityFields {
      * @param clusterCriteria2 The criteria to build up from
      * @return The cluster criteria string
      */
-    private String commandCriteriaToString(final Set<String> commandCriteria2) throws CloudServiceException {
+    private String commandCriteriaToString(final Set<String> commandCriteria2) throws GenieException {
         if (commandCriteria2 == null || commandCriteria2.isEmpty()) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command criteria entered unable to create string");
         }
@@ -1147,12 +1172,12 @@ public class Job extends CommonEntityFields {
      *
      * @param criteriaString The string to convert
      * @return The set of ClusterCriteria
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    private Set<String> stringToCommandCriteria(final String criteriaString) throws CloudServiceException {
+    private Set<String> stringToCommandCriteria(final String criteriaString) throws GenieException {
         final String[] criterias = StringUtils.split(criteriaString, CRITERIA_DELIMITER);
         if (criterias == null || criterias.length == 0) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command criteria found. Unable to continue.");
         }
@@ -1168,14 +1193,14 @@ public class Job extends CommonEntityFields {
      *
      * @param criteriaString The string to convert
      * @return The set of ClusterCriteria
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    private List<ClusterCriteria> stringToClusterCriteria(final String criteriaString) throws CloudServiceException {
+    private List<ClusterCriteria> stringToClusterCriteria(final String criteriaString) throws GenieException {
         //Rebuild the cluster criteria objects
         final List<ClusterCriteria> cc = new ArrayList<ClusterCriteria>();
         final String[] criteriaSets = StringUtils.split(criteriaString, CRITERIA_SET_DELIMITER);
         if (criteriaSets == null || criteriaSets.length == 0) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster criteria found. Unable to continue.");
         }
@@ -1191,7 +1216,7 @@ public class Job extends CommonEntityFields {
             cc.add(new ClusterCriteria(c));
         }
         if (cc.isEmpty()) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No Cluster Criteria found. Unable to continue");
         }

@@ -23,11 +23,11 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.client.ClusterServiceClient;
 import com.netflix.genie.client.CommandServiceClient;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.ClusterStatus;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -243,10 +243,10 @@ public final class ClusterServiceSampleClient {
      *
      * @param id The ID to use. If null or empty one will be created.
      * @return A cluster object
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public static Cluster createSampleCluster(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
@@ -256,7 +256,8 @@ public final class ClusterServiceSampleClient {
                 "tgianos",
                 ClusterStatus.OUT_OF_SERVICE,
                 "com.netflix.genie.server.jobmanager.impl.YarnJobManager",
-                configs);
+                configs,
+                "2.4.0");
         if (StringUtils.isNotBlank(id)) {
             cluster.setId(id);
         }
@@ -265,7 +266,6 @@ public final class ClusterServiceSampleClient {
         tags.add("h2query");
         tags.add(cluster.getId());
         cluster.setTags(tags);
-        cluster.setVersion("2.4.0");
 
         return cluster;
     }

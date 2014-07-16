@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.metrics.impl;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.inject.Inject;
@@ -132,10 +132,10 @@ public class TestGenieNodeStatisticsImpl {
      * Test the counter that sets running job.
      *
      * @throws InterruptedException
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Test
-    public void testRunningJobs() throws InterruptedException, CloudServiceException {
+    public void testRunningJobs() throws InterruptedException, GenieException {
         this.stats.setGenieRunningJobs(0);
         Assert.assertEquals(0, this.stats.getGenieRunningJobs().intValue());
     }

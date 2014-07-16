@@ -17,8 +17,9 @@
  */
 package com.netflix.genie.server.jobmanager;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import javax.inject.Inject;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,10 +41,10 @@ public class TestJobManagerFactory {
     /**
      * Tests whether an invalid class name throws an exception.
      *
-     * @throws com.netflix.genie.common.exceptions.CloudServiceException
+     * @throws GenieException
      */
-    @Test(expected = CloudServiceException.class)
-    public void testInvalidClassName() throws CloudServiceException {
+    @Test(expected = GenieException.class)
+    public void testInvalidClassName() throws GenieException {
         this.factory.getJobManager(null);
     }
 }

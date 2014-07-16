@@ -1,16 +1,14 @@
 def metaModelIgnorePattern = '**/com/netflix/genie/common/model/*_.java'
+def generatedSources = 'src/generated'
+def generatedSourcesJava = generatedSources + '/java'
 
-//TODO: Get it to work so that the generated code is dumped into a
-//      generated sources directory and we don't have to worry about putting
-//      it directly in the main source code
-//sourceSets {
-//    generated {
-//        java {
-//            srcDirs = ['src/generated-sources/java']
-//        }
-//        compileClasspath += sourceSets.main.allJava
-//    }
-//}
+sourceSets {
+    main {
+        java {
+            srcDir generatedSourcesJava
+        }
+    }
+}
 
 dependencies {
     compile ('com.sun.jersey:jersey-json:1.11')
@@ -21,14 +19,15 @@ dependencies {
 }
 
 task genJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA metamodels') {
+    def outputDir = file(generatedSourcesJava)
+    outputs.dir outputDir
     source = sourceSets.main.java
     classpath = configurations.compile
     options.compilerArgs = [
-        "-proc:only",
-        "-Aopenjpa.metamodel=true"
+            "-proc:only",
+            "-Aopenjpa.metamodel=true"
     ]
-    //destinationDir = sourceSets.generated.java.srcDirs.iterator().next()
-    destinationDir = sourceSets.main.java.srcDirs.iterator().next()
+    destinationDir = outputDir
     dependencyCacheDir = compileJava.dependencyCacheDir
 }
 
@@ -46,7 +45,6 @@ task enhance(description: "Enhance model classes for use with JPA") << {
 
 compileJava {
     dependsOn genJPAMetaModel
-    //source += sourceSets.generated.java
 }
 
 jar {
@@ -54,11 +52,7 @@ jar {
 }
 
 clean {
-    //delete 'src/generated-sources'
-    //delete 'src/main/java/com/netflix/genie/common/model/*_.java'
-    delete sourceSets.main.allJava.matching {
-        include metaModelIgnorePattern
-    }
+    delete generatedSources
 }
 
 //Ignore the generated classes from all our style/coverage/bug finding tools
@@ -68,7 +62,7 @@ tasks.withType(Checkstyle) {
 
 tasks.withType(FindBugs) {
     classes = classes.filter {
-        !it.path.contains("_")
+        !it.path.contains('_')
     }
 }
 

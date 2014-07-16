@@ -5,7 +5,7 @@
  */
 package com.netflix.genie.server.jobmanager;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 
 /**
@@ -19,25 +19,25 @@ public interface JobMonitor extends Runnable {
      * Set the job for this to monitor.
      *
      * @param job The job to monitor. Not null.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    void setJob(final Job job) throws CloudServiceException;
+    void setJob(final Job job) throws GenieException;
 
     /**
      * Set the job manager for this monitor to use.
      *
      * @param jobManager The job manager to use. Not Null.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    void setJobManager(final JobManager jobManager) throws CloudServiceException;
+    void setJobManager(final JobManager jobManager) throws GenieException;
 
     /**
      * Set the process handle for this job.
      *
      * @param proc The process handle for the job. Not null.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    void setProcess(final Process proc) throws CloudServiceException;
+    void setProcess(final Process proc) throws GenieException;
 
     /**
      * Set the working directory for this job.

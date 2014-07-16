@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -92,7 +92,7 @@ public class CommandConfigResource {
      *
      * @param command The command configuration to create
      * @return The command created
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Consumes({
@@ -124,7 +124,7 @@ public class CommandConfigResource {
                     value = "The command to create.",
                     required = true
             )
-            final Command command) throws CloudServiceException {
+            final Command command) throws GenieException {
         LOG.debug("called to create new command configuration " + command.toString());
         final Command createdCommand = this.ccs.createCommand(command);
         return Response.created(
@@ -138,7 +138,7 @@ public class CommandConfigResource {
      *
      * @param id unique id for command configuration
      * @return The command configuration
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}")
@@ -167,7 +167,7 @@ public class CommandConfigResource {
                     value = "Id of the command to get.",
                     required = true
             )
-            @PathParam("id") final String id) throws CloudServiceException {
+            @PathParam("id") final String id) throws GenieException {
         LOG.debug("Called");
         return this.ccs.getCommand(id);
     }
@@ -227,7 +227,7 @@ public class CommandConfigResource {
      * @param id unique id for the configuration to update.
      * @param updateCommand the information to update the command with
      * @return The updated command
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}")
@@ -265,7 +265,7 @@ public class CommandConfigResource {
                     value = "The command information to update.",
                     required = true
             )
-            final Command updateCommand) throws CloudServiceException {
+            final Command updateCommand) throws GenieException {
         LOG.debug("Called to create/update comamnd config");
         return this.ccs.updateCommand(id, updateCommand);
     }
@@ -274,7 +274,7 @@ public class CommandConfigResource {
      * Delete all applications from database.
      *
      * @return All The deleted comamnd
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @ApiOperation(
@@ -298,7 +298,7 @@ public class CommandConfigResource {
                 message = "Command not found"
         )
     })
-    public List<Command> deleteAllCommands() throws CloudServiceException {
+    public List<Command> deleteAllCommands() throws GenieException {
         LOG.debug("called");
         return this.ccs.deleteAllCommands();
     }
@@ -308,7 +308,7 @@ public class CommandConfigResource {
      *
      * @param id unique id for configuration to delete
      * @return The deleted configuration
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}")
@@ -337,7 +337,7 @@ public class CommandConfigResource {
                     value = "Id of the command to delete.",
                     required = true
             )
-            @PathParam("id") final String id) throws CloudServiceException {
+            @PathParam("id") final String id) throws GenieException {
         LOG.debug("Called");
         return this.ccs.deleteCommand(id);
     }
@@ -349,7 +349,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/configs")
@@ -385,7 +385,7 @@ public class CommandConfigResource {
                     value = "The configuration files to add.",
                     required = true
             )
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         LOG.debug("Called with id " + id + " and config " + configs);
         return this.ccs.addConfigsForCommand(id, configs);
     }
@@ -396,7 +396,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the configuration files for. Not
      * NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/configs")
@@ -426,7 +426,7 @@ public class CommandConfigResource {
                     value = "Id of the command to get configurations for.",
                     required = true
             )
-            @PathParam("id") final String id) throws CloudServiceException {
+            @PathParam("id") final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.getConfigsForCommand(id);
     }
@@ -439,7 +439,7 @@ public class CommandConfigResource {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of command configurations.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/configs")
@@ -475,7 +475,7 @@ public class CommandConfigResource {
                     value = "The configuration files to replace existing with.",
                     required = true
             )
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         LOG.debug("Called with id " + id + " and configs " + configs);
         return this.ccs.updateConfigsForCommand(id, configs);
     }
@@ -486,7 +486,7 @@ public class CommandConfigResource {
      * @param id The id of the command to delete the configuration files from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/configs")
@@ -515,7 +515,7 @@ public class CommandConfigResource {
                     value = "Id of the command to delete from.",
                     required = true
             )
-            @PathParam("id") final String id) throws CloudServiceException {
+            @PathParam("id") final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllConfigsForCommand(id);
     }
@@ -527,7 +527,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/tags")
@@ -548,7 +548,7 @@ public class CommandConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The tags to add.", required = true)
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         LOG.debug("Called with id " + id + " and config " + tags);
         return this.ccs.addTagsForCommand(id, tags);
     }
@@ -559,7 +559,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the tags for. Not
      * NULL/empty/blank.
      * @return The active set of tags.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/tags")
@@ -577,7 +577,7 @@ public class CommandConfigResource {
     public Set<String> getTagsForCommand(
             @ApiParam(value = "Id of the command to get tags for.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.getTagsForCommand(id);
     }
@@ -590,7 +590,7 @@ public class CommandConfigResource {
      * @param tags The tags to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of command tags.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/tags")
@@ -611,7 +611,7 @@ public class CommandConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The tags to replace existing with.", required = true)
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         LOG.debug("Called with id " + id + " and tags " + tags);
         return this.ccs.updateTagsForCommand(id, tags);
     }
@@ -622,7 +622,7 @@ public class CommandConfigResource {
      * @param id The id of the command to delete the tags from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/tags")
@@ -639,7 +639,7 @@ public class CommandConfigResource {
     public Set<String> removeAllTagsForCommand(
             @ApiParam(value = "Id of the command to delete from.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllTagsForCommand(id);
     }
@@ -651,7 +651,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param application The application to set. Not null.
      * @return The active applications for this command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/application")
@@ -690,7 +690,7 @@ public class CommandConfigResource {
                     value = "The application to add.",
                     required = true
             )
-            final Application application) throws CloudServiceException {
+            final Application application) throws GenieException {
         LOG.debug("Called with id " + id + " and application " + application);
         return this.ccs.setApplicationForCommand(id, application);
     }
@@ -701,7 +701,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the application files for. Not
      * NULL/empty/blank.
      * @return The active application for the command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/application")
@@ -730,7 +730,7 @@ public class CommandConfigResource {
                     value = "Id of the command to get the application for.",
                     required = true
             )
-            @PathParam("id") final String id) throws CloudServiceException {
+            @PathParam("id") final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.getApplicationForCommand(id);
     }
@@ -741,7 +741,7 @@ public class CommandConfigResource {
      * @param id The id of the command to delete the application from. Not
      * null/empty/blank.
      * @return The active set of applications for the command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/application")
@@ -770,7 +770,7 @@ public class CommandConfigResource {
                     value = "Id of the command to delete from.",
                     required = true
             )
-            @PathParam("id") final String id) throws CloudServiceException {
+            @PathParam("id") final String id) throws GenieException {
         LOG.debug("Called with id '" + id + "'.");
         return this.ccs.removeApplicationForCommand(id);
     }
@@ -781,7 +781,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the clusters for. Not
      * NULL/empty/blank.
      * @return The set of clusters.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/clusters")
@@ -810,7 +810,7 @@ public class CommandConfigResource {
                     value = "Id of the command to get the clusters for.",
                     required = true
             )
-            @PathParam("id") final String id) throws CloudServiceException {
+            @PathParam("id") final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.getClustersForCommand(id);
     }
@@ -822,7 +822,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the command.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
@@ -842,7 +842,7 @@ public class CommandConfigResource {
             final String id,
             @ApiParam(value = "The tag to remove.", required = true)
             @PathParam("tag")
-            final String tag) throws CloudServiceException {
+            final String tag) throws GenieException {
         LOG.debug("Called with id " + id + " and tag " + tag);
         return this.ccs.removeTagForCommand(id, tag);
     }

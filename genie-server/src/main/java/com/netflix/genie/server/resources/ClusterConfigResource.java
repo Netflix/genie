@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.ClusterStatus;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -96,7 +96,7 @@ public class ClusterConfigResource {
      *
      * @param cluster contains the cluster information to create
      * @return The created cluster
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Consumes({
@@ -115,7 +115,7 @@ public class ClusterConfigResource {
     public Response createCluster(
             @ApiParam(value = "The cluster to create.", required = true)
             final Cluster cluster)
-            throws CloudServiceException {
+            throws GenieException {
         LOG.debug("called to create new cluster");
         final Cluster createdCluster = this.ccs.createCluster(cluster);
         return Response.created(
@@ -129,7 +129,7 @@ public class ClusterConfigResource {
      *
      * @param id id for the cluster
      * @return the cluster
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}")
@@ -145,7 +145,7 @@ public class ClusterConfigResource {
     public Cluster getCluster(
             @ApiParam(value = "Id of the cluster to get.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("called with id: " + id);
         return this.ccs.getCluster(id);
     }
@@ -162,7 +162,7 @@ public class ClusterConfigResource {
      * @param limit number of entries to return
      * @param page page number
      * @return the Clusters found matching the criteria
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @ApiOperation(
@@ -195,7 +195,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit")
             @DefaultValue("1024") int limit)
-            throws CloudServiceException {
+            throws GenieException {
         LOG.debug("called");
         //Create this conversion internal in case someone uses lower case by accident?
         List<ClusterStatus> enumStatuses = null;
@@ -216,7 +216,7 @@ public class ClusterConfigResource {
      * @param id unique if for cluster to update
      * @param updateCluster contains the cluster information to update
      * @return the updated cluster
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}")
@@ -237,7 +237,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to update.", required = true)
             @PathParam("id")
             final String id,
-            final Cluster updateCluster) throws CloudServiceException {
+            final Cluster updateCluster) throws GenieException {
         LOG.debug("called to create/update cluster");
         return this.ccs.updateCluster(id, updateCluster);
     }
@@ -247,7 +247,7 @@ public class ClusterConfigResource {
      *
      * @param id unique id for cluster to delete
      * @return the deleted cluster
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}")
@@ -260,7 +260,7 @@ public class ClusterConfigResource {
         @ApiResponse(code = 400, message = "Invalid Id supplied"),
         @ApiResponse(code = 404, message = "Cluster not found")
     })
-    public Cluster deleteClusterConfig(@PathParam("id") final String id) throws CloudServiceException {
+    public Cluster deleteClusterConfig(@PathParam("id") final String id) throws GenieException {
         LOG.debug("delete called for id: " + id);
         return this.ccs.deleteCluster(id);
     }
@@ -269,7 +269,7 @@ public class ClusterConfigResource {
      * Delete all clusters from database.
      *
      * @return All The deleted clusters
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @ApiOperation(
@@ -282,7 +282,7 @@ public class ClusterConfigResource {
         @ApiResponse(code = 400, message = "Invalid Id supplied"),
         @ApiResponse(code = 404, message = "Cluster not found")
     })
-    public List<Cluster> deleteAllClusters() throws CloudServiceException {
+    public List<Cluster> deleteAllClusters() throws GenieException {
         LOG.debug("called");
         return this.ccs.deleteAllClusters();
     }
@@ -294,7 +294,7 @@ public class ClusterConfigResource {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this cluster.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/configs")
@@ -315,7 +315,7 @@ public class ClusterConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The configuration files to add.", required = true)
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         LOG.debug("Called with id " + id + " and config " + configs);
         return this.ccs.addConfigsForCluster(id, configs);
     }
@@ -326,7 +326,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to get the configuration files for. Not
      * NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/configs")
@@ -344,7 +344,7 @@ public class ClusterConfigResource {
     public Set<String> getConfigsForCluster(
             @ApiParam(value = "Id of the cluster to get configurations for.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.getConfigsForCluster(id);
     }
@@ -357,7 +357,7 @@ public class ClusterConfigResource {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of cluster configurations.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/configs")
@@ -378,7 +378,7 @@ public class ClusterConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The configuration files to replace existing with.", required = true)
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         LOG.debug("Called with id " + id + " and configs " + configs);
         return this.ccs.updateConfigsForCluster(id, configs);
     }
@@ -389,7 +389,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to delete the configuration files from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/configs")
@@ -406,7 +406,7 @@ public class ClusterConfigResource {
     public Set<String> removeAllConfigsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllConfigsForCluster(id);
     }
@@ -418,7 +418,7 @@ public class ClusterConfigResource {
      * null/empty/blank.
      * @param commands The commands to add. Not null.
      * @return The active commands for this cluster.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/commands")
@@ -442,7 +442,7 @@ public class ClusterConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The commands to add.", required = true)
-            final List<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws GenieException {
         LOG.debug("Called with id " + id + " and commands " + commands);
         return this.ccs.addCommandsForCluster(id, commands);
     }
@@ -453,7 +453,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to get the command files for. Not
      * NULL/empty/blank.
      * @return The active set of commands for the cluster.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/commands")
@@ -470,7 +470,7 @@ public class ClusterConfigResource {
     public List<Command> getCommandsForCluster(
             @ApiParam(value = "Id of the cluster to get commands for.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.getCommandsForCluster(id);
     }
@@ -483,7 +483,7 @@ public class ClusterConfigResource {
      * @param commands The commands to replace existing applications with. Not
      * null/empty/blank.
      * @return The new set of commands for the cluster.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/commands")
@@ -507,7 +507,7 @@ public class ClusterConfigResource {
             final String id,
             @ApiParam(value = "The commands to replace existing with. Should already be created",
                     required = true)
-            final List<Command> commands) throws CloudServiceException {
+            final List<Command> commands) throws GenieException {
         LOG.debug("Called with id " + id + " and configs " + commands);
         return this.ccs.updateCommandsForCluster(id, commands);
     }
@@ -518,7 +518,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to delete the commands from. Not
      * null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/commands")
@@ -535,7 +535,7 @@ public class ClusterConfigResource {
     public List<Command> removeAllCommandsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllCommandsForCluster(id);
     }
@@ -547,7 +547,7 @@ public class ClusterConfigResource {
      * null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active set of commands for the cluster.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/commands/{cmdId}")
@@ -567,7 +567,7 @@ public class ClusterConfigResource {
             final String id,
             @ApiParam(value = "The id of the command to remove.", required = true)
             @PathParam("cmdId")
-            final String cmdId) throws CloudServiceException {
+            final String cmdId) throws GenieException {
         LOG.debug("Called with id " + id + " and command id " + cmdId);
         return this.ccs.removeCommandForCluster(id, cmdId);
     }
@@ -579,7 +579,7 @@ public class ClusterConfigResource {
      * null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this cluster.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @POST
     @Path("/{id}/tags")
@@ -600,7 +600,7 @@ public class ClusterConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The tags to add.", required = true)
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         LOG.debug("Called with id " + id + " and config " + tags);
         return this.ccs.addTagsForCluster(id, tags);
     }
@@ -611,7 +611,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to get the tags for. Not
      * NULL/empty/blank.
      * @return The active set of tags.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @GET
     @Path("/{id}/tags")
@@ -629,7 +629,7 @@ public class ClusterConfigResource {
     public Set<String> getTagsForCluster(
             @ApiParam(value = "Id of the cluster to get tags for.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.getTagsForCluster(id);
     }
@@ -642,7 +642,7 @@ public class ClusterConfigResource {
      * @param tags The tags to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of cluster tags.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PUT
     @Path("/{id}/tags")
@@ -663,7 +663,7 @@ public class ClusterConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(value = "The tags to replace existing with.", required = true)
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         LOG.debug("Called with id " + id + " and tags " + tags);
         return this.ccs.updateTagsForCluster(id, tags);
     }
@@ -674,7 +674,7 @@ public class ClusterConfigResource {
      * @param id The id of the cluster to delete the tags from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/tags")
@@ -691,7 +691,7 @@ public class ClusterConfigResource {
     public Set<String> removeAllTagsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
             @PathParam("id")
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllTagsForCluster(id);
     }
@@ -703,7 +703,7 @@ public class ClusterConfigResource {
      * null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the cluster.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
@@ -723,7 +723,7 @@ public class ClusterConfigResource {
             final String id,
             @ApiParam(value = "The tag to remove.", required = true)
             @PathParam("tag")
-            final String tag) throws CloudServiceException {
+            final String tag) throws GenieException {
         LOG.debug("Called with id " + id + " and tag " + tag);
         return this.ccs.removeTagForCluster(id, tag);
     }

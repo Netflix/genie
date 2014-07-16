@@ -22,10 +22,10 @@ import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.common.model.Types.SubprocessStatus;
+import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.model.SubProcessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
@@ -65,7 +65,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author tgianos
  */
 @Named
-@Transactional(rollbackFor = CloudServiceException.class)
+@Transactional(rollbackFor = GenieException.class)
 public class ExecutionServiceJPAImpl implements ExecutionService {
 
     private static final Logger LOG = LoggerFactory
@@ -123,14 +123,14 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public Job submitJob(final Job job) throws CloudServiceException {
+    public Job submitJob(final Job job) throws GenieException {
         LOG.debug("Called");
 
         if (job == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job entered to run");
         }
@@ -187,7 +187,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             if (numRunningJobs >= maxRunningJobs) {
                 // if we get here, job can't be forwarded to an idle
                 // instance anymore and current node is overloaded
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_UNAVAILABLE,
                         "Number of running jobs greater than system limit ("
                         + maxRunningJobs
@@ -205,12 +205,12 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                 LOG.error("Can't create entity in the database", e);
                 if (e.getCause() instanceof EntityExistsException) {
                     // most likely entity already exists - return useful message
-                    throw new CloudServiceException(
+                    throw new GenieException(
                             HttpURLConnection.HTTP_CONFLICT,
                             "Job already exists for id: " + job.getId());
                 } else {
                     // unknown exception - send it back
-                    throw new CloudServiceException(
+                    throw new GenieException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
                             e);
                 }
@@ -227,7 +227,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             // update entity in DB
             job.setUpdated(new Date());
             return this.em.merge(job);
-        } catch (final CloudServiceException e) {
+        } catch (final GenieException e) {
             LOG.error("Failed to submit job: ", e);
             // update db
             job.setJobStatus(JobStatus.FAILED, e.getMessage());
@@ -242,13 +242,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
-    public Job getJobInfo(final String id) throws CloudServiceException {
+    public Job getJobInfo(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered unable to retreive job.");
         }
@@ -258,7 +258,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         if (job != null) {
             return job;
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No job exists for id " + id + ". Unable to retrieve.");
         }
@@ -267,7 +267,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -279,7 +279,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final String clusterName,
             final String clusterId,
             final int limit,
-            final int page) throws CloudServiceException {
+            final int page) throws GenieException {
         LOG.debug("called");
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
@@ -299,23 +299,23 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
-    public JobStatus getJobStatus(final String id) throws CloudServiceException {
+    public JobStatus getJobStatus(final String id) throws GenieException {
         return getJobInfo(id).getStatus();
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public Job killJob(final String id) throws CloudServiceException {
+    public Job killJob(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered unable to kill job.");
         }
@@ -324,7 +324,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         // do some basic error handling
         if (job == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No job exists for id " + id + ". Unable to kill.");
         }
@@ -338,7 +338,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         } else if (job.getStatus() == JobStatus.INIT
                 || (job.getProcessHandle() == -1)) {
             // can't kill a job if it is still initializing
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR,
                     "Unable to kill job as it is still initializing");
         }
@@ -347,7 +347,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         // redirect to the right node if killURI points to a different node
         final String killURI = job.getKillURI();
         if (StringUtils.isEmpty(killURI)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR,
                     "Failed to get killURI for jobID: " + id);
         }
@@ -363,7 +363,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         this.jobManagerFactory.getJobManager(job).kill(job);
 
         job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
-        job.setExitCode(SubprocessStatus.JOB_KILLED.code());
+        job.setExitCode(SubProcessStatus.JOB_KILLED.code());
 
         // increment counter for killed jobs
         this.stats.incrGenieKilledJobs();
@@ -402,31 +402,31 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         for (final Job job : jobs) {
             job.setStatus(JobStatus.FAILED);
             job.setFinishTime(currentTime);
-            job.setExitCode(SubprocessStatus.ZOMBIE_JOB.code());
-            job.setStatusMsg(SubprocessStatus.message(
-                    SubprocessStatus.ZOMBIE_JOB.code())
+            job.setExitCode(SubProcessStatus.ZOMBIE_JOB.code());
+            job.setStatusMsg(SubProcessStatus.message(
+                    SubProcessStatus.ZOMBIE_JOB.code())
             );
         }
         return jobs.size();
     }
 
-    private void buildJobURIs(final Job job) throws CloudServiceException {
+    private void buildJobURIs(final Job job) throws GenieException {
         job.setHostName(NetUtil.getHostName());
         job.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/" + job.getId());
         job.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + job.getId());
     }
 
-    private String getEndPoint() throws CloudServiceException {
+    private String getEndPoint() throws GenieException {
         return "http://" + NetUtil.getHostName() + ":" + SERVER_PORT;
     }
 
-    private Job forwardJobKill(final String killURI) throws CloudServiceException {
+    private Job forwardJobKill(final String killURI) throws GenieException {
         return executeRequest(Verb.DELETE, killURI, null);
     }
 
     private Job forwardJobRequest(
             final String hostURI,
-            final Job job) throws CloudServiceException {
+            final Job job) throws GenieException {
         return executeRequest(Verb.POST, hostURI, job);
     }
 
@@ -434,7 +434,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final Verb method,
             final String restURI,
             final Job job)
-            throws CloudServiceException {
+            throws GenieException {
         HttpResponse clientResponse = null;
         try {
             final RestClient genieClient = (RestClient) ClientFactory
@@ -450,17 +450,17 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             } else {
                 String msg = "Received null response while auto-forwarding request to Genie instance";
                 LOG.error(msg);
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
             }
-        } catch (final CloudServiceException e) {
+        } catch (final GenieException e) {
             // just raise it rightaway
             throw e;
         } catch (final Exception e) {
             final String msg = "Error while trying to auto-forward request: "
                     + e.getMessage();
             LOG.error(msg, e);
-            throw new CloudServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new GenieException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         } finally {
             if (clientResponse != null) {
                 // this is really really important
@@ -472,19 +472,19 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> addTagsForJob(
             final String id,
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job id entered. Unable to add tags.");
         }
         if (tags == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No tags entered.");
         }
@@ -493,7 +493,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             job.getTags().addAll(tags);
             return job.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No job with id " + id + " exists.");
         }
@@ -502,16 +502,16 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<String> getTagsForJob(
             final String id)
-            throws CloudServiceException {
+            throws GenieException {
 
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job id sent. Cannot retrieve tags.");
         }
@@ -520,7 +520,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         if (job != null) {
             return job.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No job with id " + id + " exists.");
         }
@@ -529,14 +529,14 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> updateTagsForJob(
             final String id,
-            final Set<String> tags) throws CloudServiceException {
+            final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job id entered. Unable to update tags.");
         }
@@ -545,7 +545,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             job.setTags(tags);
             return job.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No job with id " + id + " exists.");
         }
@@ -554,13 +554,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeAllTagsForJob(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job id entered. Unable to remove tags.");
         }
@@ -569,7 +569,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             job.getTags().clear();
             return job.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No job with id " + id + " exists.");
         }
@@ -577,19 +577,19 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     @Override
     public Set<String> removeTagForJob(String id, String tag)
-            throws CloudServiceException {
+            throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job id entered. Unable to remove tag.");
         }
         if (StringUtils.isBlank(tag)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No tag entered. Unable to remove tag.");
         }
         if (tag.equals(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Cannot delete job id from the tags list.");
         }
@@ -599,7 +599,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             job.getTags().remove(tag);
             return job.getTags();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No job with id " + id + " exists.");
         }

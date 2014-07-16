@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
@@ -138,18 +138,18 @@ public class Auditable {
      * Set the id.
      *
      * @param id The id to set. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setId(final String id) throws CloudServiceException {
+    public void setId(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No ID entered.");
         }
         if (StringUtils.isBlank(this.id)) {
             this.id = id;
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Id already set for this entity.");
         }

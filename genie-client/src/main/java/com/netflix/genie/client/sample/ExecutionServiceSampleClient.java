@@ -24,7 +24,7 @@ import com.netflix.genie.client.ExecutionServiceClient;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.JobStatus;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -90,7 +90,8 @@ public final class ExecutionServiceSampleClient {
                 jobName,
                 "-f hive.q",
                 commandCriteria,
-                clusterCriterias);
+                clusterCriterias,
+                null);
         job.setDescription("This is a test");
         // send the query as an attachment
         File query = File.createTempFile("hive", ".q");

@@ -19,7 +19,7 @@ package com.netflix.genie.server.jobmanager.impl;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.jobmanager.JobJanitor;
 import javax.inject.Inject;
 import org.junit.Assert;
@@ -56,12 +56,12 @@ public class TestJobJanitorImpl {
     /**
      * Test whether the janitor cleans up zombie jobs correctly.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      * @throws Exception
      */
     @Test
     @DatabaseSetup("testMarkZombies.xml")
-    public void testMarkZombies() throws CloudServiceException, Exception {
+    public void testMarkZombies() throws GenieException, Exception {
         Assert.assertTrue(2 == this.janitor.markZombies());
     }
 }

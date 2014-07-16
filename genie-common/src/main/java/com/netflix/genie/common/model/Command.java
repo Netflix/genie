@@ -17,8 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.CommandStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -71,9 +70,9 @@ public class Command extends CommonEntityFields {
     @Basic(optional = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
-            value = "If it is in use - ACTIVE, DEPRECATED, INACTIVE",
+            value = "The status of the command",
             required = true)
-    private CommandStatus status;
+    private CommandStatus status = CommandStatus.INACTIVE;
 
     /**
      * Location of the executable for this command.
@@ -155,14 +154,16 @@ public class Command extends CommonEntityFields {
      * @param user The user who created the command. Not null/empty/blank.
      * @param status The status of the command. Not null.
      * @param executable The executable of the command. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @param version The version of this command
      */
     public Command(
             final String name,
             final String user,
             final CommandStatus status,
-            final String executable) throws CloudServiceException {
-        super(name, user);
+            final String executable,
+            final String version) throws GenieException {
+        super(name, user, version);
+
         this.status = status;
         this.executable = executable;
     }
@@ -170,24 +171,16 @@ public class Command extends CommonEntityFields {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PrePersist
-    protected void onCreateCommand() throws CloudServiceException {
+    @PreUpdate
+    protected void onCreateOrUpdate() throws GenieException {
         validate(this.getName(), this.getUser(), this.status, this.executable);
         // Add the id to the tags
         if (this.tags == null) {
            this.tags = new HashSet<String>();
-           this.tags.add(this.getId());
         }
-    }
-
-    /**
-     * On any update to the command will add id to tags.
-     */
-    @PreUpdate
-    protected void onUpdateCommand() {
-        // Add the id to the tags
         this.tags.add(this.getId());
     }
 
@@ -204,16 +197,10 @@ public class Command extends CommonEntityFields {
     /**
      * Sets the status for this application.
      *
-     * @param status The new status. Not null.
-     * @throws CloudServiceException
+     * @param status The new status.
      * @see CommandStatus
      */
-    public void setStatus(final CommandStatus status) throws CloudServiceException {
-        if (status == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No status entered.");
-        }
+    public void setStatus(final CommandStatus status) {
         this.status = status;
     }
 
@@ -229,16 +216,9 @@ public class Command extends CommonEntityFields {
     /**
      * Sets the executable for this command.
      *
-     * @param executable Full path of the executable on the node. Not
-     * null/empty/blank.
-     * @throws CloudServiceException
+     * @param executable Full path of the executable on the node.
      */
-    public void setExecutable(final String executable) throws CloudServiceException {
-        if (StringUtils.isBlank(executable)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No executable entered.");
-        }
+    public void setExecutable(final String executable) {
         this.executable = executable;
     }
 
@@ -319,9 +299,9 @@ public class Command extends CommonEntityFields {
      * Sets the tags allocated to this command.
      *
      * @param tags the tags to set. Not Null.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void setTags(final Set<String> tags) throws CloudServiceException {
+    public void setTags(final Set<String> tags) throws GenieException {
         this.tags = tags;
     }
 
@@ -374,14 +354,15 @@ public class Command extends CommonEntityFields {
      * Check to make sure that the required parameters exist.
      *
      * @param command The configuration to check
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void validate() throws CloudServiceException {
+    public void validate() throws GenieException {
         this.validate(
                 this.getName(),
                 this.getUser(),
                 this.getStatus(),
                 this.getExecutable());
+
     }
 
     /**
@@ -390,14 +371,14 @@ public class Command extends CommonEntityFields {
      * @param name The name of the command
      * @param user The user who created the command
      * @param status The status of the command
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     private void validate(
             final String name,
             final String user,
             final CommandStatus status,
             final String executable)
-            throws CloudServiceException {
+            throws GenieException {
         final StringBuilder builder = new StringBuilder();
         super.validate(builder, name, user);
         if (status == null) {
@@ -411,7 +392,7 @@ public class Command extends CommonEntityFields {
             builder.insert(0, "Command configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 }

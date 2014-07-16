@@ -15,8 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.ApplicationStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
@@ -42,13 +41,15 @@ public class CommonEntityFields extends Auditable {
      *
      * @param name The name of the application. Not null/empty/blank.
      * @param user The user who created the application. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public CommonEntityFields (
             final String name,
-            final String user) throws CloudServiceException {
+            final String user,
+            final String version) throws GenieException {
         this.name = name;
         this.user = user;
+        this.version = version;
     }
     
     /**
@@ -110,11 +111,11 @@ public class CommonEntityFields extends Auditable {
      * Sets the user who created this entity.
      *
      * @param user user who created this entity. Not null/empty/blank.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void setUser(final String user) throws CloudServiceException {
+    public void setUser(final String user) throws GenieException {
         if (StringUtils.isBlank(user)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No user Entered.");
         }
@@ -146,13 +147,13 @@ public class CommonEntityFields extends Auditable {
      * @param name The name of the application
      * @param user The user who created the application
      * @param status The status of the application
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     protected void validate(
             final StringBuilder builder,
             final String name,
             final String user)
-            throws CloudServiceException {
+            throws GenieException {
         if (StringUtils.isBlank(user)) {
             builder.append("User name is missing and is required.\n");
         }

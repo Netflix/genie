@@ -22,11 +22,11 @@ import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.client.CommandServiceClient;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.CommandStatus;
+import com.netflix.genie.common.model.CommandStatus;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +53,8 @@ public final class CommandServiceSampleClient {
      * Name for the sample command.
      */
     protected static final String CMD_NAME = "pig";
+
+    private static final String CMD_VERSION = "1.0";
 
     /**
      * Private constructor.
@@ -185,15 +187,16 @@ public final class CommandServiceSampleClient {
      *
      * @param id The id to use or null if want one created.
      * @return The pig example command
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public static Command createSampleCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         final Command command = new Command(
                 CMD_NAME,
                 "tgianos",
                 CommandStatus.ACTIVE,
-                "/apps/pig/0.13/bin/pig");
+                "/apps/pig/0.13/bin/pig",
+                CMD_VERSION);
         if (!StringUtils.isEmpty(id)) {
             command.setId(id);
         }

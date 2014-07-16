@@ -18,7 +18,7 @@
 package com.netflix.genie.server.jobmanager;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
@@ -62,12 +62,12 @@ public final class JobManagerFactory implements ApplicationContextAware {
      *
      * @param ccs The cluster config service to use
      * @param clb The clb to use
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Inject
     public JobManagerFactory(
             final ClusterConfigService ccs,
-            final ClusterLoadBalancer clb) throws CloudServiceException {
+            final ClusterLoadBalancer clb) throws GenieException {
         this.ccs = ccs;
         this.clb = clb;
     }
@@ -77,9 +77,9 @@ public final class JobManagerFactory implements ApplicationContextAware {
      *
      * @param job The job this manager will be managing
      * @return instance of the appropriate job manager
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public JobManager getJobManager(final Job job) throws CloudServiceException {
+    public JobManager getJobManager(final Job job) throws GenieException {
         LOG.info("called");
 
         // Figure out a cluster to run this job. Cluster selection is done based on 
@@ -98,17 +98,42 @@ public final class JobManagerFactory implements ApplicationContextAware {
             } else {
                 final String msg = className + " is not of type JobManager. Unable to continue.";
                 LOG.error(msg);
-                throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+                throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
             }
         } catch (final ClassNotFoundException e) {
             final String msg = "Unable to create job manager for class name " + className;
             LOG.error(msg, e);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         } catch (final BeansException e) {
             final String msg = "Unable to create job manager for class name " + className;
             LOG.error(msg, e);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
+    }
+
+    /**
+=======
+     * Figure out an appropriate cluster to run this job<br>
+     * Cluster selection is done based on tags, command and application.
+     *
+     * @param job job info for this job
+     * @return cluster element to use for running this job
+     * @throws GenieException if there is any error finding a cluster for
+     * this job
+     */
+    private Cluster getCluster(final Job job) throws GenieException {
+        LOG.info("called");
+
+        if (job == null) {
+            final String msg = "No job entered. Unable to continue";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final List<Cluster> clusters = this.ccs.getClusters(job);
+
+        // return selected instance
+        return this.clb.selectCluster(clusters);
     }
 
     /**

@@ -17,11 +17,12 @@
  */
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.netflix.genie.common.model.ClusterStatus;
+
 import java.util.List;
 import java.util.Set;
 
@@ -40,18 +41,18 @@ public interface ClusterConfigService {
      *
      * @param cluster The cluster to create
      * @return The created cluster
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Cluster createCluster(final Cluster cluster) throws CloudServiceException;
+    Cluster createCluster(final Cluster cluster) throws GenieException;
 
     /**
      * Get the cluster configuration by id.
      *
      * @param id unique id of cluster configuration to return
      * @return The cluster configuration
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Cluster getCluster(final String id) throws CloudServiceException;
+    Cluster getCluster(final String id) throws GenieException;
 
     /**
      * Get cluster info for various parameters. Null or empty parameters are
@@ -65,7 +66,7 @@ public interface ClusterConfigService {
      * @param limit number of entries to return
      * @param page page number
      * @return All the clusters matching the criteria
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     List<Cluster> getClusters(
             final String name,
@@ -74,7 +75,7 @@ public interface ClusterConfigService {
             final Long minUpdateTime,
             final Long maxUpdateTime,
             final int limit,
-            final int page) throws CloudServiceException;
+            final int page) throws GenieException;
 
     /**
      * Get the cluster configurations for various parameters.
@@ -83,7 +84,7 @@ public interface ClusterConfigService {
      * @return successful response, or one with HTTP error code
      */
     List<Cluster> getClusters(
-            final Job job) throws CloudServiceException;
+            final Job job) throws GenieException;
 
     /**
      * Update a cluster configuration.
@@ -91,28 +92,28 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to update
      * @param updateCluster the information to update the cluster with
      * @return the updated cluster
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Cluster updateCluster(
             final String id,
-            final Cluster updateCluster) throws CloudServiceException;
+            final Cluster updateCluster) throws GenieException;
 
     /**
      * Delete all clusters from database.
      *
      * @return The deleted clusters
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    List<Cluster> deleteAllClusters() throws CloudServiceException;
+    List<Cluster> deleteAllClusters() throws GenieException;
 
     /**
      * Delete a cluster configuration by id.
      *
      * @param id unique id for cluster to delete
      * @return the deleted cluster
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Cluster deleteCluster(final String id) throws CloudServiceException;
+    Cluster deleteCluster(final String id) throws GenieException;
 
     /**
      * Add configuration files to the cluster.
@@ -121,11 +122,11 @@ public interface ClusterConfigService {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> addConfigsForCluster(
             final String id,
-            final Set<String> configs) throws CloudServiceException;
+            final Set<String> configs) throws GenieException;
 
     /**
      * Get the set of configuration files associated with the cluster with given
@@ -134,10 +135,10 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to get the configuration files for. Not
      * null/empty/blank.
      * @return The set of configuration files as paths
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> getConfigsForCluster(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Update the set of configuration files associated with the cluster with
@@ -148,11 +149,11 @@ public interface ClusterConfigService {
      * @param configs The configuration files to replace existing configurations
      * with. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> updateConfigsForCluster(
             final String id,
-            final Set<String> configs) throws CloudServiceException;
+            final Set<String> configs) throws GenieException;
 
     /**
      * Remove all configuration files from the cluster.
@@ -160,10 +161,10 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to remove the configuration file from.
      * Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeAllConfigsForCluster(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Add commands to the cluster.
@@ -172,11 +173,11 @@ public interface ClusterConfigService {
      * null/empty/blank.
      * @param commands The commands to add. Not null/empty.
      * @return The active list of commands
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     List<Command> addCommandsForCluster(
             final String id,
-            final List<Command> commands) throws CloudServiceException;
+            final List<Command> commands) throws GenieException;
 
     /**
      * Get the set of commands associated with the cluster with given id.
@@ -184,9 +185,9 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to get the commands for. Not
      * null/empty/blank.
      * @return The list of commands
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    List<Command> getCommandsForCluster(final String id) throws CloudServiceException;
+    List<Command> getCommandsForCluster(final String id) throws GenieException;
 
     /**
      * Update the set of command files associated with the cluster with
@@ -197,11 +198,11 @@ public interface ClusterConfigService {
      * @param commands The command files to replace existing
      * commands with. Not null/empty.
      * @return The active list of commands
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     List<Command> updateCommandsForCluster(
             final String id,
-            final List<Command> commands) throws CloudServiceException;
+            final List<Command> commands) throws GenieException;
 
     /**
      * Remove all commands from the cluster.
@@ -209,11 +210,10 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to remove the commands from. Not
      * null/empty/blank.
      * @return The active list of commands
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     List<Command> removeAllCommandsForCluster(
-            final String id) throws CloudServiceException;
-    
+            final String id) throws GenieException;
     /**
      * Remove a command from the cluster.
      *
@@ -221,9 +221,9 @@ public interface ClusterConfigService {
      * null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active list of commands
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    List<Command> removeCommandForCluster(final String id, final String cmdId) throws CloudServiceException;
+    List<Command> removeCommandForCluster(final String id, final String cmdId) throws GenieException;
     
     /**
      * Add tags to the cluster.
@@ -232,11 +232,11 @@ public interface ClusterConfigService {
      * null/empty/blank.
      * @param tags The tags to add. Not null/empty.
      * @return The active set of tagss
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> addTagsForCluster(
             final String id,
-            final Set<String> tags) throws CloudServiceException;
+            final Set<String> tags) throws GenieException;
 
     /**
      * Get the set of tags associated with the cluster with given
@@ -245,10 +245,10 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to get the tags for. Not
      * null/empty/blank.
      * @return The set of tags as paths
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> getTagsForCluster(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Update the set of tags associated with the cluster with
@@ -259,11 +259,11 @@ public interface ClusterConfigService {
      * @param tags The tags to replace existing tags
      * with. Not null/empty.
      * @return The active set of tagss
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> updateTagsForCluster(
             final String id,
-            final Set<String> tags) throws CloudServiceException;
+            final Set<String> tags) throws GenieException;
 
     /**
      * Remove all tags from the cluster.
@@ -271,10 +271,10 @@ public interface ClusterConfigService {
      * @param id The id of the cluster to remove the tags from.
      * Not null/empty/blank.
      * @return The active set of tagss
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeAllTagsForCluster(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
     
     /**
      * Remove a tag from the cluster.
@@ -283,7 +283,7 @@ public interface ClusterConfigService {
      * null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Set<String> removeTagForCluster(final String id, final String tag) throws CloudServiceException;
+    Set<String> removeTagForCluster(final String id, final String tag) throws GenieException;
 }

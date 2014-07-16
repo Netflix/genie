@@ -22,34 +22,25 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for the JobStatus enum.
+ * Tests for the ApplicationStatus enum.
  *
  * @author tgianos
  */
-public class TestJobStatus {
+public class TestApplicationStatus {
 
     /**
-     * Tests whether a valid job status is parsed correctly.
+     * Tests whether a valid application status is parsed correctly.
      *
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test
-    public void testValidJobStatus() throws GenieException {
-        Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.FAILED, JobStatus.parse(JobStatus.FAILED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.KILLED, JobStatus.parse(JobStatus.KILLED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.INIT, JobStatus.parse(JobStatus.INIT.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.SUCCEEDED, JobStatus.parse(JobStatus.SUCCEEDED.name().toLowerCase()));
-    }
-
-    /**
-     * Tests whether an invalid job status returns null.
-     *
-     * @throws com.netflix.genie.common.exceptions.GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testInvalidJobStatus() throws GenieException {
-        JobStatus.parse("DOES_NOT_EXIST");
+    public void testValidApplicationStatus() throws GenieException {
+        Assert.assertEquals(ApplicationStatus.ACTIVE,
+                ApplicationStatus.parse(ApplicationStatus.ACTIVE.name().toLowerCase()));
+        Assert.assertEquals(ApplicationStatus.DEPRECATED,
+                ApplicationStatus.parse(ApplicationStatus.DEPRECATED.name().toLowerCase()));
+        Assert.assertEquals(ApplicationStatus.INACTIVE,
+                ApplicationStatus.parse(ApplicationStatus.INACTIVE.name().toLowerCase()));
     }
 
     /**
@@ -58,7 +49,17 @@ public class TestJobStatus {
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test(expected = GenieException.class)
-    public void testBlankJobStatus() throws GenieException {
-        JobStatus.parse(null);
+    public void testInvalidApplicationStatus() throws GenieException {
+        ApplicationStatus.parse("DOES_NOT_EXIST");
+    }
+
+    /**
+     * Tests whether an invalid application status throws exception.
+     *
+     * @throws com.netflix.genie.common.exceptions.GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testBlankApplicationStatus() throws GenieException {
+        ApplicationStatus.parse(null);
     }
 }

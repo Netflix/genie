@@ -20,7 +20,7 @@ package com.netflix.genie.client;
 import com.google.common.collect.Multimap;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -77,11 +77,11 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * More details can be found on the Genie User Guide on GitHub.
      *
      * @return updated jobInfo for submitted job, if there is no error
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public Job submitJob(final Job job) throws CloudServiceException {
+    public Job submitJob(final Job job) throws GenieException {
         if (job == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job entered to validate");
         }
@@ -99,13 +99,13 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      *
      * @param id the Genie jobID (can't be null)
      * @return the jobInfo for this jobID
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public Job getJob(final String id) throws CloudServiceException {
+    public Job getJob(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -127,9 +127,9 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * More details on the parameters can be found on the Genie User Guide on
      * GitHub.
      * @return List of jobs that match the filter
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public List<Job> getJobs(final Multimap<String, String> params) throws CloudServiceException {
+    public List<Job> getJobs(final Multimap<String, String> params) throws GenieException {
         final HttpRequest request = this.buildRequest(
                 Verb.GET,
                 BASE_EXECUTION_REST_URL,
@@ -143,13 +143,13 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      *
      * @param id the Genie job ID to wait for completion
      * @param blockTimeout the time to block for (in ms), after which a
-     * CloudServiceException will be thrown
+     * GenieException will be thrown
      * @return the jobInfo for the job after completion
-     * @throws CloudServiceException on service errors
+     * @throws GenieException on service errors
      * @throws InterruptedException on timeout/thread errors
      */
     public Job waitForCompletion(final String id, final long blockTimeout)
-            throws CloudServiceException, InterruptedException {
+            throws GenieException, InterruptedException {
         //Should we use Future? See:
         //https://github.com/Netflix/ribbon/blob/master/ribbon-examples
         ///src/main/java/com/netflix/ribbon/examples/GetWithDeserialization.java
@@ -162,18 +162,18 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      *
      * @param id the Genie job ID to wait for completion
      * @param blockTimeout the time to block for (in ms), after which a
-     * CloudServiceException will be thrown
+     * GenieException will be thrown
      * @param pollTime the time to sleep between polling for job status
      * @return the jobInfo for the job after completion
-     * @throws CloudServiceException on service errors
+     * @throws GenieException on service errors
      * @throws InterruptedException on timeout/thread errors
      */
     public Job waitForCompletion(final String id, final long blockTimeout, final long pollTime)
-            throws CloudServiceException, InterruptedException {
+            throws GenieException, InterruptedException {
         if (StringUtils.isEmpty(id)) {
             final String msg = "Missing required parameter: id.";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
@@ -204,13 +204,13 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      *
      * @param id the Genie jobID for the job to kill
      * @return the final job status for this job
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public Job killJob(final String id) throws CloudServiceException {
+    public Job killJob(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             final String msg = "Missing required parameter: id";
             LOG.error(msg);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 

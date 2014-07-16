@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,10 +35,10 @@ import org.slf4j.LoggerFactory;
  */
 @Provider
 @Named
-public class CloudServiceExceptionMapper implements ExceptionMapper<CloudServiceException> {
+public class GenieExceptionMapper implements ExceptionMapper<GenieException> {
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(CloudServiceExceptionMapper.class);
+            .getLogger(GenieExceptionMapper.class);
 
     @Inject
     private GenieNodeStatistics genieNodeStatistics;
@@ -50,7 +50,7 @@ public class CloudServiceExceptionMapper implements ExceptionMapper<CloudService
      * @return a Response object
      */
     @Override
-    public Response toResponse(final CloudServiceException cse) {
+    public Response toResponse(final GenieException cse) {
         final int code = cse.getErrorCode();
         final String errorMessage = cse.getLocalizedMessage();
         if (code >= 400 && code < 500) {

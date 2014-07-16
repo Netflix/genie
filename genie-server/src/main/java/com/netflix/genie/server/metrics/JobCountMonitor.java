@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.metrics;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 
 /**
  * Monitor thread that routinely updates the statistics object.
@@ -31,41 +31,41 @@ public interface JobCountMonitor extends Runnable {
      * Get number of jobs running on this instance.
      *
      * @return number of running jobs
-     * @throws CloudServiceException if there is any error
+     * @throws GenieException if there is any error
      */
-    int getNumInstanceJobs() throws CloudServiceException;
+    int getNumInstanceJobs() throws GenieException;
 
     /**
      * Get number of running jobs on this instance running for > 15 mins.
      *
      * @return number of running jobs with runtime > 15 mins
-     * @throws CloudServiceException if there is any error
+     * @throws GenieException if there is any error
      */
-    int getNumInstanceJobs15Mins() throws CloudServiceException;
+    int getNumInstanceJobs15Mins() throws GenieException;
 
     /**
      * Get number of running jobs with 15m < runtime < 2 hours.
      *
      * @return Number of running jobs with 15m < runtime < 2 hours
-     * @throws CloudServiceException if there is any error
+     * @throws GenieException if there is any error
      */
-    int getNumInstanceJobs2Hrs() throws CloudServiceException;
+    int getNumInstanceJobs2Hrs() throws GenieException;
 
     /**
      * Get number of running jobs with 2h < runtime < 8 hours.
      *
      * @return Number of running jobs with 2h < runtime < 8 hours
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    int getNumInstanceJobs8Hrs() throws CloudServiceException;
+    int getNumInstanceJobs8Hrs() throws GenieException;
 
     /**
      * Get number of running jobs with runtime > 8h.
      *
      * @return Number of running jobs with runtime > 8h
-     * @throws CloudServiceException if there is any error
+     * @throws GenieException if there is any error
      */
-    int getNumInstanceJobs8HrsPlus() throws CloudServiceException;
+    int getNumInstanceJobs8HrsPlus() throws GenieException;
 
     /**
      * Tell the monitor thread to stop running at next iteration.

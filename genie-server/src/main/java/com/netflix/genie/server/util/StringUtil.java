@@ -17,8 +17,9 @@
  */
 package com.netflix.genie.server.util;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import java.net.HttpURLConnection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +48,10 @@ public final class StringUtil {
      * @param input command-line arguments as a string
      * @return argument array that is split using (as to close to) bash rules as
      * possible
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public static String[] splitCmdLine(String input)
-            throws CloudServiceException {
+            throws GenieException {
         LOG.debug("Command line: " + input);
         if (input == null) {
             return new String[0];
@@ -64,7 +65,7 @@ public final class StringUtil {
         } catch (Exception e) {
             String msg = "Invalid argument: " + input;
             LOG.error(msg, e);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
 

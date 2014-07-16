@@ -17,8 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.ApplicationStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -72,7 +71,7 @@ public class Application extends CommonEntityFields {
     @ApiModelProperty(
             value = "The current status of this application",
             required = true)
-    private ApplicationStatus status;
+    private ApplicationStatus status = ApplicationStatus.INACTIVE;
 
     /**
      * Users can specify a property file location with environment variables.
@@ -134,37 +133,30 @@ public class Application extends CommonEntityFields {
      * @param name The name of the application. Not null/empty/blank.
      * @param user The user who created the application. Not null/empty/blank.
      * @param status The status of the application. Not null.
-     * @throws CloudServiceException
+     * @param version The version of this application
      */
     public Application(
             final String name,
             final String user,
-            final ApplicationStatus status) throws CloudServiceException {
-        super(name, user);
+            final ApplicationStatus status,
+            final String version) throws GenieException {
+        super(name, user,version);
         this.status = status;
     }
 
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PrePersist
-    protected void onCreateApplication() throws CloudServiceException {
+    @PreUpdate
+    protected void onCreateOrUpdate() throws GenieException {
         validate(this.getName(), this.getUser(), this.status);
      // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<String>();
-            this.tags.add(this.getId());
         }
-    }
-
-    /**
-     * On any update to the application will add id to tags.
-     */
-    @PreUpdate
-    protected void onUpdateApplication() {
-        // Add the id to the tags
         this.tags.add(this.getId());
     }
 
@@ -219,9 +211,8 @@ public class Application extends CommonEntityFields {
      * Sets the configurations for this application.
      *
      * @param configs The configuration files that this application needs
-     * @throws CloudServiceException
      */
-    public void setConfigs(final Set<String> configs) throws CloudServiceException {
+    public void setConfigs(final Set<String> configs) {
         this.configs = configs;
     }
 
@@ -238,9 +229,8 @@ public class Application extends CommonEntityFields {
      * Sets the jars needed for this application.
      *
      * @param jars All jars needed for execution of this application
-     * @throws CloudServiceException
      */
-    public void setJars(final Set<String> jars) throws CloudServiceException {
+    public void setJars(final Set<String> jars) {
         this.jars = jars;
     }
 
@@ -275,7 +265,7 @@ public class Application extends CommonEntityFields {
      * Sets the tags allocated to this application.
      *
      * @param tags the tags to set.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     public void setTags(final Set<String> tags) {
         this.tags = tags;
@@ -285,9 +275,9 @@ public class Application extends CommonEntityFields {
      * Check to make sure that the required parameters exist.
      *
      * @param application The applications to check
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public void validate() throws CloudServiceException {
+    public void validate() throws GenieException {
         this.validate(this.getName(), this.getUser(), this.getStatus());
     }
 
@@ -297,13 +287,13 @@ public class Application extends CommonEntityFields {
      * @param name The name of the application
      * @param user The user who created the application
      * @param status The status of the application
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     private void validate(
             final String name,
             final String user,
             final ApplicationStatus status)
-            throws CloudServiceException {
+            throws GenieException {
         final StringBuilder builder = new StringBuilder();
         super.validate(builder, name, user);
         if (status == null) {
@@ -314,7 +304,7 @@ public class Application extends CommonEntityFields {
             builder.insert(0, "Application configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 }

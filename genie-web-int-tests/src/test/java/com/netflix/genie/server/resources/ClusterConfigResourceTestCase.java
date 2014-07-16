@@ -15,7 +15,7 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.utils.Deployments;
 import com.netflix.karyon.server.test.RunInKaryon;
 import javax.inject.Inject;
@@ -59,8 +59,8 @@ public class ClusterConfigResourceTestCase {
      *
      * @throws CloudServiceException
      */
-    @Test(expected = CloudServiceException.class)
-    public void shouldRetrieveConfigs() throws CloudServiceException {
+    @Test(expected = GenieException.class)
+    public void shouldRetrieveConfigs() throws GenieException {
         this.resource.getCluster(null);
 
 //        // then

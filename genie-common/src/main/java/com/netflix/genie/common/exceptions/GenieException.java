@@ -23,7 +23,7 @@ package com.netflix.genie.common.exceptions;
  *
  * @author skrishnan
  */
-public class CloudServiceException extends Exception {
+public class GenieException extends Exception {
 
     /* the HTTP error code */
     private final int errorCode;
@@ -37,7 +37,7 @@ public class CloudServiceException extends Exception {
      * @param msg human readable message
      * @param cause reason for this exception
      */
-    public CloudServiceException(int errorCode, String msg, Throwable cause) {
+    public GenieException(final int errorCode, final String msg, final Throwable cause) {
         super(msg, cause);
         this.errorCode = errorCode;
     }
@@ -48,7 +48,7 @@ public class CloudServiceException extends Exception {
      * @param errorCode the HTTP status code for this exception
      * @param cause reason for this exception
      */
-    public CloudServiceException(int errorCode, Throwable cause) {
+    public GenieException(final int errorCode, final Throwable cause) {
         super(cause);
         this.errorCode = errorCode;
     }
@@ -59,7 +59,7 @@ public class CloudServiceException extends Exception {
      * @param errorCode the HTTP status code for this exception
      * @param msg human readable message
      */
-    public CloudServiceException(int errorCode, String msg) {
+    public GenieException(final int errorCode, final String msg) {
         super(msg);
         this.errorCode = errorCode;
     }

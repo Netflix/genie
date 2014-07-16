@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
 import java.util.List;
@@ -37,19 +37,19 @@ public interface ApplicationConfigService {
      *
      * @param app The application configuration to create
      * @return The application that was created
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Application createApplication(
-            final Application app) throws CloudServiceException;
+            final Application app) throws GenieException;
 
     /**
      * Gets application for given id.
      *
      * @param id unique id for application configuration to get. Not null/empty.
      * @return The application if one exists or null if not.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Application getApplication(final String id) throws CloudServiceException;
+    Application getApplication(final String id) throws GenieException;
 
     /**
      * Get applications for given filter criteria.
@@ -72,28 +72,28 @@ public interface ApplicationConfigService {
      * @param updateApp Information to update for the application configuration
      * with
      * @return The updated application
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Application updateApplication(
             final String id,
-            final Application updateApp) throws CloudServiceException;
+            final Application updateApp) throws GenieException;
 
     /**
      * Delete all applications from database.
      *
      * @return The deleted applications
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    List<Application> deleteAllApplications() throws CloudServiceException;
+    List<Application> deleteAllApplications() throws GenieException;
 
     /**
      * Delete an application configuration from database.
      *
      * @param id unique id of application configuration to delete
      * @return The deleted application
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Application deleteApplication(final String id) throws CloudServiceException;
+    Application deleteApplication(final String id) throws GenieException;
 
     /**
      * Add a configuration file to the application.
@@ -102,11 +102,11 @@ public interface ApplicationConfigService {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> addConfigsToApplication(
             final String id,
-            final Set<String> configs) throws CloudServiceException;
+            final Set<String> configs) throws GenieException;
 
     /**
      * Get the set of configuration files associated with the application with
@@ -115,10 +115,10 @@ public interface ApplicationConfigService {
      * @param id The id of the application to get the configuration files for.
      * Not null/empty/blank.
      * @return The set of configuration files as paths
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> getConfigsForApplication(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Update the set of configuration files associated with the application
@@ -129,11 +129,11 @@ public interface ApplicationConfigService {
      * @param configs The configuration files to replace existing configurations
      * with. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> updateConfigsForApplication(
             final String id,
-            final Set<String> configs) throws CloudServiceException;
+            final Set<String> configs) throws GenieException;
 
     /**
      * Remove all configuration files from the application.
@@ -141,10 +141,10 @@ public interface ApplicationConfigService {
      * @param id The id of the application to remove the configuration file
      * from. Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeAllConfigsForApplication(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Remove a configuration file from the application.
@@ -153,11 +153,11 @@ public interface ApplicationConfigService {
      * from. Not null/empty/blank.
      * @param config The configuration file to remove. Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeApplicationConfig(
             final String id,
-            final String config) throws CloudServiceException;
+            final String config) throws GenieException;
 
     /**
      * Add a jar file to the application.
@@ -166,11 +166,11 @@ public interface ApplicationConfigService {
      * null/empty/blank.
      * @param jars The jar files to add. Not null.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> addJarsForApplication(
             final String id,
-            final Set<String> jars) throws CloudServiceException;
+            final Set<String> jars) throws GenieException;
 
     /**
      * Get the set of jar files associated with the application with given id.
@@ -178,10 +178,10 @@ public interface ApplicationConfigService {
      * @param id The id of the application to get the jar files for. Not
      * null/empty/blank.
      * @return The set of jar files as paths
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> getJarsForApplication(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Update the set of jar files associated with the application with given
@@ -191,11 +191,11 @@ public interface ApplicationConfigService {
      * null/empty/blank.
      * @param jars The jar files to replace existing jars with. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> updateJarsForApplication(
             final String id,
-            final Set<String> jars) throws CloudServiceException;
+            final Set<String> jars) throws GenieException;
 
     /**
      * Remove all jar files from the application.
@@ -203,10 +203,10 @@ public interface ApplicationConfigService {
      * @param id The id of the application to remove the configuration file
      * from. Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeAllJarsForApplication(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Remove a jar file from the application.
@@ -215,11 +215,11 @@ public interface ApplicationConfigService {
      * null/empty/blank.
      * @param jar The jar file to remove. Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeJarForApplication(
             final String id,
-            final String jar) throws CloudServiceException;
+            final String jar) throws GenieException;
 
     /**
      * Add tags to the application.
@@ -228,11 +228,11 @@ public interface ApplicationConfigService {
      * null/empty/blank.
      * @param tags The tags to add. Not null/empty.
      * @return The active set of tags
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> addTagsForApplication(
             final String id,
-            final Set<String> tags) throws CloudServiceException;
+            final Set<String> tags) throws GenieException;
 
     /**
      * Get the set of tags associated with the application with given
@@ -241,10 +241,10 @@ public interface ApplicationConfigService {
      * @param id The id of the application to get the tags for. Not
      * null/empty/blank.
      * @return The set of tags as paths
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> getTagsForApplication(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Update the set of tags associated with the application with
@@ -255,11 +255,11 @@ public interface ApplicationConfigService {
      * @param tags The tags to replace existing tags
      * with. Not null/empty.
      * @return The active set of tags
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> updateTagsForApplication(
             final String id,
-            final Set<String> tags) throws CloudServiceException;
+            final Set<String> tags) throws GenieException;
 
     /**
      * Remove all tags from the application.
@@ -267,20 +267,20 @@ public interface ApplicationConfigService {
      * @param id The id of the application to remove the tags from.
      * Not null/empty/blank.
      * @return The active set of tags
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeAllTagsForApplication(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Get all the commands the application with given id is associated with.
      *
      * @param id The id of the application to get the commands for.
      * @return The commands the application is a part of.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<Command> getCommandsForApplication(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Remove a tag from the application.
@@ -289,7 +289,7 @@ public interface ApplicationConfigService {
      * null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Set<String> removeTagForApplication(final String id, final String tag) throws CloudServiceException;
+    Set<String> removeTagForApplication(final String id, final String tag) throws GenieException;
 }

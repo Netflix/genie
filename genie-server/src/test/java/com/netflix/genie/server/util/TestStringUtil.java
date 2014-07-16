@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.util;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,10 +33,10 @@ public class TestStringUtil {
      * Test various command-line argument permutations to ensure that they parse
      * correctly, including spaces, single and double quotes, etc.
      *
-     * @throws CloudServiceException if anything went wrong with the parsing.
+     * @throws GenieException if anything went wrong with the parsing.
      */
     @Test
-    public void testSplitCmdLine() throws CloudServiceException {
+    public void testSplitCmdLine() throws GenieException {
         final String input = "-f ch_survey_response_f.pig -p vhs_window_start_date=20120912 "
                 + "-p survey_date=20120919 -p now_epoch_ts=1348125009 "
                 + "-p rap_comment='/**/' -p no_rap_comment='--'";
@@ -47,10 +47,10 @@ public class TestStringUtil {
     /**
      * Test spaces within quotes.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Test
-    public void testSplitCmdLineSpacesWithinQuotes() throws CloudServiceException {
+    public void testSplitCmdLineSpacesWithinQuotes() throws GenieException {
         final String input = "-f pig.q -p endDateTS=\"foo bar\" ";
         final String[] output = StringUtil.splitCmdLine(input);
         Assert.assertTrue(4 == output.length);
@@ -59,10 +59,10 @@ public class TestStringUtil {
     /**
      * Test spaces at beginning and end.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Test
-    public void testSplitCmdLineSpacesAtBeginningAndEnd() throws CloudServiceException {
+    public void testSplitCmdLineSpacesAtBeginningAndEnd() throws GenieException {
         final String input = " -f pig.q -p bar ";
         final String[] output = StringUtil.splitCmdLine(input);
         Assert.assertTrue(4 == output.length);
@@ -71,10 +71,10 @@ public class TestStringUtil {
     /**
      * Test extra spaces in the middle.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Test
-    public void testSplitCmdLineExtraSpacesInMiddle() throws CloudServiceException {
+    public void testSplitCmdLineExtraSpacesInMiddle() throws GenieException {
         final String input = "-f device_sum_step1.pig -p from_date=20120915     "
                 + "-p to_date=20120918  -p batchid=1347998107";
         final String[] output = StringUtil.splitCmdLine(input);
@@ -84,10 +84,10 @@ public class TestStringUtil {
     /**
      * Test spaces and equals in middle.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Test
-    public void testSplitCmdLineSpacesAndEqualsInMiddle() throws CloudServiceException {
+    public void testSplitCmdLineSpacesAndEqualsInMiddle() throws GenieException {
         final String input = "-f hooks.q -d \"setCommandsHook=set hive.exec.reducers.bytes.per.reducer=67108864;\"";
         final String[] output = StringUtil.splitCmdLine(input);
         Assert.assertTrue(4 == output.length);
@@ -96,10 +96,10 @@ public class TestStringUtil {
     /**
      * Test commas in arguments.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Test
-    public void testSplitCmdLineCommasInArguments() throws CloudServiceException {
+    public void testSplitCmdLineCommasInArguments() throws GenieException {
         final String input = "jar searchagg.jar searchevents "
                 + "some_agg "
                 + "20120916 20120918 "
