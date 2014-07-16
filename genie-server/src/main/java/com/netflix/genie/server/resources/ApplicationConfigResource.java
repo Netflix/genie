@@ -672,6 +672,7 @@ public class ApplicationConfigResource {
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
+    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Remove a tag from a application",
             notes = "Remove the given tag from the application with given id.",
