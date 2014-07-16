@@ -25,6 +25,8 @@ import com.netflix.genie.common.model.Job;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -224,5 +226,157 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                 null,
                 null);
         return (Job) this.executeRequest(request, null, Job.class);
+    }
+
+    /**
+     * Add some more tags to a given job.
+     *
+     * @param id The id of the job to add tags to. Not
+     * Null/empty/blank.
+     * @param tags The tags to add. Not null or empty.
+     * @return The new set of tags for the given job.
+     * @throws GenieException
+     */
+    public Set<String> addTagsToJob(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (tags == null || tags.isEmpty()) {
+            final String msg = "Missing required parameter: tags";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.POST,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                tags);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Get the active set of tags for the given job.
+     *
+     * @param id The id of the job to get tags for. Not
+     * Null/empty/blank.
+     * @return The set of tags for the given job.
+     * @throws GenieException
+     */
+    public Set<String> getTagsForJob(final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.GET,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Update the tags for a given job.
+     *
+     * @param id The id of the job to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing tag
+     * files with. Not null.
+     * @return The new set of job tags.
+     * @throws GenieException
+     */
+    public Set<String> updateTagsForJob(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (tags == null) {
+            final String msg = "Missing required parameter: tags";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.PUT,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                tags);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Delete all the tags from a given job.
+     *
+     * @param id The id of the job to delete the tags from.
+     * Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws GenieException
+     */
+    public Set<String> removeAllTagsForJob(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+    
+    /**
+     * Remove tag from a given job.
+     *
+     * @param id The id of the job to delete the tag from. Not
+     * null/empty/blank.
+     * @return The tag for the job.
+     * @throws GenieException
+     */
+    public Set<String> removeTagForJob(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{
+                                BASE_EXECUTION_REST_URL,
+                            id,
+                            "tags"
+                        },
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
 }

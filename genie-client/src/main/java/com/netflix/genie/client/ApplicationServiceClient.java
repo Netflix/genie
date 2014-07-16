@@ -477,4 +477,156 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                 null);
         return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
     }
+
+    /**
+     * Add some more tags to a given application.
+     *
+     * @param id The id of the application to add tags to. Not
+     * Null/empty/blank.
+     * @param tags The tags to add. Not null or empty.
+     * @return The new set of tags for the given application.
+     * @throws GenieException
+     */
+    public Set<String> addTagsToApplication(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (tags == null || tags.isEmpty()) {
+            final String msg = "Missing required parameter: tags";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.POST,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                tags);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Get the active set of tags for the given application.
+     *
+     * @param id The id of the application to get tags for. Not
+     * Null/empty/blank.
+     * @return The set of tags for the given application.
+     * @throws GenieException
+     */
+    public Set<String> getTagsForApplication(final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.GET,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Update the tags for a given application.
+     *
+     * @param id The id of the application to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing tag
+     * files with. Not null.
+     * @return The new set of application tags.
+     * @throws GenieException
+     */
+    public Set<String> updateTagsForApplication(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (tags == null) {
+            final String msg = "Missing required parameter: tags";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.PUT,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                tags);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Delete all the tags from a given application.
+     *
+     * @param id The id of the application to delete the tags from.
+     * Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws GenieException
+     */
+    public Set<String> removeAllTagsForApplication(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+    
+    /**
+     * Remove tag from a given application.
+     *
+     * @param id The id of the application to delete the tag from. Not
+     * null/empty/blank.
+     * @return The tag for the application.
+     * @throws GenieException
+     */
+    public Set<String> removeTagForApplication(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{
+                            BASE_CONFIG_APPLICATION_REST_URL,
+                            id,
+                            "tags"
+                        },
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
 }

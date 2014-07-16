@@ -455,4 +455,156 @@ public final class CommandServiceClient extends BaseGenieClient {
                 null);
         return (Set<Cluster>) this.executeRequest(request, Set.class, Cluster.class);
     }
+    
+    /**
+     * Add some more tags to a given command.
+     *
+     * @param id The id of the command to add tags to. Not
+     * Null/empty/blank.
+     * @param tags The tags to add. Not null or empty.
+     * @return The new set of tags for the given command.
+     * @throws GenieException
+     */
+    public Set<String> addTagsToCommand(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (tags == null || tags.isEmpty()) {
+            final String msg = "Missing required parameter: tags";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.POST,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                tags);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Get the active set of tags for the given command.
+     *
+     * @param id The id of the command to get tags for. Not
+     * Null/empty/blank.
+     * @return The set of tags for the given command.
+     * @throws GenieException
+     */
+    public Set<String> getTagsForCommand(final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.GET,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Update the tags for a given command.
+     *
+     * @param id The id of the command to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing tag
+     * files with. Not null.
+     * @return The new set of command tags.
+     * @throws GenieException
+     */
+    public Set<String> updateTagsForCommand(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+        if (tags == null) {
+            final String msg = "Missing required parameter: tags";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.PUT,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                tags);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+
+    /**
+     * Delete all the tags from a given command.
+     *
+     * @param id The id of the command to delete the tags from.
+     * Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws GenieException
+     */
+    public Set<String> removeAllTagsForCommand(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
+    
+    /**
+     * Remove tag from a given command.
+     *
+     * @param id The id of the command to delete the tag from. Not
+     * null/empty/blank.
+     * @return The tag for the command.
+     * @throws GenieException
+     */
+    public Set<String> removeTagForCommand(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            final String msg = "Missing required parameter: id";
+            LOG.error(msg);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        }
+
+        final HttpRequest request = this.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{
+                            BASE_CONFIG_COMMAND_REST_URL,
+                            id,
+                            "tags"
+                        },
+                        SLASH),
+                null,
+                null);
+        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+    }
 }
