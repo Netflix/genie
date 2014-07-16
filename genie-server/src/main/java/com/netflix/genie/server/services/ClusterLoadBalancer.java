@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import java.util.List;
 
@@ -35,7 +35,7 @@ public interface ClusterLoadBalancer {
      *
      * @param clusters The list of available clusters to choose from
      * @return the "best" cluster to run job on
-     * @throws CloudServiceException if there is any error
+     * @throws GenieException if there is any error
      */
-    Cluster selectCluster(final List<Cluster> clusters) throws CloudServiceException;
+    Cluster selectCluster(final List<Cluster> clusters) throws GenieException;
 }

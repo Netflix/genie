@@ -13,18 +13,21 @@ define([
         var self = this;
         self.archiveLocation  = ko.observable();
         self.clientHost       = ko.observable();
-        self.clusterId        = ko.observable();
-        self.clusterName      = ko.observable();
-        self.cmdArgs          = ko.observable();
+        self.executionClusterId        = ko.observable();
+        self.executionClusterName      = ko.observable();
+        self.commandArgs          = ko.observable();
         self.configuration    = ko.observable();
         self.exitCode         = ko.observable();
         self.fileDependencies = ko.observable();
         self.finishTime       = ko.observable();
         self.forwarded        = ko.observable();
         self.hostName         = ko.observable();
-        self.jobID            = ko.observable();
-        self.jobName          = ko.observable();
-        self.jobType          = ko.observable();
+        self.id            = ko.observable();
+        self.name          = ko.observable();
+        self.commandId          = ko.observable();
+        self.commandName          = ko.observable();
+        self.applicationId          = ko.observable();
+        self.applicationName          = ko.observable();
         self.killURI          = ko.observable();
         self.outputURI        = ko.observable();
         self.pigVersion       = ko.observable();
@@ -33,17 +36,18 @@ define([
         self.startTime        = ko.observable();
         self.status           = ko.observable();
         self.statusMsg        = ko.observable();
-        self.updateTime       = ko.observable();
-        self.userName         = ko.observable();
+        self.updated       = ko.observable();
+        self.created = ko.observable();
+        self.user         = ko.observable();
 
         ko.mapping.fromJS(json, {}, self);
 
-        self.jobNameFormatted = ko.computed(function() {
-            var nameLength = self.jobName() ? self.jobName().length : -1;
+        self.nameFormatted = ko.computed(function() {
+            var nameLength = self.name() ? self.name().length : -1;
             if (nameLength > 28) {
-                return self.jobName().substring(0,20) + '...' + self.jobName().substring(nameLength-8);
+                return self.name().substring(0,20) + '...' + self.name().substring(nameLength-8);
             }
-            return self.jobName();
+            return self.name();
         }, self);
 
         self.finishTimeFormatted = ko.computed(function() {
@@ -55,16 +59,17 @@ define([
         }, self);
 
         self.startTimeFormatted = ko.computed(function() {
-            if (self.startTime() > 0) {
-                var myDate = new Date(parseInt(self.startTime()));
+            //if (self.startTime() > 0) {
+            if (self.created > 0) { 	
+                var myDate = new Date(parseInt(self.created()));
                 return myDate.toUTCString();
             }
             return '';
         }, self);
 
         self.updateTimeFormatted = ko.computed(function() {
-            if (self.updateTime() > 0) {
-                var myDate = new Date(parseInt(self.updateTime()));
+            if (self.updated() > 0) {
+                var myDate = new Date(parseInt(self.updated()));
                 return myDate.toUTCString();
             }
             return '';
@@ -101,12 +106,12 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v0/jobs',
+                url:  'genie/v2/jobs',
                 data: {limit: 64, status: 'RUNNING'}
             }).done(function(data) {
                 // check to see if jobInfo is an array
-                if (data.jobs.jobInfo instanceof Array) {
-                    _.each(data.jobs.jobInfo, function(jobObj, index) {
+                if (data instanceof Array) {
+                    _.each(data, function(jobObj, index) {
                         if (!(jobObj.jobType in jobCount)) {
                             jobCount[jobObj.jobType] = 0;
                         }
@@ -130,37 +135,36 @@ define([
             self.status('searching');
             self.searchDateTime(d.toLocaleString());
             var formArray = $('#jobSearchForm').serializeArray();
-            var userName = _.where(formArray, {'name': 'userName'})[0].value;
-            var jobType  = _.where(formArray, {'name': 'jobType'})[0].value;
+            var user = _.where(formArray, {'name': 'userName'})[0].value;
             var status   = _.where(formArray, {'name': 'status'})[0].value;
-            var jobID    = _.where(formArray, {'name': 'jobID'})[0].value;
-            var jobName  = _.where(formArray, {'name': 'jobName'})[0].value;
-            var clusterName  = _.where(formArray, {'name': 'clusterName'})[0].value;
-            var clusterId  = _.where(formArray, {'name': 'clusterId'})[0].value;
+            var id    = _.where(formArray, {'name': 'jobID'})[0].value;
+            var name  = _.where(formArray, {'name': 'jobName'})[0].value;
+            var executionClusterName  = _.where(formArray, {'name': 'clusterName'})[0].value;
+            var executionClusterId  = _.where(formArray, {'name': 'clusterId'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
             $.ajax({
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v0/jobs',
-                data: {limit: limit, userName: userName, jobType: jobType, status: status, 
-                    jobID: jobID, jobName: jobName, clusterName:clusterName, clusterId:clusterId}
+                url:  'genie/v2/jobs',
+                data: {limit: limit, userName: user, status: status, 
+                    id: id, name: name, executionClusterName:executionClusterName, executionClusterId:executionClusterId}
             }).done(function(data) {
                 self.searchResults([]);
                 self.status('results');
                 // check to see if jobInfo is an array
-                if (data.jobs.jobInfo instanceof Array) {
-                    _.each(data.jobs.jobInfo, function(jobObj, index) {
-                        if (! jobObj.jobName) {
-                            jobObj.jobName = 'undefined';
+                if (data instanceof Array) {
+                    _.each(data, function(jobObj, index) {
+                        if (! jobObj.name) {
+                            jobObj.name = 'undefined';
                         }
                         self.searchResults.push(new Job(jobObj));
                     });
                 } else {
-                    if (! data.jobs.jobInfo.jobName) {
-                        data.jobs.jobInfo.jobName = 'undefined';
+                    if (! data.jobs.jobInfo.name) {
+                        data.jobs.jobInfo.name = 'undefined';
                     }
-                    self.searchResults.push(new Job(data.jobs.jobInfo));                
+                    self.searchResults.push(new Job(data));                
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR, textStatus, errorThrown);

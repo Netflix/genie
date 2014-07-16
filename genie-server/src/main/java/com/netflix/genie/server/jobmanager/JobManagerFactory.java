@@ -18,16 +18,20 @@
 package com.netflix.genie.server.jobmanager;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
-import com.netflix.genie.server.services.ConfigServiceFactory;
 import java.net.HttpURLConnection;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * Factory class to instantiate individual job managers.
@@ -36,15 +40,16 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  * @author amsharma
  */
-public final class JobManagerFactory {
+@Named
+public final class JobManagerFactory implements ApplicationContextAware {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(JobManagerFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobManagerFactory.class);
+
+    private ApplicationContext context;
 
     /**
      * The service to discover clusters.
      */
-    //TODO: this should be managed via DI framework of some type
     private final ClusterConfigService ccs;
 
     /**
@@ -55,11 +60,16 @@ public final class JobManagerFactory {
     /**
      * Default constructor.
      *
-     * @throws CloudServiceException
+     * @param ccs The cluster config service to use
+     * @param clb The clb to use
+     * @throws GenieException
      */
-    public JobManagerFactory() throws CloudServiceException {
-        this.ccs = ConfigServiceFactory.getClusterConfigImpl();
-        this.clb = ConfigServiceFactory.getClusterLoadBalancer();
+    @Inject
+    public JobManagerFactory(
+            final ClusterConfigService ccs,
+            final ClusterLoadBalancer clb) throws GenieException {
+        this.ccs = ccs;
+        this.clb = clb;
     }
 
     /**
@@ -67,58 +77,74 @@ public final class JobManagerFactory {
      *
      * @param job The job this manager will be managing
      * @return instance of the appropriate job manager
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public JobManager getJobManager(final Job job) throws CloudServiceException {
+    public JobManager getJobManager(final Job job) throws GenieException {
         LOG.info("called");
 
-        final Cluster cluster = getCluster(job);
-        final String className =  ConfigurationManager.getConfigInstance()
+        // Figure out a cluster to run this job. Cluster selection is done based on 
+        // ClusterCriteria tags and Command tags specified in the job.
+        final Cluster cluster = this.clb.selectCluster(this.ccs.getClusters(job)) ;
+        final String className = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server." + cluster.getClusterType() + ".JobManagerImpl");
 
         try {
             final Class jobManagerClass = Class.forName(className);
-            final Object instance = jobManagerClass.getConstructor(Cluster.class).newInstance(cluster);
+            final Object instance = this.context.getBean(jobManagerClass);
             if (instance instanceof JobManager) {
-                return (JobManager) instance;
+                final JobManager jobManager = (JobManager) instance;
+                jobManager.setCluster(cluster);
+                return jobManager;
             } else {
                 final String msg = className + " is not of type JobManager. Unable to continue.";
                 LOG.error(msg);
-                throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+                throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
             }
-        } catch (final Exception e) {
+        } catch (final ClassNotFoundException e) {
             final String msg = "Unable to create job manager for class name " + className;
             LOG.error(msg, e);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        } catch (final BeansException e) {
+            final String msg = "Unable to create job manager for class name " + className;
+            LOG.error(msg, e);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 
     /**
+=======
      * Figure out an appropriate cluster to run this job<br>
      * Cluster selection is done based on tags, command and application.
      *
      * @param job job info for this job
      * @return cluster element to use for running this job
-     * @throws CloudServiceException if there is any error finding a cluster for
+     * @throws GenieException if there is any error finding a cluster for
      * this job
      */
-    private Cluster getCluster(final Job job) throws CloudServiceException {
+    private Cluster getCluster(final Job job) throws GenieException {
         LOG.info("called");
 
         if (job == null) {
             final String msg = "No job entered. Unable to continue";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final List<Cluster> clusters = this.ccs.getClusters(
-                job.getApplicationId(),
-                job.getApplicationName(),
-                job.getCommandId(),
-                job.getCommandName(),
-                job.getClusterCriteria());
+        final List<Cluster> clusters = this.ccs.getClusters(job);
 
         // return selected instance
         return this.clb.selectCluster(clusters);
+    }
+
+    /**
+     * Set the spring application context for use creating beans.
+     *
+     * @param appContext The application context injected by spring
+     * @throws BeansException
+     */
+    @Override
+    public void setApplicationContext(
+            final ApplicationContext appContext) throws BeansException {
+        this.context = appContext;
     }
 }

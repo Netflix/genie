@@ -22,13 +22,11 @@ import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.client.CommandServiceClient;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.CommandStatus;
-
-import java.util.ArrayList;
+import com.netflix.genie.common.model.CommandStatus;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +53,8 @@ public final class CommandServiceSampleClient {
      * Name for the sample command.
      */
     protected static final String CMD_NAME = "pig";
+
+    private static final String CMD_VERSION = "1.0";
 
     /**
      * Private constructor.
@@ -98,11 +98,8 @@ public final class CommandServiceSampleClient {
         final CommandServiceClient commandClient = CommandServiceClient.getInstance();
 
         LOG.info("Creating command pig13_mr2");
-        final List<Application> apps = new ArrayList<Application>();
-        apps.add(app1);
-        apps.add(app2);
         final Command command1 = commandClient.createCommand(createSampleCommand(ID));
-        commandClient.addApplicationsToCommand(command1.getId(), apps);
+        commandClient.setApplicationForCommand(command1.getId(), app1);
         LOG.info("Created command:");
         LOG.info(command1.toString());
 
@@ -158,41 +155,13 @@ public final class CommandServiceSampleClient {
             LOG.info("Config = " + config);
         }
 
-        LOG.info("Applications for command with id " + command1.getId());
-        final List<Application> applications = commandClient.getApplicationsForCommand(command1.getId());
-        for (final Application application : applications) {
-            LOG.info("Application = " + application);
-        }
+        LOG.info("Application for command with id " + command1.getId());
+        final Application application = commandClient.getApplicationForCommand(command1.getId());
+        LOG.info("Application = " + application);
 
-        LOG.info("Adding applications to command with id " + command1.getId());
-        final List<Application> newApps = new ArrayList<Application>();
-        newApps.add(ApplicationServiceSampleClient.getSampleApplication(ID + "something"));
-        newApps.add(ApplicationServiceSampleClient.getSampleApplication(null));
-        final List<Application> applications2 = commandClient.addApplicationsToCommand(command1.getId(), newApps);
-        for (final Application application : applications2) {
-            LOG.info("Application = " + application);
-        }
-
-        LOG.info("Updating set of applications files associated with id " + command1.getId());
-        //This should remove the original config leaving only the two in this set
-        final List<Application> applications3 = commandClient.updateApplicationsForCommand(command1.getId(), newApps);
-        for (final Application application : applications3) {
-            LOG.info("Application = " + application);
-        }
-
-        LOG.info("Deleting the application from the command with id " + ID + "something");
-        final List<Application> applications4 =
-                commandClient.removeApplicationForCommand(command1.getId(), ID + "something");
-        for (final Application application : applications4) {
-            LOG.info("Application = " + application);
-        }
-
-        LOG.info("Deleting all the applications from the command with id " + command1.getId());
-        final List<Application> applications5 = commandClient.removeAllApplicationsForCommand(command1.getId());
-        for (final Application application : applications5) {
-            //Shouldn't print anything
-            LOG.info("Application = " + application);
-        }
+        LOG.info("Removing Application for command with id " + command1.getId());
+        final Application application2 = commandClient.removeApplicationForCommand(command1.getId());
+        LOG.info("Application = " + application2);
 
         LOG.info("Getting all the clusters for command with id  " + command1.getId());
         final Set<Cluster> clusters = commandClient.getClustersForCommand(command1.getId());
@@ -217,43 +186,22 @@ public final class CommandServiceSampleClient {
      * Create a sample command and attach the the supplied applications.
      *
      * @param id The id to use or null if want one created.
-     * @param apps The apps to add to this command or null/empty for none.
      * @return The pig example command
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public static Command createSampleCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         final Command command = new Command(
                 CMD_NAME,
                 "tgianos",
                 CommandStatus.ACTIVE,
-                "/apps/pig/0.13/bin/pig");
+                "/apps/pig/0.13/bin/pig",
+                CMD_VERSION);
         if (!StringUtils.isEmpty(id)) {
             command.setId(id);
         }
         command.setEnvPropFile("s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh");
         command.setVersion("0.13");
         return command;
-    }
-
-    /**
-     * Create a sample command.
-     *
-     * @param id The id to use or null if want one created.
-     * @return An example command
-     * @throws CloudServiceException
-     */
-    public static Command getSampleCommand(
-            final String id)
-                    throws CloudServiceException {
-        final Command cmd = new Command(CMD_NAME, "amsharma", CommandStatus.ACTIVE, "/foo/exec.sh");
-        if (StringUtils.isNotEmpty(id)) {
-            cmd.setId(id);
-        }
-        cmd.setVersion("2.4.0");
-        final Set<String> configs = new HashSet<String>();
-        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml");
-        cmd.setConfigs(configs);
-        return cmd;
     }
 }

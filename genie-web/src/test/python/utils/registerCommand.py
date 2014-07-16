@@ -27,12 +27,13 @@ import uuid
 import restclient
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/commands'
+serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/commands'
 
 def addCommandConfigProdhive11Mr1():
     print "Adding Command prodhive11_mr1"
     ID = "prodhive11_mr1"
     configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
+    tags = json.dumps(['tag1','tag2','tag3'])
     apps = json.dumps([{"id":"mr1"}])
     payload = '''
     {
@@ -43,6 +44,7 @@ def addCommandConfigProdhive11Mr1():
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/envFile.sh",
         "user" : "amsharma", 
         "version" : "0.11",
+        "tags": ''' + tags + ''',
         "configs": ''' + configs + '''
     }
     '''
@@ -53,6 +55,7 @@ def addCommandConfigProdhive11Mr1():
 def addCommandConfigHadoop103():
     print "Adding Command hadoop103"
     ID = "hadoop103"
+    tags = json.dumps(['tag1','tag2','tag3'])
     apps = json.dumps([{"id":"mr1"}])
     payload = '''
     {
@@ -61,6 +64,7 @@ def addCommandConfigHadoop103():
         "status" : "ACTIVE",
         "executable": "/apps/hadoop/1.0.3/bin/hadoop",
         "user" : "amsharma", 
+        "tags": ''' + tags + ''',
         "version" : "1.0.3"
     }
     '''
@@ -73,6 +77,7 @@ def addCommandConfigProdhive11Mr2():
     print "Adding Command prodhive11_mr2"
     ID = "prodhive11_mr2"
     configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
+    tags = json.dumps(['tag1','tag2','tag3'])
     apps = json.dumps([{"id":"mr2"}])
     payload = '''
     {
@@ -83,6 +88,7 @@ def addCommandConfigProdhive11Mr2():
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr2/envFile.sh",
         "user" : "amsharma", 
         "version" : "0.11",
+        "tags": ''' + tags + ''',
         "configs": ''' + configs + '''
     }
     '''
@@ -94,6 +100,7 @@ def addCommandConfigProdhive11Mr2():
 def addCommandConfigPig11Mr1():
     print "Adding Command pig11_mr1"
     ID = "pig11_mr1"
+    tags = json.dumps(['tag1','tag2','tag3'])
     apps = json.dumps([{"id":"mr1"}])
     payload = '''
     {
@@ -103,6 +110,7 @@ def addCommandConfigPig11Mr1():
         "executable": "/apps/pig/0.11/bin/pig",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr1/envFile.sh",
         "user" : "amsharma", 
+        "tags": ''' + tags + ''',
         "version" : "0.11"
     }
     '''
@@ -113,6 +121,7 @@ def addCommandConfigPig11Mr1():
 def addCommandConfigPig11Mr2():
     print "Adding Command pig11_mr2"
     ID = "pig11_mr2"
+    tags = json.dumps(['tag1','tag2','tag3'])
     apps = json.dumps([{"id":"mr2"}])
     payload = '''
     {
@@ -122,6 +131,7 @@ def addCommandConfigPig11Mr2():
         "executable": "/apps/pig/0.11-h2/bin/pig",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr2/envFile.sh",
         "user" : "amsharma", 
+        "tags": ''' + tags + ''',
         "version" : "0.11-h2"
     }
     '''
@@ -132,6 +142,7 @@ def addCommandConfigPig11Mr2():
 def addCommandConfigPig13Mr2():
     print "Adding Command pig13_mr2"
     ID = "pig13_mr2"
+    tags = json.dumps(['tag1','tag2','tag3'])
     apps = json.dumps([{"id":"mr2"}])
     payload = '''
     {
@@ -141,6 +152,7 @@ def addCommandConfigPig13Mr2():
         "executable": "/apps/pig/0.13/bin/pig",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh",
         "user" : "amsharma", 
+        "tags": ''' + tags + ''',
         "version" : "0.13"
     }
     '''

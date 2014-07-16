@@ -16,6 +16,7 @@
 package com.netflix.genie.server.health;
 
 import com.netflix.karyon.spi.HealthCheckHandler;
+import java.net.HttpURLConnection;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,6 @@ public class HealthCheck implements HealthCheckHandler {
     public int getStatus() {
         //TODO: Custom health check logic goes here
         LOG.debug("Health check invoked.");
-        return 200;
+        return HttpURLConnection.HTTP_OK;
     }
 }

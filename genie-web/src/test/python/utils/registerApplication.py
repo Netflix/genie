@@ -31,7 +31,7 @@ import restclient
 GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/applications'
+serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/applications'
 
 
 def addApplicationConfigMr1():
@@ -39,6 +39,8 @@ def addApplicationConfigMr1():
     ID = "mr1"
     configs = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/mapred-site.xml'])
     jars = json.dumps(['s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar'])
+    tags = json.dumps(['sla','cprod1','bdp_prod_20140101'])
+
     payload = '''
     {
         "id":"''' + ID +'''",
@@ -60,6 +62,7 @@ def addApplicationConfigMr2():
     ID = "mr2"
     configs = json.dumps(['s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml'])
     jars = json.dumps(['s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar'])
+    tags = json.dumps(['sla','cprod1','bdp_prod_20140101'])
     
     payload = '''
     {
@@ -69,6 +72,7 @@ def addApplicationConfigMr2():
         "user" : "amsharma", 
         "version" : "2.4.0",
         "configs": ''' + configs + ''', 
+        "tags": ''' + tags + ''',
         "jars": ''' + jars + ''' 
     }
     '''
@@ -78,6 +82,7 @@ def addApplicationConfigMr2():
 
 def addApplicationConfigTz1():
     print "Creating App tz1"
+    tags = json.dumps(['sla','cprod1','bdp_prod_20140101'])
     
     ID = "tz1"
     payload = '''
@@ -86,6 +91,7 @@ def addApplicationConfigTz1():
         "name": "tez", 
         "status" : "ACTIVE",
         "user" : "amsharma",
+        "tags": ''' + tags + ''',
         "version" : "1.0"
     }
     '''

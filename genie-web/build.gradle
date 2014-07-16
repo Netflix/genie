@@ -1,6 +1,6 @@
 apply plugin: 'war'
 
 dependencies {
-    runtime 'com.netflix.karyon:karyon-admin-web:1.0.22'
     runtime project(':genie-server')
+    runtime 'com.netflix.karyon:karyon-admin-web:1.0.22'
 }

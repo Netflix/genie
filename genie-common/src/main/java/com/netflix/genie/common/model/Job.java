@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2014 Netflix, Inc.
+\ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -30,15 +28,20 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.StringUtils;
@@ -57,25 +60,17 @@ import org.slf4j.LoggerFactory;
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Job extends Auditable implements Serializable {
+public class Job extends CommonEntityFields {
 
     private static final long serialVersionUID = 2979506788441089067L;
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
     private static final char CRITERIA_SET_DELIMITER = '|';
     private static final char CRITERIA_DELIMITER = ',';
+    private static final String DEFAULT_VERSION = "-1" ;
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
     // ------------------------------------------------------------------------
-    /**
-     * User who submitted the job (REQUIRED).
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "User who submitted this job",
-            required = true)
-    private String user;
-
     /**
      * Command line arguments (REQUIRED).
      */
@@ -85,14 +80,6 @@ public class Job extends Auditable implements Serializable {
             value = "Command line arguments for the job",
             required = true)
     private String commandArgs;
-
-    /**
-     * User-specified or system-generated job name.
-     */
-    @Basic
-    @ApiModelProperty(
-            value = "Name specified for the job")
-    private String name;
 
     /**
      * Human readable description.
@@ -110,14 +97,6 @@ public class Job extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "group name of the user who submitted this job")
     private String group;
-
-    /**
-     * Client - UC4, Ab Initio, Search.
-     */
-    @Basic
-    @ApiModelProperty(
-            value = "Client from where the job was submitted")
-    private String client;
 
     /**
      * Alias - Cluster Name of the cluster selected to run the job.
@@ -150,6 +129,14 @@ public class Job extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "List of criteria containing tags to use to pick a cluster to run this job")
     private List<ClusterCriteria> clusterCriteria;
+    
+    /**
+     * Set of tags to use for selecting command (REQUIRED).
+     */
+    @Transient
+    @ApiModelProperty(
+            value = "List of criteria containing tags to use to pick a command to run this job")
+    private Set<String> commandCriteria;
 
     /**
      * String representation of the the cluster criteria array list object
@@ -160,6 +147,26 @@ public class Job extends Auditable implements Serializable {
     @Lob
     @Basic(optional = false)
     private String clusterCriteriaString;
+    
+    /**
+     * String representation of the the command criteria set object
+     * above.
+     */
+    @XmlTransient
+    @JsonIgnore
+    @Lob
+    @Basic(optional = false)
+    private String commandCriteriaString;
+
+    /**
+     * String representation of the criteria that was successfully
+     * used to select a cluster.
+     */
+    @XmlTransient
+    @JsonIgnore
+    @Lob
+    @Basic(optional = false)
+    private String chosenClusterCriteriaString;
 
     /**
      * File dependencies.
@@ -194,6 +201,17 @@ public class Job extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "Email address to send notifications to on job completion.")
     private String email;
+
+    /**
+     * Set of tags for a job.
+     */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the tags"
+            + " associated with this job.")
+    private Set<String> tags;
 
     // ------------------------------------------------------------------------
     // Genie2 command and application combinations to be specified by the user while running jobs.
@@ -239,6 +257,8 @@ public class Job extends Auditable implements Serializable {
      * PID for job - updated by the server.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The process handle.")
     private int processHandle = -1;
 
     /**
@@ -246,36 +266,48 @@ public class Job extends Auditable implements Serializable {
      */
     @Basic
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(
+            value = "The current status of the job.")
     private JobStatus status;
 
     /**
      * More verbose status message.
      */
     @Basic
+    @ApiModelProperty(
+            value = "A status message about the job.")
     private String statusMsg;
 
     /**
      * Start time for job - initialized to null.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The start time of the job.")
     private Long startTime;
 
     /**
      * Finish time for job - initialized to zero (for historic reasons).
      */
     @Basic
+    @ApiModelProperty(
+            value = "The end time of the job.")
     private Long finishTime = 0L;
 
     /**
-     * The host/ip address of the client submitting job.
+     * The host/IP address of the client submitting job.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The host of the client submitting the job.")
     private String clientHost;
 
     /**
      * The genie host name on which the job is being run.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The host where the job is being run.")
     private String hostName;
 
     /**
@@ -283,30 +315,40 @@ public class Job extends Auditable implements Serializable {
      * instance.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The URI to use to kill the job.")
     private String killURI;
 
     /**
      * URI to fetch the stdout/err and logs.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The URI where to find job output.")
     private String outputURI;
 
     /**
      * Job exit code.
      */
     @Basic
+    @ApiModelProperty(
+            value = "The exit code of the job.")
     private Integer exitCode;
 
     /**
      * Whether this job was forwarded to new instance or not.
      */
     @Basic
+    @ApiModelProperty(
+            value = "Whether this job was forwared or not.")
     private boolean forwarded;
 
     /**
      * Location of logs being archived to s3.
      */
     @Lob
+    @ApiModelProperty(
+            value = "Where the logs were archived in S3.")
     private String archiveLocation;
 
     /**
@@ -327,48 +369,52 @@ public class Job extends Auditable implements Serializable {
      * @param commandArgs The command line arguments for the job. Not
      * null/empty/blank.
      * @param clusterCriteria The cluster criteria for the job. Not null/empty.
-     * @throws CloudServiceException
+     * @param version The version of this job
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Job(
             final String user,
-            final String commandId,
-            final String commandName,
+            final String name,
             final String commandArgs,
-            final List<ClusterCriteria> clusterCriteria) throws CloudServiceException {
-        this.user = user;
-        this.commandId = commandId;
-        this.commandName = commandName;
+            final Set<String> commandCriteria,
+            final List<ClusterCriteria> clusterCriteria,
+            final String version) throws GenieException {
+        super(name, user, version);
+
         this.commandArgs = commandArgs;
         this.clusterCriteria = clusterCriteria;
+        this.commandCriteria = commandCriteria;
     }
 
     /**
      * Makes sure non-transient fields are set from transient fields.
      *
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @PrePersist
-    protected void onCreateJob() throws CloudServiceException {
-        validate(this.user, this.commandId, this.commandName, this.commandArgs, this.clusterCriteria);
-        this.clusterCriteriaString = criteriaToString(this.clusterCriteria);
+    protected void onCreateJob() throws GenieException {
+        validate(this.getUser(), this.commandCriteria, this.commandArgs, this.clusterCriteria, this.getName());
+        this.clusterCriteriaString = clusterCriteriaToString(this.clusterCriteria);
+        this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
+        // Add the id to the tags
+        if (this.tags == null) {
+            this.tags = new HashSet<String>();
+            this.tags.add(this.getId());
+        }
+        
+        // Set version to -1 if not specified
+        if (StringUtils.isBlank(this.getVersion())) {
+            this.setVersion(DEFAULT_VERSION);
+        }
     }
 
     /**
-     * Gets the name for this job.
-     *
-     * @return name
+     * On any update to the entity will add id to tags.
      */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Sets the name for this job.
-     *
-     * @param name name for the job
-     */
-    public void setName(final String name) {
-        this.name = name;
+    @PreUpdate
+    protected void onUpdateJob() {
+        // Add the id to the tags
+        this.tags.add(this.getId());
     }
 
     /**
@@ -390,30 +436,6 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the user who submit the job.
-     *
-     * @return the user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Sets the user who submits the job.
-     *
-     * @param user user submitting the job
-     * @throws CloudServiceException
-     */
-    public void setUser(final String user) throws CloudServiceException {
-        if (StringUtils.isBlank(user)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No user entered.");
-        }
-        this.user = user;
-    }
-
-    /**
      * Gets the group name of the user who submitted the job.
      *
      * @return group
@@ -429,26 +451,6 @@ public class Job extends Auditable implements Serializable {
      */
     public void setGroup(final String group) {
         this.group = group;
-    }
-
-    /**
-     * Get the client from which this job is submitted. used for
-     * grouping/identifying the source.
-     *
-     * @return client
-     */
-    public String getClient() {
-        return this.client;
-    }
-
-    /**
-     * Sets the client from which the job is submitted.
-     *
-     * @param client client from which the job is submitted. Used for book
-     * keeping/grouping.
-     */
-    public void setClient(final String client) {
-        this.client = client;
     }
 
     /**
@@ -490,7 +492,7 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the criteria which was specified to pick a cluster to run the job.
+     * Gets the cluster criteria which was specified to pick a cluster to run the job.
      *
      * @return clusterCriteria
      */
@@ -502,16 +504,16 @@ public class Job extends Auditable implements Serializable {
      * Sets the list of cluster criteria specified to pick a cluster.
      *
      * @param clusterCriteria The criteria list
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setClusterCriteria(final List<ClusterCriteria> clusterCriteria) throws CloudServiceException {
+    public void setClusterCriteria(final List<ClusterCriteria> clusterCriteria) throws GenieException {
         if (clusterCriteria == null || clusterCriteria.isEmpty()) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No user entered.");
         }
         this.clusterCriteria = clusterCriteria;
-        this.clusterCriteriaString = criteriaToString(clusterCriteria);
+        this.clusterCriteriaString = clusterCriteriaToString(clusterCriteria);
     }
 
     /**
@@ -529,11 +531,11 @@ public class Job extends Auditable implements Serializable {
      *
      * @param commandArgs Arguments to be used to run the command with. Not
      * null/empty/blank.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setCommandArgs(final String commandArgs) throws CloudServiceException {
+    public void setCommandArgs(final String commandArgs) throws GenieException {
         if (StringUtils.isBlank(commandArgs)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command args entered.");
         }
@@ -571,15 +573,15 @@ public class Job extends Auditable implements Serializable {
      * Set the attachments for this job.
      *
      * @param attachments The attachments to set
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setAttachments(final Set<FileAttachment> attachments) throws CloudServiceException {
+    public void setAttachments(final Set<FileAttachment> attachments) throws GenieException {
         if (attachments != null) {
             this.attachments = attachments;
         } else {
             final String msg = "No attachments passed in to set. Unable to continue.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 
@@ -671,11 +673,11 @@ public class Job extends Auditable implements Serializable {
      *
      * @param commandName Name of the command if specified on which the job is
      * run
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setCommandName(final String commandName) throws CloudServiceException {
+    public void setCommandName(final String commandName) throws GenieException {
         if (StringUtils.isBlank(commandName)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command name entered.");
         }
@@ -695,11 +697,11 @@ public class Job extends Auditable implements Serializable {
      * Set command Id with which this job is run.
      *
      * @param commandId Id of the command if specified on which the job is run
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setCommandId(final String commandId) throws CloudServiceException {
+    public void setCommandId(final String commandId) throws GenieException {
         if (StringUtils.isBlank(commandId)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered.");
         }
@@ -925,7 +927,7 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
-     * Get the criteria specified to run this job in string format.
+     * Get the cluster criteria specified to run this job in string format.
      *
      * @return clusterCriteriaString
      */
@@ -934,19 +936,59 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
+     * Gets the command criteria which was specified to pick a command to run the job.
+     *
+     * @return commandCriteria
+     */
+    public Set<String> getCommandCriteria() {
+        return this.commandCriteria;
+    }
+
+    /**
+     * Sets the set of command criteria specified to pick a command.
+     *
+     * @param commandCriteria The criteria list
+     * @throws GenieException
+     */
+    public void setCommandCriteria(Set<String> commandCriteria) throws GenieException {
+        this.commandCriteria = commandCriteria;
+        this.commandCriteriaString = commandCriteriaToString(commandCriteria);
+    }
+
+    /**
+     * Get the command criteria specified to run this job in string format.
+     *
+     * @return commandCriteriaString
+     */
+    public String getCommandCriteriaString() {
+        return this.commandCriteriaString;
+    }
+
+    /**
+     * Set the command criteria string.
+     *
+     * @param commandCriteriaString A set of command criteria tags
+     * @throws GenieException
+     */
+    public void setCommandCriteriaString(String commandCriteriaString) throws GenieException {
+        this.commandCriteriaString = commandCriteriaString;
+        this.commandCriteria = stringToCommandCriteria(commandCriteriaString); 
+    }
+
+    /**
      * Set the cluster criteria string.
      *
      * @param clusterCriteriaString A list of cluster criteria objects
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    protected void setClusterCriteriaString(final String clusterCriteriaString) throws CloudServiceException {
+    protected void setClusterCriteriaString(final String clusterCriteriaString) throws GenieException {
         if (StringUtils.isBlank(clusterCriteriaString)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No clusterCriteriaString passed in to set. Unable to continue.");
         }
         this.clusterCriteriaString = clusterCriteriaString;
-        this.clusterCriteria = stringToCriteria(clusterCriteriaString);
+        this.clusterCriteria = stringToClusterCriteria(clusterCriteriaString);
     }
 
     /**
@@ -957,11 +999,11 @@ public class Job extends Auditable implements Serializable {
     public void setJobStatus(final JobStatus jobStatus) {
         this.status = jobStatus;
 
-        if (jobStatus == Types.JobStatus.INIT) {
+        if (jobStatus == JobStatus.INIT) {
             setStartTime(System.currentTimeMillis());
-        } else if (jobStatus == Types.JobStatus.SUCCEEDED
-                || jobStatus == Types.JobStatus.KILLED
-                || jobStatus == Types.JobStatus.FAILED) {
+        } else if (jobStatus == JobStatus.SUCCEEDED
+                || jobStatus == JobStatus.KILLED
+                || jobStatus == JobStatus.FAILED) {
             setFinishTime(System.currentTimeMillis());
         }
     }
@@ -997,23 +1039,57 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
+     * Gets the tags allocated to this job.
+     *
+     * @return the tags as an unmodifiable list
+     */
+    public Set<String> getTags() {
+        return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this job.
+     *
+     * @param tags the tags to set. Not Null.
+     * @throws GenieException
+     */
+    public void setTags(final Set<String> tags) throws GenieException {
+        this.tags = tags;
+    }
+
+    /**
+     * Gets the criteria used to select a cluster for this job.
+     *
+     * @return the criteria containing tags which was chosen to 
+     * select a cluster to run this job.
+     */
+    public String getChosenClusterCriteriaString() {
+        return chosenClusterCriteriaString;
+    }
+
+    /**
+     * Sets the criteria used to select cluster to run this job.
+     *
+     * @param chosenClusterCriteriaString he criteria used to select cluster to run this job.
+     * @throws GenieException
+     */
+    public void setChosenClusterCriteriaString(String chosenClusterCriteriaString) {
+        this.chosenClusterCriteriaString = chosenClusterCriteriaString;
+    }
+    
+    /**
      * Check to make sure that the required parameters exist.
      *
      * @param job The configuration to check
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public static void validate(final Job job) throws CloudServiceException {
-        if (job == null) {
-            final String msg = "Required parameter job can't be NULL";
-            LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-        validate(
-                job.getUser(),
-                job.getCommandId(),
-                job.getCommandName(),
-                job.getCommandArgs(),
-                job.getClusterCriteria());
+    public void validate() throws GenieException {
+        this.validate(
+                this.getUser(),
+                this.getCommandCriteria(),
+                this.getCommandArgs(),
+                this.getClusterCriteria(), 
+                this.getName());
     }
 
     /**
@@ -1024,21 +1100,21 @@ public class Job extends Auditable implements Serializable {
      * @param commandName The name of the command to run for the job
      * @param commandArgs The command line arguments for the job
      * @param criteria The cluster criteria for the job
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    private static void validate(
+    private void validate(
             final String user,
-            final String commandId,
-            final String commandName,
+            final Set<String> commandCriteria,
             final String commandArgs,
-            final List<ClusterCriteria> criteria) throws CloudServiceException {
+            final List<ClusterCriteria> criteria,
+            final String name) throws GenieException {
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing.\n");
+        
+        super.validate(builder, name, user);
+        if (commandCriteria == null || commandCriteria.isEmpty()) {
+            builder.append("Command criteria is mandatory to figure out a command to run the job.\n");
         }
-        if (StringUtils.isBlank(commandId) && StringUtils.isBlank(commandName)) {
-            builder.append("Need one of command id or command name in order to run a job\n");
-        }
+        
         if (StringUtils.isEmpty(commandArgs)) {
             builder.append("Command arguments are required\n");
         }
@@ -1050,7 +1126,7 @@ public class Job extends Auditable implements Serializable {
             builder.insert(0, "Job configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 
@@ -1060,9 +1136,9 @@ public class Job extends Auditable implements Serializable {
      * @param clusterCriteria2 The criteria to build up from
      * @return The cluster criteria string
      */
-    private String criteriaToString(final List<ClusterCriteria> clusterCriteria2) throws CloudServiceException {
+    private String clusterCriteriaToString(final List<ClusterCriteria> clusterCriteria2) throws GenieException {
         if (clusterCriteria2 == null || clusterCriteria2.isEmpty()) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster criteria entered unable to create string");
         }
@@ -1077,18 +1153,54 @@ public class Job extends Auditable implements Serializable {
     }
 
     /**
+     * Helper method for building the cluster criteria string.
+     *
+     * @param clusterCriteria2 The criteria to build up from
+     * @return The cluster criteria string
+     */
+    private String commandCriteriaToString(final Set<String> commandCriteria2) throws GenieException {
+        if (commandCriteria2 == null || commandCriteria2.isEmpty()) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command criteria entered unable to create string");
+        }
+        return StringUtils.join(commandCriteria,CRITERIA_DELIMITER);
+    }
+    
+    /**
      * Convert a string to cluster criteria objects.
      *
      * @param criteriaString The string to convert
      * @return The set of ClusterCriteria
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    private List<ClusterCriteria> stringToCriteria(final String criteriaString) throws CloudServiceException {
+    private Set<String> stringToCommandCriteria(final String criteriaString) throws GenieException {
+        final String[] criterias = StringUtils.split(criteriaString, CRITERIA_DELIMITER);
+        if (criterias == null || criterias.length == 0) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command criteria found. Unable to continue.");
+        }
+        final Set<String> c = new HashSet<String>();
+        for (final String criteria : criterias) {
+            c.add(criteria);
+        }
+        return c;
+    }
+    
+    /**
+     * Convert a string to cluster criteria objects.
+     *
+     * @param criteriaString The string to convert
+     * @return The set of ClusterCriteria
+     * @throws com.netflix.genie.common.exceptions.GenieException
+     */
+    private List<ClusterCriteria> stringToClusterCriteria(final String criteriaString) throws GenieException {
         //Rebuild the cluster criteria objects
         final List<ClusterCriteria> cc = new ArrayList<ClusterCriteria>();
         final String[] criteriaSets = StringUtils.split(criteriaString, CRITERIA_SET_DELIMITER);
         if (criteriaSets == null || criteriaSets.length == 0) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No cluster criteria found. Unable to continue.");
         }
@@ -1104,7 +1216,7 @@ public class Job extends Auditable implements Serializable {
             cc.add(new ClusterCriteria(c));
         }
         if (cc.isEmpty()) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No Cluster Criteria found. Unable to continue");
         }

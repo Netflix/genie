@@ -24,7 +24,7 @@ import com.netflix.genie.client.ExecutionServiceClient;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Types.JobStatus;
+import com.netflix.genie.common.model.JobStatus;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -65,6 +65,7 @@ public final class ExecutionServiceSampleClient {
         ExecutionServiceClient client = ExecutionServiceClient.getInstance();
 
         final String userName = "genietest";
+        final String jobName  = "sampleClientTestJob";
         System.out.println("Getting jobInfos using specified filter criteria");
         final Multimap<String, String> params = ArrayListMultimap.create();
         params.put("userName", userName);
@@ -80,14 +81,17 @@ public final class ExecutionServiceSampleClient {
         final Set<String> criteriaTags = new HashSet<String>();
         criteriaTags.add("prod");
         final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
-        final List<ClusterCriteria> criterias = new ArrayList<ClusterCriteria>();
-        criterias.add(criteria);
+        final List<ClusterCriteria> clusterCriterias = new ArrayList<ClusterCriteria>();
+        final Set<String> commandCriteria = new HashSet<String>();
+        clusterCriterias.add(criteria);
+        
         Job job = new Job(
                 userName,
-                CommandServiceSampleClient.ID,
-                null,
+                jobName,
                 "-f hive.q",
-                criterias);
+                commandCriteria,
+                clusterCriterias,
+                null);
         job.setDescription("This is a test");
         // send the query as an attachment
         File query = File.createTempFile("hive", ".q");

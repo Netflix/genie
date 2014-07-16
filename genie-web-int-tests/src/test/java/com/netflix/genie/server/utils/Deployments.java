@@ -54,6 +54,9 @@ public final class Deployments {
         archive.setWebXML("web.xml");
         // adds the archaius configuration
         archive.addAsResource("config.properties");
+        archive.addAsResource("persistence.xml");
+        archive.addAsResource("genie-application-int.xml");
+        archive.addAsResource("genie-jpa-int.xml");
 
         return archive;
     }

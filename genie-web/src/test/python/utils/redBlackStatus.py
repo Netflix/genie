@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # get list of running jobs
     jobInfo = []
     base_url = EurekaClient().getServiceBaseUrl() + '/genie/'
-    service_url = base_url + 'v0/jobs?status=RUNNING'
+    service_url = base_url + 'v2/jobs?status=RUNNING'
     req = urllib2.Request(url=service_url)
     req.add_header('Accept', 'application/json')
     assert req.get_method() == 'GET'

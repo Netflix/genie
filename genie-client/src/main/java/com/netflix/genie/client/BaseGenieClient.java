@@ -28,7 +28,7 @@ import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.discovery.DefaultEurekaClientConfig;
 import com.netflix.discovery.DiscoveryManager;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.niws.client.http.RestClient;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -73,7 +73,7 @@ public class BaseGenieClient {
     /**
      * Standard root for all rest services.
      */
-    protected static final String BASE_REST_URL = "/genie/v1/";
+    protected static final String BASE_REST_URL = "/genie/v2/";
 
     /**
      * Reusable String for /.
@@ -127,11 +127,21 @@ public class BaseGenieClient {
                 new DefaultEurekaClientConfig());
     }
 
+    /**
+     * Build a HTTP request from the given parameters.
+     *
+     * @param verb The type of HTTP request to use.
+     * @param requestUri The URI to send the request to.
+     * @param params Any query parameters to send along with the request.
+     * @param entity An entity if required to add to the request.
+     * @return The HTTP request.
+     * @throws GenieException
+     */
     protected HttpRequest buildRequest(
             final Verb verb,
             final String requestUri,
             final Multimap<String, String> params,
-            final Object entity) throws CloudServiceException {
+            final Object entity) throws GenieException {
         try {
             final HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .verb(verb)
@@ -146,42 +156,54 @@ public class BaseGenieClient {
             return builder.build();
         } catch (final URISyntaxException use) {
             LOG.error(use.getMessage(), use);
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, use);
         }
     }
 
+    /**
+     * Execute a HTTP request.
+     *
+     * @param <C> The collection class if a collection is the expected response
+     * entity.
+     * @param request The request to send
+     * @param collectionClass The collection class. Null if none expected.
+     * @param entityClass The entity class. Not null.
+     * @return The response entity.
+     * @throws GenieException
+     */
     protected <C extends Collection> Object executeRequest(
             final HttpRequest request,
             final Class<C> collectionClass,
-            final Class entityClass) throws CloudServiceException {
+            final Class entityClass) throws GenieException {
         HttpResponse response = null;
         try {
             response = this.client.executeWithLoadBalancer(request);
             if (response.isSuccess()) {
                 if (collectionClass != null) {
                     final ObjectMapper mapper = new ObjectMapper();
-                    final CollectionType type = 
-                            mapper.getTypeFactory().constructCollectionType(collectionClass, entityClass);
+                    final CollectionType type = mapper.
+                            getTypeFactory().
+                            constructCollectionType(collectionClass, entityClass);
                     return mapper.readValue(response.getInputStream(), type);
                 } else if (entityClass != null) {
                     return response.getEntity(entityClass);
                 } else {
-                    throw new CloudServiceException(
+                    throw new GenieException(
                             HttpURLConnection.HTTP_BAD_REQUEST,
                             "No return type entered.");
                 }
             } else {
-                throw new CloudServiceException(
+                throw new GenieException(
                         response.getStatus(),
                         response.getEntity(String.class));
             }
         } catch (final Exception e) {
-            if (e instanceof CloudServiceException) {
-                throw (CloudServiceException) e;
+            if (e instanceof GenieException) {
+                throw (GenieException) e;
             } else {
                 LOG.error(e.getMessage(), e);
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, e);
             }
         } finally {

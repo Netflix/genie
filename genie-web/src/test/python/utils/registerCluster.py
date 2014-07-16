@@ -27,7 +27,7 @@ import uuid
 import restclient
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v1/config/clusters'
+serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/clusters'
 
 def addClusterConfigCprod1():
     print "Registering Cprod1"

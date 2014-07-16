@@ -17,16 +17,20 @@
  */
 package com.netflix.genie.server.services.impl;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.Types.ClusterStatus;
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test for the cluster load balancer.
@@ -34,40 +38,43 @@ import org.junit.Test;
  * @author skrishnan
  * @author tgianos
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:genie-application-test.xml")
 public class TestRandomizedClusterLoadBalancerImpl {
 
-    private final ClusterLoadBalancer clb = new RandomizedClusterLoadBalancerImpl();
+    @Inject
+    private ClusterLoadBalancer clb;
 
     /**
      * Test whether a cluster is returned from a set of candidates.
      *
-     * @throws CloudServiceException if anything went wrong with the test.
+     * @throws GenieException if anything went wrong with the test.
      */
     @Test
-    public void testValidCluster() throws CloudServiceException {
+    public void testValidCluster() throws GenieException {
         final Set<String> configs = new HashSet<String>();
         configs.add("SomeConfig");
-        final Cluster cce = new Cluster("name", "tgianos", ClusterStatus.UP, "jobManager", configs);
+        final Cluster cce = new Cluster("name", "tgianos", ClusterStatus.UP, "jobManager", configs, "2.4.0");
         assertNotNull(this.clb.selectCluster(Arrays.asList(new Cluster[]{cce, cce, cce})));
     }
 
     /**
      * Ensure exception is thrown if no cluster is found.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    @Test(expected = CloudServiceException.class)
-    public void testEmptyList() throws CloudServiceException {
+    @Test(expected = GenieException.class)
+    public void testEmptyList() throws GenieException {
         this.clb.selectCluster(new ArrayList<Cluster>());
     }
 
     /**
      * Ensure exception is thrown if no cluster is found.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    @Test(expected = CloudServiceException.class)
-    public void testNullList() throws CloudServiceException {
+    @Test(expected = GenieException.class)
+    public void testNullList() throws GenieException {
         this.clb.selectCluster(null);
     }
 }

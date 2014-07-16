@@ -17,34 +17,48 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test case for Job Status utility methods.
+ * Tests for the JobStatus enum.
  *
- * @author skrishnan
+ * @author tgianos
  */
 public class TestJobStatus {
 
     /**
-     * Tests whether a job status is updated correctly, and update time is
-     * changed accordingly.
+     * Tests whether a valid job status is parsed correctly.
+     *
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     @Test
-    public void testSetJobStatus() {
-        Job job = new Job();
+    public void testValidJobStatus() throws GenieException {
+        Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.FAILED, JobStatus.parse(JobStatus.FAILED.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.KILLED, JobStatus.parse(JobStatus.KILLED.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.INIT, JobStatus.parse(JobStatus.INIT.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.SUCCEEDED, JobStatus.parse(JobStatus.SUCCEEDED.name().toLowerCase()));
+    }
 
-        // finish time is 0 on initialization
-        Assert.assertTrue(0L == job.getFinishTime());
+    /**
+     * Tests whether an invalid job status returns null.
+     *
+     * @throws com.netflix.genie.common.exceptions.GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testInvalidJobStatus() throws GenieException {
+        JobStatus.parse("DOES_NOT_EXIST");
+    }
 
-        // start time is not zero on INIT, finish time is still 0
-        job.setJobStatus(Types.JobStatus.INIT);
-        Assert.assertNotNull(job.getStartTime());
-        Assert.assertTrue(0L == job.getFinishTime());
-
-        // finish time is non-zero on completion
-        job.setJobStatus(Types.JobStatus.SUCCEEDED);
-        Assert.assertFalse(0L == job.getFinishTime());
+    /**
+     * Tests whether an invalid application status throws exception.
+     *
+     * @throws com.netflix.genie.common.exceptions.GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testBlankJobStatus() throws GenieException {
+        JobStatus.parse(null);
     }
 }

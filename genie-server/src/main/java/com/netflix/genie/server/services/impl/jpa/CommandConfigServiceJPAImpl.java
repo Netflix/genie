@@ -17,29 +17,28 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Command_;
-import com.netflix.genie.server.persistence.PersistenceManager;
+import com.netflix.genie.server.repository.jpa.ApplicationRepository;
+import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.PersistenceContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the CommandConfigService interface.
@@ -47,47 +46,80 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
+@Named
+@Transactional(rollbackFor = GenieException.class)
 public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(CommandConfigServiceJPAImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CommandConfigServiceJPAImpl.class);
 
-    private final PersistenceManager<Command> pm;
+    @PersistenceContext
+    private EntityManager em;
+
+    private final CommandRepository commandRepo;
+    private final ApplicationRepository appRepo;
 
     /**
      * Default constructor.
+     *
+     * @param commandRepo the command repository to use
+     * @param appRepo the application repository to use
      */
-    public CommandConfigServiceJPAImpl() {
-        // instantiate PersistenceManager
-        this.pm = new PersistenceManager<Command>();
+    @Inject
+    public CommandConfigServiceJPAImpl(
+            final CommandRepository commandRepo,
+            final ApplicationRepository appRepo) {
+        this.commandRepo = commandRepo;
+        this.appRepo = appRepo;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public Command getCommand(final String id) throws CloudServiceException {
+    public Command createCommand(final Command command) throws GenieException {
+        if (command == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command entered to create");
+        }
+        command.validate();
+
+        LOG.debug("Called to create command " + command.toString());
+        if (StringUtils.isEmpty(command.getId())) {
+            command.setId(UUID.randomUUID().toString());
+        }
+        if (this.commandRepo.exists(command.getId())) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "A command with id " + command.getId() + " already exists");
+        }
+
+        return this.commandRepo.save(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Command getCommand(final String id) throws GenieException {
         LOG.debug("called");
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Id can't be null or empty.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            //No need for a transation for a get
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                return command;
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            return command;
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
@@ -95,6 +127,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Command> getCommands(
             final String name,
             final String userName,
@@ -102,223 +135,110 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final int limit) {
         LOG.debug("Called");
 
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            final CriteriaBuilder cb = em.getCriteriaBuilder();
-            final CriteriaQuery<Command> cq = cb.createQuery(Command.class);
-            final Root<Command> c = cq.from(Command.class);
-            final List<Predicate> predicates = new ArrayList<Predicate>();
-            if (StringUtils.isNotEmpty(name)) {
-                predicates.add(cb.equal(c.get(Command_.name), name));
-            }
-            if (StringUtils.isNotEmpty(userName)) {
-                predicates.add(cb.equal(c.get(Command_.user), userName));
-            }
-            cq.where(cb.and(predicates.toArray(new Predicate[0])));
-            final TypedQuery<Command> query = em.createQuery(cq);
-            final int finalPage = page < 0 ? PersistenceManager.DEFAULT_PAGE_NUMBER : page;
-            final int finalLimit = limit < 0 ? PersistenceManager.DEFAULT_PAGE_SIZE : limit;
-            query.setMaxResults(finalLimit);
-            query.setFirstResult(finalLimit * finalPage);
-            return query.getResultList();
-        } finally {
-            em.close();
-        }
+        final PageRequest pageRequest = new PageRequest(
+                page < 0 ? 0 : page,
+                limit < 0 ? 1024 : limit
+        );
+        return this.commandRepo.findAll(
+                CommandSpecs.findByNameAndUser(
+                        name,
+                        userName
+                ),
+                pageRequest).getContent();
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
-     */
-    @Override
-    public Command createCommand(final Command command) throws CloudServiceException {
-        Command.validate(command);
-        LOG.debug("Called to create command " + command.toString());
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            if (StringUtils.isEmpty(command.getId())) {
-                command.setId(UUID.randomUUID().toString());
-            }
-            if (em.contains(command)) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_BAD_REQUEST,
-                        "A command with id " + command.getId() + " already exists");
-            }
-            em.persist(command);
-            trans.commit();
-            return command;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Command updateCommand(
             final String id,
-            final Command updateCommand) throws CloudServiceException {
+            final Command updateCommand) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered. Unable to update.");
         }
         if (StringUtils.isBlank(updateCommand.getId()) || !id.equals(updateCommand.getId())) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Command id either not entered or inconsistent with id passed in.");
         }
         LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
-        final EntityManager em = pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.merge(updateCommand);
-            Command.validate(command);
-            trans.commit();
-            return command;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
-        }
+        final Command command = this.em.merge(updateCommand);
+        command.validate();
+        return command;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public List<Command> deleteAllCommands() throws CloudServiceException {
+    public List<Command> deleteAllCommands() throws GenieException {
         LOG.debug("Called to delete all commands");
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final List<Command> commands = this.getCommands(null, null, 0, Integer.MAX_VALUE);
-            for (final Command command : commands) {
-                this.deleteCommand(command.getId());
-            }
-            trans.commit();
-            return commands;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        final Iterable<Command> commands = this.commandRepo.findAll();
+        final List<Command> returnCommands = new ArrayList<Command>();
+        for (final Command command : commands) {
+            returnCommands.add(this.deleteCommand(command.getId()));
         }
+        return returnCommands;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public Command deleteCommand(final String id) throws CloudServiceException {
+    public Command deleteCommand(final String id) throws GenieException {
         LOG.debug("Called to delete command config with id " + id);
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command == null) {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists to delete.");
-            }
-            //Remove the command from the associated Application references
-            final List<Application> apps = command.getApplications();
-            if (apps != null) {
-                for (final Application app : apps) {
-                    final Set<Command> commands = app.getCommands();
-                    if (commands != null) {
-                        commands.remove(command);
-                    }
-                }
-            }
-            em.remove(command);
-            trans.commit();
-            return command;
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists to delete.");
         }
+        //Remove the command from the associated Application references
+        final Application app = command.getApplication();
+        if (app != null) {
+            final Set<Command> commands = app.getCommands();
+            if (commands != null) {
+                commands.remove(command);
+            }
+        }
+        this.commandRepo.delete(command);
+        return command;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> addConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to add configurations.");
         }
         if (configs == null) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No configuration files entered.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                command.getConfigs().addAll(configs);
-                trans.commit();
-                return command.getConfigs();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
-     */
-    @Override
-    public Set<String> getConfigsForCommand(
-            final String id) throws CloudServiceException {
-        if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered. Unable to get configs.");
-        }
-        final EntityManager em = this.pm.createEntityManager();
-        final Command command = em.find(Command.class, id);
+        final Command command = this.commandRepo.findOne(id);
         if (command != null) {
+            command.getConfigs().addAll(configs);
             return command.getConfigs();
         } else {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No command with id " + id + " exists.");
         }
@@ -327,344 +247,359 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getConfigsForCommand(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to get configs.");
+        }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            return command.getConfigs();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     public Set<String> updateConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException {
+            final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to update configurations.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                command.setConfigs(configs);
-                trans.commit();
-                return command.getConfigs();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.setConfigs(configs);
+            return command.getConfigs();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeAllConfigsForCommand(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove configs.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                command.getConfigs().clear();
-                trans.commit();
-                return command.getConfigs();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getConfigs().clear();
+            return command.getConfigs();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
     public Set<String> removeConfigForCommand(
             final String id,
-            final String config) throws CloudServiceException {
+            final String config) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove configuration.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                if (StringUtils.isNotBlank(config)) {
-                    command.getConfigs().remove(config);
-                }
-                trans.commit();
-                return command.getConfigs();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            if (StringUtils.isNotBlank(config)) {
+                command.getConfigs().remove(config);
             }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+            return command.getConfigs();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public List<Application> addApplicationsForCommand(
+    public Application setApplicationForCommand(
             final String id,
-            final List<Application> applications) throws CloudServiceException {
+            final Application application) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to add applications.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                for (final Application detached : applications) {
-                    final Application app
-                            = em.find(Application.class, detached.getId());
-                    if (app != null) {
-                        command.getApplications().add(app);
-                        app.getCommands().add(command);
-                    } else {
-                        throw new CloudServiceException(
-                                HttpURLConnection.HTTP_NOT_FOUND,
-                                "No application with id " + detached.getId() + " exists.");
-                    }
-                }
-                trans.commit();
-                return command.getApplications();
+        if (application == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application entered. Unable to set application.");
+        }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            final Application app = this.appRepo.findOne(application.getId());
+            if (app != null) {
+                command.setApplication(app);
             } else {
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
+                        "No application with id " + application.getId() + " exists.");
             }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+            return command.getApplication();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public List<Application> getApplicationsForCommand(
-            final String id) throws CloudServiceException {
+    @Transactional(readOnly = true)
+    public Application getApplicationForCommand(
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to get applications.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                return command.getApplications();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            final Application app = command.getApplication();
+            if (app != null) {
+                return app;
             } else {
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
+                        "No application set for command with id '" + id + "'.");
             }
-        } finally {
-            em.close();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public List<Application> updateApplicationsForCommand(
-            final String id,
-            final List<Application> applications) throws CloudServiceException {
+    public Application removeApplicationForCommand(
+            final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered. Unable to update applications.");
-        }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                final List<Application> apps = new ArrayList<Application>();
-                for (final Application detached : applications) {
-                    final Application app
-                            = em.find(Application.class, detached.getId());
-                    if (app != null) {
-                        apps.add(app);
-                        app.getCommands().add(command);
-                    } else { 
-                        throw new CloudServiceException(
-                                HttpURLConnection.HTTP_NOT_FOUND,
-                                "No application with id " + detached.getId() + " exists.");
-                    }
-                }
-                command.setApplications(apps);
-                trans.commit();
-                return command.getApplications();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
-     */
-    @Override
-    public List<Application> removeAllApplicationsForCommand(
-            final String id) throws CloudServiceException {
-        if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered. Unable to remove applications.");
-        }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                for (final Application app : command.getApplications()) {
-                    app.getCommands().remove(command);
-                }
-                command.getApplications().clear();
-                trans.commit();
-                return command.getApplications();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CloudServiceException
-     */
-    @Override
-    public List<Application> removeApplicationForCommand(
-            final String id,
-            final String appId) throws CloudServiceException {
-        if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to remove application.");
         }
-        if (StringUtils.isBlank(appId)) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to remove application.");
-        }
-        final EntityManager em = this.pm.createEntityManager();
-        final EntityTransaction trans = em.getTransaction();
-        try {
-            trans.begin();
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                final Application app = em.find(Application.class, appId);
-                if (app != null) {
-                    app.getCommands().remove(command);
-                    command.getApplications().remove(app);
-                }
-                trans.commit();
-                return command.getApplications();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            final Application app = command.getApplication();
+            if (app != null) {
+                command.setApplication(null);
+                return app;
             } else {
-                throw new CloudServiceException(
+                throw new GenieException(
                         HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
+                        "No application set for command with id '" + id + "'.");
             }
-        } finally {
-            if (trans.isActive()) {
-                trans.rollback();
-            }
-            em.close();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @Override
-    public Set<Cluster> getClustersForCommand(
-            final String id) throws CloudServiceException {
+    public Set<String> addTagsForCommand(
+            final String id,
+            final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new CloudServiceException(
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to add tags.");
+        }
+        if (tags == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tags entered.");
+        }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getTags().addAll(tags);
+            return command.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getTagsForCommand(
+            final String id)
+            throws GenieException {
+
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id sent. Cannot retrieve tags.");
+        }
+
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            return command.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    public Set<String> updateTagsForCommand(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to update tags.");
+        }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.setTags(tags);
+            return command.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    public Set<String> removeAllTagsForCommand(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove tags.");
+        }
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getTags().clear();
+            return command.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Cluster> getClustersForCommand(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command id entered. Unable to get clusters.");
         }
-        final EntityManager em = this.pm.createEntityManager();
-        try {
-            final Command command = em.find(Command.class, id);
-            if (command != null) {
-                return command.getClusters();
-            } else {
-                throw new CloudServiceException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + id + " exists.");
-            }
-        } finally {
-            em.close();
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            return command.getClusters();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
+        }
+    }
+
+    @Override
+    public Set<String> removeTagForCommand(String id, String tag)
+            throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No command id entered. Unable to remove tag.");
+        }
+        if (StringUtils.isBlank(tag)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tag entered. Unable to remove tag.");
+        }
+        if (tag.equals(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Cannot delete command id from the tags list.");
+        }
+        
+        final Command command = this.commandRepo.findOne(id);
+        if (command != null) {
+            command.getTags().remove(tag);
+            return command.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command with id " + id + " exists.");
         }
     }
 }

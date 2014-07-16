@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ public class ClusterCriteria implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterCriteria.class);
 
     private Set<String> tags = new HashSet<String>();
-    
+
     /**
      * Default Constructor.
      */
@@ -51,20 +52,22 @@ public class ClusterCriteria implements Serializable {
 
     /**
      * Create a cluster criteria object with the included tags.
+     *
      * @param tags The tags to add
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public ClusterCriteria(final Set<String> tags) throws CloudServiceException {
+    public ClusterCriteria(final Set<String> tags) throws GenieException {
         if (tags == null || tags.isEmpty()) {
             final String msg = "No tags passed in to set. Unable to continue.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         this.tags = tags;
     }
 
     /**
      * Get the tags for this cluster criteria.
+     *
      * @return The tags for this criteria as unmodifiable list
      */
     public Set<String> getTags() {
@@ -75,13 +78,13 @@ public class ClusterCriteria implements Serializable {
      * Set the tags for the cluster criteria.
      *
      * @param tags The tags to set. Not null.
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setTags(final Set<String> tags) throws CloudServiceException {
+    public void setTags(final Set<String> tags) throws GenieException {
         if (tags == null || tags.isEmpty()) {
             final String msg = "No tags passed in to set. Unable to continue.";
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
         this.tags = tags;
     }

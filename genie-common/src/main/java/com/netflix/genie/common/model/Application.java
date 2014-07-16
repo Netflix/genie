@@ -17,23 +17,23 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types.ApplicationStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -58,28 +58,10 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "An Application")
-public class Application extends Auditable implements Serializable {
+public class Application extends CommonEntityFields {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
-
-    /**
-     * Name of this application - e.g. mapreduce1, mapreduce2, tez etc.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "Name of this application - e.g. mapreduce1, mapreduce2, tez etc",
-            required = true)
-    private String name;
-
-    /**
-     * User who created this application.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "User who created this application",
-            required = true)
-    private String user;
 
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
@@ -89,16 +71,7 @@ public class Application extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "The current status of this application",
             required = true)
-    private ApplicationStatus status;
-
-    /**
-     * Version number for this application.
-     */
-    @Basic
-    @Column(name = "appVersion")
-    @ApiModelProperty(
-            value = "The version number for this application")
-    private String version;
+    private ApplicationStatus status = ApplicationStatus.INACTIVE;
 
     /**
      * Users can specify a property file location with environment variables.
@@ -133,8 +106,19 @@ public class Application extends Auditable implements Serializable {
      */
     @XmlTransient
     @JsonIgnore
-    @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "application", fetch = FetchType.LAZY)
     private Set<Command> commands;
+
+    /**
+     * Set of tags for a application.
+     */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the tags"
+            + " associated with this application.")
+    private Set<String> tags;
 
     /**
      * Default constructor.
@@ -149,62 +133,31 @@ public class Application extends Auditable implements Serializable {
      * @param name The name of the application. Not null/empty/blank.
      * @param user The user who created the application. Not null/empty/blank.
      * @param status The status of the application. Not null.
-     * @throws CloudServiceException
+     * @param version The version of this application
      */
     public Application(
             final String name,
             final String user,
-            final ApplicationStatus status) throws CloudServiceException {
-        super();
-        this.name = name;
-        this.user = user;
+            final ApplicationStatus status,
+            final String version) throws GenieException {
+        super(name, user,version);
         this.status = status;
     }
 
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     @PrePersist
-    protected void onCreateApplication() throws CloudServiceException {
-        validate(this.name, this.user, this.status);
-    }
-
-    /**
-     * Gets the name for this application.
-     *
-     * @return name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name for this application.
-     *
-     * @param name the new name of this application. Not null/empty/blank
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets the user that created this application.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return user;
-    }
-
-    /**
-     * Sets the user who created this application.
-     *
-     * @param user user who created this application
-     */
-    public void setUser(final String user) {
-        this.user = user;
+    @PreUpdate
+    protected void onCreateOrUpdate() throws GenieException {
+        validate(this.getName(), this.getUser(), this.status);
+     // Add the id to the tags
+        if (this.tags == null) {
+            this.tags = new HashSet<String>();
+        }
+        this.tags.add(this.getId());
     }
 
     /**
@@ -224,25 +177,6 @@ public class Application extends Auditable implements Serializable {
      */
     public void setStatus(final ApplicationStatus status) {
         this.status = status;
-    }
-
-    /**
-     * Gets the version of this application.
-     *
-     * @return version - like 1.2.3
-     *
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Sets the version for this application.
-     *
-     * @param version version number for this application
-     */
-    public void setVersion(final String version) {
-        this.version = version;
     }
 
     /**
@@ -277,9 +211,8 @@ public class Application extends Auditable implements Serializable {
      * Sets the configurations for this application.
      *
      * @param configs The configuration files that this application needs
-     * @throws CloudServiceException
      */
-    public void setConfigs(final Set<String> configs) throws CloudServiceException {
+    public void setConfigs(final Set<String> configs) {
         this.configs = configs;
     }
 
@@ -296,9 +229,8 @@ public class Application extends Auditable implements Serializable {
      * Sets the jars needed for this application.
      *
      * @param jars All jars needed for execution of this application
-     * @throws CloudServiceException
      */
-    public void setJars(final Set<String> jars) throws CloudServiceException {
+    public void setJars(final Set<String> jars) {
         this.jars = jars;
     }
 
@@ -316,24 +248,37 @@ public class Application extends Auditable implements Serializable {
      *
      * @param commands The commands to set.
      */
-    public void setCommands(final Set<Command> commands) {
+    protected void setCommands(final Set<Command> commands) {
         this.commands = commands;
+    }
+
+    /**
+     * Gets the tags allocated to this application.
+     *
+     * @return the tags as an unmodifiable list
+     */
+    public Set<String> getTags() {
+        return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this application.
+     *
+     * @param tags the tags to set.
+     * @throws GenieException
+     */
+    public void setTags(final Set<String> tags) {
+        this.tags = tags;
     }
 
     /**
      * Check to make sure that the required parameters exist.
      *
      * @param application The applications to check
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    public static void validate(final Application application) throws CloudServiceException {
-        if (application == null) {
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application passed in. Unable to validate.");
-        }
-
-        validate(application.getName(), application.getUser(), application.getStatus());
+    public void validate() throws GenieException {
+        this.validate(this.getName(), this.getUser(), this.getStatus());
     }
 
     /**
@@ -342,20 +287,15 @@ public class Application extends Auditable implements Serializable {
      * @param name The name of the application
      * @param user The user who created the application
      * @param status The status of the application
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    private static void validate(
+    private void validate(
             final String name,
             final String user,
             final ApplicationStatus status)
-            throws CloudServiceException {
+            throws GenieException {
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing and is required.\n");
-        }
-        if (StringUtils.isBlank(name)) {
-            builder.append("Application name is missing and is required.\n");
-        }
+        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No application status entered and is required.\n");
         }
@@ -364,7 +304,7 @@ public class Application extends Auditable implements Serializable {
             builder.insert(0, "Application configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 }

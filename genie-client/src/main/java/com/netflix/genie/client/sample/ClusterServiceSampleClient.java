@@ -23,12 +23,11 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.client.ClusterServiceClient;
 import com.netflix.genie.client.CommandServiceClient;
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Types.ClusterStatus;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -94,20 +93,17 @@ public final class ClusterServiceSampleClient {
                 ));
         LOG.info("Created application:");
         LOG.info(app2.toString());
-        
+
         LOG.info("Initializing CommandServiceClient");
         final CommandServiceClient commandClient = CommandServiceClient.getInstance();
 
         LOG.info("Creating command pig13_mr2");
-        final List<Application> apps = new ArrayList<Application>();
-        apps.add(app1);
-        apps.add(app2);
         final Command command1 = commandClient.createCommand(
                 CommandServiceSampleClient.createSampleCommand(
                         CommandServiceSampleClient.ID));
-        
-        commandClient.addApplicationsToCommand(command1.getId(), apps);
-        
+
+        commandClient.setApplicationForCommand(command1.getId(), app1);
+
         LOG.info("Created command:");
         LOG.info(command1.toString());
         final List<Command> commands = new ArrayList<Command>();
@@ -119,7 +115,7 @@ public final class ClusterServiceSampleClient {
         LOG.info("Creating new cluster configuration");
         final Cluster cluster1 = clusterClient.createCluster(createSampleCluster(ID));
         clusterClient.addCommandsToCluster(cluster1.getId(), commands);
-        
+
         LOG.info("Cluster config created with id: " + cluster1.getId());
         LOG.info(cluster1.toString());
 
@@ -174,14 +170,15 @@ public final class ClusterServiceSampleClient {
 
         LOG.info("Commands for cluster with id " + cluster1.getId());
         final List<Command> commands1 = clusterClient.getCommandsForCluster(cluster1.getId());
-        for (final Command  command : commands1) {
+        for (final Command command : commands1) {
             LOG.info("Command = " + command);
         }
 
         LOG.info("Adding commands to cluster with id " + cluster1.getId());
         final List<Command> newCmds = new ArrayList<Command>();
-        newCmds.add(CommandServiceSampleClient.getSampleCommand(ID + "something"));
-        newCmds.add(CommandServiceSampleClient.getSampleCommand(null));
+        newCmds.add(commandClient.createCommand(CommandServiceSampleClient.createSampleCommand(ID + "something")));
+        newCmds.add(commandClient.createCommand(CommandServiceSampleClient.createSampleCommand(null)));
+
         final List<Command> commands2 = clusterClient.addCommandsToCluster(cluster1.getId(), newCmds);
         for (final Command command : commands2) {
             LOG.info("Command = " + command);
@@ -194,7 +191,7 @@ public final class ClusterServiceSampleClient {
             LOG.info("Command = " + command);
         }
 
-        LOG.info("Deleting the command from the command with id " + ID + "something");
+        LOG.info("Deleting the command from the cluster with id " + ID + "something");
         final Set<Command> commands4 = clusterClient.removeCommandForCluster(cluster1.getId(), ID + "something");
         for (final Command command : commands4) {
             LOG.info("Command = " + command);
@@ -223,6 +220,11 @@ public final class ClusterServiceSampleClient {
         LOG.info("Deleted command config with id: " + command1.getId());
         LOG.info(command5.toString());
 
+        LOG.info("Deleting commands in newCmd");
+        for (final Command cmd : newCmds) {
+            commandClient.deleteCommand(cmd.getId());
+        }
+
         LOG.info("Deleting application config using id");
         final Application app3 = appClient.deleteApplication(app1.getId());
         LOG.info("Deleted application config with id: " + app1.getId());
@@ -240,12 +242,11 @@ public final class ClusterServiceSampleClient {
      * Create a cluster from the input parameters.
      *
      * @param id The ID to use. If null or empty one will be created.
-     * @param commands The commands to use for this cluster or null/empty.
      * @return A cluster object
-     * @throws CloudServiceException
+     * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public static Cluster createSampleCluster(
-            final String id) throws CloudServiceException {
+            final String id) throws GenieException {
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
@@ -255,7 +256,8 @@ public final class ClusterServiceSampleClient {
                 "tgianos",
                 ClusterStatus.OUT_OF_SERVICE,
                 "com.netflix.genie.server.jobmanager.impl.YarnJobManager",
-                configs);
+                configs,
+                "2.4.0");
         if (StringUtils.isNotBlank(id)) {
             cluster.setId(id);
         }
@@ -264,8 +266,7 @@ public final class ClusterServiceSampleClient {
         tags.add("h2query");
         tags.add(cluster.getId());
         cluster.setTags(tags);
-        cluster.setVersion("2.4.0");
-        
+
         return cluster;
     }
 }

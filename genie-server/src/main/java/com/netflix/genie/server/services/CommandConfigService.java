@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -34,13 +34,23 @@ import java.util.Set;
 public interface CommandConfigService {
 
     /**
+     * Create new command configuration.
+     *
+     * @param command encapsulates the command configuration information to
+     * create
+     * @return The command created
+     * @throws GenieException
+     */
+    Command createCommand(final Command command) throws GenieException;
+
+    /**
      * Gets command configuration for given id.
      *
      * @param id unique id for command configuration to get. Not null/empty.
      * @return The command configuration
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Command getCommand(final String id) throws CloudServiceException;
+    Command getCommand(final String id) throws GenieException;
 
     /**
      * Get command configurations for given filter criteria.
@@ -59,44 +69,34 @@ public interface CommandConfigService {
             final int limit);
 
     /**
-     * Create new command configuration.
-     *
-     * @param command encapsulates the command configuration information to
-     * create
-     * @return The command created
-     * @throws CloudServiceException
-     */
-    Command createCommand(final Command command) throws CloudServiceException;
-
-    /**
      * Update command configuration.
      *
      * @param id The id of the command configuration to update. Not null or
      * empty.
      * @param updateCommand contains the information to update the command with
      * @return The updated command
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Command updateCommand(
             final String id,
-            final Command updateCommand) throws CloudServiceException;
+            final Command updateCommand) throws GenieException;
 
     /**
      * Delete all commands from database.
      *
      * @return The deleted commands
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    List<Command> deleteAllCommands() throws CloudServiceException;
+    List<Command> deleteAllCommands() throws GenieException;
 
     /**
      * Delete a command configuration from database.
      *
      * @param id unique if of the command configuration to delete
      * @return The deleted command configuration
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Command deleteCommand(final String id) throws CloudServiceException;
+    Command deleteCommand(final String id) throws GenieException;
 
     /**
      * Add a configuration files to the command.
@@ -105,11 +105,11 @@ public interface CommandConfigService {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> addConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException;
+            final Set<String> configs) throws GenieException;
 
     /**
      * Get the set of configuration files associated with the command with given
@@ -118,10 +118,10 @@ public interface CommandConfigService {
      * @param id The id of the command to get the configuration files for. Not
      * null/empty/blank.
      * @return The set of configuration files as paths
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> getConfigsForCommand(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Update the set of configuration files associated with the command with
@@ -132,11 +132,11 @@ public interface CommandConfigService {
      * @param configs The configuration files to replace existing configurations
      * with. Not null/empty.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> updateConfigsForCommand(
             final String id,
-            final Set<String> configs) throws CloudServiceException;
+            final Set<String> configs) throws GenieException;
 
     /**
      * Remove all configuration files from the command.
@@ -144,10 +144,10 @@ public interface CommandConfigService {
      * @param id The id of the command to remove the configuration file from.
      * Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeAllConfigsForCommand(
-            final String id) throws CloudServiceException;
+            final String id) throws GenieException;
 
     /**
      * Remove a configuration file from the command.
@@ -156,78 +156,116 @@ public interface CommandConfigService {
      * Not null/empty/blank.
      * @param config The configuration file to remove. Not null/empty/blank.
      * @return The active set of configurations
-     * @throws CloudServiceException
+     * @throws GenieException
      */
     Set<String> removeConfigForCommand(
             final String id,
-            final String config) throws CloudServiceException;
+            final String config) throws GenieException;
 
     /**
-     * Add applications to the command.
+     * Set the application for the command.
      *
      * @param id The id of the command to add the application file to. Not
      * null/empty/blank.
-     * @param applications The applications to add. Not null/empty.
-     * @return The active list of applications
-     * @throws CloudServiceException
+     * @param application The applications to set. Not null.
+     * @return The application
+     * @throws GenieException
      */
-    List<Application> addApplicationsForCommand(
+    Application setApplicationForCommand(
             final String id,
-            final List<Application> applications) throws CloudServiceException;
+            final Application application) throws GenieException;
 
     /**
-     * Get the list of applications associated with the command with given id.
+     * Get the application for a given command.
      *
-     * @param id The id of the command to get the applications for. Not
+     * @param id The id of the command to get the application for. Not
      * null/empty/blank.
-     * @return The list of applications
-     * @throws CloudServiceException
+     * @return The application or exception if none exists.
+     * @throws GenieException
      */
-    List<Application> getApplicationsForCommand(final String id) throws CloudServiceException;
+    Application getApplicationForCommand(
+            final String id) throws GenieException;
 
     /**
-     * Update the list of application files associated with the command with
-     * given id.
-     *
-     * @param id The id of the command to update the application files for. Not
-     * null/empty/blank.
-     * @param applications The application files to replace existing
-     * applications with. Not null/empty.
-     * @return The active list of applications
-     * @throws CloudServiceException
-     */
-    List<Application> updateApplicationsForCommand(
-            final String id,
-            final List<Application> applications) throws CloudServiceException;
-
-    /**
-     * Remove all applications from the command.
-     *
-     * @param id The id of the command to remove the applications from. Not
-     * null/empty/blank.
-     * @return The active set of applications
-     * @throws CloudServiceException
-     */
-     List<Application> removeAllApplicationsForCommand(
-            final String id) throws CloudServiceException;
-
-    /**
-     * Remove a application from the command.
+     * Remove the application from the command.
      *
      * @param id The id of the command to remove the application from. Not
      * null/empty/blank.
-     * @param appId The id of the application to remove. Not null/empty/blank.
-     * @return The active list of applications
-     * @throws CloudServiceException
+     * @return The removed application
+     * @throws GenieException
      */
-    List<Application> removeApplicationForCommand(final String id, final String appId) throws CloudServiceException;
+    Application removeApplicationForCommand(
+            final String id) throws GenieException;
+
+    /**
+     * Add tags to the command.
+     *
+     * @param id The id of the command to add the tags to. Not
+     * null/empty/blank.
+     * @param tags The tags to add. Not null/empty.
+     * @return The active set of tags
+     * @throws GenieException
+     */
+    Set<String> addTagsForCommand(
+            final String id,
+            final Set<String> tags) throws GenieException;
+
+    /**
+     * Get the set of tags associated with the command with given
+     * id.
+     *
+     * @param id The id of the command to get the tags for. Not
+     * null/empty/blank.
+     * @return The set of tags as paths
+     * @throws GenieException
+     */
+    Set<String> getTagsForCommand(
+            final String id) throws GenieException;
+
+    /**
+     * Update the set of tags associated with the command with
+     * given id.
+     *
+     * @param id The id of the command to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing tags
+     * with. Not null/empty.
+     * @return The active set of tags
+     * @throws GenieException
+     */
+    Set<String> updateTagsForCommand(
+            final String id,
+            final Set<String> tags) throws GenieException;
+
+    /**
+     * Remove all tags from the command.
+     *
+     * @param id The id of the command to remove the tags from.
+     * Not null/empty/blank.
+     * @return The active set of tagss
+     * @throws GenieException
+     */
+    Set<String> removeAllTagsForCommand(
+            final String id) throws GenieException;
 
     /**
      * Get all the clusters the command with given id is associated with.
      *
      * @param id The id of the command to get the clusters for.
      * @return The clusters the command is available on.
-     * @throws CloudServiceException
+     * @throws GenieException
      */
-    Set<Cluster> getClustersForCommand(final String id) throws CloudServiceException;
+    Set<Cluster> getClustersForCommand(
+            final String id) throws GenieException;
+
+    /**
+     * Remove a tag from the command.
+     *
+     * @param id The id of the command to remove the tag from. Not
+     * null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags
+     * @throws GenieException
+     */
+    Set<String> removeTagForCommand(final String id, final String tag) throws GenieException;
 }
