@@ -80,7 +80,12 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws GenieException
      */
     public Job submitJob(final Job job) throws GenieException {
-        Job.validate(job);
+        if (job == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job entered to validate");
+        }
+        job.validate();
         final HttpRequest request = this.buildRequest(
                 Verb.POST,
                 BASE_EXECUTION_REST_URL,

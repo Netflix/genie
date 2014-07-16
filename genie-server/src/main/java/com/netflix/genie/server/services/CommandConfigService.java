@@ -198,6 +198,57 @@ public interface CommandConfigService {
             final String id) throws GenieException;
 
     /**
+     * Add tags to the command.
+     *
+     * @param id The id of the command to add the tags to. Not
+     * null/empty/blank.
+     * @param tags The tags to add. Not null/empty.
+     * @return The active set of tags
+     * @throws GenieException
+     */
+    Set<String> addTagsForCommand(
+            final String id,
+            final Set<String> tags) throws GenieException;
+
+    /**
+     * Get the set of tags associated with the command with given
+     * id.
+     *
+     * @param id The id of the command to get the tags for. Not
+     * null/empty/blank.
+     * @return The set of tags as paths
+     * @throws GenieException
+     */
+    Set<String> getTagsForCommand(
+            final String id) throws GenieException;
+
+    /**
+     * Update the set of tags associated with the command with
+     * given id.
+     *
+     * @param id The id of the command to update the tags for.
+     * Not null/empty/blank.
+     * @param tags The tags to replace existing tags
+     * with. Not null/empty.
+     * @return The active set of tags
+     * @throws GenieException
+     */
+    Set<String> updateTagsForCommand(
+            final String id,
+            final Set<String> tags) throws GenieException;
+
+    /**
+     * Remove all tags from the command.
+     *
+     * @param id The id of the command to remove the tags from.
+     * Not null/empty/blank.
+     * @return The active set of tagss
+     * @throws GenieException
+     */
+    Set<String> removeAllTagsForCommand(
+            final String id) throws GenieException;
+
+    /**
      * Get all the clusters the command with given id is associated with.
      *
      * @param id The id of the command to get the clusters for.
@@ -206,4 +257,15 @@ public interface CommandConfigService {
      */
     Set<Cluster> getClustersForCommand(
             final String id) throws GenieException;
+
+    /**
+     * Remove a tag from the command.
+     *
+     * @param id The id of the command to remove the tag from. Not
+     * null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags
+     * @throws GenieException
+     */
+    Set<String> removeTagForCommand(final String id, final String tag) throws GenieException;
 }

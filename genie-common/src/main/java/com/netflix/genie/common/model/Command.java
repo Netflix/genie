@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -60,28 +59,10 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Command")
-public class Command extends Auditable implements Serializable {
+public class Command extends CommonEntityFields {
 
     private static final long serialVersionUID = -6106046473373305992L;
     private static final Logger LOG = LoggerFactory.getLogger(Command.class);
-
-    /**
-     * Name of this command - e.g. prodhive, pig, hadoop etc.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "Name of this command - e.g. prodhive, pig, hadoop etc.",
-            required = true)
-    private String name;
-
-    /**
-     * User who created this command.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "User who created this command",
-            required = true)
-    private String user;
 
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
@@ -120,15 +101,6 @@ public class Command extends Auditable implements Serializable {
     private String jobType;
 
     /**
-     * Version number for this command.
-     */
-    @Basic
-    @Column(name = "commandVersion")
-    @ApiModelProperty(
-            value = "Version number for this command")
-    private String version;
-
-    /**
      * Reference to all the configuration (xml's) needed for this command.
      */
     @XmlElementWrapper(name = "configs")
@@ -158,6 +130,17 @@ public class Command extends Auditable implements Serializable {
     private Set<Cluster> clusters;
 
     /**
+     * Set of tags for a command.
+     */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the tags"
+            + " associated with this command.")
+    private Set<String> tags;
+
+    /**
      * Default Constructor.
      */
     public Command() {
@@ -171,15 +154,16 @@ public class Command extends Auditable implements Serializable {
      * @param user The user who created the command. Not null/empty/blank.
      * @param status The status of the command. Not null.
      * @param executable The executable of the command. Not null/empty/blank.
+     * @param version The version of this command
      */
     public Command(
             final String name,
             final String user,
             final CommandStatus status,
-            final String executable) {
-        super();
-        this.name = name;
-        this.user = user;
+            final String executable,
+            final String version) throws GenieException {
+        super(name, user, version);
+
         this.status = status;
         this.executable = executable;
     }
@@ -192,43 +176,12 @@ public class Command extends Auditable implements Serializable {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdate() throws GenieException {
-        validate(this.name, this.user, this.status, this.executable);
-    }
-
-    /**
-     * Gets the name for this command.
-     *
-     * @return name
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Sets the name for this command.
-     *
-     * @param name the name of this command.
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets the user that created this command.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Sets the user who created this command.
-     *
-     * @param user user who created this command.
-     */
-    public void setUser(final String user) {
-        this.user = user;
+        validate(this.getName(), this.getUser(), this.status, this.executable);
+        // Add the id to the tags
+        if (this.tags == null) {
+           this.tags = new HashSet<String>();
+        }
+        this.tags.add(this.getId());
     }
 
     /**
@@ -307,24 +260,6 @@ public class Command extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the version of this command.
-     *
-     * @return version
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Sets the version for this command.
-     *
-     * @param version version number for this command
-     */
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    /**
      * Gets the configurations for this command.
      *
      * @return the configurations
@@ -349,6 +284,25 @@ public class Command extends Auditable implements Serializable {
      */
     public Application getApplication() {
         return this.application;
+    }
+
+    /**
+     * Gets the tags allocated to this command.
+     *
+     * @return the tags as an unmodifiable list
+     */
+    public Set<String> getTags() {
+        return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this command.
+     *
+     * @param tags the tags to set. Not Null.
+     * @throws GenieException
+     */
+    public void setTags(final Set<String> tags) throws GenieException {
+        this.tags = tags;
     }
 
     /**
@@ -402,17 +356,13 @@ public class Command extends Auditable implements Serializable {
      * @param command The configuration to check
      * @throws GenieException
      */
-    public static void validate(final Command command) throws GenieException {
-        if (command == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command entered to validate");
-        }
-        validate(
-                command.getName(),
-                command.getUser(),
-                command.getStatus(),
-                command.getExecutable());
+    public void validate() throws GenieException {
+        this.validate(
+                this.getName(),
+                this.getUser(),
+                this.getStatus(),
+                this.getExecutable());
+
     }
 
     /**
@@ -423,19 +373,14 @@ public class Command extends Auditable implements Serializable {
      * @param status The status of the command
      * @throws GenieException
      */
-    private static void validate(
+    private void validate(
             final String name,
             final String user,
             final CommandStatus status,
             final String executable)
             throws GenieException {
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing and is required.\n");
-        }
-        if (StringUtils.isBlank(name)) {
-            builder.append("Command name is missing and is required.\n");
-        }
+        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No command status entered and is required.\n");
         }

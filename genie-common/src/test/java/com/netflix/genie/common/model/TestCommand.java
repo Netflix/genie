@@ -34,6 +34,7 @@ public class TestCommand {
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final String EXECUTABLE = "/bin/pig13";
+    private static final String VERSION = "1.0";
 
     private Command c;
 
@@ -64,10 +65,11 @@ public class TestCommand {
 
     /**
      * Test the argument Constructor.
+     * @throws GenieException 
      */
     @Test
-    public void testConstructor() {
-        c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE);
+    public void testConstructor() throws GenieException {
+        c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
         Assert.assertNull(this.c.getApplication());
         Assert.assertNull(this.c.getClusters());
         Assert.assertNull(this.c.getConfigs());
@@ -77,7 +79,7 @@ public class TestCommand {
         Assert.assertEquals(NAME, this.c.getName());
         Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
         Assert.assertEquals(USER, this.c.getUser());
-        Assert.assertNull(this.c.getVersion());
+        Assert.assertEquals(VERSION, this.c.getVersion());
     }
 
     /**
@@ -87,7 +89,7 @@ public class TestCommand {
      */
     @Test
     public void testOnCreateOrUpdate() throws GenieException {
-        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE);
+        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
         this.c.onCreateOrUpdate();
     }
 
@@ -108,7 +110,7 @@ public class TestCommand {
      */
     @Test(expected = GenieException.class)
     public void testOnCreateOrUpdateNoName() throws GenieException {
-        this.c = new Command(null, USER, CommandStatus.ACTIVE, EXECUTABLE);
+        this.c = new Command(null, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
         this.c.onCreateOrUpdate();
     }
 
@@ -119,7 +121,7 @@ public class TestCommand {
      */
     @Test(expected = GenieException.class)
     public void testOnCreateOrUpdateNoUser() throws GenieException {
-        this.c = new Command(NAME, null, CommandStatus.ACTIVE, EXECUTABLE);
+        this.c = new Command(NAME, null, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
         this.c.onCreateOrUpdate();
     }
 
@@ -130,7 +132,7 @@ public class TestCommand {
      */
     @Test(expected = GenieException.class)
     public void testOnCreateOrUpdateNoStatus() throws GenieException {
-        this.c = new Command(NAME, USER, null, EXECUTABLE);
+        this.c = new Command(NAME, USER, null, EXECUTABLE, VERSION);
         this.c.onCreateOrUpdate();
     }
 
@@ -142,7 +144,7 @@ public class TestCommand {
      */
     @Test(expected = GenieException.class)
     public void testOnCreateOrUpdateNoExecutable() throws GenieException {
-        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, null);
+        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, null, VERSION);
         this.c.onCreateOrUpdate();
     }
 
@@ -153,18 +155,8 @@ public class TestCommand {
      */
     @Test
     public void testValidate() throws GenieException {
-        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE);
-        Command.validate(this.c);
-    }
-
-    /**
-     * Test to make sure null throws expected exception.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testValidateNull() throws GenieException {
-        Command.validate(null);
+        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
+        this.c.validate();
     }
 
     /**
@@ -179,9 +171,10 @@ public class TestCommand {
 
     /**
      * Test setting the user.
+     * @throws GenieException 
      */
     @Test
-    public void testSetUser() {
+    public void testSetUser() throws GenieException {
         Assert.assertNull(this.c.getUser());
         this.c.setUser(USER);
         Assert.assertEquals(USER, this.c.getUser());

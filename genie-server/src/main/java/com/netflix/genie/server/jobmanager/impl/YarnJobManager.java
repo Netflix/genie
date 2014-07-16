@@ -382,21 +382,27 @@ public class YarnJobManager implements JobManager {
         this.env.put("S3_CLUSTER_CONF_FILES", convertCollectionToCSV(clusterConfigs));
 
         Command command = null;
-
-        // If Command Id is specified use directly.
-        // If command Name is specified iterate through the commands in the cluster to get the Id that matches.
-        if (StringUtils.isNotBlank(job.getCommandId())) {
-            command = this.commandRepo.findOne(job.getCommandId());
-        } else if (StringUtils.isNoneBlank(job.getCommandName())) {
-            // Iterate through the commands the cluster supports and find the command that matches.
-            // There has to be one that matches, else the getCluster wouldn't have.
-            for (final Command cce : this.cluster.getCommands()) {
-                if (cce.getName().equals(job.getCommandName())) {
-                    command = cce;
-                    break;
-                }
+        for (final Command cmd : this.cluster.getCommands()) {
+            if (cmd.getTags().containsAll(job.getCommandCriteria())) {
+                command = cmd;
+                break;
             }
         }
+        
+//        // If Command Id is specified use directly.
+//        // If command Name is specified iterate through the commands in the cluster to get the Id that matches.
+//        if (StringUtils.isNotBlank(job.getCommandId())) {
+//            command = this.commandRepo.findOne(job.getCommandId());
+//        } else if (StringUtils.isNoneBlank(job.getCommandName())) {
+//            // Iterate through the commands the cluster supports and find the command that matches.
+//            // There has to be one that matches, else the getCluster wouldn't have.
+//            for (final Command cce : this.cluster.getCommands()) {
+//                if (cce.getName().equals(job.getCommandName())) {
+//                    command = cce;
+//                    break;
+//                }
+//            }
+//        }
 
         //Avoiding NPE
         if (command == null) {

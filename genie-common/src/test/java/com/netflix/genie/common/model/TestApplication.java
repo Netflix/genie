@@ -33,6 +33,7 @@ import java.util.Set;
 public class TestApplication {
     private static final String NAME = "pig";
     private static final String USER = "tgianos";
+    private static final String VERSION = "1.0";
 
     private Application a;
 
@@ -61,10 +62,11 @@ public class TestApplication {
 
     /**
      * Test the argument Constructor.
+     * @throws GenieException 
      */
     @Test
-    public void testConstructor() {
-        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
+    public void testConstructor() throws GenieException {
+        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
         Assert.assertNull(this.a.getCommands());
         Assert.assertNull(this.a.getConfigs());
         Assert.assertNull(this.a.getEnvPropFile());
@@ -72,7 +74,7 @@ public class TestApplication {
         Assert.assertNull(this.a.getJars());
         Assert.assertEquals(NAME, this.a.getName());
         Assert.assertEquals(USER, this.a.getUser());
-        Assert.assertNull(this.a.getVersion());
+        Assert.assertEquals(VERSION, this.a.getVersion());
     }
 
     /**
@@ -82,7 +84,7 @@ public class TestApplication {
      */
     @Test
     public void testOnCreateOrUpdate() throws GenieException {
-        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
+        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
         this.a.onCreateOrUpdate();
     }
 
@@ -103,7 +105,7 @@ public class TestApplication {
      */
     @Test(expected = GenieException.class)
     public void testOnCreateOrUpdateNoName() throws GenieException {
-        this.a = new Application(null, USER, ApplicationStatus.ACTIVE);
+        this.a = new Application(null, USER, ApplicationStatus.ACTIVE, VERSION);
         this.a.onCreateOrUpdate();
     }
 
@@ -114,7 +116,7 @@ public class TestApplication {
      */
     @Test(expected = GenieException.class)
     public void testOnCreateOrUpdateNoUser() throws GenieException {
-        this.a = new Application(NAME, null, ApplicationStatus.ACTIVE);
+        this.a = new Application(NAME, null, ApplicationStatus.ACTIVE, VERSION);
         this.a.onCreateOrUpdate();
     }
 
@@ -125,7 +127,7 @@ public class TestApplication {
      */
     @Test(expected = GenieException.class)
     public void testOnCreateOrUpdateNoStatus() throws GenieException {
-        this.a = new Application(NAME, USER, null);
+        this.a = new Application(NAME, USER, null, VERSION);
         this.a.onCreateOrUpdate();
     }
 
@@ -136,18 +138,8 @@ public class TestApplication {
      */
     @Test
     public void testValidate() throws GenieException {
-        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE);
-        Application.validate(this.a);
-    }
-
-    /**
-     * Test to make sure null throws expected exception.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testValidateNull() throws GenieException {
-        Application.validate(null);
+        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
+        this.a.validate();
     }
 
     /**
@@ -162,9 +154,10 @@ public class TestApplication {
 
     /**
      * Test setting the user.
+     * @throws GenieException 
      */
     @Test
-    public void testSetUser() {
+    public void testSetUser() throws GenieException {
         Assert.assertNull(this.a.getUser());
         this.a.setUser(USER);
         Assert.assertEquals(USER, this.a.getUser());

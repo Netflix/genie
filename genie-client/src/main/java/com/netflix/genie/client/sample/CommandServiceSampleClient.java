@@ -54,6 +54,8 @@ public final class CommandServiceSampleClient {
      */
     protected static final String CMD_NAME = "pig";
 
+    private static final String CMD_VERSION = "1.0";
+
     /**
      * Private constructor.
      */
@@ -193,7 +195,8 @@ public final class CommandServiceSampleClient {
                 CMD_NAME,
                 "tgianos",
                 CommandStatus.ACTIVE,
-                "/apps/pig/0.13/bin/pig");
+                "/apps/pig/0.13/bin/pig",
+                CMD_VERSION);
         if (!StringUtils.isEmpty(id)) {
             command.setId(id);
         }

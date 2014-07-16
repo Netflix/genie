@@ -120,7 +120,13 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     @Override
     public Application createApplication(
             final Application app) throws GenieException {
-        Application.validate(app);
+        if (app == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application entered to create.");
+        }
+        app.validate();
+
         LOG.debug("Called with application: " + app.toString());
         if (app.getId() != null && this.applicationRepo.exists(app.getId())) {
             throw new GenieException(
@@ -156,7 +162,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         }
         LOG.debug("Called with app " + updateApp.toString());
         final Application app = this.em.merge(updateApp);
-        Application.validate(app);
+        app.validate();
         return app;
     }
 
@@ -475,6 +481,112 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws GenieException
      */
     @Override
+    public Set<String> addTagsForApplication(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to add tags.");
+        }
+        if (tags == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tags entered.");
+        }
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            application.getTags().addAll(tags);
+            return application.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getTagsForApplication(
+            final String id)
+            throws GenieException {
+
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id sent. Cannot retrieve tags.");
+        }
+
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            return application.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    public Set<String> updateTagsForApplication(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to update tags.");
+        }
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            application.setTags(tags);
+            return application.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    public Set<String> removeAllTagsForApplication(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to remove tags.");
+        }
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            application.getTags().clear();
+            return application.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
     @Transactional(readOnly = true)
     public Set<Command> getCommandsForApplication(
             final String id) throws GenieException {
@@ -486,6 +598,36 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             return app.getCommands();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    @Override
+    public Set<String> removeTagForApplication(String id, String tag)
+            throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No application id entered. Unable to remove tag.");
+        }
+        if (StringUtils.isBlank(tag)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No tag entered. Unable to remove tag.");
+        }
+        if (tag.equals(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "Cannot delete application id from the tags list.");
+        }
+        
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            application.getTags().remove(tag);
+            return application.getTags();
         } else {
             throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,

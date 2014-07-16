@@ -99,7 +99,7 @@ public class Auditable {
     @XmlTransient
     @JsonIgnore
     @Version
-    @Column(name = "version")
+    @Column(name = "entityVersion")
     private Long entityVersion;
 
     /**

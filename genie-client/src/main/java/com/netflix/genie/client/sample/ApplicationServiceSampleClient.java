@@ -51,6 +51,8 @@ public final class ApplicationServiceSampleClient {
      */
     protected static final String APP_NAME = "MapReduce2";
 
+    private static final String APP_VERSION = "1.0";
+
     /**
      * Private.
      */
@@ -185,7 +187,7 @@ public final class ApplicationServiceSampleClient {
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public static Application getSampleApplication(final String id) throws GenieException {
-        final Application app = new Application(APP_NAME, "tgianos", ApplicationStatus.ACTIVE);
+        final Application app = new Application(APP_NAME, "tgianos", ApplicationStatus.ACTIVE, APP_VERSION);
         if (StringUtils.isNotEmpty(id)) {
             app.setId(id);
         }

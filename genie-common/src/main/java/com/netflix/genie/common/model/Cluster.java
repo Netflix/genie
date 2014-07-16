@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -64,28 +63,10 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Cluster")
-public class Cluster extends Auditable implements Serializable {
+public class Cluster extends CommonEntityFields {
 
     private static final long serialVersionUID = 8046582926818942370L;
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
-
-    /**
-     * Name for this cluster, e.g. cquery.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "Name of this cluster - e.g. cquery, cprod, cbonus etc.",
-            required = true)
-    private String name;
-
-    /**
-     * User who created this cluster.
-     */
-    @Basic(optional = false)
-    @ApiModelProperty(
-            value = "User who created this cluster",
-            required = true)
-    private String user;
 
     /**
      * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
@@ -110,16 +91,6 @@ public class Cluster extends Auditable implements Serializable {
     private String clusterType;
 
     /**
-     * Version of this cluster.
-     */
-    @Basic(optional = false)
-    @Column(name = "clusterVersion")
-    @ApiModelProperty(
-            value = "Version number for this cluster",
-            required = true)
-    private String version;
-
-    /**
      * Reference to all the configuration (xml's) needed for this cluster.
      */
     @XmlElementWrapper(name = "configs")
@@ -131,17 +102,6 @@ public class Cluster extends Auditable implements Serializable {
     private Set<String> configs;
 
     /**
-     * Set of tags for scheduling - e.g. adhoc, sla, vpc etc.
-     */
-    @XmlElementWrapper(name = "tags")
-    @XmlElement(name = "tag")
-    @ElementCollection(fetch = FetchType.EAGER)
-    @ApiModelProperty(
-            value = "Reference to all the tags"
-            + " associated for this cluster")
-    private Set<String> tags;
-
-    /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
      */
     @ManyToMany(fetch = FetchType.EAGER)
@@ -151,6 +111,17 @@ public class Cluster extends Auditable implements Serializable {
     @ApiModelProperty(
             value = "List of commands that this cluster can run")
     private List<Command> commands;
+
+    /**
+     * Set of tags for a cluster.
+     */
+    @XmlElementWrapper(name = "tags")
+    @XmlElement(name = "tag")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Reference to all the tags"
+            + " associated with this cluster.")
+    private Set<String> tags;
 
     /**
      * Default Constructor.
@@ -176,14 +147,11 @@ public class Cluster extends Auditable implements Serializable {
             final ClusterStatus status,
             final String clusterType,
             final Set<String> configs,
-            final String version) {
-        super();
-        this.name = name;
-        this.user = user;
+            final String version) throws GenieException {
+        super(name, user, version);
         this.status = status;
         this.clusterType = clusterType;
         this.configs = configs;
-        this.version = version;
     }
 
     /**
@@ -192,45 +160,13 @@ public class Cluster extends Auditable implements Serializable {
      * @throws GenieException
      */
     @PrePersist
-    @PreUpdate
     protected void onCreateOrUpdate() throws GenieException {
-        validate(this.name, this.user, this.status, this.clusterType, this.version, this.configs);
-    }
-
-    /**
-     * Gets the name for this cluster.
-     *
-     * @return name
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Sets the name for this cluster.
-     *
-     * @param name name for this cluster. Not null/empty/blank.
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets the user that created this cluster.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Sets the user who created this cluster.
-     *
-     * @param user user who created this cluster. Not null/empty/blank.
-     */
-    public void setUser(final String user) {
-        this.user = user;
+        validate(this.getName(), this.getUser(), this.status, this.clusterType, this.getVersion(), this.configs);
+        // Add the id to the tags
+        if (this.tags == null) {
+            this.tags = new HashSet<String>();
+        }
+        this.tags.add(this.getId());
     }
 
     /**
@@ -272,42 +208,6 @@ public class Cluster extends Auditable implements Serializable {
     }
 
     /**
-     * Gets the version of this cluster.
-     *
-     * @return version
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Sets the version for this cluster.
-     *
-     * @param version version number for this cluster
-     */
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    /**
-     * Gets the tags allocated to this cluster.
-     *
-     * @return the tags as an unmodifiable list
-     */
-    public Set<String> getTags() {
-        return this.tags;
-    }
-
-    /**
-     * Sets the tags allocated to this cluster.
-     *
-     * @param tags the tags to set. Not Null.
-     */
-    public void setTags(final Set<String> tags) {
-        this.tags = tags;
-    }
-
-    /**
      * Gets the configurations for this cluster.
      *
      * @return The cluster configurations as unmodifiable list
@@ -334,6 +234,25 @@ public class Cluster extends Auditable implements Serializable {
      */
     public List<Command> getCommands() {
         return this.commands;
+    }
+
+    /**
+     * Gets the tags allocated to this cluster.
+     *
+     * @return the tags as an unmodifiable list
+     */
+    public Set<String> getTags() {
+        return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this cluster.
+     *
+     * @param tags the tags to set. Not Null.
+     * @throws GenieException
+     */
+    public void setTags(final Set<String> tags) throws GenieException {
+        this.tags = tags;
     }
 
     /**
@@ -438,19 +357,15 @@ public class Cluster extends Auditable implements Serializable {
      * @param cluster The configuration to check
      * @throws GenieException
      */
-    public static void validate(final Cluster cluster) throws GenieException {
-        if (cluster == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No cluster entered. Unable to validate.");
-        }
-        validate(
-                cluster.getName(),
-                cluster.getUser(),
-                cluster.getStatus(),
-                cluster.getClusterType(),
-                cluster.getVersion(),
-                cluster.getConfigs());
+    public void validate() throws GenieException {
+       this.validate(
+                this.getName(),
+                this.getUser(),
+                this.getStatus(),
+                this.getClusterType(),
+                this.getVersion(),
+                this.getConfigs());
+
     }
 
     /**
@@ -463,7 +378,7 @@ public class Cluster extends Auditable implements Serializable {
      * @param configs The configuration files for the cluster
      * @throws GenieException
      */
-    private static void validate(
+    private void validate(
             final String name,
             final String user,
             final ClusterStatus status,
@@ -471,12 +386,7 @@ public class Cluster extends Auditable implements Serializable {
             final String clusterVersion,
             final Set<String> configs) throws GenieException {
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isBlank(name)) {
-            builder.append("Cluster name is missing and required.\n");
-        }
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing and required.\n");
-        }
+        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No cluster status entered and is required.\n");
         }

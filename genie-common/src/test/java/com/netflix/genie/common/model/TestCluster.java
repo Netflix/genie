@@ -69,9 +69,10 @@ public class TestCluster {
 
     /**
      * Test the argument Constructor.
+     * @throws GenieException 
      */
     @Test
-    public void testConstructor() {
+    public void testConstructor() throws GenieException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
         Assert.assertEquals(CLUSTER_TYPE, this.c.getClusterType());
         Assert.assertNull(this.c.getCommands());
@@ -196,17 +197,7 @@ public class TestCluster {
     @Test
     public void testValidate() throws GenieException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
-        Cluster.validate(this.c);
-    }
-
-    /**
-     * Test to make sure null throws expected exception.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testValidateNull() throws GenieException {
-        Cluster.validate(null);
+        this.c.validate();
     }
 
     /**
@@ -221,9 +212,10 @@ public class TestCluster {
 
     /**
      * Test setting the user.
+     * @throws GenieException 
      */
     @Test
-    public void testSetUser() {
+    public void testSetUser() throws GenieException {
         Assert.assertNull(this.c.getUser());
         this.c.setUser(USER);
         Assert.assertEquals(USER, this.c.getUser());
@@ -261,9 +253,10 @@ public class TestCluster {
 
     /**
      * Test setting the tags.
+     * @throws GenieException 
      */
     @Test
-    public void testSetTags() {
+    public void testSetTags() throws GenieException {
         Assert.assertNull(this.c.getTags());
         final Set<String> tags = new HashSet<String>();
         tags.add("prod");

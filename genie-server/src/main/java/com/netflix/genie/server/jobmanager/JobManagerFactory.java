@@ -82,7 +82,9 @@ public final class JobManagerFactory implements ApplicationContextAware {
     public JobManager getJobManager(final Job job) throws GenieException {
         LOG.info("called");
 
-        final Cluster cluster = this.getCluster(job);
+        // Figure out a cluster to run this job. Cluster selection is done based on 
+        // ClusterCriteria tags and Command tags specified in the job.
+        final Cluster cluster = this.clb.selectCluster(this.ccs.getClusters(job)) ;
         final String className = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server." + cluster.getClusterType() + ".JobManagerImpl");
 
@@ -110,6 +112,7 @@ public final class JobManagerFactory implements ApplicationContextAware {
     }
 
     /**
+=======
      * Figure out an appropriate cluster to run this job<br>
      * Cluster selection is done based on tags, command and application.
      *
@@ -127,12 +130,7 @@ public final class JobManagerFactory implements ApplicationContextAware {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final List<Cluster> clusters = this.ccs.getClusters(
-                job.getApplicationId(),
-                job.getApplicationName(),
-                job.getCommandId(),
-                job.getCommandName(),
-                job.getClusterCriteria());
+        final List<Cluster> clusters = this.ccs.getClusters(job);
 
         // return selected instance
         return this.clb.selectCluster(clusters);
