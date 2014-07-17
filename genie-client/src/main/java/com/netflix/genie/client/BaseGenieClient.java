@@ -34,6 +34,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -42,6 +43,7 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
 import org.slf4j.Logger;
@@ -130,10 +132,10 @@ public class BaseGenieClient {
     /**
      * Build a HTTP request from the given parameters.
      *
-     * @param verb The type of HTTP request to use.
+     * @param verb       The type of HTTP request to use.
      * @param requestUri The URI to send the request to.
-     * @param params Any query parameters to send along with the request.
-     * @param entity An entity if required to add to the request.
+     * @param params     Any query parameters to send along with the request.
+     * @param entity     An entity if required to add to the request.
      * @return The HTTP request.
      * @throws GenieException
      */
@@ -164,11 +166,11 @@ public class BaseGenieClient {
     /**
      * Execute a HTTP request.
      *
-     * @param <C> The collection class if a collection is the expected response
-     * entity.
-     * @param request The request to send
+     * @param <C>             The collection class if a collection is the expected response
+     *                        entity.
+     * @param request         The request to send
      * @param collectionClass The collection class. Null if none expected.
-     * @param entityClass The entity class. Not null.
+     * @param entityClass     The entity class. Not null.
      * @return The response entity.
      * @throws GenieException
      */

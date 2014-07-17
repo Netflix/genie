@@ -34,6 +34,7 @@ import com.netflix.genie.server.repository.jpa.JobSpecs;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.NetUtil;
 import com.netflix.niws.client.http.RestClient;
+
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Date;
@@ -46,6 +47,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.persistence.RollbackException;
+
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -102,9 +104,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * Default constructor - initializes persistence manager, and other utility
      * classes.
      *
-     * @param jobRepo The job repository to use.
-     * @param stats the GenieNodeStatistics object
-     * @param jobCountManager the job count manager to use
+     * @param jobRepo           The job repository to use.
+     * @param stats             the GenieNodeStatistics object
+     * @param jobCountManager   the job count manager to use
      * @param jobManagerFactory The the job manager factory to use
      */
     @Inject
@@ -184,8 +186,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                 throw new GenieException(
                         HttpURLConnection.HTTP_UNAVAILABLE,
                         "Number of running jobs greater than system limit ("
-                        + maxRunningJobs
-                        + ") - try another instance or try again later");
+                                + maxRunningJobs
+                                + ") - try another instance or try again later");
             }
 
             // if job can be launched, update the URIs
@@ -401,7 +403,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             job.setFinishTime(currentTime);
             job.setExitCode(SubProcessStatus.ZOMBIE_JOB.code());
             job.setStatusMsg(SubProcessStatus.message(
-                    SubProcessStatus.ZOMBIE_JOB.code())
+                            SubProcessStatus.ZOMBIE_JOB.code())
             );
         }
         return jobs.size();
@@ -593,7 +595,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Cannot delete job id from the tags list.");
         }
-        
+
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.getTags().remove(tag);

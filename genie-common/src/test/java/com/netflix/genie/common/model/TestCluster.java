@@ -69,7 +69,8 @@ public class TestCluster {
 
     /**
      * Test the argument Constructor.
-     * @throws GenieException 
+     *
+     * @throws GenieException
      */
     @Test
     public void testConstructor() throws GenieException {
@@ -189,7 +190,8 @@ public class TestCluster {
 
     /**
      * Test setting the tags.
-     * @throws GenieException 
+     *
+     * @throws GenieException
      */
     @Test
     public void testSetTags() throws GenieException {

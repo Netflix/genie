@@ -27,7 +27,7 @@ import java.io.IOException;
  *
  * @author tgianos
  */
-public class TestGenieException {
+public class TestGenieException extends Exception {
     private static final int ERROR_CODE = 404;
     private static final String ERROR_MESSAGE = "Not Found";
     private static final IOException IOE = new IOException("IOException");

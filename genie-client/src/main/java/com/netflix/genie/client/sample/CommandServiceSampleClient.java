@@ -27,9 +27,11 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,14 +156,14 @@ public final class CommandServiceSampleClient {
             //Shouldn't print anything
             LOG.info("Config = " + config);
         }
-        
+
         /**************** Begin tests for tag Api's *********************/
         LOG.info("Get tags for command with id " + command1.getId());
         final Set<String> tags = command1.getTags();
         for (final String tag : tags) {
             LOG.info("Tag = " + tag);
         }
-        
+
         LOG.info("Adding tags to command with id " + command1.getId());
         final Set<String> newTags = new HashSet<String>();
         newTags.add("tag1");
@@ -185,7 +187,7 @@ public final class CommandServiceSampleClient {
             //Shouldn't print anything
             LOG.info("Tag = " + tag);
         }
-        
+
         LOG.info("Deleting all the tags from the command with id " + command1.getId());
         //This should remove the original config leaving only the two in this set
         final Set<String> tags4 = commandClient.removeAllConfigsForCommand(command1.getId());
@@ -194,7 +196,7 @@ public final class CommandServiceSampleClient {
             LOG.info("Config = " + tag);
         }
         /********************** End tests for tag Api's **********************/
-        
+
         LOG.info("Application for command with id " + command1.getId());
         final Application application = commandClient.getApplicationForCommand(command1.getId());
         LOG.info("Application = " + application);
@@ -242,7 +244,7 @@ public final class CommandServiceSampleClient {
         }
         command.setEnvPropFile("s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh");
         command.setVersion("0.13");
-        
+
         final Set<String> tags = new HashSet<String>();
         tags.add("tag0");
         command.setTags(tags);

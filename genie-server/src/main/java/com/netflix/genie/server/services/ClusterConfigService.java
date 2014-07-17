@@ -58,13 +58,13 @@ public interface ClusterConfigService {
      * Get cluster info for various parameters. Null or empty parameters are
      * ignored.
      *
-     * @param name cluster name
-     * @param statuses valid types - Types.ClusterStatus
-     * @param tags tags allocated to this cluster
+     * @param name          cluster name
+     * @param statuses      valid types - Types.ClusterStatus
+     * @param tags          tags allocated to this cluster
      * @param minUpdateTime min time when cluster configuration was updated
      * @param maxUpdateTime max time when cluster configuration was updated
-     * @param limit number of entries to return
-     * @param page page number
+     * @param limit         number of entries to return
+     * @param page          page number
      * @return All the clusters matching the criteria
      * @throws GenieException
      */
@@ -89,7 +89,7 @@ public interface ClusterConfigService {
     /**
      * Update a cluster configuration.
      *
-     * @param id The id of the cluster to update
+     * @param id            The id of the cluster to update
      * @param updateCluster the information to update the cluster with
      * @return the updated cluster
      * @throws GenieException
@@ -118,8 +118,8 @@ public interface ClusterConfigService {
     /**
      * Add configuration files to the cluster.
      *
-     * @param id The id of the cluster to add the configuration file to. Not
-     * null/empty/blank.
+     * @param id      The id of the cluster to add the configuration file to. Not
+     *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
      * @return The active set of configurations
      * @throws GenieException
@@ -133,7 +133,7 @@ public interface ClusterConfigService {
      * id.
      *
      * @param id The id of the cluster to get the configuration files for. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The set of configuration files as paths
      * @throws GenieException
      */
@@ -144,10 +144,10 @@ public interface ClusterConfigService {
      * Update the set of configuration files associated with the cluster with
      * given id.
      *
-     * @param id The id of the cluster to update the configuration files for.
-     * Not null/empty/blank.
+     * @param id      The id of the cluster to update the configuration files for.
+     *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configurations
-     * with. Not null/empty.
+     *                with. Not null/empty.
      * @return The active set of configurations
      * @throws GenieException
      */
@@ -159,7 +159,7 @@ public interface ClusterConfigService {
      * Remove all configuration files from the cluster.
      *
      * @param id The id of the cluster to remove the configuration file from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return The active set of configurations
      * @throws GenieException
      */
@@ -169,8 +169,8 @@ public interface ClusterConfigService {
     /**
      * Add commands to the cluster.
      *
-     * @param id The id of the cluster to add the command file to. Not
-     * null/empty/blank.
+     * @param id       The id of the cluster to add the command file to. Not
+     *                 null/empty/blank.
      * @param commands The commands to add. Not null/empty.
      * @return The active list of commands
      * @throws GenieException
@@ -183,7 +183,7 @@ public interface ClusterConfigService {
      * Get the set of commands associated with the cluster with given id.
      *
      * @param id The id of the cluster to get the commands for. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The list of commands
      * @throws GenieException
      */
@@ -193,10 +193,10 @@ public interface ClusterConfigService {
      * Update the set of command files associated with the cluster with
      * given id.
      *
-     * @param id The id of the cluster to update the command files for. Not
-     * null/empty/blank.
+     * @param id       The id of the cluster to update the command files for. Not
+     *                 null/empty/blank.
      * @param commands The command files to replace existing
-     * commands with. Not null/empty.
+     *                 commands with. Not null/empty.
      * @return The active list of commands
      * @throws GenieException
      */
@@ -208,28 +208,29 @@ public interface ClusterConfigService {
      * Remove all commands from the cluster.
      *
      * @param id The id of the cluster to remove the commands from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The active list of commands
      * @throws GenieException
      */
     List<Command> removeAllCommandsForCluster(
             final String id) throws GenieException;
+
     /**
      * Remove a command from the cluster.
      *
-     * @param id The id of the cluster to remove the command from. Not
-     * null/empty/blank.
+     * @param id    The id of the cluster to remove the command from. Not
+     *              null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active list of commands
      * @throws GenieException
      */
     List<Command> removeCommandForCluster(final String id, final String cmdId) throws GenieException;
-    
+
     /**
      * Add tags to the cluster.
      *
-     * @param id The id of the cluster to add the tags to. Not
-     * null/empty/blank.
+     * @param id   The id of the cluster to add the tags to. Not
+     *             null/empty/blank.
      * @param tags The tags to add. Not null/empty.
      * @return The active set of tagss
      * @throws GenieException
@@ -243,7 +244,7 @@ public interface ClusterConfigService {
      * id.
      *
      * @param id The id of the cluster to get the tags for. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The set of tags as paths
      * @throws GenieException
      */
@@ -254,10 +255,10 @@ public interface ClusterConfigService {
      * Update the set of tags associated with the cluster with
      * given id.
      *
-     * @param id The id of the cluster to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the cluster to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing tags
-     * with. Not null/empty.
+     *             with. Not null/empty.
      * @return The active set of tagss
      * @throws GenieException
      */
@@ -269,18 +270,18 @@ public interface ClusterConfigService {
      * Remove all tags from the cluster.
      *
      * @param id The id of the cluster to remove the tags from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return The active set of tagss
      * @throws GenieException
      */
     Set<String> removeAllTagsForCluster(
             final String id) throws GenieException;
-    
+
     /**
      * Remove a tag from the cluster.
      *
-     * @param id The id of the cluster to remove the tag from. Not
-     * null/empty/blank.
+     * @param id  The id of the cluster to remove the tag from. Not
+     *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags
      * @throws GenieException

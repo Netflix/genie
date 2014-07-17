@@ -112,7 +112,7 @@ public class Application extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"
-            + " associated with this application.")
+                    + " associated with this application.")
     private Set<String> tags;
 
     /**
@@ -125,9 +125,9 @@ public class Application extends CommonEntityFields {
     /**
      * Construct a new Application with all required parameters.
      *
-     * @param name The name of the application. Not null/empty/blank.
-     * @param user The user who created the application. Not null/empty/blank.
-     * @param status The status of the application. Not null.
+     * @param name    The name of the application. Not null/empty/blank.
+     * @param user    The user who created the application. Not null/empty/blank.
+     * @param status  The status of the application. Not null.
      * @param version The version of this application
      */
     public Application(
@@ -187,7 +187,7 @@ public class Application extends CommonEntityFields {
      * Sets the env property file name in string form.
      *
      * @param envPropFile contains the list of env variables to set while
-     * running a command using this application.
+     *                    running a command using this application.
      */
     public void setEnvPropFile(final String envPropFile) {
         this.envPropFile = envPropFile;

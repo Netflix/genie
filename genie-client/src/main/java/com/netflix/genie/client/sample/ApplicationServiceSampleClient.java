@@ -25,9 +25,11 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +143,7 @@ public final class ApplicationServiceSampleClient {
         for (final String tag : tags) {
             LOG.info("Tag = " + tag);
         }
-        
+
         LOG.info("Adding tags to application with id " + app1.getId());
         final Set<String> newTags = new HashSet<String>();
         newTags.add("tag1");
@@ -165,7 +167,7 @@ public final class ApplicationServiceSampleClient {
             //Shouldn't print anything
             LOG.info("Tag = " + tag);
         }
-        
+
         LOG.info("Deleting all the tags from the application with id " + app1.getId());
         //This should remove the original config leaving only the two in this set
         final Set<String> tags4 = appClient.removeAllConfigsForApplication(app1.getId());
@@ -174,7 +176,7 @@ public final class ApplicationServiceSampleClient {
             LOG.info("Config = " + tag);
         }
         /********************** End tests for tag Api's **********************/
-        
+
         LOG.info("Jars for application with id " + app1.getId());
         final Set<String> jars = appClient.getJarsForApplication(app1.getId());
         for (final String jar : jars) {
@@ -235,11 +237,11 @@ public final class ApplicationServiceSampleClient {
         final Set<String> configs = new HashSet<String>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml");
         app.setConfigs(configs);
-        
+
         final Set<String> jars = new HashSet<String>();
         jars.add("s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar");
         app.setJars(jars);
-        
+
         final Set<String> tags = new HashSet<String>();
         tags.add("tag0");
         app.setTags(tags);

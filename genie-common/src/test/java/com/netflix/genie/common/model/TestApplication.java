@@ -62,7 +62,8 @@ public class TestApplication {
 
     /**
      * Test the argument Constructor.
-     * @throws GenieException 
+     *
+     * @throws GenieException
      */
     @Test
     public void testConstructor() throws GenieException {

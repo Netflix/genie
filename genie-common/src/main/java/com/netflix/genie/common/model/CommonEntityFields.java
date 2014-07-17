@@ -17,7 +17,12 @@
  */
 package com.netflix.genie.common.model;
 
-import java.net.HttpURLConnection;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -27,16 +32,11 @@ import javax.persistence.PreUpdate;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.GenieException;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import java.net.HttpURLConnection;
 
 /**
+ * The common entity fields for all Genie entities.
+ *
  * @author amsharma
  * @author tgianos
  */
@@ -68,7 +68,7 @@ public class CommonEntityFields extends Auditable {
     private String user;
 
     /**
-     * Name of this entity
+     * Name of this entity.
      */
     @Basic(optional = false)
     @ApiModelProperty(
@@ -82,12 +82,12 @@ public class CommonEntityFields extends Auditable {
     public CommonEntityFields() {
         super();
     }
-    
+
     /**
      * Construct a new CommonEntity Object with all required parameters.
      *
-     * @param name The name of the entity. Not null/empty/blank.
-     * @param user The user who created the entity. Not null/empty/blank.
+     * @param name    The name of the entity. Not null/empty/blank.
+     * @param user    The user who created the entity. Not null/empty/blank.
      * @param version The version of this entity. Not null/empty/blank.
      */
     public CommonEntityFields(

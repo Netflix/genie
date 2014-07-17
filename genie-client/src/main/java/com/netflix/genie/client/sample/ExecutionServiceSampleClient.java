@@ -25,6 +25,7 @@ import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public final class ExecutionServiceSampleClient {
         ExecutionServiceClient client = ExecutionServiceClient.getInstance();
 
         final String userName = "genietest";
-        final String jobName  = "sampleClientTestJob";
+        final String jobName = "sampleClientTestJob";
         System.out.println("Getting jobInfos using specified filter criteria");
         final Multimap<String, String> params = ArrayListMultimap.create();
         params.put("userName", userName);
@@ -84,7 +85,7 @@ public final class ExecutionServiceSampleClient {
         final List<ClusterCriteria> clusterCriterias = new ArrayList<ClusterCriteria>();
         final Set<String> commandCriteria = new HashSet<String>();
         clusterCriterias.add(criteria);
-        
+
         Job job = new Job(
                 userName,
                 jobName,

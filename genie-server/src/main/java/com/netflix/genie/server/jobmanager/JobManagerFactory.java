@@ -23,9 +23,11 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
+
 import java.net.HttpURLConnection;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -81,9 +83,9 @@ public final class JobManagerFactory implements ApplicationContextAware {
     public JobManager getJobManager(final Job job) throws GenieException {
         LOG.info("called");
 
-        // Figure out a cluster to run this job. Cluster selection is done based on 
+        // Figure out a cluster to run this job. Cluster selection is done based on
         // ClusterCriteria tags and Command tags specified in the job.
-        final Cluster cluster = this.clb.selectCluster(this.ccs.getClusters(job)) ;
+        final Cluster cluster = this.clb.selectCluster(this.ccs.getClusters(job));
         final String className = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server." + cluster.getClusterType() + ".JobManagerImpl");
 

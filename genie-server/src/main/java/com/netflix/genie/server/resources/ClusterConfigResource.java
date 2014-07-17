@@ -27,6 +27,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -61,8 +62,8 @@ import org.slf4j.LoggerFactory;
 @Path("/v2/config/clusters")
 @Api(value = "/v2/config/clusters", description = "Manage the available clusters")
 @Produces({
-    MediaType.APPLICATION_XML,
-    MediaType.APPLICATION_JSON
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
 })
 @Named
 public class ClusterConfigResource {
@@ -100,17 +101,17 @@ public class ClusterConfigResource {
      */
     @POST
     @Consumes({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+            MediaType.APPLICATION_XML,
+            MediaType.APPLICATION_JSON
     })
     @ApiOperation(
             value = "Create a cluster",
             notes = "Create a cluster from the supplied information.",
             response = Cluster.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Created", response = Cluster.class),
-        @ApiResponse(code = 400, message = "Invalid required parameter supplied"),
-        @ApiResponse(code = 409, message = "A cluster with the supplied id already exists")
+            @ApiResponse(code = 201, message = "Created", response = Cluster.class),
+            @ApiResponse(code = 400, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = 409, message = "A cluster with the supplied id already exists")
     })
     public Response createCluster(
             @ApiParam(value = "The cluster to create.", required = true)
@@ -138,9 +139,9 @@ public class ClusterConfigResource {
             notes = "Get the cluster by id if it exists",
             response = Cluster.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Cluster.class),
-        @ApiResponse(code = 400, message = "Invalid id supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK", response = Cluster.class),
+            @ApiResponse(code = 400, message = "Invalid id supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Cluster getCluster(
             @ApiParam(value = "Id of the cluster to get.", required = true)
@@ -154,13 +155,13 @@ public class ClusterConfigResource {
      * Get cluster config based on user params. If empty strings are passed for
      * they are treated as nulls (not false).
      *
-     * @param name cluster name (can be a pattern)
-     * @param statuses valid types - Types.ClusterStatus
-     * @param tags tags for the cluster
+     * @param name          cluster name (can be a pattern)
+     * @param statuses      valid types - Types.ClusterStatus
+     * @param tags          tags for the cluster
      * @param minUpdateTime min time when cluster configuration was updated
      * @param maxUpdateTime max time when cluster configuration was updated
-     * @param limit number of entries to return
-     * @param page page number
+     * @param limit         number of entries to return
+     * @param page          page number
      * @return the Clusters found matching the criteria
      * @throws GenieException
      */
@@ -171,7 +172,7 @@ public class ClusterConfigResource {
             response = Cluster.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Cluster.class)
+            @ApiResponse(code = 200, message = "OK", response = Cluster.class)
     })
     public List<Cluster> getClusters(
             @ApiParam(value = "Name of the cluster.", required = false)
@@ -213,7 +214,7 @@ public class ClusterConfigResource {
     /**
      * Update a cluster configuration.
      *
-     * @param id unique if for cluster to update
+     * @param id            unique if for cluster to update
      * @param updateCluster contains the cluster information to update
      * @return the updated cluster
      * @throws GenieException
@@ -221,17 +222,17 @@ public class ClusterConfigResource {
     @PUT
     @Path("/{id}")
     @Consumes({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+            MediaType.APPLICATION_XML,
+            MediaType.APPLICATION_JSON
     })
     @ApiOperation(
             value = "Update a cluster",
             notes = "Update a cluster from the supplied information.",
             response = Cluster.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Cluster.class),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Cluster to update not found")
+            @ApiResponse(code = 200, message = "OK", response = Cluster.class),
+            @ApiResponse(code = 400, message = "Invalid Id supplied"),
+            @ApiResponse(code = 404, message = "Cluster to update not found")
     })
     public Cluster updateClusterConfig(
             @ApiParam(value = "Id of the cluster to update.", required = true)
@@ -256,9 +257,9 @@ public class ClusterConfigResource {
             notes = "Delete a cluster with the supplied id.",
             response = Cluster.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Cluster.class),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK", response = Cluster.class),
+            @ApiResponse(code = 400, message = "Invalid Id supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Cluster deleteClusterConfig(@PathParam("id") final String id) throws GenieException {
         LOG.debug("delete called for id: " + id);
@@ -278,9 +279,9 @@ public class ClusterConfigResource {
             response = Cluster.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid Id supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public List<Cluster> deleteAllClusters() throws GenieException {
         LOG.debug("called");
@@ -290,8 +291,8 @@ public class ClusterConfigResource {
     /**
      * Add new configuration files to a given cluster.
      *
-     * @param id The id of the cluster to add the configuration file to. Not
-     * null/empty/blank.
+     * @param id      The id of the cluster to add the configuration file to. Not
+     *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this cluster.
      * @throws GenieException
@@ -306,9 +307,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> addConfigsForCluster(
             @ApiParam(value = "Id of the cluster to add configuration to.", required = true)
@@ -324,7 +325,7 @@ public class ClusterConfigResource {
      * Get all the configuration files for a given cluster.
      *
      * @param id The id of the cluster to get the configuration files for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The active set of configuration files.
      * @throws GenieException
      */
@@ -337,9 +338,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> getConfigsForCluster(
             @ApiParam(value = "Id of the cluster to get configurations for.", required = true)
@@ -352,10 +353,10 @@ public class ClusterConfigResource {
     /**
      * Update the configuration files for a given cluster.
      *
-     * @param id The id of the cluster to update the configuration files for.
-     * Not null/empty/blank.
+     * @param id      The id of the cluster to update the configuration files for.
+     *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
-     * files with. Not null/empty/blank.
+     *                files with. Not null/empty/blank.
      * @return The new set of cluster configurations.
      * @throws GenieException
      */
@@ -369,9 +370,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> updateConfigsForCluster(
             @ApiParam(value = "Id of the cluster to update configurations for.", required = true)
@@ -387,7 +388,7 @@ public class ClusterConfigResource {
      * Delete the all configuration files from a given cluster.
      *
      * @param id The id of the cluster to delete the configuration files from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -399,9 +400,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid Id supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> removeAllConfigsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
@@ -414,8 +415,8 @@ public class ClusterConfigResource {
     /**
      * Add new commands to the given cluster.
      *
-     * @param id The id of the cluster to add the commands to. Not
-     * null/empty/blank.
+     * @param id       The id of the cluster to add the commands to. Not
+     *                 null/empty/blank.
      * @param commands The commands to add. Not null.
      * @return The active commands for this cluster.
      * @throws GenieException
@@ -423,19 +424,19 @@ public class ClusterConfigResource {
     @POST
     @Path("/{id}/commands")
     @Consumes({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+            MediaType.APPLICATION_XML,
+            MediaType.APPLICATION_JSON
     })
     @ApiOperation(
             value = "Add new commands to a cluster",
             notes = "Add the supplied commands to the cluster with the supplied id."
-            + " commands should already have been created.",
+                    + " commands should already have been created.",
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "cluster not found")
     })
     public List<Command> addCommandsForcluster(
             @ApiParam(value = "Id of the cluster to add commands to.", required = true)
@@ -451,7 +452,7 @@ public class ClusterConfigResource {
      * Get all the commands configured for a given cluster.
      *
      * @param id The id of the cluster to get the command files for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The active set of commands for the cluster.
      * @throws GenieException
      */
@@ -463,9 +464,9 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public List<Command> getCommandsForCluster(
             @ApiParam(value = "Id of the cluster to get commands for.", required = true)
@@ -478,18 +479,18 @@ public class ClusterConfigResource {
     /**
      * Update the commands for a given cluster.
      *
-     * @param id The id of the cluster to update the configuration files for.
-     * Not null/empty/blank.
+     * @param id       The id of the cluster to update the configuration files for.
+     *                 Not null/empty/blank.
      * @param commands The commands to replace existing applications with. Not
-     * null/empty/blank.
+     *                 null/empty/blank.
      * @return The new set of commands for the cluster.
      * @throws GenieException
      */
     @PUT
     @Path("/{id}/commands")
     @Consumes({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+            MediaType.APPLICATION_XML,
+            MediaType.APPLICATION_JSON
     })
     @ApiOperation(
             value = "Update the commands for an cluster",
@@ -497,9 +498,9 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public List<Command> updateCommandsForCluster(
             @ApiParam(value = "Id of the cluster to update commands for.", required = true)
@@ -516,7 +517,7 @@ public class ClusterConfigResource {
      * Remove the all commands from a given cluster.
      *
      * @param id The id of the cluster to delete the commands from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -528,9 +529,9 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid Id supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public List<Command> removeAllCommandsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
@@ -539,12 +540,12 @@ public class ClusterConfigResource {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllCommandsForCluster(id);
     }
-    
+
     /**
      * Remove an command from a given cluster.
      *
-     * @param id The id of the cluster to delete the command from. Not
-     * null/empty/blank.
+     * @param id    The id of the cluster to delete the command from. Not
+     *              null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active set of commands for the cluster.
      * @throws GenieException
@@ -557,9 +558,9 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public List<Command> removeCommandForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
@@ -571,12 +572,12 @@ public class ClusterConfigResource {
         LOG.debug("Called with id " + id + " and command id " + cmdId);
         return this.ccs.removeCommandForCluster(id, cmdId);
     }
-    
+
     /**
      * Add new tags to a given cluster.
      *
-     * @param id The id of the cluster to add the tags to. Not
-     * null/empty/blank.
+     * @param id   The id of the cluster to add the tags to. Not
+     *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this cluster.
      * @throws GenieException
@@ -591,9 +592,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> addTagsForCluster(
             @ApiParam(value = "Id of the cluster to add configuration to.", required = true)
@@ -609,7 +610,7 @@ public class ClusterConfigResource {
      * Get all the tags for a given cluster.
      *
      * @param id The id of the cluster to get the tags for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The active set of tags.
      * @throws GenieException
      */
@@ -622,9 +623,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> getTagsForCluster(
             @ApiParam(value = "Id of the cluster to get tags for.", required = true)
@@ -637,10 +638,10 @@ public class ClusterConfigResource {
     /**
      * Update the tags for a given cluster.
      *
-     * @param id The id of the cluster to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the cluster to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing configuration
-     * files with. Not null/empty/blank.
+     *             files with. Not null/empty/blank.
      * @return The new set of cluster tags.
      * @throws GenieException
      */
@@ -654,9 +655,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> updateTagsForCluster(
             @ApiParam(value = "Id of the cluster to update tags for.", required = true)
@@ -672,7 +673,7 @@ public class ClusterConfigResource {
      * Delete the all tags from a given cluster.
      *
      * @param id The id of the cluster to delete the tags from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -684,9 +685,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid Id supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> removeAllTagsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
@@ -695,12 +696,12 @@ public class ClusterConfigResource {
         LOG.debug("Called with id " + id);
         return this.ccs.removeAllTagsForCluster(id);
     }
-    
+
     /**
      * Remove an tag from a given cluster.
      *
-     * @param id The id of the cluster to delete the tag from. Not
-     * null/empty/blank.
+     * @param id  The id of the cluster to delete the tag from. Not
+     *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the cluster.
      * @throws GenieException
@@ -714,9 +715,9 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Cluster not found")
     })
     public Set<String> removeTagForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
