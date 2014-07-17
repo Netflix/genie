@@ -573,6 +573,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> removeTagForJob(String id, String tag)
             throws GenieException {
@@ -601,5 +604,64 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No job with id " + id + " exists.");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobStatus finalizeJob(final String jobId, final int exitCode) {
+        final Job job = this.jobRepo.findOne(jobId);
+        job.setExitCode(exitCode);
+
+        // only update status if not KILLED
+        if (job.getStatus() != null && job.getStatus() != JobStatus.KILLED) {
+            if (exitCode != SubProcessStatus.SUCCESS.code()) {
+                // all other failures except s3 log archival failure
+                LOG.error("Failed to execute job, exit code: "
+                        + exitCode);
+                String errMsg = SubProcessStatus.message(exitCode);
+                if ((errMsg == null) || (errMsg.isEmpty())) {
+                    errMsg = "Please look at job's stderr for more details";
+                }
+                job.setJobStatus(JobStatus.FAILED,
+                        "Failed to execute job, Error Message: " + errMsg);
+                // incr counter for failed jobs
+                this.stats.incrGenieFailedJobs();
+            } else {
+                // success
+                job.setJobStatus(JobStatus.SUCCEEDED,
+                        "Job finished successfully");
+                // incr counter for successful jobs
+                this.stats.incrGenieSuccessfulJobs();
+            }
+
+            // set the archive location - if needed
+            if (!job.isDisableLogArchival()) {
+                job.setArchiveLocation(NetUtil.getArchiveURI(job.getId()));
+            }
+
+            // update the job status
+            job.setUpdated(new Date());
+            return job.getStatus();
+        } else {
+            // if job status is killed, the kill thread will update status
+            LOG.debug("Job has been killed - will not update DB: " + job.getId());
+            return JobStatus.KILLED;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long updateJob(final String jobId) {
+        LOG.debug("Updating db for job: " + jobId);
+        final Job job = this.jobRepo.findOne(jobId);
+
+        final long lastUpdatedTimeMS = System.currentTimeMillis();
+        job.setJobStatus(JobStatus.RUNNING, "Job is running");
+        job.setUpdated(new Date(lastUpdatedTimeMS));
+        return lastUpdatedTimeMS;
     }
 }

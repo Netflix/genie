@@ -27,7 +27,6 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobMonitor;
-import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.StringUtil;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -117,7 +116,7 @@ public class YarnJobManager implements JobManager {
      * @param jobMonitor The job monitor object to use.
      */
     @Inject
-    public YarnJobManager(final JobMonitor jobMonitor, final ExecutionService xs) {
+    public YarnJobManager(final JobMonitor jobMonitor) {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
     }

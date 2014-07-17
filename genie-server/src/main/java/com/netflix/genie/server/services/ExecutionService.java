@@ -162,4 +162,21 @@ public interface ExecutionService {
      * @throws GenieException
      */
     Set<String> removeTagForJob(final String id, final String tag) throws GenieException;
+
+    /**
+     * Finalize the status of a job.
+     *
+     * @param jobId The id of the job to finalize.
+     * @param exitCode The exit code of the job process.
+     * @return The job status.
+     */
+    JobStatus finalizeJob(final String jobId, final int exitCode);
+
+    /**
+     * Update a job with the last updated time.
+     *
+     * @param jobId The id of the job to update.
+     * @return The time in milliseconds when the job was updated.
+     */
+    long updateJob(final String jobId);
 }
