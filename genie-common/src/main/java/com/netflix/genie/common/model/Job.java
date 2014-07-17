@@ -280,7 +280,7 @@ public class Job extends CommonEntityFields {
     @Basic
     @ApiModelProperty(
             value = "The start time of the job.")
-    private Long startTime;
+    private long startTime = -1L;
 
     /**
      * Finish time for job - initialized to zero (for historic reasons).
@@ -288,7 +288,7 @@ public class Job extends CommonEntityFields {
     @Basic
     @ApiModelProperty(
             value = "The end time of the job.")
-    private Long finishTime = 0L;
+    private long finishTime = 0L;
 
     /**
      * The host/IP address of the client submitting job.
@@ -329,7 +329,7 @@ public class Job extends CommonEntityFields {
     @Basic
     @ApiModelProperty(
             value = "The exit code of the job.")
-    private Integer exitCode;
+    private int exitCode = -1;
 
     /**
      * Whether this job was forwarded to new instance or not.
@@ -753,7 +753,7 @@ public class Job extends CommonEntityFields {
      *
      * @return startTime : start time in ms
      */
-    public Long getStartTime() {
+    public long getStartTime() {
         return this.startTime;
     }
 
@@ -762,7 +762,7 @@ public class Job extends CommonEntityFields {
      *
      * @param startTime epoch time in ms
      */
-    public void setStartTime(final Long startTime) {
+    public void setStartTime(final long startTime) {
         this.startTime = startTime;
     }
 
@@ -771,7 +771,7 @@ public class Job extends CommonEntityFields {
      *
      * @return finishTime
      */
-    public Long getFinishTime() {
+    public long getFinishTime() {
         return this.finishTime;
     }
 
@@ -780,7 +780,7 @@ public class Job extends CommonEntityFields {
      *
      * @param finishTime epoch time in ms
      */
-    public void setFinishTime(final Long finishTime) {
+    public void setFinishTime(final long finishTime) {
         this.finishTime = finishTime;
     }
 
