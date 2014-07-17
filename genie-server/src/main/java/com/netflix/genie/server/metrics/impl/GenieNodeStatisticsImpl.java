@@ -82,6 +82,9 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
     @Monitor(name = "Successful_Email_Count", type = DataSourceType.COUNTER)
     private final AtomicLong successEmailCount = new AtomicLong(0);
 
+    @Monitor(name = "Job_Submission_Retry_Count", type = DataSourceType.COUNTER)
+    private final AtomicLong jobSubmissionRetryCount = new AtomicLong(0);
+    
     @Monitor(name = "Failed_Email_Count", type = DataSourceType.COUNTER)
     private final AtomicLong failedEmailCount = new AtomicLong(0);
 
@@ -434,4 +437,15 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
     public void setGenieRunningJobs8hPlus(int genieRunningJobs8hPlus) {
         this.genieRunningJobs8hPlus.set(genieRunningJobs8hPlus);
     }
+
+    @Override
+    public AtomicLong getJobSubmissionRetryCount() {
+        LOG.debug("called");
+        return jobSubmissionRetryCount;
+    }
+
+    @Override
+    public void incrJobSubmissionRetryCount() {
+        LOG.debug("called");
+        jobSubmissionRetryCount.incrementAndGet();}
 }

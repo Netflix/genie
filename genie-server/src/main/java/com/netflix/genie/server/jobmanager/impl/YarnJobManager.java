@@ -548,9 +548,12 @@ public class YarnJobManager implements JobManager {
         final String cpOpts = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server.hadoop.s3cp.opts", "");
 
-        final String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp";
+        final String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp -f";
         this.env.put("COPY_COMMAND", copyCommand);
 
+        // Force flag to overwrite required in Hadoop2
+        this.env.put("FORCE_COPY_FLAG", "-f");
+        
         final String mkdirCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -mkdir";
         this.env.put("MKDIR_COMMAND", mkdirCommand);
 

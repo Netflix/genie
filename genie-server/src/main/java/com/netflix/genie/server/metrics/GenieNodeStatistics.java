@@ -94,6 +94,18 @@ public interface GenieNodeStatistics {
     void incrSuccessfulEmailCount();
 
     /**
+     * Get number job submission retries.
+     *
+     * @return number of job submission retries for this instance.
+     */
+    AtomicLong getJobSubmissionRetryCount();
+
+    /**
+     * Increment job submission retry count.
+    */
+     void incrJobSubmissionRetryCount();
+        
+    /**
      * Get number of email that failed to be sent from this instance.
      *
      * @return number of failed email attempts on this instance

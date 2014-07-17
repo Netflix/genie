@@ -411,6 +411,7 @@ public class JobResource {
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
+    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Remove a tag from a job",
             notes = "Remove the given tag from the job with given id.",
