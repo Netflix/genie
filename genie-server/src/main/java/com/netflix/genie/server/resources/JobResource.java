@@ -50,6 +50,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,19 +186,23 @@ public class JobResource {
     @ApiOperation(
             value = "Get the status of the job ",
             notes = "Get the status of job whose id is sent",
-            response = Job.class)
+            response = String.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Job.class),
+            @ApiResponse(code = 200, message = "OK", response = String.class),
             @ApiResponse(code = 400, message = "Invalid id supplied"),
             @ApiResponse(code = 404, message = "Job not found")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public JobStatus getJobStatus(
+    public String getJobStatus(
             @ApiParam(value = "Id of the job.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
         LOG.debug("called for jobID" + id);
-        return this.xs.getJobStatus(id);
+        final StringBuilder builder = new StringBuilder();
+        builder.append("{\"status\":\"")
+                .append(this.xs.getJobStatus(id))
+                .append("\"}");
+        return builder.toString();
     }
 
     /**
