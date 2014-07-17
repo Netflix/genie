@@ -161,7 +161,7 @@ public class Job extends CommonEntityFields {
     @XmlTransient
     @JsonIgnore
     @Lob
-    @Basic(optional = false)
+    @Basic
     private String chosenClusterCriteriaString;
 
     /**
