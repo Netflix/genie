@@ -83,41 +83,9 @@ public class TestApplication {
      * @throws GenieException
      */
     @Test
-    public void testOnCreateOrUpdate() throws GenieException {
+    public void testOnCreateOrUpdateApplication() throws GenieException {
         this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
-        this.a.onCreateOrUpdate();
-    }
-
-    /**
-     * Test to make sure validation works.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateWithNothing() throws GenieException {
-        this.a.onCreateOrUpdate();
-    }
-
-    /**
-     * Test to make sure validation works when no name entered.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoName() throws GenieException {
-        this.a = new Application(null, USER, ApplicationStatus.ACTIVE, VERSION);
-        this.a.onCreateOrUpdate();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no User entered.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoUser() throws GenieException {
-        this.a = new Application(NAME, null, ApplicationStatus.ACTIVE, VERSION);
-        this.a.onCreateOrUpdate();
+        this.a.onCreateOrUpdateApplication();
     }
 
     /**
@@ -126,9 +94,9 @@ public class TestApplication {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoStatus() throws GenieException {
+    public void testOnCreateOrUpdateApplicationNoStatus() throws GenieException {
         this.a = new Application(NAME, USER, null, VERSION);
-        this.a.onCreateOrUpdate();
+        this.a.onCreateOrUpdateApplication();
     }
 
     /**
@@ -143,27 +111,6 @@ public class TestApplication {
     }
 
     /**
-     * Test setting the name.
-     */
-    @Test
-    public void testSetName() {
-        Assert.assertNull(this.a.getName());
-        this.a.setName(NAME);
-        Assert.assertEquals(NAME, this.a.getName());
-    }
-
-    /**
-     * Test setting the user.
-     * @throws GenieException 
-     */
-    @Test
-    public void testSetUser() throws GenieException {
-        Assert.assertNull(this.a.getUser());
-        this.a.setUser(USER);
-        Assert.assertEquals(USER, this.a.getUser());
-    }
-
-    /**
      * Test setting the status.
      */
     @Test
@@ -171,17 +118,6 @@ public class TestApplication {
         Assert.assertEquals(ApplicationStatus.INACTIVE, this.a.getStatus());
         this.a.setStatus(ApplicationStatus.ACTIVE);
         Assert.assertEquals(ApplicationStatus.ACTIVE, this.a.getStatus());
-    }
-
-    /**
-     * Test setting the version.
-     */
-    @Test
-    public void testSetVersion() {
-        Assert.assertNull(this.a.getVersion());
-        final String version = "1.2.3";
-        this.a.setVersion(version);
-        Assert.assertEquals(version, this.a.getVersion());
     }
 
     /**
@@ -217,6 +153,19 @@ public class TestApplication {
         jars.add("s3://netflix/jars/myJar.jar");
         this.a.setJars(jars);
         Assert.assertEquals(jars, this.a.getJars());
+    }
+
+    /**
+     * Test setting the tags.
+     */
+    @Test
+    public void testSetTags() {
+        Assert.assertNull(this.a.getTags());
+        final Set<String> tags = new HashSet<String>();
+        tags.add("tag1");
+        tags.add("tag2");
+        this.a.setTags(tags);
+        Assert.assertEquals(tags, this.a.getTags());
     }
 
     /**

@@ -18,7 +18,7 @@
         <property name="persistenceUnitName" value="com.netflix.genie.persistence"/>
         <property name="jpaProperties">
             <props>
-                <prop key="openjpa.jdbc.SynchronizeMappings">buildSchema(SchemaAction='add')</prop>       
+                <prop key="openjpa.jdbc.SynchronizeMappings">buildSchema(SchemaAction='add')</prop>
                 <prop key="openjpa.DynamicEnhancementAgent">false</prop> 
                 <prop key="openjpa.RuntimeUnenhancedClasses">unsupported</prop> 
             </props>

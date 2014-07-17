@@ -19,7 +19,6 @@ package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,7 +35,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -56,13 +54,11 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Entity
-@Table(schema = "genie")
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Job extends CommonEntityFields {
 
-    private static final long serialVersionUID = 2979506788441089067L;
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
     private static final char CRITERIA_SET_DELIMITER = '|';
     private static final char CRITERIA_DELIMITER = ',';
@@ -362,12 +358,9 @@ public class Job extends CommonEntityFields {
      * Construct a new Job.
      *
      * @param user The name of the user running the job. Not null/empty/blank.
-     * @param commandId The id of the command to run for the job. Not
-     * null/empty/blank if no commandName entered.
-     * @param commandName The name of the command to run for the job. Not
-     * null/empty/blank if no commandId entered.
      * @param commandArgs The command line arguments for the job. Not
      * null/empty/blank.
+     * @param commandCriteria The criteria for the command. Not null/empty.
      * @param clusterCriteria The cluster criteria for the job. Not null/empty.
      * @param version The version of this job
      * @throws com.netflix.genie.common.exceptions.GenieException
@@ -384,6 +377,10 @@ public class Job extends CommonEntityFields {
         this.commandArgs = commandArgs;
         this.clusterCriteria = clusterCriteria;
         this.commandCriteria = commandCriteria;
+
+        if (StringUtils.isBlank(this.getVersion())) {
+            this.setVersion(DEFAULT_VERSION);
+        }
     }
 
     /**
@@ -393,19 +390,14 @@ public class Job extends CommonEntityFields {
      */
     @PrePersist
     protected void onCreateJob() throws GenieException {
-        validate(this.getUser(), this.commandCriteria, this.commandArgs, this.clusterCriteria, this.getName());
+        this.validate(this.commandCriteria, this.commandArgs, this.clusterCriteria);
         this.clusterCriteriaString = clusterCriteriaToString(this.clusterCriteria);
         this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<String>();
-            this.tags.add(this.getId());
         }
-        
-        // Set version to -1 if not specified
-        if (StringUtils.isBlank(this.getVersion())) {
-            this.setVersion(DEFAULT_VERSION);
-        }
+        this.tags.add(this.getId());
     }
 
     /**
@@ -504,7 +496,7 @@ public class Job extends CommonEntityFields {
      * Sets the list of cluster criteria specified to pick a cluster.
      *
      * @param clusterCriteria The criteria list
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public void setClusterCriteria(final List<ClusterCriteria> clusterCriteria) throws GenieException {
         if (clusterCriteria == null || clusterCriteria.isEmpty()) {
@@ -531,7 +523,7 @@ public class Job extends CommonEntityFields {
      *
      * @param commandArgs Arguments to be used to run the command with. Not
      * null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public void setCommandArgs(final String commandArgs) throws GenieException {
         if (StringUtils.isBlank(commandArgs)) {
@@ -573,16 +565,9 @@ public class Job extends CommonEntityFields {
      * Set the attachments for this job.
      *
      * @param attachments The attachments to set
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setAttachments(final Set<FileAttachment> attachments) throws GenieException {
-        if (attachments != null) {
-            this.attachments = attachments;
-        } else {
-            final String msg = "No attachments passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
+    public void setAttachments(final Set<FileAttachment> attachments) {
+        this.attachments = attachments;
     }
 
     /**
@@ -673,7 +658,7 @@ public class Job extends CommonEntityFields {
      *
      * @param commandName Name of the command if specified on which the job is
      * run
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public void setCommandName(final String commandName) throws GenieException {
         if (StringUtils.isBlank(commandName)) {
@@ -721,7 +706,7 @@ public class Job extends CommonEntityFields {
     /**
      * Set the process handle for the job.
      *
-     * @param processHandle
+     * @param processHandle the process handle
      */
     public void setProcessHandle(final int processHandle) {
         this.processHandle = processHandle;
@@ -758,7 +743,7 @@ public class Job extends CommonEntityFields {
     /**
      * Set the status message for the job.
      *
-     * @param statusMsg
+     * @param statusMsg The status message.
      */
     public void setStatusMsg(final String statusMsg) {
         this.statusMsg = statusMsg;
@@ -848,7 +833,7 @@ public class Job extends CommonEntityFields {
     /**
      * Set the kill URI for this job.
      *
-     * @param killURI
+     * @param killURI The kill URI
      */
     public void setKillURI(final String killURI) {
         this.killURI = killURI;
@@ -866,7 +851,7 @@ public class Job extends CommonEntityFields {
     /**
      * Set the output URI for this job.
      *
-     * @param outputURI
+     * @param outputURI The output URI.
      */
     public void setOutputURI(final String outputURI) {
         this.outputURI = outputURI;
@@ -875,9 +860,9 @@ public class Job extends CommonEntityFields {
     /**
      * Get the exit code for this job.
      *
-     * @return exitCode
+     * @return exitCode The exit code. 0 for Success.
      */
-    public Integer getExitCode() {
+    public int getExitCode() {
         return this.exitCode;
     }
 
@@ -886,7 +871,7 @@ public class Job extends CommonEntityFields {
      *
      * @param exitCode
      */
-    public void setExitCode(final Integer exitCode) {
+    public void setExitCode(final int exitCode) {
         this.exitCode = exitCode;
     }
 
@@ -979,7 +964,7 @@ public class Job extends CommonEntityFields {
      * Set the cluster criteria string.
      *
      * @param clusterCriteriaString A list of cluster criteria objects
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     protected void setClusterCriteriaString(final String clusterCriteriaString) throws GenieException {
         if (StringUtils.isBlank(clusterCriteriaString)) {
@@ -1080,37 +1065,30 @@ public class Job extends CommonEntityFields {
     /**
      * Check to make sure that the required parameters exist.
      *
-     * @param job The configuration to check
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
+    @Override
     public void validate() throws GenieException {
+        super.validate();
         this.validate(
-                this.getUser(),
-                this.getCommandCriteria(),
-                this.getCommandArgs(),
-                this.getClusterCriteria(), 
-                this.getName());
+                this.commandCriteria,
+                this.commandArgs,
+                this.clusterCriteria);
     }
 
     /**
      * Validate that required parameters are present for a Job.
      *
-     * @param user The name of the user running the job
-     * @param commandId The id of the command to run for the job
-     * @param commandName The name of the command to run for the job
+     * @param commandCriteria The criteria for the command..
      * @param commandArgs The command line arguments for the job
      * @param criteria The cluster criteria for the job
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     private void validate(
-            final String user,
             final Set<String> commandCriteria,
             final String commandArgs,
-            final List<ClusterCriteria> criteria,
-            final String name) throws GenieException {
+            final List<ClusterCriteria> criteria) throws GenieException {
         final StringBuilder builder = new StringBuilder();
-        
-        super.validate(builder, name, user);
         if (commandCriteria == null || commandCriteria.isEmpty()) {
             builder.append("Command criteria is mandatory to figure out a command to run the job.\n");
         }
@@ -1155,7 +1133,7 @@ public class Job extends CommonEntityFields {
     /**
      * Helper method for building the cluster criteria string.
      *
-     * @param clusterCriteria2 The criteria to build up from
+     * @param commandCriteria2 The criteria to build up from
      * @return The cluster criteria string
      */
     private String commandCriteriaToString(final Set<String> commandCriteria2) throws GenieException {
@@ -1193,7 +1171,7 @@ public class Job extends CommonEntityFields {
      *
      * @param criteriaString The string to convert
      * @return The set of ClusterCriteria
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     private List<ClusterCriteria> stringToClusterCriteria(final String criteriaString) throws GenieException {
         //Rebuild the cluster criteria objects

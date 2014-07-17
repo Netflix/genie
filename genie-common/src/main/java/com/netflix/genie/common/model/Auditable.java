@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.UUID;
@@ -52,9 +53,10 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "An auditable item")
-public class Auditable {
+public class Auditable implements Serializable, Validate {
 
     private static final Logger LOG = LoggerFactory.getLogger(Auditable.class);
+    private static final long serialVersionUID = 7526472297322776147L;
 
     /**
      * Default constructor.
@@ -212,6 +214,13 @@ public class Auditable {
      */
     protected void setEntityVersion(final Long entityVersion) {
         this.entityVersion = entityVersion;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validate() throws GenieException {
     }
 
     /**

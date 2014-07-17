@@ -20,7 +20,6 @@ package com.netflix.genie.common.model;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +34,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -54,14 +52,12 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Entity
-@Table(schema = "genie")
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Command")
 public class Command extends CommonEntityFields {
 
-    private static final long serialVersionUID = -6106046473373305992L;
     private static final Logger LOG = LoggerFactory.getLogger(Command.class);
 
     /**
@@ -161,9 +157,8 @@ public class Command extends CommonEntityFields {
             final String user,
             final CommandStatus status,
             final String executable,
-            final String version) throws GenieException {
+            final String version) {
         super(name, user, version);
-
         this.status = status;
         this.executable = executable;
     }
@@ -175,8 +170,8 @@ public class Command extends CommonEntityFields {
      */
     @PrePersist
     @PreUpdate
-    protected void onCreateOrUpdate() throws GenieException {
-        validate(this.getName(), this.getUser(), this.status, this.executable);
+    protected void onCreateOrUpdateCommand() throws GenieException {
+        validate(this.status, this.executable);
         // Add the id to the tags
         if (this.tags == null) {
            this.tags = new HashSet<String>();
@@ -298,10 +293,9 @@ public class Command extends CommonEntityFields {
     /**
      * Sets the tags allocated to this command.
      *
-     * @param tags the tags to set. Not Null.
-     * @throws GenieException
+     * @param tags the tags to set.
      */
-    public void setTags(final Set<String> tags) throws GenieException {
+    public void setTags(final Set<String> tags) {
         this.tags = tags;
     }
 
@@ -353,34 +347,27 @@ public class Command extends CommonEntityFields {
     /**
      * Check to make sure that the required parameters exist.
      *
-     * @param command The configuration to check
      * @throws GenieException
      */
+    @Override
     public void validate() throws GenieException {
-        this.validate(
-                this.getName(),
-                this.getUser(),
-                this.getStatus(),
-                this.getExecutable());
+        super.validate();
+        this.validate(this.status, this.executable);
 
     }
 
     /**
      * Helper method for checking the validity of required parameters.
      *
-     * @param name The name of the command
-     * @param user The user who created the command
      * @param status The status of the command
+     * @param executable The executable of the command.
      * @throws GenieException
      */
     private void validate(
-            final String name,
-            final String user,
             final CommandStatus status,
             final String executable)
             throws GenieException {
         final StringBuilder builder = new StringBuilder();
-        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No command status entered and is required.\n");
         }

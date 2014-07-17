@@ -20,8 +20,6 @@ package com.netflix.genie.common.model;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,7 +36,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -58,14 +55,12 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Entity
-@Table(schema = "genie")
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Cluster")
 public class Cluster extends CommonEntityFields {
 
-    private static final long serialVersionUID = 8046582926818942370L;
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
 
     /**
@@ -147,7 +142,7 @@ public class Cluster extends CommonEntityFields {
             final ClusterStatus status,
             final String clusterType,
             final Set<String> configs,
-            final String version) throws GenieException {
+            final String version) {
         super(name, user, version);
         this.status = status;
         this.clusterType = clusterType;
@@ -160,8 +155,9 @@ public class Cluster extends CommonEntityFields {
      * @throws GenieException
      */
     @PrePersist
-    protected void onCreateOrUpdate() throws GenieException {
-        validate(this.getName(), this.getUser(), this.status, this.clusterType, this.getVersion(), this.configs);
+    @PreUpdate
+    protected void onCreateOrUpdateCluster() throws GenieException {
+        validate(this.status, this.clusterType, this.configs);
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<String>();
@@ -352,55 +348,41 @@ public class Cluster extends CommonEntityFields {
     }
 
     /**
-     * Check to make sure that the required parameters exist.
-     *
-     * @param cluster The configuration to check
-     * @throws GenieException
+     * {@inheritDoc}
      */
+    @Override
     public void validate() throws GenieException {
-       this.validate(
-                this.getName(),
-                this.getUser(),
-                this.getStatus(),
-                this.getClusterType(),
-                this.getVersion(),
-                this.getConfigs());
-
+        super.validate();
+        this.validate(
+                this.status,
+                this.clusterType,
+                this.configs);
     }
 
     /**
      * Helper method to ensure that values are valid for a cluster.
      *
-     * @param name The name of the cluster
-     * @param user The user who created the cluster
      * @param status The status of the cluster
      * @param clusterType The type of cluster
      * @param configs The configuration files for the cluster
      * @throws GenieException
      */
     private void validate(
-            final String name,
-            final String user,
             final ClusterStatus status,
             final String clusterType,
-            final String clusterVersion,
             final Set<String> configs) throws GenieException {
         final StringBuilder builder = new StringBuilder();
-        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No cluster status entered and is required.\n");
         }
         if (StringUtils.isBlank(clusterType)) {
             builder.append("No cluster type entered and is required.\n");
         }
-        if (StringUtils.isBlank(clusterVersion)) {
-            builder.append("No cluster version entered and is required");
-        }
         if (configs == null || configs.isEmpty()) {
             builder.append("At least one configuration file is required for the cluster.\n");
         }
 
-        if (builder.length() != 0) {
+        if (builder.length() > 0) {
             builder.insert(0, "Cluster configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);

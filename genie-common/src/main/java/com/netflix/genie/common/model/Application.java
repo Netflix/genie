@@ -20,7 +20,6 @@ package com.netflix.genie.common.model;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,14 +33,12 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,14 +50,12 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Entity
-@Table(schema = "genie")
 @Cacheable(false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "An Application")
 public class Application extends CommonEntityFields {
 
-    private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
     /**
@@ -139,8 +134,8 @@ public class Application extends CommonEntityFields {
             final String name,
             final String user,
             final ApplicationStatus status,
-            final String version) throws GenieException {
-        super(name, user,version);
+            final String version) {
+        super(name, user, version);
         this.status = status;
     }
 
@@ -151,9 +146,9 @@ public class Application extends CommonEntityFields {
      */
     @PrePersist
     @PreUpdate
-    protected void onCreateOrUpdate() throws GenieException {
-        validate(this.getName(), this.getUser(), this.status);
-     // Add the id to the tags
+    protected void onCreateOrUpdateApplication() throws GenieException {
+        this.validate(this.status);
+        // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<String>();
         }
@@ -265,42 +260,34 @@ public class Application extends CommonEntityFields {
      * Sets the tags allocated to this application.
      *
      * @param tags the tags to set.
-     * @throws GenieException
      */
     public void setTags(final Set<String> tags) {
         this.tags = tags;
     }
 
     /**
-     * Check to make sure that the required parameters exist.
-     *
-     * @param application The applications to check
-     * @throws GenieException
+     * {@inheritDoc}
      */
+    @Override
     public void validate() throws GenieException {
-        this.validate(this.getName(), this.getUser(), this.getStatus());
+        super.validate();
+        this.validate(this.getStatus());
     }
 
     /**
      * Helper method for checking the validity of required parameters.
      *
-     * @param name The name of the application
-     * @param user The user who created the application
      * @param status The status of the application
      * @throws GenieException
      */
     private void validate(
-            final String name,
-            final String user,
-            final ApplicationStatus status)
-            throws GenieException {
+            final ApplicationStatus status) throws GenieException {
         final StringBuilder builder = new StringBuilder();
-        super.validate(builder, name, user);
         if (status == null) {
             builder.append("No application status entered and is required.\n");
         }
 
-        if (builder.length() != 0) {
+        if (builder.length() > 0) {
             builder.insert(0, "Application configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);

@@ -88,9 +88,9 @@ public class TestCommand {
      * @throws GenieException
      */
     @Test
-    public void testOnCreateOrUpdate() throws GenieException {
+    public void testOnCreateOrUpdateCommand() throws GenieException {
         this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
-        this.c.onCreateOrUpdate();
+        this.c.onCreateOrUpdateCommand();
     }
 
     /**
@@ -99,30 +99,8 @@ public class TestCommand {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateWithNothing() throws GenieException {
-        this.c.onCreateOrUpdate();
-    }
-
-    /**
-     * Test to make sure validation works when no name entered.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoName() throws GenieException {
-        this.c = new Command(null, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
-        this.c.onCreateOrUpdate();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no User entered.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoUser() throws GenieException {
-        this.c = new Command(NAME, null, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
-        this.c.onCreateOrUpdate();
+    public void testOnCreateOrUpdateCommandWithNothing() throws GenieException {
+        this.c.onCreateOrUpdateCommand();
     }
 
     /**
@@ -131,9 +109,9 @@ public class TestCommand {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoStatus() throws GenieException {
+    public void testOnCreateOrUpdateCommandNoStatus() throws GenieException {
         this.c = new Command(NAME, USER, null, EXECUTABLE, VERSION);
-        this.c.onCreateOrUpdate();
+        this.c.onCreateOrUpdateCommand();
     }
 
     /**
@@ -143,9 +121,9 @@ public class TestCommand {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoExecutable() throws GenieException {
+    public void testOnCreateOrUpdateCommandNoExecutable() throws GenieException {
         this.c = new Command(NAME, USER, CommandStatus.ACTIVE, null, VERSION);
-        this.c.onCreateOrUpdate();
+        this.c.onCreateOrUpdateCommand();
     }
 
     /**
@@ -160,27 +138,6 @@ public class TestCommand {
     }
 
     /**
-     * Test setting the name.
-     */
-    @Test
-    public void testSetName() {
-        Assert.assertNull(this.c.getName());
-        this.c.setName(NAME);
-        Assert.assertEquals(NAME, this.c.getName());
-    }
-
-    /**
-     * Test setting the user.
-     * @throws GenieException 
-     */
-    @Test
-    public void testSetUser() throws GenieException {
-        Assert.assertNull(this.c.getUser());
-        this.c.setUser(USER);
-        Assert.assertEquals(USER, this.c.getUser());
-    }
-
-    /**
      * Test setting the status.
      */
     @Test
@@ -188,17 +145,6 @@ public class TestCommand {
         Assert.assertEquals(CommandStatus.INACTIVE, this.c.getStatus());
         this.c.setStatus(CommandStatus.ACTIVE);
         Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
-    }
-
-    /**
-     * Test setting the version.
-     */
-    @Test
-    public void testSetVersion() {
-        Assert.assertNull(this.c.getVersion());
-        final String version = "1.2.3";
-        this.c.setVersion(version);
-        Assert.assertEquals(version, this.c.getVersion());
     }
 
     /**
@@ -243,6 +189,19 @@ public class TestCommand {
         configs.add("s3://netflix.configFile");
         this.c.setConfigs(configs);
         Assert.assertEquals(configs, this.c.getConfigs());
+    }
+
+    /**
+     * Test setting the tags.
+     */
+    @Test
+    public void testSetTags() {
+        Assert.assertNull(this.c.getTags());
+        final Set<String> tags = new HashSet<String>();
+        tags.add("tag1");
+        tags.add("tag2");
+        this.c.setTags(tags);
+        Assert.assertEquals(tags, this.c.getTags());
     }
 
     /**

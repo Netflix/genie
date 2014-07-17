@@ -1,12 +1,29 @@
+/*
+ *
+ *  Copyright 2014 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.genie.common.model;
 
 import java.net.HttpURLConnection;
 
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
-
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -21,6 +38,7 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
  * @author amsharma
+ * @author tgianos
  */
 @MappedSuperclass
 @XmlRootElement
@@ -30,28 +48,6 @@ public class CommonEntityFields extends Auditable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommonEntityFields.class);
 
-    /**
-     * Default constructor.
-     */
-    public CommonEntityFields () {
-    }
-    
-    /**
-     * Construct a new CommonEntity Object with all required parameters.
-     *
-     * @param name The name of the application. Not null/empty/blank.
-     * @param user The user who created the application. Not null/empty/blank.
-     * @throws GenieException
-     */
-    public CommonEntityFields (
-            final String name,
-            final String user,
-            final String version) throws GenieException {
-        this.name = name;
-        this.user = user;
-        this.version = version;
-    }
-    
     /**
      * Version of this entity.
      */
@@ -79,6 +75,41 @@ public class CommonEntityFields extends Auditable {
             value = "Name of this entity",
             required = true)
     private String name;
+
+    /**
+     * Default constructor.
+     */
+    public CommonEntityFields() {
+        super();
+    }
+    
+    /**
+     * Construct a new CommonEntity Object with all required parameters.
+     *
+     * @param name The name of the entity. Not null/empty/blank.
+     * @param user The user who created the entity. Not null/empty/blank.
+     * @param version The version of this entity. Not null/empty/blank.
+     */
+    public CommonEntityFields(
+            final String name,
+            final String user,
+            final String version) {
+        super();
+        this.name = name;
+        this.user = user;
+        this.version = version;
+    }
+
+    /**
+     * Before modifying database make sure everything is ok.
+     *
+     * @throws GenieException
+     */
+    @PrePersist
+    @PreUpdate
+    protected void onCreateOrUpdateCommonEntityFields() throws GenieException {
+        this.validate(this.name, this.user, this.version);
+    }
 
     /**
      * Gets the version of this entity.
@@ -111,14 +142,8 @@ public class CommonEntityFields extends Auditable {
      * Sets the user who created this entity.
      *
      * @param user user who created this entity. Not null/empty/blank.
-     * @throws GenieException
      */
-    public void setUser(final String user) throws GenieException {
-        if (StringUtils.isBlank(user)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No user Entered.");
-        }
+    public void setUser(final String user) {
         this.user = user;
     }
 
@@ -140,25 +165,42 @@ public class CommonEntityFields extends Auditable {
     public void setName(final String name) {
         this.name = name;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validate() throws GenieException {
+        super.validate();
+        this.validate(this.name, this.user, this.version);
+    }
+
     /**
      * Helper method for checking the validity of required parameters.
      *
      * @param name The name of the application
      * @param user The user who created the application
-     * @param status The status of the application
      * @throws GenieException
      */
-    protected void validate(
-            final StringBuilder builder,
+    private void validate(
             final String name,
-            final String user)
-            throws GenieException {
+            final String user,
+            final String version) throws GenieException {
+        final StringBuilder builder = new StringBuilder();
         if (StringUtils.isBlank(user)) {
             builder.append("User name is missing and is required.\n");
         }
         if (StringUtils.isBlank(name)) {
             builder.append("Name is missing and is required.\n");
+        }
+        if (StringUtils.isBlank(version)) {
+            builder.append("Version is missing and is required.\n");
+        }
+        if (builder.length() > 0) {
+            builder.insert(0, "CommonEntityFields configuration errors:\n");
+            final String msg = builder.toString();
+            LOG.error(msg);
+            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
     }
 }

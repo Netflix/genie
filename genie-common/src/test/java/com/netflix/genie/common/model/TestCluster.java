@@ -90,9 +90,9 @@ public class TestCluster {
      * @throws GenieException
      */
     @Test
-    public void testOnCreateOrUpdate() throws GenieException {
+    public void testOnCreateOrUpdateCluster() throws GenieException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
-        this.c.onCreateOrUpdate();
+        this.c.onCreateOrUpdateCluster();
     }
 
     /**
@@ -101,30 +101,8 @@ public class TestCluster {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateWithNothing() throws GenieException {
-        this.c.onCreateOrUpdate();
-    }
-
-    /**
-     * Test to make sure validation works when no name entered.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoName() throws GenieException {
-        this.c = new Cluster(null, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
-        this.c.onCreateOrUpdate();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no User entered.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoUser() throws GenieException {
-        this.c = new Cluster(NAME, null, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
-        this.c.onCreateOrUpdate();
+    public void testOnCreateOrUpdateClusterWithNothing() throws GenieException {
+        this.c.onCreateOrUpdateCluster();
     }
 
     /**
@@ -133,9 +111,9 @@ public class TestCluster {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoStatus() throws GenieException {
+    public void testOnCreateOrUpdateClusterNoStatus() throws GenieException {
         this.c = new Cluster(NAME, USER, null, CLUSTER_TYPE, this.configs, VERSION);
-        this.c.onCreateOrUpdate();
+        this.c.onCreateOrUpdateCluster();
     }
 
     /**
@@ -144,9 +122,9 @@ public class TestCluster {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoType() throws GenieException {
+    public void testOnCreateOrUpdateClusterNoType() throws GenieException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, null, this.configs, VERSION);
-        this.c.onCreateOrUpdate();
+        this.c.onCreateOrUpdateCluster();
     }
 
     /**
@@ -155,7 +133,7 @@ public class TestCluster {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateEmptyConfigs() throws GenieException {
+    public void testOnCreateOrUpdateClusterEmptyConfigs() throws GenieException {
         this.c = new Cluster(
                 NAME,
                 USER,
@@ -164,7 +142,7 @@ public class TestCluster {
                 new HashSet<String>(),
                 VERSION
         );
-        this.c.onCreateOrUpdate();
+        this.c.onCreateOrUpdateCluster();
     }
 
     /**
@@ -173,20 +151,9 @@ public class TestCluster {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNullConfigs() throws GenieException {
+    public void testOnCreateOrUpdateClusterNullConfigs() throws GenieException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, null, VERSION);
-        this.c.onCreateOrUpdate();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no version entered.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateNoVersion() throws GenieException {
-        this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, null);
-        this.c.onCreateOrUpdate();
+        this.c.onCreateOrUpdateCluster();
     }
 
     /**
@@ -198,27 +165,6 @@ public class TestCluster {
     public void testValidate() throws GenieException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
         this.c.validate();
-    }
-
-    /**
-     * Test setting the name.
-     */
-    @Test
-    public void testSetName() {
-        Assert.assertNull(this.c.getName());
-        this.c.setName(NAME);
-        Assert.assertEquals(NAME, this.c.getName());
-    }
-
-    /**
-     * Test setting the user.
-     * @throws GenieException 
-     */
-    @Test
-    public void testSetUser() throws GenieException {
-        Assert.assertNull(this.c.getUser());
-        this.c.setUser(USER);
-        Assert.assertEquals(USER, this.c.getUser());
     }
 
     /**
@@ -239,16 +185,6 @@ public class TestCluster {
         Assert.assertNull(this.c.getClusterType());
         this.c.setClusterType(CLUSTER_TYPE);
         Assert.assertEquals(CLUSTER_TYPE, this.c.getClusterType());
-    }
-
-    /**
-     * Test setting the version.
-     */
-    @Test
-    public void testSetVersion() {
-        Assert.assertNull(this.c.getVersion());
-        this.c.setVersion(VERSION);
-        Assert.assertEquals(VERSION, this.c.getVersion());
     }
 
     /**
