@@ -677,7 +677,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      */
     @Override
     public void setJobStatus(final String id, final JobStatus status, final String msg) throws GenieException {
-        LOG.debug("Failing job with id " + id + " for reason " + msg);
+        LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setJobStatus(status, msg);
