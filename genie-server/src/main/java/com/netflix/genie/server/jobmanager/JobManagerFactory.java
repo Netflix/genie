@@ -24,7 +24,6 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import java.net.HttpURLConnection;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.slf4j.Logger;
@@ -93,7 +92,7 @@ public final class JobManagerFactory implements ApplicationContextAware {
             final Object instance = this.context.getBean(jobManagerClass);
             if (instance instanceof JobManager) {
                 final JobManager jobManager = (JobManager) instance;
-                jobManager.setCluster(cluster);
+                jobManager.init(job, cluster);
                 return jobManager;
             } else {
                 final String msg = className + " is not of type JobManager. Unable to continue.";
@@ -109,31 +108,6 @@ public final class JobManagerFactory implements ApplicationContextAware {
             LOG.error(msg, e);
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-    }
-
-    /**
-=======
-     * Figure out an appropriate cluster to run this job<br>
-     * Cluster selection is done based on tags, command and application.
-     *
-     * @param job job info for this job
-     * @return cluster element to use for running this job
-     * @throws GenieException if there is any error finding a cluster for
-     * this job
-     */
-    private Cluster getCluster(final Job job) throws GenieException {
-        LOG.info("called");
-
-        if (job == null) {
-            final String msg = "No job entered. Unable to continue";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-
-        final List<Cluster> clusters = this.ccs.getClusters(job);
-
-        // return selected instance
-        return this.clb.selectCluster(clusters);
     }
 
     /**

@@ -30,26 +30,23 @@ import com.netflix.genie.common.model.Job;
 public interface JobManager {
 
     /**
-     * Initialize, and launch the job once it has been initialized.
+     * Initialize the JobManager.
      *
-     * @param job the JobInfo object for the job to be launched
+     * @param job The job this manager will be managing.
+     */
+    void init(final Job job, final Cluster cluster) throws GenieException;
+
+    /**
+     * Launch the job.
+     *
      * @throws GenieException
      */
-    void launch(final Job job) throws GenieException;
+    void launch() throws GenieException;
 
     /**
      * Kill a job using the job information - no need to initialize this job.
      *
-     * @param job the JobInfo object for the job to be killed
      * @throws GenieException
      */
-    void kill(final Job job) throws GenieException;
-
-    /**
-     * Set the cluster to use for the job.
-     *
-     * @param cluster The cluster to set. Not null.
-     * @throws GenieException
-     */
-    void setCluster(final Cluster cluster) throws GenieException;
+    void kill() throws GenieException;
 }

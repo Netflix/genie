@@ -27,7 +27,7 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobMonitor;
-import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.StringUtil;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,52 +60,41 @@ import org.springframework.transaction.annotation.Transactional;
 public class YarnJobManager implements JobManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(YarnJobManager.class);
-
-    private final CommandRepository commandRepo;
-    private final JobMonitor jobMonitor;
-    private final Thread jobMonitorThread;
-
     /**
      * The name of the Genie job id property to be passed to all jobs.
      */
     private static final String GENIE_JOB_ID = "genie.job.id";
-
-    /**
-     * The value of the Genie job id property to pass to jobs.
-     */
-    private String genieJobIDProp;
-
     /**
      * The name of the Environment (test/prod) property to be passed to all
      * jobs.
      */
     private static final String NFLX_ENV = "netflix.environment";
-
-    /**
-     * The value of the environment to be passed to jobs.
-     */
-    private String netflixEnvProp;
-
-    /**
-     * The value for the Lipstick job ID, if needed.
-     */
-    private String lipstickUuidProp;
-
-    /**
-     * The environment variables for this job.
-     */
-    private final Map<String, String> env = new HashMap<String, String>();
-
-    /**
-     * Reference to the cluster configuration element to run the job on.
-     */
-    private Cluster cluster;
-
     /**
      * Default group name for job submissions.
      */
     private static final String HADOOP_GROUP_NAME = "hadoop";
-
+    private final JobMonitor jobMonitor;
+    private final Thread jobMonitorThread;
+    /**
+     * The environment variables for this job.
+     */
+    private final Map<String, String> env = new HashMap<String, String>();
+    /**
+     * The value of the Genie job id property to pass to jobs.
+     */
+    private String genieJobIDProp;
+    /**
+     * The value of the environment to be passed to jobs.
+     */
+    private String netflixEnvProp;
+    /**
+     * The value for the Lipstick job ID, if needed.
+     */
+    private String lipstickUuidProp;
+    /**
+     * Reference to the cluster configuration element to run the job on.
+     */
+    private Cluster cluster;
     /**
      * The command-line arguments for this job.
      */
@@ -114,7 +103,7 @@ public class YarnJobManager implements JobManager {
     /**
      * The job info for this job, which is persisted to the database.
      */
-    private Job ji;
+    private Job job;
 
     /**
      * Actual command to run determined from the Command selected.
@@ -126,44 +115,41 @@ public class YarnJobManager implements JobManager {
      * balancer.
      *
      * @param jobMonitor The job monitor object to use.
-     * @param commandRepo The command repository to use.
-     * @throws GenieException if there is any error in initialization
      */
     @Inject
-    public YarnJobManager(
-            final JobMonitor jobMonitor,
-            final CommandRepository commandRepo) throws GenieException {
+    public YarnJobManager(final JobMonitor jobMonitor, final ExecutionService xs) {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
-        this.commandRepo = commandRepo;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
-    public void setCluster(final Cluster cluster) throws GenieException {
+    public void init(final Job job, final Cluster cluster) throws GenieException {
+        if (job == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, "No job entered.");
+        }
         if (cluster == null) {
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, "No cluster entered.");
         }
+        this.jobMonitor.setJobManager(this);
+        this.job = job;
         this.cluster = cluster;
     }
 
     /**
-     * Initialize, and launch the job once it has been initialized.
-     *
-     * @param job the JobInfo object for the job to be launched
-     * @throws GenieException if there is any error in the job launch
+     * {@inheritDoc}
      */
     @Override
-    public void launch(final Job job) throws GenieException {
+    @Transactional
+    public void launch() throws GenieException {
         LOG.info("called");
 
         // initialize all the arguments and environment
-        init(job);
+        this.initLaunch();
 
         // create the ProcessBuilder for this process
         final ProcessBuilder pb = new ProcessBuilder(this.args);
@@ -171,14 +157,14 @@ public class YarnJobManager implements JobManager {
         // set current working directory for the process
         final String cWorkingDir = this.env.get("BASE_USER_WORKING_DIR")
                 + File.separator
-                + this.ji.getId();
+                + this.job.getId();
         final File userJobDir = new File(cWorkingDir);
 
         // check if working directory already exists
         if (userJobDir.exists()) {
             final String msg = "User staging directory already exists";
-            this.ji.setJobStatus(JobStatus.FAILED, msg);
-            LOG.error(this.ji.getStatusMsg() + ": "
+            this.job.setJobStatus(JobStatus.FAILED, msg);
+            LOG.error(this.job.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
             throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
@@ -188,8 +174,8 @@ public class YarnJobManager implements JobManager {
         final boolean resMkDir = userJobDir.mkdirs();
         if (!resMkDir) {
             String msg = "User staging directory can't be created";
-            ji.setJobStatus(JobStatus.FAILED, msg);
-            LOG.error(ji.getStatusMsg() + ": "
+            job.setJobStatus(JobStatus.FAILED, msg);
+            LOG.error(job.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
             throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
@@ -197,8 +183,8 @@ public class YarnJobManager implements JobManager {
         pb.directory(userJobDir);
 
         // copy over the attachments if they exist
-        if (this.ji.getAttachments() != null) {
-            for (final FileAttachment attachment : ji.getAttachments()) {
+        if (this.job.getAttachments() != null) {
+            for (final FileAttachment attachment : this.job.getAttachments()) {
                 // basic error checking
                 if ((attachment.getName() == null) || (attachment.getName().isEmpty())) {
                     final String msg = "File attachment is missing required parameter name";
@@ -256,18 +242,18 @@ public class YarnJobManager implements JobManager {
             // launch job, and get process handle
             final Process proc = pb.start();
             pid = this.getProcessId(proc);
-            this.ji.setProcessHandle(pid);
+            this.job.setProcessHandle(pid);
 
             // set off monitor thread for the job
-            this.jobMonitor.setJob(this.ji);
+            this.jobMonitor.setJob(this.job);
             this.jobMonitor.setProcess(proc);
             this.jobMonitor.setWorkingDir(cWorkingDir);
             this.jobMonitorThread.start();
-            this.ji.setJobStatus(JobStatus.RUNNING, "Job is running");
+            this.job.setJobStatus(JobStatus.RUNNING, "Job is running");
         } catch (final IOException e) {
             final String msg = "Failed to launch the job";
             LOG.error(msg, e);
-            this.ji.setJobStatus(JobStatus.FAILED, msg);
+            this.job.setJobStatus(JobStatus.FAILED, msg);
             throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
@@ -275,18 +261,15 @@ public class YarnJobManager implements JobManager {
     }
 
     /**
-     * Kill the job pointed to by the job info - this only kills the Yarn job
-     * shell.
-     *
-     * @param job the jobInfo object for the job to be killed
-     * @throws GenieException if there is any error in job killing
+     * {@inheritDoc}
      */
     @Override
-    public void kill(final Job job) throws GenieException {
+    @Transactional
+    public void kill() throws GenieException {
         LOG.info("called");
 
         // basic error checking
-        if (job == null) {
+        if (this.job == null) {
             String msg = "JobInfo object is null";
             LOG.error(msg);
             throw new GenieException(
@@ -295,33 +278,32 @@ public class YarnJobManager implements JobManager {
 
         // check to ensure that the process id is actually set (which means job
         // was launched)
-        this.ji = job;
-        int processId = job.getProcessHandle();
+        int processId = this.job.getProcessHandle();
         if (processId > 0) {
             LOG.info("Attempting to kill the process " + processId);
             try {
-                String genieHome = ConfigurationManager.getConfigInstance()
+                final String genieHome = ConfigurationManager.getConfigInstance()
                         .getString("netflix.genie.server.sys.home");
                 if ((genieHome == null) || genieHome.isEmpty()) {
-                    String msg = "Property netflix.genie.server.sys.home is not set correctly";
+                    final String msg = "Property netflix.genie.server.sys.home is not set correctly";
                     LOG.error(msg);
                     throw new GenieException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
                 }
                 Runtime.getRuntime().exec(
                         genieHome + File.separator + "jobkill.sh " + processId);
             } catch (final GenieException e) {
-                String msg = "Failed to kill the job";
+                final String msg = "Failed to kill the job";
                 LOG.error(msg, e);
                 throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
             } catch (final IOException e) {
-                String msg = "Failed to kill the job";
+                final String msg = "Failed to kill the job";
                 LOG.error(msg, e);
                 throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
             }
         } else {
-            String msg = "Could not get process id";
+            final String msg = "Could not get process id";
             LOG.error(msg);
             throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
@@ -332,48 +314,43 @@ public class YarnJobManager implements JobManager {
      * Initializes the object with the job information and environment prior to
      * job launch This method must be called before job is launched.
      *
-     * @param job the JobInfo object passed by the user
      * @throws GenieException if there is an error during initialization
      */
-    protected void init(final Job job) throws GenieException {
+    private void initLaunch() throws GenieException {
         LOG.info("called");
 
-        genieJobIDProp = GENIE_JOB_ID + "=" + job.getId();
-        netflixEnvProp = NFLX_ENV + "="
+        this.genieJobIDProp = GENIE_JOB_ID + "=" + job.getId();
+        this.netflixEnvProp = NFLX_ENV + "="
                 + ConfigurationManager.getConfigInstance().getString(
                         "netflix.environment");
 
-        String lipstickUuidPropName = ConfigurationManager.getConfigInstance().
-                getString("netflix.genie.server.lipstick.uuid.prop.name", "lipstick.uuid.prop.name");
+        final String lipstickUuidPropName = ConfigurationManager.getConfigInstance().
+                getString("netflix.genie.server.lipstick.uuid.prop.name",
+                        "lipstick.uuid.prop.name");
 
         if (ConfigurationManager.getConfigInstance().getBoolean(
                 "netflix.genie.server.lipstick.enable", false)) {
-            lipstickUuidProp = lipstickUuidPropName + "=" + GENIE_JOB_ID;
+            this.lipstickUuidProp = lipstickUuidPropName + "=" + GENIE_JOB_ID;
         }
 
         // construct the environment variables
-        initEnv(job);
+        this.initEnv();
 
         // construct command-line args
-        this.args = initArgs(job);
-
-        // save/init args, environment and jobinfo
-        this.ji = job;
+        this.args = initArgs();
     }
 
     /**
      * Set/initialize environment variables for this job.
      *
-     * @param job job info object for this job
      * @throws GenieException if there is any error in initialization
      */
-    @Transactional(readOnly = true)
-    protected void initEnv(final Job job) throws GenieException {
+    private void initEnv() throws GenieException {
         LOG.info("called");
 
-        if (job.getFileDependencies() != null
-                && !job.getFileDependencies().isEmpty()) {
-            this.env.put("CURRENT_JOB_FILE_DEPENDENCIES", job.getFileDependencies());
+        if (this.job.getFileDependencies() != null
+                && !this.job.getFileDependencies().isEmpty()) {
+            this.env.put("CURRENT_JOB_FILE_DEPENDENCIES", this.job.getFileDependencies());
         }
 
         // set the hadoop-related conf files
@@ -388,21 +365,6 @@ public class YarnJobManager implements JobManager {
                 break;
             }
         }
-        
-//        // If Command Id is specified use directly.
-//        // If command Name is specified iterate through the commands in the cluster to get the Id that matches.
-//        if (StringUtils.isNotBlank(job.getCommandId())) {
-//            command = this.commandRepo.findOne(job.getCommandId());
-//        } else if (StringUtils.isNoneBlank(job.getCommandName())) {
-//            // Iterate through the commands the cluster supports and find the command that matches.
-//            // There has to be one that matches, else the getCluster wouldn't have.
-//            for (final Command cce : this.cluster.getCommands()) {
-//                if (cce.getName().equals(job.getCommandName())) {
-//                    command = cce;
-//                    break;
-//                }
-//            }
-//        }
 
         //Avoiding NPE
         if (command == null) {
@@ -414,13 +376,13 @@ public class YarnJobManager implements JobManager {
         }
 
         // save the command name, application id and application name
-        job.setCommandId(command.getId());
-        job.setCommandName(command.getName());
+        this.job.setCommandId(command.getId());
+        this.job.setCommandName(command.getName());
 
         final Application application = command.getApplication();
         if (application != null) {
-            job.setApplicationId(application.getId());
-            job.setApplicationName(application.getName());
+            this.job.setApplicationId(application.getId());
+            this.job.setApplicationName(application.getName());
 
             if (application.getConfigs() != null && !application.getConfigs().isEmpty()) {
                 this.env.put("S3_APPLICATION_CONF_FILES", convertCollectionToCSV(application.getConfigs()));
@@ -443,29 +405,29 @@ public class YarnJobManager implements JobManager {
         this.executable = command.getExecutable();
 
         // save the cluster name and id
-        job.setExecutionClusterName(cluster.getName());
-        job.setExecutionClusterId(cluster.getId());
+        this.job.setExecutionClusterName(cluster.getName());
+        this.job.setExecutionClusterId(cluster.getId());
 
         // Get envPropertyFile for command and job and set env variable
         if (StringUtils.isNotBlank(command.getEnvPropFile())) {
             this.env.put("COMMAND_ENV_FILE", command.getEnvPropFile());
         }
 
-        if (StringUtils.isNotBlank(job.getEnvPropFile())) {
-            this.env.put("JOB_ENV_FILE", job.getEnvPropFile());
+        if (StringUtils.isNotBlank(this.job.getEnvPropFile())) {
+            this.env.put("JOB_ENV_FILE", this.job.getEnvPropFile());
         }
 
         // put the user name for hadoop to use
-        this.env.put("HADOOP_USER_NAME", job.getUser());
+        this.env.put("HADOOP_USER_NAME", this.job.getUser());
 
         // this is for the generic joblauncher.sh to use to create username
         // on the machine if needed
-        this.env.put("USER_NAME", job.getUser());
+        this.env.put("USER_NAME", this.job.getUser());
 
         // add the group name
         String groupName = HADOOP_GROUP_NAME;
-        if (job.getGroup() != null) {
-            groupName = job.getGroup();
+        if (this.job.getGroup() != null) {
+            groupName = this.job.getGroup();
             this.env.put("GROUP_NAME", groupName);
         }
         this.env.put("HADOOP_GROUP_NAME", groupName);
@@ -572,7 +534,7 @@ public class YarnJobManager implements JobManager {
 
         // set the archive location
         // unless user has explicitly requested for it to be disabled
-        if (!job.isDisableLogArchival()) {
+        if (!this.job.isDisableLogArchival()) {
             final String s3ArchiveLocation = ConfigurationManager
                     .getConfigInstance()
                     .getString("netflix.genie.server.s3.archive.location");
@@ -597,22 +559,20 @@ public class YarnJobManager implements JobManager {
      * @param list ArrayList object contains the strings
      * @return a string containing the other strings as CSV
      */
-    protected String convertCollectionToCSV(final Collection<String> list) {
+    private String convertCollectionToCSV(final Collection<String> list) {
         return StringUtils.join(list, ",");
     }
 
     /**
      * Extract/initialize command-line arguments passed by user.
      *
-     * @param ji2 job info for this job
      * @return the parsed command-line arguments as an array
      * @throws GenieException
      */
-    protected String[] initArgs(Job ji2) throws GenieException {
-
+    private String[] initArgs() throws GenieException {
         LOG.info("called");
 
-        String[] cmdArgs = StringUtil.splitCmdLine(ji2.getCommandArgs());
+        String[] cmdArgs = StringUtil.splitCmdLine(this.job.getCommandArgs());
 
         String[] hArgs;
         hArgs = new String[cmdArgs.length + 2];
@@ -622,37 +582,37 @@ public class YarnJobManager implements JobManager {
 
         // first two args are the joblauncher and job type
         hArgs[0] = genieHome + File.separator + "joblauncher.sh";
-        hArgs[1] = executable;
+        hArgs[1] = this.executable;
 
         System.arraycopy(cmdArgs, 0, hArgs, 2, cmdArgs.length);
 
         return hArgs;
     }
 
-    /**
-     * Return additional command-line arguments specific to genie.
-     *
-     * @return -D style params including genie job id and netflix environment
-     */
-    protected String[] getGenieCmdArgs() {
-        if (this.lipstickUuidProp == null) {
-            return new String[]{
-                "-D",
-                this.genieJobIDProp,
-                "-D",
-                this.netflixEnvProp
-            };
-        } else {
-            return new String[]{
-                "-D",
-                this.genieJobIDProp,
-                "-D",
-                this.netflixEnvProp,
-                "-D",
-                this.lipstickUuidProp
-            };
-        }
-    }
+//    /**
+//     * Return additional command-line arguments specific to genie.
+//     *
+//     * @return -D style params including genie job id and netflix environment
+//     */
+//    protected String[] getGenieCmdArgs() {
+//        if (this.lipstickUuidProp == null) {
+//            return new String[]{
+//                "-D",
+//                this.genieJobIDProp,
+//                "-D",
+//                this.netflixEnvProp
+//            };
+//        } else {
+//            return new String[]{
+//                "-D",
+//                this.genieJobIDProp,
+//                "-D",
+//                this.netflixEnvProp,
+//                "-D",
+//                this.lipstickUuidProp
+//            };
+//        }
+//    }
 
     /**
      * Get process id for the given process.
@@ -661,7 +621,7 @@ public class YarnJobManager implements JobManager {
      * @return pid for this process
      * @throws GenieException if there is an error getting the process id
      */
-    protected int getProcessId(final Process proc) throws GenieException {
+    private int getProcessId(final Process proc) throws GenieException {
         LOG.debug("called");
 
         try {

@@ -136,13 +136,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         }
         // validate parameters
         job.validate();
-
-        // generate job id, if need be
-        if (StringUtils.isEmpty(job.getId())) {
-            job.setId(UUID.randomUUID().toString());
-        }
-
         job.setJobStatus(JobStatus.INIT, "Initializing job");
+        final Job savedJob;
 
         // ensure that job won't overload system
         // synchronize until an entry is created and INIT-ed in DB
@@ -200,7 +195,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             // init state in DB - return if job already exists
             try {
                 // TODO add retries to avoid deadlock issue
-                this.jobRepo.save(job);
+                savedJob = this.jobRepo.save(job);
             } catch (final RollbackException e) {
                 LOG.error("Can't create entity in the database", e);
                 if (e.getCause() instanceof EntityExistsException) {
@@ -217,44 +212,28 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             }
         } // end synchronize
 
+        if (savedJob == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR, "Unable to persist job");
+        }
+
         // increment number of submitted jobs
         this.stats.incrGenieJobSubmissions();
 
         // try to run the job - return success or error
         try {
-            this.jobManagerFactory.getJobManager(job).launch(job);
+            this.jobManagerFactory.getJobManager(savedJob).launch();
 
             // update entity in DB
-            job.setUpdated(new Date());
-            // At this stage the job is successfully init'ed in the db and also launched successfully by the job manager.
-            // The call below is just trying to set the status in the DB as RUNNING and update the updateTime.
-            // We add retries to this updateEntity call, as since the job is launched we do not want to throw a false 
-            // error of job not running due to transient db connection issues.
-            int maxDBTransactionRetries = CONF.getInt(
-                    "netflix.genie.server.max.db.transaction.retries", 3);
-            int attemptNum = 1;
-            while (true) {
-                try {
-                    return this.em.merge(job);
-                } catch (RollbackException e) {
-                    if (attemptNum == maxDBTransactionRetries) {
-                        throw(e);
-                    } else {
-                        stats.incrJobSubmissionRetryCount();
-                        attemptNum++;
-                        continue;
-                    }
-                }
-            }
+            savedJob.setUpdated(new Date());
+            return savedJob;
         } catch (final GenieException e) {
             LOG.error("Failed to submit job: ", e);
             // update db
-            job.setJobStatus(JobStatus.FAILED, e.getMessage());
-            this.em.merge(job);
+            savedJob.setJobStatus(JobStatus.FAILED, e.getMessage());
             // increment counter for failed jobs
             this.stats.incrGenieFailedJobs();
-            // if it is a known exception, handle differently
-            throw e;
+            return savedJob;
         }
     }
 
@@ -379,7 +358,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         // if we get here, killURI == localURI, and job should be killed here
         LOG.debug("killing job on same instance: " + id);
-        this.jobManagerFactory.getJobManager(job).kill(job);
+        this.jobManagerFactory.getJobManager(job).kill();
 
         job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
         job.setExitCode(SubProcessStatus.JOB_KILLED.code());

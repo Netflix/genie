@@ -134,6 +134,10 @@ public class JobResource {
         }
 
         final Job createdJob = this.xs.submitJob(job);
+        if (job.getStatus() == JobStatus.FAILED) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST, "Unable to submit job");
+        }
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
                 entity(createdJob).

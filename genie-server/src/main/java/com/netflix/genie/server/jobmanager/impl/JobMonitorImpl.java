@@ -25,6 +25,7 @@ import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.model.SubProcessStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
+import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
 import java.io.File;
 import java.net.HttpURLConnection;
@@ -40,9 +41,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.apache.commons.configuration.AbstractConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -61,14 +61,12 @@ public class JobMonitorImpl implements JobMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobMonitorImpl.class);
 
-    private Job job;
+    private String jobId;
 
     private JobManager jobManager;
 
     private final GenieNodeStatistics genieNodeStatistics;
-
-    @PersistenceContext
-    private EntityManager em;
+    private final JobRepository jobRepo;
 
     // interval to poll for process status
     private static final int JOB_WAIT_TIME_MS = 5000;
@@ -100,15 +98,16 @@ public class JobMonitorImpl implements JobMonitor {
     /**
      * Constructor.
      *
+     * @param jobRepo The job repository
      * @param genieNodeStatistics The statistics object to use
      */
     @Inject
-    public JobMonitorImpl(final GenieNodeStatistics genieNodeStatistics) {
+    public JobMonitorImpl(final JobRepository jobRepo, final GenieNodeStatistics genieNodeStatistics) {
+        this.jobRepo = jobRepo;
         this.genieNodeStatistics = genieNodeStatistics;
         this.config = ConfigurationManager.getConfigInstance();
         this.maxStdoutSize = this.config.getLong("netflix.genie.job.max.stdout.size", null);
 
-        this.job = null;
         this.workingDir = null;
         this.proc = null;
         this.stdOutFile = null;
@@ -122,11 +121,11 @@ public class JobMonitorImpl implements JobMonitor {
      */
     @Override
     public void setJob(final Job job) throws GenieException {
-        if (job == null) {
+        if (job == null || StringUtils.isBlank(job.getId())) {
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST, "No job entered.");
         }
-        this.job = job;
+        this.jobId = job.getId();
     }
 
     /**
@@ -178,54 +177,12 @@ public class JobMonitorImpl implements JobMonitor {
      */
     @Override
     public void run() {
-        // flag to track if the job is killed. Used to determine status of email sent.
-        boolean killed = false;
-
         // wait for process to complete
-        int exitCode = waitForExit();
-        this.job.setExitCode(exitCode);
-
-        final Job dbJI = this.em.find(Job.class, this.job.getId());
-
-        // only update status if not KILLED
-        if (dbJI.getStatus() != null && dbJI.getStatus() != JobStatus.KILLED) {
-            if (exitCode != SubProcessStatus.SUCCESS.code()) {
-                // all other failures except s3 log archival failure
-                LOG.error("Failed to execute job, exit code: "
-                        + exitCode);
-                String errMsg = SubProcessStatus.message(exitCode);
-                if ((errMsg == null) || (errMsg.isEmpty())) {
-                    errMsg = "Please look at job's stderr for more details";
-                }
-                this.job.setJobStatus(JobStatus.FAILED,
-                        "Failed to execute job, Error Message: " + errMsg);
-                // incr counter for failed jobs
-                this.genieNodeStatistics.incrGenieFailedJobs();
-            } else {
-                // success
-                this.job.setJobStatus(JobStatus.SUCCEEDED,
-                        "Job finished successfully");
-                // incr counter for successful jobs
-                this.genieNodeStatistics.incrGenieSuccessfulJobs();
-            }
-
-            // set the archive location - if needed
-            if (!this.job.isDisableLogArchival()) {
-                this.job.setArchiveLocation(NetUtil.getArchiveURI(this.job.getId()));
-            }
-
-            // update the job status
-            this.job.setUpdated(new Date());
-            this.em.merge(this.job);
-        } else {
-            // if job status is killed, the kill thread will update status
-            LOG.debug("Job has been killed - will not update DB: " + job.getId());
-            killed = true;
-        }
+        final boolean killed = this.finalizeJob(waitForExit()) == JobStatus.KILLED;
 
         // Check if user email address is specified. If so
         // send an email to user about job completion.
-        final String emailTo = this.job.getEmail();
+        final String emailTo = this.jobRepo.findOne(this.jobId).getEmail();
 
         if (emailTo != null) {
             LOG.info("User email address: " + emailTo);
@@ -275,40 +232,20 @@ public class JobMonitorImpl implements JobMonitor {
      *
      * @return exit code for the job after it finishes
      */
-    @Transactional
     private int waitForExit() {
         this.lastUpdatedTimeMS = System.currentTimeMillis();
         while (isRunning()) {
             try {
                 Thread.sleep(JOB_WAIT_TIME_MS);
             } catch (InterruptedException e) {
-                LOG.error("Exception while waiting for job " + job.getId()
+                LOG.error("Exception while waiting for job " + this.jobId
                         + " to finish", e);
                 // move on
             }
 
             // update status only in JOB_UPDATE_TIME_MS intervals
             if (shouldUpdateJob()) {
-                LOG.debug("Updating db for job: " + job.getId());
-
-                this.lastUpdatedTimeMS = System.currentTimeMillis();
-                this.job.setJobStatus(JobStatus.RUNNING, "Job is running");
-                this.job.setUpdated(new Date(this.lastUpdatedTimeMS));
-
-                try {
-                    final Job dbJI = this.em.find(Job.class, this.job.getId());
-                    if ((dbJI.getStatus() != null)
-                            && dbJI.getStatus() != JobStatus.KILLED) {
-                        this.job.setUpdated(new Date());
-                        this.em.merge(this.job);
-                    }
-                } catch (Exception e) {
-                    LOG.error(
-                            "Exception while trying to update status for job: "
-                            + this.job.getId(), e);
-                    // continue - as we shouldn't terminate this thread until
-                    // job is running
-                }
+                updateJob();
 
                 // kill the job if it is writing out more than the max stdout limit
                 // if it has been terminated already, move on and wait for it to clean up after itself
@@ -317,13 +254,13 @@ public class JobMonitorImpl implements JobMonitor {
                         && this.maxStdoutSize != null
                         && this.stdOutFile.length() > this.maxStdoutSize
                         && !this.terminated) {
-                    LOG.warn("Killing job " + this.job.getId() + " as its stdout is greater than limit");
+                    LOG.warn("Killing job " + this.jobId + " as its stdout is greater than limit");
                     // kill the job - no need to update status, as it will be updated during next iteration
                     try {
-                        this.jobManager.kill(this.job);
+                        this.jobManager.kill();
                         this.terminated = true;
                     } catch (GenieException e) {
-                        LOG.error("Can't kill job " + this.job.getId()
+                        LOG.error("Can't kill job " + this.jobId
                                 + " after exceeding stdout limit", e);
                         // continue - hoping that it can get cleaned up during next iteration
                     }
@@ -342,6 +279,7 @@ public class JobMonitorImpl implements JobMonitor {
      * @return 0 for success, -1 for failure
      */
     private boolean sendEmail(String emailTo, boolean killed) {
+        final Job job = this.jobRepo.findOne(this.jobId);
         LOG.debug("called");
 
         if (!this.config.getBoolean("netflix.genie.server.mail.enable", false)) {
@@ -469,5 +407,57 @@ public class JobMonitorImpl implements JobMonitor {
         public PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(this.username, this.password);
         }
+    }
+
+    @Transactional
+    private JobStatus finalizeJob(final int exitCode) {
+        final Job job = this.jobRepo.findOne(this.jobId);
+        job.setExitCode(exitCode);
+
+        // only update status if not KILLED
+        if (job.getStatus() != null && job.getStatus() != JobStatus.KILLED) {
+            if (exitCode != SubProcessStatus.SUCCESS.code()) {
+                // all other failures except s3 log archival failure
+                LOG.error("Failed to execute job, exit code: "
+                        + exitCode);
+                String errMsg = SubProcessStatus.message(exitCode);
+                if ((errMsg == null) || (errMsg.isEmpty())) {
+                    errMsg = "Please look at job's stderr for more details";
+                }
+                job.setJobStatus(JobStatus.FAILED,
+                        "Failed to execute job, Error Message: " + errMsg);
+                // incr counter for failed jobs
+                this.genieNodeStatistics.incrGenieFailedJobs();
+            } else {
+                // success
+                job.setJobStatus(JobStatus.SUCCEEDED,
+                        "Job finished successfully");
+                // incr counter for successful jobs
+                this.genieNodeStatistics.incrGenieSuccessfulJobs();
+            }
+
+            // set the archive location - if needed
+            if (!job.isDisableLogArchival()) {
+                job.setArchiveLocation(NetUtil.getArchiveURI(job.getId()));
+            }
+
+            // update the job status
+            job.setUpdated(new Date());
+            return job.getStatus();
+        } else {
+            // if job status is killed, the kill thread will update status
+            LOG.debug("Job has been killed - will not update DB: " + job.getId());
+            return JobStatus.KILLED;
+        }
+    }
+
+    @Transactional
+    private void updateJob() {
+        LOG.debug("Updating db for job: " + this.jobId);
+        final Job job = this.jobRepo.findOne(this.jobId);
+
+        this.lastUpdatedTimeMS = System.currentTimeMillis();
+        job.setJobStatus(JobStatus.RUNNING, "Job is running");
+        job.setUpdated(new Date(this.lastUpdatedTimeMS));
     }
 }
