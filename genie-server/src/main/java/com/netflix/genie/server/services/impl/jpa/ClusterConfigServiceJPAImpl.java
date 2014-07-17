@@ -30,6 +30,7 @@ import com.netflix.genie.server.repository.jpa.ClusterRepository;
 import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,9 +44,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +136,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     "No cluster with id " + id + " exists.");
         }
     }
-    
+
     /**
      * {@inheritDoc}
      *
@@ -194,7 +195,8 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
-     * @throws GenieException 
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -206,10 +208,10 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             LOG.error(msg);
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-        
+
         List<ClusterCriteria> clusterCriterias = job.getClusterCriteria();
         Set<String> commandCriteria = job.getCommandCriteria();
-        
+
         for (final ClusterCriteria clusterCriteria : clusterCriterias) {
             final List<Cluster> clusters = this.clusterRepo.findAll(
                     ClusterSpecs.findByClusterAndCommandCriteria(
@@ -217,14 +219,14 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                             commandCriteria
                     )
             );
-            
+
             if (!clusters.isEmpty()) {
                 // Add the succesfully criteria to the job object in string form.
                 job.setChosenClusterCriteriaString(StringUtils.join(clusterCriteria.getTags(), CRITERIA_DELIMITER));
                 return clusters;
             }
         }
-     
+
         //if we've gotten to here no clusters were found so return empty list
         return new ArrayList<Cluster>();
     }
@@ -236,7 +238,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public Cluster updateCluster(final String id,
-            final Cluster updateCluster) throws GenieException {
+                                 final Cluster updateCluster) throws GenieException {
         if (StringUtils.isEmpty(id)) {
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -564,7 +566,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     "No cluster with id " + id + " exists.");
         }
     }
-    
+
     /**
      * {@inheritDoc}
      *
@@ -689,7 +691,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Cannot delete cluster id from the tags list.");
         }
-        
+
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getTags().remove(tag);

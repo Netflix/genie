@@ -23,10 +23,12 @@ import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +77,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Create a new application configuration.
      *
      * @param application the object encapsulating the new application
-     * configuration to create
-     *
+     *                    configuration to create
      * @return The application that was created
      * @throws GenieException
      */
@@ -100,9 +101,8 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Create or update an application configuration.
      *
-     * @param id the id for the application to create or update
+     * @param id          the id for the application to create or update
      * @param application the object encapsulating the new application to create
-     *
      * @return extracted application configuration response
      * @throws GenieException
      */
@@ -154,9 +154,9 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Gets a set of application configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *
-     * More details on the parameters can be found on the Genie User Guide on
-     * GitHub.
+     *               <p/>
+     *               More details on the parameters can be found on the Genie User Guide on
+     *               GitHub.
      * @return List of application configuration elements that match the filter
      * @throws GenieException
      */
@@ -212,8 +212,8 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Add some more configuration files to a given application.
      *
-     * @param id The id of the application to add configurations to. Not
-     * Null/empty/blank.
+     * @param id      The id of the application to add configurations to. Not
+     *                Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given application.
      * @throws GenieException
@@ -246,7 +246,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Get the active set of configuration files for the given application.
      *
      * @param id The id of the application to get configurations for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The set of configuration files for the given application.
      * @throws GenieException
      */
@@ -270,10 +270,10 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Update the configuration files for a given application.
      *
-     * @param id The id of the application to update the configuration files
-     * for. Not null/empty/blank.
+     * @param id      The id of the application to update the configuration files
+     *                for. Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
-     * files with. Not null.
+     *                files with. Not null.
      * @return The new set of application configurations.
      * @throws GenieException
      */
@@ -307,7 +307,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Delete the all configuration files from a given application.
      *
      * @param id The id of the application to delete the configuration files
-     * from. Not null/empty/blank.
+     *           from. Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -333,8 +333,8 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Add some more jar files to a given application.
      *
-     * @param id The id of the application to add jars to. Not
-     * Null/empty/blank.
+     * @param id   The id of the application to add jars to. Not
+     *             Null/empty/blank.
      * @param jars The jar files to add. Not null or empty.
      * @return The new set of jar files for the given application.
      * @throws GenieException
@@ -367,7 +367,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Get the active set of jar files for the given application.
      *
      * @param id The id of the application to get jars for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The set of jar files for the given application.
      * @throws GenieException
      */
@@ -391,10 +391,10 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Update the jar files for a given application.
      *
-     * @param id The id of the application to update the jar files
-     * for. Not null/empty/blank.
+     * @param id   The id of the application to update the jar files
+     *             for. Not null/empty/blank.
      * @param jars The jar files to replace existing jar
-     * files with. Not null.
+     *             files with. Not null.
      * @return The new set of application jars.
      * @throws GenieException
      */
@@ -428,7 +428,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Delete the all jar files from a given application.
      *
      * @param id The id of the application to delete the jar files
-     * from. Not null/empty/blank.
+     *           from. Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -455,7 +455,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Get all the commands this application is associated with.
      *
      * @param id The id of the application to get the commands for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The set of commands.
      * @throws GenieException
      */
@@ -481,8 +481,8 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Add some more tags to a given application.
      *
-     * @param id The id of the application to add tags to. Not
-     * Null/empty/blank.
+     * @param id   The id of the application to add tags to. Not
+     *             Null/empty/blank.
      * @param tags The tags to add. Not null or empty.
      * @return The new set of tags for the given application.
      * @throws GenieException
@@ -515,7 +515,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Get the active set of tags for the given application.
      *
      * @param id The id of the application to get tags for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The set of tags for the given application.
      * @throws GenieException
      */
@@ -539,10 +539,10 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Update the tags for a given application.
      *
-     * @param id The id of the application to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the application to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing tag
-     * files with. Not null.
+     *             files with. Not null.
      * @return The new set of application tags.
      * @throws GenieException
      */
@@ -576,7 +576,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Delete all the tags from a given application.
      *
      * @param id The id of the application to delete the tags from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -598,12 +598,12 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                 null);
         return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
-    
+
     /**
      * Remove tag from a given application.
      *
      * @param id The id of the application to delete the tag from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The tag for the application.
      * @throws GenieException
      */
@@ -621,10 +621,10 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
-                            BASE_CONFIG_APPLICATION_REST_URL,
-                            id,
-                            "tags",
-                            tag
+                                BASE_CONFIG_APPLICATION_REST_URL,
+                                id,
+                                "tags",
+                                tag
                         },
                         SLASH),
                 null,

@@ -26,6 +26,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +48,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +62,8 @@ import org.slf4j.LoggerFactory;
 @Path("/v2/jobs")
 @Api(value = "/v2/jobs", description = "Manage the available jobs")
 @Produces({
-    MediaType.APPLICATION_XML,
-    MediaType.APPLICATION_JSON
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
 })
 @Named
 public class JobResource {
@@ -99,15 +101,15 @@ public class JobResource {
      */
     @POST
     @Consumes({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+            MediaType.APPLICATION_XML,
+            MediaType.APPLICATION_JSON
     })
     @ApiOperation(
             value = "Submit a job",
             notes = "Submit a new job to run to genie",
             response = Job.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Created", response = Job.class)
+            @ApiResponse(code = 201, message = "Created", response = Job.class)
     })
     public Response submitJob(
             @ApiParam(value = "Job object to run.", required = true)
@@ -158,9 +160,9 @@ public class JobResource {
             notes = "Get the job by id if it exists",
             response = Job.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Job.class),
-        @ApiResponse(code = 400, message = "Invalid id supplied"),
-        @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = 200, message = "OK", response = Job.class),
+            @ApiResponse(code = 400, message = "Invalid id supplied"),
+            @ApiResponse(code = 404, message = "Job not found")
     })
     public Job getJob(
             @ApiParam(value = "Id of the job to get.", required = true)
@@ -184,9 +186,9 @@ public class JobResource {
             notes = "Get the status of job whose id is sent",
             response = Job.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Job.class),
-        @ApiResponse(code = 400, message = "Invalid id supplied"),
-        @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = 200, message = "OK", response = Job.class),
+            @ApiResponse(code = 400, message = "Invalid id supplied"),
+            @ApiResponse(code = 404, message = "Job not found")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public JobStatus getJobStatus(
@@ -200,14 +202,14 @@ public class JobResource {
     /**
      * Get jobs for given filter criteria.
      *
-     * @param id id for job
-     * @param jobName name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName user who submitted job
-     * @param status status of job - possible types Type.JobStatus
+     * @param id          id for job
+     * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
+     * @param userName    user who submitted job
+     * @param status      status of job - possible types Type.JobStatus
      * @param clusterName the name of the cluster
-     * @param clusterId the id of the cluster
-     * @param page page number for job
-     * @param limit max number of jobs to return
+     * @param clusterId   the id of the cluster
+     * @param page        page number for job
+     * @param limit       max number of jobs to return
      * @return successful response, or one with HTTP error code
      * @throws GenieException
      */
@@ -218,7 +220,7 @@ public class JobResource {
             response = Job.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Job.class)
+            @ApiResponse(code = 200, message = "OK", response = Job.class)
     })
     public List<Job> getJobs(
             @ApiParam(value = "Id of the job.", required = false)
@@ -270,7 +272,7 @@ public class JobResource {
             notes = "Delete the jobs by the id specified.",
             response = Job.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Job.class)
+            @ApiResponse(code = 200, message = "OK", response = Job.class)
     })
     public Job killJob(
             @PathParam("id")
@@ -279,12 +281,12 @@ public class JobResource {
         LOG.debug("called for jobID: " + id);
         return this.xs.killJob(id);
     }
-    
+
     /**
      * Add new tags to a given job.
      *
-     * @param id The id of the job to add the tags to. Not
-     * null/empty/blank.
+     * @param id   The id of the job to add the tags to. Not
+     *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this job.
      * @throws GenieException
@@ -299,9 +301,9 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Job not found")
     })
     public Set<String> addTagsForJob(
             @ApiParam(value = "Id of the job to add configuration to.", required = true)
@@ -317,7 +319,7 @@ public class JobResource {
      * Get all the tags for a given job.
      *
      * @param id The id of the job to get the tags for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The active set of tags.
      * @throws GenieException
      */
@@ -330,9 +332,9 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Job not found")
     })
     public Set<String> getTagsForJob(
             @ApiParam(value = "Id of the job to get tags for.", required = true)
@@ -345,10 +347,10 @@ public class JobResource {
     /**
      * Update the tags for a given job.
      *
-     * @param id The id of the job to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the job to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing configuration
-     * files with. Not null/empty/blank.
+     *             files with. Not null/empty/blank.
      * @return The new set of job tags.
      * @throws GenieException
      */
@@ -362,9 +364,9 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Job not found")
     })
     public Set<String> updateTagsForJob(
             @ApiParam(value = "Id of the job to update tags for.", required = true)
@@ -380,7 +382,7 @@ public class JobResource {
      * Delete the all tags from a given job.
      *
      * @param id The id of the job to delete the tags from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -392,9 +394,9 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid Id supplied"),
+            @ApiResponse(code = 404, message = "Job not found")
     })
     public Set<String> removeAllTagsForJob(
             @ApiParam(value = "Id of the job to delete from.", required = true)
@@ -407,8 +409,8 @@ public class JobResource {
     /**
      * Remove an tag from a given job.
      *
-     * @param id The id of the job to delete the tag from. Not
-     * null/empty/blank.
+     * @param id  The id of the job to delete the tag from. Not
+     *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the job.
      * @throws GenieException
@@ -422,9 +424,9 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Job not found")
     })
     public Set<String> removeTagForJob(
             @ApiParam(value = "Id of the job to delete from.", required = true)

@@ -25,6 +25,7 @@ import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.CommandConfigService;
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +64,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * Default constructor.
      *
      * @param commandRepo the command repository to use
-     * @param appRepo the application repository to use
+     * @param appRepo     the application repository to use
      */
     @Inject
     public CommandConfigServiceJPAImpl(
@@ -591,7 +593,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Cannot delete command id from the tags list.");
         }
-        
+
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getTags().remove(tag);

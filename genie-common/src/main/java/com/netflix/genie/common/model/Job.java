@@ -62,7 +62,7 @@ public class Job extends CommonEntityFields {
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
     private static final char CRITERIA_SET_DELIMITER = '|';
     private static final char CRITERIA_DELIMITER = ',';
-    private static final String DEFAULT_VERSION = "-1" ;
+    private static final String DEFAULT_VERSION = "-1";
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
@@ -125,7 +125,7 @@ public class Job extends CommonEntityFields {
     @ApiModelProperty(
             value = "List of criteria containing tags to use to pick a cluster to run this job")
     private List<ClusterCriteria> clusterCriteria;
-    
+
     /**
      * Set of tags to use for selecting command (REQUIRED).
      */
@@ -143,7 +143,7 @@ public class Job extends CommonEntityFields {
     @Lob
     @Basic(optional = false)
     private String clusterCriteriaString;
-    
+
     /**
      * String representation of the the command criteria set object
      * above.
@@ -206,7 +206,7 @@ public class Job extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"
-            + " associated with this job.")
+                    + " associated with this job.")
     private Set<String> tags;
 
     // ------------------------------------------------------------------------
@@ -357,12 +357,12 @@ public class Job extends CommonEntityFields {
     /**
      * Construct a new Job.
      *
-     * @param user The name of the user running the job. Not null/empty/blank.
-     * @param commandArgs The command line arguments for the job. Not
-     * null/empty/blank.
+     * @param user            The name of the user running the job. Not null/empty/blank.
+     * @param commandArgs     The command line arguments for the job. Not
+     *                        null/empty/blank.
      * @param commandCriteria The criteria for the command. Not null/empty.
      * @param clusterCriteria The cluster criteria for the job. Not null/empty.
-     * @param version The version of this job
+     * @param version         The version of this job
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
     public Job(
@@ -458,7 +458,7 @@ public class Job extends CommonEntityFields {
      * Sets the name of the cluster on which this job is run.
      *
      * @param executionClusterName Name of the cluster on which job is executed.
-     * Populated by the server.
+     *                             Populated by the server.
      */
     public void setExecutionClusterName(final String executionClusterName) {
         this.executionClusterName = executionClusterName;
@@ -477,7 +477,7 @@ public class Job extends CommonEntityFields {
      * Sets the id of the cluster on which this job is run.
      *
      * @param executionClusterId Id of the cluster on which job is executed.
-     * Populated by the server.
+     *                           Populated by the server.
      */
     public void setExecutionClusterId(final String executionClusterId) {
         this.executionClusterId = executionClusterId;
@@ -522,7 +522,7 @@ public class Job extends CommonEntityFields {
      * job run.
      *
      * @param commandArgs Arguments to be used to run the command with. Not
-     * null/empty/blank.
+     *                    null/empty/blank.
      * @throws GenieException
      */
     public void setCommandArgs(final String commandArgs) throws GenieException {
@@ -619,7 +619,7 @@ public class Job extends CommonEntityFields {
      * Set application Name with which this job is run, if not null.
      *
      * @param applicationName Name of the application if specified on which the
-     * job is run
+     *                        job is run
      */
     public void setApplicationName(final String applicationName) {
         this.applicationName = applicationName;
@@ -638,7 +638,7 @@ public class Job extends CommonEntityFields {
      * Set application Id with which this job is run, if not null.
      *
      * @param applicationId Id of the application if specified on which the job
-     * is run
+     *                      is run
      */
     public void setApplicationId(final String applicationId) {
         this.applicationId = applicationId;
@@ -657,7 +657,7 @@ public class Job extends CommonEntityFields {
      * Set command Name with which this job is run.
      *
      * @param commandName Name of the command if specified on which the job is
-     * run
+     *                    run
      * @throws GenieException
      */
     public void setCommandName(final String commandName) throws GenieException {
@@ -697,7 +697,6 @@ public class Job extends CommonEntityFields {
      * Get the process handle for the job.
      *
      * @return processHandle
-     *
      */
     public int getProcessHandle() {
         return this.processHandle;
@@ -921,6 +920,22 @@ public class Job extends CommonEntityFields {
     }
 
     /**
+     * Set the cluster criteria string.
+     *
+     * @param clusterCriteriaString A list of cluster criteria objects
+     * @throws GenieException
+     */
+    protected void setClusterCriteriaString(final String clusterCriteriaString) throws GenieException {
+        if (StringUtils.isBlank(clusterCriteriaString)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No clusterCriteriaString passed in to set. Unable to continue.");
+        }
+        this.clusterCriteriaString = clusterCriteriaString;
+        this.clusterCriteria = stringToClusterCriteria(clusterCriteriaString);
+    }
+
+    /**
      * Gets the command criteria which was specified to pick a command to run the job.
      *
      * @return commandCriteria
@@ -957,23 +972,7 @@ public class Job extends CommonEntityFields {
      */
     public void setCommandCriteriaString(String commandCriteriaString) throws GenieException {
         this.commandCriteriaString = commandCriteriaString;
-        this.commandCriteria = stringToCommandCriteria(commandCriteriaString); 
-    }
-
-    /**
-     * Set the cluster criteria string.
-     *
-     * @param clusterCriteriaString A list of cluster criteria objects
-     * @throws GenieException
-     */
-    protected void setClusterCriteriaString(final String clusterCriteriaString) throws GenieException {
-        if (StringUtils.isBlank(clusterCriteriaString)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No clusterCriteriaString passed in to set. Unable to continue.");
-        }
-        this.clusterCriteriaString = clusterCriteriaString;
-        this.clusterCriteria = stringToClusterCriteria(clusterCriteriaString);
+        this.commandCriteria = stringToCommandCriteria(commandCriteriaString);
     }
 
     /**
@@ -997,7 +996,7 @@ public class Job extends CommonEntityFields {
      * Sets job status and human-readable message.
      *
      * @param status predefined status
-     * @param msg human-readable message
+     * @param msg    human-readable message
      */
     public void setJobStatus(final JobStatus status, final String msg) {
         setJobStatus(status);
@@ -1017,7 +1016,7 @@ public class Job extends CommonEntityFields {
      * Sets the env property file name in string form.
      *
      * @param envPropFile contains the list of env variables to set while
-     * running this job.
+     *                    running this job.
      */
     public void setEnvPropFile(final String envPropFile) {
         this.envPropFile = envPropFile;
@@ -1045,7 +1044,7 @@ public class Job extends CommonEntityFields {
     /**
      * Gets the criteria used to select a cluster for this job.
      *
-     * @return the criteria containing tags which was chosen to 
+     * @return the criteria containing tags which was chosen to
      * select a cluster to run this job.
      */
     public String getChosenClusterCriteriaString() {
@@ -1061,7 +1060,7 @@ public class Job extends CommonEntityFields {
     public void setChosenClusterCriteriaString(String chosenClusterCriteriaString) {
         this.chosenClusterCriteriaString = chosenClusterCriteriaString;
     }
-    
+
     /**
      * Check to make sure that the required parameters exist.
      *
@@ -1080,8 +1079,8 @@ public class Job extends CommonEntityFields {
      * Validate that required parameters are present for a Job.
      *
      * @param commandCriteria The criteria for the command..
-     * @param commandArgs The command line arguments for the job
-     * @param criteria The cluster criteria for the job
+     * @param commandArgs     The command line arguments for the job
+     * @param criteria        The cluster criteria for the job
      * @throws GenieException
      */
     private void validate(
@@ -1092,7 +1091,7 @@ public class Job extends CommonEntityFields {
         if (commandCriteria == null || commandCriteria.isEmpty()) {
             builder.append("Command criteria is mandatory to figure out a command to run the job.\n");
         }
-        
+
         if (StringUtils.isEmpty(commandArgs)) {
             builder.append("Command arguments are required\n");
         }
@@ -1142,9 +1141,9 @@ public class Job extends CommonEntityFields {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No command criteria entered unable to create string");
         }
-        return StringUtils.join(commandCriteria,CRITERIA_DELIMITER);
+        return StringUtils.join(commandCriteria, CRITERIA_DELIMITER);
     }
-    
+
     /**
      * Convert a string to cluster criteria objects.
      *
@@ -1165,7 +1164,7 @@ public class Job extends CommonEntityFields {
         }
         return c;
     }
-    
+
     /**
      * Convert a string to cluster criteria objects.
      *

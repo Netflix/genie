@@ -28,10 +28,12 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +176,7 @@ public final class ClusterServiceSampleClient {
         for (final String tag : tags) {
             LOG.info("Tag = " + tag);
         }
-        
+
         LOG.info("Adding tags to cluster with id " + cluster1.getId());
         final Set<String> newTags = new HashSet<String>();
         newTags.add("tag1");
@@ -198,7 +200,7 @@ public final class ClusterServiceSampleClient {
             //Shouldn't print anything
             LOG.info("Tag = " + tag);
         }
-        
+
         LOG.info("Deleting all the tags from the cluster with id " + cluster1.getId());
         //This should remove the original config leaving only the two in this set
         final Set<String> tags4 = clusterClient.removeAllConfigsForCluster(cluster1.getId());
@@ -207,7 +209,7 @@ public final class ClusterServiceSampleClient {
             LOG.info("Config = " + tag);
         }
         /********************** End tests for tag Api's **********************/
-        
+
         LOG.info("Commands for cluster with id " + cluster1.getId());
         final List<Command> commands1 = clusterClient.getCommandsForCluster(cluster1.getId());
         for (final Command command : commands1) {

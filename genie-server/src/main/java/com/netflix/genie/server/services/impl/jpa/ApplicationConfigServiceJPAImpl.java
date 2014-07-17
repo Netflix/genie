@@ -23,6 +23,7 @@ import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.ApplicationSpecs;
 import com.netflix.genie.server.services.ApplicationConfigService;
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -623,7 +625,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Cannot delete application id from the tags list.");
         }
-        
+
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             application.getTags().remove(tag);

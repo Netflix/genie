@@ -39,8 +39,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Specifications for JPA queries.
- *
+ * <p/>
  * see http://tinyurl.com/n6nubvm
+ *
  * @author tgianos
  */
 public final class ClusterSpecs {
@@ -54,9 +55,9 @@ public final class ClusterSpecs {
     /**
      * Generate a specification given the parameters.
      *
-     * @param name The name of the cluster to find
-     * @param statuses The statuses of the clusters to find
-     * @param tags The tags of the clusters to find
+     * @param name          The name of the cluster to find
+     * @param statuses      The statuses of the clusters to find
+     * @param tags          The tags of the clusters to find
      * @param minUpdateTime The minimum updated time of the clusters to find
      * @param maxUpdateTime The maximum updated time of the clusters to find
      * @return The specification
@@ -82,11 +83,6 @@ public final class ClusterSpecs {
                 }
                 if (maxUpdateTime != null) {
                     predicates.add(cb.lessThan(root.get(Cluster_.updated), new Date(maxUpdateTime)));
-                }
-                if (tags != null) {
-                    for (final String tag : tags) {
-                        //predicates.add(cb.isMember(tag, root.get(Cluster_.tags))); //.isMember(tag, root.get(Cluster_.tags)));
-                    }
                 }
 
                 if (statuses != null && !statuses.isEmpty()) {
@@ -121,19 +117,19 @@ public final class ClusterSpecs {
                     final CriteriaBuilder cb) {
                 final List<Predicate> predicates = new ArrayList<Predicate>();
                 final Join<Cluster, Command> commands = root.join(Cluster_.commands);
-                
+
                 cq.distinct(true);
 
                 predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
                 predicates.add(cb.equal(root.get(Cluster_.status), ClusterStatus.UP));
-     
+
                 if (commandCriteria != null) {
-                    for (final String tag: commandCriteria) {
+                    for (final String tag : commandCriteria) {
                         predicates.add(cb.isMember(tag, commands.get(Command_.tags)));
 
                     }
                 }
-                
+
                 if (clusterCriteria.getTags() != null) {
                     for (final String tag : clusterCriteria.getTags()) {
                         predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));

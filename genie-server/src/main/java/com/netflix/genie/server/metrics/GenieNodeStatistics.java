@@ -102,9 +102,9 @@ public interface GenieNodeStatistics {
 
     /**
      * Increment job submission retry count.
-    */
-     void incrJobSubmissionRetryCount();
-        
+     */
+    void incrJobSubmissionRetryCount();
+
     /**
      * Get number of email that failed to be sent from this instance.
      *
@@ -246,7 +246,7 @@ public interface GenieNodeStatistics {
      * Set the number of running jobs with runtime less than 15 mins.
      *
      * @param genieRunningJobs0To15m number of running jobs with runtime less
-     * than 15 mins
+     *                               than 15 mins
      */
     void setGenieRunningJobs0To15m(int genieRunningJobs0To15m);
 
@@ -261,7 +261,7 @@ public interface GenieNodeStatistics {
      * Set the number of running jobs with runtime between 15 mins and 2 hours.
      *
      * @param genieRunningJobs15mTo2h number of running jobs with runtime
-     * between 15 mins and 2 hours
+     *                                between 15 mins and 2 hours
      */
     void setGenieRunningJobs15mTo2h(int genieRunningJobs15mTo2h);
 
@@ -276,7 +276,7 @@ public interface GenieNodeStatistics {
      * Set the number of running jobs with runtime between 2 to 8 hours.
      *
      * @param genieRunningJobs2hTo8h number of running jobs with runtime between
-     * 2 to 8 hours.
+     *                               2 to 8 hours.
      */
     void setGenieRunningJobs2hTo8h(int genieRunningJobs2hTo8h);
 
@@ -291,7 +291,7 @@ public interface GenieNodeStatistics {
      * Set the number of running jobs with runtime greater than 8 hours.
      *
      * @param genieRunningJobs8hPlus number of running jobs with runtime greater
-     * than 8 hours
+     *                               than 8 hours
      */
     void setGenieRunningJobs8hPlus(int genieRunningJobs8hPlus);
 

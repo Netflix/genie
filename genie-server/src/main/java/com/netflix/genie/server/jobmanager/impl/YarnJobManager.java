@@ -29,6 +29,7 @@ import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.util.StringUtil;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import java.util.Set;
 import javax.activation.DataHandler;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +118,7 @@ public class YarnJobManager implements JobManager {
      * balancer.
      *
      * @param jobMonitor The job monitor object to use.
-     * @param xs The execution service to use.
+     * @param xs         The execution service to use.
      */
     @Inject
     public YarnJobManager(final JobMonitor jobMonitor, final ExecutionService xs) {
@@ -323,7 +325,7 @@ public class YarnJobManager implements JobManager {
         this.genieJobIDProp = GENIE_JOB_ID + "=" + job.getId();
         this.netflixEnvProp = NFLX_ENV + "="
                 + ConfigurationManager.getConfigInstance().getString(
-                        "netflix.environment");
+                "netflix.environment");
 
         final String lipstickUuidPropName = ConfigurationManager.getConfigInstance().
                 getString("netflix.genie.server.lipstick.uuid.prop.name",
@@ -463,14 +465,14 @@ public class YarnJobManager implements JobManager {
                     .getConfigInstance()
                     .getString(
                             "netflix.genie.server.hadoop." + hadoopVersion
-                            + ".home");
+                                    + ".home");
             // if not, trim to 3 most significant digits
             if (hadoopHome == null) {
                 hadoopVersion = StringUtil.trimVersion(hadoopVersion);
                 hadoopHome = ConfigurationManager.getConfigInstance()
                         .getString(
                                 "netflix.genie.server.hadoop." + hadoopVersion
-                                + ".home");
+                                        + ".home");
             }
 
             if (hadoopHome == null || !new File(hadoopHome).exists()) {
@@ -503,7 +505,7 @@ public class YarnJobManager implements JobManager {
         // and set the COPY_COMMAND environment variable
         this.env.put("CP_TIMEOUT",
                 ConfigurationManager.getConfigInstance()
-                .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
+                        .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
 
         final String cpOpts = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server.hadoop.s3cp.opts", "");
@@ -513,7 +515,7 @@ public class YarnJobManager implements JobManager {
 
         // Force flag to overwrite required in Hadoop2
         this.env.put("FORCE_COPY_FLAG", "-f");
-        
+
         final String mkdirCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -mkdir";
         this.env.put("MKDIR_COMMAND", mkdirCommand);
 
@@ -544,11 +546,7 @@ public class YarnJobManager implements JobManager {
         // set the variables to be added to the core-site xml. Format of this variable is:
         // key1=value1;key2=value2;key3=value3
         this.env.put("CORE_SITE_XML_ARGS",
-                this.genieJobIDProp
-                + ";"
-                + this.netflixEnvProp
-                + ";"
-                + this.lipstickUuidProp);
+                StringUtils.join(new String[]{this.genieJobIDProp, this.netflixEnvProp, this.lipstickUuidProp}, ";"));
     }
 
     /**

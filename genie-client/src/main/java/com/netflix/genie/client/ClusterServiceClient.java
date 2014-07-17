@@ -81,8 +81,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Create a new cluster configuration.
      *
      * @param cluster the object encapsulating the new Cluster configuration to
-     * create
-     *
+     *                create
      * @return extracted cluster configuration response
      * @throws GenieException
      */
@@ -105,10 +104,9 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Create or update a cluster configuration.
      *
-     * @param id the id for the cluster configuration to create or update
+     * @param id      the id for the cluster configuration to create or update
      * @param cluster the object encapsulating the new Cluster configuration to
-     * create
-     *
+     *                create
      * @return extracted cluster configuration response
      * @throws GenieException
      */
@@ -161,9 +159,9 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Gets a set of cluster configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *
-     * More details on the parameters can be found on the Genie User Guide on
-     * GitHub.
+     *               <p/>
+     *               More details on the parameters can be found on the Genie User Guide on
+     *               GitHub.
      * @return List of cluster configuration elements that match the filter
      * @throws GenieException
      */
@@ -219,8 +217,8 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Add some more configuration files to a given cluster.
      *
-     * @param id The id of the cluster to add configurations to. Not
-     * Null/empty/blank.
+     * @param id      The id of the cluster to add configurations to. Not
+     *                Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given command.
      * @throws GenieException
@@ -253,7 +251,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Get the active set of configuration files for the given cluster.
      *
      * @param id The id of the cluster to get configurations for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The set of configuration files for the given cluster.
      * @throws GenieException
      */
@@ -277,10 +275,10 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Update the configuration files for a given cluster.
      *
-     * @param id The id of the cluster to update the configuration files for.
-     * Not null/empty/blank.
+     * @param id      The id of the cluster to update the configuration files for.
+     *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
-     * files with. Not null.
+     *                files with. Not null.
      * @return The new set of cluster configurations.
      * @throws GenieException
      */
@@ -314,7 +312,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Delete all the configuration files from a given cluster.
      *
      * @param id The id of the cluster to delete the configuration files from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -340,8 +338,8 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Add some more commands to a given cluster.
      *
-     * @param id The id of the cluster to add commands to. Not
-     * Null/empty/blank.
+     * @param id       The id of the cluster to add commands to. Not
+     *                 Null/empty/blank.
      * @param commands The commands to add. Not null or empty.
      * @return The new list of commands for the given cluster.
      * @throws GenieException
@@ -374,7 +372,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Get the active set of commands for the given cluster.
      *
      * @param id The id of the cluster to get commands for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The list of command files for the given cluster.
      * @throws GenieException
      */
@@ -399,10 +397,10 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Update the commands for a given cluster.
      *
-     * @param id The id of the cluster to update the command files for. Not
-     * null/empty/blank.
+     * @param id       The id of the cluster to update the command files for. Not
+     *                 null/empty/blank.
      * @param commands The commands to replace existing command
-     * files with. Not null.
+     *                 files with. Not null.
      * @return The new list of cluster commands.
      * @throws GenieException
      */
@@ -436,7 +434,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Delete all the commands from a given cluster.
      *
      * @param id The id of the cluster to delete the commands from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return Empty list if successful
      * @throws GenieException
      */
@@ -462,8 +460,8 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Remove an command from a given cluster.
      *
-     * @param id The id of the cluster to delete the command from. Not
-     * null/empty/blank.
+     * @param id    The id of the cluster to delete the command from. Not
+     *              null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active set of commands for the cluster.
      * @throws GenieException
@@ -497,8 +495,8 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Add some more tags to a given cluster.
      *
-     * @param id The id of the cluster to add tags to. Not
-     * Null/empty/blank.
+     * @param id   The id of the cluster to add tags to. Not
+     *             Null/empty/blank.
      * @param tags The tags to add. Not null or empty.
      * @return The new set of tags for the given cluster.
      * @throws GenieException
@@ -531,7 +529,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Get the active set of tags for the given cluster.
      *
      * @param id The id of the cluster to get tags for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The set of tags for the given cluster.
      * @throws GenieException
      */
@@ -555,10 +553,10 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Update the tags for a given cluster.
      *
-     * @param id The id of the cluster to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the cluster to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing tag
-     * files with. Not null.
+     *             files with. Not null.
      * @return The new set of cluster tags.
      * @throws GenieException
      */
@@ -592,7 +590,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Delete all the tags from a given cluster.
      *
      * @param id The id of the cluster to delete the tags from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -614,12 +612,12 @@ public final class ClusterServiceClient extends BaseGenieClient {
                 null);
         return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
-    
+
     /**
      * Remove tag from a given cluster.
      *
      * @param id The id of the cluster to delete the tag from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The tag for the cluster.
      * @throws GenieException
      */
@@ -637,10 +635,10 @@ public final class ClusterServiceClient extends BaseGenieClient {
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
-                            BASE_CONFIG_CLUSTER_REST_URL,
-                            id,
-                            "tags",
-                            tag
+                                BASE_CONFIG_CLUSTER_REST_URL,
+                                id,
+                                "tags",
+                                tag
                         },
                         SLASH),
                 null,

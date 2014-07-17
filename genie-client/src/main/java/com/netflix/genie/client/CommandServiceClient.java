@@ -24,10 +24,12 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +78,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Create a new command configuration.
      *
      * @param command the object encapsulating the new Cluster configuration to
-     * create
-     *
+     *                create
      * @return extracted command configuration response
      * @throws GenieException
      */
@@ -100,10 +101,9 @@ public final class CommandServiceClient extends BaseGenieClient {
     /**
      * Create or update a command configuration.
      *
-     * @param id the id for the command configuration to create or update
+     * @param id      the id for the command configuration to create or update
      * @param command the object encapsulating the new Cluster configuration to
-     * create
-     *
+     *                create
      * @return extracted command configuration response
      * @throws GenieException
      */
@@ -153,9 +153,9 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Gets a set of command configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *
-     * More details on the parameters can be found on the Genie User Guide on
-     * GitHub.
+     *               <p/>
+     *               More details on the parameters can be found on the Genie User Guide on
+     *               GitHub.
      * @return List of command configuration elements that match the filter
      * @throws GenieException
      */
@@ -188,7 +188,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Delete a configuration using its id.
      *
      * @param id the id for the command configuration to delete. Not null or
-     * empty.
+     *           empty.
      * @return the deleted command configuration
      * @throws GenieException
      */
@@ -212,8 +212,8 @@ public final class CommandServiceClient extends BaseGenieClient {
     /**
      * Add some more configuration files to a given command.
      *
-     * @param id The id of the command to add configurations to. Not
-     * Null/empty/blank.
+     * @param id      The id of the command to add configurations to. Not
+     *                Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given command.
      * @throws GenieException
@@ -246,7 +246,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Get the active set of configuration files for the given command.
      *
      * @param id The id of the command to get configurations for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The set of configuration files for the given command.
      * @throws GenieException
      */
@@ -270,10 +270,10 @@ public final class CommandServiceClient extends BaseGenieClient {
     /**
      * Update the configuration files for a given command.
      *
-     * @param id The id of the command to update the configuration files for.
-     * Not null/empty/blank.
+     * @param id      The id of the command to update the configuration files for.
+     *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
-     * files with. Not null.
+     *                files with. Not null.
      * @return The new set of command configurations.
      * @throws GenieException
      */
@@ -307,7 +307,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Delete all the configuration files from a given command.
      *
      * @param id The id of the command to delete the configuration files from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -333,8 +333,8 @@ public final class CommandServiceClient extends BaseGenieClient {
     /**
      * Add some more applications to a given command.
      *
-     * @param id The id of the command to add applications to. Not
-     * Null/empty/blank.
+     * @param id          The id of the command to add applications to. Not
+     *                    Null/empty/blank.
      * @param application The application to set. Not null.
      * @return The new application for the given command.
      * @throws GenieException
@@ -357,9 +357,9 @@ public final class CommandServiceClient extends BaseGenieClient {
                 Verb.POST,
                 StringUtils.join(
                         new String[]{
-                            BASE_CONFIG_COMMAND_REST_URL,
-                            id,
-                            "application"
+                                BASE_CONFIG_COMMAND_REST_URL,
+                                id,
+                                "application"
                         },
                         SLASH),
                 null,
@@ -388,9 +388,9 @@ public final class CommandServiceClient extends BaseGenieClient {
                 Verb.GET,
                 StringUtils.join(
                         new String[]{
-                            BASE_CONFIG_COMMAND_REST_URL,
-                            id,
-                            "application"
+                                BASE_CONFIG_COMMAND_REST_URL,
+                                id,
+                                "application"
                         },
                         SLASH),
                 null,
@@ -402,7 +402,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Remove application from a given command.
      *
      * @param id The id of the command to delete the application from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The active application for the command.
      * @throws GenieException
      */
@@ -419,9 +419,9 @@ public final class CommandServiceClient extends BaseGenieClient {
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
-                            BASE_CONFIG_COMMAND_REST_URL,
-                            id,
-                            "application"
+                                BASE_CONFIG_COMMAND_REST_URL,
+                                id,
+                                "application"
                         },
                         SLASH),
                 null,
@@ -433,7 +433,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Get all the clusters this command is associated with.
      *
      * @param id The id of the command to get the clusters for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The set of clusters.
      * @throws GenieException
      */
@@ -455,12 +455,12 @@ public final class CommandServiceClient extends BaseGenieClient {
                 null);
         return (Set<Cluster>) this.executeRequest(request, Set.class, Cluster.class);
     }
-    
+
     /**
      * Add some more tags to a given command.
      *
-     * @param id The id of the command to add tags to. Not
-     * Null/empty/blank.
+     * @param id   The id of the command to add tags to. Not
+     *             Null/empty/blank.
      * @param tags The tags to add. Not null or empty.
      * @return The new set of tags for the given command.
      * @throws GenieException
@@ -493,7 +493,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Get the active set of tags for the given command.
      *
      * @param id The id of the command to get tags for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The set of tags for the given command.
      * @throws GenieException
      */
@@ -517,10 +517,10 @@ public final class CommandServiceClient extends BaseGenieClient {
     /**
      * Update the tags for a given command.
      *
-     * @param id The id of the command to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the command to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing tag
-     * files with. Not null.
+     *             files with. Not null.
      * @return The new set of command tags.
      * @throws GenieException
      */
@@ -554,7 +554,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Delete all the tags from a given command.
      *
      * @param id The id of the command to delete the tags from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -576,12 +576,12 @@ public final class CommandServiceClient extends BaseGenieClient {
                 null);
         return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
-    
+
     /**
      * Remove tag from a given command.
      *
      * @param id The id of the command to delete the tag from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The tag for the command.
      * @throws GenieException
      */
@@ -599,10 +599,10 @@ public final class CommandServiceClient extends BaseGenieClient {
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
-                            BASE_CONFIG_COMMAND_REST_URL,
-                            id,
-                            "tags",
-                            tag
+                                BASE_CONFIG_COMMAND_REST_URL,
+                                id,
+                                "tags",
+                                tag
                         },
                         SLASH),
                 null,

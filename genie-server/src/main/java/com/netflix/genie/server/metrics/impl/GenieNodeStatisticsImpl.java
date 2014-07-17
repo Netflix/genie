@@ -21,11 +21,13 @@ import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.servo.annotations.DataSourceType;
 import com.netflix.servo.annotations.Monitor;
 import com.netflix.servo.monitor.Monitors;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +86,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
 
     @Monitor(name = "Job_Submission_Retry_Count", type = DataSourceType.COUNTER)
     private final AtomicLong jobSubmissionRetryCount = new AtomicLong(0);
-    
+
     @Monitor(name = "Failed_Email_Count", type = DataSourceType.COUNTER)
     private final AtomicLong failedEmailCount = new AtomicLong(0);
 
@@ -447,5 +449,6 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
     @Override
     public void incrJobSubmissionRetryCount() {
         LOG.debug("called");
-        jobSubmissionRetryCount.incrementAndGet();}
+        jobSubmissionRetryCount.incrementAndGet();
+    }
 }

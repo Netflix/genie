@@ -22,6 +22,7 @@ import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -75,9 +76,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * Submits a job using given parameters.
      *
      * @param job for submitting job (can't be null)<br>
-     *
-     * More details can be found on the Genie User Guide on GitHub.
-     *
+     *            <p/>
+     *            More details can be found on the Genie User Guide on GitHub.
      * @return updated jobInfo for submitted job, if there is no error
      * @throws GenieException
      */
@@ -125,9 +125,9 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * Gets a set of jobs for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *
-     * More details on the parameters can be found on the Genie User Guide on
-     * GitHub.
+     *               <p/>
+     *               More details on the parameters can be found on the Genie User Guide on
+     *               GitHub.
      * @return List of jobs that match the filter
      * @throws GenieException
      */
@@ -143,11 +143,11 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     /**
      * Wait for job to complete, until the given timeout.
      *
-     * @param id the Genie job ID to wait for completion
+     * @param id           the Genie job ID to wait for completion
      * @param blockTimeout the time to block for (in ms), after which a
-     * GenieException will be thrown
+     *                     GenieException will be thrown
      * @return the jobInfo for the job after completion
-     * @throws GenieException on service errors
+     * @throws GenieException       on service errors
      * @throws InterruptedException on timeout/thread errors
      */
     public Job waitForCompletion(final String id, final long blockTimeout)
@@ -162,12 +162,12 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     /**
      * Wait for job to complete, until the given timeout.
      *
-     * @param id the Genie job ID to wait for completion
+     * @param id           the Genie job ID to wait for completion
      * @param blockTimeout the time to block for (in ms), after which a
-     * GenieException will be thrown
-     * @param pollTime the time to sleep between polling for job status
+     *                     GenieException will be thrown
+     * @param pollTime     the time to sleep between polling for job status
      * @return the jobInfo for the job after completion
-     * @throws GenieException on service errors
+     * @throws GenieException       on service errors
      * @throws InterruptedException on timeout/thread errors
      */
     public Job waitForCompletion(final String id, final long blockTimeout, final long pollTime)
@@ -231,8 +231,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     /**
      * Add some more tags to a given job.
      *
-     * @param id The id of the job to add tags to. Not
-     * Null/empty/blank.
+     * @param id   The id of the job to add tags to. Not
+     *             Null/empty/blank.
      * @param tags The tags to add. Not null or empty.
      * @return The new set of tags for the given job.
      * @throws GenieException
@@ -265,7 +265,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * Get the active set of tags for the given job.
      *
      * @param id The id of the job to get tags for. Not
-     * Null/empty/blank.
+     *           Null/empty/blank.
      * @return The set of tags for the given job.
      * @throws GenieException
      */
@@ -289,10 +289,10 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     /**
      * Update the tags for a given job.
      *
-     * @param id The id of the job to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the job to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing tag
-     * files with. Not null.
+     *             files with. Not null.
      * @return The new set of job tags.
      * @throws GenieException
      */
@@ -326,7 +326,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * Delete all the tags from a given job.
      *
      * @param id The id of the job to delete the tags from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException
      */
@@ -348,12 +348,12 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                 null);
         return (Set<String>) this.executeRequest(request, Set.class, String.class);
     }
-    
+
     /**
      * Remove tag from a given job.
      *
      * @param id The id of the job to delete the tag from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The tag for the job.
      * @throws GenieException
      */
@@ -371,8 +371,8 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                 StringUtils.join(
                         new String[]{
                                 BASE_EXECUTION_REST_URL,
-                            id,
-                            "tags"
+                                id,
+                                "tags"
                         },
                         SLASH),
                 null,
