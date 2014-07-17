@@ -24,7 +24,6 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.ExecutionService;
 import java.io.File;
 import java.net.HttpURLConnection;
@@ -64,7 +63,6 @@ public class JobMonitorImpl implements JobMonitor {
 
     private final GenieNodeStatistics genieNodeStatistics;
     private final ExecutionService xs;
-    private final JobRepository jobRepo;
 
     // interval to poll for process status
     private static final int JOB_WAIT_TIME_MS = 5000;
@@ -102,10 +100,8 @@ public class JobMonitorImpl implements JobMonitor {
     @Inject
     public JobMonitorImpl(
             final ExecutionService xs,
-            final JobRepository jobRepo,
             final GenieNodeStatistics genieNodeStatistics) {
         this.xs = xs;
-        this.jobRepo = jobRepo;
         this.genieNodeStatistics = genieNodeStatistics;
         this.config = ConfigurationManager.getConfigInstance();
         this.maxStdoutSize = this.config.getLong("netflix.genie.job.max.stdout.size", null);
@@ -179,24 +175,29 @@ public class JobMonitorImpl implements JobMonitor {
      */
     @Override
     public void run() {
-        // wait for process to complete
-        final boolean killed = this.xs.finalizeJob(this.jobId, waitForExit()) == JobStatus.KILLED;
+        try {
+            // wait for process to complete
+            final boolean killed = this.xs.finalizeJob(this.jobId, waitForExit()) == JobStatus.KILLED;
 
-        // Check if user email address is specified. If so
-        // send an email to user about job completion.
-        final String emailTo = this.jobRepo.findOne(this.jobId).getEmail();
+            // Check if user email address is specified. If so
+            // send an email to user about job completion.
+            final String emailTo = this.xs.getJobInfo(this.jobId).getEmail();
 
-        if (emailTo != null) {
-            LOG.info("User email address: " + emailTo);
+            if (emailTo != null) {
+                LOG.info("User email address: " + emailTo);
 
-            if (sendEmail(emailTo, killed)) {
-                // Email sent successfully. Update success email counter
-                this.genieNodeStatistics.incrSuccessfulEmailCount();
-            } else {
-                // Failed to send email. Update email failed counter
-                LOG.warn("Failed to send email.");
-                this.genieNodeStatistics.incrFailedEmailCount();
+                if (sendEmail(emailTo, killed)) {
+                    // Email sent successfully. Update success email counter
+                    this.genieNodeStatistics.incrSuccessfulEmailCount();
+                } else {
+                    // Failed to send email. Update email failed counter
+                    LOG.warn("Failed to send email.");
+                    this.genieNodeStatistics.incrFailedEmailCount();
+                }
             }
+        } catch (final GenieException ge) {
+            //TODO: Some sort of better handling.
+            LOG.error(ge.getMessage(), ge);
         }
     }
 
@@ -207,7 +208,7 @@ public class JobMonitorImpl implements JobMonitor {
      */
     private boolean isRunning() {
         try {
-            proc.exitValue();
+            this.proc.exitValue();
         } catch (IllegalThreadStateException e) {
             return true;
         }
@@ -222,7 +223,7 @@ public class JobMonitorImpl implements JobMonitor {
      */
     private boolean shouldUpdateJob() {
         long curTimeMS = System.currentTimeMillis();
-        long timeSinceStartMS = curTimeMS - lastUpdatedTimeMS;
+        long timeSinceStartMS = curTimeMS - this.lastUpdatedTimeMS;
 
         return timeSinceStartMS >= JOB_UPDATE_TIME_MS;
     }
@@ -233,8 +234,9 @@ public class JobMonitorImpl implements JobMonitor {
      * periodically (as RUNNING).
      *
      * @return exit code for the job after it finishes
+     * @throws GenieException
      */
-    private int waitForExit() {
+    private int waitForExit() throws GenieException {
         this.lastUpdatedTimeMS = System.currentTimeMillis();
         while (isRunning()) {
             try {
@@ -279,9 +281,10 @@ public class JobMonitorImpl implements JobMonitor {
      * about Job Status.
      *
      * @return 0 for success, -1 for failure
+     * @throws GenieException
      */
-    private boolean sendEmail(String emailTo, boolean killed) {
-        final Job job = this.jobRepo.findOne(this.jobId);
+    private boolean sendEmail(String emailTo, boolean killed) throws GenieException {
+        final Job job = this.xs.getJobInfo(this.jobId);
         LOG.debug("called");
 
         if (!this.config.getBoolean("netflix.genie.server.mail.enable", false)) {

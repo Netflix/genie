@@ -166,17 +166,66 @@ public interface ExecutionService {
     /**
      * Finalize the status of a job.
      *
-     * @param jobId The id of the job to finalize.
+     * @param id The id of the job to finalize.
      * @param exitCode The exit code of the job process.
      * @return The job status.
      */
-    JobStatus finalizeJob(final String jobId, final int exitCode);
+    JobStatus finalizeJob(final String id, final int exitCode) throws GenieException;
 
     /**
      * Update a job with the last updated time.
      *
-     * @param jobId The id of the job to update.
+     * @param id The id of the job to update.
      * @return The time in milliseconds when the job was updated.
      */
-    long updateJob(final String jobId);
+    long updateJob(final String id) throws GenieException;
+
+    /**
+     * Set the status for a given job.
+     *
+     * @param id The id of the job to fail.
+     * @param status The status to set.
+     * @param msg The message of the failure.
+     * @throws GenieException
+     */
+    void setJobStatus(final String id, final JobStatus status, final String msg) throws GenieException;
+
+    /**
+     * Set the java process id that will run the given job.
+     *
+     * @param id The id of the job to attach the process to.
+     * @param pid The id of the process that will run the job.
+     * @throws GenieException
+     */
+    void setProcessIdForJob(final String id, final int pid) throws GenieException;
+
+    /**
+     * Set the command information for a given job.
+     *
+     * @param id The id of the job.
+     * @param commandId The id of the command used to run the job.
+     * @param commandName The name of the command used to run the job.
+     * @throws GenieException
+     */
+    void setCommandInfoForJob(final String id, final String commandId, final String commandName) throws GenieException;
+
+    /**
+     * Set the application information for a given job.
+     *
+     * @param id The id of the job.
+     * @param appId The id of the application used to run the job.
+     * @param appName The name of the application used to run the job.
+     * @throws GenieException
+     */
+    void setApplicationInfoForJob(final String id, final String appId, final String appName) throws GenieException;
+
+    /**
+     * Set the cluster information for a given job.
+     *
+     * @param id The id of the job.
+     * @param clusterId The id of the cluster used to run the job.
+     * @param clusterName The name of the cluster used to run the job.
+     * @throws GenieException
+     */
+    void setClusterInfoForJob(final String id, final String clusterId, final String clusterName) throws GenieException;
 }

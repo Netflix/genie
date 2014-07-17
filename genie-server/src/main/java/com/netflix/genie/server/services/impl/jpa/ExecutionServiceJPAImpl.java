@@ -39,7 +39,6 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityExistsException;
@@ -250,7 +249,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered unable to retreive job.");
         }
-        LOG.debug("called for jobId: " + id);
+        LOG.debug("called for id: " + id);
 
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
@@ -317,7 +316,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No id entered unable to kill job.");
         }
-        LOG.debug("called for jobId: " + id);
+        LOG.debug("called for id: " + id);
         final Job job = this.jobRepo.findOne(id);
 
         // do some basic error handling
@@ -610,8 +609,12 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    public JobStatus finalizeJob(final String jobId, final int exitCode) {
-        final Job job = this.jobRepo.findOne(jobId);
+    public JobStatus finalizeJob(final String id, final int exitCode) throws GenieException {
+        final Job job = this.jobRepo.findOne(id);
+        if (job == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+        }
         job.setExitCode(exitCode);
 
         // only update status if not KILLED
@@ -655,13 +658,104 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    public long updateJob(final String jobId) {
-        LOG.debug("Updating db for job: " + jobId);
-        final Job job = this.jobRepo.findOne(jobId);
+    public long updateJob(final String id) throws GenieException {
+        LOG.debug("Updating db for job: " + id);
+        final Job job = this.jobRepo.findOne(id);
+        if (job == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+        }
 
         final long lastUpdatedTimeMS = System.currentTimeMillis();
         job.setJobStatus(JobStatus.RUNNING, "Job is running");
         job.setUpdated(new Date(lastUpdatedTimeMS));
         return lastUpdatedTimeMS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setJobStatus(final String id, final JobStatus status, final String msg) throws GenieException {
+        LOG.debug("Failing job with id " + id + " for reason " + msg);
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.setJobStatus(status, msg);
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setProcessIdForJob(final String id, final int pid) throws GenieException {
+        LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.setProcessHandle(pid);
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCommandInfoForJob(
+            final String id,
+            final String commandId,
+            final String commandName) throws GenieException {
+        LOG.debug("Setting the command info for job with id " + id);
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.setCommandId(commandId);
+            job.setCommandName(commandName);
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setApplicationInfoForJob(
+            final String id,
+            final String appId,
+            final String appName) throws GenieException {
+        LOG.debug("Setting the application info for job with id " + id);
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.setApplicationId(appId);
+            job.setApplicationName(appName);
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setClusterInfoForJob(
+            final String id,
+            final String clusterId,
+            final String clusterName) throws GenieException {
+        LOG.debug("Setting the application info for job with id " + id);
+        final Job job = this.jobRepo.findOne(id);
+        if (job != null) {
+            job.setExecutionClusterId(clusterId);
+            job.setExecutionClusterName(clusterName);
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+        }
     }
 }
