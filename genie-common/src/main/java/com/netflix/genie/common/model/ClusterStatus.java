@@ -48,7 +48,7 @@ public enum ClusterStatus {
      *
      * @param value string to parse/convert into cluster status
      * @return UP, OUT_OF_SERVICE, TERMINATED if match
-     * @throws com.netflix.genie.common.exceptions.GenieException on invalid value
+     * @throws GenieException on invalid value
      */
     public static ClusterStatus parse(final String value) throws GenieException {
         if (StringUtils.isBlank(value)) {

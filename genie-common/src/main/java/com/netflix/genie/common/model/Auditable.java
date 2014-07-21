@@ -18,6 +18,8 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.util.JsonDateDeserializer;
+import com.netflix.genie.common.util.JsonDateSerializer;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
@@ -41,6 +43,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +86,8 @@ public class Auditable implements Serializable, Validate {
             value = "created",
             notes = "When this resource was created.",
             dataType = "date")
+    @JsonSerialize(using = JsonDateSerializer.class)
+    @JsonDeserialize(using = JsonDateDeserializer.class)
     private Date created = new Date();
 
     /**
@@ -93,6 +99,8 @@ public class Auditable implements Serializable, Validate {
             value = "updated",
             notes = "When this resource was last updated.",
             dataType = "date")
+    @JsonSerialize(using = JsonDateSerializer.class)
+    @JsonDeserialize(using = JsonDateDeserializer.class)
     private Date updated = new Date();
 
     /**

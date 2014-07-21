@@ -234,7 +234,7 @@ public class ClusterConfigResource {
             @ApiResponse(code = 400, message = "Invalid Id supplied"),
             @ApiResponse(code = 404, message = "Cluster to update not found")
     })
-    public Cluster updateClusterConfig(
+    public Cluster updateCluster(
             @ApiParam(value = "Id of the cluster to update.", required = true)
             @PathParam("id")
             final String id,
@@ -262,7 +262,7 @@ public class ClusterConfigResource {
             @ApiResponse(code = 400, message = "Invalid Id supplied"),
             @ApiResponse(code = 404, message = "Cluster not found")
     })
-    public Cluster deleteClusterConfig(
+    public Cluster deleteCluster(
             @ApiParam(value = "Id of the cluster to delete.", required = true)
             @PathParam("id")
             final String id) throws GenieException {

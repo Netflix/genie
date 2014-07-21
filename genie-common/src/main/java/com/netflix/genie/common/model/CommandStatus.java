@@ -48,7 +48,7 @@ public enum CommandStatus {
      *
      * @param value string to parse/convert into command status
      * @return ACTIVE, DEPRECATED, INACTIVE if match
-     * @throws com.netflix.genie.common.exceptions.GenieException on invalid value
+     * @throws GenieException on invalid value
      */
     public static CommandStatus parse(final String value) throws GenieException {
         if (StringUtils.isBlank(value)) {

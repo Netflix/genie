@@ -386,7 +386,7 @@ public class Job extends CommonEntityFields {
     /**
      * Makes sure non-transient fields are set from transient fields.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @PrePersist
     protected void onCreateJob() throws GenieException {

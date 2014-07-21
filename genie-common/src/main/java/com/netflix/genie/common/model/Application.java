@@ -20,6 +20,7 @@ package com.netflix.genie.common.model;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +40,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +114,8 @@ public class Application extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"
-                    + " associated with this application.")
+                    + " associated with this application.",
+            required = true)
     private Set<String> tags;
 
     /**

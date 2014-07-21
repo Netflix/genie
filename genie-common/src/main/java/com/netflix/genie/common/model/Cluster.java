@@ -70,7 +70,8 @@ public class Cluster extends CommonEntityFields {
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The status of the cluster",
-            required = true)
+            required = true,
+            dataType = "string")
     private ClusterStatus status = ClusterStatus.OUT_OF_SERVICE;
 
     /**
@@ -93,7 +94,8 @@ public class Cluster extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the configuration"
-            + " files needed for this cluster")
+            + " files needed for this cluster",
+            required = true)
     private Set<String> configs;
 
     /**
@@ -103,8 +105,6 @@ public class Cluster extends CommonEntityFields {
     @OrderColumn
     @XmlTransient
     @JsonIgnore
-    @ApiModelProperty(
-            value = "List of commands that this cluster can run")
     private List<Command> commands;
 
     /**
@@ -115,7 +115,8 @@ public class Cluster extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"
-            + " associated with this cluster.")
+            + " associated with this cluster.",
+            required = true)
     private Set<String> tags;
 
     /**

@@ -133,7 +133,8 @@ public class Command extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"
-            + " associated with this command.")
+            + " associated with this command.",
+            required = true)
     private Set<String> tags;
 
     /**
