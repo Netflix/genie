@@ -1,2 +1,3 @@
 rootProject.name='genie'
+rootProject.status='snapshot'
 include 'genie-common','genie-server', 'genie-web', 'genie-client', 'genie-web-int-tests'
