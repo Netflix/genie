@@ -67,7 +67,7 @@ public final class JobSpecs {
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
                 final List<Predicate> predicates = new ArrayList<Predicate>();
-                if (StringUtils.isNotBlank(userName)) {
+                if (StringUtils.isNotBlank(id)) {
                     predicates.add(cb.like(root.get(Job_.id), id));
                 }
                 if (StringUtils.isNotBlank(jobName)) {
