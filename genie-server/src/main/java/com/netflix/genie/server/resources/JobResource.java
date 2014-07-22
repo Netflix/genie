@@ -279,8 +279,8 @@ public class JobResource {
             @ApiResponse(code = 200, message = "OK", response = Job.class)
     })
     public Job killJob(
-            @PathParam("id")
             @ApiParam(value = "Id of the job.", required = true)
+            @PathParam("id")
             final String id) throws GenieException {
         LOG.debug("called for jobID: " + id);
         return this.xs.killJob(id);

@@ -190,13 +190,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                                 + ") - try another instance or try again later");
             }
 
-            // if job can be launched, update the URIs
-            buildJobURIs(job);
-
+            
             // init state in DB - return if job already exists
             try {
                 // TODO add retries to avoid deadlock issue
                 savedJob = this.jobRepo.save(job);
+             // if job can be launched, update the URIs
+                buildJobURIs(savedJob);
             } catch (final RollbackException e) {
                 LOG.error("Can't create entity in the database", e);
                 if (e.getCause() instanceof EntityExistsException) {

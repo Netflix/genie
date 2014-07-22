@@ -660,14 +660,8 @@ public class Job extends CommonEntityFields {
      *
      * @param commandName Name of the command if specified on which the job is
      *                    run
-     * @throws GenieException
      */
-    public void setCommandName(final String commandName) throws GenieException {
-        if (StringUtils.isBlank(commandName)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command name entered.");
-        }
+    public void setCommandName(final String commandName)  {
         this.commandName = commandName;
     }
 
@@ -684,14 +678,8 @@ public class Job extends CommonEntityFields {
      * Set command Id with which this job is run.
      *
      * @param commandId Id of the command if specified on which the job is run
-     * @throws com.netflix.genie.common.exceptions.GenieException
      */
-    public void setCommandId(final String commandId) throws GenieException {
-        if (StringUtils.isBlank(commandId)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command id entered.");
-        }
+    public void setCommandId(final String commandId) {
         this.commandId = commandId;
     }
 
@@ -925,14 +913,9 @@ public class Job extends CommonEntityFields {
      * Set the cluster criteria string.
      *
      * @param clusterCriteriaString A list of cluster criteria objects
-     * @throws GenieException
+     * @throws GenieException 
      */
     protected void setClusterCriteriaString(final String clusterCriteriaString) throws GenieException {
-        if (StringUtils.isBlank(clusterCriteriaString)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No clusterCriteriaString passed in to set. Unable to continue.");
-        }
         this.clusterCriteriaString = clusterCriteriaString;
         this.clusterCriteria = stringToClusterCriteria(clusterCriteriaString);
     }
@@ -1115,11 +1098,9 @@ public class Job extends CommonEntityFields {
      * @param clusterCriteria2 The criteria to build up from
      * @return The cluster criteria string
      */
-    private String clusterCriteriaToString(final List<ClusterCriteria> clusterCriteria2) throws GenieException {
+    private String clusterCriteriaToString(final List<ClusterCriteria> clusterCriteria2) {
         if (clusterCriteria2 == null || clusterCriteria2.isEmpty()) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No cluster criteria entered unable to create string");
+            return null;
         }
         final StringBuilder builder = new StringBuilder();
         for (final ClusterCriteria cc : clusterCriteria2) {
