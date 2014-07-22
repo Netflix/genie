@@ -54,13 +54,14 @@
                     <ul class="nav" role="navigation">
                         <li data-bind="css: {active: $__page__.find('job').isVisible}"><a href="#job/search">Search Jobs</a></li>
                         <li data-bind="css: {active: $__page__.find('cluster').isVisible}"><a href="#cluster/search">Search Clusters</a></li>
+                        <li data-bind="css: {active: $__page__.find('command').isVisible}"><a href="#command/search">Search Commands</a></li>
                     </ul>
                 </div>
             </div>
         </div>
 
         <div class="container">
-            <div data-bind="page: {id: 'start', beforeShow: function(page) { $root.Job.startup(); $root.Cluster.startup(); }}">
+            <div data-bind="page: {id: 'start', beforeShow: function(page) { $root.Job.startup(); $root.Cluster.startup(); $root.Command.startup(); }}">
                 <div data-bind="template: {name: 'front-page-html'}"></div>
             </div>
             <div data-bind="page: {id: 'job'}">
@@ -83,6 +84,17 @@
                 </div>
                 <div data-bind="page: {id: 'register', afterHide: $root.scrollTop}">
                     <div data-bind="template: {name: 'cluster-register-form-html'}"></div>
+                </div>
+            </div>
+            <div data-bind="page: {id: 'command'}">
+                <div data-bind="page: {id: 'search', afterHide: $root.scrollTop}">
+	                <div data-bind="template: {name: 'command-search-form-html'}"></div>
+                    <div data-bind="template: {name: 'command-search-results-html'}"></div>
+                </div>
+                <div data-bind="page: {id: 'details', beforeShow: function(page) { $root.Command.update(); $root.scrollTop(); }, afterHide: $root.scrollTop}">
+                    <div data-bind="page: {id: '?', beforeShow: $root.Command.update, afterHide: function(page) { $root.Command.update(); $root.scrollTop(); }}">
+                        <div data-bind="template: {name: 'command-details-html', data: $root.Command.current}"></div>
+                    </div>
                 </div>
             </div>
         </div> <!-- /container -->

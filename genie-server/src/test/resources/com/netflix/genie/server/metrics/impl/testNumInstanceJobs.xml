@@ -10,6 +10,8 @@
          name="one" 
          commandArgs="-tez"
          startTime="1404257258339"
+         clusterCriteriaString="y,x|h2query,adhoc" 
+    	 commandCriteriaString="tag2,tag1"
          version="1"/>
     
     <Job id="job2" 
@@ -21,6 +23,8 @@
          status="RUNNING" 
          name="two" 
          commandArgs="-tez"
+         clusterCriteriaString="y,x|h2query,adhoc" 
+    	 commandCriteriaString="tag2,tag1"    
          startTime="1404257258340"
          version="2"/>
     
@@ -30,7 +34,9 @@
          user="tgianos" 
          commandId="15" 
          commandName="pig" 
-         status="SUCCEEDED" 
+         status="SUCCEEDED"
+         clusterCriteriaString="y,x|h2query,adhoc" 
+    	 commandCriteriaString="tag2,tag1"
          name="three" 
          commandArgs="-tez"
          startTime="1404257258341"
@@ -44,6 +50,8 @@
          commandName="pig" 
          status="KILLED" 
          name="four" 
+         clusterCriteriaString="y,x|h2query,adhoc" 
+    	 commandCriteriaString="tag2,tag1"    
          commandArgs="-tez"
          startTime="1404257258342"
          version="4"/>
@@ -57,6 +65,8 @@
          status="FAILED" 
          name="five" 
          commandArgs="-tez"
+         clusterCriteriaString="y,x|h2query,adhoc" 
+    	 commandCriteriaString="tag2,tag1"    
          startTime="1404257258343"
          version="5"/>
 </dataset>

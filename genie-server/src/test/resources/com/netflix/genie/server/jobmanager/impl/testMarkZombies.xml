@@ -8,6 +8,8 @@
          commandName="pig" 
          status="RUNNING" 
          name="one" 
+		 clusterCriteriaString="y,x|h2query,adhoc" 
+    	 commandCriteriaString="tag2,tag1"   
          commandArgs="-tez"/>
     
     <Job id="job2" 
@@ -18,6 +20,8 @@
          commandName="hive" 
          status="INIT" 
          name="two" 
+    	 clusterCriteriaString="y,x|h2query,adhoc" 
+    	 commandCriteriaString="tag2,tag1"
          commandArgs="-tez"/>
     
     <Job id="job3"
@@ -27,6 +31,8 @@
          commandId="15"
          commandName="pig"
          status="SUCCEEDED"
+         clusterCriteriaString="y,x|h2query,adhoc" 
+    	 commandCriteriaString="tag2,tag1"    
          name="one"
          commandArgs="-tez"/>
 </dataset>

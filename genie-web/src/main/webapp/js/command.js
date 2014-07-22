@@ -10,7 +10,7 @@ define([
 ], function($, _, ko, mapping, pager) {
     ko.mapping = mapping;
 
-    function command(json) {
+    function Command(json) {
         var self = this;
         self.objStatus        = ko.observable('ready');
         self.created      = ko.observable();
@@ -20,7 +20,7 @@ define([
         self.status           = ko.observable();
         self.updated      = ko.observable();
         self.user             = ko.observable();
-        self.commandType = ko.observable();
+        self.jobType = ko.observable();
         self.configs = ko.observableArray();
         self.tags = ko.observableArray();
 
@@ -78,29 +78,29 @@ define([
         };
     };
 
-    var commandViewModel = function() {
-        this.command = {};
-        var self = this.command;
+    var CommandViewModel = function() {
+        this.Command = {};
+        var self = this.Command;
         self.status = ko.observable('');
-        self.current = ko.observable(new command());
+        self.current = ko.observable(new Command());
         self.searchResults = ko.observableArray();
         self.searchDateTime = ko.observable();
-        self.runningcommands = ko.observableArray();
+        self.runningCommands = ko.observableArray();
         self.allTags = ko.observableArray();
         self.selectedTags = ko.observableArray();
         
-        self.runningcommandCount = ko.computed(function() {
-            return _.reduce(self.runningcommands(), function(sum, obj, index) { return sum + obj.count; }, 0);
+        self.runningCommandCount = ko.computed(function() {
+            return _.reduce(self.runningCommands(), function(sum, obj, index) { return sum + obj.count; }, 0);
         }, self);
         
         self.startup = function() {
-            self.runningcommands([]);
+            self.runningCommands([]);
             var commandCount = {};
             $.ajax({
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/commands?status=UP&status=OUT_OF_SERVICE',
+                url:  'genie/v2/config/commands?status=ACTIVE',
             }).done(function(data) {
             	if (data instanceof Array) {
                     _.each(data, function(commandObj, index) {
@@ -122,7 +122,7 @@ define([
                     commandCount[commandObj.status] += 1                    
                 }
                 _.each(commandCount, function(count, status) {
-                    self.runningcommands.push({status: status, count: count});
+                    self.runningCommands.push({status: status, count: count});
                 });
             });
         };
@@ -150,10 +150,10 @@ define([
                 self.status('results');
                 if (data instanceof Array) {
                     _.each(data, function(commandObj, index) {
-                        self.searchResults.push(new command(commandObj));
+                        self.searchResults.push(new Command(commandObj));
                     });
                 } else {
-                    self.searchResults.push(new command(data));
+                    self.searchResults.push(new Command(data));
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR, textStatus, errorThrown);
@@ -170,14 +170,14 @@ define([
                     url:  'genie/v2/config/commands/'+commandId
                 }).done(function(data) {
                 	console.log(data);
-                    self.current(new command(data));
+                    self.current(new Command(data));
                 });
             } else {
-                self.current(new command());
+                self.current(new Command());
             }
         };
 
     };
 
-    return commandViewModel;
+    return CommandViewModel;
 });

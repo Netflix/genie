@@ -7,14 +7,16 @@ define([
     'underscore',
     'job',
     'cluster',
+    'command',
     'text!../templates/error.html',
     'loadKoTemplate!../templates/front-page.html'
-], function($, ko, mapping, pager, _, Job, Cluster, errorTemplate) {
+], function($, ko, mapping, pager, _, Job, Cluster, Command, errorTemplate) {
     $(function() {
         function appViewModel() {
             var self = this;
             Job.call(self);
             Cluster.call(self);
+            Command.call(self);
             self.page = ko.observable("index");
 
             self.scrollTop = function() {

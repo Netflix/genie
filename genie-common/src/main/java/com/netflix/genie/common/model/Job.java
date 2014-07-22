@@ -33,6 +33,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
+import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
@@ -402,11 +403,12 @@ public class Job extends CommonEntityFields {
 
     /**
      * On any update to the entity will add id to tags.
+     * @throws GenieException 
      */
-    @PreUpdate
-    protected void onUpdateJob() {
-        // Add the id to the tags
-        this.tags.add(this.getId());
+    @PostLoad
+    protected void onLoadJob() throws GenieException {
+        this.clusterCriteria = this.stringToClusterCriteria(this.clusterCriteriaString);
+        this.commandCriteria = this.stringToCommandCriteria(this.commandCriteriaString);
     }
 
     /**
@@ -1137,11 +1139,9 @@ public class Job extends CommonEntityFields {
      */
     private String commandCriteriaToString(final Set<String> commandCriteria2) throws GenieException {
         if (commandCriteria2 == null || commandCriteria2.isEmpty()) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command criteria entered unable to create string");
-        }
-        return StringUtils.join(commandCriteria, CRITERIA_DELIMITER);
+            return null;
+        } else {
+            return StringUtils.join(commandCriteria, CRITERIA_DELIMITER); }
     }
 
     /**

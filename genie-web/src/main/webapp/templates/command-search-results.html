@@ -1,20 +1,20 @@
-<div data-bind="visible: $root.Cluster.status()==='results' && $root.page()==='#cluster/search'" class="search-results-counter">
-    <h3><span data-bind="text: $root.Cluster.searchResults().length"></span> results (<span data-bind="text: $root.Cluster.searchDateTime()"></span>).</h3>
+<div data-bind="visible: $root.Command.status()==='results' && $root.page()==='#command/search'" class="search-results-counter">
+    <h3><span data-bind="text: $root.Command.searchResults().length"></span> results (<span data-bind="text: $root.Command.searchDateTime()"></span>).</h3>
 </div>
-<div data-bind="foreach: $root.Cluster.searchResults" class="cluster-search-results">
+<div data-bind="foreach: $root.Command.searchResults" class="cluster-search-results">
     <div class="cluster-info">
         <h3>
             <span data-bind="text: $data.status, css: statusClass" class="label pull-right"></span>
         </h3>
         <div class="span12">
             <div class="row">
-                <div class="span2"><strong>Cluster ID:</strong></div> 
-                <div class="span6"><a data-bind="text: $data.id, page-href: '/cluster/details/'+$data.id()"></a></div>
+                <div class="span2"><strong>Command ID:</strong></div> 
+                <div class="span6"><a data-bind="text: $data.id, page-href: '/command/details/'+$data.id()"></a></div>
             </div>
         </div>
         <div class="span12">
             <div class="row">
-                <div class="span2"><strong>Cluster Name: </strong></div>
+                <div class="span2"><strong>Command Name: </strong></div>
                 <div class="span6" data-bind="text: $data.name"></div>
             </div>
         </div>
@@ -41,7 +41,7 @@
         <div class="span12">
             <div class="row">
                 <div class="span2"><strong>Details:</strong></div>
-                <div class="span3"><a data-bind="attr: {href: 'genie/v2/config/clusters/'+$data.id()}" target="_blank">XML</a></div>
+                <div class="span3"><a data-bind="attr: {href: 'genie/v2/config/commands/'+$data.id()}" target="_blank">XML</a></div>
             </div>
         </div>
         <div class="span12">
