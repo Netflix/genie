@@ -15,10 +15,13 @@
  */
 package com.netflix.genie.server.repository.jpa;
 
+import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -45,10 +48,11 @@ public final class CommandSpecs {
      *
      * @param name The name of the command
      * @param userName The name of the user who created the command
+     * @param tags The set of tags to search the command for
      * @return A specification object used for querying
      */
-    public static Specification<Command> findByNameAndUser(
-            final String name, final String userName) {
+    public static Specification<Command> findByNameAndUserAndTags(
+            final String name, final String userName, final Set<String> tags) {
         return new Specification<Command>() {
             @Override
             public Predicate toPredicate(
@@ -61,6 +65,11 @@ public final class CommandSpecs {
                 }
                 if (StringUtils.isNotBlank(userName)) {
                     predicates.add(cb.equal(root.get(Command_.user), userName));
+                }
+                if (tags != null) {
+                    for (final String tag : tags) {
+                        predicates.add(cb.isMember(tag,root.get(Command_.tags)));
+                    }
                 }
                 return cb.and(predicates.toArray(new Predicate[0]));
             }

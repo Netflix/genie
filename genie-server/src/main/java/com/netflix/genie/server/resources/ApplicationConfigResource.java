@@ -146,6 +146,7 @@ public class ApplicationConfigResource {
      *
      * @param name     name for configuration (optional)
      * @param userName the user who created the application (optional)
+     * @param tags The set of tags you want the command for.
      * @param page     The page to start one (optional)
      * @param limit    the max number of results to return per page (optional)
      * @return All applications matching the criteria
@@ -166,6 +167,9 @@ public class ApplicationConfigResource {
             @ApiParam(value = "User who created the application.", required = false)
             @QueryParam("userName")
             final String userName,
+            @ApiParam(value = "Tags for the cluster.", required = false)
+            @QueryParam("tag")
+            final Set<String> tags,
             @ApiParam(value = "The page to start on.", required = false)
             @QueryParam("page")
             @DefaultValue("0") int page,
@@ -173,7 +177,7 @@ public class ApplicationConfigResource {
             @QueryParam("limit")
             @DefaultValue("1024") int limit) {
         LOG.debug("called");
-        return this.acs.getApplications(name, userName, page, limit);
+        return this.acs.getApplications(name, userName, tags, page, limit);
     }
 
     /**

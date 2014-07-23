@@ -56,12 +56,14 @@ public interface ApplicationConfigService {
      *
      * @param name name of application. Can be null or empty.
      * @param userName The user who created the application. Can be null/empty
+     * @param tags          tags allocated to this application
      * @param page Page number to start results on
      * @param limit Max number of results per page
      * @return successful response, or one with HTTP error code
      */
     List<Application> getApplications(final String name,
             final String userName,
+            final Set<String> tags,
             final int page,
             final int limit);
 

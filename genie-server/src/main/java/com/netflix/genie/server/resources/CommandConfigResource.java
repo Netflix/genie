@@ -171,6 +171,7 @@ public class CommandConfigResource {
      *
      * @param name name for command (optional)
      * @param userName the user who created the configuration (optional)
+     * @param tags The set of tags you want the command for.
      * @param page The page to start one (optional)
      * @param limit the max number of results to return per page (optional)
      * @return All the Commands matching the criteria or all if no criteria
@@ -199,6 +200,9 @@ public class CommandConfigResource {
                     required = false
             )
             @QueryParam("userName") final String userName,
+            @ApiParam(value = "Tags for the cluster.", required = false)
+            @QueryParam("tag")
+            final Set<String> tags,
             @ApiParam(
                     value = "The page to start on.",
                     required = false
@@ -212,7 +216,7 @@ public class CommandConfigResource {
             @QueryParam("limit")
             @DefaultValue("1024") int limit) {
         LOG.debug("Called");
-        return this.ccs.getCommands(name, userName, page, limit);
+        return this.ccs.getCommands(name, userName, tags, page, limit);
     }
 
     /**
