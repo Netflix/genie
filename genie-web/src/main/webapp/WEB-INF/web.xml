@@ -31,8 +31,7 @@
                 com.netflix.genie.server,
                 com.netflix.appinfo,
                 com.wordnik.swagger.jersey.listing,
-                com.fasterxml.jackson.jaxrs.json, <!-- JSON -->
-                com.fasterxml.jackson.jaxrs.xml <!-- XML -->
+                com.fasterxml.jackson.jaxrs.json
             </param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
