@@ -68,12 +68,12 @@ public class BaseGenieClient {
     /**
      * The name with this this REST client is registered.
      */
-    protected static final String NIWS_CLIENT_NAME_GENIE = "genieClient";
+    protected static final String NIWS_CLIENT_NAME_GENIE = "genie2Client";
 
     /**
      * The name of the server application.
      */
-    protected static final String NIWS_APP_NAME_GENIE = "genie";
+    protected static final String NIWS_APP_NAME_GENIE = "genie2";
 
     /**
      * Standard root for all rest services.

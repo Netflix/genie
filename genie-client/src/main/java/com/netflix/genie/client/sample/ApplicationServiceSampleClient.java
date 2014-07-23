@@ -70,9 +70,10 @@ public final class ApplicationServiceSampleClient {
      */
     public static void main(final String[] args) throws Exception {
 
-        // Initialize Eureka, if it is being used
-        // LOG.info("Initializing Eureka");
-        // ApplicationServiceClient.initEureka("test");
+//        //Initialize Eureka, if it is being used
+//        LOG.info("Initializing Eureka");
+//        ApplicationServiceClient.initEureka("test");
+        
         LOG.info("Initializing list of Genie servers");
         ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
                 "localhost:7001");
