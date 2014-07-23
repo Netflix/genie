@@ -19,12 +19,13 @@
 package com.netflix.genie.common.model;
 
 import java.io.Serializable;
-import javax.activation.DataHandler;
+import java.util.Arrays;
 
 /**
  * Representation of a file attachment sent as part of the job request.
  *
  * @author skrishnan
+ * @author tgianos
  */
 public class FileAttachment implements Serializable {
 
@@ -38,7 +39,7 @@ public class FileAttachment implements Serializable {
     /**
      * The data for the attachment.
      */
-    private transient DataHandler data;
+    private byte[] data;
 
     /**
      * Get the name of the file for this attachment.
@@ -59,20 +60,20 @@ public class FileAttachment implements Serializable {
     }
 
     /**
-     * Get the data handler containing the data for the attachment.
+     * Get the data for the attachment.
      *
-     * @return the data handler containing data for the attachment
+     * @return the data for the attachment
      */
-    public DataHandler getData() {
-        return this.data;
+    public byte[] getData() {
+        return Arrays.copyOf(this.data, data.length);
     }
 
     /**
-     * Set the data handler for the attachment.
+     * Set the data for the attachment.
      *
-     * @param data the data handler for the attachment.
+     * @param data the data for the attachment.
      */
-    public void setData(final DataHandler data) {
-        this.data = data;
+    public void setData(final byte[] data) {
+        this.data = Arrays.copyOf(data, data.length);
     }
 }

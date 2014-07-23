@@ -33,6 +33,8 @@ public interface JobManager {
      * Initialize the JobManager.
      *
      * @param job The job this manager will be managing.
+     * @param cluster The cluster this job will run on.
+     * @throws GenieException
      */
     void init(final Job job, final Cluster cluster) throws GenieException;
 

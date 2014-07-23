@@ -25,15 +25,17 @@ import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
+import java.io.ByteArrayOutputStream;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
@@ -42,6 +44,8 @@ import javax.activation.FileDataSource;
  * @author tgianos
  */
 public final class ExecutionServiceSampleClient {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceSampleClient.class);
 
     private ExecutionServiceSampleClient() {
         // never called
@@ -53,38 +57,39 @@ public final class ExecutionServiceSampleClient {
      * @param args
      * @throws java.lang.Exception
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
 
         // Initialize Eureka, if it is being used
-        // System.out.println("Initializing Eureka");
+        // LOG.info("Initializing Eureka");
         // ExecutionServiceClient.initEureka("test");
-        System.out.println("Initializing list of Genie servers");
+        LOG.info("Initializing list of Genie servers");
         ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
-                "localhost:7001");
+                "ec2-54-89-50-113.compute-1.amazonaws.com:7001");
 
-        System.out.println("Initializing ExecutionServiceClient");
-        ExecutionServiceClient client = ExecutionServiceClient.getInstance();
+        LOG.info("Initializing ExecutionServiceClient");
+        final ExecutionServiceClient client = ExecutionServiceClient.getInstance();
 
         final String userName = "genietest";
         final String jobName = "sampleClientTestJob";
-        System.out.println("Getting jobInfos using specified filter criteria");
+        LOG.info("Getting jobInfos using specified filter criteria");
         final Multimap<String, String> params = ArrayListMultimap.create();
         params.put("userName", userName);
         params.put("status", JobStatus.FAILED.name());
         params.put("limit", "3");
         for (final Job ji : client.getJobs(params)) {
-            System.out.println("Job Info: {id, status, finishTime} - {"
+            LOG.info("Job Info: {id, status, finishTime} - {"
                     + ji.getId() + ", " + ji.getStatus() + ", "
                     + ji.getFinishTime() + "}");
         }
 
-        System.out.println("Running Hive job");
+        LOG.info("Running Hive job");
         final Set<String> criteriaTags = new HashSet<String>();
-        criteriaTags.add("prod");
+        criteriaTags.add("adhoc");
         final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
         final List<ClusterCriteria> clusterCriterias = new ArrayList<ClusterCriteria>();
         final Set<String> commandCriteria = new HashSet<String>();
         clusterCriterias.add(criteria);
+        commandCriteria.add("prodhive11_mr2");
 
         Job job = new Job(
                 userName,
@@ -95,36 +100,60 @@ public final class ExecutionServiceSampleClient {
                 null);
         job.setDescription("This is a test");
         // send the query as an attachment
-        File query = File.createTempFile("hive", ".q");
-        PrintWriter pw = new PrintWriter(query, "UTF-8");
-        pw.println("select count(*) from counters where dateint=20120430 and hour=10;");
-        pw.close();
+        final File query = File.createTempFile("hive", ".q");
+        PrintWriter pw = null;
+        try {
+            pw = new PrintWriter(query, "UTF-8");
+            pw.println("select count(*) from counters where dateint=20120430 and hour=10;");
+        } finally {
+            if (pw != null) {
+                pw.close();
+            }
+        }
         final Set<FileAttachment> attachments = new HashSet<FileAttachment>();
         final FileAttachment attachment = new FileAttachment();
         attachment.setName("hive.q");
-        // Ensure that file exists, because the FileDataSource constructor doesn't
-        attachment.setData(new DataHandler(new FileDataSource(query.getAbsolutePath())));
+        
+        FileInputStream fin = null;
+        ByteArrayOutputStream bos = null;
+        try {
+            fin = new FileInputStream(query);
+            bos = new ByteArrayOutputStream();
+            final byte[] buf = new byte[4096];
+            int read;
+            while ((read = fin.read(buf)) != -1) {
+                bos.write(buf, 0, read);
+            }
+            attachment.setData(bos.toByteArray());
+        } finally {
+            if (fin != null) {
+                fin.close();
+            }
+            if (bos != null) {
+                bos.close();
+            }
+        }
         attachments.add(attachment);
         job.setAttachments(attachments);
         job = client.submitJob(job);
 
-        String jobID = job.getId();
-        String outputURI = job.getOutputURI();
-        System.out.println("Job ID: " + jobID);
-        System.out.println("Output URL: " + outputURI);
+        final String jobID = job.getId();
+        final String outputURI = job.getOutputURI();
+        LOG.info("Job ID: " + jobID);
+        LOG.info("Output URL: " + outputURI);
 
-        System.out.println("Getting jobInfo by jobID");
+        LOG.info("Getting jobInfo by jobID");
         job = client.getJob(jobID);
-        System.out.println("Job status: " + job.getStatus());
+        LOG.info(job.toString());
 
-        System.out.println("Waiting for job to finish");
+        LOG.info("Waiting for job to finish");
         job = client.waitForCompletion(jobID, 600000, 5000);
-        System.out.println("Job status: " + job.getStatus());
+        LOG.info("Job status: " + job.getStatus());
 
-        System.out.println("Killing jobs using jobID");
-        Job killedJob = client.killJob(jobID);
-        System.out.println("Job status: " + killedJob.getStatus());
+        LOG.info("Killing jobs using jobID");
+        final Job killedJob = client.killJob(jobID);
+        LOG.info("Job status: " + killedJob.getStatus());
 
-        System.out.println("Done");
+        LOG.info("Done");
     }
 }

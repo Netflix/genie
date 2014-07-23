@@ -39,7 +39,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.activation.DataHandler;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -190,7 +189,7 @@ public class YarnJobManager implements JobManager {
         if (this.job.getAttachments() != null) {
             for (final FileAttachment attachment : this.job.getAttachments()) {
                 // basic error checking
-                if ((attachment.getName() == null) || (attachment.getName().isEmpty())) {
+                if (attachment.getName() == null || attachment.getName().isEmpty()) {
                     final String msg = "File attachment is missing required parameter name";
                     LOG.error(msg);
                     throw new GenieException(
@@ -207,8 +206,7 @@ public class YarnJobManager implements JobManager {
                 FileOutputStream output = null;
                 try {
                     output = new FileOutputStream(cWorkingDir + File.separator + attachment.getName());
-                    final DataHandler inputHandler = attachment.getData();
-                    inputHandler.writeTo(output);
+                    output.write(attachment.getData());
                 } catch (final IOException e) {
                     final String msg = "Unable to copy attachment correctly: " + attachment.getName();
                     LOG.error(msg);
