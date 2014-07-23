@@ -29,6 +29,7 @@ import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.server.repository.jpa.ClusterRepository;
 import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.ClusterConfigService;
 
 import java.net.HttpURLConnection;
@@ -50,6 +51,7 @@ import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -152,45 +154,22 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final Long maxUpdateTime,
             final int limit,
             final int page) throws GenieException {
-        LOG.debug("GENIE: Returning configs for specified params");
-        final CriteriaBuilder cb = this.em.getCriteriaBuilder();
-        final CriteriaQuery<Cluster> cq = cb.createQuery(Cluster.class);
-        final Root<Cluster> c = cq.from(Cluster.class);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
-        if (StringUtils.isNotEmpty(name)) {
-            predicates.add(cb.like(c.get(Cluster_.name), name));
-        }
-        if (minUpdateTime != null) {
-            predicates.add(cb.greaterThanOrEqualTo(c.get(Cluster_.updated), new Date(minUpdateTime)));
-        }
-        if (maxUpdateTime != null) {
-            predicates.add(cb.lessThan(c.get(Cluster_.updated), new Date(maxUpdateTime)));
-        }
-        if (tags != null) {
-            for (final String tag : tags) {
-                predicates.add(cb.isMember(tag, c.get(Cluster_.tags)));
-            }
-        }
-
-        if (statuses != null && !statuses.isEmpty()) {
-            //Could optimize this as we know size could use native array
-            final List<Predicate> orPredicates = new ArrayList<Predicate>();
-            for (final ClusterStatus status : statuses) {
-                orPredicates.add(cb.equal(c.get(Cluster_.status), status));
-            }
-            predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
-        }
-
-        cq.where(predicates.toArray(new Predicate[0]));
-        final TypedQuery<Cluster> query = this.em.createQuery(cq);
-        final int finalPage = page < 0 ? 0 : page;
-        final int finalLimit = limit < 0 ? 1024 : limit;
-        query.setMaxResults(finalLimit);
-        query.setFirstResult(finalLimit * finalPage);
-
-        //If you want to debug query:
-        //LOG.debug(query.unwrap(org.apache.openjpa.persistence.QueryImpl.class).getQueryString());
-        return query.getResultList();
+        
+        LOG.debug("called");
+        
+        final PageRequest pageRequest = new PageRequest(
+                page < 0 ? 0 : page,
+                limit < 0 ? 1024 : limit
+        );
+        
+        return this.clusterRepo.findAll(
+                ClusterSpecs.findByNameAndStatusesAndTagsAndUpdateTime(
+                        name, 
+                        statuses, 
+                        tags, 
+                        minUpdateTime, 
+                        maxUpdateTime),
+                pageRequest).getContent();
     }
 
     /**

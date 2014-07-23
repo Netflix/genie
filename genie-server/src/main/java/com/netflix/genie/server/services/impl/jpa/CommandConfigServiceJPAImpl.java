@@ -133,6 +133,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     public List<Command> getCommands(
             final String name,
             final String userName,
+            final Set<String> tags,
             final int page,
             final int limit) {
         LOG.debug("Called");
@@ -142,9 +143,10 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                 limit < 0 ? 1024 : limit
         );
         return this.commandRepo.findAll(
-                CommandSpecs.findByNameAndUser(
+                CommandSpecs.findByNameAndUserAndTags(
                         name,
-                        userName
+                        userName,
+                        tags
                 ),
                 pageRequest).getContent();
     }

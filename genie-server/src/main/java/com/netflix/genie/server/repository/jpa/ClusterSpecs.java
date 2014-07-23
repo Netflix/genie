@@ -84,7 +84,11 @@ public final class ClusterSpecs {
                 if (maxUpdateTime != null) {
                     predicates.add(cb.lessThan(root.get(Cluster_.updated), new Date(maxUpdateTime)));
                 }
-
+                if (tags != null) {
+                    for (final String tag : tags) {
+                        predicates.add(cb.isMember(tag,root.get(Cluster_.tags)));
+                    }
+                }
                 if (statuses != null && !statuses.isEmpty()) {
                     //Could optimize this as we know size could use native array
                     final List<Predicate> orPredicates = new ArrayList<Predicate>();

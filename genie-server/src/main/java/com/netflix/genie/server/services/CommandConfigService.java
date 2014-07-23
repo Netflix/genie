@@ -58,6 +58,7 @@ public interface CommandConfigService {
      * @param name name of command config (can be null)
      * @param userName the name of the user who created the configuration (can
      * be null)
+     * @param tags          tags allocated to this command
      * @param page Page number to start results on
      * @param limit Max number of results per page
      * @return All the commands matching the specified criteria
@@ -65,6 +66,7 @@ public interface CommandConfigService {
     List<Command> getCommands(
             final String name,
             final String userName,
+            final Set<String> tags,
             final int page,
             final int limit);
 

@@ -17,8 +17,12 @@ package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Application_;
+import com.netflix.genie.common.model.Command_;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -45,10 +49,11 @@ public final class ApplicationSpecs {
      *
      * @param name The name of the application
      * @param userName The name of the user who created the application
+     * @param tags The set of tags to search the command for
      * @return A specification object used for querying
      */
-    public static Specification<Application> findByNameAndUser(
-            final String name, final String userName) {
+    public static Specification<Application> findByNameAndUserAndTags(
+            final String name, final String userName, final Set<String> tags) {
         return new Specification<Application>() {
             @Override
             public Predicate toPredicate(
@@ -61,6 +66,11 @@ public final class ApplicationSpecs {
                 }
                 if (StringUtils.isNotBlank(userName)) {
                     predicates.add(cb.equal(root.get(Application_.user), userName));
+                }
+                if (tags != null) {
+                    for (final String tag : tags) {
+                        predicates.add(cb.isMember(tag,root.get(Application_.tags)));
+                    }
                 }
                 return cb.and(predicates.toArray(new Predicate[0]));
             }

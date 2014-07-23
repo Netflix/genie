@@ -101,6 +101,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     public List<Application> getApplications(
             final String name,
             final String userName,
+            final Set<String> tags,
             final int page,
             final int limit) {
         LOG.debug("Called");
@@ -110,7 +111,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
                 limit < 0 ? 1024 : limit
         );
         return this.applicationRepo.findAll(
-                ApplicationSpecs.findByNameAndUser(name, userName),
+                ApplicationSpecs.findByNameAndUserAndTags(name, userName, tags),
                 pageRequest).getContent();
     }
 
