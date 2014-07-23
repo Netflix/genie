@@ -58,10 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v2/config/applications")
 @Api(value = "/v2/config/applications", description = "Manage the available applications")
-@Produces({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
-})
+@Produces(MediaType.APPLICATION_JSON)
 @Named
 public class ApplicationConfigResource {
 
@@ -97,10 +94,7 @@ public class ApplicationConfigResource {
      * @throws GenieException
      */
     @POST
-    @Consumes({
-            MediaType.APPLICATION_XML,
-            MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Create an application",
             notes = "Create an application from the supplied information.",
@@ -192,10 +186,7 @@ public class ApplicationConfigResource {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({
-            MediaType.APPLICATION_XML,
-            MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update an application",
             notes = "Update an application from the supplied information.",
@@ -275,7 +266,6 @@ public class ApplicationConfigResource {
     @POST
     @Path("/{id}/configs")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new configuration files to an application",
             notes = "Add the supplied configuration files to the applicaiton with the supplied id.",
@@ -306,7 +296,6 @@ public class ApplicationConfigResource {
      */
     @GET
     @Path("/{id}/configs")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get the configuration files for an application",
             notes = "Get the configuration files for the application with the supplied id.",
@@ -338,7 +327,6 @@ public class ApplicationConfigResource {
     @PUT
     @Path("/{id}/configs")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update configuration files for an application",
             notes = "Replace the existing configuration files for application with given id.",
@@ -399,7 +387,6 @@ public class ApplicationConfigResource {
     @POST
     @Path("/{id}/jars")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new jar files to an application",
             notes = "Add the supplied jar files to the applicaiton with the supplied id.",
@@ -430,7 +417,6 @@ public class ApplicationConfigResource {
      */
     @GET
     @Path("/{id}/jars")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get the jars for an application",
             notes = "Get the jars for the application with the supplied id.",
@@ -462,7 +448,6 @@ public class ApplicationConfigResource {
     @PUT
     @Path("/{id}/jars")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update jar files for an application",
             notes = "Replace the existing jar files for application with given id.",
@@ -523,7 +508,6 @@ public class ApplicationConfigResource {
     @POST
     @Path("/{id}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new tags to a application",
             notes = "Add the supplied tags to the application with the supplied id.",
@@ -554,7 +538,6 @@ public class ApplicationConfigResource {
      */
     @GET
     @Path("/{id}/tags")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get the tags for a application",
             notes = "Get the tags for the application with the supplied id.",
@@ -586,7 +569,6 @@ public class ApplicationConfigResource {
     @PUT
     @Path("/{id}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update tags for a application",
             notes = "Replace the existing tags for application with given id.",
@@ -674,7 +656,6 @@ public class ApplicationConfigResource {
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Remove a tag from a application",
             notes = "Remove the given tag from the application with given id.",

@@ -17,9 +17,11 @@
  */
 package com.netflix.genie.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,14 +38,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +52,6 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Cluster")
 public class Cluster extends CommonEntityFields {
 
@@ -89,12 +83,10 @@ public class Cluster extends CommonEntityFields {
     /**
      * Reference to all the configuration (xml's) needed for this cluster.
      */
-    @XmlElementWrapper(name = "configs")
-    @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the configuration"
-            + " files needed for this cluster",
+                    + " files needed for this cluster",
             required = true)
     private Set<String> configs;
 
@@ -103,19 +95,16 @@ public class Cluster extends CommonEntityFields {
      */
     @ManyToMany(fetch = FetchType.EAGER)
     @OrderColumn
-    @XmlTransient
     @JsonIgnore
     private List<Command> commands;
 
     /**
      * Set of tags for a cluster.
      */
-    @XmlElementWrapper(name = "tags")
-    @XmlElement(name = "tag")
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"
-            + " associated with this cluster.",
+                    + " associated with this cluster.",
             required = true)
     private Set<String> tags;
 
@@ -129,13 +118,13 @@ public class Cluster extends CommonEntityFields {
     /**
      * Construct a new Cluster.
      *
-     * @param name The name of the cluster. Not null/empty/blank.
-     * @param user The user who created the cluster. Not null/empty/blank.
-     * @param status The status of the cluster. Not null.
+     * @param name        The name of the cluster. Not null/empty/blank.
+     * @param user        The user who created the cluster. Not null/empty/blank.
+     * @param status      The status of the cluster. Not null.
      * @param clusterType The type of the cluster. Not null/empty/blank.
-     * @param configs The configuration files for the cluster. Not null or
-     * empty.
-     * @param version The version of the cluster. Not null/empty/blank.
+     * @param configs     The configuration files for the cluster. Not null or
+     *                    empty.
+     * @param version     The version of the cluster. Not null/empty/blank.
      */
     public Cluster(
             final String name,
@@ -217,7 +206,7 @@ public class Cluster extends CommonEntityFields {
      * Sets the configurations for this cluster.
      *
      * @param configs The configuration files that this cluster needs. Not
-     * null/empty.
+     *                null/empty.
      */
     public void setConfigs(final Set<String> configs) {
         this.configs = configs;
@@ -363,9 +352,9 @@ public class Cluster extends CommonEntityFields {
     /**
      * Helper method to ensure that values are valid for a cluster.
      *
-     * @param status The status of the cluster
+     * @param status      The status of the cluster
      * @param clusterType The type of cluster
-     * @param configs The configuration files for the cluster
+     * @param configs     The configuration files for the cluster
      * @throws GenieException
      */
     private void validate(

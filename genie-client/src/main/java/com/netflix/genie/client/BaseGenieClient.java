@@ -17,6 +17,10 @@
  */
 package com.netflix.genie.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Multimap;
 import com.netflix.appinfo.CloudInstanceConfig;
 import com.netflix.appinfo.EurekaInstanceConfig;
@@ -33,19 +37,18 @@ import com.netflix.niws.client.http.RestClient;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.CollectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,8 +103,10 @@ public class BaseGenieClient {
                 .getNamedClient(NIWS_CLIENT_NAME_GENIE);
 
         //Force jersey to properly serialize JSON
-        final ClientConfig clientConfig = new DefaultClientConfig();
-        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+        final Set<Class<?>> providers = new HashSet<Class<?>>();
+        providers.add(JacksonJaxbJsonProvider.class);
+        providers.add(JacksonJsonProvider.class);
+        final ClientConfig clientConfig = new DefaultClientConfig(providers);
         final Client jerseyClient = Client.create(clientConfig);
         this.client.setJerseyClient(jerseyClient);
     }

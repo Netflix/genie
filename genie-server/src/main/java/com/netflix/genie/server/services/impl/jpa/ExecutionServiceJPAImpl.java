@@ -104,9 +104,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * Default constructor - initializes persistence manager, and other utility
      * classes.
      *
-     * @param jobRepo           The job repository to use.
-     * @param stats             the GenieNodeStatistics object
-     * @param jobCountManager   the job count manager to use
+     * @param jobRepo The job repository to use.
+     * @param stats the GenieNodeStatistics object
+     * @param jobCountManager the job count manager to use
      * @param jobManagerFactory The the job manager factory to use
      */
     @Inject
@@ -186,16 +186,15 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                 throw new GenieException(
                         HttpURLConnection.HTTP_UNAVAILABLE,
                         "Number of running jobs greater than system limit ("
-                                + maxRunningJobs
-                                + ") - try another instance or try again later");
+                        + maxRunningJobs
+                        + ") - try another instance or try again later");
             }
 
-            
             // init state in DB - return if job already exists
             try {
                 // TODO add retries to avoid deadlock issue
                 savedJob = this.jobRepo.save(job);
-             // if job can be launched, update the URIs
+                // if job can be launched, update the URIs
                 buildJobURIs(savedJob);
             } catch (final RollbackException e) {
                 LOG.error("Can't create entity in the database", e);
@@ -403,7 +402,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             job.setFinishTime(currentTime);
             job.setExitCode(SubProcessStatus.ZOMBIE_JOB.code());
             job.setStatusMsg(SubProcessStatus.message(
-                            SubProcessStatus.ZOMBIE_JOB.code())
+                    SubProcessStatus.ZOMBIE_JOB.code())
             );
         }
         return jobs.size();

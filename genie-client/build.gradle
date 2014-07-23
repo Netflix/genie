@@ -6,8 +6,8 @@ configurations {
 
 dependencies {
     compile project.parent.childProjects.get('genie-common')
-    compile 'com.netflix.eureka:eureka-client:1.1.136'
-    compile 'com.netflix.ribbon:ribbon-core:0.3.12'
-    compile 'com.netflix.ribbon:ribbon-eureka:0.3.12'
-    compile 'com.netflix.ribbon:ribbon-httpclient:0.3.12'
+    compile ('com.netflix.eureka:eureka-client:1.1.136')
+    compile ('com.netflix.ribbon:ribbon-core:0.3.12')
+    compile ('com.netflix.ribbon:ribbon-eureka:0.3.12')
+    compile ('com.netflix.ribbon:ribbon-httpclient:0.3.12')
 }

@@ -61,10 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v2/config/clusters")
 @Api(value = "/v2/config/clusters", description = "Manage the available clusters")
-@Produces({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
-})
+@Produces(MediaType.APPLICATION_JSON)
 @Named
 public class ClusterConfigResource {
 
@@ -100,10 +97,7 @@ public class ClusterConfigResource {
      * @throws GenieException
      */
     @POST
-    @Consumes({
-            MediaType.APPLICATION_XML,
-            MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Create a cluster",
             notes = "Create a cluster from the supplied information.",
@@ -221,10 +215,7 @@ public class ClusterConfigResource {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({
-            MediaType.APPLICATION_XML,
-            MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update a cluster",
             notes = "Update a cluster from the supplied information.",
@@ -304,7 +295,6 @@ public class ClusterConfigResource {
     @POST
     @Path("/{id}/configs")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new configuration files to a cluster",
             notes = "Add the supplied configuration files to the cluster with the supplied id.",
@@ -335,7 +325,6 @@ public class ClusterConfigResource {
      */
     @GET
     @Path("/{id}/configs")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get the configuration files for a cluster",
             notes = "Get the configuration files for the cluster with the supplied id.",
@@ -367,7 +356,6 @@ public class ClusterConfigResource {
     @PUT
     @Path("/{id}/configs")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update configuration files for an cluster",
             notes = "Replace the existing configuration files for cluster with given id.",
@@ -389,34 +377,6 @@ public class ClusterConfigResource {
     }
 
     /**
-     * Delete the all configuration files from a given cluster.
-     *
-     * @param id The id of the cluster to delete the configuration files from.
-     *           Not null/empty/blank.
-     * @return Empty set if successful
-     * @throws GenieException
-     */
-    @DELETE
-    @Path("/{id}/configs")
-    @ApiOperation(
-            value = "Remove all configuration files from a cluster",
-            notes = "Remove all the configuration files from the cluster with given id.",
-            response = String.class,
-            responseContainer = "Set")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
-    })
-    public Set<String> removeAllConfigsForCluster(
-            @ApiParam(value = "Id of the cluster to delete from.", required = true)
-            @PathParam("id")
-            final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
-        return this.ccs.removeAllConfigsForCluster(id);
-    }
-
-    /**
      * Add new commands to the given cluster.
      *
      * @param id       The id of the cluster to add the commands to. Not
@@ -427,10 +387,7 @@ public class ClusterConfigResource {
      */
     @POST
     @Path("/{id}/commands")
-    @Consumes({
-            MediaType.APPLICATION_XML,
-            MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new commands to a cluster",
             notes = "Add the supplied commands to the cluster with the supplied id."
@@ -492,10 +449,7 @@ public class ClusterConfigResource {
      */
     @PUT
     @Path("/{id}/commands")
-    @Consumes({
-            MediaType.APPLICATION_XML,
-            MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update the commands for an cluster",
             notes = "Replace the existing commands for cluster with given id.",
@@ -589,7 +543,6 @@ public class ClusterConfigResource {
     @POST
     @Path("/{id}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new tags to a cluster",
             notes = "Add the supplied tags to the cluster with the supplied id.",
@@ -620,7 +573,6 @@ public class ClusterConfigResource {
      */
     @GET
     @Path("/{id}/tags")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get the tags for a cluster",
             notes = "Get the tags for the cluster with the supplied id.",
@@ -652,7 +604,6 @@ public class ClusterConfigResource {
     @PUT
     @Path("/{id}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update tags for a cluster",
             notes = "Replace the existing tags for cluster with given id.",
@@ -712,7 +663,6 @@ public class ClusterConfigResource {
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Remove a tag from a cluster",
             notes = "Remove the given tag from the cluster with given id.",

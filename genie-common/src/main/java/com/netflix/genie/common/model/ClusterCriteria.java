@@ -22,9 +22,6 @@ import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +32,6 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;
@@ -54,7 +49,7 @@ public class ClusterCriteria implements Serializable {
      * Create a cluster criteria object with the included tags.
      *
      * @param tags The tags to add
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public ClusterCriteria(final Set<String> tags) throws GenieException {
         if (tags == null || tags.isEmpty()) {

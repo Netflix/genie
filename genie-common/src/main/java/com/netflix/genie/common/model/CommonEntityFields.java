@@ -29,9 +29,6 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.net.HttpURLConnection;
 
 /**
@@ -41,8 +38,6 @@ import java.net.HttpURLConnection;
  * @author tgianos
  */
 @MappedSuperclass
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "Command Fields for all Entities")
 public class CommonEntityFields extends Auditable {
 

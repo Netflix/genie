@@ -17,12 +17,16 @@
  */
 package com.netflix.genie.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.Date;
@@ -36,15 +40,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +50,6 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @MappedSuperclass
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "An auditable item")
 public class Auditable implements Serializable, Validate {
 
@@ -106,7 +100,6 @@ public class Auditable implements Serializable, Validate {
     /**
      * The version of this entity. Auto handled by JPA.
      */
-    @XmlTransient
     @JsonIgnore
     @Version
     @Column(name = "entityVersion")
@@ -148,14 +141,9 @@ public class Auditable implements Serializable, Validate {
      * Set the id.
      *
      * @param id The id to set. Not null/empty/blank.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public void setId(final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No ID entered.");
-        }
         if (StringUtils.isBlank(this.id)) {
             this.id = id;
         } else {
@@ -241,7 +229,7 @@ public class Auditable implements Serializable, Validate {
         try {
             final ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(this);
-        } catch (final IOException ioe) {
+        } catch (final JsonProcessingException ioe) {
             LOG.error(ioe.getLocalizedMessage(), ioe);
             return ioe.getLocalizedMessage();
         }

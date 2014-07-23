@@ -56,10 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v2/config/commands")
 @Api(value = "/v2/config/commands", description = "Manage the available commands")
-@Produces({
-    MediaType.APPLICATION_XML,
-    MediaType.APPLICATION_JSON
-})
+@Produces(MediaType.APPLICATION_JSON)
 @Named
 public class CommandConfigResource {
 
@@ -95,10 +92,7 @@ public class CommandConfigResource {
      * @throws GenieException
      */
     @POST
-    @Consumes({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Create a command",
             notes = "Create a command from the supplied information.",
@@ -231,10 +225,7 @@ public class CommandConfigResource {
      */
     @PUT
     @Path("/{id}")
-    @Consumes({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update a command",
             notes = "Update a command from the supplied information.",
@@ -354,7 +345,6 @@ public class CommandConfigResource {
     @POST
     @Path("/{id}/configs")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new configuration files to a command",
             notes = "Add the supplied configuration files to the command with the supplied id.",
@@ -400,7 +390,6 @@ public class CommandConfigResource {
      */
     @GET
     @Path("/{id}/configs")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get the configuration files for a command",
             notes = "Get the configuration files for the command with the supplied id.",
@@ -444,7 +433,6 @@ public class CommandConfigResource {
     @PUT
     @Path("/{id}/configs")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update configuration files for an command",
             notes = "Replace the existing configuration files for command with given id.",
@@ -532,7 +520,6 @@ public class CommandConfigResource {
     @POST
     @Path("/{id}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new tags to a command",
             notes = "Add the supplied tags to the command with the supplied id.",
@@ -563,7 +550,6 @@ public class CommandConfigResource {
      */
     @GET
     @Path("/{id}/tags")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get the tags for a command",
             notes = "Get the tags for the command with the supplied id.",
@@ -595,7 +581,6 @@ public class CommandConfigResource {
     @PUT
     @Path("/{id}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update tags for a command",
             notes = "Replace the existing tags for command with given id.",
@@ -655,10 +640,7 @@ public class CommandConfigResource {
      */
     @POST
     @Path("/{id}/application")
-    @Consumes({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Set the application for a command",
             notes = "Set the supplied application to the command "
@@ -826,7 +808,6 @@ public class CommandConfigResource {
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Remove a tag from a command",
             notes = "Remove the given tag from the command with given id.",

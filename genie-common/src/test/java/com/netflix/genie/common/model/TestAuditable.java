@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.common.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,30 +57,6 @@ public class TestAuditable {
         final String id = UUID.randomUUID().toString();
         a.setId(id);
         Assert.assertEquals(id, a.getId());
-    }
-
-    /**
-     * Test the setter for id.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testSetIdWithNull() throws GenieException {
-        final Auditable a = new Auditable();
-        Assert.assertNull(a.getId());
-        a.setId(null);
-    }
-
-    /**
-     * Test the setter for id.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testSetIdWithEmpty() throws GenieException {
-        final Auditable a = new Auditable();
-        Assert.assertNull(a.getId());
-        a.setId("");
     }
 
     /**

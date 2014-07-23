@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
@@ -34,14 +35,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +47,6 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "An Application")
 public class Application extends CommonEntityFields {
 
@@ -81,8 +73,6 @@ public class Application extends CommonEntityFields {
     /**
      * Reference to all the configurations needed for this application.
      */
-    @XmlElementWrapper(name = "configs")
-    @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "All the configuration files needed for this application")
@@ -91,8 +81,6 @@ public class Application extends CommonEntityFields {
     /**
      * Set of jars required for this application.
      */
-    @XmlElementWrapper(name = "jars")
-    @XmlElement(name = "jar")
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Any jars needed to run this application")
@@ -101,7 +89,6 @@ public class Application extends CommonEntityFields {
     /**
      * The commands this application is associated with.
      */
-    @XmlTransient
     @JsonIgnore
     @OneToMany(mappedBy = "application", fetch = FetchType.LAZY)
     private Set<Command> commands;
@@ -109,8 +96,6 @@ public class Application extends CommonEntityFields {
     /**
      * Set of tags for a application.
      */
-    @XmlElementWrapper(name = "tags")
-    @XmlElement(name = "tag")
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"

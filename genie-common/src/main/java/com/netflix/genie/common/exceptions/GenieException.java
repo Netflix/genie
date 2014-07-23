@@ -22,6 +22,7 @@ package com.netflix.genie.common.exceptions;
  * HTTP error code and a human-readable error message.
  *
  * @author skrishnan
+ * @author tgianos
  */
 public class GenieException extends Exception {
 

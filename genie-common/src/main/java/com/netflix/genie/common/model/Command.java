@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
@@ -34,14 +35,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +47,6 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel(value = "A Command")
 public class Command extends CommonEntityFields {
 
@@ -99,8 +91,6 @@ public class Command extends CommonEntityFields {
     /**
      * Reference to all the configuration (xml's) needed for this command.
      */
-    @XmlElementWrapper(name = "configs")
-    @XmlElement(name = "config")
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the configuration"
@@ -112,7 +102,6 @@ public class Command extends CommonEntityFields {
      */
     @ApiModelProperty(
             value = "The application this command uses.")
-    @XmlTransient
     @JsonIgnore
     @ManyToOne
     private Application application;
@@ -120,7 +109,6 @@ public class Command extends CommonEntityFields {
     /**
      * The clusters this command is available on.
      */
-    @XmlTransient
     @JsonIgnore
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
     private Set<Cluster> clusters;
@@ -128,8 +116,6 @@ public class Command extends CommonEntityFields {
     /**
      * Set of tags for a command.
      */
-    @XmlElementWrapper(name = "tags")
-    @XmlElement(name = "tag")
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "Reference to all the tags"

@@ -162,14 +162,6 @@ public final class ClusterServiceSampleClient {
             LOG.info("Config = " + config);
         }
 
-        LOG.info("Deleting all the configuration files from the cluster with id " + cluster1.getId());
-        //This should remove the original config leaving only the two in this set
-        final Set<String> configs4 = clusterClient.removeAllConfigsForCluster(cluster1.getId());
-        for (final String config : configs4) {
-            //Shouldn't print anything
-            LOG.info("Config = " + config);
-        }
-
         /**************** Begin tests for tag Api's *********************/
         LOG.info("Get tags for cluster with id " + cluster1.getId());
         final Set<String> tags = cluster1.getTags();
@@ -203,7 +195,7 @@ public final class ClusterServiceSampleClient {
 
         LOG.info("Deleting all the tags from the cluster with id " + cluster1.getId());
         //This should remove the original config leaving only the two in this set
-        final Set<String> tags4 = clusterClient.removeAllConfigsForCluster(cluster1.getId());
+        final Set<String> tags4 = clusterClient.removeAllTagsForCluster(cluster1.getId());
         for (final String tag : tags4) {
             //Shouldn't print anything
             LOG.info("Config = " + tag);

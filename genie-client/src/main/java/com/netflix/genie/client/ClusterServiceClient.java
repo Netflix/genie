@@ -309,33 +309,6 @@ public final class ClusterServiceClient extends BaseGenieClient {
     }
 
     /**
-     * Delete all the configuration files from a given cluster.
-     *
-     * @param id The id of the cluster to delete the configuration files from.
-     *           Not null/empty/blank.
-     * @return Empty set if successful
-     * @throws GenieException
-     */
-    public Set<String> removeAllConfigsForCluster(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-
-        final HttpRequest request = this.buildRequest(
-                Verb.DELETE,
-                StringUtils.join(
-                        new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "configs"},
-                        SLASH),
-                null,
-                null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
-    }
-
-    /**
      * Add some more commands to a given cluster.
      *
      * @param id       The id of the cluster to add commands to. Not

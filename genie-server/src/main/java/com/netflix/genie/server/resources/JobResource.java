@@ -61,10 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/v2/jobs")
 @Api(value = "/v2/jobs", description = "Manage the available jobs")
-@Produces({
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
-})
+@Produces(MediaType.APPLICATION_JSON)
 @Named
 public class JobResource {
 
@@ -100,10 +97,7 @@ public class JobResource {
      * @throws GenieException
      */
     @POST
-    @Consumes({
-            MediaType.APPLICATION_XML,
-            MediaType.APPLICATION_JSON
-    })
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Submit a job",
             notes = "Submit a new job to run to genie",
@@ -190,7 +184,6 @@ public class JobResource {
             @ApiResponse(code = 400, message = "Invalid id supplied"),
             @ApiResponse(code = 404, message = "Job not found")
     })
-    @Produces(MediaType.APPLICATION_JSON)
     public String getJobStatus(
             @ApiParam(value = "Id of the job.", required = true)
             @PathParam("id")
@@ -298,7 +291,6 @@ public class JobResource {
     @POST
     @Path("/{id}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new tags to a job",
             notes = "Add the supplied tags to the job with the supplied id.",
@@ -329,7 +321,6 @@ public class JobResource {
      */
     @GET
     @Path("/{id}/tags")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get the tags for a job",
             notes = "Get the tags for the job with the supplied id.",
@@ -361,7 +352,6 @@ public class JobResource {
     @PUT
     @Path("/{id}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Update tags for a job",
             notes = "Replace the existing tags for job with given id.",
@@ -421,7 +411,6 @@ public class JobResource {
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Remove a tag from a job",
             notes = "Remove the given tag from the job with given id.",
