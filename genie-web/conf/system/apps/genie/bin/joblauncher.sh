@@ -69,59 +69,107 @@ function copyFiles {
 
 function executeCommand {
 
+    # Start Non-Generic Code 
+    # if HADOOP_HOME is set assume Yarn Job and copy remaining
+    # conf files from its conf. 
+    if [ -n "$HADOOP_HOME" ]; then
+        echo "Copying local Hadoop config files..."
+        cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
+        checkError 203
+        echo "Copied local hadoop files from conf directory"
+	echo $'\n'
+    fi
+
+    # End Non-Generic Code
+
+    # Setting Cluster, Command and Application Env Variables if specifed
+    echo "Setting env variables by sourcing env files for resources"
+    setEnvVariables
+    checkError 205
+    echo "Done setting env variables"
+    echo $'\n'
+
     # Assuming cluster config files HAVE to be specified
     echo "Copying cluster Config files ..."
     copyFiles "$S3_CLUSTER_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-    checkError 204
+    checkError 206
+    echo "Copied cluster config files"
+    echo $'\n'
     
-    # Start Non-Generic Code 
-    # if HADOOP_HOME is set assume Yarn Job and copy remaining
-    # conf files from its conf. Maybe be can put everything on
-    # s3
-    if [ -n "$HADOOP_HOME" ]; then
-        echo "Copying Hadoop config files..."
-        cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
-        checkError 204
-    fi
-   
-    # If core site xml env variable is set, we add all the variables
-    # we want to add to yarn job execution there. 
-    if [ -n "$CORE_SITE_XML_ARGS" ]; then
-        updateCoreSiteXml
-    fi
-    # End Non-Geneic Code
-
     if [ -n "$S3_COMMAND_CONF_FILES" ]; then
         echo "Copying command Config files ..."
         copyFiles "$S3_COMMAND_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-        checkError 204
+        checkError 207
+        echo "Copied command config files"
+        echo $'\n'
     fi
     
     if [ -n "$S3_APPLICATION_CONF_FILES" ]; then
         echo "Copying application Config files ..."
         copyFiles "$S3_APPLICATION_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-        checkError 204
+        checkError 208
+        echo "Copied application config files"
+        echo $'\n'
     fi
 
     if [ -n "$S3_APPLICATION_JAR_FILES" ]; then
         echo "Copying application jar files ..."
         copyFiles "$S3_APPLICATION_JAR_FILES" "file://$CURRENT_JOB_JAR_DIR"/
+        checkError 209
+        echo "Copied application jars files"
+    fi
+
+    echo "Copying job dependency files: $JOB_FILE_DEPENDENCIES" 
+    # only copy file dependencies if they exist 
+    if [ "$CURRENT_JOB_FILE_DEPENDENCIES" != "" ]
+    then
+        copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "file://$CURRENT_JOB_WORKING_DIR"
+        checkError 210
+        echo "Copied job dependency files"
+        echo $'\n'
+    fi
+
+    # If core site xml env variable is set, we add all the variables
+    # we want to add to yarn job execution there. 
+    if [ -n "$CORE_SITE_XML_ARGS" ]; then
+        echo "Updating core-site xml args"
+        updateCoreSiteXml
         checkError 204
+        echo "Updated core-site xml args"
+        echo $'\n'
     fi
     
     mkdir tmp
     echo "Executing CMD: $CMD $@"
     $CMD "$@" 1>$CURRENT_JOB_WORKING_DIR/stdout.log 2>$CURRENT_JOB_WORKING_DIR/stderr.log
-    checkError 206
+    checkError 213
 }
 
 function updateCoreSiteXml {
     
-    echo "updating core-site xml"
     # set the following variables
     # genie.job.id, netflix.environment, lipstick.uuid.prop.name from CORE_SITE_XML_ARGS
     # set dataoven.gateway.type genie
     # dataoven.job.id
+    kvarr=$(echo $CORE_SITE_XML_ARGS | tr ";" "\n")
+    for item in $kvarr
+    do
+        key=$(echo $item | awk -F'=' '{print $1}')
+        value=$(echo $item | awk -F'=' '{print $2}')
+        appendKeyValueToCoreSite $key $value
+    done
+    appendKeyValueToCoreSite "genie.version" "2" 
+return 0
+}
+
+function appendKeyValueToCoreSite {
+
+    echo "Appending $1/$2 to core-site.xml as key/value pair."
+    KEY=$1
+    VALUE=$2
+    SEARCH_PATTERN="</configuration>"
+    REPLACE_PATTERN="<property><name>$KEY</name><value>$VALUE</value></property>\n&"
+    sed -i "s|$SEARCH_PATTERN|$REPLACE_PATTERN|" $CURRENT_JOB_CONF_DIR/core-site.xml
 }
 
 function setEnvVariables {
@@ -130,37 +178,32 @@ function setEnvVariables {
     then
         echo "Copy down and Source Application Env File"
         copyFiles "$APPLICATION_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        #cp "$APPLICATION_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
         APP_FILENAME=`basename $APPLICATION_ENV_FILE`
         echo "App Env Filename: $APP_FILENAME"
         source "$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
-        #source "$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
-        echo "$APPNAME"
+        echo "Application Name = $APPNAME"
     fi
 
     if [ -n "$COMMAND_ENV_FILE" ]
     then
         echo "Copy down and Source Command Env File"
         copyFiles "$COMMAND_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        #cp "$COMMAND_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
         COMMAND_FILENAME=`basename $COMMAND_ENV_FILE`
         echo "Command Env Filename: $COMMAND_FILENAME"
         source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
-        #source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
-        echo "$CMDNAME"
+        echo "Command Name=$CMDNAME"
     fi
 
     if [ -n "$JOB_ENV_FILE" ]
     then
         echo "Copy down and Source Job File"
         copyFiles "$JOB_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        #cp "$JOB_ENV_FILE" "$CURRENT_JOB_CONF_DIR"/
         JOB_FILENAME=`basename $JOB_ENV_FILE`
         echo "Job Env Filename: $JOB_FILENAME"
         source "$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
-        #source "$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
-        echo "$JOBNAME"
+        echo "Job Name = $JOBNAME"
     fi
+    return 0
 }
 
 function archiveToS3 {
@@ -205,58 +248,32 @@ CMDLINE="$@"
 CMDLOG=$CURRENT_JOB_WORKING_DIR/cmd.log
 exec > $CMDLOG 2>&1
 
-echo "Job Execution Parameters" 
-echo "ARGS = $ARGS" 
-echo "CMD = $CMD" 
-echo "CMDLINE = $CMDLINE" 
-echo "CURRENT_JOB_FILE_DEPENDENCIES = $CURRENT_JOB_FILE_DEPENDENCIES" 
-echo "S3_CLUSTER_CONF_FILES = $S3_CLUSTER_CONF_FILES" 
-echo "S3_COMMAND_CONF_FILES = $S3_COMMAND_CONF_FILES" 
-echo "S3_APPLICATION_CONF_FILES = $S3_APPLICATION_CONF_FILES" 
-echo "S3_APPLICATION_JAR_FILES = $S3_APPLICATION_JAR_FILES" 
-echo "CURRENT_JOB_WORKING_DIR = $CURRENT_JOB_WORKING_DIR" 
-echo "CURRENT_JOB_CONF_DIR = $CURRENT_JOB_CONF_DIR" 
-echo "CURRENT_JOB_JAR_DIR = $CURRENT_JOB_JAR_DIR" 
-echo "S3_ARCHIVE_LOCATION = $S3_ARCHIVE_LOCATION"
-echo "HADOOP_USER_NAME = $HADOOP_USER_NAME"
-echo "HADOOP_GROUP_NAME = $HADOOP_GROUP_NAME"
-echo "HADOOP_HOME = $HADOOP_HOME"
-echo "CP_TIMEOUT = $CP_TIMEOUT"
-echo "COPY_COMMAND = $COPY_COMMAND"
-echo "MKDIR_COMMAND = $MKDIR_COMMAND"
-
-
-echo "Env Variables"
+echo "Job Execution Env Variables"
 echo "****************************************************************"
 env
 echo "****************************************************************"
+echo $'\n'
+
+echo "Creating job jar dir: $CURRENT_JOB_JAR_DIR"
+mkdir -p $CURRENT_JOB_JAR_DIR 
+checkError 201
+echo "Job Jar dir created"
+echo $'\n'
 
 echo "Creating job conf dir: $CURRENT_JOB_CONF_DIR"
 mkdir -p $CURRENT_JOB_CONF_DIR 
 checkError 202
-
-echo "Creating job jar dir: $CURRENT_JOB_JAR_DIR"
-mkdir -p $CURRENT_JOB_JAR_DIR 
-checkError 202
-
-echo "Copying job dependency files: $JOB_FILE_DEPENDENCIES" 
-# only copy file dependencies if they exist 
-if [ "$CURRENT_JOB_FILE_DEPENDENCIES" != "" ]
-then
-    copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "file://$CURRENT_JOB_WORKING_DIR"
-    checkError 203
-fi
-
-# Setting Cluster, Command and Application Env Variables if specifed
-setEnvVariables
+echo "Job conf directory created"
+echo $'\n'
 
 # Uncomment the following if you want Genie to create users if they don't exist already
-# echo "Create user.group $USER_NAME.$GROUP_NAME, if it doesn't exist already"
-# sudo groupadd $GROUP_NAME
-# sudo useradd $USER_NAME -g $GROUP_NAME
+#echo "Create user.group $USER_NAME.$GROUP_NAME, if it doesn't exist already"
+#sudo groupadd $GROUP_NAME
+#sudo useradd $USER_NAME -g $GROUP_NAME
+#echo "User and Group created"
+#echo $'\n'
 
 executeCommand "$@"
-
 archiveToS3
 
 echo "Done"

@@ -23,9 +23,9 @@ def submitJob(serviceUrl, payload, contentType='application/json'):
     response = restclient.post(serviceUrl=serviceUrl, payload=payload, contentType=contentType)
     results = response.read()
     json_obj = json.loads(results)
-    jobID = json_obj[u'jobs'][u'jobInfo'][u'jobID']
+    jobID = json_obj[u'id']
     print "Job ID: ", jobID
-    print "Output URI: ", json_obj[u'jobs'][u'jobInfo'][u'outputURI']
+    print "Output URI: ", json_obj[u'outputURI']
     print "Job submission successful"
     return jobID
 
