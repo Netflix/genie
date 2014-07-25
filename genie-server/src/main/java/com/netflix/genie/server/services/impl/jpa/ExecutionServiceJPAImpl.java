@@ -66,7 +66,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author tgianos
  */
 @Named
-@Transactional(rollbackFor = GenieException.class)
 public class ExecutionServiceJPAImpl implements ExecutionService {
 
     private static final Logger LOG = LoggerFactory
@@ -135,11 +134,14 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No job entered to run");
         }
-        // validate parameters
-        job.validate();
-        job.setJobStatus(JobStatus.INIT, "Initializing job");
+        
+        // Check if the job is forwarded. If not this is the first node that got the request.
+        // So we log it, to track all requests.
+        if (job.isForwarded()) {
+            LOG.info("Received job request:" + job);
+        }
+        
         final Job savedJob;
-
         // ensure that job won't overload system
         // synchronize until an entry is created and INIT-ed in DB
         // throttling related parameters
@@ -151,6 +153,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                 "netflix.genie.server.max.idle.host.threshold", 0);
         final int idleHostThresholdDelta = CONF.getInt(
                 "netflix.genie.server.idle.host.threshold.delta", 0);
+        
         synchronized (this) {
             final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
             LOG.info("Number of running jobs: " + numRunningJobs);
@@ -189,42 +192,25 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                         + maxRunningJobs
                         + ") - try another instance or try again later");
             }
-
-            // init state in DB - return if job already exists
-            try {
-                // TODO add retries to avoid deadlock issue
-                savedJob = this.jobRepo.save(job);
-                // if job can be launched, update the URIs
-                buildJobURIs(savedJob);
-            } catch (final RollbackException e) {
-                LOG.error("Can't create entity in the database", e);
-                if (e.getCause() instanceof EntityExistsException) {
-                    // most likely entity already exists - return useful message
-                    throw new GenieException(
-                            HttpURLConnection.HTTP_CONFLICT,
-                            "Job already exists for id: " + job.getId());
-                } else {
-                    // unknown exception - send it back
-                    throw new GenieException(
-                            HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            e);
-                }
-            }
+            
+            // At this point we have established that the job can be run on this node.
+            // Before running we validate the job and save it in the db if it passes validation.
+            savedJob = validateAndSaveJob(job);
         } // end synchronize
 
-        if (savedJob == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, "Unable to persist job");
-        }
-
-        // increment number of submitted jobs
-        this.stats.incrGenieJobSubmissions();
-
         // try to run the job - return success or error
+        final Job executedJob = runJob(savedJob);
+        return executedJob;
+    }
+
+    @Transactional(rollbackFor = GenieException.class)
+    private Job runJob(Job savedJob) {
         try {
             this.jobManagerFactory.getJobManager(savedJob).launch();
 
             // update entity in DB
+            // TODO This udpate runs into deadlock issue, either add manual retries
+            // or Spring retries.
             savedJob.setUpdated(new Date());
             return savedJob;
         } catch (final GenieException e) {
@@ -235,6 +221,44 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             this.stats.incrGenieFailedJobs();
             return savedJob;
         }
+    }
+
+    @Transactional(rollbackFor = GenieException.class)
+    private Job validateAndSaveJob(Job job) throws GenieException {
+        // validate parameters
+        job.validate();
+        job.setJobStatus(JobStatus.INIT, "Initializing job");
+        final Job persistedJob;
+        
+        // Validation successful. init state in DB - return if job already exists
+        try {
+            persistedJob = this.jobRepo.save(job);
+            // if job can be launched, update the URIs
+            buildJobURIs(persistedJob);
+        } catch (final RollbackException e) {
+            LOG.error("Can't create entity in the database", e);
+            if (e.getCause() instanceof EntityExistsException) {
+                // most likely entity already exists - return useful message
+                throw new GenieException(
+                        HttpURLConnection.HTTP_CONFLICT,
+                        "Job already exists for id: " + job.getId());
+            } else {
+                // unknown exception - send it back
+                throw new GenieException(
+                        HttpURLConnection.HTTP_INTERNAL_ERROR,
+                        e);
+            }
+        }
+        
+        if (persistedJob == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR, "Unable to persist job");
+        }
+        
+        // increment number of submitted jobs as we have successfully 
+        // persisted it in the database.
+        this.stats.incrGenieJobSubmissions();
+        return persistedJob;
     }
 
     /**
@@ -311,6 +335,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @throws GenieException
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public Job killJob(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
             throw new GenieException(
@@ -383,7 +408,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = GenieException.class)
     public int markZombies() {
         LOG.debug("called");
         // the equivalent query is as follows:
@@ -473,6 +498,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @throws GenieException
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public Set<String> addTagsForJob(
             final String id,
             final Set<String> tags) throws GenieException {
@@ -530,6 +556,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @throws GenieException
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public Set<String> updateTagsForJob(
             final String id,
             final Set<String> tags) throws GenieException {
@@ -555,6 +582,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @throws GenieException
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public Set<String> removeAllTagsForJob(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -577,6 +605,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public Set<String> removeTagForJob(String id, String tag)
             throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -610,6 +639,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public JobStatus finalizeJob(final String id, final int exitCode) throws GenieException {
         final Job job = this.jobRepo.findOne(id);
         if (job == null) {
@@ -659,6 +689,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public long updateJob(final String id) throws GenieException {
         LOG.debug("Updating db for job: " + id);
         final Job job = this.jobRepo.findOne(id);
@@ -677,6 +708,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public void setJobStatus(final String id, final JobStatus status, final String msg) throws GenieException {
         LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
         final Job job = this.jobRepo.findOne(id);
@@ -692,6 +724,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public void setProcessIdForJob(final String id, final int pid) throws GenieException {
         LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
         final Job job = this.jobRepo.findOne(id);
@@ -707,6 +740,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public void setCommandInfoForJob(
             final String id,
             final String commandId,
@@ -726,6 +760,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public void setApplicationInfoForJob(
             final String id,
             final String appId,
@@ -745,6 +780,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(rollbackFor = GenieException.class)
     public void setClusterInfoForJob(
             final String id,
             final String clusterId,
