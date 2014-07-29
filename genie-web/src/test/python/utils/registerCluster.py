@@ -25,6 +25,7 @@ import json
 import os
 import uuid
 import restclient
+import urllib2
 
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/clusters'
@@ -102,6 +103,12 @@ def addClusterConfigH2query():
 if __name__ == "__main__":
    print "Registering Clusters:\n"
    print "\n"
-   addClusterConfigCprod1()
-   addClusterConfigCquery1()
-   addClusterConfigH2query()
+   try:
+     addClusterConfigCprod1()
+     addClusterConfigCquery1()
+     addClusterConfigH2query()
+   except urllib2.HTTPError, e:
+    print "Caught Exception"
+    print "code = " + str(e.code)
+    print "message =" + e.msg
+    print "read =" + e.read()

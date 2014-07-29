@@ -357,6 +357,7 @@ public class Job extends CommonEntityFields {
      * Construct a new Job.
      *
      * @param user The name of the user running the job. Not null/empty/blank.
+     * @param name The name specifed for the job
      * @param commandArgs The command line arguments for the job. Not
      * null/empty/blank.
      * @param commandCriteria The criteria for the command. Not null/empty.

@@ -160,6 +160,28 @@ def addCommandConfigPig13Mr2():
     print "\n"
     print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
 
+def addCommandConfigUrsulaHive():
+    print "Adding Command ursula hive"
+    ID = "hiveconf-shadowtest_20120716-011-h24"
+    configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-shadowtest_20120716-011-h24/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
+    tags = json.dumps(['hive','shadowtest','ursula'])
+    payload = '''
+    {
+        "id":"''' + ID +'''",
+        "name": "ursulahive", 
+        "status" : "ACTIVE",
+        "executable": "/apps/hive/0.11/bin/hive",
+        "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr2/envFile.sh",
+        "user" : "amsharma", 
+        "version" : "0.11-h2",
+        "tags": ''' + tags + ''',
+        "configs": ''' + configs + '''
+    }
+    '''
+
+    print payload
+    print "\n"
+    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
 # driver method for all tests                
 if __name__ == "__main__":
    print "Adding Commands: \n"
@@ -171,3 +193,4 @@ if __name__ == "__main__":
    addCommandConfigPig11Mr2()
    addCommandConfigPig13Mr2()
    addCommandConfigHadoop103()
+   addCommandConfigUrsulaHive()

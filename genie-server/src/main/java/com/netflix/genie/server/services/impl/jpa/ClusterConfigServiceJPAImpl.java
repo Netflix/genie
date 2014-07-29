@@ -112,7 +112,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
         if (this.clusterRepo.exists(cluster.getId())) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_CONFLICT,
                     "A cluster with id " + cluster.getId() + " already exists");
         }
 
