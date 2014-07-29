@@ -25,6 +25,7 @@ import jobs
 import json
 import os
 import uuid
+import urllib2 
 
 jobID = "job-" + str(uuid.uuid4())
 # the S3 prefix where the tests are located
@@ -33,19 +34,17 @@ GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/jobs'
 # works
-clusterTags = json.dumps([{"tags" : ['adhoc','h2query']}])
-cmdTags = json.dumps(['pig11_mr2'])
-
-print clusterTags
 
 def testJsonSubmitjob():
     print serviceUrl
     print "Running testJsonSubmitjob "
+    clusterTags = json.dumps([{"tags" : ['adhoc','h2query1']}])
+    cmdTags = json.dumps(['pig11_mr2'])
     payload = '''
         {
             "id":"''' + jobID +'''",
             "name": "Genie2TestPigJob", 
-            "clusterCriteria" : ''' + clusterTags + ''',
+            "clusterCriterias" : ''' + clusterTags + ''',
             "user" : "genietest", 
             "version" : "1",
             "group" : "hadoop", 
@@ -61,7 +60,14 @@ def testJsonSubmitjob():
 # driver method for all tests                
 if __name__ == "__main__":
    print "Running unit tests:\n"
-   jobID = testJsonSubmitjob()
+   try:
+    jobID = testJsonSubmitjob()
+   except urllib2.HTTPError, e:
+    print "Caught Exception"
+    print "code = " + str(e.code)
+    print "message =" + e.msg
+    print "read =" + e.read()
+    sys.exit(0)
    print "\n"
    while True:
        print jobs.getJobInfo(serviceUrl, jobID)

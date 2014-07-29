@@ -94,7 +94,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         }
         if (this.commandRepo.exists(command.getId())) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_CONFLICT,
                     "A command with id " + command.getId() + " already exists");
         }
 
