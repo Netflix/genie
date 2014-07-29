@@ -17,22 +17,19 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
+import com.netflix.genie.server.services.JobService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Set;
@@ -79,6 +76,11 @@ public class JobResource {
     private final ExecutionService xs;
 
     /**
+     * The job service.
+     */
+    private final JobService jobService;
+
+    /**
      * Uri info for gathering information on the request.
      */
     @Context
@@ -88,10 +90,12 @@ public class JobResource {
      * Constructor.
      *
      * @param xs The execution service to use.
+     * @param jobService The job service to use.
      */
     @Inject
-    public JobResource(final ExecutionService xs) {
+    public JobResource(final ExecutionService xs, final JobService jobService) {
         this.xs = xs;
+        this.jobService = jobService;
     }
 
     /**
@@ -142,42 +146,12 @@ public class JobResource {
             job.setClientHost(clientHost);
         }
 
-        //final Job createdJob = this.xs.submitJob(job);
-        final Job createdJob = this.submitJob(job);
+        final Job createdJob = this.xs.submitJob(job);
         
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
                 entity(createdJob).
                 build();
-    }
-    
-    private Job submitJob(final Job job) throws GenieException {
-        LOG.debug("Called");
-
-        if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job entered to run");
-        }
-        
-        // Check if the job is forwarded. If not this is the first node that got the request.
-        // So we log it, to track all requests.
-        if (!job.isForwarded()) {
-            LOG.info("Received job request:" + job);
-        }
-        
-        Job forwardCheckedJob = this.xs.checkAbilityToRunOrForward(job);
-        
-        if (forwardCheckedJob.isForwarded()) {
-            return forwardCheckedJob;
-        }
-        
-        // At this point we have established that the job can be run on this node.
-        // Before running we validate the job and save it in the db if it passes validation.
-        final Job savedJob = this.xs.validateAndSaveJob(job);
-        
-        // try to run the job - return success or error
-        return this.xs.runJob(savedJob);
     }
 
     /**
@@ -205,7 +179,7 @@ public class JobResource {
             @PathParam("id")
             final String id) throws GenieException {
         LOG.debug("called for jobID: " + id);
-        return this.xs.getJob(id);
+        return this.jobService.getJob(id);
     }
 
     /**
@@ -235,7 +209,7 @@ public class JobResource {
         LOG.debug("called for jobID" + id);
         final ObjectMapper mapper = new ObjectMapper();
         final ObjectNode node = mapper.createObjectNode();
-        node.put("status", this.xs.getJobStatus(id).toString());
+        node.put("status", this.jobService.getJobStatus(id).toString());
         return node;
     }
 
@@ -291,7 +265,7 @@ public class JobResource {
             @QueryParam("limit") @DefaultValue("1024") int limit)
             throws GenieException {
         LOG.debug("Called");
-        return this.xs.getJobs(
+        return this.jobService.getJobs(
                 id,
                 jobName,
                 userName,
@@ -358,7 +332,7 @@ public class JobResource {
             @ApiParam(value = "The tags to add.", required = true)
             final Set<String> tags) throws GenieException {
         LOG.debug("Called with id " + id + " and config " + tags);
-        return this.xs.addTagsForJob(id, tags);
+        return this.jobService.addTagsForJob(id, tags);
     }
 
     /**
@@ -387,7 +361,7 @@ public class JobResource {
             @PathParam("id")
             final String id) throws GenieException {
         LOG.debug("Called with id " + id);
-        return this.xs.getTagsForJob(id);
+        return this.jobService.getTagsForJob(id);
     }
 
     /**
@@ -421,7 +395,7 @@ public class JobResource {
             @ApiParam(value = "The tags to replace existing with.", required = true)
             final Set<String> tags) throws GenieException {
         LOG.debug("Called with id " + id + " and tags " + tags);
-        return this.xs.updateTagsForJob(id, tags);
+        return this.jobService.updateTagsForJob(id, tags);
     }
 
     /**
@@ -450,7 +424,7 @@ public class JobResource {
             @PathParam("id")
             final String id) throws GenieException {
         LOG.debug("Called with id " + id);
-        return this.xs.removeAllTagsForJob(id);
+        return this.jobService.removeAllTagsForJob(id);
     }
 
     /**
@@ -483,6 +457,6 @@ public class JobResource {
             @PathParam("tag")
             final String tag) throws GenieException {
         LOG.debug("Called with id " + id + " and tag " + tag);
-        return this.xs.removeTagForJob(id, tag);
+        return this.jobService.removeTagForJob(id, tag);
     }
 }

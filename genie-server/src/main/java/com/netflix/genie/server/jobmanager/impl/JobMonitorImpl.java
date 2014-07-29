@@ -38,6 +38,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import com.netflix.genie.server.services.JobService;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -63,6 +65,7 @@ public class JobMonitorImpl implements JobMonitor {
 
     private final GenieNodeStatistics genieNodeStatistics;
     private final ExecutionService xs;
+    private final JobService jobService;
 
     // interval to poll for process status
     private static final int JOB_WAIT_TIME_MS = 5000;
@@ -95,13 +98,16 @@ public class JobMonitorImpl implements JobMonitor {
      * Constructor.
      *
      * @param xs The job execution service.
+     * @param jobservice The job service API's to use.
      * @param genieNodeStatistics The statistics object to use
      */
     @Inject
     public JobMonitorImpl(
             final ExecutionService xs,
+            final JobService jobservice,
             final GenieNodeStatistics genieNodeStatistics) {
         this.xs = xs;
+        this.jobService = jobservice;
         this.genieNodeStatistics = genieNodeStatistics;
         this.config = ConfigurationManager.getConfigInstance();
         this.maxStdoutSize = this.config.getLong("netflix.genie.job.max.stdout.size", null);
@@ -181,7 +187,7 @@ public class JobMonitorImpl implements JobMonitor {
 
             // Check if user email address is specified. If so
             // send an email to user about job completion.
-            final String emailTo = this.xs.getJob(this.jobId).getEmail();
+            final String emailTo = this.jobService.getJob(this.jobId).getEmail();
 
             if (emailTo != null) {
                 LOG.info("User email address: " + emailTo);
@@ -249,7 +255,7 @@ public class JobMonitorImpl implements JobMonitor {
 
             // update status only in JOB_UPDATE_TIME_MS intervals
             if (shouldUpdateJob()) {
-                this.lastUpdatedTimeMS = this.xs.updateJob(this.jobId);
+                this.lastUpdatedTimeMS = this.jobService.setUpdateTime(this.jobId);
 
                 // kill the job if it is writing out more than the max stdout limit
                 // if it has been terminated already, move on and wait for it to clean up after itself
@@ -284,8 +290,8 @@ public class JobMonitorImpl implements JobMonitor {
      * @throws GenieException
      */
     private boolean sendEmail(String emailTo, boolean killed) throws GenieException {
-        final Job job = this.xs.getJob(this.jobId);
         LOG.debug("called");
+        final Job job = this.jobService.getJob(this.jobId);
 
         if (!this.config.getBoolean("netflix.genie.server.mail.enable", false)) {
             LOG.warn("Email is disabled but user has specified an email address.");

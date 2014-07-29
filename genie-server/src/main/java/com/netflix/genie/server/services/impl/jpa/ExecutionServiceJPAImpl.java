@@ -32,6 +32,7 @@ import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.repository.jpa.JobSpecs;
 import com.netflix.genie.server.services.ExecutionService;
+import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.NetUtil;
 import com.netflix.niws.client.http.RestClient;
 
@@ -39,20 +40,16 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
-import javax.persistence.RollbackException;
 
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -76,7 +73,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     // these can be over-ridden in the properties file
     private static final int SERVER_PORT;
-    private static final String JOB_DIR_PREFIX;
     private static final String JOB_RESOURCE_PREFIX;
 
     // per-instance variables
@@ -84,6 +80,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     private final JobRepository jobRepo;
     private final JobCountManager jobCountManager;
     private final JobManagerFactory jobManagerFactory;
+    private final JobService jobService;
 
     @PersistenceContext
     private EntityManager em;
@@ -93,8 +90,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         //TODO: Seem to remember something about injecting configuration using governator
         CONF = ConfigurationManager.getConfigInstance();
         SERVER_PORT = CONF.getInt("netflix.appinfo.port", 7001);
-        JOB_DIR_PREFIX = CONF.getString("netflix.genie.server.job.dir.prefix",
-                "genie-jobs");
         JOB_RESOURCE_PREFIX = CONF.getString(
                 "netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
     }
@@ -113,11 +108,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final JobRepository jobRepo,
             final GenieNodeStatistics stats,
             final JobCountManager jobCountManager,
-            final JobManagerFactory jobManagerFactory) {
+            final JobManagerFactory jobManagerFactory,
+            final JobService jobService) {
         this.jobRepo = jobRepo;
         this.stats = stats;
         this.jobCountManager = jobCountManager;
         this.jobManagerFactory = jobManagerFactory;
+        this.jobService = jobService;
     }
 
     /**
@@ -149,212 +146,14 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         
         // At this point we have established that the job can be run on this node.
         // Before running we validate the job and save it in the db if it passes validation.
-        final Job savedJob = validateAndSaveJob(job);
+        final Job savedJob = this.jobService.validateAndSaveJob(job);
         
         // try to run the job - return success or error
-        return runJob(savedJob);
-    }
-    
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    public synchronized Job checkAbilityToRunOrForward(final Job job) 
-            throws GenieException {
-        // ensure that job won't overload system
-        // synchronize until an entry is created and INIT-ed in DB
-        // throttling related parameters
-        final int maxRunningJobs = CONF.getInt(
-                "netflix.genie.server.max.running.jobs", 0);
-        final int jobForwardThreshold = CONF.getInt(
-                "netflix.genie.server.forward.jobs.threshold", 0);
-        final int maxIdleHostThreshold = CONF.getInt(
-                "netflix.genie.server.max.idle.host.threshold", 0);
-        final int idleHostThresholdDelta = CONF.getInt(
-                "netflix.genie.server.idle.host.threshold.delta", 0);
-
-        final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
-        LOG.info("Number of running jobs: " + numRunningJobs);
-
-        // find an instance with fewer than (numRunningJobs -
-        // idleHostThresholdDelta)
-        int idleHostThreshold = numRunningJobs - idleHostThresholdDelta;
-        // if numRunningJobs is already >= maxRunningJobs, forward
-        // aggressively
-        // but cap it at the max
-        if ((idleHostThreshold > maxIdleHostThreshold)
-                || (numRunningJobs >= maxRunningJobs)) {
-            idleHostThreshold = maxIdleHostThreshold;
-        }
-
-        // check to see if job should be forwarded - only forward it
-        // once. the assumption is that jobForwardThreshold < maxRunningJobs
-        // (set in properties file)
-        if (numRunningJobs >= jobForwardThreshold && !job.isForwarded()) {
-            LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
-            final String idleHost = this.jobCountManager.getIdleInstance(idleHostThreshold);
-            if (!idleHost.equals(NetUtil.getHostName())) {
-                job.setForwarded(true);
-                this.stats.incrGenieForwardedJobs();
-                return forwardJobRequest("http://" + idleHost + ":"
-                        + SERVER_PORT + "/" + JOB_RESOURCE_PREFIX, job);
-            } // else, no idle hosts found - run here if capacity exists
-        }
-
-        if (numRunningJobs >= maxRunningJobs) {
-            // if we get here, job can't be forwarded to an idle
-            // instance anymore and current node is overloaded
-            throw new GenieException(
-                    HttpURLConnection.HTTP_UNAVAILABLE,
-                    "Number of running jobs greater than system limit ("
-                            + maxRunningJobs
-                            + ") - try another instance or try again later");
-        } 
-        return job;
-    }
-    
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional
-    public Job runJob(Job job) throws GenieException {
-        try {
-            this.jobManagerFactory.getJobManager(job).launch();
-
-            // update entity in DB
-            // TODO This udpate runs into deadlock issue, either add manual retries
-            // or Spring retries.
-            job = this.jobRepo.findOne(job.getId());
-            job.setUpdated(new Date());
-            return job;
-        } catch (final GenieException e) {
-            LOG.error("Failed to submit job: ", e);
-            // update db
-            job.setJobStatus(JobStatus.FAILED, e.getMessage());
-            // increment counter for failed jobs
-            this.stats.incrGenieFailedJobs();
-            throw e;
-       }
+        return this.jobService.runJob(savedJob);
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional
-    public Job validateAndSaveJob(final Job job) throws GenieException {
-        // validate parameters
-        job.validate();
-        job.setJobStatus(JobStatus.INIT, "Initializing job");
-
-        // Validation successful. init state in DB - return if job already exists
-        try {
-            
-            final Job persistedJob = this.jobRepo.save(job);
-            // if job can be launched, update the URIs
-            persistedJob.setHostName(NetUtil.getHostName());
-            persistedJob.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/" + persistedJob.getId());
-            persistedJob.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + persistedJob.getId());
-            
-            // increment number of submitted jobs as we have successfully 
-            // persisted it in the database.
-            this.stats.incrGenieJobSubmissions();
-            return persistedJob;
-        } catch (final Exception e) {
-            LOG.error("Can't create entity in the database", e);
-            if (e.getCause() instanceof EntityExistsException) {
-                // most likely entity already exists - return useful message
-                throw new GenieException(
-                        HttpURLConnection.HTTP_CONFLICT,
-                        "Job already exists for id: " + job.getId());
-            } else {
-                // unknown exception - send it back
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        e);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Job getJob(final String id) throws GenieException {
-        if (StringUtils.isEmpty(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No id entered unable to retreive job.");
-        }
-        LOG.debug("called for id: " + id);
-
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            return job;
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job exists for id " + id + ". Unable to retrieve.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<Job> getJobs(
-            final String id,
-            final String jobName,
-            final String userName,
-            final JobStatus status,
-            final String clusterName,
-            final String clusterId,
-            final int limit,
-            final int page) throws GenieException {
-        LOG.debug("called");
-        final PageRequest pageRequest = new PageRequest(
-                page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit
-        );
-        return this.jobRepo.findAll(
-                JobSpecs.find(
-                        id,
-                        jobName,
-                        userName,
-                        status,
-                        clusterName,
-                        clusterId),
-                pageRequest).getContent();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public JobStatus getJobStatus(final String id) throws GenieException {
-        return getJob(id).getStatus();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -455,6 +254,56 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         return jobs.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(rollbackFor = GenieException.class)
+    public JobStatus finalizeJob(final String id, final int exitCode) throws GenieException {
+        final Job job = this.jobRepo.findOne(id);
+        if (job == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+        }
+        job.setExitCode(exitCode);
+
+        // only update status if not KILLED
+        if (job.getStatus() != null && job.getStatus() != JobStatus.KILLED) {
+            if (exitCode != SubProcessStatus.SUCCESS.code()) {
+                // all other failures except s3 log archival failure
+                LOG.error("Failed to execute job, exit code: "
+                        + exitCode);
+                String errMsg = SubProcessStatus.message(exitCode);
+                if ((errMsg == null) || (errMsg.isEmpty())) {
+                    errMsg = "Please look at job's stderr for more details";
+                }
+                job.setJobStatus(JobStatus.FAILED,
+                        "Failed to execute job, Error Message: " + errMsg);
+                // incr counter for failed jobs
+                this.stats.incrGenieFailedJobs();
+            } else {
+                // success
+                job.setJobStatus(JobStatus.SUCCEEDED,
+                        "Job finished successfully");
+                // incr counter for successful jobs
+                this.stats.incrGenieSuccessfulJobs();
+            }
+
+            // set the archive location - if needed
+            if (!job.isDisableLogArchival()) {
+                job.setArchiveLocation(NetUtil.getArchiveURI(job.getId()));
+            }
+
+            // update the job status
+            job.setUpdated(new Date());
+            return job.getStatus();
+        } else {
+            // if job status is killed, the kill thread will update status
+            LOG.debug("Job has been killed - will not update DB: " + job.getId());
+            return JobStatus.KILLED;
+        }
+    }
+
     private String getEndPoint() throws GenieException {
         return "http://" + NetUtil.getHostName() + ":" + SERVER_PORT;
     }
@@ -510,306 +359,61 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     }
 
     /**
-     * {@inheritDoc}
+     * Check if we can run the job on this host or not.
      *
      * @throws GenieException
      */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public Set<String> addTagsForJob(
-            final String id,
-            final Set<String> tags) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id entered. Unable to add tags.");
-        }
-        if (tags == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No tags entered.");
-        }
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.getTags().addAll(tags);
-            return job.getTags();
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
-        }
-    }
+    private synchronized Job checkAbilityToRunOrForward(
+            final Job job) throws GenieException {
+        // ensure that job won't overload system
+        // synchronize until an entry is created and INIT-ed in DB
+        // throttling related parameters
+        final int maxRunningJobs = CONF.getInt(
+                "netflix.genie.server.max.running.jobs", 0);
+        final int jobForwardThreshold = CONF.getInt(
+                "netflix.genie.server.forward.jobs.threshold", 0);
+        final int maxIdleHostThreshold = CONF.getInt(
+                "netflix.genie.server.max.idle.host.threshold", 0);
+        final int idleHostThresholdDelta = CONF.getInt(
+                "netflix.genie.server.idle.host.threshold.delta", 0);
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Set<String> getTagsForJob(
-            final String id)
-            throws GenieException {
+        final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
+        LOG.info("Number of running jobs: " + numRunningJobs);
 
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id sent. Cannot retrieve tags.");
+        // find an instance with fewer than (numRunningJobs -
+        // idleHostThresholdDelta)
+        int idleHostThreshold = numRunningJobs - idleHostThresholdDelta;
+        // if numRunningJobs is already >= maxRunningJobs, forward
+        // aggressively
+        // but cap it at the max
+        if ((idleHostThreshold > maxIdleHostThreshold)
+                || (numRunningJobs >= maxRunningJobs)) {
+            idleHostThreshold = maxIdleHostThreshold;
         }
 
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            return job.getTags();
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public Set<String> updateTagsForJob(
-            final String id,
-            final Set<String> tags) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id entered. Unable to update tags.");
-        }
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setTags(tags);
-            return job.getTags();
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public Set<String> removeAllTagsForJob(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id entered. Unable to remove tags.");
-        }
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.getTags().clear();
-            return job.getTags();
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public Set<String> removeTagForJob(String id, String tag)
-            throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id entered. Unable to remove tag.");
-        }
-        if (StringUtils.isBlank(tag)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No tag entered. Unable to remove tag.");
-        }
-        if (tag.equals(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Cannot delete job id from the tags list.");
+        // check to see if job should be forwarded - only forward it
+        // once. the assumption is that jobForwardThreshold < maxRunningJobs
+        // (set in properties file)
+        if (numRunningJobs >= jobForwardThreshold && !job.isForwarded()) {
+            LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
+            final String idleHost = this.jobCountManager.getIdleInstance(idleHostThreshold);
+            if (!idleHost.equals(NetUtil.getHostName())) {
+                job.setForwarded(true);
+                this.stats.incrGenieForwardedJobs();
+                return forwardJobRequest("http://" + idleHost + ":"
+                        + SERVER_PORT + "/" + JOB_RESOURCE_PREFIX, job);
+            } // else, no idle hosts found - run here if capacity exists
         }
 
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.getTags().remove(tag);
-            return job.getTags();
-        } else {
+        if (numRunningJobs >= maxRunningJobs) {
+            // if we get here, job can't be forwarded to an idle
+            // instance anymore and current node is overloaded
             throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
+                    HttpURLConnection.HTTP_UNAVAILABLE,
+                    "Number of running jobs greater than system limit ("
+                            + maxRunningJobs
+                            + ") - try another instance or try again later");
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public JobStatus finalizeJob(final String id, final int exitCode) throws GenieException {
-        final Job job = this.jobRepo.findOne(id);
-        if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
-        }
-        job.setExitCode(exitCode);
-
-        // only update status if not KILLED
-        if (job.getStatus() != null && job.getStatus() != JobStatus.KILLED) {
-            if (exitCode != SubProcessStatus.SUCCESS.code()) {
-                // all other failures except s3 log archival failure
-                LOG.error("Failed to execute job, exit code: "
-                        + exitCode);
-                String errMsg = SubProcessStatus.message(exitCode);
-                if ((errMsg == null) || (errMsg.isEmpty())) {
-                    errMsg = "Please look at job's stderr for more details";
-                }
-                job.setJobStatus(JobStatus.FAILED,
-                        "Failed to execute job, Error Message: " + errMsg);
-                // incr counter for failed jobs
-                this.stats.incrGenieFailedJobs();
-            } else {
-                // success
-                job.setJobStatus(JobStatus.SUCCEEDED,
-                        "Job finished successfully");
-                // incr counter for successful jobs
-                this.stats.incrGenieSuccessfulJobs();
-            }
-
-            // set the archive location - if needed
-            if (!job.isDisableLogArchival()) {
-                job.setArchiveLocation(NetUtil.getArchiveURI(job.getId()));
-            }
-
-            // update the job status
-            job.setUpdated(new Date());
-            return job.getStatus();
-        } else {
-            // if job status is killed, the kill thread will update status
-            LOG.debug("Job has been killed - will not update DB: " + job.getId());
-            return JobStatus.KILLED;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public long updateJob(final String id) throws GenieException {
-        LOG.debug("Updating db for job: " + id);
-        final Job job = this.jobRepo.findOne(id);
-        if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
-        }
-
-        final long lastUpdatedTimeMS = System.currentTimeMillis();
-        job.setJobStatus(JobStatus.RUNNING, "Job is running");
-        job.setUpdated(new Date(lastUpdatedTimeMS));
-        return lastUpdatedTimeMS;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public void setJobStatus(final String id, final JobStatus status, final String msg) throws GenieException {
-        LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setJobStatus(status, msg);
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public void setProcessIdForJob(final String id, final int pid) throws GenieException {
-        LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setProcessHandle(pid);
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public void setCommandInfoForJob(
-            final String id,
-            final String commandId,
-            final String commandName) throws GenieException {
-        LOG.debug("Setting the command info for job with id " + id);
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setCommandId(commandId);
-            job.setCommandName(commandName);
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public void setApplicationInfoForJob(
-            final String id,
-            final String appId,
-            final String appName) throws GenieException {
-        LOG.debug("Setting the application info for job with id " + id);
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setApplicationId(appId);
-            job.setApplicationName(appName);
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public void setClusterInfoForJob(
-            final String id,
-            final String clusterId,
-            final String clusterName) throws GenieException {
-        LOG.debug("Setting the application info for job with id " + id);
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setExecutionClusterId(clusterId);
-            job.setExecutionClusterName(clusterName);
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
-        }
+        return job;
     }
 }

@@ -107,9 +107,8 @@ public class JobJanitorImpl implements JobJanitor {
             LOG.info("Job janitor daemon going to sleep for " + randomSleepTime / 1000 + " seconds.");
             try {
                 Thread.sleep(randomSleepTime);
-            } catch (InterruptedException e) {
-                LOG.warn(e.getMessage());
-                continue;
+            } catch (final InterruptedException e) {
+                LOG.warn(e.getMessage(), e);
             }
         }
     }

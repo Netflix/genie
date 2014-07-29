@@ -27,7 +27,7 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobMonitor;
-import com.netflix.genie.server.services.ExecutionService;
+import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.StringUtil;
 
 import java.io.File;
@@ -75,7 +75,7 @@ public class YarnJobManager implements JobManager {
     private static final String HADOOP_GROUP_NAME = "hadoop";
     private final JobMonitor jobMonitor;
     private final Thread jobMonitorThread;
-    private final ExecutionService xs;
+    private final JobService jobService;
 
     /**
      * The environment variables for this job.
@@ -117,13 +117,14 @@ public class YarnJobManager implements JobManager {
      * balancer.
      *
      * @param jobMonitor The job monitor object to use.
-     * @param xs         The execution service to use.
+     * @param jobService The job service to use.
      */
     @Inject
-    public YarnJobManager(final JobMonitor jobMonitor, final ExecutionService xs) {
+    public YarnJobManager(final JobMonitor jobMonitor,
+                          final JobService jobService) {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
-        this.xs = xs;
+        this.jobService = jobService;
     }
 
     /**
@@ -166,7 +167,7 @@ public class YarnJobManager implements JobManager {
         // check if working directory already exists
         if (userJobDir.exists()) {
             final String msg = "User staging directory already exists";
-            this.xs.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
+            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
             LOG.error(this.job.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
             throw new GenieException(
@@ -177,7 +178,7 @@ public class YarnJobManager implements JobManager {
         final boolean resMkDir = userJobDir.mkdirs();
         if (!resMkDir) {
             String msg = "User staging directory can't be created";
-            this.xs.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
+            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
             LOG.error(this.job.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
             throw new GenieException(
@@ -244,18 +245,18 @@ public class YarnJobManager implements JobManager {
             // launch job, and get process handle
             final Process proc = pb.start();
             pid = this.getProcessId(proc);
-            this.xs.setProcessIdForJob(this.job.getId(), pid);
+            this.jobService.setProcessIdForJob(this.job.getId(), pid);
 
             // set off monitor thread for the job
             this.jobMonitor.setJob(this.job);
             this.jobMonitor.setProcess(proc);
             this.jobMonitor.setWorkingDir(cWorkingDir);
             this.jobMonitorThread.start();
-            this.xs.setJobStatus(this.job.getId(), JobStatus.RUNNING, "Job is running");
+            this.jobService.setJobStatus(this.job.getId(), JobStatus.RUNNING, "Job is running");
         } catch (final IOException e) {
             final String msg = "Failed to launch the job";
             LOG.error(msg, e);
-            this.xs.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
+            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
             throw new GenieException(
                     HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
         }
@@ -377,11 +378,11 @@ public class YarnJobManager implements JobManager {
         }
 
         // save the command name, application id and application name
-        this.xs.setCommandInfoForJob(this.job.getId(), command.getId(), command.getName());
+        this.jobService.setCommandInfoForJob(this.job.getId(), command.getId(), command.getName());
 
         final Application application = command.getApplication();
         if (application != null) {
-            this.xs.setApplicationInfoForJob(this.job.getId(), application.getId(), application.getName());
+            this.jobService.setApplicationInfoForJob(this.job.getId(), application.getId(), application.getName());
 
             if (application.getConfigs() != null && !application.getConfigs().isEmpty()) {
                 this.env.put("S3_APPLICATION_CONF_FILES", convertCollectionToCSV(application.getConfigs()));
@@ -404,7 +405,7 @@ public class YarnJobManager implements JobManager {
         this.executable = command.getExecutable();
 
         // save the cluster name and id
-        this.xs.setClusterInfoForJob(this.job.getId(), this.cluster.getId(), this.cluster.getName());
+        this.jobService.setClusterInfoForJob(this.job.getId(), this.cluster.getId(), this.cluster.getName());
 
         // Get envPropertyFile for command and job and set env variable
         if (StringUtils.isNotBlank(command.getEnvPropFile())) {
