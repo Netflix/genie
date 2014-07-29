@@ -49,7 +49,7 @@ public interface ExecutionService {
      * @return the job
      * @throws GenieException
      */
-    Job getJobInfo(final String id) throws GenieException;
+    Job getJob(final String id) throws GenieException;
 
     /**
      * Get job status for give job id.
@@ -228,4 +228,32 @@ public interface ExecutionService {
      * @throws GenieException
      */
     void setClusterInfoForJob(final String id, final String clusterId, final String clusterName) throws GenieException;
+    
+    /**
+     * Validate the job and persist it if it passes validation.
+     * 
+     * @param job The job to validate and maybe save
+     * @return The validated/saved job object
+     * @throws GenieException
+     */
+    public Job validateAndSaveJob(final Job job) throws GenieException;
+    
+    /**
+     * Run the job using a JobLauncher.
+     * 
+     * @param job The job to run.
+     * @return The job object thats returned after launch
+     * @throws GenieException
+     */
+    public Job runJob(Job job) throws GenieException;
+    
+    /**
+     * Check job.
+     * 
+     * @param job. The job to check on.
+     * @return The checked job.
+     * @throws GenieException
+     */
+    public  Job checkAbilityToRunOrForward(final Job job) 
+            throws GenieException;
 }

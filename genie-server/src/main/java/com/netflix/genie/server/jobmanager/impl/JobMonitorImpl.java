@@ -181,7 +181,7 @@ public class JobMonitorImpl implements JobMonitor {
 
             // Check if user email address is specified. If so
             // send an email to user about job completion.
-            final String emailTo = this.xs.getJobInfo(this.jobId).getEmail();
+            final String emailTo = this.xs.getJob(this.jobId).getEmail();
 
             if (emailTo != null) {
                 LOG.info("User email address: " + emailTo);
@@ -284,7 +284,7 @@ public class JobMonitorImpl implements JobMonitor {
      * @throws GenieException
      */
     private boolean sendEmail(String emailTo, boolean killed) throws GenieException {
-        final Job job = this.xs.getJobInfo(this.jobId);
+        final Job job = this.xs.getJob(this.jobId);
         LOG.debug("called");
 
         if (!this.config.getBoolean("netflix.genie.server.mail.enable", false)) {

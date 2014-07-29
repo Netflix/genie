@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.common.model;
 
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,6 +26,7 @@ import org.junit.Test;
  * Test case for Job Status utility methods.
  *
  * @author skrishnan
+ * @author amsharma
  */
 public class TestJob {
 
@@ -34,17 +37,18 @@ public class TestJob {
     @Test
     public void testSetJobStatus() {
         Job job = new Job();
-
+        Date dt = new Date(0);
+        
         // finish time is 0 on initialization
-        Assert.assertTrue(0L == job.getFinishTime());
+        Assert.assertTrue(dt.compareTo(job.getFinished()) == 0);
 
         // start time is not zero on INIT, finish time is still 0
         job.setJobStatus(JobStatus.INIT);
-        Assert.assertNotNull(job.getStartTime());
-        Assert.assertTrue(0L == job.getFinishTime());
+        Assert.assertNotNull(job.getStarted());
+        Assert.assertTrue(dt.compareTo(job.getFinished()) == 0);
 
         // finish time is non-zero on completion
         job.setJobStatus(JobStatus.SUCCEEDED);
-        Assert.assertFalse(0L == job.getFinishTime());
+        Assert.assertFalse(dt.compareTo(job.getFinished()) == 0);
     }
 }

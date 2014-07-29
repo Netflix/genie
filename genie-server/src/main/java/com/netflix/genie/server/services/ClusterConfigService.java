@@ -78,13 +78,13 @@ public interface ClusterConfigService {
             final int page) throws GenieException;
 
     /**
-     * Get the cluster configurations for various parameters.
+     * Get the clusters on which the job can be run.
      *
-     * @param job Job object to run
+     * @param jobId The id of the Job to run
      * @return successful response, or one with HTTP error code
      */
-    List<Cluster> getClusters(
-            final Job job) throws GenieException;
+    List<Cluster> chooseClusterForJob(
+            final String jobId) throws GenieException;
 
     /**
      * Update a cluster configuration.

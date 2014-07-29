@@ -18,10 +18,15 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.util.JsonDateDeserializer;
+import com.netflix.genie.common.util.JsonDateSerializer;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +41,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -116,7 +123,7 @@ public class Job extends CommonEntityFields {
     @Transient
     @ApiModelProperty(
             value = "List of criteria containing tags to use to pick a cluster to run this job")
-    private List<ClusterCriteria> clusterCriteria;
+    private List<ClusterCriteria> clusterCriterias;
 
     /**
      * Set of tags to use for selecting command (REQUIRED).
@@ -133,7 +140,7 @@ public class Job extends CommonEntityFields {
     @JsonIgnore
     @Lob
     @Basic(optional = false)
-    private String clusterCriteriaString;
+    private String clusterCriteriasString;
 
     /**
      * String representation of the the command criteria set object above.
@@ -264,17 +271,23 @@ public class Job extends CommonEntityFields {
      * Start time for job - initialized to null.
      */
     @Basic
+    @Temporal(TemporalType.TIMESTAMP)
     @ApiModelProperty(
             value = "The start time of the job.")
-    private long startTime = -1L;
+    @JsonSerialize(using = JsonDateSerializer.class)
+    @JsonDeserialize(using = JsonDateDeserializer.class)
+    private Date started = new Date(0);
 
     /**
      * Finish time for job - initialized to zero (for historic reasons).
      */
     @Basic
+    @Temporal(TemporalType.TIMESTAMP)
     @ApiModelProperty(
             value = "The end time of the job.")
-    private long finishTime = 0L;
+    @JsonSerialize(using = JsonDateSerializer.class)
+    @JsonDeserialize(using = JsonDateDeserializer.class)
+    private Date finished = new Date(0);
 
     /**
      * The host/IP address of the client submitting job.
@@ -347,7 +360,7 @@ public class Job extends CommonEntityFields {
      * @param commandArgs The command line arguments for the job. Not
      * null/empty/blank.
      * @param commandCriteria The criteria for the command. Not null/empty.
-     * @param clusterCriteria The cluster criteria for the job. Not null/empty.
+     * @param clusterCriterias The cluster criteria for the job. Not null/empty.
      * @param version The version of this job
      * @throws com.netflix.genie.common.exceptions.GenieException
      */
@@ -356,12 +369,12 @@ public class Job extends CommonEntityFields {
             final String name,
             final String commandArgs,
             final Set<String> commandCriteria,
-            final List<ClusterCriteria> clusterCriteria,
+            final List<ClusterCriteria> clusterCriterias,
             final String version) throws GenieException {
         super(name, user, version);
 
         this.commandArgs = commandArgs;
-        this.clusterCriteria = clusterCriteria;
+        this.clusterCriterias = clusterCriterias;
         this.commandCriteria = commandCriteria;
 
         if (StringUtils.isBlank(this.getVersion())) {
@@ -376,8 +389,8 @@ public class Job extends CommonEntityFields {
      */
     @PrePersist
     protected void onCreateJob() throws GenieException {
-        this.validate(this.commandCriteria, this.commandArgs, this.clusterCriteria);
-        this.clusterCriteriaString = clusterCriteriaToString(this.clusterCriteria);
+        this.validate(this.commandCriteria, this.commandArgs, this.clusterCriterias, null);
+        this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
         this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
         // Add the id to the tags
         if (this.tags == null) {
@@ -393,7 +406,7 @@ public class Job extends CommonEntityFields {
      */
     @PostLoad
     protected void onLoadJob() throws GenieException {
-        this.clusterCriteria = this.stringToClusterCriteria(this.clusterCriteriaString);
+        this.clusterCriterias = this.stringToClusterCriteria(this.clusterCriteriasString);
         this.commandCriteria = this.stringToCommandCriteria(this.commandCriteriaString);
     }
 
@@ -475,26 +488,26 @@ public class Job extends CommonEntityFields {
      * Gets the cluster criteria which was specified to pick a cluster to run
      * the job.
      *
-     * @return clusterCriteria
+     * @return clusterCriterias
      */
-    public List<ClusterCriteria> getClusterCriteria() {
-        return this.clusterCriteria;
+    public List<ClusterCriteria> getClusterCriterias() {
+        return this.clusterCriterias;
     }
 
     /**
      * Sets the list of cluster criteria specified to pick a cluster.
      *
-     * @param clusterCriteria The criteria list
+     * @param clusterCriterias The criteria list
      * @throws GenieException
      */
-    public void setClusterCriteria(final List<ClusterCriteria> clusterCriteria) throws GenieException {
-        if (clusterCriteria == null || clusterCriteria.isEmpty()) {
+    public void setClusterCriterias(final List<ClusterCriteria> clusterCriterias) throws GenieException {
+        if (clusterCriterias == null || clusterCriterias.isEmpty()) {
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "No user entered.");
         }
-        this.clusterCriteria = clusterCriteria;
-        this.clusterCriteriaString = clusterCriteriaToString(clusterCriteria);
+        this.clusterCriterias = clusterCriterias;
+        this.clusterCriteriasString = clusterCriteriasToString(clusterCriterias);
     }
 
     /**
@@ -730,8 +743,8 @@ public class Job extends CommonEntityFields {
      *
      * @return startTime : start time in ms
      */
-    public long getStartTime() {
-        return this.startTime;
+    public Date getStarted() {
+        return new Date(this.started.getTime());
     }
 
     /**
@@ -739,26 +752,26 @@ public class Job extends CommonEntityFields {
      *
      * @param startTime epoch time in ms
      */
-    public void setStartTime(final long startTime) {
-        this.startTime = startTime;
+    public void setStarted(final Date started) {
+        this.started = started;
     }
 
     /**
      * Gets the finish time for this job.
      *
-     * @return finishTime
+     * @return finished. The job finish timestamp.
      */
-    public long getFinishTime() {
-        return this.finishTime;
+    public Date getFinished() {
+        return new Date(this.finished.getTime());
     }
 
     /**
      * Set the finishTime for the job.
      *
-     * @param finishTime epoch time in ms
+     * @param finishTimestamp
      */
-    public void setFinishTime(final long finishTime) {
-        this.finishTime = finishTime;
+    public void setFinished(final Date finished) {
+        this.finished = finished;
     }
 
     /**
@@ -890,21 +903,21 @@ public class Job extends CommonEntityFields {
     /**
      * Get the cluster criteria specified to run this job in string format.
      *
-     * @return clusterCriteriaString
+     * @return clusterCriteriasString
      */
-    protected String getClusterCriteriaString() {
-        return this.clusterCriteriaString;
+    protected String getClusterCriteriasString() {
+        return this.clusterCriteriasString;
     }
 
     /**
      * Set the cluster criteria string.
      *
-     * @param clusterCriteriaString A list of cluster criteria objects
+     * @param clusterCriteriasString A list of cluster criteria objects
      * @throws GenieException
      */
-    protected void setClusterCriteriaString(final String clusterCriteriaString) throws GenieException {
-        this.clusterCriteriaString = clusterCriteriaString;
-        this.clusterCriteria = stringToClusterCriteria(clusterCriteriaString);
+    protected void setClusterCriteriasString(final String clusterCriteriasString) throws GenieException {
+        this.clusterCriteriasString = clusterCriteriasString;
+        this.clusterCriterias = stringToClusterCriteria(clusterCriteriasString);
     }
 
     /**
@@ -957,11 +970,11 @@ public class Job extends CommonEntityFields {
         this.status = jobStatus;
 
         if (jobStatus == JobStatus.INIT) {
-            setStartTime(System.currentTimeMillis());
+            this.setStarted(new Date());
         } else if (jobStatus == JobStatus.SUCCEEDED
                 || jobStatus == JobStatus.KILLED
                 || jobStatus == JobStatus.FAILED) {
-            setFinishTime(System.currentTimeMillis());
+            setFinished(new Date());
         }
     }
 
@@ -1042,11 +1055,17 @@ public class Job extends CommonEntityFields {
      */
     @Override
     public void validate() throws GenieException {
-        super.validate();
+        String error = null;
+        try {
+            super.validate();
+        } catch (GenieException ge) {
+            error = ge.getMessage();
+        }
         this.validate(
                 this.commandCriteria,
                 this.commandArgs,
-                this.clusterCriteria);
+                this.clusterCriterias,
+                error);
     }
 
     /**
@@ -1060,8 +1079,12 @@ public class Job extends CommonEntityFields {
     private void validate(
             final Set<String> commandCriteria,
             final String commandArgs,
-            final List<ClusterCriteria> criteria) throws GenieException {
+            final List<ClusterCriteria> criteria,
+            final String error) throws GenieException {
         final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotBlank(error)) {
+            builder.append(error);
+        }
         if (commandCriteria == null || commandCriteria.isEmpty()) {
             builder.append("Command criteria is mandatory to figure out a command to run the job.\n");
         }
@@ -1087,7 +1110,7 @@ public class Job extends CommonEntityFields {
      * @param clusterCriteria2 The criteria to build up from
      * @return The cluster criteria string
      */
-    private String clusterCriteriaToString(final List<ClusterCriteria> clusterCriteria2) {
+    private String clusterCriteriasToString(final List<ClusterCriteria> clusterCriteria2) {
         if (clusterCriteria2 == null || clusterCriteria2.isEmpty()) {
             return null;
         }

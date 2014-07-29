@@ -137,11 +137,32 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         
         // Check if the job is forwarded. If not this is the first node that got the request.
         // So we log it, to track all requests.
-        if (job.isForwarded()) {
+        if (!job.isForwarded()) {
             LOG.info("Received job request:" + job);
         }
         
-        final Job savedJob;
+        Job forwardCheckedJob = checkAbilityToRunOrForward(job);
+        
+        if (forwardCheckedJob.isForwarded()) {
+            return forwardCheckedJob;
+        }
+        
+        // At this point we have established that the job can be run on this node.
+        // Before running we validate the job and save it in the db if it passes validation.
+        final Job savedJob = validateAndSaveJob(job);
+        
+        // try to run the job - return success or error
+        return runJob(savedJob);
+    }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    public synchronized Job checkAbilityToRunOrForward(final Job job) 
+            throws GenieException {
         // ensure that job won't overload system
         // synchronize until an entry is created and INIT-ed in DB
         // throttling related parameters
@@ -153,89 +174,100 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                 "netflix.genie.server.max.idle.host.threshold", 0);
         final int idleHostThresholdDelta = CONF.getInt(
                 "netflix.genie.server.idle.host.threshold.delta", 0);
-        
-        synchronized (this) {
-            final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
-            LOG.info("Number of running jobs: " + numRunningJobs);
 
-            // find an instance with fewer than (numRunningJobs -
-            // idleHostThresholdDelta)
-            int idleHostThreshold = numRunningJobs - idleHostThresholdDelta;
-            // if numRunningJobs is already >= maxRunningJobs, forward
-            // aggressively
-            // but cap it at the max
-            if ((idleHostThreshold > maxIdleHostThreshold)
-                    || (numRunningJobs >= maxRunningJobs)) {
-                idleHostThreshold = maxIdleHostThreshold;
-            }
+        final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
+        LOG.info("Number of running jobs: " + numRunningJobs);
 
-            // check to see if job should be forwarded - only forward it
-            // once. the assumption is that jobForwardThreshold < maxRunningJobs
-            // (set in properties file)
-            if (numRunningJobs >= jobForwardThreshold && !job.isForwarded()) {
-                LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
-                final String idleHost = this.jobCountManager.getIdleInstance(idleHostThreshold);
-                if (!idleHost.equals(NetUtil.getHostName())) {
-                    job.setForwarded(true);
-                    this.stats.incrGenieForwardedJobs();
-                    return forwardJobRequest("http://" + idleHost + ":"
-                            + SERVER_PORT + "/" + JOB_RESOURCE_PREFIX, job);
-                } // else, no idle hosts found - run here if capacity exists
-            }
+        // find an instance with fewer than (numRunningJobs -
+        // idleHostThresholdDelta)
+        int idleHostThreshold = numRunningJobs - idleHostThresholdDelta;
+        // if numRunningJobs is already >= maxRunningJobs, forward
+        // aggressively
+        // but cap it at the max
+        if ((idleHostThreshold > maxIdleHostThreshold)
+                || (numRunningJobs >= maxRunningJobs)) {
+            idleHostThreshold = maxIdleHostThreshold;
+        }
 
-            if (numRunningJobs >= maxRunningJobs) {
-                // if we get here, job can't be forwarded to an idle
-                // instance anymore and current node is overloaded
-                throw new GenieException(
-                        HttpURLConnection.HTTP_UNAVAILABLE,
-                        "Number of running jobs greater than system limit ("
-                        + maxRunningJobs
-                        + ") - try another instance or try again later");
-            }
-            
-            // At this point we have established that the job can be run on this node.
-            // Before running we validate the job and save it in the db if it passes validation.
-            savedJob = validateAndSaveJob(job);
-        } // end synchronize
+        // check to see if job should be forwarded - only forward it
+        // once. the assumption is that jobForwardThreshold < maxRunningJobs
+        // (set in properties file)
+        if (numRunningJobs >= jobForwardThreshold && !job.isForwarded()) {
+            LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
+            final String idleHost = this.jobCountManager.getIdleInstance(idleHostThreshold);
+            if (!idleHost.equals(NetUtil.getHostName())) {
+                job.setForwarded(true);
+                this.stats.incrGenieForwardedJobs();
+                return forwardJobRequest("http://" + idleHost + ":"
+                        + SERVER_PORT + "/" + JOB_RESOURCE_PREFIX, job);
+            } // else, no idle hosts found - run here if capacity exists
+        }
 
-        // try to run the job - return success or error
-        final Job executedJob = runJob(savedJob);
-        return executedJob;
+        if (numRunningJobs >= maxRunningJobs) {
+            // if we get here, job can't be forwarded to an idle
+            // instance anymore and current node is overloaded
+            throw new GenieException(
+                    HttpURLConnection.HTTP_UNAVAILABLE,
+                    "Number of running jobs greater than system limit ("
+                            + maxRunningJobs
+                            + ") - try another instance or try again later");
+        } 
+        return job;
     }
-
-    @Transactional(rollbackFor = GenieException.class)
-    private Job runJob(Job savedJob) {
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    @Transactional
+    public Job runJob(Job job) throws GenieException {
         try {
-            this.jobManagerFactory.getJobManager(savedJob).launch();
+            this.jobManagerFactory.getJobManager(job).launch();
 
             // update entity in DB
             // TODO This udpate runs into deadlock issue, either add manual retries
             // or Spring retries.
-            savedJob.setUpdated(new Date());
-            return savedJob;
+            job = this.jobRepo.findOne(job.getId());
+            job.setUpdated(new Date());
+            return job;
         } catch (final GenieException e) {
             LOG.error("Failed to submit job: ", e);
             // update db
-            savedJob.setJobStatus(JobStatus.FAILED, e.getMessage());
+            job.setJobStatus(JobStatus.FAILED, e.getMessage());
             // increment counter for failed jobs
             this.stats.incrGenieFailedJobs();
-            return savedJob;
-        }
+            throw e;
+       }
     }
 
-    @Transactional(rollbackFor = GenieException.class)
-    private Job validateAndSaveJob(Job job) throws GenieException {
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    @Transactional
+    public Job validateAndSaveJob(final Job job) throws GenieException {
         // validate parameters
         job.validate();
         job.setJobStatus(JobStatus.INIT, "Initializing job");
-        final Job persistedJob;
-        
+
         // Validation successful. init state in DB - return if job already exists
         try {
-            persistedJob = this.jobRepo.save(job);
+            
+            final Job persistedJob = this.jobRepo.save(job);
             // if job can be launched, update the URIs
-            buildJobURIs(persistedJob);
-        } catch (final RollbackException e) {
+            persistedJob.setHostName(NetUtil.getHostName());
+            persistedJob.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/" + persistedJob.getId());
+            persistedJob.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + persistedJob.getId());
+            
+            // increment number of submitted jobs as we have successfully 
+            // persisted it in the database.
+            this.stats.incrGenieJobSubmissions();
+            return persistedJob;
+        } catch (final Exception e) {
             LOG.error("Can't create entity in the database", e);
             if (e.getCause() instanceof EntityExistsException) {
                 // most likely entity already exists - return useful message
@@ -249,16 +281,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                         e);
             }
         }
-        
-        if (persistedJob == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, "Unable to persist job");
-        }
-        
-        // increment number of submitted jobs as we have successfully 
-        // persisted it in the database.
-        this.stats.incrGenieJobSubmissions();
-        return persistedJob;
     }
 
     /**
@@ -268,7 +290,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Job getJobInfo(final String id) throws GenieException {
+    public Job getJob(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -326,7 +348,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     @Override
     @Transactional(readOnly = true)
     public JobStatus getJobStatus(final String id) throws GenieException {
-        return getJobInfo(id).getStatus();
+        return getJob(id).getStatus();
     }
 
     /**
@@ -424,19 +446,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         );
         for (final Job job : jobs) {
             job.setStatus(JobStatus.FAILED);
-            job.setFinishTime(currentTime);
+            job.setFinished(new Date());
             job.setExitCode(SubProcessStatus.ZOMBIE_JOB.code());
             job.setStatusMsg(SubProcessStatus.message(
                     SubProcessStatus.ZOMBIE_JOB.code())
             );
         }
         return jobs.size();
-    }
-
-    private void buildJobURIs(final Job job) throws GenieException {
-        job.setHostName(NetUtil.getHostName());
-        job.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/" + job.getId());
-        job.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + job.getId());
     }
 
     private String getEndPoint() throws GenieException {
@@ -461,28 +477,29 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         HttpResponse clientResponse = null;
         try {
             final RestClient genieClient = (RestClient) ClientFactory
-                    .getNamedClient("genie");
+                    .getNamedClient("genie2");
             final HttpRequest req = HttpRequest.newBuilder()
                     .verb(method).header("Accept", "application/json")
                     .uri(new URI(restURI)).entity(job).build();
             clientResponse = genieClient.execute(req);
-            if (clientResponse != null) {
-                int status = clientResponse.getStatus();
-                LOG.info("Response Status: " + status);
+            if (clientResponse != null && clientResponse.isSuccess()) {
                 return clientResponse.getEntity(Job.class);
             } else {
-                String msg = "Received null response while auto-forwarding request to Genie instance";
-                LOG.error(msg);
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                if (clientResponse != null) {
+                    throw new GenieException(
+                            clientResponse.getStatus(), clientResponse.getEntity(String.class));
+                } else {
+                    throw new GenieException (
+                            HttpURLConnection.HTTP_INTERNAL_ERROR,
+                            "Unknown exception while trying to forward job.");
+                }
             }
-        } catch (final GenieException e) {
-            // just raise it rightaway
-            throw e;
         } catch (final Exception e) {
-            final String msg = "Error while trying to auto-forward request: "
+            if (e instanceof GenieException) {
+                throw (GenieException) e;
+            }
+            final String msg = "Genie Error while trying to auto-forward request: "
                     + e.getMessage();
-            LOG.error(msg, e);
             throw new GenieException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
         } finally {
             if (clientResponse != null) {

@@ -17,6 +17,10 @@
  */
 package com.netflix.genie.server.resources;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
@@ -27,6 +31,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +66,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v2/jobs")
-@Api(value = "/v2/jobs", description = "Manage the available jobs")
+@Api(value = "/v2/jobs", description = "Manage Genie Jobs.")
 @Produces(MediaType.APPLICATION_JSON)
 @Named
 public class JobResource {
@@ -103,41 +109,75 @@ public class JobResource {
             notes = "Submit a new job to run to genie",
             response = Job.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Created", response = Job.class)
+            @ApiResponse(code = HttpURLConnection.HTTP_CREATED, message = "Created", response = Job.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT, message = "Job with ID already exists."),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Precondition Failed"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public Response submitJob(
             @ApiParam(value = "Job object to run.", required = true)
             final Job job,
             @ApiParam(value = "Http Servlet request object", required = true)
             @Context final HttpServletRequest hsr) throws GenieException {
+        
+        if (job == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No job entered. Unable to submit.");
+        }
+        
         // get client's host from the context
+        // TODO : See if we can find a constant string for this
         String clientHost = hsr.getHeader("X-Forwarded-For");
         if (clientHost != null) {
             clientHost = clientHost.split(",")[0];
         } else {
             clientHost = hsr.getRemoteAddr();
         }
-        LOG.debug("called from: " + clientHost);
-        if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job entered. Unable to submit.");
-        }
-
+ 
         // set the clientHost, if it is not overridden already
-        if (StringUtils.isEmpty(clientHost)) {
+        if (StringUtils.isBlank(clientHost)) {
+            LOG.debug("called from: " + clientHost);
             job.setClientHost(clientHost);
         }
 
-        final Job createdJob = this.xs.submitJob(job);
-        if (job.getStatus() == JobStatus.FAILED) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, "Unable to submit job");
-        }
+        //final Job createdJob = this.xs.submitJob(job);
+        final Job createdJob = this.submitJob(job);
+        
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
                 entity(createdJob).
                 build();
+    }
+    
+    private Job submitJob(final Job job) throws GenieException {
+        LOG.debug("Called");
+
+        if (job == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    "No job entered to run");
+        }
+        
+        // Check if the job is forwarded. If not this is the first node that got the request.
+        // So we log it, to track all requests.
+        if (!job.isForwarded()) {
+            LOG.info("Received job request:" + job);
+        }
+        
+        Job forwardCheckedJob = this.xs.checkAbilityToRunOrForward(job);
+        
+        if (forwardCheckedJob.isForwarded()) {
+            return forwardCheckedJob;
+        }
+        
+        // At this point we have established that the job can be run on this node.
+        // Before running we validate the job and save it in the db if it passes validation.
+        final Job savedJob = this.xs.validateAndSaveJob(job);
+        
+        // try to run the job - return success or error
+        return this.xs.runJob(savedJob);
     }
 
     /**
@@ -154,16 +194,18 @@ public class JobResource {
             notes = "Get the job by id if it exists",
             response = Job.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Job.class),
-            @ApiResponse(code = 400, message = "Invalid id supplied"),
-            @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Job.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public Job getJob(
             @ApiParam(value = "Id of the job to get.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
         LOG.debug("called for jobID: " + id);
-        return this.xs.getJobInfo(id);
+        return this.xs.getJob(id);
     }
 
     /**
@@ -180,20 +222,21 @@ public class JobResource {
             notes = "Get the status of job whose id is sent",
             response = String.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = String.class),
-            @ApiResponse(code = 400, message = "Invalid id supplied"),
-            @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = String.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
-    public String getJobStatus(
+    public ObjectNode getJobStatus(
             @ApiParam(value = "Id of the job.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
         LOG.debug("called for jobID" + id);
-        final StringBuilder builder = new StringBuilder();
-        builder.append("{\"status\":\"")
-                .append(this.xs.getJobStatus(id))
-                .append("\"}");
-        return builder.toString();
+        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectNode node = mapper.createObjectNode();
+        node.put("status", this.xs.getJobStatus(id).toString());
+        return node;
     }
 
     /**
@@ -217,7 +260,11 @@ public class JobResource {
             response = Job.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Job.class)
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Job.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public List<Job> getJobs(
             @ApiParam(value = "Id of the job.", required = false)
@@ -266,10 +313,12 @@ public class JobResource {
     @Path("/{id}")
     @ApiOperation(
             value = "Delete a job",
-            notes = "Delete the jobs by the id specified.",
+            notes = "Delete the job with the id specified.",
             response = Job.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Job.class)
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Job.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public Job killJob(
             @ApiParam(value = "Id of the job.", required = true)
@@ -297,9 +346,10 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> addTagsForJob(
             @ApiParam(value = "Id of the job to add configuration to.", required = true)
@@ -327,9 +377,10 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> getTagsForJob(
             @ApiParam(value = "Id of the job to get tags for.", required = true)
@@ -358,9 +409,10 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> updateTagsForJob(
             @ApiParam(value = "Id of the job to update tags for.", required = true)
@@ -388,9 +440,10 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> removeAllTagsForJob(
             @ApiParam(value = "Id of the job to delete from.", required = true)
@@ -417,9 +470,10 @@ public class JobResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Job not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> removeTagForJob(
             @ApiParam(value = "Id of the job to delete from.", required = true)

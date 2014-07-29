@@ -8,7 +8,7 @@
          commandName="pig" 
          status="RUNNING" 
          name="one" 
-		 clusterCriteriaString="y,x|h2query,adhoc" 
+		 clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"   
          commandArgs="-tez"/>
     
@@ -20,7 +20,7 @@
          commandName="hive" 
          status="INIT" 
          name="two" 
-    	 clusterCriteriaString="y,x|h2query,adhoc" 
+    	 clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"
          commandArgs="-tez"/>
     
@@ -31,7 +31,7 @@
          commandId="15"
          commandName="pig"
          status="SUCCEEDED"
-         clusterCriteriaString="y,x|h2query,adhoc" 
+         clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"    
          name="one"
          commandArgs="-tez"/>

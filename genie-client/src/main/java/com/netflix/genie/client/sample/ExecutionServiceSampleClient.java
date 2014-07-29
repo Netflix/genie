@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 public final class ExecutionServiceSampleClient {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceSampleClient.class);
 
     private ExecutionServiceSampleClient() {
@@ -79,7 +79,7 @@ public final class ExecutionServiceSampleClient {
         for (final Job ji : client.getJobs(params)) {
             LOG.info("Job Info: {id, status, finishTime} - {"
                     + ji.getId() + ", " + ji.getStatus() + ", "
-                    + ji.getFinishTime() + "}");
+                    + ji.getFinished    () + "}");
         }
 
         LOG.info("Running Hive job");
@@ -98,7 +98,17 @@ public final class ExecutionServiceSampleClient {
                 commandCriteria,
                 clusterCriterias,
                 null);
+
         job.setDescription("This is a test");
+
+        // Add some tags for metadata about the job. This really helps for reporting on
+        // the jobs and categorization.
+        Set<String> jobTags = new HashSet<String>();
+        jobTags.add("testgenie");
+        jobTags.add("sample");
+
+        job.setTags(jobTags);
+
         // send the query as an attachment
         final File query = File.createTempFile("hive", ".q");
         PrintWriter pw = null;
@@ -113,7 +123,7 @@ public final class ExecutionServiceSampleClient {
         final Set<FileAttachment> attachments = new HashSet<FileAttachment>();
         final FileAttachment attachment = new FileAttachment();
         attachment.setName("hive.q");
-        
+
         FileInputStream fin = null;
         ByteArrayOutputStream bos = null;
         try {

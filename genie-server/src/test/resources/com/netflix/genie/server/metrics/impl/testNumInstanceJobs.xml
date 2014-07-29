@@ -9,8 +9,8 @@
          status="INIT" 
          name="one" 
          commandArgs="-tez"
-         startTime="1404257258339"
-         clusterCriteriaString="y,x|h2query,adhoc" 
+		 started="2014-07-01 16:27:38"   
+         clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"
          version="1"/>
     
@@ -23,10 +23,10 @@
          status="RUNNING" 
          name="two" 
          commandArgs="-tez"
-         clusterCriteriaString="y,x|h2query,adhoc" 
+         clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"    
-         startTime="1404257258340"
-         version="2"/>
+         started="2014-07-01 16:27:38"
+    	 version="2"/>
     
     <Job id="job3" 
          created="2013-06-01 16:04:00" 
@@ -35,11 +35,11 @@
          commandId="15" 
          commandName="pig" 
          status="SUCCEEDED"
-         clusterCriteriaString="y,x|h2query,adhoc" 
+         clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"
          name="three" 
          commandArgs="-tez"
-         startTime="1404257258341"
+		 started="2014-07-01 16:27:38"	
          version="3"/>
     
     <Job id="job4" 
@@ -50,10 +50,10 @@
          commandName="pig" 
          status="KILLED" 
          name="four" 
-         clusterCriteriaString="y,x|h2query,adhoc" 
+         clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"    
          commandArgs="-tez"
-         startTime="1404257258342"
+         started="2014-07-01 16:27:38"
          version="4"/>
     
     <Job id="job5" 
@@ -65,8 +65,8 @@
          status="FAILED" 
          name="five" 
          commandArgs="-tez"
-         clusterCriteriaString="y,x|h2query,adhoc" 
+         clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"    
-         startTime="1404257258343"
+         started="2014-07-01 16:27:38"
          version="5"/>
 </dataset>

@@ -29,6 +29,7 @@ import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.util.NetUtil;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -116,10 +117,10 @@ public class JobCountManagerImpl implements JobCountManager {
         predicates.add(cb.equal(j.get(Job_.hostName), hostName));
         predicates.add(cb.or(runningStatus, initStatus));
         if (minStartTime != null) {
-            predicates.add(cb.ge(j.get(Job_.startTime), minStartTime));
+            predicates.add(cb.greaterThanOrEqualTo(j.get(Job_.started), new Date(minStartTime)));
         }
         if (maxStartTime != null) {
-            predicates.add(cb.lt(j.get(Job_.startTime), maxStartTime));
+            predicates.add(cb.lessThanOrEqualTo(j.get(Job_.started), new Date(maxStartTime)));
         }
         //documentation says that by default predicate array is conjuncted together
         cq.where(predicates.toArray(new Predicate[0]));

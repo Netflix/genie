@@ -25,6 +25,7 @@ import com.netflix.genie.common.model.Job;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -185,7 +186,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             final Job job = getJob(id);
 
             // wait for job to finish - and finish time to be updated
-            if (job.getFinishTime() > 0) {
+            if (job.getFinished() != new Date(0)) {
                 return job;
             }
 

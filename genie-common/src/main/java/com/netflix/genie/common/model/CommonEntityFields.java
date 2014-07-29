@@ -103,7 +103,7 @@ public class CommonEntityFields extends Auditable {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateCommonEntityFields() throws GenieException {
-        this.validate(this.name, this.user, this.version);
+        this.validate(this.name, this.user, this.version, null);
     }
 
     /**
@@ -166,8 +166,13 @@ public class CommonEntityFields extends Auditable {
      */
     @Override
     public void validate() throws GenieException {
-        super.validate();
-        this.validate(this.name, this.user, this.version);
+        String error = null;
+        try {
+            super.validate();
+        } catch (GenieException ge) {
+            error = ge.getMessage();
+        }
+        this.validate(this.name, this.user, this.version, error);
     }
 
     /**
@@ -180,8 +185,12 @@ public class CommonEntityFields extends Auditable {
     private void validate(
             final String name,
             final String user,
-            final String version) throws GenieException {
+            final String version,
+            final String error) throws GenieException {
         final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotBlank(error)) {
+            builder.append(error);
+        }
         if (StringUtils.isBlank(user)) {
             builder.append("User name is missing and is required.\n");
         }

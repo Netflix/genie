@@ -30,6 +30,7 @@ import com.netflix.genie.server.repository.jpa.ClusterRepository;
 import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
+import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
 
 import java.net.HttpURLConnection;
@@ -72,6 +73,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     private final ClusterRepository clusterRepo;
     private final CommandRepository commandRepo;
+    private final JobRepository jobRepo;
     private static final char CRITERIA_DELIMITER = ',';
 
     /**
@@ -83,9 +85,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     @Inject
     public ClusterConfigServiceJPAImpl(
             final ClusterRepository clusterRepo,
-            final CommandRepository commandRepo) {
+            final CommandRepository commandRepo,
+            final JobRepository jobRepo) {
         this.clusterRepo = clusterRepo;
         this.commandRepo = commandRepo;
+        this.jobRepo = jobRepo;
     }
 
     /**
@@ -178,17 +182,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws GenieException
      */
     @Override
-    @Transactional(readOnly = true)
-    public List<Cluster> getClusters(
-            final Job job) throws GenieException {
+    @Transactional
+    public List<Cluster> chooseClusterForJob(
+            final String jobId) throws GenieException {
         LOG.debug("Called");
-        if (job == null) {
-            final String msg = "No job entered. Unable to continue";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
-
-        List<ClusterCriteria> clusterCriterias = job.getClusterCriteria();
+        final Job job = this.jobRepo.findOne(jobId);
+        
+        List<ClusterCriteria> clusterCriterias = job.getClusterCriterias();
         Set<String> commandCriteria = job.getCommandCriteria();
 
         for (final ClusterCriteria clusterCriteria : clusterCriterias) {
