@@ -398,6 +398,7 @@ public class Job extends CommonEntityFields {
             this.tags = new HashSet<String>();
         }
         this.tags.add(this.getId());
+        this.tags.add(this.getName());  
     }
 
     /**
@@ -751,7 +752,7 @@ public class Job extends CommonEntityFields {
     /**
      * Set the startTime for the job.
      *
-     * @param startTime epoch time in ms
+     * @param started epoch time in ms
      */
     public void setStarted(final Date started) {
         this.started = started;
@@ -769,7 +770,7 @@ public class Job extends CommonEntityFields {
     /**
      * Set the finishTime for the job.
      *
-     * @param finishTimestamp
+     * @param finished
      */
     public void setFinished(final Date finished) {
         this.finished = finished;
@@ -1012,9 +1013,12 @@ public class Job extends CommonEntityFields {
     /**
      * Gets the tags allocated to this job.
      *
-     * @return the tags as an unmodifiable list
+     * @return the tags as a list
      */
     public Set<String> getTags() {
+        if (this.tags == null) {
+            this.tags = new HashSet<String>();
+        }
         return this.tags;
     }
 

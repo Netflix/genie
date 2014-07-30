@@ -197,7 +197,7 @@ public class TestCommand {
      */
     @Test
     public void testSetTags() {
-        Assert.assertNull(this.c.getTags());
+        Assert.assertNotNull(this.c.getTags());
         final Set<String> tags = new HashSet<String>();
         tags.add("tag1");
         tags.add("tag2");

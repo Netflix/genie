@@ -15,7 +15,6 @@
  */
 package com.netflix.genie.server.repository.jpa;
 
-import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
 import java.util.ArrayList;
@@ -68,7 +67,7 @@ public final class CommandSpecs {
                 }
                 if (tags != null) {
                     for (final String tag : tags) {
-                        predicates.add(cb.isMember(tag,root.get(Command_.tags)));
+                        predicates.add(cb.isMember(tag, root.get(Command_.tags)));
                     }
                 }
                 return cb.and(predicates.toArray(new Predicate[0]));

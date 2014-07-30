@@ -33,12 +33,56 @@ GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/jobs'
-# works
+def testConflictJob():
+    print serviceUrl
+    print "Running testJsonSubmitjob "
+    clusterTags = json.dumps([{"tags" : ['adhoc','h2query']}])
+    cmdTags = json.dumps(['pig11_mr2'])
+    payload = '''
+        {
+            "id":"testblah",
+            "name": "Genie2TestPigJob", 
+            "clusterCriterias" : ''' + clusterTags + ''',
+            "user" : "genietest", 
+            "version" : "1",
+            "group" : "hadoop", 
+            "commandArgs" : "-f pig2.q", 
+            "commandCriteria" :''' + cmdTags + ''',
+            "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/pig2.q"
+        }
+    '''
+    print payload
+    print "\n"
+    jobs.submitJob(serviceUrl, payload)
+    sleep(30)
+    return jobs.submitJob(serviceUrl, payload)
 
-def testJsonSubmitjob():
+def testNoClusterJob():
     print serviceUrl
     print "Running testJsonSubmitjob "
     clusterTags = json.dumps([{"tags" : ['adhoc','h2query1']}])
+    cmdTags = json.dumps(['pig11_mr2'])
+    payload = '''
+        {
+            "id":"''' + jobID +'''",
+            "name": "Genie2TestPigJob", 
+            "clusterCriterias" : ''' + clusterTags + ''',
+            "user" : "genietest", 
+            "version" : "1",
+            "group" : "hadoop", 
+            "commandArgs" : "-f pig2.q", 
+            "commandCriteria" :''' + cmdTags + ''',
+            "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/pig2.q"
+        }
+    '''
+    print payload
+    print "\n"
+    return jobs.submitJob(serviceUrl, payload)
+
+def testGoodJob():
+    print serviceUrl
+    print "Running testJsonSubmitjob "
+    clusterTags = json.dumps([{"tags" : ['adhoc','h2query']}])
     cmdTags = json.dumps(['pig11_mr2'])
     payload = '''
         {
@@ -61,7 +105,9 @@ def testJsonSubmitjob():
 if __name__ == "__main__":
    print "Running unit tests:\n"
    try:
-    jobID = testJsonSubmitjob()
+    jobID = testConflictJob()
+    #jobID = jobs.submitJob()
+    #jobID = testGoodJob()
    except urllib2.HTTPError, e:
     print "Caught Exception"
     print "code = " + str(e.code)

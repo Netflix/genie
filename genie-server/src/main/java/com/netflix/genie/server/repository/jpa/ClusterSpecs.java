@@ -86,7 +86,7 @@ public final class ClusterSpecs {
                 }
                 if (tags != null) {
                     for (final String tag : tags) {
-                        predicates.add(cb.isMember(tag,root.get(Cluster_.tags)));
+                        predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
                     }
                 }
                 if (statuses != null && !statuses.isEmpty()) {

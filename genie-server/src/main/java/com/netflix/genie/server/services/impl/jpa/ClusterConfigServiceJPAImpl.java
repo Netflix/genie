@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
 
-import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.ClusterStatus;
@@ -29,13 +28,11 @@ import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.server.repository.jpa.ClusterRepository;
 import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
-import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -43,11 +40,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -158,20 +150,20 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final Long maxUpdateTime,
             final int limit,
             final int page) throws GenieException {
-        
+
         LOG.debug("called");
-        
+
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
                 limit < 0 ? 1024 : limit
         );
-        
+
         return this.clusterRepo.findAll(
                 ClusterSpecs.findByNameAndStatusesAndTagsAndUpdateTime(
-                        name, 
-                        statuses, 
-                        tags, 
-                        minUpdateTime, 
+                        name,
+                        statuses,
+                        tags,
+                        minUpdateTime,
                         maxUpdateTime),
                 pageRequest).getContent();
     }
@@ -187,7 +179,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final String jobId) throws GenieException {
         LOG.debug("Called");
         final Job job = this.jobRepo.findOne(jobId);
-        
+
         List<ClusterCriteria> clusterCriterias = job.getClusterCriterias();
         Set<String> commandCriteria = job.getCommandCriteria();
 

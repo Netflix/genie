@@ -73,7 +73,7 @@ public final class ApplicationServiceSampleClient {
 //        //Initialize Eureka, if it is being used
 //        LOG.info("Initializing Eureka");
 //        ApplicationServiceClient.initEureka("test");
-        
+
         LOG.info("Initializing list of Genie servers");
         ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
                 "localhost:7001");

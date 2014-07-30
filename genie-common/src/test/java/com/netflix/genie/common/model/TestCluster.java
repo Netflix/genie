@@ -62,7 +62,7 @@ public class TestCluster {
         Assert.assertNull(this.c.getConfigs());
         Assert.assertNull(this.c.getName());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, this.c.getStatus());
-        Assert.assertNull(this.c.getTags());
+        Assert.assertNotNull(this.c.getTags());
         Assert.assertNull(this.c.getUser());
         Assert.assertNull(this.c.getVersion());
     }
@@ -80,7 +80,7 @@ public class TestCluster {
         Assert.assertEquals(this.configs, this.c.getConfigs());
         Assert.assertEquals(NAME, this.c.getName());
         Assert.assertEquals(ClusterStatus.UP, this.c.getStatus());
-        Assert.assertNull(this.c.getTags());
+        Assert.assertNotNull(this.c.getTags());
         Assert.assertEquals(USER, this.c.getUser());
         Assert.assertEquals(VERSION, this.c.getVersion());
     }
@@ -195,7 +195,7 @@ public class TestCluster {
      */
     @Test
     public void testSetTags() throws GenieException {
-        Assert.assertNull(this.c.getTags());
+        Assert.assertNotNull(this.c.getTags());
         final Set<String> tags = new HashSet<String>();
         tags.add("prod");
         tags.add("sla");

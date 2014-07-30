@@ -69,7 +69,7 @@ public final class ApplicationSpecs {
                 }
                 if (tags != null) {
                     for (final String tag : tags) {
-                        predicates.add(cb.isMember(tag,root.get(Application_.tags)));
+                        predicates.add(cb.isMember(tag, root.get(Application_.tags)));
                     }
                 }
                 return cb.and(predicates.toArray(new Predicate[0]));

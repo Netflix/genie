@@ -88,7 +88,7 @@ public final class JobManagerFactory implements ApplicationContextAware {
             LOG.error(msg);
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
-            
+
         // Figure out a cluster to run this job. Cluster selection is done based on
         // ClusterCriteria tags and Command tags specified in the job.
         final Cluster cluster = this.clb.selectCluster(this.ccs.chooseClusterForJob(job.getId()));

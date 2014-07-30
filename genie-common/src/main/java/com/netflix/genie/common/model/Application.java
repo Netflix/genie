@@ -141,6 +141,7 @@ public class Application extends CommonEntityFields {
             this.tags = new HashSet<String>();
         }
         this.tags.add(this.getId());
+        this.tags.add(this.getName());  
     }
 
     /**
@@ -241,6 +242,9 @@ public class Application extends CommonEntityFields {
      * @return the tags as an unmodifiable list
      */
     public Set<String> getTags() {
+        if (this.tags == null) {
+            this.tags = new HashSet<String>();
+        }
         return this.tags;
     }
 

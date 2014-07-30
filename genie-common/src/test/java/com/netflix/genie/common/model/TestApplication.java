@@ -161,7 +161,7 @@ public class TestApplication {
      */
     @Test
     public void testSetTags() {
-        Assert.assertNull(this.a.getTags());
+        Assert.assertNotNull(this.a.getTags());
         final Set<String> tags = new HashSet<String>();
         tags.add("tag1");
         tags.add("tag2");

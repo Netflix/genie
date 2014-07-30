@@ -128,26 +128,33 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         if (job == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No job entered to run");
         }
-        
+
+        if (StringUtils.isNotBlank(job.getId()) && this.jobRepo.exists(job.getId())) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_CONFLICT,
+                    "Job with ID specified already exists."
+                    );
+        }
+
         // Check if the job is forwarded. If not this is the first node that got the request.
         // So we log it, to track all requests.
         if (!job.isForwarded()) {
             LOG.info("Received job request:" + job);
         }
-        
+
         Job forwardCheckedJob = checkAbilityToRunOrForward(job);
-        
+
         if (forwardCheckedJob.isForwarded()) {
             return forwardCheckedJob;
         }
-        
+
         // At this point we have established that the job can be run on this node.
         // Before running we validate the job and save it in the db if it passes validation.
         final Job savedJob = this.jobService.validateAndSaveJob(job);
-        
+
         // try to run the job - return success or error
         return this.jobService.runJob(savedJob);
     }
@@ -338,7 +345,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     throw new GenieException(
                             clientResponse.getStatus(), clientResponse.getEntity(String.class));
                 } else {
-                    throw new GenieException (
+                    throw new GenieException(
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
                             "Unknown exception while trying to forward job.");
                 }

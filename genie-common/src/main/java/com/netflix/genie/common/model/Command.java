@@ -164,6 +164,7 @@ public class Command extends CommonEntityFields {
            this.tags = new HashSet<String>();
         }
         this.tags.add(this.getId());
+        this.tags.add(this.getName());       
     }
 
     /**
@@ -274,6 +275,9 @@ public class Command extends CommonEntityFields {
      * @return the tags as an unmodifiable list
      */
     public Set<String> getTags() {
+        if (this.tags == null) {
+            this.tags = new HashSet<String>();
+        }
         return this.tags;
     }
 
