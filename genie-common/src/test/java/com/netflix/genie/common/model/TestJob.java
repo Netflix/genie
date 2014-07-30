@@ -38,7 +38,7 @@ public class TestJob {
     public void testSetJobStatus() {
         Job job = new Job();
         Date dt = new Date(0);
-        
+
         // finish time is 0 on initialization
         Assert.assertTrue(dt.compareTo(job.getFinished()) == 0);
 

@@ -25,6 +25,7 @@ import jobs
 import json
 import os
 import uuid
+import urllib2
 
 jobID = "job-" + str(uuid.uuid4())
 # the S3 prefix where the tests are located
@@ -33,8 +34,8 @@ GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/jobs'
 # works
-clusterTags = json.dumps([{"tags" : ['adhoc','h2query']}])
-cmdTags = json.dumps(['prodhive11_mr2'])
+clusterTags = json.dumps([{"tags" : ['shadowtest_20120716']}])
+cmdTags = json.dumps(['hive'])
 
 print clusterTags
 
@@ -45,12 +46,12 @@ def testJsonSubmitjob():
         {
             "name": "Genie2TestHiveJob", 
             "clusterCriterias" : ''' + clusterTags + ''',
-            "user" : "genietest", 
+            "user" : "ursula", 
             "version" : "1",
             "group" : "hadoop", 
-            "commandArgs" : "-f hive.q", 
+            "commandArgs" : "-f test.q", 
             "commandCriteria" :''' + cmdTags + ''',
-            "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hive.q"
+            "fileDependencies":"s3n://netflix-dataoven-test-users/tochen/genie2/test.q"
         }
     '''
     print payload
@@ -60,8 +61,14 @@ def testJsonSubmitjob():
 # driver method for all tests                
 if __name__ == "__main__":
    print "Running unit tests:\n"
-   jobID = testJsonSubmitjob()
-   print "\n"
+   try:
+    jobID = testJsonSubmitjob()
+   except urllib2.HTTPError, e:
+    print "Caught Exception"
+    print "code = " + str(e.code)
+    print "message =" + e.msg
+    print "read =" + e.read()
+    sys.exit(0)
    while True:
        print jobs.getJobInfo(serviceUrl, jobID)
        print "\n"

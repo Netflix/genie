@@ -117,7 +117,8 @@ public class JobResource {
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
             @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT, message = "Job with ID already exists."),
             @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Precondition Failed"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, 
+                            message = "Genie Server Error due to Unknown Exception")
     })
     public Response submitJob(
             @ApiParam(value = "Job object to run.", required = true)

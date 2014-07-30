@@ -17,7 +17,6 @@ package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Application_;
-import com.netflix.genie.common.model.Command_;
 
 import java.util.ArrayList;
 import java.util.List;

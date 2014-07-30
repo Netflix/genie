@@ -153,7 +153,7 @@ public class Cluster extends CommonEntityFields {
             this.tags = new HashSet<String>();
         }
         this.tags.add(this.getId());
-        this.tags.add(this.getName());  
+        this.tags.add(this.getName());
     }
 
     /**

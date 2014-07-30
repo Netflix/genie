@@ -79,7 +79,7 @@ public final class ExecutionServiceSampleClient {
         for (final Job ji : client.getJobs(params)) {
             LOG.info("Job Info: {id, status, finishTime} - {"
                     + ji.getId() + ", " + ji.getStatus() + ", "
-                    + ji.getFinished    () + "}");
+                    + ji.getFinished() + "}");
         }
 
         LOG.info("Running Hive job");

@@ -105,9 +105,9 @@ def testGoodJob():
 if __name__ == "__main__":
    print "Running unit tests:\n"
    try:
-    jobID = testConflictJob()
+    #jobID = testConflictJob()
     #jobID = jobs.submitJob()
-    #jobID = testGoodJob()
+    jobID = testGoodJob()
    except urllib2.HTTPError, e:
     print "Caught Exception"
     print "code = " + str(e.code)
