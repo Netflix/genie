@@ -112,7 +112,7 @@ public class ApplicationConfigResource {
     public Response createApplication(
             @ApiParam(value = "The application to create.", required = true)
             final Application app) throws GenieException {
-        LOG.debug("Called to create new application");
+        LOG.info("Called to create new application");
         final Application createdApp = this.acs.createApplication(app);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
@@ -144,7 +144,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to get.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called");
+        LOG.info("Called to get Application for id " + id);
         return this.acs.getApplication(id);
     }
 
@@ -186,7 +186,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit")
             @DefaultValue("1024") int limit) {
-        LOG.debug("called");
+        LOG.info("Called to get Applications");
         return this.acs.getApplications(name, userName, tags, page, limit);
     }
 
@@ -216,7 +216,7 @@ public class ApplicationConfigResource {
             final String id,
             @ApiParam(value = "The application information to update.", required = true)
             final Application updateApp) throws GenieException {
-        LOG.debug("called to update application config with info " + updateApp.toString());
+        LOG.info("called to update application config with info " + updateApp.toString());
         return this.acs.updateApplication(id, updateApp);
     }
 
@@ -238,7 +238,7 @@ public class ApplicationConfigResource {
             @ApiResponse(code = 404, message = "Application not found")
     })
     public List<Application> deleteAllApplications() throws GenieException {
-        LOG.debug("called");
+        LOG.info("Delete all Applications");
         return this.acs.deleteAllApplications();
     }
 
@@ -264,7 +264,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to delete.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("called");
+        LOG.info("Delete an application with id " + id);
         return this.acs.deleteApplication(id);
     }
 
@@ -296,7 +296,7 @@ public class ApplicationConfigResource {
             final String id,
             @ApiParam(value = "The configuration files to add.", required = true)
             final Set<String> configs) throws GenieException {
-        LOG.debug("Called with id " + id + " and config " + configs);
+        LOG.info("Called with id " + id + " and config " + configs);
         return this.acs.addConfigsToApplication(id, configs);
     }
 
@@ -324,7 +324,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to get configurations for.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.acs.getConfigsForApplication(id);
     }
 
@@ -357,7 +357,7 @@ public class ApplicationConfigResource {
             final String id,
             @ApiParam(value = "The configuration files to replace existing with.", required = true)
             final Set<String> configs) throws GenieException {
-        LOG.debug("Called with id " + id + " and configs " + configs);
+        LOG.info("Called with id " + id + " and configs " + configs);
         return this.acs.updateConfigsForApplication(id, configs);
     }
 
@@ -385,7 +385,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to delete from.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.acs.removeAllConfigsForApplication(id);
     }
 
@@ -417,7 +417,7 @@ public class ApplicationConfigResource {
             final String id,
             @ApiParam(value = "The jar files to add.", required = true)
             final Set<String> jars) throws GenieException {
-        LOG.debug("Called with id " + id + " and jars " + jars);
+        LOG.info("Called with id " + id + " and jars " + jars);
         return this.acs.addJarsForApplication(id, jars);
     }
 
@@ -445,7 +445,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to get the jars for.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.acs.getJarsForApplication(id);
     }
 
@@ -478,7 +478,7 @@ public class ApplicationConfigResource {
             final String id,
             @ApiParam(value = "The jar files to replace existing with.", required = true)
             final Set<String> jars) throws GenieException {
-        LOG.debug("Called with id " + id + " and jars " + jars);
+        LOG.info("Called with id " + id + " and jars " + jars);
         return this.acs.updateJarsForApplication(id, jars);
     }
 
@@ -506,7 +506,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to delete from.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.acs.removeAllJarsForApplication(id);
     }
 
@@ -538,7 +538,7 @@ public class ApplicationConfigResource {
             final String id,
             @ApiParam(value = "The tags to add.", required = true)
             final Set<String> tags) throws GenieException {
-        LOG.debug("Called with id " + id + " and config " + tags);
+        LOG.info("Called with id " + id + " and config " + tags);
         return this.acs.addTagsForApplication(id, tags);
     }
 
@@ -566,7 +566,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to get tags for.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.acs.getTagsForApplication(id);
     }
 
@@ -599,7 +599,7 @@ public class ApplicationConfigResource {
             final String id,
             @ApiParam(value = "The tags to replace existing with.", required = true)
             final Set<String> tags) throws GenieException {
-        LOG.debug("Called with id " + id + " and tags " + tags);
+        LOG.info("Called with id " + id + " and tags " + tags);
         return this.acs.updateTagsForApplication(id, tags);
     }
 
@@ -627,7 +627,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to delete from.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.acs.removeAllTagsForApplication(id);
     }
 
@@ -655,7 +655,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "Id of the application to get the commands for.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.acs.getCommandsForApplication(id);
     }
 
@@ -687,7 +687,7 @@ public class ApplicationConfigResource {
             @ApiParam(value = "The tag to remove.", required = true)
             @PathParam("tag")
             final String tag) throws GenieException {
-        LOG.debug("Called with id " + id + " and tag " + tag);
+        LOG.info("Called with id " + id + " and tag " + tag);
         return this.acs.removeTagForApplication(id, tag);
     }
 }
