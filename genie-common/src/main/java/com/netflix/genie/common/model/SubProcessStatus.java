@@ -87,8 +87,7 @@ public enum SubProcessStatus {
     /**
      *  Command Run Failure.
      */
-    COMMAND_RUN_FAILURE(213)
-    ;
+    COMMAND_RUN_FAILURE(213);
 
     // A map of all status-es and their corresponding messages
     private static final Map<Integer, String> STATUS_MAP = new HashMap<Integer, String>();

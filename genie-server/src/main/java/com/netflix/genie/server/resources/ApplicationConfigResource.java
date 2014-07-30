@@ -102,12 +102,12 @@ public class ApplicationConfigResource {
             response = Application.class)
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_CREATED, message = "Application created successfully.",
-                            response = Application.class),
+                    response = Application.class),
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid required parameter supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT, 
-                            message = "An application with the supplied id already exists"),
+            @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT,
+                    message = "An application with the supplied id already exists"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            message = "Genie Server Error due to Unknown Exception")
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Response createApplication(
             @ApiParam(value = "The application to create.", required = true)
@@ -138,7 +138,7 @@ public class ApplicationConfigResource {
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        message = "Genie Server Error due to Unknown Exception")
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Application getApplication(
             @ApiParam(value = "Id of the application to get.", required = true)
@@ -153,7 +153,7 @@ public class ApplicationConfigResource {
      *
      * @param name     name for configuration (optional)
      * @param userName the user who created the application (optional)
-     * @param tags The set of tags you want the command for.
+     * @param tags     The set of tags you want the command for.
      * @param page     The page to start one (optional)
      * @param limit    the max number of results to return per page (optional)
      * @return All applications matching the criteria
