@@ -29,43 +29,20 @@ import restclient
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/commands'
 
-def addCommandConfigProdhive11Mr1():
-    print "Adding Command prodhive11_mr1"
-    ID = "prodhive11_mr1"
-    configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
-    tags = json.dumps(['tag1','tag2','tag3'])
-    apps = json.dumps([{"id":"mr1"}])
-    payload = '''
-    {
-        "id":"''' + ID +'''",
-        "name": "prodhive", 
-        "status" : "ACTIVE",
-        "executable": "/apps/hive/0.11/bin/hive",
-        "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/envFile.sh",
-        "user" : "amsharma", 
-        "version" : "0.11",
-        "tags": ''' + tags + ''',
-        "configs": ''' + configs + '''
-    }
-    '''
-    print payload
-    print "\n"
-    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
-
-def addCommandConfigHadoop103():
-    print "Adding Command hadoop103"
-    ID = "hadoop103"
-    tags = json.dumps(['tag1','tag2','tag3'])
-    apps = json.dumps([{"id":"mr1"}])
+def addCommandConfigHadoop240():
+    print "Adding Command hadoop240"
+    ID = "hadoop240"
+    tags = json.dumps(['hadoop240'])
     payload = '''
     {
         "id":"''' + ID +'''",
         "name": "hadoop", 
         "status" : "ACTIVE",
-        "executable": "/apps/hadoop/1.0.3/bin/hadoop",
+        "executable": "/apps/hadoop/2.4.0/bin/hadoop",
         "user" : "amsharma", 
         "tags": ''' + tags + ''',
-        "version" : "1.0.3"
+        "jobType" : "hadoop",
+        "version" : "2.4.0"
     }
     '''
 
@@ -76,44 +53,24 @@ def addCommandConfigHadoop103():
 def addCommandConfigProdhive11Mr2():
     print "Adding Command prodhive11_mr2"
     ID = "prodhive11_mr2"
-    configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
-    tags = json.dumps(['tag1','tag2','tag3'])
+    configs = json.dumps(['s3://netflix-dataoven-prod/genie/config/hiveconf-prodhive-011-h24/hive-site.xml','s3://netflix-dataoven-test/genie2/command/prodhive11_mr1/hive-default.xml'])
+    tags = json.dumps(['hive','prod','0.11-h24'])
     apps = json.dumps([{"id":"mr2"}])
     payload = '''
     {
         "id":"''' + ID +'''",
         "name": "prodhive", 
         "status" : "ACTIVE",
-        "executable": "/apps/hive/0.11/bin/hive",
+        "executable": "/apps/hive/0.11-h2/bin/hive",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr2/envFile.sh",
         "user" : "amsharma", 
-        "version" : "0.11",
+        "version" : "0.11-h2",
         "tags": ''' + tags + ''',
+        "jobType" : "hive",
         "configs": ''' + configs + '''
     }
     '''
 
-    print payload
-    print "\n"
-    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
-
-def addCommandConfigPig11Mr1():
-    print "Adding Command pig11_mr1"
-    ID = "pig11_mr1"
-    tags = json.dumps(['tag1','tag2','tag3'])
-    apps = json.dumps([{"id":"mr1"}])
-    payload = '''
-    {
-        "id":"''' + ID +'''",
-        "name": "pig", 
-        "status" : "ACTIVE",
-        "executable": "/apps/pig/0.11/bin/pig",
-        "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr1/envFile.sh",
-        "user" : "amsharma", 
-        "tags": ''' + tags + ''',
-        "version" : "0.11"
-    }
-    '''
     print payload
     print "\n"
     print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
@@ -131,6 +88,7 @@ def addCommandConfigPig11Mr2():
         "executable": "/apps/pig/0.11-h2/bin/pig",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig11_mr2/envFile.sh",
         "user" : "amsharma", 
+        "jobType" : "pig",
         "tags": ''' + tags + ''',
         "version" : "0.11-h2"
     }
@@ -152,6 +110,7 @@ def addCommandConfigPig13Mr2():
         "executable": "/apps/pig/0.13/bin/pig",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh",
         "user" : "amsharma", 
+        "jobType" : "pig",
         "tags": ''' + tags + ''',
         "version" : "0.13"
     }
@@ -170,10 +129,11 @@ def addCommandConfigUrsulaHive():
         "id":"''' + ID +'''",
         "name": "ursulahive", 
         "status" : "ACTIVE",
-        "executable": "/apps/hive/0.11/bin/hive",
+        "executable": "/apps/hive/0.11-h2/bin/hive",
         "envPropFile": "s3://netflix-dataoven-test/genie2/command/prodhive11_mr2/envFile.sh",
         "user" : "amsharma", 
         "version" : "0.11-h2",
+        "jobType" : "hive",
         "tags": ''' + tags + ''',
         "configs": ''' + configs + '''
     }
@@ -187,10 +147,8 @@ if __name__ == "__main__":
    print "Adding Commands: \n"
    print "\n"
 
-   addCommandConfigProdhive11Mr1()
+   addCommandConfigHadoop240()
    addCommandConfigProdhive11Mr2()
-   addCommandConfigPig11Mr1()
    addCommandConfigPig11Mr2()
    addCommandConfigPig13Mr2()
-   addCommandConfigHadoop103()
    addCommandConfigUrsulaHive()
