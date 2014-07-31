@@ -335,8 +335,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Whether this job was forwared or not.")
-    private boolean forwarded;
+            value = "Whether this job was forwarded or not.")
+    private boolean forwarded = false;
 
     /**
      * Location of logs being archived to s3.

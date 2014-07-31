@@ -47,10 +47,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -131,9 +128,12 @@ public class JobResource {
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No job entered. Unable to submit.");
         }
+        // Save whether the job was forwarded from this host
+        final boolean forwarded = job.isForwarded();
 
         // get client's host from the context
         // TODO : See if we can find a constant string for this
+        // TODO: Where is this set?
         String clientHost = hsr.getHeader("X-Forwarded-For");
         if (clientHost != null) {
             clientHost = clientHost.split(",")[0];
@@ -149,10 +149,14 @@ public class JobResource {
 
         final Job createdJob = this.xs.submitJob(job);
 
-        return Response.created(
-                this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
-                entity(createdJob).
-                build();
+        if (forwarded) {
+            return Response.ok().entity(createdJob).build();
+        } else {
+            return Response.created(
+                    this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
+                    entity(createdJob).
+                    build();
+        }
     }
 
     /**

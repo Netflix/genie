@@ -49,6 +49,7 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.Client;
@@ -351,8 +352,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final Client jerseyClient = Client.create(clientConfig);
             genieClient.setJerseyClient(jerseyClient);
             final HttpRequest req = HttpRequest.newBuilder()
-                    .verb(method).header("Accept", MediaType.APPLICATION_JSON)
-                    .header("Content-Type", MediaType.APPLICATION_JSON)
+                    .verb(method).header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                     .uri(new URI(restURI)).entity(job).build();
             clientResponse = genieClient.execute(req);
             if (clientResponse != null && clientResponse.isSuccess()) {
