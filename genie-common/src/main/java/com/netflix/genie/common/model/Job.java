@@ -61,7 +61,7 @@ public class Job extends CommonEntityFields {
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
     private static final char CRITERIA_SET_DELIMITER = '|';
     private static final char CRITERIA_DELIMITER = ',';
-    private static final String DEFAULT_VERSION = "-1";
+    private static final String DEFAULT_VERSION = "NA";
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
@@ -351,6 +351,10 @@ public class Job extends CommonEntityFields {
      */
     public Job() {
         super();
+        // Set version to default if not specified
+        if (StringUtils.isBlank(this.getVersion())) {
+            this.setVersion(DEFAULT_VERSION);
+        }
     }
 
     /**
@@ -378,6 +382,7 @@ public class Job extends CommonEntityFields {
         this.clusterCriterias = clusterCriterias;
         this.commandCriteria = commandCriteria;
 
+        // Set version to default if not specified
         if (StringUtils.isBlank(this.getVersion())) {
             this.setVersion(DEFAULT_VERSION);
         }
