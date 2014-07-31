@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.netflix.client.ClientFactory;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
@@ -39,13 +41,19 @@ import com.netflix.niws.client.http.RestClient;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.core.MediaType;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -334,8 +342,15 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         try {
             final RestClient genieClient = (RestClient) ClientFactory
                     .getNamedClient("genie2");
+            //Force jersey to properly serialize JSON
+            final Set<Class<?>> providers = new HashSet<Class<?>>();
+            providers.add(JacksonJaxbJsonProvider.class);
+            providers.add(JacksonJsonProvider.class);
+            final ClientConfig clientConfig = new DefaultClientConfig(providers);
+            final Client jerseyClient = Client.create(clientConfig);
+            genieClient.setJerseyClient(jerseyClient);
             final HttpRequest req = HttpRequest.newBuilder()
-                    .verb(method).header("Accept", "application/json")
+                    .verb(method).header("Accept", MediaType.APPLICATION_JSON)
                     .uri(new URI(restURI)).entity(job).build();
             clientResponse = genieClient.execute(req);
             if (clientResponse != null && clientResponse.isSuccess()) {

@@ -25,6 +25,7 @@ import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
+
 import java.io.ByteArrayOutputStream;
 
 import java.io.File;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +56,8 @@ public final class ExecutionServiceSampleClient {
     /**
      * Main for running client code .
      *
-     * @param args
-     * @throws java.lang.Exception
+     * @param args command line arguments
+     * @throws Exception
      */
     public static void main(final String[] args) throws Exception {
 

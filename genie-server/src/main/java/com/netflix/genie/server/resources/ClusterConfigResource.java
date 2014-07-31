@@ -111,7 +111,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "The cluster to create.", required = true)
             final Cluster cluster)
             throws GenieException {
-        LOG.debug("called to create new cluster");
+        LOG.info("Called to create new cluster " + cluster);
         final Cluster createdCluster = this.ccs.createCluster(cluster);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdCluster.getId()).build()).
@@ -141,7 +141,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to get.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("called with id: " + id);
+        LOG.info("Called with id: " + id);
         return this.ccs.getCluster(id);
     }
 
@@ -191,7 +191,20 @@ public class ClusterConfigResource {
             @QueryParam("limit")
             @DefaultValue("1024") int limit)
             throws GenieException {
-        LOG.debug("called");
+        LOG.info("Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page | limit");
+        LOG.info(name
+                + " | "
+                + statuses
+                + " | "
+                + tags
+                + " | "
+                + minUpdateTime
+                + " | "
+                + maxUpdateTime
+                + " | "
+                + page
+                + " | "
+                + limit);
         //Create this conversion internal in case someone uses lower case by accident?
         List<ClusterStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
@@ -231,7 +244,7 @@ public class ClusterConfigResource {
             final String id,
             @ApiParam(value = "The cluster information to update with.", required = true)
             final Cluster updateCluster) throws GenieException {
-        LOG.debug("called to create/update cluster");
+        LOG.info("Called to update cluster with id " + id + " update fields " + updateCluster);
         return this.ccs.updateCluster(id, updateCluster);
     }
 
@@ -257,7 +270,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to delete.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("delete called for id: " + id);
+        LOG.info("Delete called for id: " + id);
         return this.ccs.deleteCluster(id);
     }
 
@@ -279,7 +292,7 @@ public class ClusterConfigResource {
             @ApiResponse(code = 404, message = "Cluster not found")
     })
     public List<Cluster> deleteAllClusters() throws GenieException {
-        LOG.debug("called");
+        LOG.info("called");
         return this.ccs.deleteAllClusters();
     }
 
@@ -311,7 +324,7 @@ public class ClusterConfigResource {
             final String id,
             @ApiParam(value = "The configuration files to add.", required = true)
             final Set<String> configs) throws GenieException {
-        LOG.debug("Called with id " + id + " and config " + configs);
+        LOG.info("Called with id " + id + " and config " + configs);
         return this.ccs.addConfigsForCluster(id, configs);
     }
 
@@ -339,7 +352,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to get configurations for.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.ccs.getConfigsForCluster(id);
     }
 
@@ -372,7 +385,7 @@ public class ClusterConfigResource {
             final String id,
             @ApiParam(value = "The configuration files to replace existing with.", required = true)
             final Set<String> configs) throws GenieException {
-        LOG.debug("Called with id " + id + " and configs " + configs);
+        LOG.info("Called with id " + id + " and configs " + configs);
         return this.ccs.updateConfigsForCluster(id, configs);
     }
 
@@ -399,13 +412,13 @@ public class ClusterConfigResource {
             @ApiResponse(code = 400, message = "Invalid ID supplied"),
             @ApiResponse(code = 404, message = "cluster not found")
     })
-    public List<Command> addCommandsForcluster(
+    public List<Command> addCommandsForCluster(
             @ApiParam(value = "Id of the cluster to add commands to.", required = true)
             @PathParam("id")
             final String id,
             @ApiParam(value = "The commands to add.", required = true)
             final List<Command> commands) throws GenieException {
-        LOG.debug("Called with id " + id + " and commands " + commands);
+        LOG.info("Called with id " + id + " and commands " + commands);
         return this.ccs.addCommandsForCluster(id, commands);
     }
 
@@ -433,7 +446,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to get commands for.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.ccs.getCommandsForCluster(id);
     }
 
@@ -467,7 +480,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "The commands to replace existing with. Should already be created",
                     required = true)
             final List<Command> commands) throws GenieException {
-        LOG.debug("Called with id " + id + " and configs " + commands);
+        LOG.info("Called with id " + id + " and commands " + commands);
         return this.ccs.updateCommandsForCluster(id, commands);
     }
 
@@ -495,7 +508,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.ccs.removeAllCommandsForCluster(id);
     }
 
@@ -527,7 +540,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "The id of the command to remove.", required = true)
             @PathParam("cmdId")
             final String cmdId) throws GenieException {
-        LOG.debug("Called with id " + id + " and command id " + cmdId);
+        LOG.info("Called with id " + id + " and command id " + cmdId);
         return this.ccs.removeCommandForCluster(id, cmdId);
     }
 
@@ -559,7 +572,7 @@ public class ClusterConfigResource {
             final String id,
             @ApiParam(value = "The tags to add.", required = true)
             final Set<String> tags) throws GenieException {
-        LOG.debug("Called with id " + id + " and config " + tags);
+        LOG.info("Called with id " + id + " and tags " + tags);
         return this.ccs.addTagsForCluster(id, tags);
     }
 
@@ -587,7 +600,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to get tags for.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.ccs.getTagsForCluster(id);
     }
 
@@ -620,7 +633,7 @@ public class ClusterConfigResource {
             final String id,
             @ApiParam(value = "The tags to replace existing with.", required = true)
             final Set<String> tags) throws GenieException {
-        LOG.debug("Called with id " + id + " and tags " + tags);
+        LOG.info("Called with id " + id + " and tags " + tags);
         return this.ccs.updateTagsForCluster(id, tags);
     }
 
@@ -648,7 +661,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
             @PathParam("id")
             final String id) throws GenieException {
-        LOG.debug("Called with id " + id);
+        LOG.info("Called with id " + id);
         return this.ccs.removeAllTagsForCluster(id);
     }
 
@@ -680,7 +693,7 @@ public class ClusterConfigResource {
             @ApiParam(value = "The tag to remove.", required = true)
             @PathParam("tag")
             final String tag) throws GenieException {
-        LOG.debug("Called with id " + id + " and tag " + tag);
+        LOG.info("Called with id " + id + " and tag " + tag);
         return this.ccs.removeTagForCluster(id, tag);
     }
 }
