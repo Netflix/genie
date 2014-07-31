@@ -97,6 +97,7 @@ public class JobCountManagerImpl implements JobCountManager {
      */
     @Override
     @Transactional(readOnly = true)
+    //TODO: Move to specification
     public int getNumInstanceJobs(
             String hostName,
             final Long minStartTime,
@@ -123,7 +124,7 @@ public class JobCountManagerImpl implements JobCountManager {
             predicates.add(cb.lessThanOrEqualTo(j.get(Job_.started), new Date(maxStartTime)));
         }
         //documentation says that by default predicate array is conjuncted together
-        cq.where(predicates.toArray(new Predicate[0]));
+        cq.where(predicates.toArray(new Predicate[predicates.size()]));
         final TypedQuery<Long> query = this.em.createQuery(cq);
         //Downgrading to an int since all the code seems to want ints
         //Don't feel like changing everthing right now can figure out later
@@ -141,18 +142,19 @@ public class JobCountManagerImpl implements JobCountManager {
             final long minJobThreshold)
             throws GenieException {
         LOG.debug("called");
-        String localhost = NetUtil.getHostName();
+        final String localhost = NetUtil.getHostName();
 
         // naive implementation where we loop through all instances in discovery
         // no need to raise any exceptions here, just return localhost if there
         // is any error
-        DiscoveryClient discoveryClient = DiscoveryManager.getInstance()
+        //TODO: use injection instead of getInstance
+        final DiscoveryClient discoveryClient = DiscoveryManager.getInstance()
                 .getDiscoveryClient();
         if (discoveryClient == null) {
             LOG.warn("Can't instantiate DiscoveryClient - returning localhost");
             return localhost;
         }
-        Application app = discoveryClient.getApplication("genie");
+        final Application app = discoveryClient.getApplication("genie2");
         if (app == null) {
             LOG.warn("Discovery client can't find genie - returning localhost");
             return localhost;
@@ -160,8 +162,8 @@ public class JobCountManagerImpl implements JobCountManager {
 
         for (InstanceInfo instance : app.getInstances()) {
             // only pick instances that are UP
-            if ((instance.getStatus() == null)
-                    || (instance.getStatus() != InstanceStatus.UP)) {
+            if (instance.getStatus() == null
+                    || instance.getStatus() != InstanceStatus.UP) {
                 continue;
             }
 
@@ -182,7 +184,7 @@ public class JobCountManagerImpl implements JobCountManager {
 
         // no hosts found with numInstanceJobs < minJobThreshold, return current
         // instance
-        LOG.info("Can't find any host to foward to - returning localhost");
+        LOG.info("Can't find any host to forward to - returning localhost");
         return localhost;
     }
 }
