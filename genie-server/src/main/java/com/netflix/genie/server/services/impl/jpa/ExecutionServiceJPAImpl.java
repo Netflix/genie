@@ -340,6 +340,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             throws GenieException {
         HttpResponse clientResponse = null;
         try {
+            LOG.info("Forwarded Request to: " + restURI);
             final RestClient genieClient = (RestClient) ClientFactory
                     .getNamedClient("genie2");
             //Force jersey to properly serialize JSON
@@ -351,6 +352,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             genieClient.setJerseyClient(jerseyClient);
             final HttpRequest req = HttpRequest.newBuilder()
                     .verb(method).header("Accept", MediaType.APPLICATION_JSON)
+                    .header("Content-Type", MediaType.APPLICATION_JSON)
                     .uri(new URI(restURI)).entity(job).build();
             clientResponse = genieClient.execute(req);
             if (clientResponse != null && clientResponse.isSuccess()) {
