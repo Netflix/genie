@@ -134,6 +134,7 @@ public class JobResource {
 
         // get client's host from the context
         // TODO : See if we can find a constant string for this
+        // TODO: Where is this set?
         String clientHost = hsr.getHeader("X-Forwarded-For");
         if (clientHost != null) {
             clientHost = clientHost.split(",")[0];
@@ -142,7 +143,7 @@ public class JobResource {
         }
 
         // set the clientHost, if it is not overridden already
-        if (StringUtils.isBlank(clientHost)) {
+        if (StringUtils.isNotBlank(clientHost)) {
             LOG.debug("called from: " + clientHost);
             job.setClientHost(clientHost);
         }

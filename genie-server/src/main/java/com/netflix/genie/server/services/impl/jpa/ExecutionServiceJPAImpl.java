@@ -49,6 +49,7 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.Client;
@@ -153,10 +154,10 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             LOG.info("Received job request:" + job);
         }
 
-        Job forwardCheckedJob = checkAbilityToRunOrForward(job);
+        final Job forwardedJob = checkAbilityToRunOrForward(job);
 
-        if (forwardCheckedJob.isForwarded()) {
-            return forwardCheckedJob;
+        if (forwardedJob != null) {
+            return forwardedJob;
         }
 
         // At this point we have established that the job can be run on this node.
@@ -351,8 +352,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final Client jerseyClient = Client.create(clientConfig);
             genieClient.setJerseyClient(jerseyClient);
             final HttpRequest req = HttpRequest.newBuilder()
-                    .verb(method).header("Accept", MediaType.APPLICATION_JSON)
-                    .header("Content-Type", MediaType.APPLICATION_JSON)
+                    .verb(method).header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                     .uri(new URI(restURI)).entity(job).build();
             clientResponse = genieClient.execute(req);
             if (clientResponse != null && clientResponse.isSuccess()) {
@@ -410,8 +411,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         // if numRunningJobs is already >= maxRunningJobs, forward
         // aggressively
         // but cap it at the max
-        if ((idleHostThreshold > maxIdleHostThreshold)
-                || (numRunningJobs >= maxRunningJobs)) {
+        if (idleHostThreshold > maxIdleHostThreshold
+                || numRunningJobs >= maxRunningJobs) {
             idleHostThreshold = maxIdleHostThreshold;
         }
 
@@ -429,6 +430,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             } // else, no idle hosts found - run here if capacity exists
         }
 
+        // TODO: Gotta be something better we can do than this
         if (numRunningJobs >= maxRunningJobs) {
             // if we get here, job can't be forwarded to an idle
             // instance anymore and current node is overloaded
@@ -438,6 +440,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                             + maxRunningJobs
                             + ") - try another instance or try again later");
         }
-        return job;
+
+        //We didn't forward the job so return null to signal to run the job locally
+        return null;
     }
 }
