@@ -186,7 +186,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             final Job job = getJob(id);
 
             // wait for job to finish - and finish time to be updated
-            if (job.getFinished() != new Date(0)) {
+            if (!job.getFinished().equals(new Date(0))) {
                 return job;
             }
 
