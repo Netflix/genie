@@ -131,8 +131,6 @@ public class JobResource {
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No job entered. Unable to submit.");
         }
-        // Save whether the job was forwarded from this host
-        final boolean forwarded = job.isForwarded();
 
         // get client's host from the context
         // TODO : See if we can find a constant string for this
@@ -152,14 +150,10 @@ public class JobResource {
 
         final Job createdJob = this.xs.submitJob(job);
 
-        if (forwarded) {
-            return Response.ok().entity(createdJob).build();
-        } else {
-            return Response.created(
-                    this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
-                    entity(createdJob).
-                    build();
-        }
+        return Response.created(
+                this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
+                entity(createdJob).
+                build();
     }
 
     /**

@@ -45,9 +45,10 @@ def testJsonSubmitjob():
         {
             "name": "Genie2TestHiveJob", 
             "clusterCriterias" : ''' + clusterTags + ''',
-            "user" : "genietest", 
+            "user" : "tgianos",
             "version" : "1",
-            "group" : "hadoop", 
+            "group" : "hadoop",
+            "forwarded" : false,
             "commandArgs" : "-f hive.q", 
             "commandCriteria" :''' + cmdTags + ''',
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hive.q"
