@@ -145,7 +145,7 @@ public class JobResource {
         }
 
         // set the clientHost, if it is not overridden already
-        if (StringUtils.isBlank(clientHost)) {
+        if (StringUtils.isNotBlank(clientHost)) {
             LOG.debug("called from: " + clientHost);
             job.setClientHost(clientHost);
         }
