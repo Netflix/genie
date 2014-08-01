@@ -117,7 +117,7 @@ public class JobResource {
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
             @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT, message = "Job with ID already exists."),
             @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Precondition Failed"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR, 
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                             message = "Genie Server Error due to Unknown Exception")
     })
     public Response submitJob(
@@ -220,7 +220,7 @@ public class JobResource {
      * Get jobs for given filter criteria.
      *
      * @param id          id for job
-     * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
+     * @param name     name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName    user who submitted job
      * @param status      status of job - possible types Type.JobStatus
      * @param clusterName the name of the cluster
@@ -249,8 +249,8 @@ public class JobResource {
             @QueryParam("id")
             final String id,
             @ApiParam(value = "Name of the job.", required = false)
-            @QueryParam("jobName")
-            final String jobName,
+            @QueryParam("name")
+            final String name,
             @ApiParam(value = "Name of the user who submitted the job.", required = false)
             @QueryParam("userName")
             final String userName,
@@ -271,7 +271,7 @@ public class JobResource {
         LOG.info("Called with [id | jobName | userName | status | clusterName | clusterId | page | limit]");
         LOG.info(id
                 + " | "
-                + jobName
+                + name
                 + " | "
                 + userName
                 + " | "
@@ -286,7 +286,7 @@ public class JobResource {
                 + limit);
         return this.jobService.getJobs(
                 id,
-                jobName,
+                name,
                 userName,
                 ((status == null) || (status.isEmpty()) ? null : JobStatus.parse(status)),
                 clusterName,
