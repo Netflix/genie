@@ -187,6 +187,7 @@ public class BaseGenieClient {
         try {
             response = this.client.executeWithLoadBalancer(request);
             if (response.isSuccess()) {
+                LOG.info("response returned success as job was submitted succesfully.");
                 if (collectionClass != null) {
                     final ObjectMapper mapper = new ObjectMapper();
                     final CollectionType type = mapper.
@@ -194,6 +195,7 @@ public class BaseGenieClient {
                             constructCollectionType(collectionClass, entityClass);
                     return mapper.readValue(response.getInputStream(), type);
                 } else if (entityClass != null) {
+                    LOG.info("Returning object for EntityClass" + entityClass);
                     return response.getEntity(entityClass);
                 } else {
                     throw new GenieException(
@@ -201,6 +203,8 @@ public class BaseGenieClient {
                             "No return type entered.");
                 }
             } else {
+                LOG.error("Looks like job failed during submission. Here is the response object: ." + response.toString());
+                LOG.error("Response Status is: " + response.getStatus());
                 throw new GenieException(
                         response.getStatus(),
                         response.getEntity(String.class));
