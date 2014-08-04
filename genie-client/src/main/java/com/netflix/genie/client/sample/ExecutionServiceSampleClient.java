@@ -65,8 +65,8 @@ public final class ExecutionServiceSampleClient {
         // LOG.info("Initializing Eureka");
         // ExecutionServiceClient.initEureka("test");
         LOG.info("Initializing list of Genie servers");
-        ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
-                "ec2-54-89-50-113.compute-1.amazonaws.com:7001");
+        ConfigurationManager.getConfigInstance().setProperty("genie2Client.ribbon.listOfServers",
+                "localhost:7001");
 
         LOG.info("Initializing ExecutionServiceClient");
         final ExecutionServiceClient client = ExecutionServiceClient.getInstance();
