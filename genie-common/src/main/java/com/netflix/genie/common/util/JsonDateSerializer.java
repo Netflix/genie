@@ -20,6 +20,7 @@ package com.netflix.genie.common.util;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -33,17 +34,12 @@ import java.util.Date;
 public class JsonDateSerializer extends JsonSerializer<Date> {
 
     /**
-     * The format to use, ISO standard.
-     */
-    protected static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void serialize(final Date date, final JsonGenerator gen, final SerializerProvider provider)
             throws IOException {
-        gen.writeString(FORMAT.format(date));
+        gen.writeString(ISO8601Utils.format(date, true));
     }
 }
 

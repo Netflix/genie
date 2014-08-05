@@ -33,7 +33,7 @@ import java.util.Date;
  * @author tgianos
  */
 public class TestJsonDateDeserializer {
-    private static final String DATE_STRING = "2014-07-18T14:04:32.021-0800";
+    private static final String DATE_STRING = "2014-07-18T14:04:32.021-08:00";
     private static final long EXPECTED_MILLISECONDS = 1405721072021L;
 
     private JsonParser parser;
@@ -67,7 +67,7 @@ public class TestJsonDateDeserializer {
      *
      * @throws IOException
      */
-    @Test(expected = IOException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testSerializeError() throws IOException {
         Mockito.when(parser.getText()).thenReturn("I am not a valid date.");
 

@@ -20,13 +20,13 @@ package com.netflix.genie.common.util;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 
 /**
- * Used to deserialize dates from strings in Json payloads.
+ * Used to de-serialize dates from strings in Json payloads.
  *
  * @author tgianos
  */
@@ -37,11 +37,6 @@ public class JsonDateDeserializer extends JsonDeserializer<Date> {
     @Override
     public Date deserialize(final JsonParser parser,
                             final DeserializationContext context) throws IOException {
-        try {
-            final String date = parser.getText();
-            return JsonDateSerializer.FORMAT.parse(date);
-        } catch (final ParseException e) {
-            throw new IOException(e);
-        }
+        return ISO8601Utils.parse(parser.getText());
     }
 }

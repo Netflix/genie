@@ -187,8 +187,8 @@ public class BaseGenieClient {
         try {
             response = this.client.executeWithLoadBalancer(request);
             if (response.isSuccess()) {
-                LOG.info("response returned success as job was submitted succesfully.");
-                if (collectionClass != null) {
+                LOG.info("response returned success as job was submitted successfully.");
+                if (collectionClass != null && entityClass != null) {
                     final ObjectMapper mapper = new ObjectMapper();
                     final CollectionType type = mapper.
                             getTypeFactory().

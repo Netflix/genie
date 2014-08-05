@@ -19,6 +19,7 @@ package com.netflix.genie.common.util;
 
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -42,7 +43,7 @@ public class TestJsonDateSerializer {
      */
     @Before
     public void setup() {
-        this.expectedString = JsonDateSerializer.FORMAT.format(DATE);
+        this.expectedString = ISO8601Utils.format(DATE, true);
     }
 
     /**
