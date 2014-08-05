@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.netflix.client.ClientFactory;
@@ -357,7 +358,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     .uri(new URI(restURI)).entity(job).build();
             clientResponse = genieClient.execute(req);
             if (clientResponse != null && clientResponse.isSuccess()) {
-                return clientResponse.getEntity(Job.class);
+                final ObjectMapper mapper = new ObjectMapper();
+                return mapper.readValue(clientResponse.getInputStream(), Job.class);
             } else {
                 if (clientResponse != null) {
                     throw new GenieException(
