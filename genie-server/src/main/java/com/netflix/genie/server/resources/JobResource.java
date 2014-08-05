@@ -149,7 +149,9 @@ public class JobResource {
         }
 
         final Job createdJob = this.xs.submitJob(job);
-
+        //TODO: Remove
+        LOG.info("Job after submission/creation:");
+        LOG.info(job.toString());
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
                 entity(createdJob).
