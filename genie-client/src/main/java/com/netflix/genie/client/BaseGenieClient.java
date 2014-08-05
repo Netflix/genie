@@ -188,15 +188,15 @@ public class BaseGenieClient {
             response = this.client.executeWithLoadBalancer(request);
             if (response.isSuccess()) {
                 LOG.info("response returned success as job was submitted successfully.");
+                final ObjectMapper mapper = new ObjectMapper();
                 if (collectionClass != null && entityClass != null) {
-                    final ObjectMapper mapper = new ObjectMapper();
                     final CollectionType type = mapper.
                             getTypeFactory().
                             constructCollectionType(collectionClass, entityClass);
                     return mapper.readValue(response.getInputStream(), type);
                 } else if (entityClass != null) {
                     LOG.info("Returning object for EntityClass" + entityClass);
-                    return response.getEntity(entityClass);
+                    return mapper.readValue(response.getInputStream(), entityClass);
                 } else {
                     throw new GenieException(
                             HttpURLConnection.HTTP_BAD_REQUEST,
