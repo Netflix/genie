@@ -168,9 +168,11 @@ public class TestAuditable {
     public void testToString() throws GenieException, IOException {
         final Auditable a = new Auditable();
         final String id = UUID.randomUUID().toString();
+        final Date created = new Date(1000L);
+        final Date updated = new Date(2000L);
         a.setId(id);
-        final Date created = a.getCreated();
-        final Date updated = a.getUpdated();
+        a.setCreated(created);
+        a.setUpdated(updated);
 
         final String json = a.toString();
 
