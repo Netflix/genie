@@ -21,10 +21,12 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.CommandConfigService;
+import org.springframework.data.domain.Sort.Direction;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -140,7 +142,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit
+                limit < 0 ? 1024 : limit,
+                Direction.DESC,
+                Command_.updated.getName()
         );
         return this.commandRepo.findAll(
                 CommandSpecs.findByNameAndUserAndTags(

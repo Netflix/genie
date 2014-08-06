@@ -19,10 +19,12 @@ package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.ApplicationSpecs;
 import com.netflix.genie.server.services.ApplicationConfigService;
+import org.springframework.data.domain.Sort.Direction;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -108,7 +110,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit
+                limit < 0 ? 1024 : limit,
+                Direction.DESC,
+                Application_.updated.getName()
         );
         return this.applicationRepo.findAll(
                 ApplicationSpecs.findByNameAndUserAndTags(name, userName, tags),

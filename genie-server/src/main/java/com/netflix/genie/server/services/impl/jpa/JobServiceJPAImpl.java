@@ -18,6 +18,7 @@
 package com.netflix.genie.server.services.impl.jpa;
 
 import com.netflix.config.ConfigurationManager;
+
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
@@ -33,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort.Direction;
+import com.netflix.genie.common.model.Job_;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -134,8 +137,12 @@ public class JobServiceJPAImpl implements JobService {
         LOG.debug("called");
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit
-        );
+                limit < 0 ? 1024 : limit,
+                        Direction.DESC,
+                        Job_.updated.getName()
+                );
+        
+        
         return this.jobRepo.findAll(
                 JobSpecs.find(
                         id,

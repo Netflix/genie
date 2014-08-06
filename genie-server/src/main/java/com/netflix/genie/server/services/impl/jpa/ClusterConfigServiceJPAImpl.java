@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
 
+import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.ClusterStatus;
@@ -30,6 +31,7 @@ import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
+import org.springframework.data.domain.Sort.Direction;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -155,7 +157,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit
+                limit < 0 ? 1024 : limit,
+                Direction.DESC,
+                Cluster_.updated.getName()
         );
 
         return this.clusterRepo.findAll(
