@@ -83,8 +83,8 @@ public class JobServiceJPAImpl implements JobService {
     /**
      * Constructor.
      *
-     * @param jobRepo The job repository to use.
-     * @param stats the GenieNodeStatistics object
+     * @param jobRepo           The job repository to use.
+     * @param stats             the GenieNodeStatistics object
      * @param jobManagerFactory The the job manager factory to use
      */
     @Inject
@@ -138,11 +138,11 @@ public class JobServiceJPAImpl implements JobService {
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
                 limit < 0 ? 1024 : limit,
-                        Direction.DESC,
-                        Job_.updated.getName()
-                );
-        
-        
+                Direction.DESC,
+                Job_.updated.getName()
+        );
+
+
         return this.jobRepo.findAll(
                 JobSpecs.find(
                         id,
