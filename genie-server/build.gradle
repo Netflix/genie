@@ -1,6 +1,5 @@
 dependencies {
     compile project.parent.childProjects.get('genie-common')
-//    compile ('com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.4.1')
     compile ('com.netflix.archaius:archaius-core:0.6.0')
     compile ('com.netflix.eureka:eureka-client:1.1.136')
     compile ('com.netflix.karyon:karyon-extensions:1.0.25')
