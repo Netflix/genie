@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client;
+package com.netflix.genie.common.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -73,7 +73,7 @@ public class BaseGenieClient {
     /**
      * The name of the server application.
      */
-    protected static final String NIWS_APP_NAME_GENIE = "genie2";
+//    protected static final String NIWS_APP_NAME_GENIE = "genie2";
 
     /**
      * Standard root for all rest services.
@@ -95,7 +95,7 @@ public class BaseGenieClient {
      *
      * @throws IOException if properties can't be loaded
      */
-    protected BaseGenieClient() throws IOException {
+    public BaseGenieClient() throws IOException {
         ConfigurationManager.loadPropertiesFromResources(NIWS_CLIENT_NAME_GENIE + ".properties");
 
         // execute an HTTP request on Genie using load balancer
@@ -112,29 +112,6 @@ public class BaseGenieClient {
     }
 
     /**
-     * Initializes Eureka for the given environment, if it is being used -
-     * should only be used if the user of library hasn't initialized Eureka
-     * already.
-     *
-     * @param env "prod" or "test" or "dev"
-     */
-    public static synchronized void initEureka(final String env) {
-        if (env != null) {
-            System.setProperty("eureka.environment", env);
-        }
-
-        final EurekaInstanceConfig config;
-        if (CLOUD.equals(ConfigurationManager.getDeploymentContext()
-                .getDeploymentDatacenter())) {
-            config = new CloudInstanceConfig();
-        } else {
-            config = new MyDataCenterInstanceConfig();
-        }
-        DiscoveryManager.getInstance().initComponent(config,
-                new DefaultEurekaClientConfig());
-    }
-
-    /**
      * Build a HTTP request from the given parameters.
      *
      * @param verb       The type of HTTP request to use.
@@ -144,7 +121,7 @@ public class BaseGenieClient {
      * @return The HTTP request.
      * @throws GenieException
      */
-    protected HttpRequest buildRequest(
+    public HttpRequest buildRequest(
             final Verb verb,
             final String requestUri,
             final Multimap<String, String> params,
@@ -179,7 +156,7 @@ public class BaseGenieClient {
      * @return The response entity.
      * @throws GenieException
      */
-    protected <C extends Collection> Object executeRequest(
+    public <C extends Collection> Object executeRequest(
             final HttpRequest request,
             final Class<C> collectionClass,
             final Class entityClass) throws GenieException {
@@ -187,7 +164,7 @@ public class BaseGenieClient {
         try {
             response = this.client.executeWithLoadBalancer(request);
             if (response.isSuccess()) {
-                LOG.info("response returned success as job was submitted successfully.");
+                LOG.info("Response returned success.");
                 final ObjectMapper mapper = new ObjectMapper();
                 if (collectionClass != null && entityClass != null) {
                     final CollectionType type = mapper.
@@ -195,7 +172,6 @@ public class BaseGenieClient {
                             constructCollectionType(collectionClass, entityClass);
                     return mapper.readValue(response.getInputStream(), type);
                 } else if (entityClass != null) {
-                    LOG.info("Returning object for EntityClass" + entityClass);
                     return mapper.readValue(response.getInputStream(), entityClass);
                 } else {
                     throw new GenieException(
@@ -203,8 +179,6 @@ public class BaseGenieClient {
                             "No return type entered.");
                 }
             } else {
-                LOG.error("Looks like job failed during submission. Here is the response object: ." + response.toString());
-                LOG.error("Response Status is: " + response.getStatus());
                 throw new GenieException(
                         response.getStatus(),
                         response.getEntity(String.class));
@@ -222,5 +196,28 @@ public class BaseGenieClient {
                 response.close();
             }
         }
+    }
+
+    /**
+     * Initializes Eureka for the given environment, if it is being used -
+     * should only be used if the user of library hasn't initialized Eureka
+     * already.
+     *
+     * @param env "prod" or "test" or "dev"
+     */
+    public static synchronized void initEureka(final String env) {
+        if (env != null) {
+            System.setProperty("eureka.environment", env);
+        }
+
+        final EurekaInstanceConfig config;
+        if (CLOUD.equals(ConfigurationManager.getDeploymentContext()
+                .getDeploymentDatacenter())) {
+            config = new CloudInstanceConfig();
+        } else {
+            config = new MyDataCenterInstanceConfig();
+        }
+        DiscoveryManager.getInstance().initComponent(config,
+                new DefaultEurekaClientConfig());
     }
 }

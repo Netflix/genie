@@ -20,6 +20,7 @@ package com.netflix.genie.client;
 import com.google.common.collect.Multimap;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
+import com.netflix.genie.common.client.BaseGenieClient;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -41,8 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  * @author amsharma
  */
-// TODO: Can probably templetize the config clients or part of them as
-//     much of the code is the same
+// TODO: Can probably templetize the clients or part of them
 public final class ClusterServiceClient extends BaseGenieClient {
 
     private static final Logger LOG = LoggerFactory

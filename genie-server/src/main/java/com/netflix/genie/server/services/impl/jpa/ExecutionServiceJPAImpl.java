@@ -17,14 +17,10 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.netflix.client.ClientFactory;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
-import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
+import com.netflix.genie.common.client.BaseGenieClient;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
@@ -37,30 +33,21 @@ import com.netflix.genie.server.repository.jpa.JobSpecs;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.NetUtil;
-import com.netflix.niws.client.http.RestClient;
-
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.PersistenceContext;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.PersistenceContext;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Implementation of the Genie Execution Service API that uses a local job
@@ -108,9 +95,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * Default constructor - initializes persistence manager, and other utility
      * classes.
      *
-     * @param jobRepo The job repository to use.
-     * @param stats the GenieNodeStatistics object
-     * @param jobCountManager the job count manager to use
+     * @param jobRepo           The job repository to use.
+     * @param stats             the GenieNodeStatistics object
+     * @param jobCountManager   the job count manager to use
      * @param jobManagerFactory The the job manager factory to use
      */
     @Inject
@@ -146,7 +133,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             throw new GenieException(
                     HttpURLConnection.HTTP_CONFLICT,
                     "Job with ID specified already exists."
-                    );
+            );
         }
 
         // Check if the job is forwarded. If not this is the first node that got the request.
@@ -265,7 +252,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             job.setFinished(new Date());
             job.setExitCode(SubProcessStatus.ZOMBIE_JOB.code());
             job.setStatusMsg(SubProcessStatus.message(
-                    SubProcessStatus.ZOMBIE_JOB.code())
+                            SubProcessStatus.ZOMBIE_JOB.code())
             );
         }
         return jobs.size();
@@ -326,62 +313,30 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     }
 
     private Job forwardJobKill(final String killURI) throws GenieException {
-        return executeRequest(Verb.DELETE, killURI, null);
+        try {
+            final BaseGenieClient client = new BaseGenieClient();
+            final HttpRequest request = client.buildRequest(Verb.DELETE, killURI, null, null);
+            return (Job) client.executeRequest(request, null, Job.class);
+        } catch (final IOException ioe) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    ioe.getMessage(),
+                    ioe);
+        }
     }
 
     private Job forwardJobRequest(
             final String hostURI,
             final Job job) throws GenieException {
-        return executeRequest(Verb.POST, hostURI, job);
-    }
-
-    private Job executeRequest(
-            final Verb method,
-            final String restURI,
-            final Job job)
-            throws GenieException {
-        HttpResponse clientResponse = null;
         try {
-            LOG.info("Forwarded Request to: " + restURI);
-            final RestClient genieClient = (RestClient) ClientFactory
-                    .getNamedClient("genie2");
-            //Force jersey to properly serialize JSON
-            final Set<Class<?>> providers = new HashSet<Class<?>>();
-            providers.add(JacksonJaxbJsonProvider.class);
-            providers.add(JacksonJsonProvider.class);
-            final ClientConfig clientConfig = new DefaultClientConfig(providers);
-            final Client jerseyClient = Client.create(clientConfig);
-            genieClient.setJerseyClient(jerseyClient);
-            final HttpRequest req = HttpRequest.newBuilder()
-                    .verb(method).header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                    .uri(new URI(restURI)).entity(job).build();
-            clientResponse = genieClient.execute(req);
-            if (clientResponse != null && clientResponse.isSuccess()) {
-                final ObjectMapper mapper = new ObjectMapper();
-                return mapper.readValue(clientResponse.getInputStream(), Job.class);
-            } else {
-                if (clientResponse != null) {
-                    throw new GenieException(
-                            clientResponse.getStatus(), clientResponse.getEntity(String.class));
-                } else {
-                    throw new GenieException(
-                            HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            "Unknown exception while trying to forward job.");
-                }
-            }
-        } catch (final Exception e) {
-            if (e instanceof GenieException) {
-                throw (GenieException) e;
-            }
-            final String msg = "Genie Error while trying to auto-forward request: "
-                    + e.getMessage();
-            throw new GenieException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        } finally {
-            if (clientResponse != null) {
-                // this is really really important
-                clientResponse.close();
-            }
+            final BaseGenieClient client = new BaseGenieClient();
+            final HttpRequest request = client.buildRequest(Verb.POST, hostURI, null, job);
+            return (Job) client.executeRequest(request, null, Job.class);
+        } catch (final IOException ioe) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    ioe.getMessage(),
+                    ioe);
         }
     }
 
