@@ -31,7 +31,7 @@ public class TestClusterStatus {
     /**
      * Tests whether a valid cluster status is parsed correctly.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test
     public void testValidClusterStatus() throws GenieException {
@@ -46,7 +46,7 @@ public class TestClusterStatus {
     /**
      * Tests whether an invalid cluster status throws exception.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testInvalidClusterStatus() throws GenieException {
@@ -56,7 +56,7 @@ public class TestClusterStatus {
     /**
      * Tests whether an invalid cluster status throws exception.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testBlankClusterStatus() throws GenieException {

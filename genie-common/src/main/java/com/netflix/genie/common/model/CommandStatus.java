@@ -19,8 +19,9 @@ package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.wordnik.swagger.annotations.ApiModel;
-import java.net.HttpURLConnection;
 import org.apache.commons.lang3.StringUtils;
+
+import java.net.HttpURLConnection;
 
 /**
  * The available statuses for Commands.
@@ -51,18 +52,14 @@ public enum CommandStatus {
      * @throws GenieException on invalid value
      */
     public static CommandStatus parse(final String value) throws GenieException {
-        if (StringUtils.isBlank(value)) {
-            throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
-                    "Unacceptable command status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
-        } else if (value.equalsIgnoreCase("ACTIVE")) {
-            return ACTIVE;
-        } else if (value.equalsIgnoreCase("DEPRECATED")) {
-            return DEPRECATED;
-        } else if (value.equalsIgnoreCase("INACTIVE")) {
-            return INACTIVE;
-        } else {
-            throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
-                    "Unacceptable command status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
+        if (StringUtils.isNotBlank(value)) {
+            for (final CommandStatus status : CommandStatus.values()) {
+                if (value.equalsIgnoreCase(status.toString())) {
+                    return status;
+                }
+            }
         }
+        throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                "Unacceptable command status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
     }
 }

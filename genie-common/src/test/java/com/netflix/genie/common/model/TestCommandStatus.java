@@ -31,7 +31,7 @@ public class TestCommandStatus {
     /**
      * Tests whether a valid command status is parsed correctly.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test
     public void testValidCommandStatus() throws GenieException {
@@ -46,7 +46,7 @@ public class TestCommandStatus {
     /**
      * Tests whether an invalid command status throws exception.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testInvalidCommandStatus() throws GenieException {
@@ -56,7 +56,7 @@ public class TestCommandStatus {
     /**
      * Tests whether an invalid application status throws exception.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testBlankCommandStatus() throws GenieException {

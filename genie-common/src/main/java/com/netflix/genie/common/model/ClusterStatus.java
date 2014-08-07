@@ -51,18 +51,14 @@ public enum ClusterStatus {
      * @throws GenieException on invalid value
      */
     public static ClusterStatus parse(final String value) throws GenieException {
-        if (StringUtils.isBlank(value)) {
-            throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
-                    "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}");
-        } else if (value.equalsIgnoreCase("UP")) {
-            return UP;
-        } else if (value.equalsIgnoreCase("OUT_OF_SERVICE")) {
-            return OUT_OF_SERVICE;
-        } else if (value.equalsIgnoreCase("TERMINATED")) {
-            return TERMINATED;
-        } else {
-            throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
-                    "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}");
+        if (StringUtils.isNotBlank(value)) {
+            for (final ClusterStatus status : ClusterStatus.values()) {
+                if (value.equalsIgnoreCase(status.toString())) {
+                    return status;
+                }
+            }
         }
+        throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+                "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}");
     }
 }

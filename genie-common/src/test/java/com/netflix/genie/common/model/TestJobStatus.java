@@ -31,7 +31,7 @@ public class TestJobStatus {
     /**
      * Tests whether a valid job status is parsed correctly.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test
     public void testValidJobStatus() throws GenieException {
@@ -45,7 +45,7 @@ public class TestJobStatus {
     /**
      * Tests whether an invalid job status returns null.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testInvalidJobStatus() throws GenieException {
@@ -55,7 +55,7 @@ public class TestJobStatus {
     /**
      * Tests whether an invalid application status throws exception.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testBlankJobStatus() throws GenieException {

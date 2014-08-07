@@ -24,7 +24,7 @@ import com.netflix.genie.common.client.BaseGenieClient;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
-import com.netflix.genie.common.model.SubProcessStatus;
+import com.netflix.genie.common.util.ProcessStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
@@ -211,7 +211,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         this.jobManagerFactory.getJobManager(job).kill();
 
         job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
-        job.setExitCode(SubProcessStatus.JOB_KILLED.code());
+        job.setExitCode(ProcessStatus.JOB_KILLED.getExitCode());
 
         // increment counter for killed jobs
         this.stats.incrGenieKilledJobs();
@@ -236,6 +236,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     @Transactional(rollbackFor = GenieException.class)
     public int markZombies() {
         LOG.debug("called");
+        final ProcessStatus zombie = ProcessStatus.ZOMBIE_JOB;
         // the equivalent query is as follows:
         // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
         // statusMsg='Job has been marked as a zombie'
@@ -250,10 +251,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         for (final Job job : jobs) {
             job.setStatus(JobStatus.FAILED);
             job.setFinished(new Date());
-            job.setExitCode(SubProcessStatus.ZOMBIE_JOB.code());
-            job.setStatusMsg(SubProcessStatus.message(
-                            SubProcessStatus.ZOMBIE_JOB.code())
-            );
+            job.setExitCode(zombie.getExitCode());
+            job.setStatusMsg(zombie.getMessage());
         }
         return jobs.size();
     }
@@ -273,12 +272,14 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         // only update status if not KILLED
         if (job.getStatus() != null && job.getStatus() != JobStatus.KILLED) {
-            if (exitCode != SubProcessStatus.SUCCESS.code()) {
+            if (exitCode != ProcessStatus.SUCCESS.getExitCode()) {
                 // all other failures except s3 log archival failure
                 LOG.error("Failed to execute job, exit code: "
                         + exitCode);
-                String errMsg = SubProcessStatus.message(exitCode);
-                if ((errMsg == null) || (errMsg.isEmpty())) {
+                String errMsg;
+                try {
+                    errMsg = ProcessStatus.parse(exitCode).getMessage();
+                } catch (final GenieException ge) {
                     errMsg = "Please look at job's stderr for more details";
                 }
                 job.setJobStatus(JobStatus.FAILED,

@@ -31,7 +31,7 @@ public class TestApplicationStatus {
     /**
      * Tests whether a valid application status is parsed correctly.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test
     public void testValidApplicationStatus() throws GenieException {
@@ -46,7 +46,7 @@ public class TestApplicationStatus {
     /**
      * Tests whether an invalid application status throws exception.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testInvalidApplicationStatus() throws GenieException {
@@ -56,7 +56,7 @@ public class TestApplicationStatus {
     /**
      * Tests whether an invalid application status throws exception.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testBlankApplicationStatus() throws GenieException {
