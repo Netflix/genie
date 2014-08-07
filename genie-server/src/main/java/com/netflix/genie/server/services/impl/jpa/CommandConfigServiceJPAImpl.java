@@ -146,13 +146,16 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                 Direction.DESC,
                 Command_.updated.getName()
         );
-        return this.commandRepo.findAll(
+
+        @SuppressWarnings("unchecked")
+        final List<Command> commands = this.commandRepo.findAll(
                 CommandSpecs.findByNameAndUserAndTags(
                         name,
                         userName,
                         tags
                 ),
                 pageRequest).getContent();
+        return commands;
     }
 
     /**

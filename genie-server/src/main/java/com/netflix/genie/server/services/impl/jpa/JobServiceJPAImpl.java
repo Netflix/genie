@@ -142,8 +142,8 @@ public class JobServiceJPAImpl implements JobService {
                 Job_.updated.getName()
         );
 
-
-        return this.jobRepo.findAll(
+        @SuppressWarnings("unchecked")
+        final List<Job> jobs = this.jobRepo.findAll(
                 JobSpecs.find(
                         id,
                         jobName,
@@ -152,6 +152,7 @@ public class JobServiceJPAImpl implements JobService {
                         clusterName,
                         clusterId),
                 pageRequest).getContent();
+        return jobs;
     }
 
     /**

@@ -162,7 +162,8 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 Cluster_.updated.getName()
         );
 
-        return this.clusterRepo.findAll(
+        @SuppressWarnings("unchecked")
+        final List<Cluster> clusters = this.clusterRepo.findAll(
                 ClusterSpecs.findByNameAndStatusesAndTagsAndUpdateTime(
                         name,
                         statuses,
@@ -170,6 +171,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                         minUpdateTime,
                         maxUpdateTime),
                 pageRequest).getContent();
+        return clusters;
     }
 
     /**
@@ -188,6 +190,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         Set<String> commandCriteria = job.getCommandCriteria();
 
         for (final ClusterCriteria clusterCriteria : clusterCriterias) {
+            @SuppressWarnings("unchecked")
             final List<Cluster> clusters = this.clusterRepo.findAll(
                     ClusterSpecs.findByClusterAndCommandCriteria(
                             clusterCriteria,
@@ -492,7 +495,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
-            final List<Command> cmdList = new ArrayList();
+            final List<Command> cmdList = new ArrayList<Command>();
             cmdList.addAll(cluster.getCommands());
             for (final Command cmd : cmdList) {
                 cluster.removeCommand(cmd);

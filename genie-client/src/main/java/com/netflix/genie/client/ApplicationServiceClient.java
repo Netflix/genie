@@ -57,7 +57,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @throws IOException if there is any error during initialization
      */
     private ApplicationServiceClient() throws IOException {
-        super();
+        super(null);
     }
 
     /**
@@ -91,7 +91,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
         }
 
         application.validate();
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 BASE_CONFIG_APPLICATION_REST_URL,
                 null,
@@ -117,7 +117,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id},
@@ -141,7 +141,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id},
@@ -163,12 +163,15 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      */
     public List<Application> getApplications(final Multimap<String, String> params)
             throws GenieException {
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 BASE_CONFIG_APPLICATION_REST_URL,
                 params,
                 null);
-        return (List<Application>) this.executeRequest(request, List.class, Application.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Application> apps = (List<Application>) this.executeRequest(request, List.class, Application.class);
+        return apps;
     }
 
     /**
@@ -178,12 +181,15 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @throws GenieException
      */
     public List<Application> deleteAllApplications() throws GenieException {
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 BASE_CONFIG_APPLICATION_REST_URL,
                 null,
                 null);
-        return (List<Application>) this.executeRequest(request, List.class, Application.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Application> apps = (List<Application>) this.executeRequest(request, List.class, Application.class);
+        return apps;
     }
 
     /**
@@ -200,7 +206,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id},
@@ -233,14 +239,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 configs);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newConfigs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newConfigs;
     }
 
     /**
@@ -258,14 +267,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> configs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return configs;
     }
 
     /**
@@ -294,14 +306,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 configs);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newConfigs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newConfigs;
     }
 
     /**
@@ -321,14 +336,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> configs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return configs;
     }
 
     /**
@@ -354,14 +372,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "jars"},
                         SLASH),
                 null,
                 jars);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newJars = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newJars;
     }
 
     /**
@@ -379,14 +400,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "jars"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> jars = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return jars;
     }
 
     /**
@@ -415,14 +439,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "jars"},
                         SLASH),
                 null,
                 jars);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newJars = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newJars;
     }
 
     /**
@@ -442,14 +469,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "jars"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> jars = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return jars;
     }
 
     /**
@@ -469,14 +499,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "commands"},
                         SLASH),
                 null,
                 null);
-        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<Command> commands = (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+        return commands;
     }
 
     /**
@@ -502,14 +535,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 tags);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
     }
 
     /**
@@ -527,14 +563,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 
     /**
@@ -563,14 +602,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 tags);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
     }
 
     /**
@@ -590,14 +632,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_APPLICATION_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 
     /**
@@ -618,7 +663,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
@@ -630,6 +675,9 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 }

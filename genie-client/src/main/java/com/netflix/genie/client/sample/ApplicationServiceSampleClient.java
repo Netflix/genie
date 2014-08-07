@@ -65,8 +65,8 @@ public final class ApplicationServiceSampleClient {
     /**
      * Main for running client code.
      *
-     * @param args
-     * @throws java.lang.Exception
+     * @param args program arguments
+     * @throws Exception
      */
     public static void main(final String[] args) throws Exception {
 

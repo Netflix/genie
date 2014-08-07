@@ -114,9 +114,12 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
                 Direction.DESC,
                 Application_.updated.getName()
         );
-        return this.applicationRepo.findAll(
+
+        @SuppressWarnings("unchecked")
+        final List<Application> apps = this.applicationRepo.findAll(
                 ApplicationSpecs.findByNameAndUserAndTags(name, userName, tags),
                 pageRequest).getContent();
+        return apps;
     }
 
     /**

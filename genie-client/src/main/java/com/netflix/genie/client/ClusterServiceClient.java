@@ -60,7 +60,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @throws IOException if there is any error during initialization
      */
     private ClusterServiceClient() throws IOException {
-        super();
+        super(null);
     }
 
     /**
@@ -93,7 +93,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     "No cluster entered. Unable to validate.");
         }
         cluster.validate();
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 BASE_CONFIG_CLUSTER_REST_URL,
                 null,
@@ -121,7 +121,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id},
@@ -145,7 +145,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id},
@@ -167,12 +167,15 @@ public final class ClusterServiceClient extends BaseGenieClient {
      */
     public List<Cluster> getClusters(final Multimap<String, String> params)
             throws GenieException {
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 BASE_CONFIG_CLUSTER_REST_URL,
                 params,
                 null);
-        return (List<Cluster>) this.executeRequest(request, List.class, Cluster.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Cluster> clusters = (List<Cluster>) this.executeRequest(request, List.class, Cluster.class);
+        return clusters;
     }
 
     /**
@@ -182,12 +185,15 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @throws GenieException
      */
     public List<Cluster> deleteAllClusters() throws GenieException {
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 BASE_CONFIG_CLUSTER_REST_URL,
                 null,
                 null);
-        return (List<Cluster>) this.executeRequest(request, List.class, Cluster.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Cluster> clusters = (List<Cluster>) this.executeRequest(request, List.class, Cluster.class);
+        return clusters;
     }
 
     /**
@@ -204,7 +210,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id},
@@ -237,14 +243,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 configs);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newConfigs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newConfigs;
     }
 
     /**
@@ -262,14 +271,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> configs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return configs;
     }
 
     /**
@@ -298,14 +310,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 configs);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newConfigs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newConfigs;
     }
 
     /**
@@ -331,14 +346,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands"},
                         SLASH),
                 null,
                 commands);
-        return (List<Command>) this.executeRequest(request, List.class, Command.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Command> newCommands = (List<Command>) this.executeRequest(request, List.class, Command.class);
+        return newCommands;
     }
 
     /**
@@ -357,14 +375,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands"},
                         SLASH),
                 null,
                 null);
-        return (List<Command>) this.executeRequest(request, List.class, Command.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Command> commands = (List<Command>) this.executeRequest(request, List.class, Command.class);
+        return commands;
     }
 
     /**
@@ -393,14 +414,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands"},
                         SLASH),
                 null,
                 commands);
-        return (List<Command>) this.executeRequest(request, List.class, Command.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Command> newCommands = (List<Command>) this.executeRequest(request, List.class, Command.class);
+        return newCommands;
     }
 
     /**
@@ -420,14 +444,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands"},
                         SLASH),
                 null,
                 null);
-        return (List<Command>) this.executeRequest(request, List.class, Command.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Command> commands = (List<Command>) this.executeRequest(request, List.class, Command.class);
+        return commands;
     }
 
     /**
@@ -455,14 +482,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "commands", cmdId},
                         SLASH),
                 null,
                 null);
-        return (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<Command> commands = (Set<Command>) this.executeRequest(request, Set.class, Command.class);
+        return commands;
     }
 
     /**
@@ -488,14 +518,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 tags);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
     }
 
     /**
@@ -513,14 +546,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 
     /**
@@ -549,14 +585,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 tags);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
     }
 
     /**
@@ -576,14 +615,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_CLUSTER_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 
     /**
@@ -604,7 +646,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
@@ -616,6 +658,9 @@ public final class ClusterServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 }

@@ -58,7 +58,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @throws IOException if there is any error during initialization
      */
     private CommandServiceClient() throws IOException {
-        super();
+        super(null);
     }
 
     /**
@@ -91,7 +91,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                     "No command entered to validate");
         }
         command.validate();
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 BASE_CONFIG_COMMAND_REST_URL,
                 null,
@@ -116,7 +116,7 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id},
@@ -140,7 +140,7 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id},
@@ -162,12 +162,15 @@ public final class CommandServiceClient extends BaseGenieClient {
      */
     public List<Command> getCommands(final Multimap<String, String> params)
             throws GenieException {
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 BASE_CONFIG_COMMAND_REST_URL,
                 params,
                 null);
-        return (List<Command>) this.executeRequest(request, List.class, Command.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Command> commands = (List<Command>) this.executeRequest(request, List.class, Command.class);
+        return commands;
     }
 
     /**
@@ -177,12 +180,15 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @throws GenieException
      */
     public List<Command> deleteAllCommands() throws GenieException {
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 BASE_CONFIG_COMMAND_REST_URL,
                 null,
                 null);
-        return (List<Command>) this.executeRequest(request, List.class, Command.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Command> commands = (List<Command>) this.executeRequest(request, List.class, Command.class);
+        return commands;
     }
 
     /**
@@ -200,7 +206,7 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id},
@@ -233,14 +239,17 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 configs);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newConfigs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newConfigs;
     }
 
     /**
@@ -258,7 +267,7 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "configs"},
@@ -294,14 +303,17 @@ public final class CommandServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 configs);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newConfigs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newConfigs;
     }
 
     /**
@@ -321,14 +333,17 @@ public final class CommandServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> configs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return configs;
     }
 
     /**
@@ -354,7 +369,7 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{
@@ -385,7 +400,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{
@@ -416,7 +431,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
@@ -447,14 +462,17 @@ public final class CommandServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "configs"},
                         SLASH),
                 null,
                 null);
-        return (Set<Cluster>) this.executeRequest(request, Set.class, Cluster.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<Cluster> clusters = (Set<Cluster>) this.executeRequest(request, Set.class, Cluster.class);
+        return clusters;
     }
 
     /**
@@ -480,14 +498,17 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 tags);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
     }
 
     /**
@@ -505,14 +526,17 @@ public final class CommandServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 
     /**
@@ -541,14 +565,17 @@ public final class CommandServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 tags);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
     }
 
     /**
@@ -568,14 +595,17 @@ public final class CommandServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_CONFIG_COMMAND_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 
     /**
@@ -596,7 +626,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
@@ -608,6 +638,9 @@ public final class CommandServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 }

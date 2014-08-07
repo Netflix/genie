@@ -18,7 +18,7 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

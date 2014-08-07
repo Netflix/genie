@@ -57,7 +57,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws IOException if there is any error during initialization
      */
     private ExecutionServiceClient() throws IOException {
-        super();
+        super(null);
     }
 
     /**
@@ -90,7 +90,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                     "No job entered to validate");
         }
         job.validate();
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 BASE_EXECUTION_REST_URL,
                 null,
@@ -113,7 +113,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_EXECUTION_REST_URL, id},
@@ -134,12 +134,15 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws GenieException
      */
     public List<Job> getJobs(final Multimap<String, String> params) throws GenieException {
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 BASE_EXECUTION_REST_URL,
                 params,
                 null);
-        return (List<Job>) this.executeRequest(request, List.class, Job.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Job> jobs = (List<Job>) this.executeRequest(request, List.class, Job.class);
+        return jobs;
     }
 
     /**
@@ -220,7 +223,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
 
         // this assumes that the service will forward the delete to the right
         // instance
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_EXECUTION_REST_URL, id},
@@ -253,14 +256,17 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 StringUtils.join(
                         new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 tags);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
     }
 
     /**
@@ -278,14 +284,17 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.GET,
                 StringUtils.join(
                         new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 
     /**
@@ -314,14 +323,17 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.PUT,
                 StringUtils.join(
                         new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 tags);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
     }
 
     /**
@@ -341,14 +353,17 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 
     /**
@@ -368,7 +383,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                     HttpURLConnection.HTTP_BAD_REQUEST, msg);
         }
 
-        final HttpRequest request = this.buildRequest(
+        final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.DELETE,
                 StringUtils.join(
                         new String[]{
@@ -379,6 +394,9 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 }

@@ -245,6 +245,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         final long zombieTime = CONF.getLong(
                 "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
 
+        @SuppressWarnings("unchecked")
         final List<Job> jobs = this.jobRepo.findAll(
                 JobSpecs.findZombies(currentTime, zombieTime)
         );
@@ -315,8 +316,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     private Job forwardJobKill(final String killURI) throws GenieException {
         try {
-            final BaseGenieClient client = new BaseGenieClient();
-            final HttpRequest request = client.buildRequest(Verb.DELETE, killURI, null, null);
+            final BaseGenieClient client = new BaseGenieClient(null);
+            final HttpRequest request = BaseGenieClient.buildRequest(Verb.DELETE, killURI, null, null);
             return (Job) client.executeRequest(request, null, Job.class);
         } catch (final IOException ioe) {
             throw new GenieException(
@@ -330,8 +331,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final String hostURI,
             final Job job) throws GenieException {
         try {
-            final BaseGenieClient client = new BaseGenieClient();
-            final HttpRequest request = client.buildRequest(Verb.POST, hostURI, null, job);
+            final BaseGenieClient client = new BaseGenieClient(null);
+            final HttpRequest request = BaseGenieClient.buildRequest(Verb.POST, hostURI, null, job);
             return (Job) client.executeRequest(request, null, Job.class);
         } catch (final IOException ioe) {
             throw new GenieException(
