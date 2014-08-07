@@ -49,12 +49,12 @@ public class TestJsonDateDeserializer {
     }
 
     /**
-     * Test the serialization method.
+     * Test the de-serialization method.
      *
      * @throws IOException
      */
     @Test
-    public void testSerialize() throws IOException {
+    public void testDeserialize() throws IOException {
         Mockito.when(this.parser.getText()).thenReturn(DATE_STRING);
 
         final JsonDateDeserializer deserializer = new JsonDateDeserializer();
@@ -63,12 +63,12 @@ public class TestJsonDateDeserializer {
     }
 
     /**
-     * Test the serialization method.
+     * Test the de-serialization method.
      *
      * @throws IOException
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testSerializeError() throws IOException {
+    public void testDeserializeError() throws IOException {
         Mockito.when(parser.getText()).thenReturn("I am not a valid date.");
 
         final JsonDateDeserializer deserializer = new JsonDateDeserializer();

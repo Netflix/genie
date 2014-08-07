@@ -15,10 +15,13 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.GenieException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
+import java.net.HttpURLConnection;
 import java.util.Arrays;
 
 /**
@@ -54,8 +57,15 @@ public class FileAttachment implements Serializable {
      * Set the name of the file for this attachment.
      *
      * @param name name of the file for this attachment
+     * @throws GenieException
      */
-    public void setName(final String name) {
+    public void setName(final String name) throws GenieException {
+        if (StringUtils.isBlank(name)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No name entered for attachment. Unable to continue."
+            );
+        }
         this.name = name;
     }
 
@@ -65,15 +75,26 @@ public class FileAttachment implements Serializable {
      * @return the data for the attachment
      */
     public byte[] getData() {
-        return Arrays.copyOf(this.data, data.length);
+        if (this.data != null) {
+            return Arrays.copyOf(this.data, this.data.length);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Set the data for the attachment.
      *
-     * @param data the data for the attachment.
+     * @param data the data for the attachment. Not null or empty.
+     * @throws GenieException
      */
-    public void setData(final byte[] data) {
+    public void setData(final byte[] data) throws GenieException {
+        if (data == null || data.length == 0) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No data entered for attachment. Unable to continue."
+            );
+        }
         this.data = Arrays.copyOf(data, data.length);
     }
 }

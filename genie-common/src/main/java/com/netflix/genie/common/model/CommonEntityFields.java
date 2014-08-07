@@ -169,7 +169,7 @@ public class CommonEntityFields extends Auditable {
         String error = null;
         try {
             super.validate();
-        } catch (GenieException ge) {
+        } catch (final GenieException ge) {
             error = ge.getMessage();
         }
         this.validate(this.name, this.user, this.version, error);
