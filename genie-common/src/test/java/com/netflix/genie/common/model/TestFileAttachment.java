@@ -22,6 +22,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -30,9 +31,10 @@ import java.util.Arrays;
  * @author tgianos
  */
 public class TestFileAttachment {
+    private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
     private static final String NAME = "someQuery.q";
     private static final String QUERY = "select * from myTable";
-    private static final byte[] DATA = QUERY.getBytes();
+    private static final byte[] DATA = QUERY.getBytes(UTF8_CHARSET);
 
     private FileAttachment attachment;
 

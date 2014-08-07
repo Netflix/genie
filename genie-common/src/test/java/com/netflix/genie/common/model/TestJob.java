@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ import java.util.UUID;
  */
 public class TestJob {
 
+    private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
     private static final String USER = "tgianos";
     private static final String NAME = "TomsJob";
     private static final String VERSION = "1.2.3";
@@ -356,7 +358,7 @@ public class TestJob {
         Assert.assertNull(this.job.getAttachments());
         final FileAttachment attachment = new FileAttachment();
         attachment.setName("/some/query.q");
-        attachment.setData("select * from mytable;".getBytes());
+        attachment.setData("select * from mytable;".getBytes(UTF8_CHARSET));
         final Set<FileAttachment> attachments = new HashSet<FileAttachment>();
         attachments.add(attachment);
         this.job.setAttachments(attachments);
