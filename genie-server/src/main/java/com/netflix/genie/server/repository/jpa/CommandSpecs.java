@@ -39,7 +39,7 @@ public final class CommandSpecs {
     /**
      * Private constructor for utility class.
      */
-    private CommandSpecs() {
+    protected CommandSpecs() {
     }
 
     /**
@@ -70,7 +70,7 @@ public final class CommandSpecs {
                         predicates.add(cb.isMember(tag, root.get(Command_.tags)));
                     }
                 }
-                return cb.and(predicates.toArray(new Predicate[0]));
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
     }

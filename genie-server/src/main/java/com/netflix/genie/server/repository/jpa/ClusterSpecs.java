@@ -49,7 +49,7 @@ public final class ClusterSpecs {
     /**
      * Private constructor for utility class.
      */
-    private ClusterSpecs() {
+    protected ClusterSpecs() {
     }
 
     /**
@@ -95,10 +95,10 @@ public final class ClusterSpecs {
                     for (final ClusterStatus status : statuses) {
                         orPredicates.add(cb.equal(root.get(Cluster_.status), status));
                     }
-                    predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
+                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
                 }
 
-                return cb.and(predicates.toArray(new Predicate[0]));
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
     }
@@ -140,7 +140,7 @@ public final class ClusterSpecs {
                     }
                 }
 
-                return cb.and(predicates.toArray(new Predicate[0]));
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
     }

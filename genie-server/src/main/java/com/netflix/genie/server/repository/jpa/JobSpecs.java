@@ -37,9 +37,9 @@ import org.springframework.data.jpa.domain.Specification;
 public final class JobSpecs {
 
     /**
-     * Private constructor for utility class.
+     * Protected constructor for utility class.
      */
-    private JobSpecs() {
+    protected JobSpecs() {
     }
 
     /**
@@ -85,7 +85,7 @@ public final class JobSpecs {
                 if (StringUtils.isNotBlank(clusterId)) {
                     predicates.add(cb.equal(root.get(Job_.executionClusterId), clusterId));
                 }
-                return cb.and(predicates.toArray(new Predicate[0]));
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
     }
@@ -111,7 +111,7 @@ public final class JobSpecs {
                 final Predicate orPredicate1 = cb.equal(root.get(Job_.status), JobStatus.RUNNING);
                 final Predicate orPredicate2 = cb.equal(root.get(Job_.status), JobStatus.INIT);
                 predicates.add(cb.or(orPredicate1, orPredicate2));
-                return cb.and(predicates.toArray(new Predicate[0]));
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
     }

@@ -40,7 +40,7 @@ public final class ApplicationSpecs {
     /**
      * Private constructor for utility class.
      */
-    private ApplicationSpecs() {
+    protected ApplicationSpecs() {
     }
 
     /**
@@ -71,7 +71,7 @@ public final class ApplicationSpecs {
                         predicates.add(cb.isMember(tag, root.get(Application_.tags)));
                     }
                 }
-                return cb.and(predicates.toArray(new Predicate[0]));
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
     }
