@@ -39,6 +39,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,14 +100,17 @@ public class JobCountManagerImpl implements JobCountManager {
     @Transactional(readOnly = true)
     //TODO: Move to specification
     public int getNumInstanceJobs(
-            String hostName,
+            final String hostName,
             final Long minStartTime,
             final Long maxStartTime) throws GenieException {
         LOG.debug("called");
 
+        final String finalHostName;
         // initialize host name
-        if (hostName == null) {
-            hostName = NetUtil.getHostName();
+        if (StringUtils.isBlank(hostName)) {
+            finalHostName = NetUtil.getHostName();
+        } else {
+            finalHostName = hostName;
         }
         final CriteriaBuilder cb = this.em.getCriteriaBuilder();
         final CriteriaQuery<Long> cq = cb.createQuery(Long.class);
@@ -115,13 +119,13 @@ public class JobCountManagerImpl implements JobCountManager {
         final Predicate runningStatus = cb.equal(j.get(Job_.status), JobStatus.RUNNING);
         final Predicate initStatus = cb.equal(j.get(Job_.status), JobStatus.INIT);
         final List<Predicate> predicates = new ArrayList<Predicate>();
-        predicates.add(cb.equal(j.get(Job_.hostName), hostName));
+        predicates.add(cb.equal(j.get(Job_.hostName), finalHostName));
         predicates.add(cb.or(runningStatus, initStatus));
         if (minStartTime != null) {
             predicates.add(cb.greaterThanOrEqualTo(j.get(Job_.started), new Date(minStartTime)));
         }
         if (maxStartTime != null) {
-            predicates.add(cb.lessThanOrEqualTo(j.get(Job_.started), new Date(maxStartTime)));
+            predicates.add(cb.lessThan(j.get(Job_.started), new Date(maxStartTime)));
         }
         //documentation says that by default predicate array is conjuncted together
         cq.where(predicates.toArray(new Predicate[predicates.size()]));

@@ -110,6 +110,16 @@ public class TestStringUtil {
     }
 
     /**
+     * Test that null returns empty string.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testSplitCmdLineWithNull() throws GenieException {
+        Assert.assertEquals(0, StringUtil.splitCmdLine(null).length);
+    }
+
+    /**
      * Test whether Hadoop/Hive/Pig versions are trimmed correctly to 3 digits.
      */
     @Test
@@ -134,8 +144,16 @@ public class TestStringUtil {
         version = StringUtil.trimVersion(input);
         Assert.assertEquals("0", version);
 
-        input = null;
-        version = StringUtil.trimVersion(input);
+        version = StringUtil.trimVersion(null);
         Assert.assertEquals(version, null);
+    }
+
+    /**
+     * Completeness.
+     */
+    @Test
+    public void testConstructor() {
+        final StringUtil util = new StringUtil();
+        Assert.assertNotNull(util);
     }
 }

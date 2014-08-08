@@ -20,6 +20,7 @@ package com.netflix.genie.server.util;
 import com.netflix.genie.common.exceptions.GenieException;
 import java.net.HttpURLConnection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * Utility class to parse string (for command-line arguments, versions, etc).
  *
  * @author skrishnan
+ * @author tgianos
  */
 public final class StringUtil {
 
@@ -35,10 +37,12 @@ public final class StringUtil {
     /**
      * The argument delimiter, which is set to white space.
      */
-    public static final String ARG_DELIMITER = "\\s";
+    private static final String ARG_DELIMITER = "\\s";
 
-    private StringUtil() {
-        // never called
+    /**
+     * Should never be called.
+     */
+    protected StringUtil() {
     }
 
     /**
@@ -50,23 +54,24 @@ public final class StringUtil {
      * possible
      * @throws GenieException
      */
-    public static String[] splitCmdLine(String input)
+    public static String[] splitCmdLine(final String input)
             throws GenieException {
         LOG.debug("Command line: " + input);
-        if (input == null) {
+        if (StringUtils.isBlank(input)) {
             return new String[0];
         }
 
-        String[] output = null;
+        final String[] output;
         try {
             // ignore delimiter if it is within quotes
             output = input.trim().split("[" + ARG_DELIMITER
                     + "]+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-        } catch (Exception e) {
-            String msg = "Invalid argument: " + input;
+        } catch (final Exception e) {
+            final String msg = "Invalid argument: " + input;
             LOG.error(msg, e);
             throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
+                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    msg, e);
         }
 
         // "cleanse" inputs - get rid of enclosing quotes

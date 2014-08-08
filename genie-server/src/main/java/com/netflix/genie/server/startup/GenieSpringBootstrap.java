@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.server.startup;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.jobmanager.JobJanitor;
-import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.metrics.JobCountMonitor;
 import javax.annotation.PostConstruct;
@@ -50,14 +50,12 @@ public class GenieSpringBootstrap {
      * Constructor.
      *
      * @param janitor The job janitor to used
-     * @param genieNodeStatistics The genie statistics to use
      * @param jobCountManager The job count manager to use
      * @param jobCountMonitor The job count monitor to use
      */
     @Inject
     public GenieSpringBootstrap(
             final JobJanitor janitor,
-            final GenieNodeStatistics genieNodeStatistics,
             final JobCountManager jobCountManager,
             final JobCountMonitor jobCountMonitor) {
         this.jobJanitor = janitor;
@@ -70,10 +68,10 @@ public class GenieSpringBootstrap {
     /**
      * Initialize the application here - db connections, daemon threads, etc.
      *
-     * @throws Exception
+     * @throws GenieException
      */
     @PostConstruct
-    public void initialize() throws Exception {
+    public void initialize() throws GenieException {
         LOG.info("called");
 
         // hack to ensure that a DB connection is made correctly for the first time

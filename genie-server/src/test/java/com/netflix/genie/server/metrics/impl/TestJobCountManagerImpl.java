@@ -68,15 +68,17 @@ public class TestJobCountManagerImpl {
     @DatabaseSetup("testNumInstanceJobs.xml")
     public void testNumInstanceJobs() throws GenieException {
         //Force the hostname of the jobs to be the machine running the build
+        final String hostName = NetUtil.getHostName();
         final List<Job> jobs = this.jobRepo.findAll();
         for (final Job job : jobs) {
-            job.setHostName(NetUtil.getHostName());
+            job.setHostName(hostName);
         }
         this.jobRepo.flush();
 
-        Assert.assertTrue(2 == this.manager.getNumInstanceJobs());
-        Assert.assertTrue(2 == this.manager.getNumInstanceJobs(0L, System.currentTimeMillis()));
-        //Assert.assertTrue(5 == this.manager.getNumInstanceJobs(1404257258340L, 1404257258341L));
-        Assert.assertTrue(0 == this.manager.getNumInstanceJobs(0L, 0L));
+        Assert.assertEquals(2, this.manager.getNumInstanceJobs());
+        Assert.assertEquals(2, this.manager.getNumInstanceJobs(0L, System.currentTimeMillis()));
+        Assert.assertEquals(1, this.manager.getNumInstanceJobs(1404257259000L, 1404257260000L));
+        Assert.assertEquals(1, this.manager.getNumInstanceJobs(hostName, 1404257258000L, 1404257259000L));
+        Assert.assertEquals(0, this.manager.getNumInstanceJobs(0L, 0L));
     }
 }

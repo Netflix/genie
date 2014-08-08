@@ -18,14 +18,10 @@
 package com.netflix.genie.server.metrics.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.inject.Inject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test case for GenieNodeStatistics.
@@ -33,12 +29,33 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author skrishnan
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
 public class TestGenieNodeStatisticsImpl {
 
-    @Inject
-    private GenieNodeStatistics stats;
+    private GenieNodeStatisticsImpl stats;
+
+    /**
+     * Setup the tests.
+     */
+    @Before
+    public void setup() {
+        this.stats = new GenieNodeStatisticsImpl();
+    }
+
+    /**
+     * Test the initialize method.
+     */
+    @Test
+    public void testInitialize() {
+        this.stats.initialize();
+    }
+
+    /**
+     * Test the shutdown method.
+     */
+    @Test
+    public void testShutdown() {
+        this.stats.shutdown();
+    }
 
     /**
      * Test the counter that increments 200 error codes (success).
@@ -138,5 +155,93 @@ public class TestGenieNodeStatisticsImpl {
     public void testRunningJobs() throws InterruptedException, GenieException {
         this.stats.setGenieRunningJobs(0);
         Assert.assertEquals(0, this.stats.getGenieRunningJobs().intValue());
+    }
+
+    /**
+     * Test the counter for successful emails.
+     */
+    @Test
+    public void testSuccessfulEmailCountCounter() {
+        Assert.assertEquals(0L, this.stats.getSuccessfulEmailSentCount().get());
+        this.stats.incrSuccessfulEmailCount();
+        Assert.assertEquals(1L, this.stats.getSuccessfulEmailSentCount().get());
+    }
+
+    /**
+     * Test the counter for failed emails.
+     */
+    @Test
+    public void testFailedEmailCountCounter() {
+        Assert.assertEquals(0L, this.stats.getFailedEmailSentCount().get());
+        this.stats.incrFailedEmailCount();
+        Assert.assertEquals(1L, this.stats.getFailedEmailSentCount().get());
+    }
+
+    /**
+     * Test the counter for forwarded jobs.
+     */
+    @Test
+    public void testGenieForwardedJobsCounter() {
+        Assert.assertEquals(0L, this.stats.getGenieForwardedJobs().get());
+        this.stats.incrGenieForwardedJobs();
+        Assert.assertEquals(1L, this.stats.getGenieForwardedJobs().get());
+
+        final long count = 584L;
+        this.stats.setGenieForwardedJobs(new AtomicLong(count));
+        Assert.assertEquals(count, this.stats.getGenieForwardedJobs().get());
+    }
+
+    /**
+     * Test the counter for Genie running jobs 0 to 15 minutes.
+     */
+    @Test
+    public void testGenieRunningJobs0To15mCounter() {
+        Assert.assertEquals(0, this.stats.getGenieRunningJobs0To15m().get());
+        final int count = 532;
+        this.stats.setGenieRunningJobs0To15m(count);
+        Assert.assertEquals(count, this.stats.getGenieRunningJobs0To15m().get());
+    }
+
+    /**
+     * Test the counter for Genie running jobs 15 minutes to 2 hours.
+     */
+    @Test
+    public void testGenieRunningJobs15mTo2hCounter() {
+        Assert.assertEquals(0, this.stats.getGenieRunningJobs15mTo2h().get());
+        final int count = 532;
+        this.stats.setGenieRunningJobs15mTo2h(count);
+        Assert.assertEquals(count, this.stats.getGenieRunningJobs15mTo2h().get());
+    }
+
+    /**
+     * Test the counter for Genie running jobs 2 to 8 hours.
+     */
+    @Test
+    public void testGenieRunningJobs2hTo8hCounter() {
+        Assert.assertEquals(0, this.stats.getGenieRunningJobs2hTo8h().get());
+        final int count = 53554;
+        this.stats.setGenieRunningJobs2hTo8h(count);
+        Assert.assertEquals(count, this.stats.getGenieRunningJobs2hTo8h().get());
+    }
+
+    /**
+     * Test the counter for Genie running jobs 8 hours plus.
+     */
+    @Test
+    public void testGenieRunningJobs8hPlusCounter() {
+        Assert.assertEquals(0, this.stats.getGenieRunningJobs8hPlus().get());
+        final int count = 5524;
+        this.stats.setGenieRunningJobs8hPlus(count);
+        Assert.assertEquals(count, this.stats.getGenieRunningJobs8hPlus().get());
+    }
+
+    /**
+     * Test the counter for job submission retries.
+     */
+    @Test
+    public void testJobSubmissionRetryCounter() {
+        Assert.assertEquals(0L, this.stats.getJobSubmissionRetryCount().get());
+        this.stats.incrJobSubmissionRetryCount();
+        Assert.assertEquals(1L, this.stats.getJobSubmissionRetryCount().get());
     }
 }

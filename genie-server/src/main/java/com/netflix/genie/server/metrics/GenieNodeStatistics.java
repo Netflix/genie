@@ -29,11 +29,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public interface GenieNodeStatistics {
 
     /**
-     * Register static instance with servo.
-     */
-    void register();
-
-    /**
      * Get count of 2xx responses.
      *
      * @return count of 2xx responses
@@ -294,9 +289,4 @@ public interface GenieNodeStatistics {
      *                               than 8 hours
      */
     void setGenieRunningJobs8hPlus(int genieRunningJobs8hPlus);
-
-    /**
-     * Shut down cleanly.
-     */
-    void shutdown();
 }

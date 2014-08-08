@@ -57,7 +57,7 @@ public interface JobCountManager {
      * @param hostName - if null, local host name is used
      * @param minStartTime min start time in ms
      * @param maxStartTime max start time in ms
-     * @return number of running jobs matching specified critiera
+     * @return number of running jobs matching specified criteria
      * @throws GenieException if there is an error
      */
     int getNumInstanceJobs(
