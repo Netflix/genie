@@ -73,7 +73,7 @@ public class ClusterCriteria implements Serializable {
      * Set the tags for the cluster criteria.
      *
      * @param tags The tags to set. Not null.
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public void setTags(final Set<String> tags) throws GenieException {
         if (tags == null || tags.isEmpty()) {

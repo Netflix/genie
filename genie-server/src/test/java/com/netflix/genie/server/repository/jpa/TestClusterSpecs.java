@@ -15,11 +15,14 @@
  */
 package com.netflix.genie.server.repository.jpa;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Cluster_;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
-//import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.common.model.CommandStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,6 +39,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,12 +54,16 @@ public class TestClusterSpecs {
     private static final String TAG_1 = "prod";
     private static final String TAG_2 = "yarn";
     private static final String TAG_3 = "hadoop";
+    private static final String COMMAND_CRITERIA_TAG_1 = "hive";
+    private static final String COMMAND_CRITERIA_TAG_2 = "prod";
     private static final ClusterStatus STATUS_1 = ClusterStatus.UP;
     private static final ClusterStatus STATUS_2 = ClusterStatus.OUT_OF_SERVICE;
     private static final List<String> TAGS = new ArrayList<String>();
     private static final List<ClusterStatus> STATUSES = new ArrayList<ClusterStatus>();
     private static final Long MIN_UPDATE_TIME = 123467L;
     private static final Long MAX_UPDATE_TIME = 1234643L;
+    private static final Set<String> CLUSTER_CRITERIA_TAGS = new HashSet<String>();
+    private static final Set<String> COMMAND_CRITERIA = new HashSet<String>();
 
     private Root<Cluster> root;
     private CriteriaQuery<?> cq;
@@ -73,6 +81,13 @@ public class TestClusterSpecs {
 
         STATUSES.add(STATUS_1);
         STATUSES.add(STATUS_2);
+
+        CLUSTER_CRITERIA_TAGS.add(TAG_1);
+        CLUSTER_CRITERIA_TAGS.add(TAG_2);
+        CLUSTER_CRITERIA_TAGS.add(TAG_3);
+
+        COMMAND_CRITERIA.add(COMMAND_CRITERIA_TAG_1);
+        COMMAND_CRITERIA.add(COMMAND_CRITERIA_TAG_2);
     }
 
     /**
@@ -365,14 +380,54 @@ public class TestClusterSpecs {
         }
     }
 
-//    @Test
-//    public void testFindByClusterAndCommandCriteriaNoCriteria() {
-//        final Specification<Cluster> spec = ClusterSpecs
-//                .findByClusterAndCommandCriteria(null, null);
-//
-//        spec.toPredicate(this.root, this.cq, this.cb);
-//        Mockito.verify(this.cq, Mockito.times(1)).distinct(true);
-//    }
+    /**
+     * Test to make sure no member of predicates are added.
+     */
+    @Test
+    public void testFindByClusterAndCommandCriteriaNoCriteria() {
+        final Specification<Cluster> spec = ClusterSpecs
+                .findByClusterAndCommandCriteria(null, null);
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cq, Mockito.times(1)).distinct(true);
+        Mockito.verify(this.commands, Mockito.times(1)).get(Command_.status);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.commands.get(Command_.status), CommandStatus.ACTIVE);
+        Mockito.verify(this.root, Mockito.times(1)).get(Cluster_.status);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Cluster_.status), ClusterStatus.UP);
+        Mockito.verify(this.cb, Mockito.never())
+                .isMember(Mockito.any(String.class), Mockito.any(Expression.class));
+    }
+
+    /**
+     * Test to all predicates are added.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testFindByClusterAndCommandCriteria() throws GenieException {
+        final ClusterCriteria criteria = new ClusterCriteria(CLUSTER_CRITERIA_TAGS);
+        final Specification<Cluster> spec = ClusterSpecs
+                .findByClusterAndCommandCriteria(criteria, COMMAND_CRITERIA);
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cq, Mockito.times(1)).distinct(true);
+        Mockito.verify(this.commands, Mockito.times(1)).get(Command_.status);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.commands.get(Command_.status), CommandStatus.ACTIVE);
+        Mockito.verify(this.root, Mockito.times(1)).get(Cluster_.status);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Cluster_.status), ClusterStatus.UP);
+        Mockito.verify(this.commands, Mockito.times(COMMAND_CRITERIA.size()))
+                .get(Command_.tags);
+        Mockito.verify(this.root, Mockito.times(CLUSTER_CRITERIA_TAGS.size()))
+                .get(Cluster_.tags);
+        Mockito.verify(
+                this.cb,
+                Mockito.times(COMMAND_CRITERIA.size() + CLUSTER_CRITERIA_TAGS.size()))
+                .isMember(Mockito.any(String.class), Mockito.any(Expression.class));
+    }
 
     /**
      * Here for completeness.

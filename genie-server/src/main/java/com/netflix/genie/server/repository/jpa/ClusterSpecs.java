@@ -134,7 +134,7 @@ public final class ClusterSpecs {
                     }
                 }
 
-                if (clusterCriteria.getTags() != null) {
+                if (clusterCriteria != null) {
                     for (final String tag : clusterCriteria.getTags()) {
                         predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
                     }
