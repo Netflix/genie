@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
     <Job id="job1" 
-         created="2013-06-01 16:02:00" 
-         updated="2013-06-01 16:02:00" 
+         created="2013-06-01 16:02:00 +0000" 
+         updated="2013-06-01 16:02:00 +0000" 
          user="tgianos" 
          commandId="15" 
          commandName="pig" 
          status="INIT" 
          name="one" 
          commandArgs="-tez"
-		 started="2014-07-01 16:27:38"   
+		 started="2014-07-01 16:27:38 +0000"
          clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"
          version="1"/>
     
     <Job id="job2" 
-         created="2013-06-01 16:03:00" 
-         updated="2013-06-01 16:03:00" 
+         created="2013-06-01 16:03:00 +0000" 
+         updated="2013-06-01 16:03:00 +0000" 
          user="tgianos" 
          commandId="15" 
          commandName="pig" 
@@ -25,12 +25,12 @@
          commandArgs="-tez"
          clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"    
-         started="2014-07-01 16:27:39"
+         started="2014-07-01 16:27:39 +0000"
     	 version="2"/>
     
     <Job id="job3" 
-         created="2013-06-01 16:04:00" 
-         updated="2013-06-01 16:04:00" 
+         created="2013-06-01 16:04:00 +0000" 
+         updated="2013-06-01 16:04:00 +0000" 
          user="tgianos" 
          commandId="15" 
          commandName="pig" 
@@ -39,12 +39,12 @@
     	 commandCriteriaString="tag2,tag1"
          name="three" 
          commandArgs="-tez"
-		 started="2014-07-01 16:27:40"	
+		 started="2014-07-01 16:27:40 +0000"	
          version="3"/>
     
     <Job id="job4" 
-         created="2013-06-01 16:05:00" 
-         updated="2013-06-01 16:05:00" 
+         created="2013-06-01 16:05:00 +0000" 
+         updated="2013-06-01 16:05:00 +0000" 
          user="tgianos" 
          commandId="15" 
          commandName="pig" 
@@ -53,12 +53,12 @@
          clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"    
          commandArgs="-tez"
-         started="2014-07-01 16:27:41"
+         started="2014-07-01 16:27:41 +0000"
          version="4"/>
     
     <Job id="job5" 
-         created="2013-06-01 16:06:00" 
-         updated="2013-06-01 16:06:00" 
+         created="2013-06-01 16:06:00 +0000" 
+         updated="2013-06-01 16:06:00 +0000" 
          user="tgianos" 
          commandId="15" 
          commandName="pig" 
@@ -67,6 +67,6 @@
          commandArgs="-tez"
          clusterCriteriasString="y,x|h2query,adhoc" 
     	 commandCriteriaString="tag2,tag1"    
-         started="2014-07-01 16:27:42"
+         started="2014-07-01 16:27:42 +0000"
          version="5"/>
 </dataset>

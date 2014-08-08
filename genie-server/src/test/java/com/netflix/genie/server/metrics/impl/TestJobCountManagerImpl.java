@@ -23,6 +23,8 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
+
+import java.util.Calendar;
 import java.util.List;
 import javax.inject.Inject;
 import org.junit.Assert;
@@ -75,10 +77,38 @@ public class TestJobCountManagerImpl {
         }
         this.jobRepo.flush();
 
+        final Calendar one = Calendar.getInstance();
+        one.clear();
+        one.set(2014, Calendar.JULY, 1, 16, 27, 38);
+
+        final Calendar two = Calendar.getInstance();
+        two.clear();
+        two.set(2014, Calendar.JULY, 1, 16, 27, 39);
+
+        final Calendar three = Calendar.getInstance();
+        three.clear();
+        three.set(2014, Calendar.JULY, 1, 16, 27, 40);
+
         Assert.assertEquals(2, this.manager.getNumInstanceJobs());
-        Assert.assertEquals(2, this.manager.getNumInstanceJobs(0L, System.currentTimeMillis()));
-        Assert.assertEquals(1, this.manager.getNumInstanceJobs(1404257259000L, 1404257260000L));
-        Assert.assertEquals(1, this.manager.getNumInstanceJobs(hostName, 1404257258000L, 1404257259000L));
+        Assert.assertEquals(2,
+                this.manager.getNumInstanceJobs(
+                        0L,
+                        System.currentTimeMillis()
+                )
+        );
+        Assert.assertEquals(1,
+                this.manager.getNumInstanceJobs(
+                        one.getTimeInMillis(),
+                        two.getTimeInMillis()
+                )
+        );
+        Assert.assertEquals(1,
+                this.manager.getNumInstanceJobs(
+                        hostName,
+                        two.getTimeInMillis(),
+                        three.getTimeInMillis()
+                )
+        );
         Assert.assertEquals(0, this.manager.getNumInstanceJobs(0L, 0L));
     }
 }
