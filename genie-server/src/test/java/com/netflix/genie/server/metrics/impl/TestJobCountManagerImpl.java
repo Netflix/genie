@@ -25,7 +25,10 @@ import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
 
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -72,23 +75,25 @@ public class TestJobCountManagerImpl {
         //Force the hostname of the jobs to be the machine running the build
         final String hostName = NetUtil.getHostName();
         final List<Job> jobs = this.jobRepo.findAll();
+        final Set<Long> times = new HashSet<Long>();
         for (final Job job : jobs) {
             job.setHostName(hostName);
+            times.add(job.getStarted().getTime());
         }
         this.jobRepo.flush();
 
         final Calendar one = Calendar.getInstance();
         one.clear();
         one.set(2014, Calendar.JULY, 1, 16, 27, 38);
-
+        long ones = one.getTimeInMillis();
         final Calendar two = Calendar.getInstance();
         two.clear();
         two.set(2014, Calendar.JULY, 1, 16, 27, 39);
-
+        long twos = two.getTimeInMillis();
         final Calendar three = Calendar.getInstance();
         three.clear();
         three.set(2014, Calendar.JULY, 1, 16, 27, 40);
-
+        long threes = three.getTimeInMillis();
         Assert.assertEquals(2, this.manager.getNumInstanceJobs());
         Assert.assertEquals(2,
                 this.manager.getNumInstanceJobs(

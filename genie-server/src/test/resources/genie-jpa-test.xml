@@ -29,7 +29,9 @@
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
     
-    <jdbc:embedded-database id="dataSource" type="HSQL"/>
+    <jdbc:embedded-database id="dataSource" type="HSQL">
+        <!--<jdbc:script location="classpath:init.sql"/>-->
+    </jdbc:embedded-database>
     
     <jpa:repositories base-package="com.netflix.genie.server.repository.jpa"/>
     
