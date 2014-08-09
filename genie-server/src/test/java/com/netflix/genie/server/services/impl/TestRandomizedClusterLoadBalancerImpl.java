@@ -25,12 +25,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import javax.inject.Inject;
 import static org.junit.Assert.assertNotNull;
+
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test for the cluster load balancer.
@@ -38,12 +36,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author skrishnan
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
 public class TestRandomizedClusterLoadBalancerImpl {
 
-    @Inject
     private ClusterLoadBalancer clb;
+
+    /**
+     * Setup for the tests.
+     */
+    @Before
+    public void setup() {
+        this.clb = new RandomizedClusterLoadBalancerImpl();
+    }
 
     /**
      * Test whether a cluster is returned from a set of candidates.
@@ -55,7 +58,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
         final Set<String> configs = new HashSet<String>();
         configs.add("SomeConfig");
         final Cluster cce = new Cluster("name", "tgianos", ClusterStatus.UP, "jobManager", configs, "2.4.0");
-        assertNotNull(this.clb.selectCluster(Arrays.asList(new Cluster[]{cce, cce, cce})));
+        assertNotNull(this.clb.selectCluster(Arrays.asList(cce, cce, cce)));
     }
 
     /**

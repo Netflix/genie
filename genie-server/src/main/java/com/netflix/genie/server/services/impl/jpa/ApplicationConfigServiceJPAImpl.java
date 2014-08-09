@@ -78,7 +78,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     @Transactional(readOnly = true)
     public Application getApplication(
             final String id) throws GenieException {
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtils.isBlank(id)) {
             //Messages will be logged by exception mapper at resource level
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
@@ -90,9 +90,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
                     "No application with id " + id);
-        } else {
-            return app;
         }
+
+        return app;
     }
 
     /**

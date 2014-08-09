@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <Application
+            id="app1"
+            created="2014-08-08 01:45:00"
+            updated="2014-08-08 01:50:00"
+            user="tgianos"
+            name="tez"
+            version="1.2.3"
+            status="INACTIVE"/>
+    <Application_tags
+            APPLICATION_ID="app1"
+            element="tez"/>
+    <Application_tags
+            APPLICATION_ID="app1"
+            element="prod"/>
+    <Application_tags
+            APPLICATION_ID="app1"
+            element="yarn"/>
+    <Application_configs
+            APPLICATION_ID="app1"
+            element="s3://some/config/file"/>
+    <Application_configs
+            APPLICATION_ID="app1"
+            element="s3://some/other/config/file"/>
+    <Application_jars
+            APPLICATION_ID="app1"
+            element="foo.jar"/>
+    <Application_jars
+            APPLICATION_ID="app1"
+            element="bar.jar"/>
+</dataset>
