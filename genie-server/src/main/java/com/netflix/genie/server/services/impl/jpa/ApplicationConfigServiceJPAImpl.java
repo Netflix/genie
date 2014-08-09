@@ -157,18 +157,29 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final Application updateApp) throws GenieException {
         if (StringUtils.isEmpty(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application id entered. Unable to update.");
         }
         if (updateApp == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application information entered. Unable to update.");
         }
-        if (StringUtils.isBlank(updateApp.getId()) || !id.equals(updateApp.getId())) {
+        if (!this.applicationRepo.exists(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application information entered. Unable to update.");
+        }
+        if (StringUtils.isNotBlank(updateApp.getId())
+                && !id.equals(updateApp.getId())) {
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Application id either not entered or inconsistent with id passed in.");
+        }
+
+        //Set the id if it's not set so we can merge
+        if (StringUtils.isBlank(updateApp.getId())) {
+            updateApp.setId(id);
         }
         LOG.debug("Called with app " + updateApp.toString());
         final Application app = this.em.merge(updateApp);
@@ -200,9 +211,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     @Override
     public Application deleteApplication(
             final String id) throws GenieException {
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application id entered. Unable to delete.");
         }
         LOG.debug("Called with id " + id);
@@ -615,6 +626,11 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
     @Override
     public Set<String> removeTagForApplication(String id, String tag)
             throws GenieException {

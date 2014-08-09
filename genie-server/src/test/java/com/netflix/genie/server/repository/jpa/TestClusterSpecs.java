@@ -435,6 +435,6 @@ public class TestClusterSpecs {
     @Test
     public void testProtectedConstructor() {
         final ClusterSpecs specs = new ClusterSpecs();
-        Assert.assertEquals(ClusterSpecs.class, specs.getClass());
+        Assert.assertNotNull(specs);
     }
 }
