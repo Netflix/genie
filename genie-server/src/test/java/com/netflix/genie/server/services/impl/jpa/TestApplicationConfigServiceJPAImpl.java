@@ -490,7 +490,7 @@ public class TestApplicationConfigServiceJPAImpl {
         Assert.assertNull(this.command_service.getCommand(COMMAND_1_ID)
                 .getApplication());
 
-        //Test a case where the app has no commands to 
+        //Test a case where the app has no commands to
         //make sure that also works.
         Assert.assertEquals(APP_3_ID,
                 this.service.deleteApplication(APP_3_ID).getId());

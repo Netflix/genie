@@ -66,7 +66,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * Default constructor.
      *
      * @param commandRepo the command repository to use
-     * @param appRepo     the application repository to use
+     * @param appRepo the application repository to use
      */
     @Inject
     public CommandConfigServiceJPAImpl(
@@ -85,7 +85,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     public Command createCommand(final Command command) throws GenieException {
         if (command == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command entered to create");
         }
         command.validate();
@@ -114,7 +114,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         LOG.debug("called");
         if (StringUtils.isEmpty(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "Id can't be null or empty.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -167,15 +167,31 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     public Command updateCommand(
             final String id,
             final Command updateCommand) throws GenieException {
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No id entered. Unable to update.");
         }
-        if (StringUtils.isBlank(updateCommand.getId()) || !id.equals(updateCommand.getId())) {
+        if (updateCommand == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No command information entered. Unable to update.");
+        }
+        if (!this.commandRepo.exists(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No command information entered. Unable to update.");
+        }
+        if (StringUtils.isNotBlank(updateCommand.getId())
+                && !id.equals(updateCommand.getId())) {
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
                     "Command id either not entered or inconsistent with id passed in.");
+        }
+
+        //Set the id if it's not set so we can merge
+        if (StringUtils.isBlank(updateCommand.getId())) {
+            updateCommand.setId(id);
         }
         LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
         final Command command = this.em.merge(updateCommand);
@@ -207,6 +223,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     @Override
     public Command deleteCommand(final String id) throws GenieException {
         LOG.debug("Called to delete command config with id " + id);
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No id entered. Unable to delete.");
+        }
         final Command command = this.commandRepo.findOne(id);
         if (command == null) {
             throw new GenieException(
@@ -236,12 +257,12 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to add configurations.");
         }
         if (configs == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No configuration files entered.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -266,7 +287,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to get configs.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -290,7 +311,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to update configurations.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -314,7 +335,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to remove configs.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -339,7 +360,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final String config) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to remove configuration.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -366,13 +387,18 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final Application application) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to add applications.");
         }
         if (application == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application entered. Unable to set application.");
+        }
+        if (StringUtils.isBlank(application.getId())) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No application id entered. Unable to set application.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
@@ -403,7 +429,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to get applications.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -433,7 +459,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to remove application.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -465,12 +491,12 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to add tags.");
         }
         if (tags == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No tags entered.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -497,7 +523,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id sent. Cannot retrieve tags.");
         }
 
@@ -522,7 +548,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to update tags.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -546,7 +572,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to remove tags.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -571,7 +597,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to get clusters.");
         }
         final Command command = this.commandRepo.findOne(id);
@@ -584,27 +610,27 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
     @Override
-    public Set<String> removeTagForCommand(String id, String tag)
+    public Set<String> removeTagForCommand(final String id, final String tag)
             throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command id entered. Unable to remove tag.");
-        }
-        if (StringUtils.isBlank(tag)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No tag entered. Unable to remove tag.");
-        }
-        if (tag.equals(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Cannot delete command id from the tags list.");
         }
 
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
+            if (id.equals(tag)) {
+                throw new GenieException(
+                        HttpURLConnection.HTTP_PRECON_FAILED,
+                        "Cannot delete command id from the tags list.");
+            }
             command.getTags().remove(tag);
             return command.getTags();
         } else {
