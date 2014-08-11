@@ -157,7 +157,7 @@ public interface ApplicationConfigService {
      * @return The active set of configurations
      * @throws GenieException
      */
-    Set<String> removeApplicationConfig(
+    Set<String> removeConfigForApplication(
             final String id,
             final String config) throws GenieException;
 

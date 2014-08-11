@@ -24,7 +24,9 @@ import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.services.ApplicationConfigService;
+import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +66,8 @@ public class TestApplicationConfigServiceJPAImpl {
     private static final ApplicationStatus APP_1_STATUS
             = ApplicationStatus.INACTIVE;
 
+    private static final String COMMAND_1_ID = "command1";
+
     private static final String APP_2_ID = "app2";
     private static final String APP_2_NAME = "spark";
     private static final String APP_2_USER = "amsharma";
@@ -80,6 +84,9 @@ public class TestApplicationConfigServiceJPAImpl {
 
     @Inject
     private ApplicationConfigService service;
+
+    @Inject
+    private CommandConfigService command_service;
 
     /**
      * Test the get application method.
@@ -461,5 +468,851 @@ public class TestApplicationConfigServiceJPAImpl {
         Assert.assertTrue(
                 this.service.getApplications(null, null, null, 0, 10)
                 .isEmpty());
+    }
+
+    /**
+     * Test delete.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testDelete() throws GenieException {
+        Assert.assertEquals(APP_1_ID,
+                this.command_service
+                .getApplicationForCommand(COMMAND_1_ID)
+                .getId());
+        Assert.assertEquals(APP_1_ID,
+                this.service.deleteApplication(APP_1_ID).getId());
+        Assert.assertNull(this.command_service.getCommand(COMMAND_1_ID)
+                .getApplication());
+
+        //Test a case where the app has no commands to 
+        //make sure that also works.
+        Assert.assertEquals(APP_3_ID,
+                this.service.deleteApplication(APP_3_ID).getId());
+    }
+
+    /**
+     * Test delete.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testDeleteNoId() throws GenieException {
+        this.service.deleteApplication(null);
+    }
+
+    /**
+     * Test delete.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testDeleteNoAppToDelete() throws GenieException {
+        this.service.deleteApplication(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test add configurations to application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testAddConfigsToApplication() throws GenieException {
+        final String newConfig1 = UUID.randomUUID().toString();
+        final String newConfig2 = UUID.randomUUID().toString();
+        final String newConfig3 = UUID.randomUUID().toString();
+
+        final Set<String> newConfigs = new HashSet<String>();
+        newConfigs.add(newConfig1);
+        newConfigs.add(newConfig2);
+        newConfigs.add(newConfig3);
+
+        Assert.assertEquals(2,
+                this.service.getConfigsForApplication(APP_1_ID).size());
+        final Set<String> finalConfigs
+                = this.service.addConfigsToApplication(APP_1_ID, newConfigs);
+        Assert.assertEquals(5, finalConfigs.size());
+        Assert.assertTrue(finalConfigs.contains(newConfig1));
+        Assert.assertTrue(finalConfigs.contains(newConfig2));
+        Assert.assertTrue(finalConfigs.contains(newConfig3));
+    }
+
+    /**
+     * Test add configurations to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddConfigsToApplicationNoId() throws GenieException {
+        this.service.addConfigsToApplication(null, new HashSet<String>());
+    }
+
+    /**
+     * Test add configurations to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddConfigsToApplicationNoConfigs() throws GenieException {
+        this.service.addConfigsToApplication(APP_1_ID, null);
+    }
+
+    /**
+     * Test add configurations to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddConfigsToApplicationNoApp() throws GenieException {
+        this.service.addConfigsToApplication(UUID.randomUUID().toString(),
+                new HashSet<String>());
+    }
+
+    /**
+     * Test update configurations for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testUpdateConfigsForApplication() throws GenieException {
+        final String newConfig1 = UUID.randomUUID().toString();
+        final String newConfig2 = UUID.randomUUID().toString();
+        final String newConfig3 = UUID.randomUUID().toString();
+
+        final Set<String> newConfigs = new HashSet<String>();
+        newConfigs.add(newConfig1);
+        newConfigs.add(newConfig2);
+        newConfigs.add(newConfig3);
+
+        Assert.assertEquals(2,
+                this.service.getConfigsForApplication(APP_1_ID).size());
+        final Set<String> finalConfigs
+                = this.service.updateConfigsForApplication(APP_1_ID, newConfigs);
+        Assert.assertEquals(3, finalConfigs.size());
+        Assert.assertTrue(finalConfigs.contains(newConfig1));
+        Assert.assertTrue(finalConfigs.contains(newConfig2));
+        Assert.assertTrue(finalConfigs.contains(newConfig3));
+    }
+
+    /**
+     * Test update configurations for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateConfigsForApplicationNoId() throws GenieException {
+        this.service.updateConfigsForApplication(null, new HashSet<String>());
+    }
+
+    /**
+     * Test update configurations for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateConfigsForApplicationNoApp() throws GenieException {
+        this.service.updateConfigsForApplication(UUID.randomUUID().toString(),
+                new HashSet<String>());
+    }
+
+    /**
+     * Test get configurations for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testGetConfigsForApplication() throws GenieException {
+        Assert.assertEquals(2,
+                this.service.getConfigsForApplication(APP_1_ID).size());
+    }
+
+    /**
+     * Test get configurations to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetConfigsForApplicationNoId() throws GenieException {
+        this.service.getConfigsForApplication(null);
+    }
+
+    /**
+     * Test get configurations to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetConfigsForApplicationNoApp() throws GenieException {
+        this.service.getConfigsForApplication(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test remove all configurations for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveAllConfigsForApplication() throws GenieException {
+        Assert.assertEquals(2,
+                this.service.getConfigsForApplication(APP_1_ID).size());
+        Assert.assertEquals(0,
+                this.service.removeAllConfigsForApplication(APP_1_ID).size());
+    }
+
+    /**
+     * Test remove all configurations for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveAllConfigsForApplicationNoId() throws GenieException {
+        this.service.removeAllConfigsForApplication(null);
+    }
+
+    /**
+     * Test remove all configurations for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveAllConfigsForApplicationNoApp() throws GenieException {
+        this.service.removeAllConfigsForApplication(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveConfigForApplication() throws GenieException {
+        final Set<String> configs
+                = this.service.getConfigsForApplication(APP_1_ID);
+        Assert.assertEquals(2, configs.size());
+        Assert.assertEquals(1,
+                this.service.removeConfigForApplication(
+                        APP_1_ID,
+                        configs.iterator().next()).size());
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveConfigForApplicationNullConfig()
+            throws GenieException {
+        final Set<String> configs
+                = this.service.getConfigsForApplication(APP_1_ID);
+        Assert.assertEquals(2, configs.size());
+        Assert.assertEquals(2,
+                this.service.removeConfigForApplication(
+                        APP_1_ID, null).size());
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveConfigForApplicationNoId() throws GenieException {
+        this.service.removeConfigForApplication(null, "something");
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveConfigForApplicationNoApp() throws GenieException {
+        this.service.removeConfigForApplication(
+                UUID.randomUUID().toString(),
+                "something");
+    }
+
+    /**
+     * Test add jars to application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testAddJarsToApplication() throws GenieException {
+        final String newJar1 = UUID.randomUUID().toString();
+        final String newJar2 = UUID.randomUUID().toString();
+        final String newJar3 = UUID.randomUUID().toString();
+
+        final Set<String> newJars = new HashSet<String>();
+        newJars.add(newJar1);
+        newJars.add(newJar2);
+        newJars.add(newJar3);
+
+        Assert.assertEquals(2,
+                this.service.getJarsForApplication(APP_1_ID).size());
+        final Set<String> finalJars
+                = this.service.addJarsForApplication(APP_1_ID, newJars);
+        Assert.assertEquals(5, finalJars.size());
+        Assert.assertTrue(finalJars.contains(newJar1));
+        Assert.assertTrue(finalJars.contains(newJar2));
+        Assert.assertTrue(finalJars.contains(newJar3));
+    }
+
+    /**
+     * Test add jars to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddJarsToApplicationNoId() throws GenieException {
+        this.service.addJarsForApplication(null, new HashSet<String>());
+    }
+
+    /**
+     * Test add jars to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddJarsToApplicationNoJars() throws GenieException {
+        this.service.addJarsForApplication(APP_1_ID, null);
+    }
+
+    /**
+     * Test add jars to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddJarsForApplicationNoApp() throws GenieException {
+        this.service.addJarsForApplication(UUID.randomUUID().toString(),
+                new HashSet<String>());
+    }
+
+    /**
+     * Test update jars for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testUpdateJarsForApplication() throws GenieException {
+        final String newJar1 = UUID.randomUUID().toString();
+        final String newJar2 = UUID.randomUUID().toString();
+        final String newJar3 = UUID.randomUUID().toString();
+
+        final Set<String> newJars = new HashSet<String>();
+        newJars.add(newJar1);
+        newJars.add(newJar2);
+        newJars.add(newJar3);
+
+        Assert.assertEquals(2,
+                this.service.getJarsForApplication(APP_1_ID).size());
+        final Set<String> finalJars
+                = this.service.updateJarsForApplication(APP_1_ID, newJars);
+        Assert.assertEquals(3, finalJars.size());
+        Assert.assertTrue(finalJars.contains(newJar1));
+        Assert.assertTrue(finalJars.contains(newJar2));
+        Assert.assertTrue(finalJars.contains(newJar3));
+    }
+
+    /**
+     * Test update jars for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateJarsForApplicationNoId() throws GenieException {
+        this.service.updateJarsForApplication(null, new HashSet<String>());
+    }
+
+    /**
+     * Test update jars for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateJarsForApplicationNoApp() throws GenieException {
+        this.service.updateJarsForApplication(UUID.randomUUID().toString(),
+                new HashSet<String>());
+    }
+
+    /**
+     * Test get jars for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testGetJarsForApplication() throws GenieException {
+        Assert.assertEquals(2,
+                this.service.getJarsForApplication(APP_1_ID).size());
+    }
+
+    /**
+     * Test get jars to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetJarsForApplicationNoId() throws GenieException {
+        this.service.getJarsForApplication(null);
+    }
+
+    /**
+     * Test get jars to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetJarsForApplicationNoApp() throws GenieException {
+        this.service.getJarsForApplication(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test remove all jars for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveAllJarsForApplication() throws GenieException {
+        Assert.assertEquals(2,
+                this.service.getJarsForApplication(APP_1_ID).size());
+        Assert.assertEquals(0,
+                this.service.removeAllJarsForApplication(APP_1_ID).size());
+    }
+
+    /**
+     * Test remove all jars for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveAllJarsForApplicationNoId() throws GenieException {
+        this.service.removeAllJarsForApplication(null);
+    }
+
+    /**
+     * Test remove all jars for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveAllJarsForApplicationNoApp() throws GenieException {
+        this.service.removeAllJarsForApplication(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveJarForApplication() throws GenieException {
+        final Set<String> jars
+                = this.service.getJarsForApplication(APP_1_ID);
+        Assert.assertEquals(2, jars.size());
+        Assert.assertEquals(1,
+                this.service.removeJarForApplication(
+                        APP_1_ID,
+                        jars.iterator().next()).size());
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveJarForApplicationNullJar()
+            throws GenieException {
+        final Set<String> jars
+                = this.service.getJarsForApplication(APP_1_ID);
+        Assert.assertEquals(2, jars.size());
+        Assert.assertEquals(2,
+                this.service.removeJarForApplication(
+                        APP_1_ID, null).size());
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveJarForApplicationNoId() throws GenieException {
+        this.service.removeJarForApplication(null, "something");
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveJarForApplicationNoApp() throws GenieException {
+        this.service.removeJarForApplication(
+                UUID.randomUUID().toString(),
+                "something");
+    }
+
+    /**
+     * Test add tags to application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testAddTagsToApplication() throws GenieException {
+        final String newTag1 = UUID.randomUUID().toString();
+        final String newTag2 = UUID.randomUUID().toString();
+        final String newTag3 = UUID.randomUUID().toString();
+
+        final Set<String> newTags = new HashSet<String>();
+        newTags.add(newTag1);
+        newTags.add(newTag2);
+        newTags.add(newTag3);
+
+        Assert.assertEquals(4,
+                this.service.getTagsForApplication(APP_1_ID).size());
+        final Set<String> finalTags
+                = this.service.addTagsForApplication(APP_1_ID, newTags);
+        Assert.assertEquals(7, finalTags.size());
+        Assert.assertTrue(finalTags.contains(newTag1));
+        Assert.assertTrue(finalTags.contains(newTag2));
+        Assert.assertTrue(finalTags.contains(newTag3));
+    }
+
+    /**
+     * Test add tags to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddTagsToApplicationNoId() throws GenieException {
+        this.service.addTagsForApplication(null, new HashSet<String>());
+    }
+
+    /**
+     * Test add tags to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddTagsToApplicationNoTags() throws GenieException {
+        this.service.addTagsForApplication(APP_1_ID, null);
+    }
+
+    /**
+     * Test add tags to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddTagsForApplicationNoApp() throws GenieException {
+        this.service.addTagsForApplication(UUID.randomUUID().toString(),
+                new HashSet<String>());
+    }
+
+    /**
+     * Test update tags for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testUpdateTagsForApplication() throws GenieException {
+        final String newTag1 = UUID.randomUUID().toString();
+        final String newTag2 = UUID.randomUUID().toString();
+        final String newTag3 = UUID.randomUUID().toString();
+
+        final Set<String> newTags = new HashSet<String>();
+        newTags.add(newTag1);
+        newTags.add(newTag2);
+        newTags.add(newTag3);
+
+        Assert.assertEquals(4,
+                this.service.getTagsForApplication(APP_1_ID).size());
+        final Set<String> finalTags
+                = this.service.updateTagsForApplication(APP_1_ID, newTags);
+        Assert.assertEquals(5, finalTags.size());
+        Assert.assertTrue(finalTags.contains(newTag1));
+        Assert.assertTrue(finalTags.contains(newTag2));
+        Assert.assertTrue(finalTags.contains(newTag3));
+        Assert.assertTrue(finalTags.contains(APP_1_ID));
+        Assert.assertTrue(finalTags.contains(APP_1_NAME));
+    }
+
+    /**
+     * Test update tags for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateTagsForApplicationNoId() throws GenieException {
+        this.service.updateTagsForApplication(null, new HashSet<String>());
+    }
+
+    /**
+     * Test update tags for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateTagsForApplicationNoApp() throws GenieException {
+        this.service.updateTagsForApplication(UUID.randomUUID().toString(),
+                new HashSet<String>());
+    }
+
+    /**
+     * Test get tags for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testGetTagsForApplication() throws GenieException {
+        Assert.assertEquals(4,
+                this.service.getTagsForApplication(APP_1_ID).size());
+    }
+
+    /**
+     * Test get tags to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetTagsForApplicationNoId() throws GenieException {
+        this.service.getTagsForApplication(null);
+    }
+
+    /**
+     * Test get tags to application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetTagsForApplicationNoApp() throws GenieException {
+        this.service.getTagsForApplication(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test remove all tags for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveAllTagsForApplication() throws GenieException {
+        Assert.assertEquals(4,
+                this.service.getTagsForApplication(APP_1_ID).size());
+        final Set<String> finalTags
+                = this.service.removeAllTagsForApplication(APP_1_ID);
+        Assert.assertEquals(2,
+                finalTags.size());
+        Assert.assertTrue(finalTags.contains(APP_1_ID));
+        Assert.assertTrue(finalTags.contains(APP_1_NAME));
+    }
+
+    /**
+     * Test remove all tags for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveAllTagsForApplicationNoId() throws GenieException {
+        this.service.removeAllTagsForApplication(null);
+    }
+
+    /**
+     * Test remove all tags for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveAllTagsForApplicationNoApp() throws GenieException {
+        this.service.removeAllTagsForApplication(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test remove tag for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveTagForApplication() throws GenieException {
+        final Set<String> tags
+                = this.service.getTagsForApplication(APP_1_ID);
+        Assert.assertEquals(4, tags.size());
+        Assert.assertEquals(3,
+                this.service.removeTagForApplication(
+                        APP_1_ID,
+                        "yarn").size()
+        );
+    }
+
+    /**
+     * Test remove tag for application.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveTagForApplicationNullTag()
+            throws GenieException {
+        final Set<String> tags
+                = this.service.getTagsForApplication(APP_1_ID);
+        Assert.assertEquals(4, tags.size());
+        Assert.assertEquals(4,
+                this.service.removeTagForApplication(
+                        APP_1_ID, null).size());
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveTagForApplicationNoId() throws GenieException {
+        this.service.removeTagForApplication(null, "something");
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveTagForApplicationNoApp() throws GenieException {
+        this.service.removeTagForApplication(
+                UUID.randomUUID().toString(),
+                "something"
+        );
+    }
+
+    /**
+     * Test remove configuration for application.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveTagForApplicationId() throws GenieException {
+        this.service.removeTagForApplication(
+                APP_1_ID,
+                APP_1_ID
+        );
+    }
+
+    /**
+     * Test the Get commands for application method.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("application/init.xml")
+    @DatabaseTearDown(
+            value = "application/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testGetCommandsForApplication() throws GenieException {
+        final Set<Command> commands
+                = this.service.getCommandsForApplication(APP_1_ID);
+        Assert.assertEquals(1, commands.size());
+        Assert.assertEquals(COMMAND_1_ID, commands.iterator().next().getId());
+    }
+
+    /**
+     * Test the Get commands for application method.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetCommandsForApplicationNoId() throws GenieException {
+        this.service.getCommandsForApplication("");
+    }
+
+    /**
+     * Test the Get commands for application method.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetCommandsForApplicationNoApp() throws GenieException {
+        this.service.getCommandsForApplication(UUID.randomUUID().toString());
     }
 }

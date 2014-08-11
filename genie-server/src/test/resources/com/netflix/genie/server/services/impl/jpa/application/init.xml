@@ -1,92 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
     <Application
-            id="app1"
-            created="2014-08-08 01:45:00"
-            updated="2014-08-08 01:50:00"
-            user="tgianos"
-            name="tez"
-            version="1.2.3"
-            status="INACTIVE"/>
+        id="app1"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        user="tgianos"
+        name="tez"
+        version="1.2.3"
+        status="INACTIVE"/>
     <Application_tags
-            APPLICATION_ID="app1"
-            element="app1"/>
+        APPLICATION_ID="app1"
+        element="app1"/>
     <Application_tags
-            APPLICATION_ID="app1"
-            element="tez"/>
+        APPLICATION_ID="app1"
+        element="tez"/>
     <Application_tags
-            APPLICATION_ID="app1"
-            element="prod"/>
+        APPLICATION_ID="app1"
+        element="prod"/>
     <Application_tags
-            APPLICATION_ID="app1"
-            element="yarn"/>
+        APPLICATION_ID="app1"
+        element="yarn"/>
     <Application_configs
-            APPLICATION_ID="app1"
-            element="s3://some/config/file"/>
+        APPLICATION_ID="app1"
+        element="s3://some/config/file"/>
     <Application_configs
-            APPLICATION_ID="app1"
-            element="s3://some/other/config/file"/>
+        APPLICATION_ID="app1"
+        element="s3://some/other/config/file"/>
     <Application_jars
-            APPLICATION_ID="app1"
-            element="tez.jar"/>
+        APPLICATION_ID="app1"
+        element="tez.jar"/>
     <Application_jars
-            APPLICATION_ID="app1"
-            element="yarn.jar"/>
+        APPLICATION_ID="app1"
+        element="yarn.jar"/>
+    
+    <Command
+        id="command1"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        user="tgianos"
+        name="pig_13_prod"
+        version="1.2.3"
+        executable="pig"
+        jobType="yarn"
+        status="INACTIVE"
+        APPLICATION_ID="app1"/>
     
     <Application
-            id="app2"
-            created="2014-08-09 01:45:00"
-            updated="2014-08-09 01:50:00"
-            user="amsharma"
-            name="spark"
-            version="4.5.6"
-            status="ACTIVE"/>
+        id="app2"
+        created="2014-08-09 01:45:00"
+        updated="2014-08-09 01:50:00"
+        user="amsharma"
+        name="spark"
+        version="4.5.6"
+        status="ACTIVE"/>
     <Application_tags
-            APPLICATION_ID="app2"
-            element="app2"/>
+        APPLICATION_ID="app2"
+        element="app2"/>
     <Application_tags
-            APPLICATION_ID="app2"
-            element="spark"/>
+        APPLICATION_ID="app2"
+        element="spark"/>
     <Application_tags
-            APPLICATION_ID="app2"
-            element="prod"/>
+        APPLICATION_ID="app2"
+        element="prod"/>
     <Application_tags
-            APPLICATION_ID="app2"
-            element="yarn"/>
+        APPLICATION_ID="app2"
+        element="yarn"/>
     <Application_configs
-            APPLICATION_ID="app2"
-            element="s3://some/spark/config/file"/>
+        APPLICATION_ID="app2"
+        element="s3://some/spark/config/file"/>
     <Application_configs
-            APPLICATION_ID="app2"
-            element="s3://some/other/spark/config/file"/>
+        APPLICATION_ID="app2"
+        element="s3://some/other/spark/config/file"/>
     <Application_jars
-            APPLICATION_ID="app2"
-            element="spark.jar"/>
+        APPLICATION_ID="app2"
+        element="spark.jar"/>
     
     <Application
-            id="app3"
-            created="2014-08-10 01:45:00"
-            updated="2014-08-10 01:50:00"
-            user="tgianos"
-            name="storm"
-            version="7.8.9"
-            status="DEPRECATED"/>
+        id="app3"
+        created="2014-08-10 01:45:00"
+        updated="2014-08-10 01:50:00"
+        user="tgianos"
+        name="storm"
+        version="7.8.9"
+        status="DEPRECATED"/>
     <Application_tags
-            APPLICATION_ID="app3"
-            element="app3"/>
+        APPLICATION_ID="app3"
+        element="app3"/>
     <Application_tags
-            APPLICATION_ID="app3"
-            element="storm"/>
+        APPLICATION_ID="app3"
+        element="storm"/>
     <Application_tags
-            APPLICATION_ID="app3"
-            element="prod"/>
+        APPLICATION_ID="app3"
+        element="prod"/>
     <Application_configs
-            APPLICATION_ID="app3"
-            element="s3://some/storm/config/file"/>
+        APPLICATION_ID="app3"
+        element="s3://some/storm/config/file"/>
     <Application_jars
-            APPLICATION_ID="app3"
-            element="storm.jar"/>
+        APPLICATION_ID="app3"
+        element="storm.jar"/>
     <Application_jars
-            APPLICATION_ID="app3"
-            element="yarn.jar"/>
+        APPLICATION_ID="app3"
+        element="yarn.jar"/>
 </dataset>

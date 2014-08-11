@@ -246,12 +246,12 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application id entered. Unable to add configurations.");
         }
         if (configs == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No configuration files entered.");
         }
         final Application app = this.applicationRepo.findOne(id);
@@ -344,7 +344,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @throws GenieException
      */
     @Override
-    public Set<String> removeApplicationConfig(
+    public Set<String> removeConfigForApplication(
             final String id,
             final String config) throws GenieException {
         if (StringUtils.isBlank(id)) {
@@ -507,12 +507,12 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application id entered. Unable to add tags.");
         }
         if (tags == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No tags entered.");
         }
         final Application application = this.applicationRepo.findOne(id);
@@ -539,7 +539,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application id sent. Cannot retrieve tags.");
         }
 
@@ -564,7 +564,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application id entered. Unable to update tags.");
         }
         final Application application = this.applicationRepo.findOne(id);
@@ -588,12 +588,44 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No application id entered. Unable to remove tags.");
         }
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             application.getTags().clear();
+            return application.getTags();
+        } else {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No application with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    public Set<String> removeTagForApplication(final String id, final String tag)
+            throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No application id entered. Unable to remove tag.");
+        }
+
+        final Application application = this.applicationRepo.findOne(id);
+        if (application != null) {
+            if (id.equals(tag)) {
+                throw new GenieException(
+                        HttpURLConnection.HTTP_PRECON_FAILED,
+                        "Cannot delete application id from the tags list.");
+            }
+            if (StringUtils.isNotBlank(tag)) {
+                application.getTags().remove(tag);
+            }
             return application.getTags();
         } else {
             throw new GenieException(
@@ -619,41 +651,6 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             return app.getCommands();
-        } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    public Set<String> removeTagForApplication(String id, String tag)
-            throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to remove tag.");
-        }
-        if (StringUtils.isBlank(tag)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No tag entered. Unable to remove tag.");
-        }
-        if (tag.equals(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Cannot delete application id from the tags list.");
-        }
-
-        final Application application = this.applicationRepo.findOne(id);
-        if (application != null) {
-            application.getTags().remove(tag);
-            return application.getTags();
         } else {
             throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
