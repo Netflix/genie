@@ -64,8 +64,8 @@ public final class ClusterSpecs {
      */
     public static Specification<Cluster> findByNameAndStatusesAndTagsAndUpdateTime(
             final String name,
-            final List<ClusterStatus> statuses,
-            final List<String> tags,
+            final Set<ClusterStatus> statuses,
+            final Set<String> tags,
             final Long minUpdateTime,
             final Long maxUpdateTime) {
         return new Specification<Cluster>() {

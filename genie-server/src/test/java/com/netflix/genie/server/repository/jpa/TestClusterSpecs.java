@@ -37,10 +37,9 @@ import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,8 +57,8 @@ public class TestClusterSpecs {
     private static final String COMMAND_CRITERIA_TAG_2 = "prod";
     private static final ClusterStatus STATUS_1 = ClusterStatus.UP;
     private static final ClusterStatus STATUS_2 = ClusterStatus.OUT_OF_SERVICE;
-    private static final List<String> TAGS = new ArrayList<String>();
-    private static final List<ClusterStatus> STATUSES = new ArrayList<ClusterStatus>();
+    private static final Set<String> TAGS = new HashSet<String>();
+    private static final Set<ClusterStatus> STATUSES = EnumSet.noneOf(ClusterStatus.class);
     private static final Long MIN_UPDATE_TIME = 123467L;
     private static final Long MAX_UPDATE_TIME = 1234643L;
     private static final Set<String> CLUSTER_CRITERIA_TAGS = new HashSet<String>();
@@ -248,7 +247,7 @@ public class TestClusterSpecs {
         final Specification<Cluster> spec = ClusterSpecs
                 .findByNameAndStatusesAndTagsAndUpdateTime(
                         NAME,
-                        new ArrayList<ClusterStatus>(),
+                        EnumSet.noneOf(ClusterStatus.class),
                         TAGS,
                         MIN_UPDATE_TIME,
                         MAX_UPDATE_TIME

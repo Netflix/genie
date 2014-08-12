@@ -99,6 +99,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @param stats             the GenieNodeStatistics object
      * @param jobCountManager   the job count manager to use
      * @param jobManagerFactory The the job manager factory to use
+     * @param jobService        The job service to use.
      */
     @Inject
     public ExecutionServiceJPAImpl(

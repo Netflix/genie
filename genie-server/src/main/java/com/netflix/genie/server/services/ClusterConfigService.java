@@ -62,28 +62,27 @@ public interface ClusterConfigService {
      * @param tags          tags allocated to this cluster
      * @param minUpdateTime min time when cluster configuration was updated
      * @param maxUpdateTime max time when cluster configuration was updated
-     * @param limit         number of entries to return
      * @param page          page number
+     * @param limit         number of entries to return
      * @return All the clusters matching the criteria
-     * @throws GenieException
      */
     List<Cluster> getClusters(
             final String name,
-            final List<ClusterStatus> statuses,
-            final List<String> tags,
+            final Set<ClusterStatus> statuses,
+            final Set<String> tags,
             final Long minUpdateTime,
             final Long maxUpdateTime,
-            final int limit,
-            final int page) throws GenieException;
+            final int page,
+            final int limit);
 
     /**
      * Get the clusters on which the job can be run.
      *
      * @param jobId The id of the Job to run
      * @return successful response, or one with HTTP error code
+     * @throws GenieException
      */
-    List<Cluster> chooseClusterForJob(
-            final String jobId) throws GenieException;
+    List<Cluster> chooseClusterForJob(final String jobId) throws GenieException;
 
     /**
      * Update a cluster configuration.
@@ -153,17 +152,6 @@ public interface ClusterConfigService {
     Set<String> updateConfigsForCluster(
             final String id,
             final Set<String> configs) throws GenieException;
-
-    /**
-     * Remove all configuration files from the cluster.
-     *
-     * @param id The id of the cluster to remove the configuration file from.
-     *           Not null/empty/blank.
-     * @return The active set of configurations
-     * @throws GenieException
-     */
-    Set<String> removeAllConfigsForCluster(
-            final String id) throws GenieException;
 
     /**
      * Add commands to the cluster.

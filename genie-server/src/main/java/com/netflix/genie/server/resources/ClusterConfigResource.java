@@ -28,7 +28,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
-import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -174,10 +174,10 @@ public class ClusterConfigResource {
             final String name,
             @ApiParam(value = "Status of the cluster.", required = false)
             @QueryParam("status")
-            final List<String> statuses,
+            final Set<String> statuses,
             @ApiParam(value = "Tags for the cluster.", required = false)
             @QueryParam("tag")
-            final List<String> tags,
+            final Set<String> tags,
             @ApiParam(value = "Minimum time threshold for cluster update", required = false)
             @QueryParam("minUpdateTime")
             final Long minUpdateTime,
@@ -206,16 +206,16 @@ public class ClusterConfigResource {
                 + " | "
                 + limit);
         //Create this conversion internal in case someone uses lower case by accident?
-        List<ClusterStatus> enumStatuses = null;
+        Set<ClusterStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
-            enumStatuses = new ArrayList<ClusterStatus>();
+            enumStatuses = EnumSet.noneOf(ClusterStatus.class);
             for (final String status : statuses) {
                 if (!StringUtils.isBlank(status)) {
                     enumStatuses.add(ClusterStatus.parse(status));
                 }
             }
         }
-        return this.ccs.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, limit, page);
+        return this.ccs.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page, limit);
     }
 
     /**

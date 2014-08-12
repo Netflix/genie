@@ -142,7 +142,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit,
+                limit < 1 ? 1024 : limit,
                 Direction.DESC,
                 Command_.updated.getName()
         );
@@ -180,13 +180,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (!this.commandRepo.exists(id)) {
             throw new GenieException(
                     HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command information entered. Unable to update.");
+                    "No command exists with the given id. Unable to update.");
         }
         if (StringUtils.isNotBlank(updateCommand.getId())
                 && !id.equals(updateCommand.getId())) {
             throw new GenieException(
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Command id either not entered or inconsistent with id passed in.");
+                    "Command id inconsistent with id passed in.");
         }
 
         //Set the id if it's not set so we can merge

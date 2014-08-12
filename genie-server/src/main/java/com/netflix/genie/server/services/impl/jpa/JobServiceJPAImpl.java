@@ -137,7 +137,7 @@ public class JobServiceJPAImpl implements JobService {
         LOG.debug("called");
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit,
+                limit < 1 ? 1024 : limit,
                 Direction.DESC,
                 Job_.updated.getName()
         );

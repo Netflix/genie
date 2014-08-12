@@ -110,7 +110,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
-                limit < 0 ? 1024 : limit,
+                limit < 1 ? 1024 : limit,
                 Direction.DESC,
                 Application_.updated.getName()
         );
