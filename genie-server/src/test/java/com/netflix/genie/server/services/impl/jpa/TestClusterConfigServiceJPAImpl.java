@@ -25,9 +25,13 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
+import com.netflix.genie.server.services.JobService;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -65,14 +69,16 @@ public class TestClusterConfigServiceJPAImpl {
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
     private static final String COMMAND_3_ID = "command3";
-    
+    private static final String JOB_1_ID = "job1";
+    private static final String JOB_2_ID = "job2";
+
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
     private static final String CLUSTER_1_NAME = "h2prod";
     private static final String CLUSTER_1_VERSION = "2.4.0";
     private static final String CLUSTER_1_TYPE = "yarn";
     private static final ClusterStatus CLUSTER_1_STATUS = ClusterStatus.UP;
-    
+
     private static final String CLUSTER_2_ID = "cluster2";
     private static final String CLUSTER_2_USER = "amsharma";
     private static final String CLUSTER_2_NAME = "h2query";
@@ -85,6 +91,9 @@ public class TestClusterConfigServiceJPAImpl {
 
     @Inject
     private CommandConfigService commandService;
+
+    @Inject
+    private JobService jobService;
 
     /**
      * Test the get cluster method.
@@ -244,6 +253,64 @@ public class TestClusterConfigServiceJPAImpl {
                 null, null, null, null, time.getTimeInMillis(), 0, 10);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
+    }
+
+    /**
+     * Test the choseClusterForJob function.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL
+    )
+    public void testChooseClusterForJob() throws GenieException {
+        final List<Cluster> clusters = this.service.chooseClusterForJob(JOB_1_ID);
+        Assert.assertEquals(1, clusters.size());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
+        final Job job = this.jobService.getJob(JOB_1_ID);
+        final String chosen = job.getChosenClusterCriteriaString();
+        Assert.assertEquals(8, chosen.length());
+        Assert.assertTrue(chosen.contains("prod"));
+        Assert.assertTrue(chosen.contains("pig"));
+        Assert.assertTrue(chosen.contains(","));
+    }
+
+    /**
+     * Test the choseClusterForJob function.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testChooseClusterForJobNoId() throws GenieException {
+        this.service.chooseClusterForJob(null);
+    }
+
+    /**
+     * Test the choseClusterForJob function.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testChooseClusterForJobNoJobExists() throws GenieException {
+        this.service.chooseClusterForJob(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test the choseClusterForJob function.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL
+    )
+    public void testChooseClusterForJobNonChosen() throws GenieException {
+        Assert.assertTrue(this.service.chooseClusterForJob(JOB_2_ID).isEmpty());
     }
 
     /**
@@ -507,7 +574,7 @@ public class TestClusterConfigServiceJPAImpl {
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getClusters(null, null, null, null, null, 0, 10)
-                        .size());
+                .size());
         Assert.assertEquals(2, this.service.deleteAllClusters().size());
         Assert.assertTrue(
                 this.service.getClusters(null, null, null, null, null, 0, 10)
@@ -525,31 +592,31 @@ public class TestClusterConfigServiceJPAImpl {
             value = "cluster/init.xml",
             type = DatabaseOperation.DELETE_ALL)
     public void testDelete() throws GenieException {
-        Assert.assertEquals(2, 
+        Assert.assertEquals(2,
                 this.commandService.getClustersForCommand(COMMAND_1_ID).size());
-        Assert.assertEquals(2, 
+        Assert.assertEquals(2,
                 this.commandService.getClustersForCommand(COMMAND_2_ID).size());
-        Assert.assertEquals(2, 
+        Assert.assertEquals(2,
                 this.commandService.getClustersForCommand(COMMAND_3_ID).size());
-        
-        Assert.assertEquals(CLUSTER_1_ID, 
+
+        Assert.assertEquals(CLUSTER_1_ID,
                 this.service.deleteCluster(CLUSTER_1_ID).getId());
-        
-        Assert.assertEquals(1, 
+
+        Assert.assertEquals(1,
                 this.commandService.getClustersForCommand(COMMAND_1_ID).size());
-        Assert.assertEquals(CLUSTER_2_ID, 
+        Assert.assertEquals(CLUSTER_2_ID,
                 this.commandService.getClustersForCommand(COMMAND_1_ID)
-                        .iterator().next().getId());
-        Assert.assertEquals(1, 
+                .iterator().next().getId());
+        Assert.assertEquals(1,
                 this.commandService.getClustersForCommand(COMMAND_2_ID).size());
-        Assert.assertEquals(CLUSTER_2_ID, 
+        Assert.assertEquals(CLUSTER_2_ID,
                 this.commandService.getClustersForCommand(COMMAND_2_ID)
-                        .iterator().next().getId());
-        Assert.assertEquals(1, 
+                .iterator().next().getId());
+        Assert.assertEquals(1,
                 this.commandService.getClustersForCommand(COMMAND_3_ID).size());
-        Assert.assertEquals(CLUSTER_2_ID, 
+        Assert.assertEquals(CLUSTER_2_ID,
                 this.commandService.getClustersForCommand(COMMAND_3_ID)
-                        .iterator().next().getId());
+                .iterator().next().getId());
     }
 
     /**
@@ -719,202 +786,355 @@ public class TestClusterConfigServiceJPAImpl {
         this.service.getConfigsForCluster(UUID.randomUUID().toString());
     }
 
-//    /**
-//     * Test setting the application for a given cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test
-//    @DatabaseSetup("cluster/init.xml")
-//    @DatabaseTearDown(
-//            value = "cluster/init.xml",
-//            type = DatabaseOperation.DELETE_ALL)
-//    public void testSetApplicationForCluster() throws GenieException {
-//        final Cluster cluster2 = this.service.getCluster(CLUSTER_2_ID);
-//        Assert.assertNull(cluster2.getApplication());
-//
-//        final Application app = this.appService.getApplication(APP_1_ID);
-//        final Set<Cluster> preClusters
-//                = this.appService.getClustersForApplication(APP_1_ID);
-//        Assert.assertEquals(1, preClusters.size());
-//        Assert.assertEquals(CLUSTER_1_ID, preClusters.iterator().next().getId());
-//
-//        this.service.setApplicationForCluster(CLUSTER_2_ID, app);
-//
-//        final Set<Cluster> savedClusters
-//                = this.appService.getClustersForApplication(APP_1_ID);
-//        Assert.assertEquals(2, savedClusters.size());
-//        Assert.assertNotNull(this.service.getApplicationForCluster(CLUSTER_2_ID));
-//    }
-//
-//    /**
-//     * Test setting the application for a given cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    public void testSetApplicationForClusterNoId() throws GenieException {
-//        this.service.setApplicationForCluster(null, new Application());
-//    }
-//
-//    /**
-//     * Test setting the application for a given cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    public void testSetApplicationForClusterNoApp() throws GenieException {
-//        this.service.setApplicationForCluster(CLUSTER_2_ID, null);
-//    }
-//
-//    /**
-//     * Test setting the application for a given cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    @DatabaseSetup("cluster/init.xml")
-//    @DatabaseTearDown(
-//            value = "cluster/init.xml",
-//            type = DatabaseOperation.DELETE_ALL)
-//    public void testSetApplicationForClusterNoAppId() throws GenieException {
-//        this.service.setApplicationForCluster(CLUSTER_2_ID, new Application());
-//    }
-//
-//    /**
-//     * Test setting the application for a given cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    public void testSetApplicationForClusterNoClusterExists() throws GenieException {
-//        final Application app = new Application();
-//        app.setId(APP_1_ID);
-//        this.service.setApplicationForCluster(
-//                UUID.randomUUID().toString(), app);
-//    }
-//
-//    /**
-//     * Test setting the application for a given cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    @DatabaseSetup("cluster/init.xml")
-//    @DatabaseTearDown(
-//            value = "cluster/init.xml",
-//            type = DatabaseOperation.DELETE_ALL)
-//    public void testSetApplicationForClusterNoAppExists() throws GenieException {
-//        final Application app = new Application();
-//        app.setId(UUID.randomUUID().toString());
-//        this.service.setApplicationForCluster(
-//                CLUSTER_2_ID, app);
-//    }
-//
-//    /**
-//     * Test get application for cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test
-//    @DatabaseSetup("cluster/init.xml")
-//    @DatabaseTearDown(
-//            value = "cluster/init.xml",
-//            type = DatabaseOperation.DELETE_ALL)
-//    public void testGetApplicationForCluster() throws GenieException {
-//        final Application app = this.service.getApplicationForCluster(CLUSTER_1_ID);
-//        Assert.assertEquals(APP_1_ID, app.getId());
-//    }
-//
-//    /**
-//     * Test get application for cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    public void testGetApplicationForClusterNoId() throws GenieException {
-//        this.service.getApplicationForCluster(null);
-//    }
-//
-//    /**
-//     * Test get application for cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    public void testGetApplicationForClusterNoCluster() throws GenieException {
-//        this.service.getApplicationForCluster(UUID.randomUUID().toString());
-//    }
-//
-//    /**
-//     * Test get application for cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    @DatabaseSetup("cluster/init.xml")
-//    @DatabaseTearDown(
-//            value = "cluster/init.xml",
-//            type = DatabaseOperation.DELETE_ALL)
-//    public void testGetApplicationForClusterNoApp() throws GenieException {
-//        this.service.getApplicationForCluster(CLUSTER_2_ID);
-//    }
-//
-//    /**
-//     * Test remove application for cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test
-//    @DatabaseSetup("cluster/init.xml")
-//    @DatabaseTearDown(
-//            value = "cluster/init.xml",
-//            type = DatabaseOperation.DELETE_ALL)
-//    public void testRemoveApplicationForCluster() throws GenieException {
-//        Assert.assertNotNull(this.service.getApplicationForCluster(CLUSTER_1_ID));
-//        Assert.assertNotNull(this.service.removeApplicationForCluster(CLUSTER_1_ID));
-//        try {
-//            this.service.getApplicationForCluster(CLUSTER_1_ID);
-//            Assert.fail();
-//        } catch (final GenieException ge) {
-//            Assert.assertEquals(
-//                    HttpURLConnection.HTTP_NOT_FOUND, ge.getErrorCode());
-//        }
-//    }
-//
-//    /**
-//     * Test remove application for cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    public void testRemoveApplicationForClusterNoId() throws GenieException {
-//        this.service.removeApplicationForCluster(null);
-//    }
-//
-//    /**
-//     * Test remove application for cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    public void testRemoveApplicationForClusterNoClusterExists() throws GenieException {
-//        this.service.removeApplicationForCluster(UUID.randomUUID().toString());
-//    }
-//
-//    /**
-//     * Test remove application for cluster.
-//     *
-//     * @throws GenieException
-//     */
-//    @Test(expected = GenieException.class)
-//    @DatabaseSetup("cluster/init.xml")
-//    @DatabaseTearDown(
-//            value = "cluster/init.xml",
-//            type = DatabaseOperation.DELETE_ALL)
-//    public void testRemoveApplicationForClusterNoAppExists() throws GenieException {
-//        this.service.removeApplicationForCluster(CLUSTER_2_ID);
-//    }
+    /**
+     * Test adding commands to the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testAddCommandsForCluster() throws GenieException {
+        final Command command1 = this.commandService.createCommand(
+                new Command(
+                        "name",
+                        "user",
+                        CommandStatus.ACTIVE,
+                        "pig",
+                        "23.1.0"
+                )
+        );
+        final Command command2 = this.commandService.createCommand(
+                new Command(
+                        "name2",
+                        "user2",
+                        CommandStatus.INACTIVE,
+                        "pig2",
+                        "23.1.1"
+                )
+        );
+        final List<Command> newCommands = new ArrayList<Command>();
+        newCommands.add(command1);
+        newCommands.add(command2);
+        Assert.assertEquals(
+                3,
+                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+        );
+        final List<Command> commands
+                = this.service.addCommandsForCluster(CLUSTER_1_ID, newCommands);
+        Assert.assertEquals(
+                5,
+                commands.size()
+        );
+    }
+
+    /**
+     * Test adding commands to the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddCommandsForClusterNoId() throws GenieException {
+        this.service.addCommandsForCluster(null, new ArrayList<Command>());
+    }
+
+    /**
+     * Test adding commands to the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddCommandsForClusterNoCommands() throws GenieException {
+        this.service.addCommandsForCluster(UUID.randomUUID().toString(), null);
+    }
+
+    /**
+     * Test adding commands to the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testAddCommandsForClusterClusterDoesntExist()
+            throws GenieException {
+        this.service.addCommandsForCluster(
+                UUID.randomUUID().toString(), new ArrayList<Command>());
+    }
+
+    /**
+     * Test adding commands to the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testAddCommandsForClusterCommandDoesntExist()
+            throws GenieException {
+        final List<Command> commands = new ArrayList<Command>();
+        final Command command = new Command();
+        command.setId(UUID.randomUUID().toString());
+        commands.add(command);
+        this.service.addCommandsForCluster(
+                CLUSTER_1_ID, commands);
+    }
+
+    /**
+     * Test the Get commands for cluster function.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testGetCommandsForCluster() throws GenieException {
+        final List<Command> commands
+                = this.service.getCommandsForCluster(CLUSTER_1_ID);
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(2).getId());
+    }
+
+    /**
+     * Test the Get clusters for cluster function.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetCommandsForClusterNoId() throws GenieException {
+        this.service.getCommandsForCluster("");
+    }
+
+    /**
+     * Test the Get clusters for cluster function.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testGetCommandsForClusterNoCluster() throws GenieException {
+        this.service.getCommandsForCluster(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test updating commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testUpdateCommandsForCluster() throws GenieException {
+        final Command command1 = this.commandService.createCommand(
+                new Command(
+                        "name",
+                        "user",
+                        CommandStatus.ACTIVE,
+                        "pig",
+                        "23.1.0"
+                )
+        );
+        final Command command2 = this.commandService.createCommand(
+                new Command(
+                        "name2",
+                        "user2",
+                        CommandStatus.INACTIVE,
+                        "pig2",
+                        "23.1.1"
+                )
+        );
+        final List<Command> newCommands = new ArrayList<Command>();
+        newCommands.add(command1);
+        newCommands.add(command2);
+        Assert.assertEquals(
+                3,
+                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+        );
+        final List<Command> commands
+                = this.service.updateCommandsForCluster(
+                        CLUSTER_1_ID,
+                        newCommands
+                );
+        Assert.assertEquals(
+                2,
+                commands.size()
+        );
+    }
+
+    /**
+     * Test updating commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateCommandsForClusterNoId() throws GenieException {
+        this.service.updateCommandsForCluster(null, new ArrayList<Command>());
+    }
+
+    /**
+     * Test updating commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateCommandsForClusterNoCommands() throws GenieException {
+        this.service.updateCommandsForCluster(UUID.randomUUID().toString(), null);
+    }
+
+    /**
+     * Test updating commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testUpdateCommandsForClusterClusterDoesntExist()
+            throws GenieException {
+        this.service.updateCommandsForCluster(
+                UUID.randomUUID().toString(), new ArrayList<Command>());
+    }
+
+    /**
+     * Test updating commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testUpdateCommandsForClusterCommandDoesntExist()
+            throws GenieException {
+        final List<Command> commands = new ArrayList<Command>();
+        final Command command = new Command();
+        command.setId(UUID.randomUUID().toString());
+        commands.add(command);
+        this.service.updateCommandsForCluster(
+                CLUSTER_1_ID, commands);
+    }
+
+    /**
+     * Test removing all commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveAllCommandsForCluster() throws GenieException {
+        Assert.assertEquals(
+                3,
+                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+        );
+        Assert.assertEquals(
+                0,
+                this.service.removeAllCommandsForCluster(CLUSTER_1_ID).size()
+        );
+        Assert.assertEquals(
+                0,
+                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+        );
+    }
+
+    /**
+     * Test removing all commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveAllCommandsForClusterNoId() throws GenieException {
+        this.service.removeAllCommandsForCluster(null);
+    }
+
+    /**
+     * Test removing all commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveAllCommandsForClusterNoCluster()
+            throws GenieException {
+        this.service.removeAllCommandsForCluster(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Test removing all commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveCommandForCluster() throws GenieException {
+        Assert.assertEquals(
+                3,
+                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+        );
+        Assert.assertEquals(
+                2,
+                this.service.removeCommandForCluster(
+                        CLUSTER_1_ID,
+                        COMMAND_1_ID
+                ).size()
+        );
+    }
+
+    /**
+     * Test removing all commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveCommandForClusterNoId() throws GenieException {
+        this.service.removeCommandForCluster(null, COMMAND_1_ID);
+    }
+
+    /**
+     * Test removing all commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveCommandForClusterNoCmdId() throws GenieException {
+        this.service.removeCommandForCluster(CLUSTER_1_ID, null);
+    }
+
+    /**
+     * Test removing all commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    public void testRemoveCommandForClusterNoCluster() throws GenieException {
+        this.service.removeCommandForCluster(
+                UUID.randomUUID().toString(), COMMAND_1_ID);
+    }
+
+    /**
+     * Test removing all commands for the cluster.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = GenieException.class)
+    @DatabaseSetup("cluster/init.xml")
+    @DatabaseTearDown(
+            value = "cluster/init.xml",
+            type = DatabaseOperation.DELETE_ALL)
+    public void testRemoveCommandForClusterNoCommand() throws GenieException {
+        this.service.removeCommandForCluster(
+                CLUSTER_1_ID, UUID.randomUUID().toString());
+    }
 
     /**
      * Test add tags to cluster.
@@ -1185,44 +1405,5 @@ public class TestClusterConfigServiceJPAImpl {
                 CLUSTER_1_ID,
                 CLUSTER_1_ID
         );
-    }
-
-    /**
-     * Test the Get commands for cluster function.
-     *
-     * @throws GenieException
-     */
-    @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
-    public void testGetCommandsForCluster() throws GenieException {
-        final List<Command> commands
-                = this.service.getCommandsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(3, commands.size());
-        Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
-        Assert.assertEquals(COMMAND_2_ID, commands.get(2).getId());
-    }
-
-    /**
-     * Test the Get clusters for cluster function.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testGetCommandsForClusterNoId() throws GenieException {
-        this.service.getCommandsForCluster("");
-    }
-
-    /**
-     * Test the Get clusters for cluster function.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GenieException.class)
-    public void testGetCommandsForClusterNoCluster() throws GenieException {
-        this.service.getCommandsForCluster(UUID.randomUUID().toString());
     }
 }

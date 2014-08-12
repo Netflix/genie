@@ -179,7 +179,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws GenieException
      */
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Cluster> chooseClusterForJob(
             final String jobId) throws GenieException {
         LOG.debug("Called");
@@ -190,6 +190,12 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             );
         }
         final Job job = this.jobRepo.findOne(jobId);
+        if (job == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job with id " + jobId + " exists. Unable to continue."
+            );
+        }
 
         final List<ClusterCriteria> clusterCriterias = job.getClusterCriterias();
         final Set<String> commandCriteria = job.getCommandCriteria();
@@ -403,6 +409,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No cluster id entered. Unable to add commands.");
         }
+        if (commands == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No commands entered. Unable to add commands.");
+        }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             for (final Command detached : commands) {
@@ -453,6 +464,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @throws GenieException
      */
     @Override
+    //TODO: Shares a lot of code with the add, should be able to refactor
     public List<Command> updateCommandsForCluster(
             final String id,
             final List<Command> commands) throws GenieException {
@@ -460,6 +472,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             throw new GenieException(
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No cluster id entered. Unable to update commands.");
+        }
+        if (commands == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No commands entered. Unable to add commands.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {

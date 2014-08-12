@@ -171,4 +171,22 @@
         CLUSTERS_ID="cluster2"
         COMMANDS_ID="command3"
         commands_ORDER="2"/>
+    
+    <Job
+        id="job1"
+        user="tgianos"
+        name="testPigJob"
+        version="2.4"
+        commandArgs="-f -j"
+        commandCriteriaString="prod,pig"
+        clusterCriteriasString="prod,pig|h2prod|h2query"/>
+    
+    <Job
+        id="job2"
+        user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        commandArgs="-f -j"
+        commandCriteriaString="spark,prod"
+        clusterCriteriasString="spark,prod|spark"/>
 </dataset>
