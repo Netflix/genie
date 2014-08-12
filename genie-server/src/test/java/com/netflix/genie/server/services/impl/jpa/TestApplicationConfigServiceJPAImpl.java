@@ -86,7 +86,7 @@ public class TestApplicationConfigServiceJPAImpl {
     private ApplicationConfigService service;
 
     @Inject
-    private CommandConfigService command_service;
+    private CommandConfigService commandService;
 
     /**
      * Test the get application method.
@@ -482,12 +482,12 @@ public class TestApplicationConfigServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL)
     public void testDelete() throws GenieException {
         Assert.assertEquals(APP_1_ID,
-                this.command_service
+                this.commandService
                 .getApplicationForCommand(COMMAND_1_ID)
                 .getId());
         Assert.assertEquals(APP_1_ID,
                 this.service.deleteApplication(APP_1_ID).getId());
-        Assert.assertNull(this.command_service.getCommand(COMMAND_1_ID)
+        Assert.assertNull(this.commandService.getCommand(COMMAND_1_ID)
                 .getApplication());
 
         //Test a case where the app has no commands to

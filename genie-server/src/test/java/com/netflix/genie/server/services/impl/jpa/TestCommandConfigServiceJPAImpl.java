@@ -96,10 +96,10 @@ public class TestCommandConfigServiceJPAImpl {
     private CommandConfigService service;
 
     @Inject
-    private ClusterConfigService cluster_service;
+    private ClusterConfigService clusterService;
 
     @Inject
-    private ApplicationConfigService app_service;
+    private ApplicationConfigService appService;
 
     /**
      * Test the get command method.
@@ -507,7 +507,7 @@ public class TestCommandConfigServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL)
     public void testDelete() throws GenieException {
         List<Command> commands
-                = this.cluster_service.getCommandsForCluster(CLUSTER_1_ID);
+                = this.clusterService.getCommandsForCluster(CLUSTER_1_ID);
         Assert.assertEquals(3, commands.size());
         boolean found = false;
         for (final Command command : commands) {
@@ -518,7 +518,7 @@ public class TestCommandConfigServiceJPAImpl {
         }
         Assert.assertTrue(found);
         Set<Command> appCommands
-                = this.app_service.getCommandsForApplication(APP_1_ID);
+                = this.appService.getCommandsForApplication(APP_1_ID);
         Assert.assertEquals(1, appCommands.size());
         found = false;
         for (final Command command : appCommands) {
@@ -533,7 +533,7 @@ public class TestCommandConfigServiceJPAImpl {
         Assert.assertEquals(COMMAND_1_ID,
                 this.service.deleteCommand(COMMAND_1_ID).getId());
 
-        commands = this.cluster_service.getCommandsForCluster(CLUSTER_1_ID);
+        commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID);
         Assert.assertEquals(2, commands.size());
         found = false;
         for (final Command command : commands) {
@@ -543,7 +543,7 @@ public class TestCommandConfigServiceJPAImpl {
             }
         }
         Assert.assertFalse(found);
-        appCommands = this.app_service.getCommandsForApplication(APP_1_ID);
+        appCommands = this.appService.getCommandsForApplication(APP_1_ID);
         Assert.assertTrue(appCommands.isEmpty());
 
         //Test a case where the app has no commands to
@@ -832,16 +832,16 @@ public class TestCommandConfigServiceJPAImpl {
         final Command command2 = this.service.getCommand(COMMAND_2_ID);
         Assert.assertNull(command2.getApplication());
 
-        final Application app = this.app_service.getApplication(APP_1_ID);
+        final Application app = this.appService.getApplication(APP_1_ID);
         final Set<Command> preCommands
-                = this.app_service.getCommandsForApplication(APP_1_ID);
+                = this.appService.getCommandsForApplication(APP_1_ID);
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(COMMAND_1_ID, preCommands.iterator().next().getId());
 
         this.service.setApplicationForCommand(COMMAND_2_ID, app);
 
         final Set<Command> savedCommands
-                = this.app_service.getCommandsForApplication(APP_1_ID);
+                = this.appService.getCommandsForApplication(APP_1_ID);
         Assert.assertEquals(2, savedCommands.size());
         Assert.assertNotNull(this.service.getApplicationForCommand(COMMAND_2_ID));
     }
