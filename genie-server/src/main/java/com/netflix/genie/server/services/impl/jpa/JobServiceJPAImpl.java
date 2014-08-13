@@ -39,7 +39,6 @@ import com.netflix.genie.common.model.Job_;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityExistsException;
 import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.List;
@@ -83,8 +82,8 @@ public class JobServiceJPAImpl implements JobService {
     /**
      * Constructor.
      *
-     * @param jobRepo           The job repository to use.
-     * @param stats             the GenieNodeStatistics object
+     * @param jobRepo The job repository to use.
+     * @param stats the GenieNodeStatistics object
      * @param jobManagerFactory The the job manager factory to use
      */
     @Inject
@@ -99,16 +98,61 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
+     */
+    @Override
+    @Transactional
+    public Job createJob(final Job job) throws GenieException {
+        if (StringUtils.isNotEmpty(job.getId())
+                && this.jobRepo.exists(job.getId())) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_CONFLICT,
+                    "A job with id " + job.getId() + " already exists. Unable to save."
+            );
+        }
+        // validate parameters
+        job.validate();
+        job.setJobStatus(JobStatus.INIT, "Initializing job");
+
+        // Validation successful. init state in DB - return if job already exists
+        try {
+            final Job persistedJob = this.jobRepo.save(job);
+            // if job can be launched, update the URIs
+            final String hostName = NetUtil.getHostName();
+            persistedJob.setHostName(hostName);
+            persistedJob.setOutputURI(
+                    getEndPoint(hostName)
+                    + "/" + JOB_DIR_PREFIX
+                    + "/" + persistedJob.getId()
+            );
+            persistedJob.setKillURI(
+                    getEndPoint(hostName)
+                    + "/" + JOB_RESOURCE_PREFIX
+                    + "/" + persistedJob.getId()
+            );
+
+            // increment number of submitted jobs as we have successfully
+            // persisted it in the database.
+            this.stats.incrGenieJobSubmissions();
+            return persistedJob;
+        } catch (final Exception e) {
+            //This will catch runtime as well
+            LOG.error("Can't create entity in the database", e);
+            throw new GenieException(
+                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     @Transactional(readOnly = true)
     public Job getJob(final String id) throws GenieException {
-        if (StringUtils.isEmpty(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No id entered unable to retrieve job.");
-        }
         LOG.debug("called for id: " + id);
+        this.testId(id);
 
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
@@ -132,8 +176,8 @@ public class JobServiceJPAImpl implements JobService {
             final JobStatus status,
             final String clusterName,
             final String clusterId,
-            final int limit,
-            final int page) throws GenieException {
+            final int page,
+            final int limit) {
         LOG.debug("called");
         final PageRequest pageRequest = new PageRequest(
                 page < 0 ? 0 : page,
@@ -165,14 +209,10 @@ public class JobServiceJPAImpl implements JobService {
     public Set<String> addTagsForJob(
             final String id,
             final Set<String> tags) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id entered. Unable to add tags.");
-        }
+        this.testId(id);
         if (tags == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No tags entered.");
         }
         final Job job = this.jobRepo.findOne(id);
@@ -196,12 +236,7 @@ public class JobServiceJPAImpl implements JobService {
     public Set<String> getTagsForJob(
             final String id)
             throws GenieException {
-
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id sent. Cannot retrieve tags.");
-        }
+        this.testId(id);
 
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
@@ -223,11 +258,7 @@ public class JobServiceJPAImpl implements JobService {
     public Set<String> updateTagsForJob(
             final String id,
             final Set<String> tags) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id entered. Unable to update tags.");
-        }
+        this.testId(id);
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setTags(tags);
@@ -248,11 +279,7 @@ public class JobServiceJPAImpl implements JobService {
     @Transactional(rollbackFor = GenieException.class)
     public Set<String> removeAllTagsForJob(
             final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id entered. Unable to remove tags.");
-        }
+        this.testId(id);
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.getTags().clear();
@@ -269,27 +296,20 @@ public class JobServiceJPAImpl implements JobService {
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
-    public Set<String> removeTagForJob(String id, String tag)
+    public Set<String> removeTagForJob(final String id, final String tag)
             throws GenieException {
-        if (StringUtils.isBlank(id)) {
+        this.testId(id);
+        if (id.equals(tag)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No job id entered. Unable to remove tag.");
-        }
-        if (StringUtils.isBlank(tag)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No tag entered. Unable to remove tag.");
-        }
-        if (tag.equals(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "Cannot delete job id from the tags list.");
         }
 
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
-            job.getTags().remove(tag);
+            if (StringUtils.isNotBlank(tag)) {
+                job.getTags().remove(tag);
+            }
             return job.getTags();
         } else {
             throw new GenieException(
@@ -305,10 +325,13 @@ public class JobServiceJPAImpl implements JobService {
     @Transactional(rollbackFor = GenieException.class)
     public long setUpdateTime(final String id) throws GenieException {
         LOG.debug("Updating db for job: " + id);
+        this.testId(id);
         final Job job = this.jobRepo.findOne(id);
         if (job == null) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+                    HttpURLConnection.HTTP_NOT_FOUND,
+                    "No job with id " + id + " exists"
+            );
         }
 
         final long lastUpdatedTimeMS = System.currentTimeMillis();
@@ -322,8 +345,18 @@ public class JobServiceJPAImpl implements JobService {
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
-    public void setJobStatus(final String id, final JobStatus status, final String msg) throws GenieException {
+    public void setJobStatus(
+            final String id,
+            final JobStatus status,
+            final String msg) throws GenieException {
         LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
+        this.testId(id);
+        if (status == null) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No status entered."
+            );
+        }
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setJobStatus(status, msg);
@@ -340,6 +373,7 @@ public class JobServiceJPAImpl implements JobService {
     @Transactional(rollbackFor = GenieException.class)
     public void setProcessIdForJob(final String id, final int pid) throws GenieException {
         LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
+        this.testId(id);
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setProcessHandle(pid);
@@ -359,8 +393,10 @@ public class JobServiceJPAImpl implements JobService {
             final String commandId,
             final String commandName) throws GenieException {
         LOG.debug("Setting the command info for job with id " + id);
+        this.testId(id);
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
+            //TODO: Should we check if this is valid
             job.setCommandId(commandId);
             job.setCommandName(commandName);
         } else {
@@ -379,6 +415,7 @@ public class JobServiceJPAImpl implements JobService {
             final String appId,
             final String appName) throws GenieException {
         LOG.debug("Setting the application info for job with id " + id);
+        this.testId(id);
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setApplicationId(appId);
@@ -399,6 +436,7 @@ public class JobServiceJPAImpl implements JobService {
             final String clusterId,
             final String clusterName) throws GenieException {
         LOG.debug("Setting the application info for job with id " + id);
+        this.testId(id);
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setExecutionClusterId(clusterId);
@@ -436,7 +474,7 @@ public class JobServiceJPAImpl implements JobService {
             runningJob.setUpdated(new Date());
             return runningJob;
         } catch (final GenieException e) {
-            LOG.error("Failed to submit job: ", e);
+            LOG.error("Failed to run job: ", e);
             final Job failedJob = this.jobRepo.findOne(job.getId());
             // update db
             failedJob.setJobStatus(JobStatus.FAILED, e.getMessage());
@@ -446,48 +484,16 @@ public class JobServiceJPAImpl implements JobService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws GenieException
-     */
-    @Override
-    @Transactional
-    public Job validateAndSaveJob(final Job job) throws GenieException {
-        // validate parameters
-        job.validate();
-        job.setJobStatus(JobStatus.INIT, "Initializing job");
-
-        // Validation successful. init state in DB - return if job already exists
-        try {
-
-            final Job persistedJob = this.jobRepo.save(job);
-            // if job can be launched, update the URIs
-            persistedJob.setHostName(NetUtil.getHostName());
-            persistedJob.setOutputURI(getEndPoint() + "/" + JOB_DIR_PREFIX + "/" + persistedJob.getId());
-            persistedJob.setKillURI(getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + persistedJob.getId());
-
-            // increment number of submitted jobs as we have successfully
-            // persisted it in the database.
-            this.stats.incrGenieJobSubmissions();
-            return persistedJob;
-        } catch (final Exception e) {
-            LOG.error("Can't create entity in the database", e);
-            if (e.getCause() instanceof EntityExistsException) {
-                // most likely entity already exists - return useful message
-                throw new GenieException(
-                        HttpURLConnection.HTTP_CONFLICT,
-                        "Job already exists for id: " + job.getId());
-            } else {
-                // unknown exception - send it back
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        e);
-            }
-        }
+    private String getEndPoint(final String hostName) throws GenieException {
+        return "http://" + hostName + ":" + SERVER_PORT;
     }
 
-    private String getEndPoint() throws GenieException {
-        return "http://" + NetUtil.getHostName() + ":" + SERVER_PORT;
+    private void testId(final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GenieException(
+                    HttpURLConnection.HTTP_PRECON_FAILED,
+                    "No id entered."
+            );
+        }
     }
 }

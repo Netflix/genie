@@ -42,7 +42,7 @@ import org.springframework.context.ApplicationContextAware;
  * @author amsharma
  */
 @Named
-public final class JobManagerFactory implements ApplicationContextAware {
+public class JobManagerFactory implements ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobManagerFactory.class);
 

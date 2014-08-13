@@ -32,6 +32,15 @@ import java.util.Set;
 public interface JobService {
 
     /**
+     * Validate the job and persist it if it passes validation.
+     *
+     * @param job The job to validate and maybe save
+     * @return The validated/saved job object
+     * @throws GenieException
+     */
+    Job createJob(final Job job) throws GenieException;
+
+    /**
      * Get job information for given job id.
      *
      * @param id id of job to look up
@@ -58,10 +67,9 @@ public interface JobService {
      * @param status status of job - possible types Type.JobStatus
      * @param clusterName name of cluster for job
      * @param clusterId id of cluster for job
-     * @param limit max number of jobs to return
      * @param page page number for job
+     * @param limit max number of jobs to return
      * @return All jobs which match the criteria
-     * @throws GenieException
      */
     List getJobs(
             final String id,
@@ -70,14 +78,13 @@ public interface JobService {
             final JobStatus status,
             final String clusterName,
             final String clusterId,
-            final int limit,
-            final int page) throws GenieException;
+            final int page,
+            final int limit);
 
     /**
      * Add tags to the job.
      *
-     * @param id The id of the job to add the tags to. Not
-     * null/empty/blank.
+     * @param id The id of the job to add the tags to. Not null/empty/blank.
      * @param tags The tags to add. Not null/empty.
      * @return The active set of tags
      * @throws GenieException
@@ -87,11 +94,9 @@ public interface JobService {
             final Set<String> tags) throws GenieException;
 
     /**
-     * Get the set of tags associated with the job with given
-     * id.
+     * Get the set of tags associated with the job with given id.
      *
-     * @param id The id of the job to get the tags for. Not
-     * null/empty/blank.
+     * @param id The id of the job to get the tags for. Not null/empty/blank.
      * @return The set of tags as paths
      * @throws GenieException
      */
@@ -99,13 +104,10 @@ public interface JobService {
             final String id) throws GenieException;
 
     /**
-     * Update the set of tags associated with the job with
-     * given id.
+     * Update the set of tags associated with the job with given id.
      *
-     * @param id The id of the job to update the tags for.
-     * Not null/empty/blank.
-     * @param tags The tags to replace existing tags
-     * with. Not null/empty.
+     * @param id The id of the job to update the tags for. Not null/empty/blank.
+     * @param tags The tags to replace existing tags with. Not null/empty.
      * @return The active set of tags
      * @throws GenieException
      */
@@ -116,8 +118,8 @@ public interface JobService {
     /**
      * Remove all tags from the job.
      *
-     * @param id The id of the job to remove the tags from.
-     * Not null/empty/blank.
+     * @param id The id of the job to remove the tags from. Not
+     * null/empty/blank.
      * @return The active set of tags
      * @throws GenieException
      */
@@ -127,20 +129,22 @@ public interface JobService {
     /**
      * Remove a tag from the job.
      *
-     * @param id The id of the job to remove the tag from. Not
-     * null/empty/blank.
+     * @param id The id of the job to remove the tag from. Not null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags
      * @throws GenieException
      */
     Set<String> removeTagForJob(final String id, final String tag) throws GenieException;
+
     /**
      * Update a job with the last updated time.
      *
      * @param id The id of the job to update.
      * @return The time in milliseconds when the job was updated.
+     * @throws GenieException
      */
     long setUpdateTime(final String id) throws GenieException;
+
     /**
      * Set the status for a given job.
      *
@@ -191,20 +195,11 @@ public interface JobService {
     void setClusterInfoForJob(final String id, final String clusterId, final String clusterName) throws GenieException;
 
     /**
-     * Validate the job and persist it if it passes validation.
-     *
-     * @param job The job to validate and maybe save
-     * @return The validated/saved job object
-     * @throws GenieException
-     */
-    Job validateAndSaveJob(final Job job) throws GenieException;
-
-    /**
      * Run the job using a JobLauncher.
      *
      * @param job The job to run.
      * @return The job object thats returned after launch
      * @throws GenieException
      */
-    Job runJob(Job job) throws GenieException;
+    Job runJob(final Job job) throws GenieException;
 }

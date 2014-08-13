@@ -157,19 +157,20 @@ public class TestJob {
     }
 
     /**
-     * Test the onCreateJob method which is called by @PrePersist.
+     * Test the onCreateOrUpdateJob method which is called before saving
+     * or updating.
      *
      * @throws GenieException
      */
     @Test
-    public void testOnCreateJob() throws GenieException {
+    public void testOnCreateOrUpdateJob() throws GenieException {
         Assert.assertNull(this.job.getId());
         Assert.assertNull(this.job.getClusterCriteriasString());
         Assert.assertNull(this.job.getCommandCriteriaString());
         //Simulate the call stack JPA will make on persist
         this.job.onCreateAuditable();
         this.job.onCreateOrUpdateCommonEntityFields();
-        this.job.onCreateJob();
+        this.job.onCreateOrUpdateJob();
         Assert.assertNotNull(this.job.getId());
         Assert.assertNotNull(this.job.getClusterCriteriasString());
         Assert.assertNotNull(this.job.getCommandCriteriaString());
@@ -184,11 +185,11 @@ public class TestJob {
      * @throws GenieException
      */
     @Test
-    public void testOnCreateJobWithNotNullTags() throws GenieException {
+    public void testOnCreateOrUpdateJobWithNotNullTags() throws GenieException {
         Assert.assertTrue(this.job.getTags().isEmpty());
         this.job.onCreateAuditable();
         this.job.onCreateOrUpdateCommonEntityFields();
-        this.job.onCreateJob();
+        this.job.onCreateOrUpdateJob();
         Assert.assertNotNull(this.job.getTags());
         Assert.assertNotNull(this.job.getId());
         Assert.assertNotNull(this.job.getClusterCriteriasString());
@@ -204,7 +205,7 @@ public class TestJob {
      */
     @Test
     public void testOnLoadJob() throws GenieException {
-        this.job.onCreateJob();
+        this.job.onCreateOrUpdateJob();
         final String clusterCriteriasString = this.job.getClusterCriteriasString();
         final String commandCriteriaString = this.job.getCommandCriteriaString();
         final Job job2 = new Job();

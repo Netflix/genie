@@ -43,6 +43,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -405,7 +406,8 @@ public class Job extends CommonEntityFields {
      * @throws GenieException
      */
     @PrePersist
-    protected void onCreateJob() throws GenieException {
+    @PreUpdate
+    protected void onCreateOrUpdateJob() throws GenieException {
         this.validate(this.commandCriteria, this.commandArgs, this.clusterCriterias, null);
         this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
         this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);

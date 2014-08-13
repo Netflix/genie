@@ -151,7 +151,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         // At this point we have established that the job can be run on this node.
         // Before running we validate the job and save it in the db if it passes validation.
-        final Job savedJob = this.jobService.validateAndSaveJob(job);
+        final Job savedJob = this.jobService.createJob(job);
 
         // try to run the job - return success or error
         return this.jobService.runJob(savedJob);

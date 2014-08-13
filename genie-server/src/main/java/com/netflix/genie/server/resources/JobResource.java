@@ -291,8 +291,8 @@ public class JobResource {
                 ((status == null) || (status.isEmpty()) ? null : JobStatus.parse(status)),
                 clusterName,
                 clusterId,
-                limit,
-                page);
+                page,
+                limit);
     }
 
     /**
