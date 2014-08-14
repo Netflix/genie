@@ -28,39 +28,49 @@ import java.io.IOException;
  * @author tgianos
  */
 public class TestGenieException extends Exception {
+
     private static final int ERROR_CODE = 404;
     private static final String ERROR_MESSAGE = "Not Found";
     private static final IOException IOE = new IOException("IOException");
 
     /**
      * Test the constructor.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testThreeArgConstructor() {
+    @Test(expected = GenieException.class)
+    public void testThreeArgConstructor() throws GenieException {
         final GenieException ge = new GenieException(ERROR_CODE, ERROR_MESSAGE, IOE);
         Assert.assertEquals(ERROR_CODE, ge.getErrorCode());
         Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
         Assert.assertEquals(IOE, ge.getCause());
+        throw ge;
     }
 
     /**
      * Test the constructor.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testTwoArgConstructorWithMessage() {
+    @Test(expected = GenieException.class)
+    public void testTwoArgConstructorWithMessage() throws GenieException {
         final GenieException ge = new GenieException(ERROR_CODE, ERROR_MESSAGE);
         Assert.assertEquals(ERROR_CODE, ge.getErrorCode());
         Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
         Assert.assertNull(ge.getCause());
+        throw ge;
     }
 
     /**
      * Test the constructor.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testTwoArgConstructorWithThrowable() {
+    @Test(expected = GenieException.class)
+    public void testTwoArgConstructorWithThrowable() throws GenieException {
         final GenieException ge = new GenieException(ERROR_CODE, IOE);
         Assert.assertEquals(ERROR_CODE, ge.getErrorCode());
         Assert.assertEquals(IOE, ge.getCause());
+        throw ge;
     }
 }

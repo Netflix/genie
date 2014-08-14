@@ -31,6 +31,7 @@ import java.util.Arrays;
  * @author tgianos
  */
 public class TestFileAttachment {
+
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
     private static final String NAME = "someQuery.q";
     private static final String QUERY = "select * from myTable";
@@ -48,6 +49,8 @@ public class TestFileAttachment {
 
     /**
      * Test the setter and getter for name.
+     *
+     * @throws GenieException
      */
     @Test
     public void testSetGetName() throws GenieException {
@@ -88,6 +91,8 @@ public class TestFileAttachment {
 
     /**
      * Test the setter and getter for data.
+     *
+     * @throws GenieException
      */
     @Test
     public void testSetGetData() throws GenieException {
@@ -98,6 +103,8 @@ public class TestFileAttachment {
 
     /**
      * Test the setting bad data.
+     *
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testSetDataNull() throws GenieException {
@@ -106,6 +113,8 @@ public class TestFileAttachment {
 
     /**
      * Test the setting bad data.
+     *
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testSetDataEmpty() throws GenieException {

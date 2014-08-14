@@ -33,6 +33,7 @@ import java.util.Set;
  * @author tgianos
  */
 public class TestCluster {
+
     private static final String NAME = "h2prod";
     private static final String USER = "tgianos";
     private static final String CONFIG = "s3://netflix/clusters/configs/config1";
@@ -107,7 +108,8 @@ public class TestCluster {
     }
 
     /**
-     * Test to make sure validation works and throws exception when no status entered.
+     * Test to make sure validation works and throws exception when no status
+     * entered.
      *
      * @throws GenieException
      */
@@ -118,7 +120,8 @@ public class TestCluster {
     }
 
     /**
-     * Test to make sure validation works and throws exception when no type entered.
+     * Test to make sure validation works and throws exception when no type
+     * entered.
      *
      * @throws GenieException
      */
@@ -129,7 +132,8 @@ public class TestCluster {
     }
 
     /**
-     * Test to make sure validation works and throws exception when no configs entered.
+     * Test to make sure validation works and throws exception when no configs
+     * entered.
      *
      * @throws GenieException
      */
@@ -147,7 +151,8 @@ public class TestCluster {
     }
 
     /**
-     * Test to make sure validation works and throws exception when no configs entered.
+     * Test to make sure validation works and throws exception when no configs
+     * entered.
      *
      * @throws GenieException
      */
@@ -295,6 +300,8 @@ public class TestCluster {
 
     /**
      * Make sure you can't remove a null command.
+     *
+     * @throws GenieException
      */
     @Test(expected = GenieException.class)
     public void testRemoveNullCommand() throws GenieException {

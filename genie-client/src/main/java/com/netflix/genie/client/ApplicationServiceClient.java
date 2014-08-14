@@ -650,6 +650,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *
      * @param id The id of the application to delete the tag from. Not
      *           null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
      * @return The tag for the application.
      * @throws GenieException
      */

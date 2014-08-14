@@ -116,9 +116,9 @@ public class TestJob {
      */
     @Test
     public void testDefaultConstructor() {
-        final Job job = new Job();
-        Assert.assertNull(job.getId());
-        Assert.assertEquals(Job.DEFAULT_VERSION, job.getVersion());
+        final Job localJob = new Job();
+        Assert.assertNull(localJob.getId());
+        Assert.assertEquals(Job.DEFAULT_VERSION, localJob.getVersion());
     }
 
     /**
@@ -140,20 +140,20 @@ public class TestJob {
      */
     @Test
     public void testConstructorWithBlankVersion() {
-        final Job job = new Job(
+        final Job localJob = new Job(
                 USER,
                 NAME,
                 COMMAND_ARGS,
                 COMMAND_CRITERIA,
                 CLUSTER_CRITERIAS,
                 null);
-        Assert.assertNull(job.getId());
-        Assert.assertEquals(NAME, job.getName());
-        Assert.assertEquals(USER, job.getUser());
-        Assert.assertEquals(Job.DEFAULT_VERSION, job.getVersion());
-        Assert.assertEquals(COMMAND_ARGS, job.getCommandArgs());
-        Assert.assertEquals(COMMAND_CRITERIA, job.getCommandCriteria());
-        Assert.assertEquals(CLUSTER_CRITERIAS, job.getClusterCriterias());
+        Assert.assertNull(localJob.getId());
+        Assert.assertEquals(NAME, localJob.getName());
+        Assert.assertEquals(USER, localJob.getUser());
+        Assert.assertEquals(Job.DEFAULT_VERSION, localJob.getVersion());
+        Assert.assertEquals(COMMAND_ARGS, localJob.getCommandArgs());
+        Assert.assertEquals(COMMAND_CRITERIA, localJob.getCommandCriteria());
+        Assert.assertEquals(CLUSTER_CRITERIAS, localJob.getClusterCriterias());
     }
 
     /**
@@ -267,12 +267,12 @@ public class TestJob {
      */
     @Test
     public void testSetGetClusterCriterias() throws GenieException {
-        final Job job = new Job(); //Use default constructor so null
-        Assert.assertNull(job.getClusterCriterias());
-        Assert.assertNull(job.getClusterCriteriasString());
-        job.setClusterCriterias(CLUSTER_CRITERIAS);
-        Assert.assertEquals(CLUSTER_CRITERIAS, job.getClusterCriterias());
-        Assert.assertNotNull(job.getClusterCriteriasString());
+        final Job localJob = new Job(); //Use default constructor so null
+        Assert.assertNull(localJob.getClusterCriterias());
+        Assert.assertNull(localJob.getClusterCriteriasString());
+        localJob.setClusterCriterias(CLUSTER_CRITERIAS);
+        Assert.assertEquals(CLUSTER_CRITERIAS, localJob.getClusterCriterias());
+        Assert.assertNotNull(localJob.getClusterCriteriasString());
     }
 
     /**
@@ -302,10 +302,10 @@ public class TestJob {
      */
     @Test
     public void testSetGetCommandArgs() throws GenieException {
-        final Job job = new Job(); //Use default constructor so null
-        Assert.assertNull(job.getCommandArgs());
-        job.setCommandArgs(COMMAND_ARGS);
-        Assert.assertEquals(COMMAND_ARGS, job.getCommandArgs());
+        final Job localJob = new Job(); //Use default constructor so null
+        Assert.assertNull(localJob.getCommandArgs());
+        localJob.setCommandArgs(COMMAND_ARGS);
+        Assert.assertEquals(COMMAND_ARGS, localJob.getCommandArgs());
     }
 
     /**
@@ -584,12 +584,12 @@ public class TestJob {
      */
     @Test
     public void testSetGetCommandCriteria() throws GenieException {
-        final Job job = new Job(); //so that command criteria is null
-        Assert.assertNull(job.getCommandCriteria());
-        Assert.assertNull(job.getCommandCriteriaString());
-        job.setCommandCriteria(COMMAND_CRITERIA);
-        Assert.assertEquals(COMMAND_CRITERIA, job.getCommandCriteria());
-        Assert.assertNotNull(job.getCommandCriteriaString());
+        final Job localJob = new Job(); //so that command criteria is null
+        Assert.assertNull(localJob.getCommandCriteria());
+        Assert.assertNull(localJob.getCommandCriteriaString());
+        localJob.setCommandCriteria(COMMAND_CRITERIA);
+        Assert.assertEquals(COMMAND_CRITERIA, localJob.getCommandCriteria());
+        Assert.assertNotNull(localJob.getCommandCriteriaString());
     }
 
     /**
@@ -613,20 +613,20 @@ public class TestJob {
      */
     @Test
     public void testSetJobStatus() {
-        final Job job = new Job();
+        final Job localJob = new Job();
         final Date dt = new Date(0);
 
         // finish time is 0 on initialization
-        Assert.assertTrue(dt.compareTo(job.getFinished()) == 0);
+        Assert.assertTrue(dt.compareTo(localJob.getFinished()) == 0);
 
         // start time is not zero on INIT, finish time is still 0
-        job.setJobStatus(JobStatus.INIT);
-        Assert.assertNotNull(job.getStarted());
-        Assert.assertTrue(dt.compareTo(job.getFinished()) == 0);
+        localJob.setJobStatus(JobStatus.INIT);
+        Assert.assertNotNull(localJob.getStarted());
+        Assert.assertTrue(dt.compareTo(localJob.getFinished()) == 0);
 
         // finish time is non-zero on completion
-        job.setJobStatus(JobStatus.SUCCEEDED);
-        Assert.assertFalse(dt.compareTo(job.getFinished()) == 0);
+        localJob.setJobStatus(JobStatus.SUCCEEDED);
+        Assert.assertFalse(dt.compareTo(localJob.getFinished()) == 0);
 
         final Job job2 = new Job();
         // finish time is 0 on initialization
@@ -700,8 +700,8 @@ public class TestJob {
      */
     @Test(expected = GenieException.class)
     public void testValidateBadSuperClass() throws GenieException {
-        final Job job = new Job();
-        job.validate();
+        final Job localJob = new Job();
+        localJob.validate();
     }
 
     /**
@@ -711,14 +711,14 @@ public class TestJob {
      */
     @Test(expected = GenieException.class)
     public void testValidateNullCommandCriteria() throws GenieException {
-        final Job job = new Job(
+        final Job localJob = new Job(
                 USER,
                 NAME,
                 COMMAND_ARGS,
                 null,
                 CLUSTER_CRITERIAS,
                 VERSION);
-        job.validate();
+        localJob.validate();
     }
 
     /**
@@ -728,14 +728,14 @@ public class TestJob {
      */
     @Test(expected = GenieException.class)
     public void testValidateEmptyCommandCriteria() throws GenieException {
-        final Job job = new Job(
+        final Job localJob = new Job(
                 USER,
                 NAME,
                 COMMAND_ARGS,
                 new HashSet<String>(),
                 CLUSTER_CRITERIAS,
                 VERSION);
-        job.validate();
+        localJob.validate();
     }
 
     /**
@@ -745,14 +745,14 @@ public class TestJob {
      */
     @Test(expected = GenieException.class)
     public void testValidateNullCommandArgs() throws GenieException {
-        final Job job = new Job(
+        final Job localJob = new Job(
                 USER,
                 NAME,
                 null,
                 COMMAND_CRITERIA,
                 CLUSTER_CRITERIAS,
                 VERSION);
-        job.validate();
+        localJob.validate();
     }
 
     /**
@@ -762,14 +762,14 @@ public class TestJob {
      */
     @Test(expected = GenieException.class)
     public void testValidateEmptyCommandArgs() throws GenieException {
-        final Job job = new Job(
+        final Job localJob = new Job(
                 USER,
                 NAME,
                 "",
                 COMMAND_CRITERIA,
                 CLUSTER_CRITERIAS,
                 VERSION);
-        job.validate();
+        localJob.validate();
     }
 
     /**
@@ -779,14 +779,14 @@ public class TestJob {
      */
     @Test(expected = GenieException.class)
     public void testValidateBlankCommandArgs() throws GenieException {
-        final Job job = new Job(
+        final Job localJob = new Job(
                 USER,
                 NAME,
                 "  ",
                 COMMAND_CRITERIA,
                 CLUSTER_CRITERIAS,
                 VERSION);
-        job.validate();
+        localJob.validate();
     }
 
     /**
@@ -796,14 +796,14 @@ public class TestJob {
      */
     @Test(expected = GenieException.class)
     public void testValidateNullClusterCriteria() throws GenieException {
-        final Job job = new Job(
+        final Job localJob = new Job(
                 USER,
                 NAME,
                 COMMAND_ARGS,
                 COMMAND_CRITERIA,
                 null,
                 VERSION);
-        job.validate();
+        localJob.validate();
     }
 
     /**
@@ -813,14 +813,14 @@ public class TestJob {
      */
     @Test(expected = GenieException.class)
     public void testValidateEmptyClusterCriteria() throws GenieException {
-        final Job job = new Job(
+        final Job localJob = new Job(
                 USER,
                 NAME,
                 COMMAND_ARGS,
                 COMMAND_CRITERIA,
                 new ArrayList<ClusterCriteria>(),
                 VERSION);
-        job.validate();
+        localJob.validate();
     }
 
     /**

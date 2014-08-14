@@ -171,7 +171,6 @@ public class TestApplicationSpecs {
      */
     @Test
     public void testProtectedConstructor() {
-        final ApplicationSpecs specs = new ApplicationSpecs();
-        Assert.assertEquals(ApplicationSpecs.class, specs.getClass());
+        Assert.assertNotNull(new ApplicationSpecs());
     }
 }

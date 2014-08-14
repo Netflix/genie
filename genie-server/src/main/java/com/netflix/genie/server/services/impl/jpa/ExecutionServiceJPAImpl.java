@@ -95,11 +95,11 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * Default constructor - initializes persistence manager, and other utility
      * classes.
      *
-     * @param jobRepo           The job repository to use.
-     * @param stats             the GenieNodeStatistics object
-     * @param jobCountManager   the job count manager to use
+     * @param jobRepo The job repository to use.
+     * @param stats the GenieNodeStatistics object
+     * @param jobCountManager the job count manager to use
      * @param jobManagerFactory The the job manager factory to use
-     * @param jobService        The job service to use.
+     * @param jobService The job service to use.
      */
     @Inject
     public ExecutionServiceJPAImpl(
@@ -159,6 +159,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -234,7 +236,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = GenieException.class)
+    @Transactional
     public int markZombies() {
         LOG.debug("called");
         final ProcessStatus zombie = ProcessStatus.ZOMBIE_JOB;
@@ -261,6 +263,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -397,8 +401,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             throw new GenieException(
                     HttpURLConnection.HTTP_UNAVAILABLE,
                     "Number of running jobs greater than system limit ("
-                            + maxRunningJobs
-                            + ") - try another instance or try again later");
+                    + maxRunningJobs
+                    + ") - try another instance or try again later");
         }
 
         //We didn't forward the job so return null to signal to run the job locally

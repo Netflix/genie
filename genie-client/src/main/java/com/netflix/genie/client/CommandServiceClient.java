@@ -616,6 +616,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      *
      * @param id The id of the command to delete the tag from. Not
      *           null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
      * @return The tag for the command.
      * @throws GenieException
      */

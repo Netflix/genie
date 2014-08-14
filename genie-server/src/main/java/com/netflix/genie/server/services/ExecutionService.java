@@ -63,6 +63,7 @@ public interface ExecutionService {
      * @param id The id of the job to finalize.
      * @param exitCode The exit code of the job process.
      * @return The job status.
+     * @throws GenieException
      */
     JobStatus finalizeJob(final String id, final int exitCode) throws GenieException;
 }

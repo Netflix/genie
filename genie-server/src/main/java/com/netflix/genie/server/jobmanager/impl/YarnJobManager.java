@@ -121,7 +121,7 @@ public class YarnJobManager implements JobManager {
      */
     @Inject
     public YarnJobManager(final JobMonitor jobMonitor,
-                          final JobService jobService) {
+            final JobService jobService) {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
         this.jobService = jobService;
@@ -129,6 +129,8 @@ public class YarnJobManager implements JobManager {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     public void init(final Job job, final Cluster cluster) throws GenieException {
@@ -147,6 +149,8 @@ public class YarnJobManager implements JobManager {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     public void launch() throws GenieException {
@@ -265,6 +269,8 @@ public class YarnJobManager implements JobManager {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     public void kill() throws GenieException {
@@ -319,7 +325,7 @@ public class YarnJobManager implements JobManager {
         this.genieJobIDProp = GENIE_JOB_ID + "=" + job.getId();
         this.netflixEnvProp = NFLX_ENV + "="
                 + ConfigurationManager.getConfigInstance().getString(
-                "netflix.environment");
+                        "netflix.environment");
 
         final String lipstickUuidPropName = ConfigurationManager.getConfigInstance().
                 getString("netflix.genie.server.lipstick.uuid.prop.name",
@@ -459,14 +465,14 @@ public class YarnJobManager implements JobManager {
                     .getConfigInstance()
                     .getString(
                             "netflix.genie.server.hadoop." + hadoopVersion
-                                    + ".home");
+                            + ".home");
             // if not, trim to 3 most significant digits
             if (hadoopHome == null) {
                 hadoopVersion = StringUtil.trimVersion(hadoopVersion);
                 hadoopHome = ConfigurationManager.getConfigInstance()
                         .getString(
                                 "netflix.genie.server.hadoop." + hadoopVersion
-                                        + ".home");
+                                + ".home");
             }
 
             if (hadoopHome == null || !new File(hadoopHome).exists()) {
@@ -499,7 +505,7 @@ public class YarnJobManager implements JobManager {
         // and set the COPY_COMMAND environment variable
         this.env.put("CP_TIMEOUT",
                 ConfigurationManager.getConfigInstance()
-                        .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
+                .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
 
         final String cpOpts = ConfigurationManager.getConfigInstance()
                 .getString("netflix.genie.server.hadoop.s3cp.opts", "");
@@ -593,7 +599,7 @@ public class YarnJobManager implements JobManager {
             final Field f = proc.getClass().getDeclaredField("pid");
             f.setAccessible(true);
             return f.getInt(proc);
-        } catch (Exception e) {
+        } catch (final IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
             String msg = "Can't get process id for job";
             LOG.error(msg, e);
             throw new GenieException(

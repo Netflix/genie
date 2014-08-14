@@ -136,7 +136,7 @@ public class JobServiceJPAImpl implements JobService {
             // persisted it in the database.
             this.stats.incrGenieJobSubmissions();
             return persistedJob;
-        } catch (final Exception e) {
+        } catch (final RuntimeException e) {
             //This will catch runtime as well
             LOG.error("Can't create entity in the database", e);
             throw new GenieException(
@@ -147,6 +147,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -293,6 +295,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -320,6 +324,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -342,6 +348,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -368,6 +376,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -385,6 +395,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -407,6 +419,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -428,6 +442,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -460,6 +476,8 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws GenieException
      */
     @Override
     @Transactional

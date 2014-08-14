@@ -94,6 +94,7 @@ public class BaseGenieClient {
     /**
      * Protected constructor for singleton class.
      *
+     * @param client the Rest client to use
      * @throws IOException if properties can't be loaded
      */
     public BaseGenieClient(final RestClient client) throws IOException {
@@ -145,9 +146,7 @@ public class BaseGenieClient {
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No request entered. Unable to continue..");
         }
-        HttpResponse response = null;
-        try {
-            response = this.client.executeWithLoadBalancer(request);
+        try (final HttpResponse response = this.client.executeWithLoadBalancer(request)) {
             if (response.isSuccess()) {
                 LOG.info("Response returned success.");
                 final ObjectMapper mapper = new ObjectMapper();
@@ -171,10 +170,6 @@ public class BaseGenieClient {
                 LOG.error(e.getMessage(), e);
                 throw new GenieException(
                         HttpURLConnection.HTTP_INTERNAL_ERROR, e);
-            }
-        } finally {
-            if (response != null) {
-                response.close();
             }
         }
     }

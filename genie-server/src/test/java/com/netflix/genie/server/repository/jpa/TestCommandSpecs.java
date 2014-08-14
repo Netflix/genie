@@ -175,7 +175,6 @@ public class TestCommandSpecs {
      */
     @Test
     public void testProtectedConstructor() {
-        final CommandSpecs specs = new CommandSpecs();
-        Assert.assertEquals(CommandSpecs.class, specs.getClass());
+        Assert.assertNotNull(new CommandSpecs());
     }
 }

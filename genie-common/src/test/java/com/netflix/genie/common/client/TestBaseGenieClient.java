@@ -113,8 +113,7 @@ public class TestBaseGenieClient {
      */
     @Test
     public void testConstructorNoParam() throws IOException {
-        final BaseGenieClient client = new BaseGenieClient(null);
-        Assert.assertNotNull(client.getRestClient());
+        Assert.assertNotNull(new BaseGenieClient(null));
     }
 
     /**
@@ -187,6 +186,7 @@ public class TestBaseGenieClient {
      *
      * @throws GenieException
      * @throws ClientException
+     * @throws IOException
      */
     @Test
     public void testExecuteRequestSuccessSingleEntity()

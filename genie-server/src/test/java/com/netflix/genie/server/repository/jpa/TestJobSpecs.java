@@ -352,7 +352,6 @@ public class TestJobSpecs {
      */
     @Test
     public void testProtectedConstructor() {
-        final JobSpecs specs = new JobSpecs();
-        Assert.assertEquals(JobSpecs.class, specs.getClass());
+        Assert.assertNotNull(new JobSpecs());
     }
 }
