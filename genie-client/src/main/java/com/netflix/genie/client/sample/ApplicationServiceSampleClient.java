@@ -115,7 +115,7 @@ public final class ApplicationServiceSampleClient {
         }
 
         LOG.info("Adding configurations to application with id " + app1.getId());
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add("someNewConfigFile");
         newConfigs.add("someOtherNewConfigFile");
         final Set<String> configs2 = appClient.addConfigsToApplication(app1.getId(), newConfigs);
@@ -146,7 +146,7 @@ public final class ApplicationServiceSampleClient {
         }
 
         LOG.info("Adding tags to application with id " + app1.getId());
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add("tag1");
         newTags.add("tag2");
         final Set<String> tags2 = appClient.addTagsToApplication(app1.getId(), newTags);
@@ -185,7 +185,7 @@ public final class ApplicationServiceSampleClient {
         }
 
         LOG.info("Adding jars to application with id " + app1.getId());
-        final Set<String> newJars = new HashSet<String>();
+        final Set<String> newJars = new HashSet<>();
         newJars.add("someNewJarFile.jar");
         newJars.add("someOtherNewJarFile.jar");
         final Set<String> jars2 = appClient.addJarsToApplication(app1.getId(), newJars);
@@ -231,19 +231,19 @@ public final class ApplicationServiceSampleClient {
      */
     public static Application getSampleApplication(final String id) throws GenieException {
         final Application app = new Application(APP_NAME, "tgianos", ApplicationStatus.ACTIVE, APP_VERSION);
-        if (StringUtils.isNotEmpty(id)) {
+        if (StringUtils.isNotBlank(id)) {
             app.setId(id);
         }
         app.setVersion("2.4.0");
-        final Set<String> configs = new HashSet<String>();
+        final Set<String> configs = new HashSet<>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml");
         app.setConfigs(configs);
 
-        final Set<String> jars = new HashSet<String>();
+        final Set<String> jars = new HashSet<>();
         jars.add("s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar");
         app.setJars(jars);
 
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("tag0");
         app.setTags(tags);
         return app;

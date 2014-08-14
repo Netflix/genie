@@ -40,7 +40,7 @@ public class TestClusterCriteria {
         ClusterCriteria cc = new ClusterCriteria();
         Assert.assertNotNull(cc.getTags());
 
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("Some Tag");
         cc = new ClusterCriteria(tags);
         Assert.assertEquals(tags, cc.getTags());
@@ -64,7 +64,7 @@ public class TestClusterCriteria {
      */
     @Test(expected = GenieException.class)
     public void testEmptyTagsConstructor() throws GenieException {
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         ClusterCriteria cc = new ClusterCriteria(tags);
         cc.getTags();
     }
@@ -77,7 +77,7 @@ public class TestClusterCriteria {
     @Test
     public void testTagsSetter() throws GenieException {
         final ClusterCriteria cc = new ClusterCriteria();
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("tag1");
         tags.add("tag2");
         tags.add("tag3");
@@ -103,7 +103,7 @@ public class TestClusterCriteria {
      */
     @Test(expected = GenieException.class)
     public void testEmptyTagsSetter() throws GenieException {
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         final ClusterCriteria cc = new ClusterCriteria();
         cc.setTags(tags);
     }

@@ -226,7 +226,7 @@ public class TestBaseGenieClient {
             throws GenieException, ClientException, IOException {
         Mockito.when(this.response.isSuccess()).thenReturn(true);
 
-        final List<Command> commands = new ArrayList<Command>();
+        final List<Command> commands = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             commands.add(
                     new Command(

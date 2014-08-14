@@ -161,7 +161,7 @@ public class Command extends CommonEntityFields {
         validate(this.status, this.executable);
         // Add the id to the tags
         if (this.tags == null) {
-           this.tags = new HashSet<String>();
+           this.tags = new HashSet<>();
         }
         this.tags.add(this.getId());
         this.tags.add(this.getName());
@@ -276,7 +276,7 @@ public class Command extends CommonEntityFields {
      */
     public Set<String> getTags() {
         if (this.tags == null) {
-            this.tags = new HashSet<String>();
+            this.tags = new HashSet<>();
         }
         return this.tags;
     }
@@ -308,7 +308,7 @@ public class Command extends CommonEntityFields {
         if (this.application != null) {
             Set<Command> commands = this.application.getCommands();
             if (commands == null) {
-                commands = new HashSet<Command>();
+                commands = new HashSet<>();
                 this.application.setCommands(commands);
             }
             if (!commands.contains(this)) {

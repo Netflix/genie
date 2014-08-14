@@ -55,7 +55,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
      */
     @Test
     public void testValidCluster() throws GenieException {
-        final Set<String> configs = new HashSet<String>();
+        final Set<String> configs = new HashSet<>();
         configs.add("SomeConfig");
         final Cluster cce = new Cluster("name", "tgianos", ClusterStatus.UP, "jobManager", configs, "2.4.0");
         assertNotNull(this.clb.selectCluster(Arrays.asList(cce, cce, cce)));

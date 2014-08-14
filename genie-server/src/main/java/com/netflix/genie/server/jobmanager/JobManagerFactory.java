@@ -107,11 +107,7 @@ public class JobManagerFactory implements ApplicationContextAware {
                 LOG.error(msg);
                 throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
             }
-        } catch (final ClassNotFoundException e) {
-            final String msg = "Unable to create job manager for class name " + className;
-            LOG.error(msg, e);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        } catch (final BeansException e) {
+        } catch (final ClassNotFoundException | BeansException e) {
             final String msg = "Unable to create job manager for class name " + className;
             LOG.error(msg, e);
             throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);

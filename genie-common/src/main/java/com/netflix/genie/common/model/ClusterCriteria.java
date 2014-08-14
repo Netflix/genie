@@ -37,7 +37,7 @@ public class ClusterCriteria implements Serializable {
     private static final long serialVersionUID = 1782794735938665541L;
     private static final Logger LOG = LoggerFactory.getLogger(ClusterCriteria.class);
 
-    private Set<String> tags = new HashSet<String>();
+    private Set<String> tags = new HashSet<>();
 
     /**
      * Default Constructor.

@@ -210,7 +210,7 @@ public class TestCommandConfigServiceJPAImpl {
             value = "command/init.xml",
             type = DatabaseOperation.DELETE_ALL)
     public void testGetCommandsByTags() {
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         List<Command> commands = this.service.getCommands(
                 null, null, tags, 0, 10);
@@ -381,7 +381,7 @@ public class TestCommandConfigServiceJPAImpl {
         final Command updateCommand = new Command();
         updateCommand.setStatus(CommandStatus.INACTIVE);
         updateCommand.setUser(COMMAND_2_USER);
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("tez");
         tags.add("yarn");
@@ -415,7 +415,7 @@ public class TestCommandConfigServiceJPAImpl {
         updateApp.setId(COMMAND_1_ID);
         updateApp.setStatus(CommandStatus.INACTIVE);
         updateApp.setUser(COMMAND_2_USER);
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("tez");
         tags.add("yarn");
@@ -587,7 +587,7 @@ public class TestCommandConfigServiceJPAImpl {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add(newConfig1);
         newConfigs.add(newConfig2);
         newConfigs.add(newConfig3);
@@ -648,7 +648,7 @@ public class TestCommandConfigServiceJPAImpl {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add(newConfig1);
         newConfigs.add(newConfig2);
         newConfigs.add(newConfig3);
@@ -1030,7 +1030,7 @@ public class TestCommandConfigServiceJPAImpl {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add(newTag1);
         newTags.add(newTag2);
         newTags.add(newTag3);
@@ -1091,7 +1091,7 @@ public class TestCommandConfigServiceJPAImpl {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add(newTag1);
         newTags.add(newTag2);
         newTags.add(newTag3);

@@ -150,7 +150,7 @@ public class Cluster extends CommonEntityFields {
         validate(this.status, this.clusterType, this.configs);
         // Add the id to the tags
         if (this.tags == null) {
-            this.tags = new HashSet<String>();
+            this.tags = new HashSet<>();
         }
         this.tags.add(this.getId());
         this.tags.add(this.getName());
@@ -230,7 +230,7 @@ public class Cluster extends CommonEntityFields {
      */
     public Set<String> getTags() {
         if (this.tags == null) {
-            this.tags = new HashSet<String>();
+            this.tags = new HashSet<>();
         }
         return this.tags;
     }
@@ -267,7 +267,7 @@ public class Cluster extends CommonEntityFields {
             for (final Command command : this.commands) {
                 Set<Cluster> clusters = command.getClusters();
                 if (clusters == null) {
-                    clusters = new HashSet<Cluster>();
+                    clusters = new HashSet<>();
                     command.setClusters(clusters);
                 }
                 if (!clusters.contains(this)) {
@@ -292,13 +292,13 @@ public class Cluster extends CommonEntityFields {
         }
 
         if (this.commands == null) {
-            this.commands = new ArrayList<Command>();
+            this.commands = new ArrayList<>();
         }
         this.commands.add(command);
 
         Set<Cluster> clusters = command.getClusters();
         if (clusters == null) {
-            clusters = new HashSet<Cluster>();
+            clusters = new HashSet<>();
             command.setClusters(clusters);
         }
         clusters.add(this);
@@ -333,7 +333,7 @@ public class Cluster extends CommonEntityFields {
      */
     public void removeAllCommands() throws GenieException {
         if (this.commands != null) {
-            final List<Command> locCommands = new ArrayList<Command>();
+            final List<Command> locCommands = new ArrayList<>();
             locCommands.addAll(this.commands);
             for (final Command command : locCommands) {
                 this.removeCommand(command);

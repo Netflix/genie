@@ -87,21 +87,21 @@ public class TestJobServiceJPAImpl {
         final String user = UUID.randomUUID().toString();
         final String version = UUID.randomUUID().toString();
         final String commandArgs = UUID.randomUUID().toString();
-        final List<ClusterCriteria> clusterCriterias = new ArrayList<ClusterCriteria>();
+        final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
         final ClusterCriteria criteria1 = new ClusterCriteria();
-        final Set<String> tags1 = new HashSet<String>();
+        final Set<String> tags1 = new HashSet<>();
         tags1.add(UUID.randomUUID().toString());
         tags1.add(UUID.randomUUID().toString());
         criteria1.setTags(tags1);
         clusterCriterias.add(criteria1);
         final ClusterCriteria criteria2 = new ClusterCriteria();
-        final Set<String> tags2 = new HashSet<String>();
+        final Set<String> tags2 = new HashSet<>();
         tags2.add(UUID.randomUUID().toString());
         tags2.add(UUID.randomUUID().toString());
         criteria2.setTags(tags2);
         clusterCriterias.add(criteria2);
 
-        final Set<String> commandCriteria = new HashSet<String>();
+        final Set<String> commandCriteria = new HashSet<>();
         commandCriteria.add(UUID.randomUUID().toString());
         commandCriteria.add(UUID.randomUUID().toString());
 
@@ -148,21 +148,21 @@ public class TestJobServiceJPAImpl {
         final String user = UUID.randomUUID().toString();
         final String version = UUID.randomUUID().toString();
         final String commandArgs = UUID.randomUUID().toString();
-        final List<ClusterCriteria> clusterCriterias = new ArrayList<ClusterCriteria>();
+        final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
         final ClusterCriteria criteria1 = new ClusterCriteria();
-        final Set<String> tags1 = new HashSet<String>();
+        final Set<String> tags1 = new HashSet<>();
         tags1.add(UUID.randomUUID().toString());
         tags1.add(UUID.randomUUID().toString());
         criteria1.setTags(tags1);
         clusterCriterias.add(criteria1);
         final ClusterCriteria criteria2 = new ClusterCriteria();
-        final Set<String> tags2 = new HashSet<String>();
+        final Set<String> tags2 = new HashSet<>();
         tags2.add(UUID.randomUUID().toString());
         tags2.add(UUID.randomUUID().toString());
         criteria2.setTags(tags2);
         clusterCriterias.add(criteria2);
 
-        final Set<String> commandCriteria = new HashSet<String>();
+        final Set<String> commandCriteria = new HashSet<>();
         commandCriteria.add(UUID.randomUUID().toString());
         commandCriteria.add(UUID.randomUUID().toString());
 
@@ -210,21 +210,21 @@ public class TestJobServiceJPAImpl {
         final String user = UUID.randomUUID().toString();
         final String version = UUID.randomUUID().toString();
         final String commandArgs = UUID.randomUUID().toString();
-        final List<ClusterCriteria> clusterCriterias = new ArrayList<ClusterCriteria>();
+        final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
         final ClusterCriteria criteria1 = new ClusterCriteria();
-        final Set<String> tags1 = new HashSet<String>();
+        final Set<String> tags1 = new HashSet<>();
         tags1.add(UUID.randomUUID().toString());
         tags1.add(UUID.randomUUID().toString());
         criteria1.setTags(tags1);
         clusterCriterias.add(criteria1);
         final ClusterCriteria criteria2 = new ClusterCriteria();
-        final Set<String> tags2 = new HashSet<String>();
+        final Set<String> tags2 = new HashSet<>();
         tags2.add(UUID.randomUUID().toString());
         tags2.add(UUID.randomUUID().toString());
         criteria2.setTags(tags2);
         clusterCriterias.add(criteria2);
 
-        final Set<String> commandCriteria = new HashSet<String>();
+        final Set<String> commandCriteria = new HashSet<>();
         commandCriteria.add(UUID.randomUUID().toString());
         commandCriteria.add(UUID.randomUUID().toString());
 
@@ -357,6 +357,7 @@ public class TestJobServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL
     )
     public void testGetJobsById() {
+        @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
                 JOB_1_ID,
                 null,
@@ -381,6 +382,7 @@ public class TestJobServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL
     )
     public void testGetJobsByName() {
+        @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
                 null,
                 "testSparkJob",
@@ -405,6 +407,7 @@ public class TestJobServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL
     )
     public void testGetJobsByUser() {
+        @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
                 null,
                 null,
@@ -429,6 +432,7 @@ public class TestJobServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL
     )
     public void testGetJobsByStatus() {
+        @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
                 null,
                 null,
@@ -453,6 +457,7 @@ public class TestJobServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL
     )
     public void testGetJobsByClusterName() {
+        @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
                 null,
                 null,
@@ -477,6 +482,7 @@ public class TestJobServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL
     )
     public void testGetJobsByClusterId() {
+        @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
                 null,
                 null,
@@ -506,7 +512,7 @@ public class TestJobServiceJPAImpl {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add(newTag1);
         newTags.add(newTag2);
         newTags.add(newTag3);
@@ -567,7 +573,7 @@ public class TestJobServiceJPAImpl {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add(newTag1);
         newTags.add(newTag2);
         newTags.add(newTag3);

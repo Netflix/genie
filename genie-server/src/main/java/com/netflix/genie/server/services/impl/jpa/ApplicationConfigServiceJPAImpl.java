@@ -196,7 +196,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     public List<Application> deleteAllApplications() throws GenieException {
         LOG.debug("Called");
         final Iterable<Application> apps = this.applicationRepo.findAll();
-        final List<Application> returnApps = new ArrayList<Application>();
+        final List<Application> returnApps = new ArrayList<>();
         for (final Application app : apps) {
             returnApps.add(this.deleteApplication(app.getId()));
         }
@@ -225,7 +225,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         }
 
         if (app.getCommands() != null) {
-            final Set<Command> commands = new HashSet<Command>();
+            final Set<Command> commands = new HashSet<>();
             commands.addAll(app.getCommands());
             for (final Command command : commands) {
                 command.setApplication(null);

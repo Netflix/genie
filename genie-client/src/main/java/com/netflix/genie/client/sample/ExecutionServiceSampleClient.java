@@ -85,11 +85,11 @@ public final class ExecutionServiceSampleClient {
         }
 
         LOG.info("Running Hive job");
-        final Set<String> criteriaTags = new HashSet<String>();
+        final Set<String> criteriaTags = new HashSet<>();
         criteriaTags.add("adhoc");
         final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
-        final List<ClusterCriteria> clusterCriterias = new ArrayList<ClusterCriteria>();
-        final Set<String> commandCriteria = new HashSet<String>();
+        final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
+        final Set<String> commandCriteria = new HashSet<>();
         clusterCriterias.add(criteria);
         commandCriteria.add("prodhive11_mr2");
 
@@ -105,7 +105,7 @@ public final class ExecutionServiceSampleClient {
 
         // Add some tags for metadata about the job. This really helps for reporting on
         // the jobs and categorization.
-        Set<String> jobTags = new HashSet<String>();
+        Set<String> jobTags = new HashSet<>();
         jobTags.add("testgenie");
         jobTags.add("sample");
 
@@ -122,7 +122,7 @@ public final class ExecutionServiceSampleClient {
                 pw.close();
             }
         }
-        final Set<FileAttachment> attachments = new HashSet<FileAttachment>();
+        final Set<FileAttachment> attachments = new HashSet<>();
         final FileAttachment attachment = new FileAttachment();
         attachment.setName("hive.q");
 

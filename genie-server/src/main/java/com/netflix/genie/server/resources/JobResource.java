@@ -118,7 +118,7 @@ public class JobResource {
             @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT, message = "Job with ID already exists."),
             @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Precondition Failed"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            message = "Genie Server Error due to Unknown Exception")
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Response submitJob(
             @ApiParam(value = "Job object to run.", required = true)
@@ -220,7 +220,7 @@ public class JobResource {
      * Get jobs for given filter criteria.
      *
      * @param id          id for job
-     * @param name     name of job (can be a SQL-style pattern such as HIVE%)
+     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName    user who submitted job
      * @param status      status of job - possible types Type.JobStatus
      * @param clusterName the name of the cluster
@@ -284,7 +284,9 @@ public class JobResource {
                 + page
                 + " | "
                 + limit);
-        return this.jobService.getJobs(
+
+        @SuppressWarnings("unchecked")
+        final List<Job> jobs = this.jobService.getJobs(
                 id,
                 name,
                 userName,
@@ -293,6 +295,7 @@ public class JobResource {
                 clusterId,
                 page,
                 limit);
+        return jobs;
     }
 
     /**

@@ -413,7 +413,7 @@ public class Job extends CommonEntityFields {
         this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
         // Add the id to the tags
         if (this.tags == null) {
-            this.tags = new HashSet<String>();
+            this.tags = new HashSet<>();
         }
         this.tags.add(this.getId());
         this.tags.add(this.getName());
@@ -1035,7 +1035,7 @@ public class Job extends CommonEntityFields {
      */
     public Set<String> getTags() {
         if (this.tags == null) {
-            this.tags = new HashSet<String>();
+            this.tags = new HashSet<>();
         }
         return this.tags;
     }
@@ -1173,7 +1173,7 @@ public class Job extends CommonEntityFields {
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No command criteria found. Unable to continue.");
         }
-        final Set<String> c = new HashSet<String>();
+        final Set<String> c = new HashSet<>();
         c.addAll(Arrays.asList(criterias));
         return c;
     }
@@ -1193,13 +1193,13 @@ public class Job extends CommonEntityFields {
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No cluster criteria found. Unable to continue.");
         }
-        final List<ClusterCriteria> cc = new ArrayList<ClusterCriteria>();
+        final List<ClusterCriteria> cc = new ArrayList<>();
         for (final String criteriaSet : criteriaSets) {
             final String[] criterias = StringUtils.split(criteriaSet, CRITERIA_DELIMITER);
             if (criterias == null || criterias.length == 0) {
                 continue;
             }
-            final Set<String> c = new HashSet<String>();
+            final Set<String> c = new HashSet<>();
             c.addAll(Arrays.asList(criterias));
             cc.add(new ClusterCriteria(c));
         }

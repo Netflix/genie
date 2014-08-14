@@ -186,7 +186,7 @@ public class TestCommand {
     @Test
     public void testSetConfigs() {
         Assert.assertNull(this.c.getConfigs());
-        final Set<String> configs = new HashSet<String>();
+        final Set<String> configs = new HashSet<>();
         configs.add("s3://netflix.configFile");
         this.c.setConfigs(configs);
         Assert.assertEquals(configs, this.c.getConfigs());
@@ -198,7 +198,7 @@ public class TestCommand {
     @Test
     public void testSetTags() {
         Assert.assertNotNull(this.c.getTags());
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("tag1");
         tags.add("tag2");
         this.c.setTags(tags);
@@ -236,7 +236,7 @@ public class TestCommand {
     @Test
     public void testSetClusters() {
         Assert.assertNull(this.c.getClusters());
-        final Set<Cluster> clusters = new HashSet<Cluster>();
+        final Set<Cluster> clusters = new HashSet<>();
         clusters.add(new Cluster());
         this.c.setClusters(clusters);
         Assert.assertEquals(clusters, this.c.getClusters());

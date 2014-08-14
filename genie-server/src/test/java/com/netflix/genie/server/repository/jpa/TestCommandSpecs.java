@@ -45,7 +45,7 @@ public class TestCommandSpecs {
     private static final String TAG_1 = "prod";
     private static final String TAG_2 = "hive";
     private static final String TAG_3 = "11";
-    private static final Set<String> TAGS = new HashSet<String>();
+    private static final Set<String> TAGS = new HashSet<>();
 
     private Root<Command> root;
     private CriteriaQuery<?> cq;

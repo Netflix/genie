@@ -66,9 +66,9 @@ public class TestJob {
 
 
     private static final Set<String> COMMAND_CRITERIA
-            = new HashSet<String>();
+            = new HashSet<>();
     private static final List<ClusterCriteria> CLUSTER_CRITERIAS
-            = new ArrayList<ClusterCriteria>();
+            = new ArrayList<>();
 
     private Job job;
 
@@ -83,14 +83,14 @@ public class TestJob {
         COMMAND_CRITERIA.add(COMMAND_CRITERIA_2);
 
         final ClusterCriteria one = new ClusterCriteria();
-        final Set<String> tagsOne = new HashSet<String>();
+        final Set<String> tagsOne = new HashSet<>();
         tagsOne.add(CLUSTER_CRITERIA_1);
         tagsOne.add(CLUSTER_CRITERIA_2);
         one.setTags(tagsOne);
         CLUSTER_CRITERIAS.add(one);
 
         final ClusterCriteria two = new ClusterCriteria();
-        final Set<String> tagsTwo = new HashSet<String>();
+        final Set<String> tagsTwo = new HashSet<>();
         tagsTwo.add(CLUSTER_CRITERIA_3);
         tagsTwo.add(CLUSTER_CRITERIA_4);
         two.setTags(tagsTwo);
@@ -360,7 +360,7 @@ public class TestJob {
         final FileAttachment attachment = new FileAttachment();
         attachment.setName("/some/query.q");
         attachment.setData("select * from mytable;".getBytes(UTF8_CHARSET));
-        final Set<FileAttachment> attachments = new HashSet<FileAttachment>();
+        final Set<FileAttachment> attachments = new HashSet<>();
         attachments.add(attachment);
         this.job.setAttachments(attachments);
         Assert.assertEquals(attachments, this.job.getAttachments());
@@ -664,7 +664,7 @@ public class TestJob {
     @Test
     public void testSetGetTags() {
         Assert.assertTrue(this.job.getTags().isEmpty());
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("someTag");
         tags.add("someOtherTag");
         this.job.setTags(tags);

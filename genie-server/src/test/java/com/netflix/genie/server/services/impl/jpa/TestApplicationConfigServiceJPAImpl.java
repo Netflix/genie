@@ -190,7 +190,7 @@ public class TestApplicationConfigServiceJPAImpl {
             value = "application/init.xml",
             type = DatabaseOperation.DELETE_ALL)
     public void testGetApplicationsByTags() {
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         List<Application> apps = this.service.getApplications(
                 null, null, tags, 0, 10);
@@ -356,7 +356,7 @@ public class TestApplicationConfigServiceJPAImpl {
         final Application updateApp = new Application();
         updateApp.setStatus(ApplicationStatus.ACTIVE);
         updateApp.setUser(APP_2_USER);
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("tez");
         tags.add("yarn");
@@ -390,7 +390,7 @@ public class TestApplicationConfigServiceJPAImpl {
         updateApp.setId(APP_1_ID);
         updateApp.setStatus(ApplicationStatus.ACTIVE);
         updateApp.setUser(APP_2_USER);
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("tez");
         tags.add("yarn");
@@ -531,7 +531,7 @@ public class TestApplicationConfigServiceJPAImpl {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add(newConfig1);
         newConfigs.add(newConfig2);
         newConfigs.add(newConfig3);
@@ -592,7 +592,7 @@ public class TestApplicationConfigServiceJPAImpl {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add(newConfig1);
         newConfigs.add(newConfig2);
         newConfigs.add(newConfig3);
@@ -777,7 +777,7 @@ public class TestApplicationConfigServiceJPAImpl {
         final String newJar2 = UUID.randomUUID().toString();
         final String newJar3 = UUID.randomUUID().toString();
 
-        final Set<String> newJars = new HashSet<String>();
+        final Set<String> newJars = new HashSet<>();
         newJars.add(newJar1);
         newJars.add(newJar2);
         newJars.add(newJar3);
@@ -838,7 +838,7 @@ public class TestApplicationConfigServiceJPAImpl {
         final String newJar2 = UUID.randomUUID().toString();
         final String newJar3 = UUID.randomUUID().toString();
 
-        final Set<String> newJars = new HashSet<String>();
+        final Set<String> newJars = new HashSet<>();
         newJars.add(newJar1);
         newJars.add(newJar2);
         newJars.add(newJar3);
@@ -1023,7 +1023,7 @@ public class TestApplicationConfigServiceJPAImpl {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add(newTag1);
         newTags.add(newTag2);
         newTags.add(newTag3);
@@ -1084,7 +1084,7 @@ public class TestApplicationConfigServiceJPAImpl {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add(newTag1);
         newTags.add(newTag2);
         newTags.add(newTag3);

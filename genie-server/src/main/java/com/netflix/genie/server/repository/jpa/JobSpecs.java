@@ -66,7 +66,7 @@ public final class JobSpecs {
                     final Root<Job> root,
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
-                final List<Predicate> predicates = new ArrayList<Predicate>();
+                final List<Predicate> predicates = new ArrayList<>();
                 if (StringUtils.isNotBlank(id)) {
                     predicates.add(cb.like(root.get(Job_.id), id));
                 }
@@ -106,7 +106,7 @@ public final class JobSpecs {
                     final Root<Job> root,
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
-                final List<Predicate> predicates = new ArrayList<Predicate>();
+                final List<Predicate> predicates = new ArrayList<>();
                 predicates.add(cb.lessThan(root.get(Job_.updated), new Date(currentTime - zombieTime)));
                 final Predicate orPredicate1 = cb.equal(root.get(Job_.status), JobStatus.RUNNING);
                 final Predicate orPredicate2 = cb.equal(root.get(Job_.status), JobStatus.INIT);

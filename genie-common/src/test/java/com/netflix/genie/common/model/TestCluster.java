@@ -48,7 +48,7 @@ public class TestCluster {
     @Before
     public void setup() {
         this.c = new Cluster();
-        this.configs = new HashSet<String>();
+        this.configs = new HashSet<>();
         this.configs.add(CONFIG);
     }
 
@@ -196,7 +196,7 @@ public class TestCluster {
     @Test
     public void testSetTags() throws GenieException {
         Assert.assertNotNull(this.c.getTags());
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("sla");
         this.c.setTags(tags);
@@ -225,7 +225,7 @@ public class TestCluster {
         one.setId("one");
         final Command two = new Command();
         two.setId("two");
-        final List<Command> commands = new ArrayList<Command>();
+        final List<Command> commands = new ArrayList<>();
         commands.add(one);
         commands.add(two);
         this.c.setCommands(commands);
@@ -313,7 +313,7 @@ public class TestCluster {
         one.setId("one");
         final Command two = new Command();
         two.setId("two");
-        final List<Command> commands = new ArrayList<Command>();
+        final List<Command> commands = new ArrayList<>();
         commands.add(one);
         commands.add(two);
         this.c.setCommands(commands);

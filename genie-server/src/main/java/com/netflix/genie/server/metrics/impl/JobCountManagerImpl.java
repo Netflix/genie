@@ -118,7 +118,7 @@ public class JobCountManagerImpl implements JobCountManager {
         cq.select(cb.count(j));
         final Predicate runningStatus = cb.equal(j.get(Job_.status), JobStatus.RUNNING);
         final Predicate initStatus = cb.equal(j.get(Job_.status), JobStatus.INIT);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
+        final List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(j.get(Job_.hostName), finalHostName));
         predicates.add(cb.or(runningStatus, initStatus));
         if (minStartTime != null) {

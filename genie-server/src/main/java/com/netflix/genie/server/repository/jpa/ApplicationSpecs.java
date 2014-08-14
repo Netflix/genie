@@ -59,7 +59,7 @@ public final class ApplicationSpecs {
                     final Root<Application> root,
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
-                final List<Predicate> predicates = new ArrayList<Predicate>();
+                final List<Predicate> predicates = new ArrayList<>();
                 if (StringUtils.isNotBlank(name)) {
                     predicates.add(cb.equal(root.get(Application_.name), name));
                 }

@@ -68,8 +68,8 @@ public final class CommandServiceSampleClient {
     /**
      * Main for running client code.
      *
-     * @param args
-     * @throws java.lang.Exception
+     * @param args program arguments
+     * @throws Exception
      */
     public static void main(final String[] args) throws Exception {
 
@@ -134,7 +134,7 @@ public final class CommandServiceSampleClient {
         }
 
         LOG.info("Adding configurations to command with id " + command1.getId());
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add("someNewConfigFile");
         newConfigs.add("someOtherNewConfigFile");
         final Set<String> configs2 = commandClient.addConfigsToCommand(command1.getId(), newConfigs);
@@ -165,7 +165,7 @@ public final class CommandServiceSampleClient {
         }
 
         LOG.info("Adding tags to command with id " + command1.getId());
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add("tag1");
         newTags.add("tag2");
         final Set<String> tags2 = commandClient.addTagsToCommand(command1.getId(), newTags);
@@ -229,7 +229,7 @@ public final class CommandServiceSampleClient {
      *
      * @param id The id to use or null if want one created.
      * @return The pig example command
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException
      */
     public static Command createSampleCommand(
             final String id) throws GenieException {
@@ -239,13 +239,13 @@ public final class CommandServiceSampleClient {
                 CommandStatus.ACTIVE,
                 "/apps/pig/0.13/bin/pig",
                 CMD_VERSION);
-        if (!StringUtils.isEmpty(id)) {
+        if (StringUtils.isNotBlank(id)) {
             command.setId(id);
         }
         command.setEnvPropFile("s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh");
         command.setVersion("0.13");
 
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("tag0");
         command.setTags(tags);
         return command;

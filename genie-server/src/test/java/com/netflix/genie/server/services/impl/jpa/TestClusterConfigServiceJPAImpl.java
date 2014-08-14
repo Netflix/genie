@@ -191,7 +191,7 @@ public class TestClusterConfigServiceJPAImpl {
             value = "cluster/init.xml",
             type = DatabaseOperation.DELETE_ALL)
     public void testGetClustersByTags() {
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         List<Cluster> clusters = this.service.getClusters(
                 null, null, tags, null, null, 0, 10);
@@ -329,7 +329,7 @@ public class TestClusterConfigServiceJPAImpl {
                     ge.getErrorCode()
             );
         }
-        final Set<String> configs = new HashSet<String>();
+        final Set<String> configs = new HashSet<>();
         configs.add("a config");
         configs.add("another config");
         configs.add("yet another config");
@@ -379,7 +379,7 @@ public class TestClusterConfigServiceJPAImpl {
                         0,
                         Integer.MAX_VALUE
                 ).isEmpty());
-        final Set<String> configs = new HashSet<String>();
+        final Set<String> configs = new HashSet<>();
         configs.add("a config");
         configs.add("another config");
         configs.add("yet another config");
@@ -431,7 +431,7 @@ public class TestClusterConfigServiceJPAImpl {
             value = "cluster/init.xml",
             type = DatabaseOperation.DELETE_ALL)
     public void testCreateClusterAlreadyExists() throws GenieException {
-        final Set<String> configs = new HashSet<String>();
+        final Set<String> configs = new HashSet<>();
         configs.add("a config");
         configs.add("another config");
         configs.add("yet another config");
@@ -466,7 +466,7 @@ public class TestClusterConfigServiceJPAImpl {
         final Cluster updateCluster = new Cluster();
         updateCluster.setStatus(ClusterStatus.OUT_OF_SERVICE);
         updateCluster.setUser(CLUSTER_2_USER);
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("tez");
         tags.add("yarn");
@@ -500,7 +500,7 @@ public class TestClusterConfigServiceJPAImpl {
         updateApp.setId(CLUSTER_1_ID);
         updateApp.setStatus(ClusterStatus.OUT_OF_SERVICE);
         updateApp.setUser(CLUSTER_2_USER);
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("tez");
         tags.add("yarn");
@@ -654,7 +654,7 @@ public class TestClusterConfigServiceJPAImpl {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add(newConfig1);
         newConfigs.add(newConfig2);
         newConfigs.add(newConfig3);
@@ -715,7 +715,7 @@ public class TestClusterConfigServiceJPAImpl {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add(newConfig1);
         newConfigs.add(newConfig2);
         newConfigs.add(newConfig3);
@@ -815,7 +815,7 @@ public class TestClusterConfigServiceJPAImpl {
                         "23.1.1"
                 )
         );
-        final List<Command> newCommands = new ArrayList<Command>();
+        final List<Command> newCommands = new ArrayList<>();
         newCommands.add(command1);
         newCommands.add(command2);
         Assert.assertEquals(
@@ -874,7 +874,7 @@ public class TestClusterConfigServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL)
     public void testAddCommandsForClusterCommandDoesntExist()
             throws GenieException {
-        final List<Command> commands = new ArrayList<Command>();
+        final List<Command> commands = new ArrayList<>();
         final Command command = new Command();
         command.setId(UUID.randomUUID().toString());
         commands.add(command);
@@ -950,7 +950,7 @@ public class TestClusterConfigServiceJPAImpl {
                         "23.1.1"
                 )
         );
-        final List<Command> newCommands = new ArrayList<Command>();
+        final List<Command> newCommands = new ArrayList<>();
         newCommands.add(command1);
         newCommands.add(command2);
         Assert.assertEquals(
@@ -1012,7 +1012,7 @@ public class TestClusterConfigServiceJPAImpl {
             type = DatabaseOperation.DELETE_ALL)
     public void testUpdateCommandsForClusterCommandDoesntExist()
             throws GenieException {
-        final List<Command> commands = new ArrayList<Command>();
+        final List<Command> commands = new ArrayList<>();
         final Command command = new Command();
         command.setId(UUID.randomUUID().toString());
         commands.add(command);
@@ -1151,7 +1151,7 @@ public class TestClusterConfigServiceJPAImpl {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add(newTag1);
         newTags.add(newTag2);
         newTags.add(newTag3);
@@ -1212,7 +1212,7 @@ public class TestClusterConfigServiceJPAImpl {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add(newTag1);
         newTags.add(newTag2);
         newTags.add(newTag3);

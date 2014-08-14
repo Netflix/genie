@@ -274,7 +274,10 @@ public final class CommandServiceClient extends BaseGenieClient {
                         SLASH),
                 null,
                 null);
-        return (Set<String>) this.executeRequest(request, Set.class, String.class);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> configs = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return configs;
     }
 
     /**

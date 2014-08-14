@@ -61,7 +61,7 @@ public class TestJobJanitorImpl {
      */
     @Test
     @DatabaseSetup("testMarkZombies.xml")
-    public void testMarkZombies() throws GenieException, Exception {
-        Assert.assertTrue(2 == this.janitor.markZombies());
+    public void testMarkZombies() throws Exception {
+        Assert.assertEquals(2, this.janitor.markZombies());
     }
 }

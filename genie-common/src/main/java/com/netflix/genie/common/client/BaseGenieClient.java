@@ -107,7 +107,7 @@ public class BaseGenieClient {
         }
 
         //Force jersey to properly serialize JSON
-        final Set<Class<?>> providers = new HashSet<Class<?>>();
+        final Set<Class<?>> providers = new HashSet<>();
         providers.add(JacksonJaxbJsonProvider.class);
         providers.add(JacksonJsonProvider.class);
         final ClientConfig clientConfig = new DefaultClientConfig(providers);

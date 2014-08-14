@@ -208,7 +208,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     public List<Command> deleteAllCommands() throws GenieException {
         LOG.debug("Called to delete all commands");
         final Iterable<Command> commands = this.commandRepo.findAll();
-        final List<Command> returnCommands = new ArrayList<Command>();
+        final List<Command> returnCommands = new ArrayList<>();
         for (final Command command : commands) {
             returnCommands.add(this.deleteCommand(command.getId()));
         }

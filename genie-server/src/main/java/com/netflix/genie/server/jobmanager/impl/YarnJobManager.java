@@ -80,7 +80,7 @@ public class YarnJobManager implements JobManager {
     /**
      * The environment variables for this job.
      */
-    private final Map<String, String> env = new HashMap<String, String>();
+    private final Map<String, String> env = new HashMap<>();
     /**
      * The value of the Genie job id property to pass to jobs.
      */
@@ -293,12 +293,7 @@ public class YarnJobManager implements JobManager {
                 }
                 Runtime.getRuntime().exec(
                         genieHome + File.separator + "jobkill.sh " + processId);
-            } catch (final GenieException e) {
-                final String msg = "Failed to kill the job";
-                LOG.error(msg, e);
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
-            } catch (final IOException e) {
+            } catch (final GenieException | IOException e) {
                 final String msg = "Failed to kill the job";
                 LOG.error(msg, e);
                 throw new GenieException(

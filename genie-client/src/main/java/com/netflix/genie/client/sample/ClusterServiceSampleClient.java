@@ -67,8 +67,8 @@ public final class ClusterServiceSampleClient {
     /**
      * Main for running client code.
      *
-     * @param args
-     * @throws java.lang.Exception
+     * @param args program arguments
+     * @throws Exception
      */
     public static void main(final String[] args) throws Exception {
 
@@ -108,7 +108,7 @@ public final class ClusterServiceSampleClient {
 
         LOG.info("Created command:");
         LOG.info(command1.toString());
-        final List<Command> commands = new ArrayList<Command>();
+        final List<Command> commands = new ArrayList<>();
         commands.add(command1);
 
         LOG.info("Initializing ClusterConfigServiceClient");
@@ -147,7 +147,7 @@ public final class ClusterServiceSampleClient {
         }
 
         LOG.info("Adding configurations to cluster with id " + cluster1.getId());
-        final Set<String> newConfigs = new HashSet<String>();
+        final Set<String> newConfigs = new HashSet<>();
         newConfigs.add("someNewConfigFile");
         newConfigs.add("someOtherNewConfigFile");
         final Set<String> configs2 = clusterClient.addConfigsToCluster(cluster1.getId(), newConfigs);
@@ -170,7 +170,7 @@ public final class ClusterServiceSampleClient {
         }
 
         LOG.info("Adding tags to cluster with id " + cluster1.getId());
-        final Set<String> newTags = new HashSet<String>();
+        final Set<String> newTags = new HashSet<>();
         newTags.add("tag1");
         newTags.add("tag2");
         final Set<String> tags2 = clusterClient.addTagsToCluster(cluster1.getId(), newTags);
@@ -209,7 +209,7 @@ public final class ClusterServiceSampleClient {
         }
 
         LOG.info("Adding commands to cluster with id " + cluster1.getId());
-        final List<Command> newCmds = new ArrayList<Command>();
+        final List<Command> newCmds = new ArrayList<>();
         newCmds.add(commandClient.createCommand(CommandServiceSampleClient.createSampleCommand(ID + "something")));
         newCmds.add(commandClient.createCommand(CommandServiceSampleClient.createSampleCommand(null)));
 
@@ -281,7 +281,7 @@ public final class ClusterServiceSampleClient {
      */
     public static Cluster createSampleCluster(
             final String id) throws GenieException {
-        final Set<String> configs = new HashSet<String>();
+        final Set<String> configs = new HashSet<>();
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
         configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/yarn-site.xml");
@@ -295,7 +295,7 @@ public final class ClusterServiceSampleClient {
         if (StringUtils.isNotBlank(id)) {
             cluster.setId(id);
         }
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("adhoc");
         tags.add("h2query");
         tags.add(cluster.getId());

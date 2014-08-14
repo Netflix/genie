@@ -74,7 +74,7 @@ public final class ClusterSpecs {
                     final Root<Cluster> root,
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
-                final List<Predicate> predicates = new ArrayList<Predicate>();
+                final List<Predicate> predicates = new ArrayList<>();
                 if (StringUtils.isNotBlank(name)) {
                     predicates.add(cb.like(root.get(Cluster_.name), name));
                 }
@@ -91,7 +91,7 @@ public final class ClusterSpecs {
                 }
                 if (statuses != null && !statuses.isEmpty()) {
                     //Could optimize this as we know size could use native array
-                    final List<Predicate> orPredicates = new ArrayList<Predicate>();
+                    final List<Predicate> orPredicates = new ArrayList<>();
                     for (final ClusterStatus status : statuses) {
                         orPredicates.add(cb.equal(root.get(Cluster_.status), status));
                     }
@@ -119,7 +119,7 @@ public final class ClusterSpecs {
                     final Root<Cluster> root,
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
-                final List<Predicate> predicates = new ArrayList<Predicate>();
+                final List<Predicate> predicates = new ArrayList<>();
                 final Join<Cluster, Command> commands = root.join(Cluster_.commands);
 
                 cq.distinct(true);

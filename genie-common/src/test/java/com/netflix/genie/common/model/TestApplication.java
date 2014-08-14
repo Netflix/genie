@@ -138,7 +138,7 @@ public class TestApplication {
     @Test
     public void testSetConfigs() {
         Assert.assertNull(this.a.getConfigs());
-        final Set<String> configs = new HashSet<String>();
+        final Set<String> configs = new HashSet<>();
         configs.add("s3://netflix.configFile");
         this.a.setConfigs(configs);
         Assert.assertEquals(configs, this.a.getConfigs());
@@ -150,7 +150,7 @@ public class TestApplication {
     @Test
     public void testSetJars() {
         Assert.assertNull(this.a.getJars());
-        final Set<String> jars = new HashSet<String>();
+        final Set<String> jars = new HashSet<>();
         jars.add("s3://netflix/jars/myJar.jar");
         this.a.setJars(jars);
         Assert.assertEquals(jars, this.a.getJars());
@@ -162,7 +162,7 @@ public class TestApplication {
     @Test
     public void testSetTags() {
         Assert.assertNotNull(this.a.getTags());
-        final Set<String> tags = new HashSet<String>();
+        final Set<String> tags = new HashSet<>();
         tags.add("tag1");
         tags.add("tag2");
         this.a.setTags(tags);
@@ -175,7 +175,7 @@ public class TestApplication {
     @Test
     public void testSetCommands() {
         Assert.assertNull(this.a.getCommands());
-        final Set<Command> commands = new HashSet<Command>();
+        final Set<Command> commands = new HashSet<>();
         commands.add(new Command());
         this.a.setCommands(commands);
         Assert.assertEquals(commands, this.a.getCommands());

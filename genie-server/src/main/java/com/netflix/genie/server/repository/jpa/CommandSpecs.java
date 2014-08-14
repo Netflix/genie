@@ -58,7 +58,7 @@ public final class CommandSpecs {
                     final Root<Command> root,
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
-                final List<Predicate> predicates = new ArrayList<Predicate>();
+                final List<Predicate> predicates = new ArrayList<>();
                 if (StringUtils.isNotBlank(name)) {
                     predicates.add(cb.equal(root.get(Command_.name), name));
                 }

@@ -222,7 +222,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
 
         //if we've gotten to here no clusters were found so return empty list
-        return new ArrayList<Cluster>();
+        return new ArrayList<>();
     }
 
     /**
@@ -480,7 +480,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
-            final List<Command> cmds = new ArrayList<Command>();
+            final List<Command> cmds = new ArrayList<>();
             for (final Command detached : commands) {
                 final Command cmd = this.commandRepo.findOne(detached.getId());
                 if (cmd != null) {
@@ -515,7 +515,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
-            final List<Command> cmdList = new ArrayList<Command>();
+            final List<Command> cmdList = new ArrayList<>();
             cmdList.addAll(cluster.getCommands());
             for (final Command cmd : cmdList) {
                 cluster.removeCommand(cmd);

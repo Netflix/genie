@@ -45,7 +45,7 @@ public class TestApplicationSpecs {
     private static final String TAG_1 = "tez";
     private static final String TAG_2 = "yarn";
     private static final String TAG_3 = "hadoop";
-    private static final Set<String> TAGS = new HashSet<String>();
+    private static final Set<String> TAGS = new HashSet<>();
 
     private Root<Application> root;
     private CriteriaQuery<?> cq;
