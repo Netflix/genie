@@ -19,7 +19,6 @@ package com.netflix.genie.server.jobmanager.impl;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.jobmanager.JobJanitor;
 import javax.inject.Inject;
 import org.junit.Assert;
@@ -56,7 +55,6 @@ public class TestJobJanitorImpl {
     /**
      * Test whether the janitor cleans up zombie jobs correctly.
      *
-     * @throws GenieException
      * @throws Exception
      */
     @Test
