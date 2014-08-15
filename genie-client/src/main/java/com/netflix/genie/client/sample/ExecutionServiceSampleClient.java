@@ -113,14 +113,8 @@ public final class ExecutionServiceSampleClient {
 
         // send the query as an attachment
         final File query = File.createTempFile("hive", ".q");
-        PrintWriter pw = null;
-        try {
-            pw = new PrintWriter(query, "UTF-8");
+        try (PrintWriter pw = new PrintWriter(query, "UTF-8")) {
             pw.println("select count(*) from counters where dateint=20120430 and hour=10;");
-        } finally {
-            if (pw != null) {
-                pw.close();
-            }
         }
         final Set<FileAttachment> attachments = new HashSet<>();
         final FileAttachment attachment = new FileAttachment();

@@ -41,9 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Date;
@@ -78,9 +75,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     private final JobCountManager jobCountManager;
     private final JobManagerFactory jobManagerFactory;
     private final JobService jobService;
-
-    @PersistenceContext
-    private EntityManager em;
 
     // initialize static variables
     static {
@@ -130,7 +124,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                     "No job entered to run");
         }
 
-        if (StringUtils.isNotBlank(job.getId()) && this.jobRepo.exists(job.getId())) {
+        if (StringUtils.isNotBlank(job.getId())
+                && this.jobRepo.exists(job.getId())) {
             throw new GenieException(
                     HttpURLConnection.HTTP_CONFLICT,
                     "Job with ID specified already exists."
@@ -165,9 +160,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     @Override
     @Transactional(rollbackFor = GenieException.class)
     public Job killJob(final String id) throws GenieException {
-        if (StringUtils.isEmpty(id)) {
+        if (StringUtils.isBlank(id)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "No id entered unable to kill job.");
         }
         LOG.debug("called for id: " + id);
@@ -187,19 +182,19 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             // job already exited, return status to user
             return job;
         } else if (job.getStatus() == JobStatus.INIT
-                || (job.getProcessHandle() == -1)) {
+                || job.getProcessHandle() == -1) {
             // can't kill a job if it is still initializing
             throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "Unable to kill job as it is still initializing");
         }
 
         // if we get here, job is still running - and can be killed
         // redirect to the right node if killURI points to a different node
         final String killURI = job.getKillURI();
-        if (StringUtils.isEmpty(killURI)) {
+        if (StringUtils.isBlank(killURI)) {
             throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    HttpURLConnection.HTTP_PRECON_FAILED,
                     "Failed to get killURI for jobID: " + id);
         }
         final String localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + id;
@@ -220,10 +215,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         this.stats.incrGenieKilledJobs();
 
         LOG.debug("updating job status to KILLED for: " + id);
-        // acquire write lock first, and then update status
-        // if job status changed between when it was read and now,
-        // this thread will simply overwrite it - final state will be KILLED
-        this.em.lock(job, LockModeType.PESSIMISTIC_WRITE);
         if (!job.isDisableLogArchival()) {
             job.setArchiveLocation(NetUtil.getArchiveURI(id));
         }
@@ -240,11 +231,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     public int markZombies() {
         LOG.debug("called");
         final ProcessStatus zombie = ProcessStatus.ZOMBIE_JOB;
-        // the equivalent query is as follows:
-        // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
-        // statusMsg='Job has been marked as a zombie'
-        // where updateTime < $min and (status='RUNNING' or status='INIT')"
-        final long currentTime = System.currentTimeMillis();
+        final long currentTime = new Date().getTime();
         final long zombieTime = CONF.getLong(
                 "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
 

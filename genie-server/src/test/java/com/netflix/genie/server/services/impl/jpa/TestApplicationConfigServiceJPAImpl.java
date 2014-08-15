@@ -17,10 +17,7 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseOperation;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
@@ -34,13 +31,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import javax.inject.Inject;
 
@@ -49,15 +39,8 @@ import javax.inject.Inject;
  *
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class,
-    TransactionDbUnitTestExecutionListener.class
-})
-public class TestApplicationConfigServiceJPAImpl {
+@DatabaseSetup("application/init.xml")
+public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String APP_1_NAME = "tez";
@@ -94,10 +77,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetApplication() throws GenieException {
         final Application app = this.service.getApplication(APP_1_ID);
         Assert.assertEquals(APP_1_ID, app.getId());
@@ -154,10 +133,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * Test the get applications method.
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetApplicationsByName() {
         final List<Application> apps = this.service.getApplications(
                 APP_2_NAME, null, null, 0, 10);
@@ -169,10 +144,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * Test the get applications method.
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetApplicationsByUserName() {
         final List<Application> apps = this.service.getApplications(
                 null, APP_1_USER, null, -1, -5000);
@@ -185,10 +156,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * Test the get applications method.
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetApplicationsByTags() {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
@@ -234,31 +201,23 @@ public class TestApplicationConfigServiceJPAImpl {
      */
     @Test
     public void testCreateApplication() throws GenieException {
-        try {
-            this.service.getApplication(APP_1_ID);
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
-            );
-        }
         final Application app = new Application(
                 APP_1_NAME,
                 APP_1_USER,
                 ApplicationStatus.ACTIVE,
                 APP_1_VERSION
         );
-        app.setId(APP_1_ID);
+        final String id = UUID.randomUUID().toString();
+        app.setId(id);
         final Application created = this.service.createApplication(app);
-        Assert.assertNotNull(this.service.getApplication(APP_1_ID));
-        Assert.assertEquals(APP_1_ID, created.getId());
+        Assert.assertNotNull(this.service.getApplication(id));
+        Assert.assertEquals(id, created.getId());
         Assert.assertEquals(APP_1_NAME, created.getName());
         Assert.assertEquals(APP_1_USER, created.getUser());
         Assert.assertEquals(ApplicationStatus.ACTIVE, created.getStatus());
-        this.service.deleteApplication(APP_1_ID);
+        this.service.deleteApplication(id);
         try {
-            this.service.getApplication(APP_1_ID);
+            this.service.getApplication(id);
             Assert.fail("Should have thrown exception");
         } catch (final GenieException ge) {
             Assert.assertEquals(
@@ -275,14 +234,6 @@ public class TestApplicationConfigServiceJPAImpl {
      */
     @Test
     public void testCreateApplicationNoId() throws GenieException {
-        Assert.assertTrue(
-                this.service.getApplications(
-                        null,
-                        null,
-                        null,
-                        0,
-                        Integer.MAX_VALUE
-                ).isEmpty());
         final Application app = new Application(
                 APP_1_NAME,
                 APP_1_USER,
@@ -297,7 +248,7 @@ public class TestApplicationConfigServiceJPAImpl {
         this.service.deleteApplication(created.getId());
         try {
             this.service.getApplication(created.getId());
-            Assert.fail("Should have thrown exception");
+            Assert.fail();
         } catch (final GenieException ge) {
             Assert.assertEquals(
                     HttpURLConnection.HTTP_NOT_FOUND,
@@ -322,10 +273,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testCreateApplicationAlreadyExists() throws GenieException {
         final Application app = new Application(
                 APP_1_NAME,
@@ -343,10 +290,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateApplicationNoId() throws GenieException {
         final Application init = this.service.getApplication(APP_1_ID);
         Assert.assertEquals(APP_1_USER, init.getUser());
@@ -376,10 +319,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateApplicationWithId() throws GenieException {
         final Application init = this.service.getApplication(APP_1_ID);
         Assert.assertEquals(APP_1_USER, init.getUser());
@@ -441,10 +380,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateApplicationIdsDontMatch() throws GenieException {
         final Application updateApp = new Application();
         updateApp.setId(UUID.randomUUID().toString());
@@ -457,10 +392,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(3,
                 this.service.getApplications(null, null, null, 0, 10).size());
@@ -476,10 +407,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testDelete() throws GenieException {
         Assert.assertEquals(APP_1_ID,
                 this.commandService
@@ -522,10 +449,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddConfigsToApplication() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
@@ -583,10 +506,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateConfigsForApplication() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
@@ -634,10 +553,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetConfigsForApplication() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getConfigsForApplication(APP_1_ID).size());
@@ -669,10 +584,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveAllConfigsForApplication() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getConfigsForApplication(APP_1_ID).size());
@@ -706,10 +617,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveConfigForApplication() throws GenieException {
         final Set<String> configs
                 = this.service.getConfigsForApplication(APP_1_ID);
@@ -726,10 +633,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveConfigForApplicationNullConfig()
             throws GenieException {
         final Set<String> configs
@@ -768,10 +671,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddJarsToApplication() throws GenieException {
         final String newJar1 = UUID.randomUUID().toString();
         final String newJar2 = UUID.randomUUID().toString();
@@ -829,10 +728,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateJarsForApplication() throws GenieException {
         final String newJar1 = UUID.randomUUID().toString();
         final String newJar2 = UUID.randomUUID().toString();
@@ -880,10 +775,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetJarsForApplication() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getJarsForApplication(APP_1_ID).size());
@@ -915,10 +806,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveAllJarsForApplication() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getJarsForApplication(APP_1_ID).size());
@@ -952,10 +839,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveJarForApplication() throws GenieException {
         final Set<String> jars
                 = this.service.getJarsForApplication(APP_1_ID);
@@ -972,10 +855,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveJarForApplicationNullJar()
             throws GenieException {
         final Set<String> jars
@@ -1014,10 +893,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddTagsToApplication() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
@@ -1075,10 +950,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateTagsForApplication() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
@@ -1128,10 +999,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetTagsForApplication() throws GenieException {
         Assert.assertEquals(4,
                 this.service.getTagsForApplication(APP_1_ID).size());
@@ -1163,10 +1030,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveAllTagsForApplication() throws GenieException {
         Assert.assertEquals(4,
                 this.service.getTagsForApplication(APP_1_ID).size());
@@ -1204,10 +1067,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForApplication() throws GenieException {
         final Set<String> tags
                 = this.service.getTagsForApplication(APP_1_ID);
@@ -1225,10 +1084,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForApplicationNullTag()
             throws GenieException {
         final Set<String> tags
@@ -1268,10 +1123,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForApplicationId() throws GenieException {
         this.service.removeTagForApplication(
                 APP_1_ID,
@@ -1285,10 +1136,6 @@ public class TestApplicationConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("application/init.xml")
-    @DatabaseTearDown(
-            value = "application/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetCommandsForApplication() throws GenieException {
         final Set<Command> commands
                 = this.service.getCommandsForApplication(APP_1_ID);

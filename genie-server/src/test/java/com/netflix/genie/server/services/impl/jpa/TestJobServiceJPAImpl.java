@@ -17,10 +17,7 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseOperation;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
@@ -41,29 +38,15 @@ import java.util.UUID;
 import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 /**
  * Tests for the JobServiceJPAImpl class.
  *
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class,
-    TransactionDbUnitTestExecutionListener.class
-})
-public class TestJobServiceJPAImpl {
+@DatabaseSetup("job/init.xml")
+public class TestJobServiceJPAImpl extends DBUnitTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";
@@ -77,11 +60,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testCreateJob() throws GenieException {
         final String name = UUID.randomUUID().toString();
         final String user = UUID.randomUUID().toString();
@@ -137,11 +115,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testCreateJobWithIdAlreadySet() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
@@ -200,11 +173,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testCreateJobAlreadyExists() throws GenieException {
         final String name = UUID.randomUUID().toString();
         final String user = UUID.randomUUID().toString();
@@ -281,11 +249,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJob() throws GenieException {
         final Job job1 = this.service.getJob(JOB_1_ID);
         Assert.assertEquals(JOB_1_ID, job1.getId());
@@ -330,11 +293,6 @@ public class TestJobServiceJPAImpl {
      * Test the get job function.
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJobNoJobExists() {
         try {
             this.service.getJob(UUID.randomUUID().toString());
@@ -351,11 +309,6 @@ public class TestJobServiceJPAImpl {
      * Test the get jobs function.
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJobsById() {
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
@@ -376,11 +329,6 @@ public class TestJobServiceJPAImpl {
      * Test the get jobs function.
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJobsByName() {
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
@@ -401,11 +349,6 @@ public class TestJobServiceJPAImpl {
      * Test the get jobs function.
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJobsByUser() {
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
@@ -426,11 +369,6 @@ public class TestJobServiceJPAImpl {
      * Test the get jobs function.
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJobsByStatus() {
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
@@ -451,11 +389,6 @@ public class TestJobServiceJPAImpl {
      * Test the get jobs function.
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJobsByClusterName() {
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
@@ -476,11 +409,6 @@ public class TestJobServiceJPAImpl {
      * Test the get jobs function.
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJobsByClusterId() {
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
@@ -503,10 +431,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddTagsToJob() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
@@ -564,10 +488,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateTagsForJob() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
@@ -617,10 +537,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetTagsForJob() throws GenieException {
         Assert.assertEquals(3,
                 this.service.getTagsForJob(JOB_1_ID).size());
@@ -652,10 +568,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveAllTagsForJob() throws GenieException {
         Assert.assertEquals(3,
                 this.service.getTagsForJob(JOB_1_ID).size());
@@ -693,10 +605,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForJob() throws GenieException {
         final Set<String> tags
                 = this.service.getTagsForJob(JOB_1_ID);
@@ -714,10 +622,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForJobNullTag()
             throws GenieException {
         final Set<String> tags
@@ -757,10 +661,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForJobId() throws GenieException {
         this.service.removeTagForJob(
                 JOB_1_ID,
@@ -774,11 +674,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testSetUpdateTime() throws GenieException {
         final long initialUpdated = this.service.getJob(JOB_1_ID).getUpdated().getTime();
         final long newUpdated = this.service.setUpdateTime(JOB_1_ID);
@@ -821,11 +716,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testSetJobStatus() throws GenieException {
         final String msg = UUID.randomUUID().toString();
         this.service.setJobStatus(JOB_1_ID, JobStatus.RUNNING, msg);
@@ -870,11 +760,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testSetJobStatusNoMessage() throws GenieException {
         this.service.setJobStatus(JOB_1_ID, JobStatus.SUCCEEDED, null);
         final Job job = this.service.getJob(JOB_1_ID);
@@ -907,11 +792,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testSetProcessIdForJob() throws GenieException {
         Assert.assertEquals(-1, this.service.getJob(JOB_1_ID).getProcessHandle());
         final Random random = new Random();
@@ -959,11 +839,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testSetCommandInfoForJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
@@ -1009,11 +884,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testSetApplicationInfoForJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
@@ -1059,11 +929,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testSetClusterInfoForJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
@@ -1109,11 +974,6 @@ public class TestJobServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("job/init.xml")
-    @DatabaseTearDown(
-            value = "job/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testGetJobStatus() throws GenieException {
         Assert.assertEquals(JobStatus.FAILED, this.service.getJobStatus(JOB_2_ID));
     }

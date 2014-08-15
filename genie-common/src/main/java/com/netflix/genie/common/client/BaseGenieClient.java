@@ -148,7 +148,7 @@ public class BaseGenieClient {
         }
         try (final HttpResponse response = this.client.executeWithLoadBalancer(request)) {
             if (response.isSuccess()) {
-                LOG.info("Response returned success.");
+                LOG.debug("Response returned success.");
                 final ObjectMapper mapper = new ObjectMapper();
                 if (collectionClass != null) {
                     final CollectionType type = mapper.

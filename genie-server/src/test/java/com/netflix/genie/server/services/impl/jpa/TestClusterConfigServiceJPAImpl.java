@@ -17,10 +17,7 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseOperation;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
@@ -40,13 +37,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import javax.inject.Inject;
 
@@ -55,16 +45,9 @@ import javax.inject.Inject;
  *
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class,
-    TransactionDbUnitTestExecutionListener.class
-})
 //TODO: Test error codes in exceptions
-public class TestClusterConfigServiceJPAImpl {
+@DatabaseSetup("cluster/init.xml")
+public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
@@ -101,10 +84,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetCluster() throws GenieException {
         final Cluster cluster1 = this.service.getCluster(CLUSTER_1_ID);
         Assert.assertEquals(CLUSTER_1_ID, cluster1.getId());
@@ -153,10 +132,6 @@ public class TestClusterConfigServiceJPAImpl {
      * Test the get clusters method.
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetClustersByName() {
         final List<Cluster> clusters = this.service.getClusters(
                 CLUSTER_2_NAME, null, null, null, null, 0, 10);
@@ -168,10 +143,6 @@ public class TestClusterConfigServiceJPAImpl {
      * Test the get clusters method.
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetClustersByStatuses() {
         final Set<ClusterStatus> statuses = EnumSet.noneOf(ClusterStatus.class);
         statuses.add(ClusterStatus.UP);
@@ -186,10 +157,6 @@ public class TestClusterConfigServiceJPAImpl {
      * Test the get clusters method.
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetClustersByTags() {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
@@ -223,10 +190,6 @@ public class TestClusterConfigServiceJPAImpl {
      * Test the get clusters method.
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetClustersByMinUpdateTime() {
         final Calendar time = Calendar.getInstance();
         time.clear();
@@ -241,10 +204,6 @@ public class TestClusterConfigServiceJPAImpl {
      * Test the get clusters method.
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetClustersByMaxUpdateTime() {
         final Calendar time = Calendar.getInstance();
         time.clear();
@@ -261,11 +220,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testChooseClusterForJob() throws GenieException {
         final List<Cluster> clusters = this.service.chooseClusterForJob(JOB_1_ID);
         Assert.assertEquals(1, clusters.size());
@@ -304,11 +258,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL
-    )
     public void testChooseClusterForJobNonChosen() throws GenieException {
         Assert.assertTrue(this.service.chooseClusterForJob(JOB_2_ID).isEmpty());
     }
@@ -320,15 +269,6 @@ public class TestClusterConfigServiceJPAImpl {
      */
     @Test
     public void testCreateCluster() throws GenieException {
-        try {
-            this.service.getCluster(CLUSTER_1_ID);
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
-            );
-        }
         final Set<String> configs = new HashSet<>();
         configs.add("a config");
         configs.add("another config");
@@ -341,18 +281,19 @@ public class TestClusterConfigServiceJPAImpl {
                 configs,
                 CLUSTER_1_VERSION
         );
-        cluster.setId(CLUSTER_1_ID);
+        final String id = UUID.randomUUID().toString();
+        cluster.setId(id);
         final Cluster created = this.service.createCluster(cluster);
-        Assert.assertNotNull(this.service.getCluster(CLUSTER_1_ID));
-        Assert.assertEquals(CLUSTER_1_ID, created.getId());
+        Assert.assertNotNull(this.service.getCluster(id));
+        Assert.assertEquals(id, created.getId());
         Assert.assertEquals(CLUSTER_1_NAME, created.getName());
         Assert.assertEquals(CLUSTER_1_USER, created.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
         Assert.assertEquals(CLUSTER_1_TYPE, created.getClusterType());
         Assert.assertEquals(3, created.getConfigs().size());
-        this.service.deleteCluster(CLUSTER_1_ID);
+        this.service.deleteCluster(id);
         try {
-            this.service.getCluster(CLUSTER_1_ID);
+            this.service.getCluster(id);
             Assert.fail("Should have thrown exception");
         } catch (final GenieException ge) {
             Assert.assertEquals(
@@ -369,16 +310,6 @@ public class TestClusterConfigServiceJPAImpl {
      */
     @Test
     public void testCreateClusterNoId() throws GenieException {
-        Assert.assertTrue(
-                this.service.getClusters(
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        0,
-                        Integer.MAX_VALUE
-                ).isEmpty());
         final Set<String> configs = new HashSet<>();
         configs.add("a config");
         configs.add("another config");
@@ -426,10 +357,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testCreateClusterAlreadyExists() throws GenieException {
         final Set<String> configs = new HashSet<>();
         configs.add("a config");
@@ -453,10 +380,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateClusterNoId() throws GenieException {
         final Cluster init = this.service.getCluster(CLUSTER_1_ID);
         Assert.assertEquals(CLUSTER_1_USER, init.getUser());
@@ -486,10 +409,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateClusterWithId() throws GenieException {
         final Cluster init = this.service.getCluster(CLUSTER_1_ID);
         Assert.assertEquals(CLUSTER_1_USER, init.getUser());
@@ -551,10 +470,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateClusterIdsDontMatch() throws GenieException {
         final Cluster updateApp = new Cluster();
         updateApp.setId(UUID.randomUUID().toString());
@@ -567,10 +482,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getClusters(null, null, null, null, null, 0, 10)
@@ -587,10 +498,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testDelete() throws GenieException {
         Assert.assertEquals(2,
                 this.commandService.getClustersForCommand(COMMAND_1_ID).size());
@@ -645,10 +552,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddConfigsToCluster() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
@@ -706,10 +609,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateConfigsForCluster() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
@@ -757,10 +656,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetConfigsForCluster() throws GenieException {
         Assert.assertEquals(1,
                 this.service.getConfigsForCluster(CLUSTER_1_ID).size());
@@ -792,10 +687,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddCommandsForCluster() throws GenieException {
         final Command command1 = this.commandService.createCommand(
                 new Command(
@@ -868,10 +759,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddCommandsForClusterCommandDoesntExist()
             throws GenieException {
         final List<Command> commands = new ArrayList<>();
@@ -888,10 +775,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetCommandsForCluster() throws GenieException {
         final List<Command> commands
                 = this.service.getCommandsForCluster(CLUSTER_1_ID);
@@ -927,10 +810,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateCommandsForCluster() throws GenieException {
         final Command command1 = this.commandService.createCommand(
                 new Command(
@@ -1006,10 +885,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateCommandsForClusterCommandDoesntExist()
             throws GenieException {
         final List<Command> commands = new ArrayList<>();
@@ -1026,10 +901,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveAllCommandsForCluster() throws GenieException {
         Assert.assertEquals(
                 3,
@@ -1072,10 +943,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveCommandForCluster() throws GenieException {
         Assert.assertEquals(
                 3,
@@ -1127,10 +994,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveCommandForClusterNoCommand() throws GenieException {
         this.service.removeCommandForCluster(
                 CLUSTER_1_ID, UUID.randomUUID().toString());
@@ -1142,10 +1005,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddTagsToCluster() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
@@ -1203,10 +1062,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateTagsForCluster() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
@@ -1256,10 +1111,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetTagsForCluster() throws GenieException {
         Assert.assertEquals(5,
                 this.service.getTagsForCluster(CLUSTER_1_ID).size());
@@ -1291,10 +1142,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveAllTagsForCluster() throws GenieException {
         Assert.assertEquals(5,
                 this.service.getTagsForCluster(CLUSTER_1_ID).size());
@@ -1332,10 +1179,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForCluster() throws GenieException {
         final Set<String> tags
                 = this.service.getTagsForCluster(CLUSTER_1_ID);
@@ -1353,10 +1196,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForClusterNullTag()
             throws GenieException {
         final Set<String> tags
@@ -1396,10 +1235,6 @@ public class TestClusterConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("cluster/init.xml")
-    @DatabaseTearDown(
-            value = "cluster/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForClusterId() throws GenieException {
         this.service.removeTagForCluster(
                 CLUSTER_1_ID,

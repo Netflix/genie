@@ -17,10 +17,7 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseOperation;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
@@ -36,13 +33,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import javax.inject.Inject;
 
@@ -51,16 +41,9 @@ import javax.inject.Inject;
  *
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class,
-    TransactionDbUnitTestExecutionListener.class
-})
 //TODO: Test error codes in exceptions
-public class TestCommandConfigServiceJPAImpl {
+@DatabaseSetup("command/init.xml")
+public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String CLUSTER_1_ID = "cluster1";
@@ -107,10 +90,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetCommand() throws GenieException {
         final Command command1 = this.service.getCommand(COMMAND_1_ID);
         Assert.assertEquals(COMMAND_1_ID, command1.getId());
@@ -174,10 +153,6 @@ public class TestCommandConfigServiceJPAImpl {
      * Test the get commands method.
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetCommandsByName() {
         final List<Command> commands = this.service.getCommands(
                 COMMAND_2_NAME, null, null, 0, 10);
@@ -189,10 +164,6 @@ public class TestCommandConfigServiceJPAImpl {
      * Test the get commands method.
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetCommandsByUserName() {
         final List<Command> apps = this.service.getCommands(
                 null, COMMAND_1_USER, null, -1, -5000);
@@ -205,10 +176,6 @@ public class TestCommandConfigServiceJPAImpl {
      * Test the get commands method.
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetCommandsByTags() {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
@@ -254,15 +221,6 @@ public class TestCommandConfigServiceJPAImpl {
      */
     @Test
     public void testCreateCommand() throws GenieException {
-        try {
-            this.service.getCommand(COMMAND_1_ID);
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
-            );
-        }
         final Command command = new Command(
                 COMMAND_1_NAME,
                 COMMAND_1_USER,
@@ -270,17 +228,18 @@ public class TestCommandConfigServiceJPAImpl {
                 COMMAND_1_EXECUTABLE,
                 COMMAND_1_VERSION
         );
-        command.setId(COMMAND_1_ID);
+        final String id = UUID.randomUUID().toString();
+        command.setId(id);
         final Command created = this.service.createCommand(command);
-        Assert.assertNotNull(this.service.getCommand(COMMAND_1_ID));
-        Assert.assertEquals(COMMAND_1_ID, created.getId());
+        Assert.assertNotNull(this.service.getCommand(id));
+        Assert.assertEquals(id, created.getId());
         Assert.assertEquals(COMMAND_1_NAME, created.getName());
         Assert.assertEquals(COMMAND_1_USER, created.getUser());
         Assert.assertEquals(CommandStatus.ACTIVE, created.getStatus());
         Assert.assertEquals(COMMAND_1_EXECUTABLE, created.getExecutable());
-        this.service.deleteCommand(COMMAND_1_ID);
+        this.service.deleteCommand(id);
         try {
-            this.service.getCommand(COMMAND_1_ID);
+            this.service.getCommand(id);
             Assert.fail("Should have thrown exception");
         } catch (final GenieException ge) {
             Assert.assertEquals(
@@ -297,14 +256,6 @@ public class TestCommandConfigServiceJPAImpl {
      */
     @Test
     public void testCreateCommandNoId() throws GenieException {
-        Assert.assertTrue(
-                this.service.getCommands(
-                        null,
-                        null,
-                        null,
-                        0,
-                        Integer.MAX_VALUE
-                ).isEmpty());
         final Command command = new Command(
                 COMMAND_1_NAME,
                 COMMAND_1_USER,
@@ -346,10 +297,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testCreateCommandAlreadyExists() throws GenieException {
         final Command command = new Command(
                 COMMAND_1_NAME,
@@ -368,10 +315,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateCommandNoId() throws GenieException {
         final Command init = this.service.getCommand(COMMAND_1_ID);
         Assert.assertEquals(COMMAND_1_USER, init.getUser());
@@ -401,10 +344,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateCommandWithId() throws GenieException {
         final Command init = this.service.getCommand(COMMAND_1_ID);
         Assert.assertEquals(COMMAND_1_USER, init.getUser());
@@ -466,10 +405,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateCommandIdsDontMatch() throws GenieException {
         final Command updateApp = new Command();
         updateApp.setId(UUID.randomUUID().toString());
@@ -482,10 +417,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(3,
                 this.service.getCommands(null, null, null, 0, 10).size());
@@ -501,10 +432,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testDelete() throws GenieException {
         List<Command> commands
                 = this.clusterService.getCommandsForCluster(CLUSTER_1_ID);
@@ -578,10 +505,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddConfigsToCommand() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
@@ -639,10 +562,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateConfigsForCommand() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
@@ -690,10 +609,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetConfigsForCommand() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getConfigsForCommand(COMMAND_1_ID).size());
@@ -725,10 +640,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveAllConfigsForCommand() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getConfigsForCommand(COMMAND_1_ID).size());
@@ -762,10 +673,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveConfigForCommand() throws GenieException {
         final Set<String> configs
                 = this.service.getConfigsForCommand(COMMAND_1_ID);
@@ -782,10 +689,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveConfigForCommandNullConfig()
             throws GenieException {
         final Set<String> configs
@@ -824,10 +727,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testSetApplicationForCommand() throws GenieException {
         final Command command2 = this.service.getCommand(COMMAND_2_ID);
         Assert.assertNull(command2.getApplication());
@@ -872,10 +771,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testSetApplicationForCommandNoAppId() throws GenieException {
         this.service.setApplicationForCommand(COMMAND_2_ID, new Application());
     }
@@ -899,10 +794,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testSetApplicationForCommandNoAppExists() throws GenieException {
         final Application app = new Application();
         app.setId(UUID.randomUUID().toString());
@@ -916,10 +807,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetApplicationForCommand() throws GenieException {
         final Application app = this.service.getApplicationForCommand(COMMAND_1_ID);
         Assert.assertEquals(APP_1_ID, app.getId());
@@ -951,10 +838,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetApplicationForCommandNoApp() throws GenieException {
         this.service.getApplicationForCommand(COMMAND_2_ID);
     }
@@ -965,10 +848,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveApplicationForCommand() throws GenieException {
         Assert.assertNotNull(this.service.getApplicationForCommand(COMMAND_1_ID));
         Assert.assertNotNull(this.service.removeApplicationForCommand(COMMAND_1_ID));
@@ -1007,10 +886,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveApplicationForCommandNoAppExists() throws GenieException {
         this.service.removeApplicationForCommand(COMMAND_2_ID);
     }
@@ -1021,10 +896,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testAddTagsToCommand() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
@@ -1082,10 +953,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testUpdateTagsForCommand() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
@@ -1135,10 +1002,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetTagsForCommand() throws GenieException {
         Assert.assertEquals(5,
                 this.service.getTagsForCommand(COMMAND_1_ID).size());
@@ -1170,10 +1033,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveAllTagsForCommand() throws GenieException {
         Assert.assertEquals(5,
                 this.service.getTagsForCommand(COMMAND_1_ID).size());
@@ -1211,10 +1070,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForCommand() throws GenieException {
         final Set<String> tags
                 = this.service.getTagsForCommand(COMMAND_1_ID);
@@ -1232,10 +1087,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForCommandNullTag()
             throws GenieException {
         final Set<String> tags
@@ -1275,10 +1126,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test(expected = GenieException.class)
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testRemoveTagForCommandId() throws GenieException {
         this.service.removeTagForCommand(
                 COMMAND_1_ID,
@@ -1292,10 +1139,6 @@ public class TestCommandConfigServiceJPAImpl {
      * @throws GenieException
      */
     @Test
-    @DatabaseSetup("command/init.xml")
-    @DatabaseTearDown(
-            value = "command/init.xml",
-            type = DatabaseOperation.DELETE_ALL)
     public void testGetCommandsForCommand() throws GenieException {
         final Set<Cluster> clusters
                 = this.service.getClustersForCommand(COMMAND_1_ID);

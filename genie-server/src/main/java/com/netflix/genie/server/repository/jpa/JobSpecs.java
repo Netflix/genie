@@ -106,6 +106,10 @@ public final class JobSpecs {
                     final Root<Job> root,
                     final CriteriaQuery<?> cq,
                     final CriteriaBuilder cb) {
+                // the equivalent query is as follows:
+                // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
+                // statusMsg='Job has been marked as a zombie'
+                // where updateTime < $min and (status='RUNNING' or status='INIT')"
                 final List<Predicate> predicates = new ArrayList<>();
                 predicates.add(cb.lessThan(root.get(Job_.updated), new Date(currentTime - zombieTime)));
                 final Predicate orPredicate1 = cb.equal(root.get(Job_.status), JobStatus.RUNNING);
