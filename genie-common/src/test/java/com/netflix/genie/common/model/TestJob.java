@@ -832,8 +832,11 @@ public class TestJob {
         Assert.assertNull(this.job.clusterCriteriasToString(
                 new ArrayList<ClusterCriteria>()));
 
-        Assert.assertEquals(EXPECTED_CLUSTER_CRITERIAS_STRING,
-                this.job.clusterCriteriasToString(CLUSTER_CRITERIAS));
+        final String criterias = this.job.clusterCriteriasToString(CLUSTER_CRITERIAS);
+        Assert.assertTrue(criterias.contains(CLUSTER_CRITERIA_2));
+        Assert.assertTrue(criterias.contains(CLUSTER_CRITERIA_1));
+        Assert.assertTrue(criterias.contains(CLUSTER_CRITERIA_3));
+        Assert.assertTrue(criterias.contains(CLUSTER_CRITERIA_4));
     }
 
     /**

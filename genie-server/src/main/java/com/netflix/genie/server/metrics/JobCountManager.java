@@ -51,7 +51,7 @@ public interface JobCountManager {
             throws GenieException;
 
     /**
-     * Get number of running jobs with minStartTime <= startTime < maxStartTime
+     * Get number of running jobs with minStartTime &lt;= startTime &lt; maxStartTime
      * min/max startTimes are ignored if they are null.
      *
      * @param hostName - if null, local host name is used

@@ -36,33 +36,33 @@ public interface JobCountMonitor extends Runnable {
     int getNumInstanceJobs() throws GenieException;
 
     /**
-     * Get number of running jobs on this instance running for > 15 mins.
+     * Get number of running jobs on this instance running for &gt; 15 minutes.
      *
-     * @return number of running jobs with runtime > 15 mins
+     * @return number of running jobs with runtime &gt; 15 minutes
      * @throws GenieException if there is any error
      */
     int getNumInstanceJobs15Mins() throws GenieException;
 
     /**
-     * Get number of running jobs with 15m < runtime < 2 hours.
+     * Get number of running jobs with 15m &lt; runtime &lt; 2 hours.
      *
-     * @return Number of running jobs with 15m < runtime < 2 hours
+     * @return Number of running jobs with 15m &lt; runtime &lt; 2 hours
      * @throws GenieException if there is any error
      */
     int getNumInstanceJobs2Hrs() throws GenieException;
 
     /**
-     * Get number of running jobs with 2h < runtime < 8 hours.
+     * Get number of running jobs with 2h &lt; runtime &lt; hours.
      *
-     * @return Number of running jobs with 2h < runtime < 8 hours
+     * @return Number of running jobs with 2h &lt; runtime &lt; hours
      * @throws GenieException
      */
     int getNumInstanceJobs8Hrs() throws GenieException;
 
     /**
-     * Get number of running jobs with runtime > 8h.
+     * Get number of running jobs with runtime &gt; 8h.
      *
-     * @return Number of running jobs with runtime > 8h
+     * @return Number of running jobs with runtime &gt; 8h
      * @throws GenieException if there is any error
      */
     int getNumInstanceJobs8HrsPlus() throws GenieException;

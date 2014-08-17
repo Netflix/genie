@@ -155,7 +155,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Gets a set of application configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *               <p/>
+     *               <p></p>
      *               More details on the parameters can be found on the Genie User Guide on
      *               GitHub.
      * @return List of application configuration elements that match the filter

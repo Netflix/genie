@@ -88,7 +88,7 @@ public final class StringUtil {
     /**
      * Returns a canonical version number with at most 3 digits of the form
      * X.Y.Z.<br>
-     * 0.8.1.4 -> 0.8.1, 0.8.2 -> 0.8.2, 0.8 -> 0.8.
+     * 0.8.1.4 -&gt; 0.8.1, 0.8.2 -&gt; 0.8.2, 0.8 -&gt; 0.8.
      *
      * @param fullVersion input version number
      * @return trimmed version number as documented

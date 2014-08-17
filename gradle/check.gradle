@@ -9,6 +9,7 @@ subprojects {
     // FindBugs
     apply plugin: 'findbugs'
     findbugs {
+        toolVersion = '3.0.0'
         ignoreFailures = true
     }
 

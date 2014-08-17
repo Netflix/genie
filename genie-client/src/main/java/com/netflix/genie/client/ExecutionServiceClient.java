@@ -78,7 +78,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * Submits a job using given parameters.
      *
      * @param job for submitting job (can't be null)<br>
-     *            <p/>
+     *            <p></p>
      *            More details can be found on the Genie User Guide on GitHub.
      * @return updated jobInfo for submitted job, if there is no error
      * @throws GenieException
@@ -127,7 +127,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * Gets a set of jobs for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *               <p/>
+     *               <p></p>
      *               More details on the parameters can be found on the Genie User Guide on
      *               GitHub.
      * @return List of jobs that match the filter
