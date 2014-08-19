@@ -41,14 +41,13 @@ def testJsonSubmitjob():
     print "Running testJsonSubmitjob "
     payload = '''
         {
-            "id":"''' + jobID +'''",
             "name": "Genie2TestJob", 
-            "clusterCriteria" : ''' + clusterTags + ''',
-            "commandCriteria" :''' + cmdTags + ''',
+            "clusterCriterias" : ''' + clusterTags + ''',
             "user" : "genietest", 
             "version" : "1",
-            "group" : "hadoop", 
+            "group" : "hadoop",
             "commandArgs" : "jar hadoop-examples.jar pi 2 2", 
+            "commandCriteria" :''' + cmdTags + ''',
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/hadoop-examples.jar"
         }
     '''

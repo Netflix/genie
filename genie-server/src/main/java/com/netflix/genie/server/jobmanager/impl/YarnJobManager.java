@@ -410,8 +410,9 @@ public class YarnJobManager implements JobManager {
         String groupName = HADOOP_GROUP_NAME;
         if (this.job.getGroup() != null) {
             groupName = this.job.getGroup();
-            this.env.put("GROUP_NAME", groupName);
         }
+        
+        this.env.put("GROUP_NAME", groupName);
         this.env.put("HADOOP_GROUP_NAME", groupName);
 
         // set the java home
