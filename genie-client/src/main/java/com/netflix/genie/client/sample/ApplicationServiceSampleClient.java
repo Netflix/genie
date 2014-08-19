@@ -66,7 +66,7 @@ public final class ApplicationServiceSampleClient {
      * Main for running client code.
      *
      * @param args program arguments
-     * @throws Exception
+     * @throws Exception On issue.
      */
     public static void main(final String[] args) throws Exception {
 
@@ -227,7 +227,7 @@ public final class ApplicationServiceSampleClient {
      *
      * @param id The id to use or null/empty if want one created.
      * @return A sample application with id MR2
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException For any issue
      */
     public static Application getSampleApplication(final String id) throws GenieException {
         final Application app = new Application(APP_NAME, "tgianos", ApplicationStatus.ACTIVE, APP_VERSION);

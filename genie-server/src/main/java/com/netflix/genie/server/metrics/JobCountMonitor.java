@@ -55,7 +55,7 @@ public interface JobCountMonitor extends Runnable {
      * Get number of running jobs with 2h &lt; runtime &lt; hours.
      *
      * @return Number of running jobs with 2h &lt; runtime &lt; hours
-     * @throws GenieException
+     * @throws GenieException if there is any error
      */
     int getNumInstanceJobs8Hrs() throws GenieException;
 

@@ -31,9 +31,8 @@ public interface JobJanitor extends Runnable {
      * netflix.genie.server.janitor.zombie.delta.ms.
      *
      * @return Number of jobs marked as zombies
-     * @throws Exception if there is any error during the process
      */
-    int markZombies() throws Exception;
+    int markZombies();
 
     /**
      * Tell the janitor thread to stop running at next iteration.

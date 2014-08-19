@@ -18,12 +18,14 @@
 package com.netflix.genie.server.util;
 
 import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.exceptions.GenieException;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -78,7 +80,7 @@ public final class NetUtil {
      * used in the cloud, or InetAddress.getLocalHost() will be used in the DC.
      *
      * @return host name
-     * @throws GenieException
+     * @throws GenieException For any error.
      */
     public static String getHostName() throws GenieException {
         LOG.debug("called");
@@ -86,24 +88,23 @@ public final class NetUtil {
         // check the fast property first
         String hostName = ConfigurationManager.getConfigInstance().getString(
                 "netflix.genie.server.host");
-        if ((hostName != null) && (!hostName.isEmpty())) {
+        if (hostName != null && !hostName.isEmpty()) {
             return hostName;
         }
 
         // if hostName is not set by property, figure it out based on the datacenter
         String dc = ConfigurationManager.getConfigInstance().getString(
                 "netflix.datacenter");
-        if ((dc != null) && dc.equals("cloud")) {
+        if (dc != null && dc.equals("cloud")) {
             hostName = getCloudHostName();
         } else {
             hostName = getDCHostName();
         }
 
-        if ((hostName == null) || (hostName.isEmpty())) {
+        if (hostName == null || hostName.isEmpty()) {
             String msg = "Can't figure out host name for instance";
             LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new GenieServerException(msg);
         }
 
         return hostName;
@@ -112,7 +113,7 @@ public final class NetUtil {
     private static String getCloudHostName() throws GenieException {
         LOG.debug("called");
 
-        if ((cloudHostName != null) && (!cloudHostName.isEmpty())) {
+        if (cloudHostName != null && !cloudHostName.isEmpty()) {
             return cloudHostName;
         }
 
@@ -122,17 +123,15 @@ public final class NetUtil {
         } catch (IOException ioe) {
             String msg = "Unable to get public hostname from instance metadata";
             LOG.error(msg, ioe);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg, ioe);
+            throw new GenieServerException(msg, ioe);
         }
-        if ((cloudHostName == null) || (cloudHostName.isEmpty())) {
+        if (cloudHostName == null || cloudHostName.isEmpty()) {
             try {
                 cloudHostName = httpGet(LOCAL_IPV4_URI);
-            } catch (IOException ioe) {
+            } catch (final IOException ioe) {
                 String msg = "Unable to get local IP from instance metadata";
                 LOG.error(msg, ioe);
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg, ioe);
+                throw new GenieServerException(msg, ioe);
             }
         }
         LOG.info("cloudHostName=" + cloudHostName);
@@ -148,7 +147,7 @@ public final class NetUtil {
      * @return response from an HTTP GET call if it succeeds, null otherwise
      * @throws IOException if there was an error with the HTTP request
      */
-    private static String httpGet(String uri) throws IOException {
+    private static String httpGet(final String uri) throws IOException {
         String response = null;
         //TODO: Use one of other http clients to remove dependency
         HttpClient client = new HttpClient();
@@ -175,8 +174,7 @@ public final class NetUtil {
         } catch (final UnknownHostException e) {
             String msg = "Unable to get the hostname";
             LOG.error(msg, e);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
+            throw new GenieServerException(msg, e);
         }
 
         return dcHostName;

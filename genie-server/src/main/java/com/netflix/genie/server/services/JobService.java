@@ -36,7 +36,7 @@ public interface JobService {
      *
      * @param job The job to validate and maybe save
      * @return The validated/saved job object
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Job createJob(final Job job) throws GenieException;
 
@@ -45,7 +45,7 @@ public interface JobService {
      *
      * @param id id of job to look up
      * @return the job
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Job getJob(final String id) throws GenieException;
 
@@ -54,21 +54,21 @@ public interface JobService {
      *
      * @param id id for job to look up
      * @return successful response, or one with HTTP error code
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     JobStatus getJobStatus(final String id) throws GenieException;
 
     /**
      * Get job info for given filter criteria.
      *
-     * @param id id for job
-     * @param jobName name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName user who submitted job
-     * @param status status of job - possible types Type.JobStatus
+     * @param id          id for job
+     * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
+     * @param userName    user who submitted job
+     * @param status      status of job - possible types Type.JobStatus
      * @param clusterName name of cluster for job
-     * @param clusterId id of cluster for job
-     * @param page page number for job
-     * @param limit max number of jobs to return
+     * @param clusterId   id of cluster for job
+     * @param page        page number for job
+     * @param limit       max number of jobs to return
      * @return All jobs which match the criteria
      */
     List getJobs(
@@ -84,10 +84,10 @@ public interface JobService {
     /**
      * Add tags to the job.
      *
-     * @param id The id of the job to add the tags to. Not null/empty/blank.
+     * @param id   The id of the job to add the tags to. Not null/empty/blank.
      * @param tags The tags to add. Not null/empty.
      * @return The active set of tags
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> addTagsForJob(
             final String id,
@@ -98,7 +98,7 @@ public interface JobService {
      *
      * @param id The id of the job to get the tags for. Not null/empty/blank.
      * @return The set of tags as paths
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> getTagsForJob(
             final String id) throws GenieException;
@@ -106,10 +106,10 @@ public interface JobService {
     /**
      * Update the set of tags associated with the job with given id.
      *
-     * @param id The id of the job to update the tags for. Not null/empty/blank.
+     * @param id   The id of the job to update the tags for. Not null/empty/blank.
      * @param tags The tags to replace existing tags with. Not null/empty.
      * @return The active set of tags
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> updateTagsForJob(
             final String id,
@@ -119,9 +119,9 @@ public interface JobService {
      * Remove all tags from the job.
      *
      * @param id The id of the job to remove the tags from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The active set of tags
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> removeAllTagsForJob(
             final String id) throws GenieException;
@@ -129,10 +129,10 @@ public interface JobService {
     /**
      * Remove a tag from the job.
      *
-     * @param id The id of the job to remove the tag from. Not null/empty/blank.
+     * @param id  The id of the job to remove the tag from. Not null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> removeTagForJob(final String id, final String tag) throws GenieException;
 
@@ -141,56 +141,56 @@ public interface JobService {
      *
      * @param id The id of the job to update.
      * @return The time in milliseconds when the job was updated.
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     long setUpdateTime(final String id) throws GenieException;
 
     /**
      * Set the status for a given job.
      *
-     * @param id The id of the job to fail.
+     * @param id     The id of the job to fail.
      * @param status The status to set.
-     * @param msg The message of the failure.
-     * @throws GenieException
+     * @param msg    The message of the failure.
+     * @throws GenieException if there is an error
      */
     void setJobStatus(final String id, final JobStatus status, final String msg) throws GenieException;
 
     /**
      * Set the java process id that will run the given job.
      *
-     * @param id The id of the job to attach the process to.
+     * @param id  The id of the job to attach the process to.
      * @param pid The id of the process that will run the job.
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     void setProcessIdForJob(final String id, final int pid) throws GenieException;
 
     /**
      * Set the command information for a given job.
      *
-     * @param id The id of the job.
-     * @param commandId The id of the command used to run the job.
+     * @param id          The id of the job.
+     * @param commandId   The id of the command used to run the job.
      * @param commandName The name of the command used to run the job.
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     void setCommandInfoForJob(final String id, final String commandId, final String commandName) throws GenieException;
 
     /**
      * Set the application information for a given job.
      *
-     * @param id The id of the job.
-     * @param appId The id of the application used to run the job.
+     * @param id      The id of the job.
+     * @param appId   The id of the application used to run the job.
      * @param appName The name of the application used to run the job.
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     void setApplicationInfoForJob(final String id, final String appId, final String appName) throws GenieException;
 
     /**
      * Set the cluster information for a given job.
      *
-     * @param id The id of the job.
-     * @param clusterId The id of the cluster used to run the job.
+     * @param id          The id of the job.
+     * @param clusterId   The id of the cluster used to run the job.
      * @param clusterName The name of the cluster used to run the job.
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     void setClusterInfoForJob(final String id, final String clusterId, final String clusterName) throws GenieException;
 
@@ -198,8 +198,8 @@ public interface JobService {
      * Run the job using a JobLauncher.
      *
      * @param job The job to run.
-     * @return The job object thats returned after launch
-     * @throws GenieException
+     * @return The job object that's returned after launch
+     * @throws GenieException if there is an error
      */
     Job runJob(final Job job) throws GenieException;
 }

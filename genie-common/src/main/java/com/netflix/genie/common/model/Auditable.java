@@ -22,13 +22,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Basic;
@@ -141,15 +140,13 @@ public class Auditable implements Serializable, Validate {
      * Set the id.
      *
      * @param id The id to set. Not null/empty/blank.
-     * @throws GenieException
+     * @throws GeniePreconditionException When precondition isn't met.
      */
-    public void setId(final String id) throws GenieException {
+    public void setId(final String id) throws GeniePreconditionException {
         if (StringUtils.isBlank(this.id)) {
             this.id = id;
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Id already set for this entity.");
+            throw new GeniePreconditionException("Id already set for this entity.");
         }
     }
 
@@ -216,7 +213,7 @@ public class Auditable implements Serializable, Validate {
      * {@inheritDoc}
      */
     @Override
-    public void validate() throws GenieException {
+    public void validate() throws GeniePreconditionException {
     }
 
     /**

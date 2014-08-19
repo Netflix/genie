@@ -92,7 +92,7 @@ public class ApplicationConfigResource {
      *
      * @param app The application to create
      * @return The created application configuration
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -125,7 +125,7 @@ public class ApplicationConfigResource {
      *
      * @param id unique id for application configuration
      * @return The application configuration
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}")
@@ -196,7 +196,7 @@ public class ApplicationConfigResource {
      * @param id        unique id for configuration to update
      * @param updateApp contains the application information to update
      * @return successful response, or one with an HTTP error code
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @PUT
     @Path("/{id}")
@@ -206,9 +206,9 @@ public class ApplicationConfigResource {
             notes = "Update an application from the supplied information.",
             response = Application.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Application.class),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application to update not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application to update not found")
     })
     public Application updateApplication(
             @ApiParam(value = "Id of the application to update.", required = true)
@@ -224,7 +224,7 @@ public class ApplicationConfigResource {
      * Delete all applications from database.
      *
      * @return All The deleted applications
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @ApiOperation(
@@ -233,9 +233,9 @@ public class ApplicationConfigResource {
             response = Application.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public List<Application> deleteAllApplications() throws GenieException {
         LOG.info("Delete all Applications");
@@ -247,7 +247,7 @@ public class ApplicationConfigResource {
      *
      * @param id unique id of configuration to delete
      * @return The deleted application configuration
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}")
@@ -256,9 +256,9 @@ public class ApplicationConfigResource {
             notes = "Delete an application with the supplied id.",
             response = Application.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Application.class),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Application deleteApplication(
             @ApiParam(value = "Id of the application to delete.", required = true)
@@ -275,7 +275,7 @@ public class ApplicationConfigResource {
      *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this application.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Path("/{id}/configs")
@@ -286,9 +286,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> addConfigsToApplication(
             @ApiParam(value = "Id of the application to add configuration to.", required = true)
@@ -306,7 +306,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the configuration files for.
      *           Not NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/configs")
@@ -316,9 +316,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> getConfigsForApplication(
             @ApiParam(value = "Id of the application to get configurations for.", required = true)
@@ -336,7 +336,7 @@ public class ApplicationConfigResource {
      * @param configs The configuration files to replace existing configuration
      *                files with. Not null/empty/blank.
      * @return The new set of application configurations.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @PUT
     @Path("/{id}/configs")
@@ -347,9 +347,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> updateConfigsForApplication(
             @ApiParam(value = "Id of the application to update configurations for.", required = true)
@@ -367,7 +367,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to delete the configuration files
      *           from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/configs")
@@ -377,9 +377,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> removeAllConfigsForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)
@@ -396,7 +396,7 @@ public class ApplicationConfigResource {
      *             null/empty/blank.
      * @param jars The jar files to add. Not null.
      * @return The active set of application jars.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Path("/{id}/jars")
@@ -407,9 +407,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> addJarsForApplication(
             @ApiParam(value = "Id of the application to add jar to.", required = true)
@@ -427,7 +427,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the jar files for. Not
      *           NULL/empty/blank.
      * @return The set of jar files.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/jars")
@@ -437,9 +437,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> getJarsForApplication(
             @ApiParam(value = "Id of the application to get the jars for.", required = true)
@@ -457,7 +457,7 @@ public class ApplicationConfigResource {
      * @param jars The jar files to replace existing jar files with. Not
      *             null/empty/blank.
      * @return The active set of application jars
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @PUT
     @Path("/{id}/jars")
@@ -468,9 +468,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> updateJarsForApplication(
             @ApiParam(value = "Id of the application to update configurations for.", required = true)
@@ -488,7 +488,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to delete the jar files from. Not
      *           null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/jars")
@@ -498,9 +498,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> removeAllJarsForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)
@@ -517,7 +517,7 @@ public class ApplicationConfigResource {
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this application.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Path("/{id}/tags")
@@ -528,9 +528,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> addTagsForApplication(
             @ApiParam(value = "Id of the application to add configuration to.", required = true)
@@ -548,7 +548,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the tags for. Not
      *           NULL/empty/blank.
      * @return The active set of tags.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/tags")
@@ -558,9 +558,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> getTagsForApplication(
             @ApiParam(value = "Id of the application to get tags for.", required = true)
@@ -578,7 +578,7 @@ public class ApplicationConfigResource {
      * @param tags The tags to replace existing configuration
      *             files with. Not null/empty/blank.
      * @return The new set of application tags.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @PUT
     @Path("/{id}/tags")
@@ -589,9 +589,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> updateTagsForApplication(
             @ApiParam(value = "Id of the application to update tags for.", required = true)
@@ -609,7 +609,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to delete the tags from.
      *           Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/tags")
@@ -619,9 +619,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> removeAllTagsForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)
@@ -637,7 +637,7 @@ public class ApplicationConfigResource {
      * @param id The id of the application to get the commands for. Not
      *           NULL/empty/blank.
      * @return The set of commands.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/commands")
@@ -647,9 +647,9 @@ public class ApplicationConfigResource {
             response = Command.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<Command> getCommandsForApplication(
             @ApiParam(value = "Id of the application to get the commands for.", required = true)
@@ -666,7 +666,7 @@ public class ApplicationConfigResource {
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the application.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/tags/{tag}")
@@ -676,9 +676,9 @@ public class ApplicationConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
     })
     public Set<String> removeTagForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)

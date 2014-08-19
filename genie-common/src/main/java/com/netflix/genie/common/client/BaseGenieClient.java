@@ -32,14 +32,16 @@ import com.netflix.client.http.HttpResponse;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.discovery.DefaultEurekaClientConfig;
 import com.netflix.discovery.DiscoveryManager;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.niws.client.http.RestClient;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -125,26 +127,21 @@ public class BaseGenieClient {
      * @param collectionClass The collection class. Null if none expected.
      * @param entityClass     The entity class. Not null.
      * @return The response entity.
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
     public <C extends Collection> Object executeRequest(
             final HttpRequest request,
             final Class<C> collectionClass,
             final Class entityClass) throws GenieException {
         if (collectionClass == null && entityClass == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No return type entered. Unable to continue.");
+            throw new GeniePreconditionException("No return type entered. Unable to continue.");
         }
         if (collectionClass != null && entityClass == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
+            throw new GeniePreconditionException(
                     "No entity class for collection class " + collectionClass + " entered.");
         }
         if (request == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No request entered. Unable to continue..");
+            throw new GeniePreconditionException("No request entered. Unable to continue..");
         }
         try (final HttpResponse response = this.client.executeWithLoadBalancer(request)) {
             if (response.isSuccess()) {
@@ -168,8 +165,7 @@ public class BaseGenieClient {
                 throw (GenieException) e;
             } else {
                 LOG.error(e.getMessage(), e);
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, e);
+                throw new GenieServerException(e);
             }
         }
     }
@@ -182,7 +178,7 @@ public class BaseGenieClient {
      * @param params     Any query parameters to send along with the request.
      * @param entity     An entity. Required for POST or PUT.
      * @return The HTTP request.
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
     public static HttpRequest buildRequest(
             final Verb verb,
@@ -190,22 +186,13 @@ public class BaseGenieClient {
             final Multimap<String, String> params,
             final Object entity) throws GenieException {
         if (verb == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No http verb entered unable to continue."
-            );
+            throw new GeniePreconditionException("No http verb entered unable to continue.");
         }
         if ((verb == Verb.POST || verb == Verb.PUT) && entity == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "Must have an entity to perform a post or a put."
-            );
+            throw new GeniePreconditionException("Must have an entity to perform a post or a put.");
         }
         if (StringUtils.isBlank(requestUri)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No request uri entered. Unable to continue."
-            );
+            throw new GeniePreconditionException("No request uri entered. Unable to continue.");
         }
         try {
             final HttpRequest.Builder builder = HttpRequest.newBuilder()
@@ -222,8 +209,7 @@ public class BaseGenieClient {
             return builder.build();
         } catch (final URISyntaxException use) {
             LOG.error(use.getMessage(), use);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, use);
+            throw new GenieBadRequestException(use);
         }
     }
 

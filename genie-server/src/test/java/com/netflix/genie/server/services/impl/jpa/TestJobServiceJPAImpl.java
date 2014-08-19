@@ -18,7 +18,10 @@
 package com.netflix.genie.server.services.impl.jpa;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
@@ -172,7 +175,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GenieConflictException.class)
     public void testCreateJobAlreadyExists() throws GenieException {
         final String name = UUID.randomUUID().toString();
         final String user = UUID.randomUUID().toString();
@@ -205,16 +208,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 version
         );
         jobToCreate.setId(JOB_1_ID);
-
-        try {
-            this.service.createJob(jobToCreate);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_CONFLICT,
-                    ge.getErrorCode()
-            );
-        }
+        this.service.createJob(jobToCreate);
     }
 
     /**
@@ -275,34 +269,22 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
 
     /**
      * Test the get job function.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testGetJobNoId() {
-        try {
-            this.service.getJob(null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    ge.getErrorCode()
-            );
-        }
+    @Test(expected = GeniePreconditionException.class)
+    public void testGetJobNoId() throws GenieException {
+        this.service.getJob(null);
     }
 
     /**
      * Test the get job function.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testGetJobNoJobExists() {
-        try {
-            this.service.getJob(UUID.randomUUID().toString());
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
-            );
-        }
+    @Test(expected = GenieNotFoundException.class)
+    public void testGetJobNoJobExists() throws GenieException {
+        this.service.getJob(UUID.randomUUID().toString());
     }
 
     /**
@@ -456,7 +438,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddTagsToJobNoId() throws GenieException {
         this.service.addTagsForJob(null, new HashSet<String>());
     }
@@ -466,7 +448,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddTagsToJobNoTags() throws GenieException {
         this.service.addTagsForJob(JOB_1_ID, null);
     }
@@ -476,8 +458,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
-    public void testAddTagsForJobNoApp() throws GenieException {
+    @Test(expected = GenieNotFoundException.class)
+    public void testAddTagsForJobNoJob() throws GenieException {
         this.service.addTagsForJob(UUID.randomUUID().toString(),
                 new HashSet<String>());
     }
@@ -515,7 +497,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testUpdateTagsForJobNoId() throws GenieException {
         this.service.updateTagsForJob(null, new HashSet<String>());
     }
@@ -525,8 +507,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
-    public void testUpdateTagsForJobNoApp() throws GenieException {
+    @Test(expected = GenieNotFoundException.class)
+    public void testUpdateTagsForJobNoJob() throws GenieException {
         this.service.updateTagsForJob(UUID.randomUUID().toString(),
                 new HashSet<String>());
     }
@@ -547,7 +529,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testGetTagsForJobNoId() throws GenieException {
         this.service.getTagsForJob(null);
     }
@@ -557,8 +539,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
-    public void testGetTagsForJobNoApp() throws GenieException {
+    @Test(expected = GenieNotFoundException.class)
+    public void testGetTagsForJobNoJob() throws GenieException {
         this.service.getTagsForJob(UUID.randomUUID().toString());
     }
 
@@ -584,7 +566,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveAllTagsForJobNoId() throws GenieException {
         this.service.removeAllTagsForJob(null);
     }
@@ -594,8 +576,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
-    public void testRemoveAllTagsForJobNoApp() throws GenieException {
+    @Test(expected = GenieNotFoundException.class)
+    public void testRemoveAllTagsForJobNoJob() throws GenieException {
         this.service.removeAllTagsForJob(UUID.randomUUID().toString());
     }
 
@@ -637,7 +619,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveTagForJobNoId() throws GenieException {
         this.service.removeTagForJob(null, "something");
     }
@@ -647,8 +629,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
-    public void testRemoveTagForJobNoApp() throws GenieException {
+    @Test(expected = GenieNotFoundException.class)
+    public void testRemoveTagForJobNoJob() throws GenieException {
         this.service.removeTagForJob(
                 UUID.randomUUID().toString(),
                 "something"
@@ -660,7 +642,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveTagForJobId() throws GenieException {
         this.service.removeTagForJob(
                 JOB_1_ID,
@@ -685,14 +667,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GeniePreconditionException.class)
     public void testSetUpdateTimeNoId() throws GenieException {
-        try {
-            this.service.setUpdateTime(null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, ge.getErrorCode());
-        }
+        this.service.setUpdateTime(null);
     }
 
     /**
@@ -700,14 +677,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GenieNotFoundException.class)
     public void testSetUpdateTimeNoJob() throws GenieException {
-        try {
-            this.service.setUpdateTime(UUID.randomUUID().toString());
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, ge.getErrorCode());
-        }
+        this.service.setUpdateTime(UUID.randomUUID().toString());
     }
 
     /**
@@ -729,14 +701,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GeniePreconditionException.class)
     public void testSetJobStatusNoId() throws GenieException {
-        try {
-            this.service.setJobStatus(null, null, null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, ge.getErrorCode());
-        }
+        this.service.setJobStatus(null, null, null);
     }
 
     /**
@@ -744,14 +711,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GeniePreconditionException.class)
     public void testSetJobStatusNoStatus() throws GenieException {
-        try {
-            this.service.setJobStatus(JOB_1_ID, null, null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, ge.getErrorCode());
-        }
+        this.service.setJobStatus(JOB_1_ID, null, null);
     }
 
     /**
@@ -772,18 +734,13 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GenieNotFoundException.class)
     public void testSetJobStatusNoJob() throws GenieException {
-        try {
-            this.service.setJobStatus(
-                    UUID.randomUUID().toString(),
-                    JobStatus.SUCCEEDED,
-                    null
-            );
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, ge.getErrorCode());
-        }
+        this.service.setJobStatus(
+                UUID.randomUUID().toString(),
+                JobStatus.SUCCEEDED,
+                null
+        );
     }
 
     /**
@@ -808,14 +765,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GeniePreconditionException.class)
     public void testSetProcessIdForJobNoId() throws GenieException {
-        try {
-            this.service.setProcessIdForJob(null, 810);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, ge.getErrorCode());
-        }
+        this.service.setProcessIdForJob(null, 810);
     }
 
     /**
@@ -823,14 +775,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GenieNotFoundException.class)
     public void testSetProcessIdForJobNoJob() throws GenieException {
-        try {
-            this.service.setProcessIdForJob(UUID.randomUUID().toString(), 810);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, ge.getErrorCode());
-        }
+        this.service.setProcessIdForJob(UUID.randomUUID().toString(), 810);
     }
 
     /**
@@ -853,14 +800,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GeniePreconditionException.class)
     public void testSetCommandInfoForJobNoId() throws GenieException {
-        try {
-            this.service.setCommandInfoForJob(null, null, null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, ge.getErrorCode());
-        }
+        this.service.setCommandInfoForJob(null, null, null);
     }
 
     /**
@@ -868,14 +810,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GenieNotFoundException.class)
     public void testSetCommandInfoForJobNoJob() throws GenieException {
-        try {
-            this.service.setCommandInfoForJob(UUID.randomUUID().toString(), null, null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, ge.getErrorCode());
-        }
+        this.service.setCommandInfoForJob(UUID.randomUUID().toString(), null, null);
     }
 
     /**
@@ -898,14 +835,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GeniePreconditionException.class)
     public void testSetApplicationInfoForJobNoId() throws GenieException {
-        try {
-            this.service.setApplicationInfoForJob(null, null, null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, ge.getErrorCode());
-        }
+        this.service.setApplicationInfoForJob(null, null, null);
     }
 
     /**
@@ -913,14 +845,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GenieNotFoundException.class)
     public void testSetApplicationInfoForJobNoJob() throws GenieException {
-        try {
-            this.service.setApplicationInfoForJob(UUID.randomUUID().toString(), null, null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, ge.getErrorCode());
-        }
+        this.service.setApplicationInfoForJob(UUID.randomUUID().toString(), null, null);
     }
 
     /**
@@ -943,14 +870,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GeniePreconditionException.class)
     public void testSetClusterInfoForJobNoId() throws GenieException {
-        try {
-            this.service.setClusterInfoForJob(null, null, null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, ge.getErrorCode());
-        }
+        this.service.setClusterInfoForJob(null, null, null);
     }
 
     /**
@@ -958,14 +880,9 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
+    @Test(expected = GenieNotFoundException.class)
     public void testSetClusterInfoForJobNoJob() throws GenieException {
-        try {
-            this.service.setClusterInfoForJob(UUID.randomUUID().toString(), null, null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, ge.getErrorCode());
-        }
+        this.service.setClusterInfoForJob(UUID.randomUUID().toString(), null, null);
     }
 
     /**

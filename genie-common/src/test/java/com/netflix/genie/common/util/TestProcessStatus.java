@@ -1,6 +1,6 @@
 package com.netflix.genie.common.util;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -73,10 +73,10 @@ public class TestProcessStatus {
     /**
      * Test to make sure the parse method works for valid cases.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testParse() throws GenieException {
+    public void testParse() throws GeniePreconditionException {
         Assert.assertEquals(ProcessStatus.JOB_INTERRUPTED,
                 ProcessStatus.parse(-1));
         Assert.assertEquals(ProcessStatus.SUCCESS,
@@ -112,10 +112,10 @@ public class TestProcessStatus {
     /**
      * Test to make sure the parse method works for valid cases.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testParseBadErrorCode() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testParseBadErrorCode() throws GeniePreconditionException {
         Assert.assertEquals(ProcessStatus.COMMAND_RUN_FAILURE,
                 ProcessStatus.parse(-2490354));
     }

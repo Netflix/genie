@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
+
 import java.util.List;
 import java.util.Set;
 
@@ -37,9 +38,9 @@ public interface CommandConfigService {
      * Create new command configuration.
      *
      * @param command encapsulates the command configuration information to
-     * create
+     *                create
      * @return The command created
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Command createCommand(final Command command) throws GenieException;
 
@@ -48,19 +49,18 @@ public interface CommandConfigService {
      *
      * @param id unique id for command configuration to get. Not null/empty.
      * @return The command configuration
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Command getCommand(final String id) throws GenieException;
 
     /**
      * Get command configurations for given filter criteria.
      *
-     * @param name name of command config (can be null)
-     * @param userName the name of the user who created the configuration (can
-     * be null)
-     * @param tags          tags allocated to this command
-     * @param page Page number to start results on
-     * @param limit Max number of results per page
+     * @param name     name of command config
+     * @param userName the name of the user who created the configuration
+     * @param tags     tags allocated to this command
+     * @param page     Page number to start results on
+     * @param limit    Max number of results per page
      * @return All the commands matching the specified criteria
      */
     List<Command> getCommands(
@@ -73,11 +73,11 @@ public interface CommandConfigService {
     /**
      * Update command configuration.
      *
-     * @param id The id of the command configuration to update. Not null or
-     * empty.
+     * @param id            The id of the command configuration to update. Not null or
+     *                      empty.
      * @param updateCommand contains the information to update the command with
      * @return The updated command
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Command updateCommand(
             final String id,
@@ -87,7 +87,7 @@ public interface CommandConfigService {
      * Delete all commands from database.
      *
      * @return The deleted commands
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     List<Command> deleteAllCommands() throws GenieException;
 
@@ -96,18 +96,18 @@ public interface CommandConfigService {
      *
      * @param id unique if of the command configuration to delete
      * @return The deleted command configuration
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Command deleteCommand(final String id) throws GenieException;
 
     /**
      * Add a configuration files to the command.
      *
-     * @param id The id of the command to add the configuration file to. Not
-     * null/empty/blank.
+     * @param id      The id of the command to add the configuration file to. Not
+     *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
      * @return The active set of configurations
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> addConfigsForCommand(
             final String id,
@@ -118,9 +118,9 @@ public interface CommandConfigService {
      * id.
      *
      * @param id The id of the command to get the configuration files for. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The set of configuration files as paths
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> getConfigsForCommand(
             final String id) throws GenieException;
@@ -129,12 +129,12 @@ public interface CommandConfigService {
      * Update the set of configuration files associated with the command with
      * given id.
      *
-     * @param id The id of the command to update the configuration files for.
-     * Not null/empty/blank.
+     * @param id      The id of the command to update the configuration files for.
+     *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configurations
-     * with. Not null/empty.
+     *                with. Not null/empty.
      * @return The active set of configurations
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> updateConfigsForCommand(
             final String id,
@@ -144,9 +144,9 @@ public interface CommandConfigService {
      * Remove all configuration files from the command.
      *
      * @param id The id of the command to remove the configuration file from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return The active set of configurations
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> removeAllConfigsForCommand(
             final String id) throws GenieException;
@@ -154,11 +154,11 @@ public interface CommandConfigService {
     /**
      * Remove a configuration file from the command.
      *
-     * @param id The id of the command to remove the configuration file from.
-     * Not null/empty/blank.
+     * @param id     The id of the command to remove the configuration file from.
+     *               Not null/empty/blank.
      * @param config The configuration file to remove. Not null/empty/blank.
      * @return The active set of configurations
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> removeConfigForCommand(
             final String id,
@@ -167,11 +167,11 @@ public interface CommandConfigService {
     /**
      * Set the application for the command.
      *
-     * @param id The id of the command to add the application file to. Not
-     * null/empty/blank.
+     * @param id          The id of the command to add the application file to. Not
+     *                    null/empty/blank.
      * @param application The applications to set. Not null.
      * @return The application
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Application setApplicationForCommand(
             final String id,
@@ -181,9 +181,9 @@ public interface CommandConfigService {
      * Get the application for a given command.
      *
      * @param id The id of the command to get the application for. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The application or exception if none exists.
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Application getApplicationForCommand(
             final String id) throws GenieException;
@@ -192,9 +192,9 @@ public interface CommandConfigService {
      * Remove the application from the command.
      *
      * @param id The id of the command to remove the application from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The removed application
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Application removeApplicationForCommand(
             final String id) throws GenieException;
@@ -202,11 +202,11 @@ public interface CommandConfigService {
     /**
      * Add tags to the command.
      *
-     * @param id The id of the command to add the tags to. Not
-     * null/empty/blank.
+     * @param id   The id of the command to add the tags to. Not
+     *             null/empty/blank.
      * @param tags The tags to add. Not null/empty.
      * @return The active set of tags
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> addTagsForCommand(
             final String id,
@@ -217,9 +217,9 @@ public interface CommandConfigService {
      * id.
      *
      * @param id The id of the command to get the tags for. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The set of tags as paths
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> getTagsForCommand(
             final String id) throws GenieException;
@@ -228,12 +228,12 @@ public interface CommandConfigService {
      * Update the set of tags associated with the command with
      * given id.
      *
-     * @param id The id of the command to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the command to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing tags
-     * with. Not null/empty.
+     *             with. Not null/empty.
      * @return The active set of tags
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> updateTagsForCommand(
             final String id,
@@ -243,9 +243,9 @@ public interface CommandConfigService {
      * Remove all tags from the command.
      *
      * @param id The id of the command to remove the tags from.
-     * Not null/empty/blank.
-     * @return The active set of tagss
-     * @throws GenieException
+     *           Not null/empty/blank.
+     * @return The active set of tags
+     * @throws GenieException if there is an error
      */
     Set<String> removeAllTagsForCommand(
             final String id) throws GenieException;
@@ -255,7 +255,7 @@ public interface CommandConfigService {
      *
      * @param id The id of the command to get the clusters for.
      * @return The clusters the command is available on.
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<Cluster> getClustersForCommand(
             final String id) throws GenieException;
@@ -263,11 +263,11 @@ public interface CommandConfigService {
     /**
      * Remove a tag from the command.
      *
-     * @param id The id of the command to remove the tag from. Not
-     * null/empty/blank.
+     * @param id  The id of the command to remove the tag from. Not
+     *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Set<String> removeTagForCommand(final String id, final String tag) throws GenieException;
 }

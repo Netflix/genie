@@ -20,6 +20,10 @@ package com.netflix.genie.server.services.impl.jpa;
 import com.netflix.config.ConfigurationManager;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieConflictException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
@@ -39,7 +43,6 @@ import com.netflix.genie.common.model.Job_;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -98,16 +101,13 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional
     public Job createJob(final Job job) throws GenieException {
         if (StringUtils.isNotEmpty(job.getId())
                 && this.jobRepo.exists(job.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_CONFLICT,
+            throw new GenieConflictException(
                     "A job with id " + job.getId() + " already exists. Unable to save."
             );
         }
@@ -139,16 +139,12 @@ public class JobServiceJPAImpl implements JobService {
         } catch (final RuntimeException e) {
             //This will catch runtime as well
             LOG.error("Can't create entity in the database", e);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    e);
+            throw new GenieServerException(e);
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -160,8 +156,7 @@ public class JobServiceJPAImpl implements JobService {
         if (job != null) {
             return job;
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
+            throw new GenieNotFoundException(
                     "No job exists for id " + id + ". Unable to retrieve.");
         }
     }
@@ -203,8 +198,6 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -213,47 +206,35 @@ public class JobServiceJPAImpl implements JobService {
             final Set<String> tags) throws GenieException {
         this.testId(id);
         if (tags == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No tags entered.");
+            throw new GeniePreconditionException("No tags entered.");
         }
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.getTags().addAll(tags);
             return job.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
+            throw new GenieNotFoundException("No job with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<String> getTagsForJob(
-            final String id)
-            throws GenieException {
+    public Set<String> getTagsForJob(final String id) throws GenieException {
         this.testId(id);
 
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             return job.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
+            throw new GenieNotFoundException("No job with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -266,16 +247,12 @@ public class JobServiceJPAImpl implements JobService {
             job.setTags(tags);
             return job.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
+            throw new GenieNotFoundException("No job with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -287,16 +264,12 @@ public class JobServiceJPAImpl implements JobService {
             job.getTags().clear();
             return job.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
+            throw new GenieNotFoundException("No job with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -304,8 +277,7 @@ public class JobServiceJPAImpl implements JobService {
             throws GenieException {
         this.testId(id);
         if (id.equals(tag)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
+            throw new GeniePreconditionException(
                     "Cannot delete job id from the tags list.");
         }
 
@@ -316,16 +288,12 @@ public class JobServiceJPAImpl implements JobService {
             }
             return job.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + id + " exists.");
+            throw new GenieNotFoundException("No job with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -334,8 +302,7 @@ public class JobServiceJPAImpl implements JobService {
         this.testId(id);
         final Job job = this.jobRepo.findOne(id);
         if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
+            throw new GenieNotFoundException(
                     "No job with id " + id + " exists"
             );
         }
@@ -348,8 +315,6 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -360,24 +325,18 @@ public class JobServiceJPAImpl implements JobService {
         LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
         this.testId(id);
         if (status == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No status entered."
-            );
+            throw new GeniePreconditionException("No status entered.");
         }
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setJobStatus(status, msg);
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+            throw new GenieNotFoundException("No job with id " + id + " exists");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -388,15 +347,12 @@ public class JobServiceJPAImpl implements JobService {
         if (job != null) {
             job.setProcessHandle(pid);
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+            throw new GenieNotFoundException("No job with id " + id + " exists");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -412,15 +368,12 @@ public class JobServiceJPAImpl implements JobService {
             job.setCommandId(commandId);
             job.setCommandName(commandName);
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+            throw new GenieNotFoundException("No job with id " + id + " exists");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -435,15 +388,12 @@ public class JobServiceJPAImpl implements JobService {
             job.setApplicationId(appId);
             job.setApplicationName(appName);
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+            throw new GenieNotFoundException("No job with id " + id + " exists");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
@@ -458,15 +408,12 @@ public class JobServiceJPAImpl implements JobService {
             job.setExecutionClusterId(clusterId);
             job.setExecutionClusterName(clusterName);
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+            throw new GenieNotFoundException("No job with id " + id + " exists");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -476,8 +423,6 @@ public class JobServiceJPAImpl implements JobService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional
@@ -508,10 +453,7 @@ public class JobServiceJPAImpl implements JobService {
 
     private void testId(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No id entered."
-            );
+            throw new GeniePreconditionException("No id entered.");
         }
     }
 }

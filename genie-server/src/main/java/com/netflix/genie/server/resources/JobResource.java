@@ -104,7 +104,7 @@ public class JobResource {
      * @param job request object containing job info element for new job
      * @param hsr servlet context
      * @return The submitted job
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -160,7 +160,7 @@ public class JobResource {
      *
      * @param id id for job to look up
      * @return the Job
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}")
@@ -189,7 +189,7 @@ public class JobResource {
      *
      * @param id id for job to look up
      * @return The status of the job
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/status")
@@ -228,7 +228,7 @@ public class JobResource {
      * @param page        page number for job
      * @param limit       max number of jobs to return
      * @return successful response, or one with HTTP error code
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @ApiOperation(
@@ -303,7 +303,7 @@ public class JobResource {
      *
      * @param id id for job to kill
      * @return The job that was killed
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}")
@@ -332,7 +332,7 @@ public class JobResource {
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this job.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Path("/{id}/tags")
@@ -365,7 +365,7 @@ public class JobResource {
      * @param id The id of the job to get the tags for. Not
      *           NULL/empty/blank.
      * @return The active set of tags.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/tags")
@@ -397,7 +397,7 @@ public class JobResource {
      * @param tags The tags to replace existing configuration
      *             files with. Not null/empty/blank.
      * @return The new set of job tags.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @PUT
     @Path("/{id}/tags")
@@ -430,7 +430,7 @@ public class JobResource {
      * @param id The id of the job to delete the tags from.
      *           Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/tags")
@@ -461,7 +461,7 @@ public class JobResource {
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the job.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/tags/{tag}")

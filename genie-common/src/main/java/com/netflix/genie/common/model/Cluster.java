@@ -18,11 +18,10 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -142,12 +141,12 @@ public class Cluster extends CommonEntityFields {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @PrePersist
     @PreUpdate
-    protected void onCreateOrUpdateCluster() throws GenieException {
-        validate(this.status, this.clusterType, this.configs);
+    protected void onCreateOrUpdateCluster() throws GeniePreconditionException {
+        validate(this.status, this.clusterType, this.configs, null);
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<>();
@@ -239,9 +238,8 @@ public class Cluster extends CommonEntityFields {
      * Sets the tags allocated to this cluster.
      *
      * @param tags the tags to set. Not Null.
-     * @throws GenieException
      */
-    public void setTags(final Set<String> tags) throws GenieException {
+    public void setTags(final Set<String> tags) {
         this.tags = tags;
     }
 
@@ -281,14 +279,12 @@ public class Cluster extends CommonEntityFields {
      * Add a new command to this cluster. Manages both sides of relationship.
      *
      * @param command The command to add. Not null.
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     public void addCommand(final Command command)
-            throws GenieException {
+            throws GeniePreconditionException {
         if (command == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command entered unable to add.");
+            throw new GeniePreconditionException("No command entered unable to add.");
         }
 
         if (this.commands == null) {
@@ -308,14 +304,12 @@ public class Cluster extends CommonEntityFields {
      * Remove an command from this command. Manages both sides of relationship.
      *
      * @param command The command to remove. Not null.
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     public void removeCommand(final Command command)
-            throws GenieException {
+            throws GeniePreconditionException {
         if (command == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command entered unable to remove.");
+            throw new GeniePreconditionException("No command entered unable to remove.");
         }
 
         if (this.commands != null) {
@@ -329,9 +323,9 @@ public class Cluster extends CommonEntityFields {
     /**
      * Remove all the commands from this application.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void removeAllCommands() throws GenieException {
+    public void removeAllCommands() throws GeniePreconditionException {
         if (this.commands != null) {
             final List<Command> locCommands = new ArrayList<>();
             locCommands.addAll(this.commands);
@@ -345,12 +339,17 @@ public class Cluster extends CommonEntityFields {
      * {@inheritDoc}
      */
     @Override
-    public void validate() throws GenieException {
-        super.validate();
+    public void validate() throws GeniePreconditionException {
+        String error = null;
+        try {
+            super.validate();
+        } catch (final GeniePreconditionException ge) {
+            error = ge.getMessage();
+        }
         this.validate(
                 this.status,
                 this.clusterType,
-                this.configs);
+                this.configs, error);
     }
 
     /**
@@ -359,13 +358,17 @@ public class Cluster extends CommonEntityFields {
      * @param status      The status of the cluster
      * @param clusterType The type of cluster
      * @param configs     The configuration files for the cluster
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     private void validate(
             final ClusterStatus status,
             final String clusterType,
-            final Set<String> configs) throws GenieException {
+            final Set<String> configs,
+            final String error) throws GeniePreconditionException {
         final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotBlank(error)) {
+            builder.append(error);
+        }
         if (status == null) {
             builder.append("No cluster status entered and is required.\n");
         }
@@ -380,7 +383,7 @@ public class Cluster extends CommonEntityFields {
             builder.insert(0, "Cluster configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException(msg);
         }
     }
 }

@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import java.io.Serializable;
-import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,15 +47,11 @@ public class ClusterCriteria implements Serializable {
     /**
      * Create a cluster criteria object with the included tags.
      *
-     * @param tags The tags to add
-     * @throws GenieException
+     * @param tags The tags to add. Not null or empty.
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public ClusterCriteria(final Set<String> tags) throws GenieException {
-        if (tags == null || tags.isEmpty()) {
-            final String msg = "No tags passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
-        }
+    public ClusterCriteria(final Set<String> tags) throws GeniePreconditionException {
+        this.checkTags(tags);
         this.tags = tags;
     }
 
@@ -72,15 +67,25 @@ public class ClusterCriteria implements Serializable {
     /**
      * Set the tags for the cluster criteria.
      *
-     * @param tags The tags to set. Not null.
-     * @throws GenieException
+     * @param tags The tags to set. Not null or empty.
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setTags(final Set<String> tags) throws GenieException {
+    public void setTags(final Set<String> tags) throws GeniePreconditionException {
+        this.checkTags(tags);
+        this.tags = tags;
+    }
+
+    /**
+     * Helper method for checking the tags.
+     *
+     * @param tags The tags to check
+     * @throws GeniePreconditionException If the tags are null or empty.
+     */
+    private void checkTags(final Set<String> tags) throws GeniePreconditionException {
         if (tags == null || tags.isEmpty()) {
             final String msg = "No tags passed in to set. Unable to continue.";
             LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException(msg);
         }
-        this.tags = tags;
     }
 }

@@ -73,5 +73,4 @@ public class GenieException extends Exception {
     public int getErrorCode() {
         return errorCode;
     }
-
 }

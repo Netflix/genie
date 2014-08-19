@@ -18,6 +18,7 @@
 package com.netflix.genie.server.services.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
@@ -66,7 +67,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testEmptyList() throws GenieException {
         this.clb.selectCluster(new ArrayList<Cluster>());
     }
@@ -76,7 +77,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testNullList() throws GenieException {
         this.clb.selectCluster(null);
     }

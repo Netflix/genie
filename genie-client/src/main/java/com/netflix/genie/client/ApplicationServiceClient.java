@@ -22,17 +22,15 @@ import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.client.BaseGenieClient;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Singleton class, which acts as the client library for the Application
@@ -41,9 +39,6 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 public final class ApplicationServiceClient extends BaseGenieClient {
-
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ApplicationServiceClient.class);
 
     private static final String BASE_CONFIG_APPLICATION_REST_URL
             = BASE_REST_URL + "config/applications";
@@ -80,14 +75,12 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param application the object encapsulating the new application
      *                    configuration to create
      * @return The application that was created
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Application createApplication(final Application application)
             throws GenieException {
         if (application == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application passed in. Unable to validate.");
+            throw new GeniePreconditionException("No application passed in. Unable to validate.");
         }
 
         application.validate();
@@ -105,16 +98,14 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id          the id for the application to create or update
      * @param application the object encapsulating the new application to create
      * @return extracted application configuration response
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Application updateApplication(
             final String id,
             final Application application)
             throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Required parameter id is missing. Unable to update.";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Required parameter id is missing. Unable to update.");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -132,13 +123,11 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *
      * @param id the application id to get (can't be null or empty)
      * @return the application for this id
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Application getApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Required parameter id is missing. Unable to get.";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Required parameter id is missing. Unable to get.");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -155,11 +144,10 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Gets a set of application configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *               <p></p>
      *               More details on the parameters can be found on the Genie User Guide on
      *               GitHub.
      * @return List of application configuration elements that match the filter
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Application> getApplications(final Multimap<String, String> params)
             throws GenieException {
@@ -178,7 +166,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * Delete all the applications in the database.
      *
      * @return the should be empty set.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Application> deleteAllApplications() throws GenieException {
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -197,13 +185,11 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *
      * @param id the id for the application to delete
      * @return the deleted application
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Application deleteApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -223,20 +209,16 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *                Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given application.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> addConfigsToApplication(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (configs == null || configs.isEmpty()) {
-            final String msg = "Missing required parameter: configs";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: configs");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -258,13 +240,11 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get configurations for. Not
      *           Null/empty/blank.
      * @return The set of configuration files for the given application.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> getConfigsForApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -288,22 +268,16 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param configs The configuration files to replace existing configuration
      *                files with. Not null.
      * @return The new set of application configurations.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> updateConfigsForApplication(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (configs == null) {
-            final String msg = "Missing required parameter: configs";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: configs");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -325,15 +299,12 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to delete the configuration files
      *           from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> removeAllConfigsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -356,20 +327,16 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *             Null/empty/blank.
      * @param jars The jar files to add. Not null or empty.
      * @return The new set of jar files for the given application.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> addJarsToApplication(
             final String id,
             final Set<String> jars) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (jars == null || jars.isEmpty()) {
-            final String msg = "Missing required parameter: jars";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: jars");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -391,13 +358,11 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get jars for. Not
      *           Null/empty/blank.
      * @return The set of jar files for the given application.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> getJarsForApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -421,22 +386,16 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param jars The jar files to replace existing jar
      *             files with. Not null.
      * @return The new set of application jars.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> updateJarsForApplication(
             final String id,
             final Set<String> jars) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (jars == null) {
-            final String msg = "Missing required parameter: jars";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: jars");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -458,15 +417,12 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to delete the jar files
      *           from. Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> removeAllJarsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -488,15 +444,12 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get the commands for. Not
      *           NULL/empty/blank.
      * @return The set of commands.
-     * @throws GenieException
+     * @throws GenieException For any error.
      */
     public Set<Command> getCommandsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -519,20 +472,16 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      *             Null/empty/blank.
      * @param tags The tags to add. Not null or empty.
      * @return The new set of tags for the given application.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> addTagsToApplication(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (tags == null || tags.isEmpty()) {
-            final String msg = "Missing required parameter: tags";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: tags");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -554,13 +503,11 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to get tags for. Not
      *           Null/empty/blank.
      * @return The set of tags for the given application.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> getTagsForApplication(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -584,22 +531,16 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param tags The tags to replace existing tag
      *             files with. Not null.
      * @return The new set of application tags.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> updateTagsForApplication(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (tags == null) {
-            final String msg = "Missing required parameter: tags";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: tags");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -621,15 +562,12 @@ public final class ApplicationServiceClient extends BaseGenieClient {
      * @param id The id of the application to delete the tags from.
      *           Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any error.
      */
     public Set<String> removeAllTagsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -648,20 +586,17 @@ public final class ApplicationServiceClient extends BaseGenieClient {
     /**
      * Remove tag from a given application.
      *
-     * @param id The id of the application to delete the tag from. Not
-     *           null/empty/blank.
+     * @param id  The id of the application to delete the tag from. Not
+     *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The tag for the application.
-     * @throws GenieException
+     * @throws GenieException For any error.
      */
     public Set<String> removeTagForApplication(
             final String id,
             final String tag) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(

@@ -17,7 +17,11 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -28,7 +32,6 @@ import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.CommandConfigService;
 import org.springframework.data.domain.Sort.Direction;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -66,7 +69,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * Default constructor.
      *
      * @param commandRepo the command repository to use
-     * @param appRepo the application repository to use
+     * @param appRepo     the application repository to use
      */
     @Inject
     public CommandConfigServiceJPAImpl(
@@ -78,15 +81,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Command createCommand(final Command command) throws GenieException {
         if (command == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command entered to create");
+            throw new GeniePreconditionException("No command entered to create");
         }
         command.validate();
 
@@ -95,9 +94,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             command.setId(UUID.randomUUID().toString());
         }
         if (this.commandRepo.exists(command.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_CONFLICT,
-                    "A command with id " + command.getId() + " already exists");
+            throw new GenieConflictException("A command with id " + command.getId() + " already exists");
         }
 
         return this.commandRepo.save(command);
@@ -105,25 +102,19 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Command getCommand(final String id) throws GenieException {
         LOG.debug("called");
         if (StringUtils.isEmpty(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "Id can't be null or empty.");
+            throw new GeniePreconditionException("Id can't be null or empty.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command;
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
@@ -160,33 +151,23 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Command updateCommand(
             final String id,
             final Command updateCommand) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No id entered. Unable to update.");
+            throw new GeniePreconditionException("No id entered. Unable to update.");
         }
         if (updateCommand == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command information entered. Unable to update.");
+            throw new GeniePreconditionException("No command information entered. Unable to update.");
         }
         if (!this.commandRepo.exists(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command exists with the given id. Unable to update.");
+            throw new GenieNotFoundException("No command exists with the given id. Unable to update.");
         }
         if (StringUtils.isNotBlank(updateCommand.getId())
                 && !id.equals(updateCommand.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Command id inconsistent with id passed in.");
+            throw new GenieBadRequestException("Command id inconsistent with id passed in.");
         }
 
         //Set the id if it's not set so we can merge
@@ -201,8 +182,6 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public List<Command> deleteAllCommands() throws GenieException {
@@ -217,22 +196,16 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Command deleteCommand(final String id) throws GenieException {
         LOG.debug("Called to delete command config with id " + id);
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No id entered. Unable to delete.");
+            throw new GeniePreconditionException("No id entered. Unable to delete.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists to delete.");
+            throw new GenieNotFoundException("No command with id " + id + " exists to delete.");
         }
         //Remove the command from the associated Application references
         final Application app = command.getApplication();
@@ -248,120 +221,90 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> addConfigsForCommand(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to add configurations.");
+            throw new GeniePreconditionException("No command id entered. Unable to add configurations.");
         }
         if (configs == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No configuration files entered.");
+            throw new GeniePreconditionException("No configuration files entered.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getConfigs().addAll(configs);
             return command.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to get configs.");
+            throw new GeniePreconditionException("No command id entered. Unable to get configs.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> updateConfigsForCommand(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to update configurations.");
+            throw new GeniePreconditionException("No command id entered. Unable to update configurations.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.setConfigs(configs);
             return command.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeAllConfigsForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to remove configs.");
+            throw new GeniePreconditionException("No command id entered. Unable to remove configs.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getConfigs().clear();
             return command.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeConfigForCommand(
             final String id,
             final String config) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to remove configuration.");
+            throw new GeniePreconditionException("No command id entered. Unable to remove configuration.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
@@ -370,35 +313,25 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             }
             return command.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Application setApplicationForCommand(
             final String id,
             final Application application) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to add applications.");
+            throw new GeniePreconditionException("No command id entered. Unable to add applications.");
         }
         if (application == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application entered. Unable to set application.");
+            throw new GeniePreconditionException("No application entered. Unable to set application.");
         }
         if (StringUtils.isBlank(application.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id entered. Unable to set application.");
+            throw new GeniePreconditionException("No application id entered. Unable to set application.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
@@ -406,31 +339,23 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             if (app != null) {
                 command.setApplication(app);
             } else {
-                throw new GenieException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No application with id " + application.getId() + " exists.");
+                throw new GenieNotFoundException("No application with id " + application.getId() + " exists.");
             }
             return command.getApplication();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Application getApplicationForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to get applications.");
+            throw new GeniePreconditionException("No command id entered. Unable to get applications.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
@@ -438,29 +363,21 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             if (app != null) {
                 return app;
             } else {
-                throw new GenieException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No application set for command with id '" + id + "'.");
+                throw new GenieNotFoundException("No application set for command with id '" + id + "'.");
             }
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Application removeApplicationForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to remove application.");
+            throw new GeniePreconditionException("No command id entered. Unable to remove application.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
@@ -469,51 +386,37 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
                 command.setApplication(null);
                 return app;
             } else {
-                throw new GenieException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No application set for command with id '" + id + "'.");
+                throw new GenieNotFoundException("No application set for command with id '" + id + "'.");
             }
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> addTagsForCommand(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to add tags.");
+            throw new GeniePreconditionException("No command id entered. Unable to add tags.");
         }
         if (tags == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No tags entered.");
+            throw new GeniePreconditionException("No tags entered.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getTags().addAll(tags);
             return command.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -522,121 +425,91 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             throws GenieException {
 
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id sent. Cannot retrieve tags.");
+            throw new GeniePreconditionException("No command id sent. Cannot retrieve tags.");
         }
 
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> updateTagsForCommand(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to update tags.");
+            throw new GeniePreconditionException("No command id entered. Unable to update tags.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.setTags(tags);
             return command.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeAllTagsForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to remove tags.");
+            throw new GeniePreconditionException("No command id entered. Unable to remove tags.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getTags().clear();
             return command.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<Cluster> getClustersForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to get clusters.");
+            throw new GeniePreconditionException("No command id entered. Unable to get clusters.");
         }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command.getClusters();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeTagForCommand(final String id, final String tag)
             throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to remove tag.");
+            throw new GeniePreconditionException("No command id entered. Unable to remove tag.");
         }
 
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             if (id.equals(tag)) {
-                throw new GenieException(
-                        HttpURLConnection.HTTP_PRECON_FAILED,
-                        "Cannot delete command id from the tags list.");
+                throw new GeniePreconditionException("Cannot delete command id from the tags list.");
             }
             command.getTags().remove(tag);
             return command.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No command with id " + id + " exists.");
+            throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
     }
 }

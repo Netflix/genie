@@ -58,8 +58,6 @@ public class JobCountMonitorImpl implements JobCountMonitor {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs() throws GenieException {
@@ -69,8 +67,6 @@ public class JobCountMonitorImpl implements JobCountMonitor {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs15Mins() throws GenieException {
@@ -81,8 +77,6 @@ public class JobCountMonitorImpl implements JobCountMonitor {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs2Hrs() throws GenieException {
@@ -94,8 +88,6 @@ public class JobCountMonitorImpl implements JobCountMonitor {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs8Hrs() throws GenieException {
@@ -107,8 +99,6 @@ public class JobCountMonitorImpl implements JobCountMonitor {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs8HrsPlus() throws GenieException {
@@ -160,10 +150,10 @@ public class JobCountMonitorImpl implements JobCountMonitor {
                     LOG.info("JobCountMonitor daemon going to sleep");
                     Thread.sleep(sleepTime);
                 }
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 // log error and move on
                 LOG.warn("Interrupted exception caught", e);
-            } catch (GenieException e) {
+            } catch (final GenieException e) {
                 // log error and move on
                 LOG.warn("Exception while setting number of running jobs", e);
             }

@@ -69,7 +69,7 @@ public final class CommandServiceSampleClient {
      * Main for running client code.
      *
      * @param args program arguments
-     * @throws Exception
+     * @throws Exception on issue.
      */
     public static void main(final String[] args) throws Exception {
 
@@ -229,7 +229,7 @@ public final class CommandServiceSampleClient {
      *
      * @param id The id to use or null if want one created.
      * @return The pig example command
-     * @throws GenieException
+     * @throws GenieException On configuration issue.
      */
     public static Command createSampleCommand(
             final String id) throws GenieException {

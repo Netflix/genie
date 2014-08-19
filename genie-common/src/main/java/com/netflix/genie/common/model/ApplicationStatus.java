@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
-import java.net.HttpURLConnection;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -48,9 +47,9 @@ public enum ApplicationStatus {
      *
      * @param value string to parse/convert into config status
      * @return ACTIVE, DEPRECATED, INACTIVE if match
-     * @throws com.netflix.genie.common.exceptions.GenieException on invalid value
+     * @throws GeniePreconditionException on invalid value
      */
-    public static ApplicationStatus parse(final String value) throws GenieException {
+    public static ApplicationStatus parse(final String value) throws GeniePreconditionException {
         if (StringUtils.isNotBlank(value)) {
             for (final ApplicationStatus status : ApplicationStatus.values()) {
                 if (value.equalsIgnoreCase(status.toString())) {
@@ -58,7 +57,7 @@ public enum ApplicationStatus {
                 }
             }
         }
-        throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+        throw new GeniePreconditionException(
                 "Unacceptable application status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
     }
 }

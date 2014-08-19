@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,10 +71,10 @@ public class TestCluster {
     /**
      * Test the argument Constructor.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testConstructor() throws GenieException {
+    public void testConstructor() throws GeniePreconditionException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
         Assert.assertEquals(CLUSTER_TYPE, this.c.getClusterType());
         Assert.assertNull(this.c.getCommands());
@@ -89,10 +89,10 @@ public class TestCluster {
     /**
      * Test to make sure validation works.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateCluster() throws GenieException {
+    public void testOnCreateOrUpdateCluster() throws GeniePreconditionException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
         this.c.onCreateOrUpdateCluster();
     }
@@ -100,10 +100,10 @@ public class TestCluster {
     /**
      * Test to make sure validation works.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateClusterWithNothing() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateClusterWithNothing() throws GeniePreconditionException {
         this.c.onCreateOrUpdateCluster();
     }
 
@@ -111,10 +111,10 @@ public class TestCluster {
      * Test to make sure validation works and throws exception when no status
      * entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateClusterNoStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateClusterNoStatus() throws GeniePreconditionException {
         this.c = new Cluster(NAME, USER, null, CLUSTER_TYPE, this.configs, VERSION);
         this.c.onCreateOrUpdateCluster();
     }
@@ -123,10 +123,10 @@ public class TestCluster {
      * Test to make sure validation works and throws exception when no type
      * entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateClusterNoType() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateClusterNoType() throws GeniePreconditionException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, null, this.configs, VERSION);
         this.c.onCreateOrUpdateCluster();
     }
@@ -135,10 +135,10 @@ public class TestCluster {
      * Test to make sure validation works and throws exception when no configs
      * entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateClusterEmptyConfigs() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateClusterEmptyConfigs() throws GeniePreconditionException {
         this.c = new Cluster(
                 NAME,
                 USER,
@@ -154,10 +154,10 @@ public class TestCluster {
      * Test to make sure validation works and throws exception when no configs
      * entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateClusterNullConfigs() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateClusterNullConfigs() throws GeniePreconditionException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, null, VERSION);
         this.c.onCreateOrUpdateCluster();
     }
@@ -165,11 +165,22 @@ public class TestCluster {
     /**
      * Make sure validation works on valid cluster.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GenieException {
+    public void testValidate() throws GeniePreconditionException {
         this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
+        this.c.validate();
+    }
+
+    /**
+     * Make sure validation works on valid cluster.
+     *
+     * @throws GeniePreconditionException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateSuperFails() throws GeniePreconditionException {
+        this.c = new Cluster(null, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
         this.c.validate();
     }
 
@@ -196,10 +207,10 @@ public class TestCluster {
     /**
      * Test setting the tags.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetTags() throws GenieException {
+    public void testSetTags() throws GeniePreconditionException {
         Assert.assertNotNull(this.c.getTags());
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
@@ -221,10 +232,10 @@ public class TestCluster {
     /**
      * Test setting the commands.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetCommands() throws GenieException {
+    public void testSetCommands() throws GeniePreconditionException {
         Assert.assertNull(this.c.getCommands());
         final Command one = new Command();
         one.setId("one");
@@ -246,10 +257,10 @@ public class TestCluster {
     /**
      * Test adding a command.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testAddCommand() throws GenieException {
+    public void testAddCommand() throws GeniePreconditionException {
         final Command command = new Command();
         command.setId("commandId");
         Assert.assertNull(this.c.getCommands());
@@ -261,20 +272,20 @@ public class TestCluster {
     /**
      * Test to make sure you can't add a null command.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testAddNullCommand() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testAddNullCommand() throws GeniePreconditionException {
         this.c.addCommand(null);
     }
 
     /**
      * Test removing a command.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testRemoveCommand() throws GenieException {
+    public void testRemoveCommand() throws GeniePreconditionException {
         final Command one = new Command();
         one.setId("one");
         final Command two = new Command();
@@ -301,20 +312,20 @@ public class TestCluster {
     /**
      * Make sure you can't remove a null command.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testRemoveNullCommand() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testRemoveNullCommand() throws GeniePreconditionException {
         this.c.removeCommand(null);
     }
 
     /**
      * Test removing all the commands.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testRemoveAllCommands() throws GenieException {
+    public void testRemoveAllCommands() throws GeniePreconditionException {
         Assert.assertNull(this.c.getCommands());
         final Command one = new Command();
         one.setId("one");

@@ -21,9 +21,11 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.jobmanager.JobJanitor;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.metrics.JobCountMonitor;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -49,7 +51,7 @@ public class GenieSpringBootstrap {
     /**
      * Constructor.
      *
-     * @param janitor The job janitor to used
+     * @param janitor         The job janitor to used
      * @param jobCountManager The job count manager to use
      * @param jobCountMonitor The job count monitor to use
      */
@@ -68,7 +70,7 @@ public class GenieSpringBootstrap {
     /**
      * Initialize the application here - db connections, daemon threads, etc.
      *
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     @PostConstruct
     public void initialize() throws GenieException {

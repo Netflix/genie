@@ -19,6 +19,8 @@ package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
@@ -34,7 +36,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -129,18 +130,14 @@ public class YarnJobManager implements JobManager {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public void init(final Job job, final Cluster cluster) throws GenieException {
         if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, "No job entered.");
+            throw new GeniePreconditionException("No job entered.");
         }
         if (cluster == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, "No cluster entered.");
+            throw new GeniePreconditionException("No cluster entered.");
         }
         this.jobMonitor.setJobManager(this);
         this.job = job;
@@ -149,8 +146,6 @@ public class YarnJobManager implements JobManager {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public void launch() throws GenieException {
@@ -174,8 +169,7 @@ public class YarnJobManager implements JobManager {
             this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
             LOG.error(this.job.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new GenieServerException(msg);
         }
 
         // create the working directory
@@ -185,8 +179,7 @@ public class YarnJobManager implements JobManager {
             this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
             LOG.error(this.job.getStatusMsg() + ": "
                     + userJobDir.getAbsolutePath());
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new GenieServerException(msg);
         }
         pb.directory(userJobDir);
 
@@ -197,14 +190,12 @@ public class YarnJobManager implements JobManager {
                 if (attachment.getName() == null || attachment.getName().isEmpty()) {
                     final String msg = "File attachment is missing required parameter name";
                     LOG.error(msg);
-                    throw new GenieException(
-                            HttpURLConnection.HTTP_BAD_REQUEST, msg);
+                    throw new GeniePreconditionException(msg);
                 }
                 if (attachment.getData() == null) {
                     final String msg = "File attachment is missing required parameter data";
                     LOG.error(msg);
-                    throw new GenieException(
-                            HttpURLConnection.HTTP_BAD_REQUEST, msg);
+                    throw new GeniePreconditionException(msg);
                 }
                 // good to go - copy attachments
                 // not checking for 0-byte attachments - assuming they are legitimate
@@ -215,8 +206,7 @@ public class YarnJobManager implements JobManager {
                 } catch (final IOException e) {
                     final String msg = "Unable to copy attachment correctly: " + attachment.getName();
                     LOG.error(msg);
-                    throw new GenieException(
-                            HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
+                    throw new GenieServerException(msg, e);
                 } finally {
                     if (output != null) {
                         try {
@@ -261,16 +251,13 @@ public class YarnJobManager implements JobManager {
             final String msg = "Failed to launch the job";
             LOG.error(msg, e);
             this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
+            throw new GenieServerException(msg, e);
         }
         LOG.info("Successfully launched the job with PID = " + pid);
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public void kill() throws GenieException {
@@ -280,8 +267,7 @@ public class YarnJobManager implements JobManager {
         if (this.job == null) {
             final String msg = "JobInfo object is null";
             LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new GeniePreconditionException(msg);
         }
 
         // check to ensure that the process id is actually set (which means job
@@ -295,21 +281,19 @@ public class YarnJobManager implements JobManager {
                 if (genieHome == null || genieHome.isEmpty()) {
                     final String msg = "Property netflix.genie.server.sys.home is not set correctly";
                     LOG.error(msg);
-                    throw new GenieException(HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                    throw new GenieServerException(msg);
                 }
                 Runtime.getRuntime().exec(
                         genieHome + File.separator + "jobkill.sh " + processId);
             } catch (final GenieException | IOException e) {
                 final String msg = "Failed to kill the job";
                 LOG.error(msg, e);
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
+                throw new GenieServerException(msg, e);
             }
         } else {
             final String msg = "Could not get process id";
             LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new GenieServerException(msg);
         }
     }
 
@@ -373,9 +357,7 @@ public class YarnJobManager implements JobManager {
         if (command == null) {
             final String msg = "No command found for params. Unable to continue.";
             LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    msg);
+            throw new GeniePreconditionException(msg);
         }
 
         // save the command name, application id and application name
@@ -447,9 +429,7 @@ public class YarnJobManager implements JobManager {
         if (StringUtils.isBlank(genieHome)) {
             final String msg = "Property netflix.genie.server.sys.home is not set correctly";
             LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    msg);
+            throw new GenieServerException(msg);
         }
         this.env.put("XS_SYSTEM_HOME", genieHome);
 
@@ -479,8 +459,7 @@ public class YarnJobManager implements JobManager {
                 String msg = "This genie instance doesn't support Hadoop version: "
                         + hadoopVersion;
                 LOG.error(msg);
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                throw new GenieServerException(msg);
             }
 
             LOG.info("Overriding HADOOP_HOME from cluster config to: "
@@ -494,8 +473,7 @@ public class YarnJobManager implements JobManager {
             if (hadoopHome == null || !new File(hadoopHome).exists()) {
                 final String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
                 LOG.error(msg);
-                throw new GenieException(
-                        HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+                throw new GenieServerException(msg);
             }
             this.env.put("HADOOP_HOME", hadoopHome);
         }
@@ -526,8 +504,7 @@ public class YarnJobManager implements JobManager {
         if (StringUtils.isBlank(baseUserWorkingDir)) {
             final String msg = "Property netflix.genie.server.user.working.dir is not set";
             LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
+            throw new GenieServerException(msg);
         } else {
             this.env.put("BASE_USER_WORKING_DIR", baseUserWorkingDir);
         }
@@ -563,7 +540,7 @@ public class YarnJobManager implements JobManager {
      * Extract/initialize command-line arguments passed by user.
      *
      * @return the parsed command-line arguments as an array
-     * @throws GenieException
+     * @throws GenieException On issue
      */
     private String[] initArgs() throws GenieException {
         LOG.info("called");
@@ -602,8 +579,7 @@ public class YarnJobManager implements JobManager {
         } catch (final IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
             String msg = "Can't get process id for job";
             LOG.error(msg, e);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
+            throw new GenieServerException(msg, e);
         }
     }
 }

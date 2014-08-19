@@ -68,7 +68,7 @@ public final class ClusterServiceSampleClient {
      * Main for running client code.
      *
      * @param args program arguments
-     * @throws Exception
+     * @throws Exception On issue.
      */
     public static void main(final String[] args) throws Exception {
 
@@ -277,7 +277,7 @@ public final class ClusterServiceSampleClient {
      *
      * @param id The ID to use. If null or empty one will be created.
      * @return A cluster object
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws GenieException For any configuration exception.
      */
     public static Cluster createSampleCluster(
             final String id) throws GenieException {

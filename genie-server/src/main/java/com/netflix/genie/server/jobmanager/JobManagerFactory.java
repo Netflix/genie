@@ -18,13 +18,14 @@
 package com.netflix.genie.server.jobmanager;
 
 import com.netflix.config.ConfigurationManager;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 
-import java.net.HttpURLConnection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -63,12 +64,11 @@ public class JobManagerFactory implements ApplicationContextAware {
      *
      * @param ccs The cluster config service to use
      * @param clb The clb to use
-     * @throws GenieException
      */
     @Inject
     public JobManagerFactory(
             final ClusterConfigService ccs,
-            final ClusterLoadBalancer clb) throws GenieException {
+            final ClusterLoadBalancer clb) {
         this.ccs = ccs;
         this.clb = clb;
     }
@@ -78,7 +78,7 @@ public class JobManagerFactory implements ApplicationContextAware {
      *
      * @param job The job this manager will be managing
      * @return instance of the appropriate job manager
-     * @throws GenieException
+     * @throws GenieException On error
      */
     public JobManager getJobManager(final Job job) throws GenieException {
         LOG.info("called");
@@ -86,7 +86,7 @@ public class JobManagerFactory implements ApplicationContextAware {
         if (job == null) {
             final String msg = "No job entered. Unable to continue";
             LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException(msg);
         }
 
         // Figure out a cluster to run this job. Cluster selection is done based on
@@ -105,20 +105,17 @@ public class JobManagerFactory implements ApplicationContextAware {
             } else {
                 final String msg = className + " is not of type JobManager. Unable to continue.";
                 LOG.error(msg);
-                throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+                throw new GeniePreconditionException(msg);
             }
         } catch (final ClassNotFoundException | BeansException e) {
             final String msg = "Unable to create job manager for class name " + className;
             LOG.error(msg, e);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GenieBadRequestException(msg);
         }
     }
 
     /**
-     * Set the spring application context for use creating beans.
-     *
-     * @param appContext The application context injected by spring
-     * @throws BeansException
+     * {@inheritDoc}
      */
     @Override
     public void setApplicationContext(

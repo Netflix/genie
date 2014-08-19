@@ -18,8 +18,8 @@
 package com.netflix.genie.server.util;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import java.net.HttpURLConnection;
 
+import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public final class StringUtil {
      * @param input command-line arguments as a string
      * @return argument array that is split using (as to close to) bash rules as
      * possible
-     * @throws GenieException
+     * @throws GenieException If there is any error
      */
     public static String[] splitCmdLine(final String input)
             throws GenieException {
@@ -69,9 +69,7 @@ public final class StringUtil {
         } catch (final Exception e) {
             final String msg = "Invalid argument: " + input;
             LOG.error(msg, e);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    msg, e);
+            throw new GenieServerException(msg, e);
         }
 
         // "cleanse" inputs - get rid of enclosing quotes
@@ -93,7 +91,7 @@ public final class StringUtil {
      * @param fullVersion input version number
      * @return trimmed version number as documented
      */
-    public static String trimVersion(String fullVersion) {
+    public static String trimVersion(final String fullVersion) {
         LOG.debug("Returning canonical version for " + fullVersion);
         if (fullVersion == null) {
             return null;

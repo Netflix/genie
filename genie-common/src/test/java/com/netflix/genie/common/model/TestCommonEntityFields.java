@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,10 +66,10 @@ public class TestCommonEntityFields {
     /**
      * Test to make sure validation works.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateCommonEntityFields() throws GenieException {
+    public void testOnCreateOrUpdateCommonEntityFields() throws GeniePreconditionException {
         this.c = new CommonEntityFields(NAME, USER, VERSION);
         this.c.onCreateOrUpdateCommonEntityFields();
     }
@@ -77,20 +77,20 @@ public class TestCommonEntityFields {
     /**
      * Test to make sure validation works.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateCommonEntityFieldsWithNothing() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateCommonEntityFieldsWithNothing() throws GeniePreconditionException {
         this.c.onCreateOrUpdateCommonEntityFields();
     }
 
     /**
      * Test to make sure validation works and throws exception when no name entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateCommonEntityFieldsNoName() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateCommonEntityFieldsNoName() throws GeniePreconditionException {
         this.c = new CommonEntityFields(null, USER, VERSION);
         this.c.onCreateOrUpdateCommonEntityFields();
     }
@@ -98,10 +98,10 @@ public class TestCommonEntityFields {
     /**
      * Test to make sure validation works and throws exception when no user entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateCommonEntityFieldsNoUser() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateCommonEntityFieldsNoUser() throws GeniePreconditionException {
         this.c = new CommonEntityFields(null, USER, VERSION);
         this.c.onCreateOrUpdateCommonEntityFields();
     }
@@ -109,10 +109,10 @@ public class TestCommonEntityFields {
     /**
      * Test to make sure validation works and throws exception when no user entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateCommonEntityFieldsNoVersion() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateCommonEntityFieldsNoVersion() throws GeniePreconditionException {
         this.c = new CommonEntityFields(NAME, USER, null);
         this.c.onCreateOrUpdateCommonEntityFields();
     }
@@ -120,10 +120,10 @@ public class TestCommonEntityFields {
     /**
      * Make sure validation works on valid commands.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GenieException {
+    public void testValidate() throws GeniePreconditionException {
         this.c = new CommonEntityFields(NAME, USER, VERSION);
         this.c.validate();
     }

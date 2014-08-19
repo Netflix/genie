@@ -39,7 +39,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Specifications for JPA queries.
- * <p></p>
  * see http://tinyurl.com/n6nubvm
  *
  * @author tgianos
