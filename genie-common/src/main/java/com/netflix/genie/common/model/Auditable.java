@@ -56,12 +56,6 @@ public class Auditable implements Serializable, Validate {
     private static final long serialVersionUID = 7526472297322776147L;
 
     /**
-     * Default constructor.
-     */
-    public Auditable() {
-    }
-
-    /**
      * Unique ID.
      */
     @Id

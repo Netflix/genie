@@ -175,7 +175,6 @@ public class TestJob {
         Assert.assertNotNull(this.job.getClusterCriteriasString());
         Assert.assertNotNull(this.job.getCommandCriteriaString());
         Assert.assertTrue(this.job.getTags().contains(this.job.getId()));
-        Assert.assertTrue(this.job.getTags().contains(NAME));
     }
 
     /**
@@ -195,7 +194,6 @@ public class TestJob {
         Assert.assertNotNull(this.job.getClusterCriteriasString());
         Assert.assertNotNull(this.job.getCommandCriteriaString());
         Assert.assertTrue(this.job.getTags().contains(this.job.getId()));
-        Assert.assertTrue(this.job.getTags().contains(NAME));
     }
 
     /**

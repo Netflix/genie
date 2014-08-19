@@ -141,7 +141,6 @@ public class Application extends CommonEntityFields {
             this.tags = new HashSet<>();
         }
         this.tags.add(this.getId());
-        this.tags.add(this.getName());
     }
 
     /**

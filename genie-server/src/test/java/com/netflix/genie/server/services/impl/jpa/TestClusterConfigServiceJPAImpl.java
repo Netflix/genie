@@ -403,7 +403,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         final Cluster updated = this.service.getCluster(CLUSTER_1_ID);
         Assert.assertEquals(CLUSTER_2_USER, updated.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, updated.getStatus());
-        Assert.assertEquals(6, updated.getTags().size());
+        Assert.assertEquals(5, updated.getTags().size());
     }
 
     /**
@@ -433,7 +433,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         final Cluster updated = this.service.getCluster(CLUSTER_1_ID);
         Assert.assertEquals(CLUSTER_2_USER, updated.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, updated.getStatus());
-        Assert.assertEquals(6, updated.getTags().size());
+        Assert.assertEquals(5, updated.getTags().size());
     }
 
     /**
@@ -1079,12 +1079,11 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForCluster(CLUSTER_1_ID).size());
         final Set<String> finalTags
                 = this.service.updateTagsForCluster(CLUSTER_1_ID, newTags);
-        Assert.assertEquals(5, finalTags.size());
+        Assert.assertEquals(4, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
         Assert.assertTrue(finalTags.contains(CLUSTER_1_ID));
-        Assert.assertTrue(finalTags.contains(CLUSTER_1_NAME));
     }
 
     /**
@@ -1150,10 +1149,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForCluster(CLUSTER_1_ID).size());
         final Set<String> finalTags
                 = this.service.removeAllTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(2,
+        Assert.assertEquals(1,
                 finalTags.size());
         Assert.assertTrue(finalTags.contains(CLUSTER_1_ID));
-        Assert.assertTrue(finalTags.contains(CLUSTER_1_NAME));
     }
 
     /**

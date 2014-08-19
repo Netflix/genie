@@ -968,12 +968,11 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForApplication(APP_1_ID).size());
         final Set<String> finalTags
                 = this.service.updateTagsForApplication(APP_1_ID, newTags);
-        Assert.assertEquals(5, finalTags.size());
+        Assert.assertEquals(4, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
         Assert.assertTrue(finalTags.contains(APP_1_ID));
-        Assert.assertTrue(finalTags.contains(APP_1_NAME));
     }
 
     /**
@@ -1039,10 +1038,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForApplication(APP_1_ID).size());
         final Set<String> finalTags
                 = this.service.removeAllTagsForApplication(APP_1_ID);
-        Assert.assertEquals(2,
+        Assert.assertEquals(1,
                 finalTags.size());
         Assert.assertTrue(finalTags.contains(APP_1_ID));
-        Assert.assertTrue(finalTags.contains(APP_1_NAME));
     }
 
     /**

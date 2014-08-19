@@ -163,7 +163,6 @@ public class Command extends CommonEntityFields {
            this.tags = new HashSet<>();
         }
         this.tags.add(this.getId());
-        this.tags.add(this.getName());
     }
 
     /**
@@ -348,7 +347,6 @@ public class Command extends CommonEntityFields {
             error = ge.getMessage();
         }
         this.validate(this.status, this.executable, error);
-
     }
 
     /**

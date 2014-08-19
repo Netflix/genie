@@ -338,7 +338,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         final Command updated = this.service.getCommand(COMMAND_1_ID);
         Assert.assertEquals(COMMAND_2_USER, updated.getUser());
         Assert.assertEquals(CommandStatus.INACTIVE, updated.getStatus());
-        Assert.assertEquals(6, updated.getTags().size());
+        Assert.assertEquals(5, updated.getTags().size());
     }
 
     /**
@@ -368,7 +368,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         final Command updated = this.service.getCommand(COMMAND_1_ID);
         Assert.assertEquals(COMMAND_2_USER, updated.getUser());
         Assert.assertEquals(CommandStatus.INACTIVE, updated.getStatus());
-        Assert.assertEquals(6, updated.getTags().size());
+        Assert.assertEquals(5, updated.getTags().size());
     }
 
     /**
@@ -970,12 +970,11 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForCommand(COMMAND_1_ID).size());
         final Set<String> finalTags
                 = this.service.updateTagsForCommand(COMMAND_1_ID, newTags);
-        Assert.assertEquals(5, finalTags.size());
+        Assert.assertEquals(4, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
         Assert.assertTrue(finalTags.contains(COMMAND_1_ID));
-        Assert.assertTrue(finalTags.contains(COMMAND_1_NAME));
     }
 
     /**
@@ -1041,10 +1040,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForCommand(COMMAND_1_ID).size());
         final Set<String> finalTags
                 = this.service.removeAllTagsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(2,
+        Assert.assertEquals(1,
                 finalTags.size());
         Assert.assertTrue(finalTags.contains(COMMAND_1_ID));
-        Assert.assertTrue(finalTags.contains(COMMAND_1_NAME));
     }
 
     /**
