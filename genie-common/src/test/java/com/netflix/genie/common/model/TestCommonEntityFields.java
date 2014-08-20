@@ -150,7 +150,7 @@ public class TestCommonEntityFields {
         final CommonEntityFields local = new CommonEntityFields();
         Assert.assertNull(local.getUser());
         local.setUser(USER);
-        Assert.assertEquals(USER,local.getUser());
+        Assert.assertEquals(USER, local.getUser());
     }
 
     /**
