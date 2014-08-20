@@ -57,7 +57,7 @@ public final class ExecutionServiceSampleClient {
      * Main for running client code .
      *
      * @param args command line arguments
-     * @throws Exception
+     * @throws Exception On any issue.
      */
     public static void main(final String[] args) throws Exception {
 

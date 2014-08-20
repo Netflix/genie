@@ -18,7 +18,7 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,10 +48,10 @@ public class TestAuditable {
     /**
      * Test the setter for id.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetId() throws GenieException {
+    public void testSetId() throws GeniePreconditionException {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
         final String id = UUID.randomUUID().toString();
@@ -62,10 +62,10 @@ public class TestAuditable {
     /**
      * Test the setter for id.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetIdTwice() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetIdTwice() throws GeniePreconditionException {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
         final String id = UUID.randomUUID().toString();
@@ -79,10 +79,10 @@ public class TestAuditable {
      * Test to make sure @PrePersist annotation will do what we want before persistence.
      *
      * @throws InterruptedException
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateAuditable() throws InterruptedException, GenieException {
+    public void testOnCreateAuditable() throws InterruptedException, GeniePreconditionException {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
         final Date originalCreate = a.getCreated();
@@ -161,11 +161,11 @@ public class TestAuditable {
     /**
      * Make sure we generate valid JSON.
      *
-     * @throws com.netflix.genie.common.exceptions.GenieException
+     * @throws com.netflix.genie.common.exceptions.GeniePreconditionException
      * @throws IOException
      */
     @Test
-    public void testToString() throws GenieException, IOException {
+    public void testToString() throws GeniePreconditionException, IOException {
         final Auditable a = new Auditable();
         final String id = UUID.randomUUID().toString();
         final Date created = new Date(1000L);

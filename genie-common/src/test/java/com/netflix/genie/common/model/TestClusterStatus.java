@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,10 +31,10 @@ public class TestClusterStatus {
     /**
      * Tests whether a valid cluster status is parsed correctly.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException if any precondition isn't met.
      */
     @Test
-    public void testValidClusterStatus() throws GenieException {
+    public void testValidClusterStatus() throws GeniePreconditionException {
         Assert.assertEquals(ClusterStatus.UP,
                 ClusterStatus.parse(ClusterStatus.UP.name().toLowerCase()));
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE,
@@ -46,20 +46,20 @@ public class TestClusterStatus {
     /**
      * Tests whether an invalid cluster status throws exception.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException if any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testInvalidClusterStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testInvalidClusterStatus() throws GeniePreconditionException {
         ClusterStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
      * Tests whether an invalid cluster status throws exception.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException if any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testBlankClusterStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testBlankClusterStatus() throws GeniePreconditionException {
         ClusterStatus.parse(null);
     }
 }

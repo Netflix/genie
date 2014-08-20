@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,10 +66,10 @@ public class TestCommand {
     /**
      * Test the argument Constructor.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testConstructor() throws GenieException {
+    public void testConstructor() throws GeniePreconditionException {
         c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
         Assert.assertNull(this.c.getApplication());
         Assert.assertNull(this.c.getClusters());
@@ -86,10 +86,10 @@ public class TestCommand {
     /**
      * Test to make sure validation works.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateCommand() throws GenieException {
+    public void testOnCreateOrUpdateCommand() throws GeniePreconditionException {
         this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
         this.c.onCreateOrUpdateCommand();
     }
@@ -97,20 +97,20 @@ public class TestCommand {
     /**
      * Test to make sure validation works.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateCommandWithNothing() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateCommandWithNothing() throws GeniePreconditionException {
         this.c.onCreateOrUpdateCommand();
     }
 
     /**
      * Test to make sure validation works and throws exception when no status entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateCommandNoStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateCommandNoStatus() throws GeniePreconditionException {
         this.c = new Command(NAME, USER, null, EXECUTABLE, VERSION);
         this.c.onCreateOrUpdateCommand();
     }
@@ -119,10 +119,10 @@ public class TestCommand {
      * Test to make sure validation works and throws exception when no executable
      * entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateCommandNoExecutable() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateCommandNoExecutable() throws GeniePreconditionException {
         this.c = new Command(NAME, USER, CommandStatus.ACTIVE, null, VERSION);
         this.c.onCreateOrUpdateCommand();
     }
@@ -130,11 +130,22 @@ public class TestCommand {
     /**
      * Make sure validation works on valid commands.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GenieException {
+    public void testValidate() throws GeniePreconditionException {
         this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
+        this.c.validate();
+    }
+
+    /**
+     * Make sure validation works on valid commands.
+     *
+     * @throws GeniePreconditionException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateSuperFails() throws GeniePreconditionException {
+        this.c = new Command(null, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
         this.c.validate();
     }
 
@@ -208,10 +219,10 @@ public class TestCommand {
     /**
      * Test setting an application.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetApplication() throws GenieException {
+    public void testSetApplication() throws GeniePreconditionException {
         Assert.assertNull(this.c.getApplication());
         final Application one = new Application();
         one.setId("one");

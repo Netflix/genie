@@ -61,11 +61,9 @@ public class JobJanitorImpl implements JobJanitor {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws Exception
      */
     @Override
-    public int markZombies() throws Exception {
+    public int markZombies() {
         return this.xs.markZombies();
     }
 

@@ -17,11 +17,10 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.StringUtils;
 
-import java.net.HttpURLConnection;
 
 /**
  * The available statuses for Commands.
@@ -49,9 +48,9 @@ public enum CommandStatus {
      *
      * @param value string to parse/convert into command status
      * @return ACTIVE, DEPRECATED, INACTIVE if match
-     * @throws GenieException on invalid value
+     * @throws GeniePreconditionException on invalid value
      */
-    public static CommandStatus parse(final String value) throws GenieException {
+    public static CommandStatus parse(final String value) throws GeniePreconditionException {
         if (StringUtils.isNotBlank(value)) {
             for (final CommandStatus status : CommandStatus.values()) {
                 if (value.equalsIgnoreCase(status.toString())) {
@@ -59,7 +58,7 @@ public enum CommandStatus {
                 }
             }
         }
-        throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+        throw new GeniePreconditionException(
                 "Unacceptable command status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
     }
 }

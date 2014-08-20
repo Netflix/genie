@@ -19,7 +19,7 @@ public interface JobMonitor extends Runnable {
      * Set the job for this to monitor.
      *
      * @param job The job to monitor. Not null.
-     * @throws GenieException
+     * @throws GenieException On any exception
      */
     void setJob(final Job job) throws GenieException;
 
@@ -27,7 +27,7 @@ public interface JobMonitor extends Runnable {
      * Set the job manager for this monitor to use.
      *
      * @param jobManager The job manager to use. Not Null.
-     * @throws GenieException
+     * @throws GenieException on any non-runtime exception
      */
     void setJobManager(final JobManager jobManager) throws GenieException;
 
@@ -35,7 +35,7 @@ public interface JobMonitor extends Runnable {
      * Set the process handle for this job.
      *
      * @param proc The process handle for the job. Not null.
-     * @throws GenieException
+     * @throws GenieException for any non-runtime exception
      */
     void setProcess(final Process proc) throws GenieException;
 

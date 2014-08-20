@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,10 +31,10 @@ public class TestApplicationStatus {
     /**
      * Tests whether a valid application status is parsed correctly.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidApplicationStatus() throws GenieException {
+    public void testValidApplicationStatus() throws GeniePreconditionException {
         Assert.assertEquals(ApplicationStatus.ACTIVE,
                 ApplicationStatus.parse(ApplicationStatus.ACTIVE.name().toLowerCase()));
         Assert.assertEquals(ApplicationStatus.DEPRECATED,
@@ -46,20 +46,20 @@ public class TestApplicationStatus {
     /**
      * Tests whether an invalid application status throws exception.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testInvalidApplicationStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testInvalidApplicationStatus() throws GeniePreconditionException {
         ApplicationStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
      * Tests whether an invalid application status throws exception.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testBlankApplicationStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testBlankApplicationStatus() throws GeniePreconditionException {
         ApplicationStatus.parse(null);
     }
 }

@@ -66,8 +66,6 @@ public class JobCountManagerImpl implements JobCountManager {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs() throws GenieException {
@@ -78,8 +76,6 @@ public class JobCountManagerImpl implements JobCountManager {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public int getNumInstanceJobs(
@@ -93,8 +89,6 @@ public class JobCountManagerImpl implements JobCountManager {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -138,8 +132,6 @@ public class JobCountManagerImpl implements JobCountManager {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public String getIdleInstance(

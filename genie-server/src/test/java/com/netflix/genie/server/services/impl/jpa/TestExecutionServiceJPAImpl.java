@@ -18,11 +18,13 @@
 package com.netflix.genie.server.services.impl.jpa;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
-import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -42,7 +44,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     private static final String JOB_2_ID = "job2";
     private static final String JOB_3_ID = "job3";
     private static final String JOB_4_ID = "job4";
-    private static final String JOB_5_ID = "job5";
+//    private static final String JOB_5_ID = "job5";
     private static final String JOB_6_ID = "job6";
 
     @Inject
@@ -50,36 +52,24 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
 
     /**
      * Test submitting a null job.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testSubmitJobNoJob() {
-        try {
-            this.xs.submitJob(null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    ge.getErrorCode()
-            );
-        }
+    @Test(expected = GeniePreconditionException.class)
+    public void testSubmitJobNoJob() throws GenieException {
+        this.xs.submitJob(null);
     }
 
     /**
      * Test submitting a job that already exists.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testSubmitJobThatExists() {
-        try {
-            final Job job = new Job();
-            job.setId(JOB_1_ID);
-            this.xs.submitJob(job);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_CONFLICT,
-                    ge.getErrorCode()
-            );
-        }
+    @Test(expected = GenieConflictException.class)
+    public void testSubmitJobThatExists() throws GenieException {
+        final Job job = new Job();
+        job.setId(JOB_1_ID);
+        this.xs.submitJob(job);
     }
 
     /**
@@ -112,18 +102,12 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
 
     /**
      * Test whether a job kill returns immediately for a finished job.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testTryingToKillInitializingJob() {
-        try {
-            this.xs.killJob(JOB_4_ID);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    ge.getErrorCode()
-            );
-        }
+    @Test(expected = GeniePreconditionException.class)
+    public void testTryingToKillInitializingJob() throws GenieException {
+        this.xs.killJob(JOB_4_ID);
 //        try {
 //            this.xs.killJob(JOB_5_ID);
 //            Assert.fail();
@@ -137,49 +121,31 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
 
     /**
      * Test killing a job with no id passed in.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testKillJobNoId() {
-        try {
-            this.xs.killJob(null);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    ge.getErrorCode()
-            );
-        }
+    @Test(expected = GeniePreconditionException.class)
+    public void testKillJobNoId() throws GenieException {
+        this.xs.killJob(null);
     }
 
     /**
      * Test killing a job with no job exists.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testKillJobNoJob() {
-        try {
-            this.xs.killJob(UUID.randomUUID().toString());
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
-            );
-        }
+    @Test(expected = GenieNotFoundException.class)
+    public void testKillJobNoJob() throws GenieException {
+        this.xs.killJob(UUID.randomUUID().toString());
     }
 
     /**
      * Test killing a job with no kill URI.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testKillJobNoKillURI() {
-        try {
-            this.xs.killJob(JOB_6_ID);
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    ge.getErrorCode()
-            );
-        }
+    @Test(expected = GeniePreconditionException.class)
+    public void testKillJobNoKillURI() throws GenieException {
+        this.xs.killJob(JOB_6_ID);
     }
 }

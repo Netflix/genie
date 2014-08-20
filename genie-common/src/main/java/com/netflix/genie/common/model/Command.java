@@ -18,10 +18,9 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -153,18 +152,17 @@ public class Command extends CommonEntityFields {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @PrePersist
     @PreUpdate
-    protected void onCreateOrUpdateCommand() throws GenieException {
-        validate(this.status, this.executable);
+    protected void onCreateOrUpdateCommand() throws GeniePreconditionException {
+        validate(this.status, this.executable, null);
         // Add the id to the tags
         if (this.tags == null) {
            this.tags = new HashSet<>();
         }
         this.tags.add(this.getId());
-        this.tags.add(this.getName());
     }
 
     /**
@@ -338,13 +336,17 @@ public class Command extends CommonEntityFields {
     /**
      * Check to make sure that the required parameters exist.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Override
-    public void validate() throws GenieException {
-        super.validate();
-        this.validate(this.status, this.executable);
-
+    public void validate() throws GeniePreconditionException {
+        String error = null;
+        try {
+            super.validate();
+        } catch (final GeniePreconditionException ge) {
+            error = ge.getMessage();
+        }
+        this.validate(this.status, this.executable, error);
     }
 
     /**
@@ -352,13 +354,18 @@ public class Command extends CommonEntityFields {
      *
      * @param status The status of the command
      * @param executable The executable of the command.
-     * @throws GenieException
+     * @param error The existing errors if any exist.
+     * @throws GeniePreconditionException
      */
     private void validate(
             final CommandStatus status,
-            final String executable)
-            throws GenieException {
+            final String executable,
+            final String error)
+            throws GeniePreconditionException {
         final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotBlank(error)) {
+            builder.append(error);
+        }
         if (status == null) {
             builder.append("No command status entered and is required.\n");
         }
@@ -370,7 +377,7 @@ public class Command extends CommonEntityFields {
             builder.insert(0, "Command configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException(msg);
         }
     }
 }

@@ -18,7 +18,11 @@
 package com.netflix.genie.server.services.impl.jpa;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
@@ -114,7 +118,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testGetApplicationNull() throws GenieException {
         this.service.getApplication(null);
     }
@@ -124,7 +128,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testGetApplicationNotExists() throws GenieException {
         this.service.getApplication(UUID.randomUUID().toString());
     }
@@ -262,7 +266,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testCreateApplicationNull() throws GenieException {
         this.service.createApplication(null);
     }
@@ -272,7 +276,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieConflictException.class)
     public void testCreateApplicationAlreadyExists() throws GenieException {
         final Application app = new Application(
                 APP_1_NAME,
@@ -348,7 +352,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testUpdateApplicationNullId() throws GenieException {
         this.service.updateApplication(null, new Application());
     }
@@ -358,7 +362,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testUpdateApplicationNullUpdateApp() throws GenieException {
         this.service.updateApplication(APP_1_ID, null);
     }
@@ -368,7 +372,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testUpdateApplicationNoAppExists() throws GenieException {
         this.service.updateApplication(
                 UUID.randomUUID().toString(), new Application());
@@ -379,7 +383,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieBadRequestException.class)
     public void testUpdateApplicationIdsDontMatch() throws GenieException {
         final Application updateApp = new Application();
         updateApp.setId(UUID.randomUUID().toString());
@@ -474,7 +478,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddConfigsToApplicationNoId() throws GenieException {
         this.service.addConfigsToApplication(null, new HashSet<String>());
     }
@@ -484,7 +488,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddConfigsToApplicationNoConfigs() throws GenieException {
         this.service.addConfigsToApplication(APP_1_ID, null);
     }
@@ -494,7 +498,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToApplicationNoApp() throws GenieException {
         this.service.addConfigsToApplication(UUID.randomUUID().toString(),
                 new HashSet<String>());
@@ -531,7 +535,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testUpdateConfigsForApplicationNoId() throws GenieException {
         this.service.updateConfigsForApplication(null, new HashSet<String>());
     }
@@ -541,7 +545,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForApplicationNoApp() throws GenieException {
         this.service.updateConfigsForApplication(UUID.randomUUID().toString(),
                 new HashSet<String>());
@@ -563,7 +567,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testGetConfigsForApplicationNoId() throws GenieException {
         this.service.getConfigsForApplication(null);
     }
@@ -573,7 +577,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testGetConfigsForApplicationNoApp() throws GenieException {
         this.service.getConfigsForApplication(UUID.randomUUID().toString());
     }
@@ -596,7 +600,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveAllConfigsForApplicationNoId() throws GenieException {
         this.service.removeAllConfigsForApplication(null);
     }
@@ -606,7 +610,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllConfigsForApplicationNoApp() throws GenieException {
         this.service.removeAllConfigsForApplication(UUID.randomUUID().toString());
     }
@@ -648,7 +652,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveConfigForApplicationNoId() throws GenieException {
         this.service.removeConfigForApplication(null, "something");
     }
@@ -658,7 +662,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testRemoveConfigForApplicationNoApp() throws GenieException {
         this.service.removeConfigForApplication(
                 UUID.randomUUID().toString(),
@@ -696,7 +700,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddJarsToApplicationNoId() throws GenieException {
         this.service.addJarsForApplication(null, new HashSet<String>());
     }
@@ -706,7 +710,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddJarsToApplicationNoJars() throws GenieException {
         this.service.addJarsForApplication(APP_1_ID, null);
     }
@@ -716,7 +720,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testAddJarsForApplicationNoApp() throws GenieException {
         this.service.addJarsForApplication(UUID.randomUUID().toString(),
                 new HashSet<String>());
@@ -753,7 +757,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testUpdateJarsForApplicationNoId() throws GenieException {
         this.service.updateJarsForApplication(null, new HashSet<String>());
     }
@@ -763,7 +767,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testUpdateJarsForApplicationNoApp() throws GenieException {
         this.service.updateJarsForApplication(UUID.randomUUID().toString(),
                 new HashSet<String>());
@@ -785,7 +789,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testGetJarsForApplicationNoId() throws GenieException {
         this.service.getJarsForApplication(null);
     }
@@ -795,7 +799,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testGetJarsForApplicationNoApp() throws GenieException {
         this.service.getJarsForApplication(UUID.randomUUID().toString());
     }
@@ -818,7 +822,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveAllJarsForApplicationNoId() throws GenieException {
         this.service.removeAllJarsForApplication(null);
     }
@@ -828,7 +832,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllJarsForApplicationNoApp() throws GenieException {
         this.service.removeAllJarsForApplication(UUID.randomUUID().toString());
     }
@@ -870,7 +874,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveJarForApplicationNoId() throws GenieException {
         this.service.removeJarForApplication(null, "something");
     }
@@ -880,7 +884,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testRemoveJarForApplicationNoApp() throws GenieException {
         this.service.removeJarForApplication(
                 UUID.randomUUID().toString(),
@@ -918,7 +922,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddTagsToApplicationNoId() throws GenieException {
         this.service.addTagsForApplication(null, new HashSet<String>());
     }
@@ -928,7 +932,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddTagsToApplicationNoTags() throws GenieException {
         this.service.addTagsForApplication(APP_1_ID, null);
     }
@@ -938,7 +942,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForApplicationNoApp() throws GenieException {
         this.service.addTagsForApplication(UUID.randomUUID().toString(),
                 new HashSet<String>());
@@ -964,12 +968,11 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForApplication(APP_1_ID).size());
         final Set<String> finalTags
                 = this.service.updateTagsForApplication(APP_1_ID, newTags);
-        Assert.assertEquals(5, finalTags.size());
+        Assert.assertEquals(4, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
         Assert.assertTrue(finalTags.contains(APP_1_ID));
-        Assert.assertTrue(finalTags.contains(APP_1_NAME));
     }
 
     /**
@@ -977,7 +980,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testUpdateTagsForApplicationNoId() throws GenieException {
         this.service.updateTagsForApplication(null, new HashSet<String>());
     }
@@ -987,7 +990,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForApplicationNoApp() throws GenieException {
         this.service.updateTagsForApplication(UUID.randomUUID().toString(),
                 new HashSet<String>());
@@ -1009,7 +1012,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testGetTagsForApplicationNoId() throws GenieException {
         this.service.getTagsForApplication(null);
     }
@@ -1019,7 +1022,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForApplicationNoApp() throws GenieException {
         this.service.getTagsForApplication(UUID.randomUUID().toString());
     }
@@ -1035,10 +1038,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForApplication(APP_1_ID).size());
         final Set<String> finalTags
                 = this.service.removeAllTagsForApplication(APP_1_ID);
-        Assert.assertEquals(2,
+        Assert.assertEquals(1,
                 finalTags.size());
         Assert.assertTrue(finalTags.contains(APP_1_ID));
-        Assert.assertTrue(finalTags.contains(APP_1_NAME));
     }
 
     /**
@@ -1046,7 +1048,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveAllTagsForApplicationNoId() throws GenieException {
         this.service.removeAllTagsForApplication(null);
     }
@@ -1056,7 +1058,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForApplicationNoApp() throws GenieException {
         this.service.removeAllTagsForApplication(UUID.randomUUID().toString());
     }
@@ -1099,7 +1101,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveTagForApplicationNoId() throws GenieException {
         this.service.removeTagForApplication(null, "something");
     }
@@ -1109,7 +1111,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForApplicationNoApp() throws GenieException {
         this.service.removeTagForApplication(
                 UUID.randomUUID().toString(),
@@ -1122,7 +1124,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testRemoveTagForApplicationId() throws GenieException {
         this.service.removeTagForApplication(
                 APP_1_ID,
@@ -1148,7 +1150,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testGetCommandsForApplicationNoId() throws GenieException {
         this.service.getCommandsForApplication("");
     }
@@ -1158,7 +1160,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForApplicationNoApp() throws GenieException {
         this.service.getCommandsForApplication(UUID.randomUUID().toString());
     }

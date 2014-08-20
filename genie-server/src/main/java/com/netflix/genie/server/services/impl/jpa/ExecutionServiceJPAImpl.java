@@ -21,7 +21,11 @@ import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.client.BaseGenieClient;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.util.ProcessStatus;
@@ -42,7 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.List;
 
@@ -89,11 +92,11 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * Default constructor - initializes persistence manager, and other utility
      * classes.
      *
-     * @param jobRepo The job repository to use.
-     * @param stats the GenieNodeStatistics object
-     * @param jobCountManager the job count manager to use
+     * @param jobRepo           The job repository to use.
+     * @param stats             the GenieNodeStatistics object
+     * @param jobCountManager   the job count manager to use
      * @param jobManagerFactory The the job manager factory to use
-     * @param jobService The job service to use.
+     * @param jobService        The job service to use.
      */
     @Inject
     public ExecutionServiceJPAImpl(
@@ -111,25 +114,18 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Job submitJob(final Job job) throws GenieException {
         LOG.debug("Called");
 
         if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No job entered to run");
+            throw new GeniePreconditionException("No job entered to run");
         }
 
         if (StringUtils.isNotBlank(job.getId())
                 && this.jobRepo.exists(job.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_CONFLICT,
-                    "Job with ID specified already exists."
-            );
+            throw new GenieConflictException("Job with ID specified already exists.");
         }
 
         // Check if the job is forwarded. If not this is the first node that got the request.
@@ -154,25 +150,19 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
     public Job killJob(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No id entered unable to kill job.");
+            throw new GeniePreconditionException("No id entered unable to kill job.");
         }
         LOG.debug("called for id: " + id);
         final Job job = this.jobRepo.findOne(id);
 
         // do some basic error handling
         if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job exists for id " + id + ". Unable to kill.");
+            throw new GenieNotFoundException("No job exists for id " + id + ". Unable to kill.");
         }
 
         // check if it is done already
@@ -184,18 +174,14 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         } else if (job.getStatus() == JobStatus.INIT
                 || job.getProcessHandle() == -1) {
             // can't kill a job if it is still initializing
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "Unable to kill job as it is still initializing");
+            throw new GeniePreconditionException("Unable to kill job as it is still initializing");
         }
 
         // if we get here, job is still running - and can be killed
         // redirect to the right node if killURI points to a different node
         final String killURI = job.getKillURI();
         if (StringUtils.isBlank(killURI)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "Failed to get killURI for jobID: " + id);
+            throw new GeniePreconditionException("Failed to get killURI for jobID: " + id);
         }
         final String localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + id;
 
@@ -250,16 +236,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(rollbackFor = GenieException.class)
     public JobStatus finalizeJob(final String id, final int exitCode) throws GenieException {
         final Job job = this.jobRepo.findOne(id);
         if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND, "No job with id " + id + " exists");
+            throw new GenieNotFoundException("No job with id " + id + " exists");
         }
         job.setExitCode(exitCode);
 
@@ -312,10 +295,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final HttpRequest request = BaseGenieClient.buildRequest(Verb.DELETE, killURI, null, null);
             return (Job) client.executeRequest(request, null, Job.class);
         } catch (final IOException ioe) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    ioe.getMessage(),
-                    ioe);
+            throw new GenieServerException(ioe.getMessage(), ioe);
         }
     }
 
@@ -327,10 +307,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final HttpRequest request = BaseGenieClient.buildRequest(Verb.POST, hostURI, null, job);
             return (Job) client.executeRequest(request, null, Job.class);
         } catch (final IOException ioe) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    ioe.getMessage(),
-                    ioe);
+            throw new GenieServerException(ioe.getMessage(), ioe);
         }
     }
 
@@ -385,11 +362,10 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         if (numRunningJobs >= maxRunningJobs) {
             // if we get here, job can't be forwarded to an idle
             // instance anymore and current node is overloaded
-            throw new GenieException(
-                    HttpURLConnection.HTTP_UNAVAILABLE,
+            throw new GeniePreconditionException(
                     "Number of running jobs greater than system limit ("
-                    + maxRunningJobs
-                    + ") - try another instance or try again later");
+                            + maxRunningJobs
+                            + ") - try another instance or try again later");
         }
 
         //We didn't forward the job so return null to signal to run the job locally

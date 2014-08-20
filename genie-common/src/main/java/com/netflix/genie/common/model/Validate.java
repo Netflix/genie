@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 
 /**
  * Interface all Model classes should implement.
@@ -28,7 +28,7 @@ public interface Validate {
     /**
      * Validate that this instance is valid for database storage.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException When Preconditions aren't met.
      */
-    void validate() throws GenieException;
+    void validate() throws GeniePreconditionException;
 }

@@ -22,18 +22,16 @@ import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.client.BaseGenieClient;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Singleton class, which acts as the client library for the Command
@@ -42,9 +40,6 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 public final class CommandServiceClient extends BaseGenieClient {
-
-    private static final Logger LOG = LoggerFactory
-            .getLogger(CommandServiceClient.class);
 
     private static final String BASE_CONFIG_COMMAND_REST_URL
             = BASE_REST_URL + "config/commands";
@@ -81,14 +76,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param command the object encapsulating the new Cluster configuration to
      *                create
      * @return extracted command configuration response
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Command createCommand(final Command command)
             throws GenieException {
         if (command == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No command entered to validate");
+            throw new GeniePreconditionException("No command entered to validate");
         }
         command.validate();
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -106,14 +99,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param command the object encapsulating the new Cluster configuration to
      *                create
      * @return extracted command configuration response
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Command updateCommand(final String id, final Command command)
             throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Required parameter id can't be null or empty.";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Required parameter id can't be null or empty.");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -131,13 +122,11 @@ public final class CommandServiceClient extends BaseGenieClient {
      *
      * @param id the command configuration id to get (can't be null or empty)
      * @return the command configuration for this id
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Command getCommand(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -154,11 +143,10 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Gets a set of command configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *               <p></p>
      *               More details on the parameters can be found on the Genie User Guide on
      *               GitHub.
      * @return List of command configuration elements that match the filter
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Command> getCommands(final Multimap<String, String> params)
             throws GenieException {
@@ -177,7 +165,7 @@ public final class CommandServiceClient extends BaseGenieClient {
      * Delete all the commands in the database.
      *
      * @return the should be empty set.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Command> deleteAllCommands() throws GenieException {
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -197,13 +185,11 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id the id for the command configuration to delete. Not null or
      *           empty.
      * @return the deleted command configuration
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Command deleteCommand(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -223,20 +209,16 @@ public final class CommandServiceClient extends BaseGenieClient {
      *                Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given command.
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
     public Set<String> addConfigsToCommand(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (configs == null || configs.isEmpty()) {
-            final String msg = "Missing required parameter: configs";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: configs");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -258,13 +240,11 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to get configurations for. Not
      *           Null/empty/blank.
      * @return The set of configuration files for the given command.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> getConfigsForCommand(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -288,22 +268,16 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param configs The configuration files to replace existing configuration
      *                files with. Not null.
      * @return The new set of command configurations.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> updateConfigsForCommand(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (configs == null) {
-            final String msg = "Missing required parameter: configs";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: configs");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -325,15 +299,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to delete the configuration files from.
      *           Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> removeAllConfigsForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -356,20 +327,16 @@ public final class CommandServiceClient extends BaseGenieClient {
      *                    Null/empty/blank.
      * @param application The application to set. Not null.
      * @return The new application for the given command.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Application setApplicationForCommand(
             final String id,
             final Application application) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (application == null) {
-            final String msg = "Missing required parameter: application";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: application");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -392,15 +359,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      *
      * @param id The id of the command to get application for. Not Null.
      * @return The application for the given command.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Application getApplicationForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -423,15 +387,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to delete the application from. Not
      *           null/empty/blank.
      * @return The active application for the command.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Application removeApplicationForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -454,15 +415,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to get the clusters for. Not
      *           NULL/empty/blank.
      * @return The set of clusters.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<Cluster> getClustersForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -485,20 +443,16 @@ public final class CommandServiceClient extends BaseGenieClient {
      *             Null/empty/blank.
      * @param tags The tags to add. Not null or empty.
      * @return The new set of tags for the given command.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> addTagsToCommand(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (tags == null || tags.isEmpty()) {
-            final String msg = "Missing required parameter: tags";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: tags");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -520,13 +474,11 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to get tags for. Not
      *           Null/empty/blank.
      * @return The set of tags for the given command.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> getTagsForCommand(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -550,22 +502,16 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param tags The tags to replace existing tag
      *             files with. Not null.
      * @return The new set of command tags.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> updateTagsForCommand(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (tags == null) {
-            final String msg = "Missing required parameter: tags";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: tags");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -587,15 +533,12 @@ public final class CommandServiceClient extends BaseGenieClient {
      * @param id The id of the command to delete the tags from.
      *           Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> removeAllTagsForCommand(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -614,20 +557,17 @@ public final class CommandServiceClient extends BaseGenieClient {
     /**
      * Remove tag from a given command.
      *
-     * @param id The id of the command to delete the tag from. Not
-     *           null/empty/blank.
+     * @param id  The id of the command to delete the tag from. Not
+     *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The tag for the command.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> removeTagForCommand(
             final String id,
             final String tag) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(

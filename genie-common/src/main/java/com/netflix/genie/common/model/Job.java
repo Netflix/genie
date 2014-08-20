@@ -20,12 +20,11 @@ package com.netflix.genie.common.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -403,11 +402,11 @@ public class Job extends CommonEntityFields {
     /**
      * Makes sure non-transient fields are set from transient fields.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @PrePersist
     @PreUpdate
-    protected void onCreateOrUpdateJob() throws GenieException {
+    protected void onCreateOrUpdateJob() throws GeniePreconditionException {
         this.validate(this.commandCriteria, this.commandArgs, this.clusterCriterias, null);
         this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
         this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
@@ -416,16 +415,15 @@ public class Job extends CommonEntityFields {
             this.tags = new HashSet<>();
         }
         this.tags.add(this.getId());
-        this.tags.add(this.getName());
     }
 
     /**
      * On any update to the entity will add id to tags.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @PostLoad
-    protected void onLoadJob() throws GenieException {
+    protected void onLoadJob() throws GeniePreconditionException {
         this.clusterCriterias = this.stringToClusterCriterias(this.clusterCriteriasString);
         this.commandCriteria = this.stringToCommandCriteria(this.commandCriteriaString);
     }
@@ -518,13 +516,11 @@ public class Job extends CommonEntityFields {
      * Sets the list of cluster criteria specified to pick a cluster.
      *
      * @param clusterCriterias The criteria list. Not null or empty.
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setClusterCriterias(final List<ClusterCriteria> clusterCriterias) throws GenieException {
+    public void setClusterCriterias(final List<ClusterCriteria> clusterCriterias) throws GeniePreconditionException {
         if (clusterCriterias == null || clusterCriterias.isEmpty()) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster criteria entered.");
+            throw new GeniePreconditionException("No cluster criteria entered.");
         }
         this.clusterCriterias = clusterCriterias;
         this.clusterCriteriasString = clusterCriteriasToString(clusterCriterias);
@@ -545,13 +541,11 @@ public class Job extends CommonEntityFields {
      *
      * @param commandArgs Arguments to be used to run the command with. Not
      *                    null/empty/blank.
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setCommandArgs(final String commandArgs) throws GenieException {
+    public void setCommandArgs(final String commandArgs) throws GeniePreconditionException {
         if (StringUtils.isBlank(commandArgs)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command args entered.");
+            throw new GeniePreconditionException("No command args entered.");
         }
         this.commandArgs = commandArgs;
     }
@@ -933,9 +927,9 @@ public class Job extends CommonEntityFields {
      * Set the cluster criteria string.
      *
      * @param clusterCriteriasString A list of cluster criteria objects
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    protected void setClusterCriteriasString(final String clusterCriteriasString) throws GenieException {
+    protected void setClusterCriteriasString(final String clusterCriteriasString) throws GeniePreconditionException {
         this.clusterCriteriasString = clusterCriteriasString;
         this.clusterCriterias = stringToClusterCriterias(clusterCriteriasString);
     }
@@ -954,9 +948,9 @@ public class Job extends CommonEntityFields {
      * Sets the set of command criteria specified to pick a command.
      *
      * @param commandCriteria The criteria list
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setCommandCriteria(Set<String> commandCriteria) throws GenieException {
+    public void setCommandCriteria(Set<String> commandCriteria) throws GeniePreconditionException {
         this.commandCriteria = commandCriteria;
         this.commandCriteriaString = commandCriteriaToString(commandCriteria);
     }
@@ -974,9 +968,9 @@ public class Job extends CommonEntityFields {
      * Set the command criteria string.
      *
      * @param commandCriteriaString A set of command criteria tags
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setCommandCriteriaString(String commandCriteriaString) throws GenieException {
+    public void setCommandCriteriaString(String commandCriteriaString) throws GeniePreconditionException {
         this.commandCriteriaString = commandCriteriaString;
         this.commandCriteria = stringToCommandCriteria(commandCriteriaString);
     }
@@ -1072,14 +1066,14 @@ public class Job extends CommonEntityFields {
     /**
      * Check to make sure that the required parameters exist.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Override
-    public void validate() throws GenieException {
+    public void validate() throws GeniePreconditionException {
         String error = null;
         try {
             super.validate();
-        } catch (final GenieException ge) {
+        } catch (final GeniePreconditionException ge) {
             error = ge.getMessage();
         }
         this.validate(
@@ -1095,13 +1089,14 @@ public class Job extends CommonEntityFields {
      * @param commandCriteria The criteria for the command..
      * @param commandArgs     The command line arguments for the job
      * @param criteria        The cluster criteria for the job
-     * @throws GenieException
+     * @param error           Any pre-existing error.
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     private void validate(
             final Set<String> commandCriteria,
             final String commandArgs,
             final List<ClusterCriteria> criteria,
-            final String error) throws GenieException {
+            final String error) throws GeniePreconditionException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotBlank(error)) {
             builder.append(error);
@@ -1121,7 +1116,7 @@ public class Job extends CommonEntityFields {
             builder.insert(0, "Job configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException(msg);
         }
     }
 
@@ -1164,14 +1159,12 @@ public class Job extends CommonEntityFields {
      *
      * @param criteriaString The string to convert
      * @return The set of ClusterCriteria
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    protected Set<String> stringToCommandCriteria(final String criteriaString) throws GenieException {
+    protected Set<String> stringToCommandCriteria(final String criteriaString) throws GeniePreconditionException {
         final String[] criterias = StringUtils.split(criteriaString, CRITERIA_DELIMITER);
         if (criterias == null || criterias.length == 0) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command criteria found. Unable to continue.");
+            throw new GeniePreconditionException("No command criteria found. Unable to continue.");
         }
         final Set<String> c = new HashSet<>();
         c.addAll(Arrays.asList(criterias));
@@ -1183,15 +1176,14 @@ public class Job extends CommonEntityFields {
      *
      * @param criteriaString The string to convert
      * @return The set of ClusterCriteria
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    protected List<ClusterCriteria> stringToClusterCriterias(final String criteriaString) throws GenieException {
+    protected List<ClusterCriteria> stringToClusterCriterias(final String criteriaString)
+            throws GeniePreconditionException {
         //Rebuild the cluster criteria objects
         final String[] criteriaSets = StringUtils.split(criteriaString, CRITERIA_SET_DELIMITER);
         if (criteriaSets == null || criteriaSets.length == 0) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster criteria found. Unable to continue.");
+            throw new GeniePreconditionException("No cluster criteria found. Unable to continue.");
         }
         final List<ClusterCriteria> cc = new ArrayList<>();
         for (final String criteriaSet : criteriaSets) {
@@ -1204,9 +1196,7 @@ public class Job extends CommonEntityFields {
             cc.add(new ClusterCriteria(c));
         }
         if (cc.isEmpty()) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No Cluster Criteria found. Unable to continue");
+            throw new GeniePreconditionException("No Cluster Criteria found. Unable to continue");
         }
         return cc;
     }

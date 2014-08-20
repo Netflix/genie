@@ -24,6 +24,8 @@ import com.netflix.client.ClientException;
 import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpResponse;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
@@ -83,7 +85,7 @@ public class TestBaseGenieClient {
     /**
      * Setup variables to use in the tests.
      *
-     * @throws IOException
+     * @throws IOException during mock creation.
      */
     @Before
     public void setup() throws IOException {
@@ -109,7 +111,7 @@ public class TestBaseGenieClient {
     /**
      * Test the default constructor behavior.
      *
-     * @throws IOException
+     * @throws IOException during creation.
      */
     @Test
     public void testConstructorNoParam() throws IOException {
@@ -128,9 +130,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure http request is never sent if no return type is entered.
      *
-     * @throws GenieException
+     * @throws GenieException Random issues.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testExecuteRequestNoReturnTypeEntered() throws GenieException {
         this.client.executeRequest(this.request, null, null);
     }
@@ -138,9 +140,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure http request is never sent if no entity class is entered along with a collection.
      *
-     * @throws GenieException
+     * @throws GenieException Random issues.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testExecuteRequestNoEntityClassEnteredForCollection() throws GenieException {
         this.client.executeRequest(this.request, Set.class, null);
     }
@@ -148,9 +150,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure http request is never sent if no http request is entered.
      *
-     * @throws GenieException
+     * @throws GenieException Random issues.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testExecuteRequestNoRequestEntered() throws GenieException {
         this.client.executeRequest(null, Set.class, String.class);
     }
@@ -158,11 +160,12 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure if response is null a genie exception is thrown not a NPE.
      *
-     * @throws GenieException
-     * @throws ClientException
+     * @throws GenieException  Random issues.
+     * @throws ClientException Some http request failed.
      */
-    @Test(expected = GenieException.class)
-    public void testExecuteRequestNoResponseReturned() throws GenieException, ClientException {
+    @Test(expected = GenieServerException.class)
+    public void testExecuteRequestNoResponseReturned()
+            throws GenieException, ClientException {
         Mockito.when(this.restClient.executeWithLoadBalancer(this.request)).thenReturn(null);
         this.client.executeRequest(this.request, Set.class, String.class);
     }
@@ -184,9 +187,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure if response is successful entity is returned.
      *
-     * @throws GenieException
-     * @throws ClientException
-     * @throws IOException
+     * @throws GenieException  Random issues.
+     * @throws ClientException A http client.
+     * @throws IOException     IOException.
      */
     @Test
     public void testExecuteRequestSuccessSingleEntity()
@@ -217,9 +220,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure if response is successful collection is returned.
      *
-     * @throws GenieException
-     * @throws ClientException
-     * @throws IOException
+     * @throws GenieException             Random issues.
+     * @throws ClientException            A http client.
+     * @throws IOException                IOException.
      */
     @Test
     public void testExecuteRequestSuccessCollection()
@@ -269,9 +272,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure when you build a request and pass in null for the verb it doesn't work.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testBuildRequestNoVerb() throws GenieException {
         BaseGenieClient.buildRequest(null, "blah", null, null);
     }
@@ -279,9 +282,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure when you build a request and don't pass in entity with post it fails.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testBuildRequestNullEntityForPost() throws GenieException {
         BaseGenieClient.buildRequest(HttpRequest.Verb.POST, null, null, null);
     }
@@ -289,9 +292,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure when you build a request and don't pass in entity with post it fails.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testBuildRequestNullEntityForPut() throws GenieException {
         BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, null, null, null);
     }
@@ -299,9 +302,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure when you build a request and don't pass URI it fails.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testBuildRequestNullRequestUri() throws GenieException {
         BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, null, null, new Job());
     }
@@ -309,9 +312,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure when you build a request and don't pass URI it fails.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testBuildRequestEmptyRequestUri() throws GenieException {
         BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, "", null, new Job());
     }
@@ -319,9 +322,9 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure when you build a request and don't pass URI it fails.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testBuildRequestBlankRequestUri() throws GenieException {
         BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, "   ", null, new Job());
     }
@@ -329,7 +332,7 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure when you send a bad URI.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
     @Test(expected = GenieException.class)
     public void testBuildRequestBadUri() throws GenieException {
@@ -339,7 +342,7 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure builds a valid post request.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
     @Test
     public void testBuildRequestValidPost() throws GenieException {
@@ -361,7 +364,7 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure builds a valid get request with no query parameters.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
     @Test
     public void testBuildRequestValidGetEmptyQueryParams() throws GenieException {
@@ -383,7 +386,7 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure builds a valid get request with no query parameters.
      *
-     * @throws GenieException
+     * @throws GenieException On any error.
      */
     @Test
     public void testBuildRequestValidGetWithSomeQueryParams() throws GenieException {

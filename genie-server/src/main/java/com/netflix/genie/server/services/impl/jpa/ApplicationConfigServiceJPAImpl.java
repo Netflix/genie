@@ -17,7 +17,11 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Command;
@@ -26,7 +30,6 @@ import com.netflix.genie.server.repository.jpa.ApplicationSpecs;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import org.springframework.data.domain.Sort.Direction;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,8 +74,6 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -80,16 +81,12 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
             //Messages will be logged by exception mapper at resource level
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No id entered. Unable to get");
+            throw new GeniePreconditionException("No id entered. Unable to get");
         }
         LOG.debug("Called with id " + id);
         final Application app = this.applicationRepo.findOne(id);
         if (app == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id);
+            throw new GenieNotFoundException("No application with id " + id);
         }
 
         return app;
@@ -124,57 +121,41 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Application createApplication(
             final Application app) throws GenieException {
         if (app == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application entered to create.");
+            throw new GeniePreconditionException("No application entered to create.");
         }
         app.validate();
 
         LOG.debug("Called with application: " + app.toString());
         if (app.getId() != null && this.applicationRepo.exists(app.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_CONFLICT,
-                    "An application with id " + app.getId() + " already exists");
+            throw new GenieConflictException("An application with id " + app.getId() + " already exists");
         }
         return this.applicationRepo.save(app);
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Application updateApplication(
             final String id,
             final Application updateApp) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id entered. Unable to update.");
+            throw new GeniePreconditionException("No application id entered. Unable to update.");
         }
         if (updateApp == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application information entered. Unable to update.");
+            throw new GeniePreconditionException("No application information entered. Unable to update.");
         }
         if (!this.applicationRepo.exists(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application information entered. Unable to update.");
+            throw new GenieNotFoundException("No application information entered. Unable to update.");
         }
         if (StringUtils.isNotBlank(updateApp.getId())
                 && !id.equals(updateApp.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Application id either not entered or inconsistent with id passed in.");
+            throw new GenieBadRequestException("Application id either not entered or inconsistent with id passed in.");
         }
 
         //Set the id if it's not set so we can merge
@@ -189,8 +170,6 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public List<Application> deleteAllApplications() throws GenieException {
@@ -205,23 +184,17 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Application deleteApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id entered. Unable to delete.");
+            throw new GeniePreconditionException("No application id entered. Unable to delete.");
         }
         LOG.debug("Called with id " + id);
         final Application app = this.applicationRepo.findOne(id);
         if (app == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
 
         if (app.getCommands() != null) {
@@ -237,120 +210,90 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> addConfigsToApplication(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id entered. Unable to add configurations.");
+            throw new GeniePreconditionException("No application id entered. Unable to add configurations.");
         }
         if (configs == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No configuration files entered.");
+            throw new GeniePreconditionException("No configuration files entered.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.getConfigs().addAll(configs);
             return app.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> updateConfigsForApplication(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to update configurations.");
+            throw new GeniePreconditionException("No application id entered. Unable to update configurations.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.setConfigs(configs);
             return app.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to get configs.");
+            throw new GeniePreconditionException("No application id entered. Unable to get configs.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             return app.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeAllConfigsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to remove jars.");
+            throw new GeniePreconditionException("No application id entered. Unable to remove jars.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.getConfigs().clear();
             return app.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeConfigForApplication(
             final String id,
             final String config) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to remove configuration.");
+            throw new GeniePreconditionException("No application id entered. Unable to remove configuration.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
@@ -359,46 +302,34 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             }
             return app.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> addJarsForApplication(
             final String id,
             final Set<String> jars) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to add jar.");
+            throw new GeniePreconditionException("No application id entered. Unable to add jar.");
         }
         if (jars == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No jar entered. Unable to add jars.");
+            throw new GeniePreconditionException("No jar entered. Unable to add jars.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.getJars().addAll(jars);
             return app.getJars();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -406,82 +337,62 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     public Set<String> getJarsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to get jars.");
+            throw new GeniePreconditionException("No application id entered. Unable to get jars.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             return app.getJars();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> updateJarsForApplication(
             final String id,
             final Set<String> jars) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to update jars.");
+            throw new GeniePreconditionException("No application id entered. Unable to update jars.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.setJars(jars);
             return app.getJars();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeAllJarsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to remove jars.");
+            throw new GeniePreconditionException("No application id entered. Unable to remove jars.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.getJars().clear();
             return app.getJars();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeJarForApplication(
             final String id,
             final String jar) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to remove jar.");
+            throw new GeniePreconditionException("No application id entered. Unable to remove jar.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
@@ -490,46 +401,34 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             }
             return app.getJars();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> addTagsForApplication(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id entered. Unable to add tags.");
+            throw new GeniePreconditionException("No application id entered. Unable to add tags.");
         }
         if (tags == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No tags entered.");
+            throw new GeniePreconditionException("No tags entered.");
         }
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             application.getTags().addAll(tags);
             return application.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -538,123 +437,93 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             throws GenieException {
 
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id sent. Cannot retrieve tags.");
+            throw new GeniePreconditionException("No application id sent. Cannot retrieve tags.");
         }
 
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             return application.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> updateTagsForApplication(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id entered. Unable to update tags.");
+            throw new GeniePreconditionException("No application id entered. Unable to update tags.");
         }
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             application.setTags(tags);
             return application.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeAllTagsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id entered. Unable to remove tags.");
+            throw new GeniePreconditionException("No application id entered. Unable to remove tags.");
         }
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             application.getTags().clear();
             return application.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeTagForApplication(final String id, final String tag)
             throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No application id entered. Unable to remove tag.");
+            throw new GeniePreconditionException("No application id entered. Unable to remove tag.");
         }
 
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             if (id.equals(tag)) {
-                throw new GenieException(
-                        HttpURLConnection.HTTP_PRECON_FAILED,
-                        "Cannot delete application id from the tags list.");
+                throw new GeniePreconditionException("Cannot delete application id from the tags list.");
             }
             if (StringUtils.isNotBlank(tag)) {
                 application.getTags().remove(tag);
             }
             return application.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Set<Command> getCommandsForApplication(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "No application id entered. Unable to get commands.");
+            throw new GeniePreconditionException("No application id entered. Unable to get commands.");
         }
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             return app.getCommands();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No application with id " + id + " exists.");
+            throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
     }
 }

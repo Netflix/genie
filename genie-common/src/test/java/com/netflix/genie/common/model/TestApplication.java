@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,10 +63,10 @@ public class TestApplication {
     /**
      * Test the argument Constructor.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testConstructor() throws GenieException {
+    public void testConstructor() throws GeniePreconditionException {
         this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
         Assert.assertNull(this.a.getCommands());
         Assert.assertNull(this.a.getConfigs());
@@ -81,10 +81,10 @@ public class TestApplication {
     /**
      * Test to make sure validation works.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateApplication() throws GenieException {
+    public void testOnCreateOrUpdateApplication() throws GeniePreconditionException {
         this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
         this.a.onCreateOrUpdateApplication();
     }
@@ -92,10 +92,10 @@ public class TestApplication {
     /**
      * Test to make sure validation works and throws exception when no status entered.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testOnCreateOrUpdateApplicationNoStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testOnCreateOrUpdateApplicationNoStatus() throws GeniePreconditionException {
         this.a = new Application(NAME, USER, null, VERSION);
         this.a.onCreateOrUpdateApplication();
     }
@@ -103,11 +103,22 @@ public class TestApplication {
     /**
      * Make sure validation works on valid apps.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GenieException {
+    public void testValidate() throws GeniePreconditionException {
         this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
+        this.a.validate();
+    }
+
+    /**
+     * Make sure validation works on with failure from super class.
+     *
+     * @throws GeniePreconditionException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateSuperFail() throws GeniePreconditionException {
+        this.a = new Application(null, USER, ApplicationStatus.ACTIVE, VERSION);
         this.a.validate();
     }
 

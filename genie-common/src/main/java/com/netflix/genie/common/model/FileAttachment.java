@@ -17,11 +17,10 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.net.HttpURLConnection;
 import java.util.Arrays;
 
 /**
@@ -56,15 +55,12 @@ public class FileAttachment implements Serializable {
     /**
      * Set the name of the file for this attachment.
      *
-     * @param name name of the file for this attachment
-     * @throws GenieException
+     * @param name name of the file for this attachment. Not null/empty/blank.
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setName(final String name) throws GenieException {
+    public void setName(final String name) throws GeniePreconditionException {
         if (StringUtils.isBlank(name)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No name entered for attachment. Unable to continue."
-            );
+            throw new GeniePreconditionException("No name entered for attachment. Unable to continue.");
         }
         this.name = name;
     }
@@ -86,14 +82,11 @@ public class FileAttachment implements Serializable {
      * Set the data for the attachment.
      *
      * @param data the data for the attachment. Not null or empty.
-     * @throws GenieException
+     * @throws GeniePreconditionException If preconditions aren't met.
      */
-    public void setData(final byte[] data) throws GenieException {
+    public void setData(final byte[] data) throws GeniePreconditionException {
         if (data == null || data.length == 0) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No data entered for attachment. Unable to continue."
-            );
+            throw new GeniePreconditionException("No data entered for attachment. Unable to continue.");
         }
         this.data = Arrays.copyOf(data, data.length);
     }

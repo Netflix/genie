@@ -22,17 +22,15 @@ import com.netflix.client.http.HttpRequest;
 import com.netflix.client.http.HttpRequest.Verb;
 import com.netflix.genie.common.client.BaseGenieClient;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Singleton class, which acts as the client library for the Cluster
@@ -42,11 +40,8 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  * @author amsharma
  */
-// TODO: Can probably templetize the clients or part of them
+// TODO: Can probably templatize the clients or part of them
 public final class ClusterServiceClient extends BaseGenieClient {
-
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ClusterServiceClient.class);
 
     private static final String BASE_CONFIG_CLUSTER_REST_URL
             = BASE_REST_URL + "config/clusters";
@@ -83,13 +78,12 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param cluster the object encapsulating the new Cluster configuration to
      *                create
      * @return extracted cluster configuration response
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Cluster createCluster(final Cluster cluster)
             throws GenieException {
         if (cluster == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
+            throw new GeniePreconditionException(
                     "No cluster entered. Unable to validate.");
         }
         cluster.validate();
@@ -108,17 +102,14 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param cluster the object encapsulating the new Cluster configuration to
      *                create
      * @return extracted cluster configuration response
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Cluster updateCluster(
             final String id,
             final Cluster cluster)
             throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Required parameter id can't be null or empty.";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Required parameter id can't be null or empty.");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -136,13 +127,11 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *
      * @param id the cluster configuration id to get (can't be null or empty)
      * @return the cluster configuration for this id
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Cluster getCluster(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -159,11 +148,10 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Gets a set of cluster configurations for the given parameters.
      *
      * @param params key/value pairs in a map object.<br>
-     *               <p></p>
      *               More details on the parameters can be found on the Genie User Guide on
      *               GitHub.
      * @return List of cluster configuration elements that match the filter
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Cluster> getClusters(final Multimap<String, String> params)
             throws GenieException {
@@ -182,7 +170,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * Delete all the clusters in the database.
      *
      * @return the should be empty set.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Cluster> deleteAllClusters() throws GenieException {
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -201,13 +189,11 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *
      * @param id the id for the cluster cluster to delete
      * @return the deleted cluster cluster
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Cluster deleteCluster(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -227,20 +213,16 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *                Null/empty/blank.
      * @param configs The configuration files to add. Not null or empty.
      * @return The new set of configuration files for the given command.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> addConfigsToCluster(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (configs == null || configs.isEmpty()) {
-            final String msg = "Missing required parameter: configs";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: configs");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -262,13 +244,11 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to get configurations for. Not
      *           Null/empty/blank.
      * @return The set of configuration files for the given cluster.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> getConfigsForCluster(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -292,22 +272,16 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param configs The configuration files to replace existing configuration
      *                files with. Not null.
      * @return The new set of cluster configurations.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> updateConfigsForCluster(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (configs == null) {
-            final String msg = "Missing required parameter: configs";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: configs");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -330,20 +304,16 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *                 Null/empty/blank.
      * @param commands The commands to add. Not null or empty.
      * @return The new list of commands for the given cluster.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Command> addCommandsToCluster(
             final String id,
             final List<Command> commands) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (commands == null || commands.isEmpty()) {
-            final String msg = "Missing required parameter: commands";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: commands");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -365,14 +335,11 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to get commands for. Not
      *           Null/empty/blank.
      * @return The list of command files for the given cluster.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Command> getCommandsForCluster(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -396,22 +363,16 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param commands The commands to replace existing command
      *                 files with. Not null.
      * @return The new list of cluster commands.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Command> updateCommandsForCluster(
             final String id,
             final List<Command> commands) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (commands == null) {
-            final String msg = "Missing required parameter: commands";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: commands");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -433,15 +394,12 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to delete the commands from. Not
      *           null/empty/blank.
      * @return Empty list if successful
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public List<Command> removeAllCommandsForCluster(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -464,22 +422,16 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *              null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
      * @return The active set of commands for the cluster.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<Command> removeCommandForCluster(
             final String id,
             final String cmdId) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (StringUtils.isBlank(cmdId)) {
-            final String msg = "Missing required parameter: cmdId";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: cmdId");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -502,20 +454,16 @@ public final class ClusterServiceClient extends BaseGenieClient {
      *             Null/empty/blank.
      * @param tags The tags to add. Not null or empty.
      * @return The new set of tags for the given cluster.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> addTagsToCluster(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (tags == null || tags.isEmpty()) {
-            final String msg = "Missing required parameter: tags";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: tags");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -537,13 +485,11 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to get tags for. Not
      *           Null/empty/blank.
      * @return The set of tags for the given cluster.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> getTagsForCluster(final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -567,22 +513,16 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param tags The tags to replace existing tag
      *             files with. Not null.
      * @return The new set of cluster tags.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> updateTagsForCluster(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
         if (tags == null) {
-            final String msg = "Missing required parameter: tags";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: tags");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -604,15 +544,12 @@ public final class ClusterServiceClient extends BaseGenieClient {
      * @param id The id of the cluster to delete the tags from.
      *           Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> removeAllTagsForCluster(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(
@@ -631,20 +568,17 @@ public final class ClusterServiceClient extends BaseGenieClient {
     /**
      * Remove tag from a given cluster.
      *
-     * @param id The id of the cluster to delete the tag from. Not
-     *           null/empty/blank.
+     * @param id  The id of the cluster to delete the tag from. Not
+     *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The tag for the cluster.
-     * @throws GenieException
+     * @throws GenieException For any other error.
      */
     public Set<String> removeTagForCluster(
             final String id,
             final String tag) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            final String msg = "Missing required parameter: id";
-            LOG.error(msg);
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         final HttpRequest request = BaseGenieClient.buildRequest(

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,10 +33,10 @@ public class TestClusterCriteria {
     /**
      * Make sure the constructors create sets properly.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testConstructors() throws GenieException {
+    public void testConstructors() throws GeniePreconditionException {
         ClusterCriteria cc = new ClusterCriteria();
         Assert.assertNotNull(cc.getTags());
 
@@ -49,10 +49,10 @@ public class TestClusterCriteria {
     /**
      * Test to make sure constructor throws exception on bad inputs.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testNullTagsConstructor() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testNullTagsConstructor() throws GeniePreconditionException {
         ClusterCriteria cc = new ClusterCriteria(null);
         cc.getTags();
     }
@@ -60,10 +60,10 @@ public class TestClusterCriteria {
     /**
      * Test to make sure constructor throws exception on bad inputs.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testEmptyTagsConstructor() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testEmptyTagsConstructor() throws GeniePreconditionException {
         final Set<String> tags = new HashSet<>();
         ClusterCriteria cc = new ClusterCriteria(tags);
         cc.getTags();
@@ -72,10 +72,10 @@ public class TestClusterCriteria {
     /**
      * Test to make sure setter saves the proper set.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testTagsSetter() throws GenieException {
+    public void testTagsSetter() throws GeniePreconditionException {
         final ClusterCriteria cc = new ClusterCriteria();
         final Set<String> tags = new HashSet<>();
         tags.add("tag1");
@@ -88,10 +88,10 @@ public class TestClusterCriteria {
     /**
      * Test to make sure set throws exception on bad inputs.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testNullTagsSetter() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testNullTagsSetter() throws GeniePreconditionException {
         final ClusterCriteria cc = new ClusterCriteria();
         cc.setTags(null);
     }
@@ -99,10 +99,10 @@ public class TestClusterCriteria {
     /**
      * Test to make sure set throws exception on bad inputs.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testEmptyTagsSetter() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testEmptyTagsSetter() throws GeniePreconditionException {
         final Set<String> tags = new HashSet<>();
         final ClusterCriteria cc = new ClusterCriteria();
         cc.setTags(tags);

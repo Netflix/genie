@@ -34,21 +34,21 @@ public interface JobManager {
      *
      * @param job The job this manager will be managing.
      * @param cluster The cluster this job will run on.
-     * @throws GenieException
+     * @throws GenieException On issue
      */
     void init(final Job job, final Cluster cluster) throws GenieException;
 
     /**
      * Launch the job.
      *
-     * @throws GenieException
+     * @throws GenieException On issue
      */
     void launch() throws GenieException;
 
     /**
      * Kill a job using the job information - no need to initialize this job.
      *
-     * @throws GenieException
+     * @throws GenieException On issue
      */
     void kill() throws GenieException;
 }

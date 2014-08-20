@@ -36,7 +36,7 @@ public interface ExecutionService {
      *
      * @param job the job to submit
      * @return The job that was submitted
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Job submitJob(final Job job) throws GenieException;
 
@@ -45,7 +45,7 @@ public interface ExecutionService {
      *
      * @param id id for job to kill
      * @return The killed job
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     Job killJob(final String id) throws GenieException;
 
@@ -60,10 +60,10 @@ public interface ExecutionService {
     /**
      * Finalize the status of a job.
      *
-     * @param id The id of the job to finalize.
+     * @param id       The id of the job to finalize.
      * @param exitCode The exit code of the job process.
      * @return The job status.
-     * @throws GenieException
+     * @throws GenieException if there is an error
      */
     JobStatus finalizeJob(final String id, final int exitCode) throws GenieException;
 }

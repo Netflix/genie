@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +29,6 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import java.net.HttpURLConnection;
 
 /**
  * The common entity fields for all Genie entities.
@@ -98,11 +97,11 @@ public class CommonEntityFields extends Auditable {
     /**
      * Before modifying database make sure everything is ok.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @PrePersist
     @PreUpdate
-    protected void onCreateOrUpdateCommonEntityFields() throws GenieException {
+    protected void onCreateOrUpdateCommonEntityFields() throws GeniePreconditionException {
         this.validate(this.name, this.user, this.version, null);
     }
 
@@ -165,11 +164,11 @@ public class CommonEntityFields extends Auditable {
      * {@inheritDoc}
      */
     @Override
-    public void validate() throws GenieException {
+    public void validate() throws GeniePreconditionException {
         String error = null;
         try {
             super.validate();
-        } catch (final GenieException ge) {
+        } catch (final GeniePreconditionException ge) {
             error = ge.getMessage();
         }
         this.validate(this.name, this.user, this.version, error);
@@ -180,13 +179,13 @@ public class CommonEntityFields extends Auditable {
      *
      * @param name The name of the application
      * @param user The user who created the application
-     * @throws GenieException
+     * @throws GeniePreconditionException
      */
     private void validate(
             final String name,
             final String user,
             final String version,
-            final String error) throws GenieException {
+            final String error) throws GeniePreconditionException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotBlank(error)) {
             builder.append(error);
@@ -204,7 +203,7 @@ public class CommonEntityFields extends Auditable {
             builder.insert(0, "CommonEntityFields configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException(msg);
         }
     }
 }

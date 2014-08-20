@@ -17,11 +17,10 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.StringUtils;
 
-import java.net.HttpURLConnection;
 
 /**
  * Possible statuses for a Job.
@@ -57,9 +56,9 @@ public enum JobStatus {
      *
      * @param value string to parse/convert
      * @return INIT, RUNNING, SUCCEEDED, KILLED, FAILED if match
-     * @throws GenieException if invalid value passed in
+     * @throws GeniePreconditionException if invalid value passed in
      */
-    public static JobStatus parse(final String value) throws GenieException {
+    public static JobStatus parse(final String value) throws GeniePreconditionException {
         if (StringUtils.isNotBlank(value)) {
             for (final JobStatus status : JobStatus.values()) {
                 if (value.equalsIgnoreCase(status.toString())) {
@@ -67,7 +66,7 @@ public enum JobStatus {
                 }
             }
         }
-        throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+        throw new GeniePreconditionException(
                 "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed}");
     }
 }

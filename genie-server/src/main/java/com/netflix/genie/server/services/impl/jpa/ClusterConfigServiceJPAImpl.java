@@ -17,7 +17,11 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
 
@@ -33,7 +37,6 @@ import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
 import org.springframework.data.domain.Sort.Direction;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -89,15 +92,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Cluster createCluster(final Cluster cluster) throws GenieException {
         if (cluster == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster entered. Unable to validate.");
+            throw new GeniePreconditionException("No cluster entered. Unable to validate.");
         }
         cluster.validate();
 
@@ -106,9 +105,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             cluster.setId(UUID.randomUUID().toString());
         }
         if (this.clusterRepo.exists(cluster.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_CONFLICT,
-                    "A cluster with id " + cluster.getId() + " already exists");
+            throw new GenieConflictException("A cluster with id " + cluster.getId() + " already exists");
         }
 
         return this.clusterRepo.save(cluster);
@@ -116,25 +113,19 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public Cluster getCluster(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No id entered.");
+            throw new GeniePreconditionException("No id entered.");
         }
         LOG.debug("Called with id " + id);
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             return cluster;
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
@@ -175,8 +166,6 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -184,16 +173,12 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final String jobId) throws GenieException {
         LOG.debug("Called");
         if (StringUtils.isBlank(jobId)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No job id entered. Unable to continue"
+            throw new GeniePreconditionException("No job id entered. Unable to continue"
             );
         }
         final Job job = this.jobRepo.findOne(jobId);
         if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No job with id " + jobId + " exists. Unable to continue."
+            throw new GenieNotFoundException("No job with id " + jobId + " exists. Unable to continue."
             );
         }
 
@@ -227,8 +212,6 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Cluster updateCluster(
@@ -236,25 +219,17 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final Cluster updateCluster) throws GenieException {
         LOG.debug("Called with id " + id + " and cluster " + updateCluster);
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to update.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to update.");
         }
         if (updateCluster == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster information entered. Unable to update.");
+            throw new GeniePreconditionException("No cluster information entered. Unable to update.");
         }
         if (!this.clusterRepo.exists(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster exists with the given id. Unable to update.");
+            throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
         if (StringUtils.isNotBlank(updateCluster.getId())
                 && !id.equals(updateCluster.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Cluster id inconsistent with id passed in.");
+            throw new GenieBadRequestException("Cluster id inconsistent with id passed in.");
         }
 
         //Set the id if it's not set so we can merge
@@ -268,22 +243,16 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Cluster deleteCluster(final String id) throws GenieException {
         if (StringUtils.isEmpty(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No id entered unable to delete.");
+            throw new GeniePreconditionException("No id entered unable to delete.");
         }
         LOG.debug("Called");
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists to delete.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists to delete.");
         }
         final List<Command> commands = cluster.getCommands();
         if (commands != null) {
@@ -300,8 +269,6 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public List<Cluster> deleteAllClusters() throws GenieException {
@@ -315,38 +282,28 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> addConfigsForCluster(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to add configurations.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to add configurations.");
         }
         if (configs == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No configuration files entered.");
+            throw new GeniePreconditionException("No configuration files entered.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getConfigs().addAll(configs);
             return cluster.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -355,64 +312,48 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             throws GenieException {
 
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id sent. Cannot retrieve configurations.");
+            throw new GeniePreconditionException("No cluster id sent. Cannot retrieve configurations.");
         }
 
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             return cluster.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> updateConfigsForCluster(
             final String id,
             final Set<String> configs) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to update configurations.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to update configurations.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.setConfigs(configs);
             return cluster.getConfigs();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public List<Command> addCommandsForCluster(
             final String id,
             final List<Command> commands) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to add commands.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to add commands.");
         }
         if (commands == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No commands entered. Unable to add commands.");
+            throw new GeniePreconditionException("No commands entered. Unable to add commands.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
@@ -421,47 +362,35 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 if (cmd != null) {
                     cluster.addCommand(cmd);
                 } else {
-                    throw new GenieException(
-                            HttpURLConnection.HTTP_NOT_FOUND,
-                            "No command with id " + detached.getId() + " exists.");
+                    throw new GenieNotFoundException("No command with id " + detached.getId() + " exists.");
                 }
             }
             return cluster.getCommands();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
     public List<Command> getCommandsForCluster(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to get commands.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to get commands.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             return cluster.getCommands();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     //TODO: Shares a lot of code with the add, should be able to refactor
@@ -469,14 +398,10 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final String id,
             final List<Command> commands) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to update commands.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to update commands.");
         }
         if (commands == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No commands entered. Unable to add commands.");
+            throw new GeniePreconditionException("No commands entered. Unable to add commands.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
@@ -486,32 +411,24 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 if (cmd != null) {
                     cmds.add(cmd);
                 } else {
-                    throw new GenieException(
-                            HttpURLConnection.HTTP_NOT_FOUND,
-                            "No command with id " + detached.getId() + " exists.");
+                    throw new GenieNotFoundException("No command with id " + detached.getId() + " exists.");
                 }
             }
             cluster.setCommands(cmds);
             return cluster.getCommands();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public List<Command> removeAllCommandsForCluster(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to remove commands.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to remove commands.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
@@ -522,30 +439,22 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             }
             return cluster.getCommands();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public List<Command> removeCommandForCluster(
             final String id,
             final String cmdId) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to remove command.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to remove command.");
         }
         if (StringUtils.isBlank(cmdId)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No command id entered. Unable to remove command.");
+            throw new GeniePreconditionException("No command id entered. Unable to remove command.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
@@ -553,52 +462,38 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             if (cmd != null) {
                 cluster.removeCommand(cmd);
             } else {
-                throw new GenieException(
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        "No command with id " + cmdId + " exists.");
+                throw new GenieNotFoundException("No command with id " + cmdId + " exists.");
             }
             return cluster.getCommands();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> addTagsForCluster(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to add tags.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to add tags.");
         }
         if (tags == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No tags entered.");
+            throw new GeniePreconditionException("No tags entered.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getTags().addAll(tags);
             return cluster.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     @Transactional(readOnly = true)
@@ -607,87 +502,65 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             throws GenieException {
 
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id sent. Cannot retrieve tags.");
+            throw new GeniePreconditionException("No cluster id sent. Cannot retrieve tags.");
         }
 
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             return cluster.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> updateTagsForCluster(
             final String id,
             final Set<String> tags) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to update tags.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to update tags.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.setTags(tags);
             return cluster.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeAllTagsForCluster(
             final String id) throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to remove tags.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to remove tags.");
         }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getTags().clear();
             return cluster.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws GenieException
      */
     @Override
     public Set<String> removeTagForCluster(final String id, final String tag)
             throws GenieException {
         if (StringUtils.isBlank(id)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No cluster id entered. Unable to remove tag.");
+            throw new GeniePreconditionException("No cluster id entered. Unable to remove tag.");
         }
         if (id.equals(tag)) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "Cannot delete cluster id from the tags list.");
+            throw new GeniePreconditionException("Cannot delete cluster id from the tags list.");
         }
 
         final Cluster cluster = this.clusterRepo.findOne(id);
@@ -697,9 +570,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             }
             return cluster.getTags();
         } else {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    "No cluster with id " + id + " exists.");
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
     }
 }

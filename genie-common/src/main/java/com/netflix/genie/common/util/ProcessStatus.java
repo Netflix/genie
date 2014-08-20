@@ -17,9 +17,7 @@
  */
 package com.netflix.genie.common.util;
 
-import com.netflix.genie.common.exceptions.GenieException;
-
-import java.net.HttpURLConnection;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 
 /**
  * Possible status values for jobs, and associated messages.
@@ -130,16 +128,16 @@ public enum ProcessStatus {
      *
      * @param exitCode The exit code to attempt to parse.
      * @return The corresponding ProcessStatus if one exists.
-     * @throws GenieException
+     * @throws GeniePreconditionException If the code isn't available.
      */
-    public static ProcessStatus parse(final int exitCode) throws GenieException {
+    public static ProcessStatus parse(final int exitCode) throws GeniePreconditionException {
         for (final ProcessStatus status : ProcessStatus.values()) {
             if (exitCode == status.exitCode) {
                 return status;
             }
         }
         // If we got to here no status exists for the error code. Throw exception.
-        throw new GenieException(HttpURLConnection.HTTP_NOT_ACCEPTABLE,
+        throw new GeniePreconditionException(
                 "No ProcessStatus found for code " + exitCode);
     }
 }

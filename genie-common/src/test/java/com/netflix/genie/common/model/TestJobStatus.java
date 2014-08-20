@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,10 +31,10 @@ public class TestJobStatus {
     /**
      * Tests whether a valid job status is parsed correctly.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidJobStatus() throws GenieException {
+    public void testValidJobStatus() throws GeniePreconditionException {
         Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()));
         Assert.assertEquals(JobStatus.FAILED, JobStatus.parse(JobStatus.FAILED.name().toLowerCase()));
         Assert.assertEquals(JobStatus.KILLED, JobStatus.parse(JobStatus.KILLED.name().toLowerCase()));
@@ -45,20 +45,20 @@ public class TestJobStatus {
     /**
      * Tests whether an invalid job status returns null.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testInvalidJobStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testInvalidJobStatus() throws GeniePreconditionException {
         JobStatus.parse("DOES_NOT_EXIST");
     }
 
     /**
      * Tests whether an invalid application status throws exception.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testBlankJobStatus() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testBlankJobStatus() throws GeniePreconditionException {
         JobStatus.parse(null);
     }
 }

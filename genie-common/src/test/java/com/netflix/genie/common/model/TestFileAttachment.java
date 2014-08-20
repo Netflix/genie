@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,10 +50,10 @@ public class TestFileAttachment {
     /**
      * Test the setter and getter for name.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetGetName() throws GenieException {
+    public void testSetGetName() throws GeniePreconditionException {
         Assert.assertNull(this.attachment.getName());
         this.attachment.setName(NAME);
         Assert.assertEquals(NAME, this.attachment.getName());
@@ -62,40 +62,40 @@ public class TestFileAttachment {
     /**
      * Test setting a bad name.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetNameNull() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetNameNull() throws GeniePreconditionException {
         this.attachment.setName(null);
     }
 
     /**
      * Test setting a bad name.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetNameEmpty() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetNameEmpty() throws GeniePreconditionException {
         this.attachment.setName("");
     }
 
     /**
      * Test setting a bad name.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetNameBlank() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetNameBlank() throws GeniePreconditionException {
         this.attachment.setName("   ");
     }
 
     /**
      * Test the setter and getter for data.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetGetData() throws GenieException {
+    public void testSetGetData() throws GeniePreconditionException {
         Assert.assertNull(this.attachment.getData());
         this.attachment.setData(DATA);
         Assert.assertTrue(Arrays.equals(DATA, attachment.getData()));
@@ -104,20 +104,20 @@ public class TestFileAttachment {
     /**
      * Test the setting bad data.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetDataNull() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetDataNull() throws GeniePreconditionException {
         this.attachment.setData(null);
     }
 
     /**
      * Test the setting bad data.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetDataEmpty() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetDataEmpty() throws GeniePreconditionException {
         this.attachment.setData(new byte[0]);
     }
 }

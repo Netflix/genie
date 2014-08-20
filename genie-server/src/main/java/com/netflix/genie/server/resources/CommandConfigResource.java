@@ -89,7 +89,7 @@ public class CommandConfigResource {
      *
      * @param command The command configuration to create
      * @return The command created
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -132,7 +132,7 @@ public class CommandConfigResource {
      *
      * @param id unique id for command configuration
      * @return The command configuration
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}")
@@ -225,7 +225,7 @@ public class CommandConfigResource {
      * @param id unique id for the configuration to update.
      * @param updateCommand the information to update the command with
      * @return The updated command
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @PUT
     @Path("/{id}")
@@ -269,7 +269,7 @@ public class CommandConfigResource {
      * Delete all applications from database.
      *
      * @return All The deleted comamnd
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @ApiOperation(
@@ -303,7 +303,7 @@ public class CommandConfigResource {
      *
      * @param id unique id for configuration to delete
      * @return The deleted configuration
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}")
@@ -344,7 +344,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this command.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Path("/{id}/configs")
@@ -390,7 +390,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the configuration files for. Not
      * NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/configs")
@@ -432,7 +432,7 @@ public class CommandConfigResource {
      * @param configs The configuration files to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of command configurations.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @PUT
     @Path("/{id}/configs")
@@ -478,7 +478,7 @@ public class CommandConfigResource {
      * @param id The id of the command to delete the configuration files from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/configs")
@@ -519,7 +519,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this command.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Path("/{id}/tags")
@@ -550,7 +550,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the tags for. Not
      * NULL/empty/blank.
      * @return The active set of tags.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/tags")
@@ -580,7 +580,7 @@ public class CommandConfigResource {
      * @param tags The tags to replace existing configuration
      * files with. Not null/empty/blank.
      * @return The new set of command tags.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @PUT
     @Path("/{id}/tags")
@@ -611,7 +611,7 @@ public class CommandConfigResource {
      * @param id The id of the command to delete the tags from.
      * Not null/empty/blank.
      * @return Empty set if successful
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/tags")
@@ -640,7 +640,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param application The application to set. Not null.
      * @return The active applications for this command.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @POST
     @Path("/{id}/application")
@@ -687,7 +687,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the application files for. Not
      * NULL/empty/blank.
      * @return The active application for the command.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/application")
@@ -727,7 +727,7 @@ public class CommandConfigResource {
      * @param id The id of the command to delete the application from. Not
      * null/empty/blank.
      * @return The active set of applications for the command.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/application")
@@ -767,7 +767,7 @@ public class CommandConfigResource {
      * @param id The id of the command to get the clusters for. Not
      * NULL/empty/blank.
      * @return The set of clusters.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @GET
     @Path("/{id}/clusters")
@@ -808,7 +808,7 @@ public class CommandConfigResource {
      * null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the command.
-     * @throws GenieException
+     * @throws GenieException For any error
      */
     @DELETE
     @Path("/{id}/tags/{tag}")

@@ -18,6 +18,7 @@
 package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.model.Job;
@@ -25,8 +26,8 @@ import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.services.ExecutionService;
+
 import java.io.File;
-import java.net.HttpURLConnection;
 import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -97,8 +98,8 @@ public class JobMonitorImpl implements JobMonitor {
     /**
      * Constructor.
      *
-     * @param xs The job execution service.
-     * @param jobservice The job service API's to use.
+     * @param xs                  The job execution service.
+     * @param jobservice          The job service API's to use.
      * @param genieNodeStatistics The statistics object to use
      */
     @Inject
@@ -118,24 +119,18 @@ public class JobMonitorImpl implements JobMonitor {
     }
 
     /**
-     * Set the job for this to monitor.
-     *
-     * @param job The job to monitor. Not null.
-     * @throws GenieException
+     * {@inheritDoc}
      */
     @Override
     public void setJob(final Job job) throws GenieException {
         if (job == null || StringUtils.isBlank(job.getId())) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, "No job entered.");
+            throw new GeniePreconditionException("No job entered.");
         }
         this.jobId = job.getId();
     }
 
     /**
-     * Set the working directory for this job.
-     *
-     * @param workingDir The working directory to use for this job
+     * {@inheritDoc}
      */
     @Override
     public void setWorkingDir(final String workingDir) {
@@ -146,31 +141,23 @@ public class JobMonitorImpl implements JobMonitor {
     }
 
     /**
-     * Set the process handle for this job.
-     *
-     * @param proc The process handle for the job. Not null.
-     * @throws GenieException
+     * {@inheritDoc}
      */
     @Override
     public void setProcess(final Process proc) throws GenieException {
         if (proc == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, "No process entered.");
+            throw new GeniePreconditionException("No process entered.");
         }
         this.proc = proc;
     }
 
     /**
-     * Set the job manager for this monitor to use.
-     *
-     * @param jobManager The job manager to use. Not Null.
-     * @throws GenieException
+     * {@inheritDoc}
      */
     @Override
     public void setJobManager(final JobManager jobManager) throws GenieException {
         if (jobManager == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_BAD_REQUEST, "No job manager entered.");
+            throw new GeniePreconditionException("No job manager entered.");
         }
         this.jobManager = jobManager;
     }
@@ -215,7 +202,7 @@ public class JobMonitorImpl implements JobMonitor {
     private boolean isRunning() {
         try {
             this.proc.exitValue();
-        } catch (IllegalThreadStateException e) {
+        } catch (final IllegalThreadStateException e) {
             return true;
         }
         return false;
@@ -240,14 +227,14 @@ public class JobMonitorImpl implements JobMonitor {
      * periodically (as RUNNING).
      *
      * @return exit code for the job after it finishes
-     * @throws GenieException
+     * @throws GenieException on issue
      */
     private int waitForExit() throws GenieException {
         this.lastUpdatedTimeMS = System.currentTimeMillis();
         while (isRunning()) {
             try {
                 Thread.sleep(JOB_WAIT_TIME_MS);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 LOG.error("Exception while waiting for job " + this.jobId
                         + " to finish", e);
                 // move on
@@ -287,7 +274,7 @@ public class JobMonitorImpl implements JobMonitor {
      * about Job Status.
      *
      * @return 0 for success, -1 for failure
-     * @throws GenieException
+     * @throws GenieException on issue
      */
     private boolean sendEmail(String emailTo, boolean killed) throws GenieException {
         LOG.debug("called");
@@ -392,7 +379,7 @@ public class JobMonitorImpl implements JobMonitor {
             Transport.send(message);
             LOG.info("Sent email message successfully....");
             return true;
-        } catch (MessagingException mex) {
+        } catch (final MessagingException mex) {
             LOG.error("Got exception while sending email", mex);
             return false;
         }

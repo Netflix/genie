@@ -18,11 +18,10 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
-import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -36,6 +35,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,18 +130,17 @@ public class Application extends CommonEntityFields {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any preconditions aren't met.
      */
     @PrePersist
     @PreUpdate
-    protected void onCreateOrUpdateApplication() throws GenieException {
-        this.validate(this.status);
+    protected void onCreateOrUpdateApplication() throws GeniePreconditionException {
+        this.validate(this.status, null);
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<>();
         }
         this.tags.add(this.getId());
-        this.tags.add(this.getName());
     }
 
     /**
@@ -261,20 +260,29 @@ public class Application extends CommonEntityFields {
      * {@inheritDoc}
      */
     @Override
-    public void validate() throws GenieException {
-        super.validate();
-        this.validate(this.getStatus());
+    public void validate() throws GeniePreconditionException {
+        String error = null;
+        try {
+            super.validate();
+        } catch (final GeniePreconditionException ge) {
+            error = ge.getMessage();
+        }
+        this.validate(this.getStatus(), error);
     }
 
     /**
      * Helper method for checking the validity of required parameters.
      *
      * @param status The status of the application
-     * @throws GenieException
+     * @param error Any pre-existing error condition
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     private void validate(
-            final ApplicationStatus status) throws GenieException {
+            final ApplicationStatus status, final String error) throws GeniePreconditionException {
         final StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotBlank(error)) {
+            builder.append(error);
+        }
         if (status == null) {
             builder.append("No application status entered and is required.\n");
         }
@@ -283,7 +291,7 @@ public class Application extends CommonEntityFields {
             builder.insert(0, "Application configuration errors:\n");
             final String msg = builder.toString();
             LOG.error(msg);
-            throw new GenieException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+            throw new GeniePreconditionException(msg);
         }
     }
 }

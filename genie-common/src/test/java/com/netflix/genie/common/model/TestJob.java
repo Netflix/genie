@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -75,10 +75,10 @@ public class TestJob {
     /**
      * Setup some variables for tests.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @BeforeClass
-    public static void setupClass() throws GenieException {
+    public static void setupClass() throws GeniePreconditionException {
         COMMAND_CRITERIA.add(COMMAND_CRITERIA_1);
         COMMAND_CRITERIA.add(COMMAND_CRITERIA_2);
 
@@ -160,10 +160,10 @@ public class TestJob {
      * Test the onCreateOrUpdateJob method which is called before saving
      * or updating.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateJob() throws GenieException {
+    public void testOnCreateOrUpdateJob() throws GeniePreconditionException {
         Assert.assertNull(this.job.getId());
         Assert.assertNull(this.job.getClusterCriteriasString());
         Assert.assertNull(this.job.getCommandCriteriaString());
@@ -175,17 +175,16 @@ public class TestJob {
         Assert.assertNotNull(this.job.getClusterCriteriasString());
         Assert.assertNotNull(this.job.getCommandCriteriaString());
         Assert.assertTrue(this.job.getTags().contains(this.job.getId()));
-        Assert.assertTrue(this.job.getTags().contains(NAME));
     }
 
     /**
      * Just test to make sure it doesn't try to do something weird
      * with tags.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateJobWithNotNullTags() throws GenieException {
+    public void testOnCreateOrUpdateJobWithNotNullTags() throws GeniePreconditionException {
         Assert.assertTrue(this.job.getTags().isEmpty());
         this.job.onCreateAuditable();
         this.job.onCreateOrUpdateCommonEntityFields();
@@ -195,16 +194,15 @@ public class TestJob {
         Assert.assertNotNull(this.job.getClusterCriteriasString());
         Assert.assertNotNull(this.job.getCommandCriteriaString());
         Assert.assertTrue(this.job.getTags().contains(this.job.getId()));
-        Assert.assertTrue(this.job.getTags().contains(NAME));
     }
 
     /**
      * Test to make sure the sets are recreated onLoad.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnLoadJob() throws GenieException {
+    public void testOnLoadJob() throws GeniePreconditionException {
         this.job.onCreateOrUpdateJob();
         final String clusterCriteriasString = this.job.getClusterCriteriasString();
         final String commandCriteriaString = this.job.getCommandCriteriaString();
@@ -263,10 +261,10 @@ public class TestJob {
     /**
      * Test setting and getting the clusterCriterias.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetGetClusterCriterias() throws GenieException {
+    public void testSetGetClusterCriterias() throws GeniePreconditionException {
         final Job localJob = new Job(); //Use default constructor so null
         Assert.assertNull(localJob.getClusterCriterias());
         Assert.assertNull(localJob.getClusterCriteriasString());
@@ -278,30 +276,30 @@ public class TestJob {
     /**
      * Make sure user can't set bad cluster criterias.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetClusterCriteriasWithNull() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetClusterCriteriasWithNull() throws GeniePreconditionException {
         this.job.setClusterCriterias(null);
     }
 
     /**
      * Make sure user can't set bad cluster criterias.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetClusterCriteriasWithEmpty() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetClusterCriteriasWithEmpty() throws GeniePreconditionException {
         this.job.setClusterCriterias(new ArrayList<ClusterCriteria>());
     }
 
     /**
      * Test setting and getting the command args.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetGetCommandArgs() throws GenieException {
+    public void testSetGetCommandArgs() throws GeniePreconditionException {
         final Job localJob = new Job(); //Use default constructor so null
         Assert.assertNull(localJob.getCommandArgs());
         localJob.setCommandArgs(COMMAND_ARGS);
@@ -311,30 +309,30 @@ public class TestJob {
     /**
      * Make sure user can't set bad command args.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetCommandArgsNull() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetCommandArgsNull() throws GeniePreconditionException {
         this.job.setCommandArgs(null);
     }
 
     /**
      * Make sure user can't set bad command args.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetCommandArgsWithEmpty() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetCommandArgsWithEmpty() throws GeniePreconditionException {
         this.job.setCommandArgs("");
     }
 
     /**
      * Make sure user can't set bad command args.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testSetCommandArgsWithBlank() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetCommandArgsWithBlank() throws GeniePreconditionException {
         this.job.setCommandArgs("   ");
     }
 
@@ -352,10 +350,10 @@ public class TestJob {
     /**
      * Test the setter and getter for attachments.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetGetAttachments() throws GenieException {
+    public void testSetGetAttachments() throws GeniePreconditionException {
         Assert.assertNull(this.job.getAttachments());
         final FileAttachment attachment = new FileAttachment();
         attachment.setName("/some/query.q");
@@ -566,10 +564,10 @@ public class TestJob {
     /**
      * Test the setter and getter for Cluster criterias string.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetGetClusterCriteriasString() throws GenieException {
+    public void testSetGetClusterCriteriasString() throws GeniePreconditionException {
         Assert.assertNull(this.job.getClusterCriteriasString());
         Assert.assertEquals(2, this.job.getClusterCriterias().size());
         this.job.setClusterCriteriasString(CLUSTER_CRITERIA_1);
@@ -580,10 +578,10 @@ public class TestJob {
     /**
      * Test setter and getter for command criteria.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetGetCommandCriteria() throws GenieException {
+    public void testSetGetCommandCriteria() throws GeniePreconditionException {
         final Job localJob = new Job(); //so that command criteria is null
         Assert.assertNull(localJob.getCommandCriteria());
         Assert.assertNull(localJob.getCommandCriteriaString());
@@ -595,10 +593,10 @@ public class TestJob {
     /**
      * Test setter and getter for the command criteria string.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetGetCommandCriteriaString() throws GenieException {
+    public void testSetGetCommandCriteriaString() throws GeniePreconditionException {
         Assert.assertNull(this.job.getCommandCriteriaString());
         Assert.assertEquals(2, this.job.getCommandCriteria().size());
         final String commandCriteriaString = "newCriteria";
@@ -686,20 +684,20 @@ public class TestJob {
     /**
      * Test Validate ok.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GenieException {
+    public void testValidate() throws GeniePreconditionException {
         this.job.validate();
     }
 
     /**
      * Test validate with exception from super class.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testValidateBadSuperClass() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateBadSuperClass() throws GeniePreconditionException {
         final Job localJob = new Job();
         localJob.validate();
     }
@@ -707,10 +705,10 @@ public class TestJob {
     /**
      * Test validate with null command criteria.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testValidateNullCommandCriteria() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNullCommandCriteria() throws GeniePreconditionException {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -724,10 +722,10 @@ public class TestJob {
     /**
      * Test validate with empty command criteria.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testValidateEmptyCommandCriteria() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateEmptyCommandCriteria() throws GeniePreconditionException {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -741,10 +739,10 @@ public class TestJob {
     /**
      * Test validate with null command args.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testValidateNullCommandArgs() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNullCommandArgs() throws GeniePreconditionException {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -758,10 +756,10 @@ public class TestJob {
     /**
      * Test validate with empty command args.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testValidateEmptyCommandArgs() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateEmptyCommandArgs() throws GeniePreconditionException {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -775,10 +773,10 @@ public class TestJob {
     /**
      * Test validate with blank command args.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testValidateBlankCommandArgs() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateBlankCommandArgs() throws GeniePreconditionException {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -792,10 +790,10 @@ public class TestJob {
     /**
      * Test validate with null Cluster criteria.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testValidateNullClusterCriteria() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNullClusterCriteria() throws GeniePreconditionException {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -809,10 +807,10 @@ public class TestJob {
     /**
      * Test validate with empty Cluster criteria.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testValidateEmptyClusterCriteria() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateEmptyClusterCriteria() throws GeniePreconditionException {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -855,10 +853,10 @@ public class TestJob {
     /**
      * Test the helper method to convert string to command criteria.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testStringToCommandCriteria() throws GenieException {
+    public void testStringToCommandCriteria() throws GeniePreconditionException {
         Assert.assertEquals(COMMAND_CRITERIA,
                 this.job.stringToCommandCriteria(
                         EXPECTED_COMMAND_CRITERIA_STRING));
@@ -867,10 +865,10 @@ public class TestJob {
     /**
      * Test the helper method to convert string to command criteria.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testStringToCommandCriteriaNull() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testStringToCommandCriteriaNull() throws GeniePreconditionException {
         Assert.assertEquals(COMMAND_CRITERIA,
                 this.job.stringToCommandCriteria(null));
     }
@@ -878,10 +876,10 @@ public class TestJob {
     /**
      * Test the helper method to convert string to command criteria.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testStringToCommandCriteriaEmpty() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testStringToCommandCriteriaEmpty() throws GeniePreconditionException {
         Assert.assertEquals(COMMAND_CRITERIA,
                 this.job.stringToCommandCriteria(""));
     }
@@ -889,10 +887,10 @@ public class TestJob {
     /**
      * Test the helper method to convert string to cluster criterias.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testStringToClusterCriterias() throws GenieException {
+    public void testStringToClusterCriterias() throws GeniePreconditionException {
         final List<ClusterCriteria> criterias =
                 this.job.stringToClusterCriterias(EXPECTED_CLUSTER_CRITERIAS_STRING);
         Assert.assertEquals(CLUSTER_CRITERIAS.size(), criterias.size());
@@ -905,10 +903,10 @@ public class TestJob {
     /**
      * Test the helper method to convert string to cluster criterias.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testStringToClusterCriteriasNull() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testStringToClusterCriteriasNull() throws GeniePreconditionException {
         final List<ClusterCriteria> criterias =
                 this.job.stringToClusterCriterias(null);
         Assert.assertEquals(CLUSTER_CRITERIAS.size(), criterias.size());
@@ -921,10 +919,10 @@ public class TestJob {
     /**
      * Test the helper method to convert string to cluster criterias.
      *
-     * @throws GenieException
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GenieException.class)
-    public void testStringToClusterCriteriasEmpty() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testStringToClusterCriteriasEmpty() throws GeniePreconditionException {
         final List<ClusterCriteria> criterias =
                 this.job.stringToClusterCriterias("");
         Assert.assertEquals(CLUSTER_CRITERIAS.size(), criterias.size());
