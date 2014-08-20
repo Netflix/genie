@@ -26,6 +26,7 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommonEntityFields;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
@@ -88,7 +89,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(APP_1_USER, app.getUser());
         Assert.assertEquals(APP_1_VERSION, app.getVersion());
         Assert.assertEquals(APP_1_STATUS, app.getStatus());
-        Assert.assertEquals(4, app.getTags().size());
+        Assert.assertEquals(3, app.getTags().size());
         Assert.assertEquals(2, app.getConfigs().size());
         Assert.assertEquals(2, app.getJars().size());
 
@@ -173,12 +174,11 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         tags.add("yarn");
         apps = this.service.getApplications(
                 null, null, tags, 0, 10);
-        Assert.assertEquals(2, apps.size());
+        Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
-        Assert.assertEquals(APP_1_ID, apps.get(1).getId());
 
         tags.clear();
-        tags.add("spark");
+        tags.add("genie.name:spark");
         apps = this.service.getApplications(
                 null, null, tags, 0, 10);
         Assert.assertEquals(1, apps.size());
@@ -298,7 +298,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Application init = this.service.getApplication(APP_1_ID);
         Assert.assertEquals(APP_1_USER, init.getUser());
         Assert.assertEquals(ApplicationStatus.INACTIVE, init.getStatus());
-        Assert.assertEquals(4, init.getTags().size());
+        Assert.assertEquals(3, init.getTags().size());
 
         final Application updateApp = new Application();
         updateApp.setStatus(ApplicationStatus.ACTIVE);
@@ -314,7 +314,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Application updated = this.service.getApplication(APP_1_ID);
         Assert.assertEquals(APP_2_USER, updated.getUser());
         Assert.assertEquals(ApplicationStatus.ACTIVE, updated.getStatus());
-        Assert.assertEquals(5, updated.getTags().size());
+        Assert.assertEquals(6, updated.getTags().size());
     }
 
     /**
@@ -327,7 +327,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Application init = this.service.getApplication(APP_1_ID);
         Assert.assertEquals(APP_1_USER, init.getUser());
         Assert.assertEquals(ApplicationStatus.INACTIVE, init.getStatus());
-        Assert.assertEquals(4, init.getTags().size());
+        Assert.assertEquals(3, init.getTags().size());
 
         final Application updateApp = new Application();
         updateApp.setId(APP_1_ID);
@@ -344,7 +344,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Application updated = this.service.getApplication(APP_1_ID);
         Assert.assertEquals(APP_2_USER, updated.getUser());
         Assert.assertEquals(ApplicationStatus.ACTIVE, updated.getStatus());
-        Assert.assertEquals(5, updated.getTags().size());
+        Assert.assertEquals(6, updated.getTags().size());
     }
 
     /**
@@ -907,11 +907,11 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         newTags.add(newTag2);
         newTags.add(newTag3);
 
-        Assert.assertEquals(4,
+        Assert.assertEquals(3,
                 this.service.getTagsForApplication(APP_1_ID).size());
         final Set<String> finalTags
                 = this.service.addTagsForApplication(APP_1_ID, newTags);
-        Assert.assertEquals(7, finalTags.size());
+        Assert.assertEquals(6, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
@@ -964,15 +964,14 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         newTags.add(newTag2);
         newTags.add(newTag3);
 
-        Assert.assertEquals(4,
+        Assert.assertEquals(3,
                 this.service.getTagsForApplication(APP_1_ID).size());
         final Set<String> finalTags
                 = this.service.updateTagsForApplication(APP_1_ID, newTags);
-        Assert.assertEquals(4, finalTags.size());
+        Assert.assertEquals(5, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
-        Assert.assertTrue(finalTags.contains(APP_1_ID));
     }
 
     /**
@@ -1003,7 +1002,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testGetTagsForApplication() throws GenieException {
-        Assert.assertEquals(4,
+        Assert.assertEquals(3,
                 this.service.getTagsForApplication(APP_1_ID).size());
     }
 
@@ -1034,13 +1033,12 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveAllTagsForApplication() throws GenieException {
-        Assert.assertEquals(4,
+        Assert.assertEquals(3,
                 this.service.getTagsForApplication(APP_1_ID).size());
         final Set<String> finalTags
                 = this.service.removeAllTagsForApplication(APP_1_ID);
-        Assert.assertEquals(1,
+        Assert.assertEquals(2,
                 finalTags.size());
-        Assert.assertTrue(finalTags.contains(APP_1_ID));
     }
 
     /**
@@ -1072,11 +1070,11 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     public void testRemoveTagForApplication() throws GenieException {
         final Set<String> tags
                 = this.service.getTagsForApplication(APP_1_ID);
-        Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(3,
+        Assert.assertEquals(3, tags.size());
+        Assert.assertEquals(2,
                 this.service.removeTagForApplication(
                         APP_1_ID,
-                        "yarn").size()
+                        "prod").size()
         );
     }
 
@@ -1090,8 +1088,8 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
             throws GenieException {
         final Set<String> tags
                 = this.service.getTagsForApplication(APP_1_ID);
-        Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(4,
+        Assert.assertEquals(3, tags.size());
+        Assert.assertEquals(3,
                 this.service.removeTagForApplication(
                         APP_1_ID, null).size());
     }

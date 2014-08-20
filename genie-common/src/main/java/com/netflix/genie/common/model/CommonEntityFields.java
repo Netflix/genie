@@ -29,6 +29,7 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import java.util.Set;
 
 /**
  * The common entity fields for all Genie entities.
@@ -41,6 +42,13 @@ import javax.persistence.PreUpdate;
 public class CommonEntityFields extends Auditable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommonEntityFields.class);
+
+    protected static final String GENIE_TAG_NAMESPACE = "genie.";
+    protected static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
+    protected static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
+    protected static final int MAX_ID_TAG_NAMESPACE = 1;
+    protected static final int MAX_NAME_TAG_NAMESPACE = 1;
+    protected static final int MAX_TAG_GENIE_NAMESPACE = 2;
 
     /**
      * Version of this entity.
@@ -172,6 +180,73 @@ public class CommonEntityFields extends Auditable {
             error = ge.getMessage();
         }
         this.validate(this.name, this.user, this.version, error);
+    }
+
+    /**
+     * Reusable method for adding the system tags to the set of tags.
+     *
+     * @param tags The tags to add the system tags to.
+     * @throws GeniePreconditionException If a precondition is violated.
+     */
+    protected void addAndValidateSystemTags(final Set<String> tags) throws GeniePreconditionException {
+        if (tags == null) {
+            throw new GeniePreconditionException("No tags entered. Unable to continue.");
+        }
+        // Add Genie tags to the app and make sure if old ones existed they're removed
+        tags.add(GENIE_ID_TAG_NAMESPACE + this.getId());
+        String oldNameTag = null;
+        for (final String tag : tags) {
+            if (tag.contains(GENIE_NAME_TAG_NAMESPACE) && !tag.contains(this.name)) {
+                oldNameTag = tag;
+                break;
+            }
+        }
+        if (oldNameTag != null) {
+            tags.remove(oldNameTag);
+        }
+        tags.add(GENIE_NAME_TAG_NAMESPACE + this.name);
+
+
+        int genieNameSpaceCount = 0;
+        int genieIdTagCount = 0;
+        int genieNameTagCount = 0;
+        for (final String tag : tags) {
+            if (tag.contains(GENIE_TAG_NAMESPACE)) {
+                genieNameSpaceCount++;
+                if (tag.contains(GENIE_ID_TAG_NAMESPACE)) {
+                    genieIdTagCount++;
+                } else if (tag.contains(GENIE_NAME_TAG_NAMESPACE)) {
+                    genieNameTagCount++;
+                }
+            }
+        }
+        if (genieIdTagCount > MAX_ID_TAG_NAMESPACE) {
+            throw new GeniePreconditionException(
+                    "More Genie id namespace tags encountered ("
+                            + genieIdTagCount
+                            + ") than expected ("
+                            + MAX_ID_TAG_NAMESPACE
+                            + ")."
+            );
+        }
+        if (genieNameTagCount > MAX_NAME_TAG_NAMESPACE) {
+            throw new GeniePreconditionException(
+                    "More Genie name namespace tags encountered ("
+                            + genieNameTagCount
+                            + ") than expected ("
+                            + MAX_NAME_TAG_NAMESPACE
+                            + ")."
+            );
+        }
+        if (genieNameSpaceCount > MAX_TAG_GENIE_NAMESPACE) {
+            throw new GeniePreconditionException(
+                    "More Genie namespace tags encountered ("
+                            + genieNameSpaceCount
+                            + ") than expected ("
+                            + MAX_TAG_GENIE_NAMESPACE
+                            + ")."
+            );
+        }
     }
 
     /**

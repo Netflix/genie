@@ -10,16 +10,13 @@
         status="INACTIVE"/>
     <Application_tags
         APPLICATION_ID="app1"
-        element="app1"/>
+        element="genie.id:app1"/>
     <Application_tags
-        APPLICATION_ID="app1"
-        element="tez"/>
+            APPLICATION_ID="app1"
+            element="genie.name:tez"/>
     <Application_tags
         APPLICATION_ID="app1"
         element="prod"/>
-    <Application_tags
-        APPLICATION_ID="app1"
-        element="yarn"/>
     <Application_configs
         APPLICATION_ID="app1"
         element="s3://some/config/file"/>
@@ -54,11 +51,11 @@
         version="4.5.6"
         status="ACTIVE"/>
     <Application_tags
-        APPLICATION_ID="app2"
-        element="app2"/>
+            APPLICATION_ID="app2"
+            element="genie.id:app2"/>
     <Application_tags
-        APPLICATION_ID="app2"
-        element="spark"/>
+            APPLICATION_ID="app2"
+            element="genie.name:spark"/>
     <Application_tags
         APPLICATION_ID="app2"
         element="prod"/>
@@ -84,11 +81,11 @@
         version="7.8.9"
         status="DEPRECATED"/>
     <Application_tags
-        APPLICATION_ID="app3"
-        element="app3"/>
+            APPLICATION_ID="app3"
+            element="genie.id:app3"/>
     <Application_tags
-        APPLICATION_ID="app3"
-        element="storm"/>
+            APPLICATION_ID="app3"
+            element="genie.name:storm"/>
     <Application_tags
         APPLICATION_ID="app3"
         element="prod"/>
