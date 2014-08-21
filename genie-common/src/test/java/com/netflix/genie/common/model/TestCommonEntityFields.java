@@ -22,6 +22,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 /**
  * Test the CommonEntityFields class and methods.
  *
@@ -39,7 +43,7 @@ public class TestCommonEntityFields {
      */
     @Before
     public void setup() {
-        this.c = new CommonEntityFields();
+        this.c = new CommonEntityFields(NAME, USER, VERSION);
     }
 
     /**
@@ -47,9 +51,10 @@ public class TestCommonEntityFields {
      */
     @Test
     public void testDefaultConstructor() {
-        Assert.assertNull(this.c.getName());
-        Assert.assertNull(this.c.getUser());
-        Assert.assertNull(this.c.getVersion());
+        final CommonEntityFields local = new CommonEntityFields();
+        Assert.assertNull(local.getName());
+        Assert.assertNull(local.getUser());
+        Assert.assertNull(local.getVersion());
     }
 
     /**
@@ -57,7 +62,6 @@ public class TestCommonEntityFields {
      */
     @Test
     public void testConstructor() {
-        c = new CommonEntityFields(NAME, USER, VERSION);
         Assert.assertEquals(NAME, this.c.getName());
         Assert.assertEquals(USER, this.c.getUser());
         Assert.assertEquals(VERSION, this.c.getVersion());
@@ -70,7 +74,6 @@ public class TestCommonEntityFields {
      */
     @Test
     public void testOnCreateOrUpdateCommonEntityFields() throws GeniePreconditionException {
-        this.c = new CommonEntityFields(NAME, USER, VERSION);
         this.c.onCreateOrUpdateCommonEntityFields();
     }
 
@@ -81,7 +84,8 @@ public class TestCommonEntityFields {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testOnCreateOrUpdateCommonEntityFieldsWithNothing() throws GeniePreconditionException {
-        this.c.onCreateOrUpdateCommonEntityFields();
+        final CommonEntityFields local = new CommonEntityFields();
+        local.onCreateOrUpdateCommonEntityFields();
     }
 
     /**
@@ -91,8 +95,8 @@ public class TestCommonEntityFields {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testOnCreateOrUpdateCommonEntityFieldsNoName() throws GeniePreconditionException {
-        this.c = new CommonEntityFields(null, USER, VERSION);
-        this.c.onCreateOrUpdateCommonEntityFields();
+        final CommonEntityFields local = new CommonEntityFields(null, USER, VERSION);
+        local.onCreateOrUpdateCommonEntityFields();
     }
 
     /**
@@ -102,8 +106,8 @@ public class TestCommonEntityFields {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testOnCreateOrUpdateCommonEntityFieldsNoUser() throws GeniePreconditionException {
-        this.c = new CommonEntityFields(null, USER, VERSION);
-        this.c.onCreateOrUpdateCommonEntityFields();
+        final CommonEntityFields local = new CommonEntityFields(null, USER, VERSION);
+        local.onCreateOrUpdateCommonEntityFields();
     }
 
     /**
@@ -113,8 +117,8 @@ public class TestCommonEntityFields {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testOnCreateOrUpdateCommonEntityFieldsNoVersion() throws GeniePreconditionException {
-        this.c = new CommonEntityFields(NAME, USER, null);
-        this.c.onCreateOrUpdateCommonEntityFields();
+        final CommonEntityFields local = new CommonEntityFields(NAME, USER, null);
+        local.onCreateOrUpdateCommonEntityFields();
     }
 
     /**
@@ -124,7 +128,6 @@ public class TestCommonEntityFields {
      */
     @Test
     public void testValidate() throws GeniePreconditionException {
-        this.c = new CommonEntityFields(NAME, USER, VERSION);
         this.c.validate();
     }
 
@@ -133,9 +136,10 @@ public class TestCommonEntityFields {
      */
     @Test
     public void testSetName() {
-        Assert.assertNull(this.c.getName());
-        this.c.setName(NAME);
-        Assert.assertEquals(NAME, this.c.getName());
+        final CommonEntityFields local = new CommonEntityFields();
+        Assert.assertNull(local.getName());
+        local.setName(NAME);
+        Assert.assertEquals(NAME, local.getName());
     }
 
     /**
@@ -143,9 +147,10 @@ public class TestCommonEntityFields {
      */
     @Test
     public void testSetUser() {
-        Assert.assertNull(this.c.getUser());
-        this.c.setUser(USER);
-        Assert.assertEquals(USER, this.c.getUser());
+        final CommonEntityFields local = new CommonEntityFields();
+        Assert.assertNull(local.getUser());
+        local.setUser(USER);
+        Assert.assertEquals(USER, local.getUser());
     }
 
     /**
@@ -153,8 +158,151 @@ public class TestCommonEntityFields {
      */
     @Test
     public void testSetVersion() {
-        Assert.assertNull(this.c.getVersion());
-        this.c.setVersion(VERSION);
-        Assert.assertEquals(VERSION, this.c.getVersion());
+        final CommonEntityFields local = new CommonEntityFields();
+        Assert.assertNull(local.getVersion());
+        local.setVersion(VERSION);
+        Assert.assertEquals(VERSION, local.getVersion());
+    }
+
+    /**
+     * Test the method which adds system tags.
+     *
+     * @throws GeniePreconditionException
+     */
+    @Test
+    public void testAddAndValidateSystemTags() throws GeniePreconditionException {
+        final Set<String> tags = new HashSet<>();
+        final String tag1 = UUID.randomUUID().toString();
+        final String tag2 = UUID.randomUUID().toString();
+        final String tag3 = UUID.randomUUID().toString();
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+
+        final String id = UUID.randomUUID().toString();
+        this.c.setId(id);
+
+        this.c.addAndValidateSystemTags(tags);
+        Assert.assertEquals(5, tags.size());
+        Assert.assertTrue(tags.contains(tag1));
+        Assert.assertTrue(tags.contains(tag2));
+        Assert.assertTrue(tags.contains(tag3));
+        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + id));
+        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + NAME));
+    }
+
+    /**
+     * Test the method which adds system tags.
+     *
+     * @throws GeniePreconditionException
+     */
+    @Test
+    public void testAddAndValidateSystemTagsWithChangedName() throws GeniePreconditionException {
+        final Set<String> tags = new HashSet<>();
+        final String tag1 = UUID.randomUUID().toString();
+        final String tag2 = UUID.randomUUID().toString();
+        final String tag3 = UUID.randomUUID().toString();
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+
+        final String id = UUID.randomUUID().toString();
+        this.c.setId(id);
+
+        this.c.addAndValidateSystemTags(tags);
+        Assert.assertEquals(5, tags.size());
+        Assert.assertTrue(tags.contains(tag1));
+        Assert.assertTrue(tags.contains(tag2));
+        Assert.assertTrue(tags.contains(tag3));
+        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + id));
+        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + NAME));
+
+        final String newName = UUID.randomUUID().toString();
+        this.c.setName(newName);
+
+        this.c.addAndValidateSystemTags(tags);
+        Assert.assertEquals(5, tags.size());
+        Assert.assertTrue(tags.contains(tag1));
+        Assert.assertTrue(tags.contains(tag2));
+        Assert.assertTrue(tags.contains(tag3));
+        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + id));
+        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + newName));
+    }
+
+    /**
+     * Test the method which adds system tags.
+     *
+     * @throws GeniePreconditionException
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testAddAndValidateSystemTagsNullTags() throws GeniePreconditionException {
+        this.c.addAndValidateSystemTags(null);
+    }
+
+    /**
+     * Test the method which adds system tags.
+     *
+     * @throws GeniePreconditionException
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testAddAndValidateSystemTagsWithTooManyIdTags() throws GeniePreconditionException {
+        final Set<String> tags = new HashSet<>();
+        final String tag1 = UUID.randomUUID().toString();
+        final String tag2 = UUID.randomUUID().toString();
+        final String tag3 = UUID.randomUUID().toString();
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+
+        final String id = UUID.randomUUID().toString();
+        this.c.setId(id);
+        tags.add(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + UUID.randomUUID().toString());
+
+        this.c.addAndValidateSystemTags(tags);
+    }
+
+    /**
+     * Test the method which adds system tags.
+     *
+     * @throws GeniePreconditionException
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testAddAndValidateSystemTagsWithTooManyNameTags() throws GeniePreconditionException {
+        final Set<String> tags = new HashSet<>();
+        final String tag1 = UUID.randomUUID().toString();
+        final String tag2 = UUID.randomUUID().toString();
+        final String tag3 = UUID.randomUUID().toString();
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+        tags.add(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + UUID.randomUUID().toString());
+        tags.add(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + UUID.randomUUID().toString());
+
+        final String id = UUID.randomUUID().toString();
+        this.c.setId(id);
+
+        this.c.addAndValidateSystemTags(tags);
+    }
+
+    /**
+     * Test the method which adds system tags.
+     *
+     * @throws GeniePreconditionException
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testAddAndValidateSystemTagsWithTooManyGenieNamespaceTags() throws GeniePreconditionException {
+        final Set<String> tags = new HashSet<>();
+        final String tag1 = UUID.randomUUID().toString();
+        final String tag2 = UUID.randomUUID().toString();
+        final String tag3 = UUID.randomUUID().toString();
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+        tags.add(CommonEntityFields.GENIE_TAG_NAMESPACE + UUID.randomUUID().toString());
+
+        final String id = UUID.randomUUID().toString();
+        this.c.setId(id);
+
+        this.c.addAndValidateSystemTags(tags);
     }
 }

@@ -140,7 +140,7 @@ public class Application extends CommonEntityFields {
         if (this.tags == null) {
             this.tags = new HashSet<>();
         }
-        this.tags.add(this.getId());
+        this.addAndValidateSystemTags(this.tags);
     }
 
     /**
@@ -250,7 +250,7 @@ public class Application extends CommonEntityFields {
     /**
      * Sets the tags allocated to this application.
      *
-     * @param tags the tags to set.
+     * @param tags the tags to set. No tag can start with genie. as this is system reserved.
      */
     public void setTags(final Set<String> tags) {
         this.tags = tags;
@@ -274,7 +274,7 @@ public class Application extends CommonEntityFields {
      * Helper method for checking the validity of required parameters.
      *
      * @param status The status of the application
-     * @param error Any pre-existing error condition
+     * @param error  Any pre-existing error condition
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     private void validate(

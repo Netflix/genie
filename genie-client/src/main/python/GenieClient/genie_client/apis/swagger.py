@@ -1,8 +1,4 @@
 # !/usr/bin/env python
-"""Wordnik.com's Swagger generic API client. This client handles the client-
-server communication, and is invariant across implementations. Specifics of
-the methods and models for each application are generated from the Swagger
-templates."""
 
 import re
 import urllib
@@ -12,6 +8,7 @@ import datetime
 import dateutil.parser
 
 from genie_client.models import *
+
 
 class ApiClient:
     """Generic API client for Swagger client library builds"""
@@ -231,5 +228,4 @@ class MethodRequest(urllib2.Request):
 
     def get_method(self):
         return getattr(self, 'method', urllib2.Request.get_method(self))
-
 

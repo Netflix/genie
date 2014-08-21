@@ -162,7 +162,7 @@ public class Command extends CommonEntityFields {
         if (this.tags == null) {
            this.tags = new HashSet<>();
         }
-        this.tags.add(this.getId());
+        this.addAndValidateSystemTags(this.tags);
     }
 
     /**

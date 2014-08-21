@@ -18,10 +18,10 @@
         element="s3://some/other/config/file"/>
     <Command_tags
         COMMAND_ID="command1"
-        element="command1"/>
+        element="genie.id:command1"/>
     <Command_tags
         COMMAND_ID="command1"
-        element="pig_13_prod"/>
+        element="genie.name:pig_13_prod"/>
     <Command_tags
         COMMAND_ID="command1"
         element="pig"/>
@@ -47,10 +47,10 @@
         element="s3://some/config/file"/>
     <Command_tags
         COMMAND_ID="command2"
-        element="command1"/>
+        element="genie.id:command2"/>
     <Command_tags
         COMMAND_ID="command2"
-        element="hive_11_prod"/>
+        element="genie.name:hive_11_prod"/>
     <Command_tags
         COMMAND_ID="command2"
         element="hive"/>
@@ -73,10 +73,10 @@
         element="s3://some/config/file"/>
     <Command_tags
         COMMAND_ID="command3"
-        element="command1"/>
+        element="genie.id:command3"/>
     <Command_tags
         COMMAND_ID="command3"
-        element="pig_11_prod"/>
+        element="genie.name:pig_11_prod"/>
     <Command_tags
         COMMAND_ID="command3"
         element="pig"/>
@@ -101,10 +101,10 @@
         element="s3://some/config/file"/>
     <Cluster_tags
         CLUSTER_ID="cluster1"
-        element="cluster1"/>
+        element="genie.id:cluster1"/>
     <Cluster_tags
         CLUSTER_ID="cluster1"
-        element="h2prod"/>
+        element="genie.name:h2prod"/>
     <Cluster_tags
         CLUSTER_ID="cluster1"
         element="pig"/>
@@ -145,10 +145,10 @@
         element="s3://some/other/config/file"/>
     <Cluster_tags
         CLUSTER_ID="cluster2"
-        element="cluster2"/>
+        element="genie.id:cluster2"/>
     <Cluster_tags
         CLUSTER_ID="cluster2"
-        element="h2query"/>
+        element="genie.name:h2query"/>
     <Cluster_tags
         CLUSTER_ID="cluster2"
         element="pig"/>

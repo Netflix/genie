@@ -22,6 +22,7 @@ import os
 
 from genie_client.models import *
 
+
 class V2Api(object):
 
     def __init__(self, apiClient):

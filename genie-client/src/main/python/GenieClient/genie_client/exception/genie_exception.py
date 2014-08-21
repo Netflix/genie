@@ -1,5 +1,6 @@
 __author__ = 'amsharma'
 
+
 class GenieException(Exception):
     """Exception class for errors for this module."""
     # Call the base class constructor with the parameters it needs

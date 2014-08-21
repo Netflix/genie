@@ -1,9 +1,9 @@
 __author__ = 'tgianos'
 
 import logging
-from swagger import ApiClient
-from V2Api import V2Api
-from genie_client.exception.genie_exception import GenieException
+from genie_client.apis import swagger
+from genie_client.apis import V2Api
+from genie_client.exception import genie_exception
 import urllib2
 
 DEBUG = logging.getLogger(__name__).debug
@@ -19,8 +19,8 @@ class Job(object):
     def __init__(self, service_base_url):
         DEBUG("Application API initialized with Service Base URL [%s]" % service_base_url)
         self._service_base_url = service_base_url
-        self._api_client = ApiClient("key", self._service_base_url)
-        self._api = V2Api(self._api_client)
+        self._api_client = swagger.ApiClient("key", self._service_base_url)
+        self._api = V2Api.V2Api(self._api_client)
 
     def find_jobs(self, **kwargs):
         """Get all running jobs for the given cluster"""
@@ -30,13 +30,13 @@ class Job(object):
         try:
             return self._api.getJobs(**kwargs)
         except urllib2.HTTPError, http_error:
-            raise GenieException('Unable to get jobs due to error code: [ '
-                                 + str(http_error.code)
-                                 + '] because ['
-                                 + http_error.read()
-                                 + ']', http_error.code)
+            raise genie_exception.GenieException('Unable to get jobs due to error code: [ '
+                                                 + str(http_error.code)
+                                                 + '] because ['
+                                                 + http_error.read()
+                                                 + ']', http_error.code)
         except urllib2.URLError, url_error:
-            raise GenieException('Unable to get job. ' + url_error.reason)
+            raise genie_exception.GenieException('Unable to get job. ' + url_error.reason)
 
     def get_job(self, job_id):
         """Get the job for the given id"""
@@ -46,13 +46,13 @@ class Job(object):
         try:
             return self._api.getJob(job_id)
         except urllib2.HTTPError, http_error:
-            raise GenieException('Unable to get job due to error code: [ '
-                                 + str(http_error.code)
-                                 + '] because ['
-                                 + http_error.read()
-                                 + ']', http_error.code)
+            raise genie_exception.GenieException('Unable to get job due to error code: [ '
+                                                 + str(http_error.code)
+                                                 + '] because ['
+                                                 + http_error.read()
+                                                 + ']', http_error.code)
         except urllib2.URLError, url_error:
-            raise GenieException('Unable to get job. ' + url_error.reason)
+            raise genie_exception.GenieException('Unable to get job. ' + url_error.reason)
 
     def submit_job(self, job_obj):
         """Submit a job to genie"""
@@ -62,10 +62,10 @@ class Job(object):
         try:
             return self._api.submitJob(job_obj)
         except urllib2.HTTPError, http_error:
-            raise GenieException('Unable to submit job due to error code: [ '
-                                 + str(http_error.code)
-                                 + '] because ['
-                                 + http_error.read()
-                                 + ']', http_error.code)
+            raise genie_exception.GenieException('Unable to submit job due to error code: [ '
+                                                 + str(http_error.code)
+                                                 + '] because ['
+                                                 + http_error.read()
+                                                 + ']', http_error.code)
         except urllib2.URLError, url_error:
-            raise GenieException('Unable to get job. ' + url_error.reason)
+            raise genie_exception.GenieException('Unable to get job. ' + url_error.reason)
