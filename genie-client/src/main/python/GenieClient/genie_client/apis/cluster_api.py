@@ -2,9 +2,9 @@ __author__ = 'amsharma'
 
 import logging
 import collections
-import swagger
-import V2Api
-import genie_exception
+from genie_client.apis import swagger
+from genie_client.apis import V2Api
+from genie_client.exception import genie_exception
 import urllib2
 
 DEBUG = logging.getLogger(__name__).debug

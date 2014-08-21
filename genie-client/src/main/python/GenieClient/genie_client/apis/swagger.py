@@ -7,12 +7,7 @@ import json
 import datetime
 import dateutil.parser
 
-import Application
-import Cluster
-import ClusterCriteria
-import Command
-import FileAttachment
-import Job
+from genie_client.models import *
 
 
 class ApiClient:
