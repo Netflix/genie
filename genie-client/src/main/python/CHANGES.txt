@@ -1,0 +1,3 @@
+0.1.0, 08/20/2014 -- Initial release.
+0.1.1, 08/20/2014 -- Changes for testing.
+0.1.2, 08/21/2014 -- Reorganizing code.
