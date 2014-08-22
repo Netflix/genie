@@ -7,7 +7,13 @@ import json
 import datetime
 import dateutil.parser
 
-from genie_client.models import *
+# Used by dynamic reference
+import genie2.model.Application
+import genie2.model.Cluster
+import genie2.model.ClusterCriteria
+import genie2.model.Command
+import genie2.model.FileAttachment
+import genie2.model.Job
 
 
 class ApiClient:
