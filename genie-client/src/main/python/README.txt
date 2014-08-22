@@ -14,8 +14,6 @@ Typical usage often looks like this::
     cluster = cluster_api.get_cluster(cluster_id) 
 
 
-(Note the double-colon and 4-space indent formatting above.)
-
 Cluster Api
 ===========
 
@@ -34,4 +32,4 @@ Examples to use cluster API:
 
 2. TODO example 2 
 
-Go to Genie OSS page at `<https://github.com/Netflix/genie/>`_.
+Go to Genie OSS page at `<http://netflix.github.io/genie/>`_.
