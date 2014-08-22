@@ -1,43 +1,37 @@
 ===========
-Towel Stuff
+Genie Python Client
 ===========
 
-Towel Stuff provides such and such and so and so. You might find
-it most useful for tasks involving <x> and also <y>. Typical usage
-often looks like this::
+Typical usage often looks like this::
 
     #!/usr/bin/env python
 
-    from towelstuff import location
-    from towelstuff import utils
+    from genie_client.apis import cluster_api
+  
+    cluster_id = "blah" 
+    service_base_url = "http://localhost:7001"
+    cluster_api.Cluster(service_base_url)
+    cluster = cluster_api.get_cluster(cluster_id) 
 
-    if utils.has_towel():
-        print "Your towel is located:", location.where_is_my_towel()
 
 (Note the double-colon and 4-space indent formatting above.)
 
-Paragraphs are separated by blank lines. *Italics*, **bold**,
-and ``monospace`` look like this.
+Cluster Api
+===========
 
+Methods supported by Cluster Api:
 
-A Section
-=========
+* get_cluster 
 
-Lists look like this:
+* get_clusters 
 
-* First
-
-* Second. Can be multiple lines
-  but must be indented properly.
-
-A Sub-Section
+Samples
 -------------
 
-Numbered lists look like you'd expect:
+Examples to use cluster API:
 
-1. hi there
+1. TODO example 1 
 
-2. must be going
+2. TODO example 2 
 
-Urls are http://like.this and links can be
-written `like this <http://www.example.com/foo/bar>`_.
+Go to Genie OSS page at `<https://github.com/Netflix/genie/>`_.
