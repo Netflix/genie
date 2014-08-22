@@ -147,7 +147,7 @@ class ApiClient:
             if obj_class in ['int', 'float', 'long', 'dict', 'list', 'str', 'bool', 'datetime']:
                 obj_class = eval(obj_class)
             else:  # not a native type, must be model class
-                obj_class = eval(obj_class + '.' + obj_class)
+                obj_class = eval('genie2.model.' + obj_class + '.' + obj_class)
 
         if obj_class in [int, long, float, dict, list, str, bool]:
             return obj_class(obj)
