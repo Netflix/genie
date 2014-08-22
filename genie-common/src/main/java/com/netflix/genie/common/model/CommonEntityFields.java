@@ -196,7 +196,8 @@ public class CommonEntityFields extends Auditable {
         tags.add(GENIE_ID_TAG_NAMESPACE + this.getId());
         String oldNameTag = null;
         for (final String tag : tags) {
-            if (tag.contains(GENIE_NAME_TAG_NAMESPACE) && !tag.contains(this.name)) {
+            if (tag.startsWith(GENIE_NAME_TAG_NAMESPACE)
+                    && !tag.equalsIgnoreCase(GENIE_NAME_TAG_NAMESPACE + this.name)) {
                 oldNameTag = tag;
                 break;
             }
