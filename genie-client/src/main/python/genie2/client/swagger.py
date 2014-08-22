@@ -63,7 +63,6 @@ class ApiClient:
                 headers['Content-Type'] = 'application/json'
                 data = self.sanitizeForSerialization(post_data)
                 data = json.dumps(data)
-                print data
 
         else:
             raise Exception('Method ' + method + ' is not recognized.')
