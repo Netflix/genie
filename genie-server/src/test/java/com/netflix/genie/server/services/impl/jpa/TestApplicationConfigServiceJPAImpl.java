@@ -1118,19 +1118,6 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     }
 
     /**
-     * Test remove configuration for application.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testRemoveTagForApplicationId() throws GenieException {
-        this.service.removeTagForApplication(
-                APP_1_ID,
-                APP_1_ID
-        );
-    }
-
-    /**
      * Test the Get commands for application method.
      *
      * @throws GenieException

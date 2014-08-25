@@ -1120,19 +1120,6 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     }
 
     /**
-     * Test remove configuration for command.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testRemoveTagForCommandId() throws GenieException {
-        this.service.removeTagForCommand(
-                COMMAND_1_ID,
-                COMMAND_1_ID
-        );
-    }
-
-    /**
      * Test the Get clusters for command function.
      *
      * @throws GenieException

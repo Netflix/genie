@@ -649,7 +649,8 @@ public class ClusterConfigResource {
     @Path("/{id}/tags")
     @ApiOperation(
             value = "Remove all tags from a cluster",
-            notes = "Remove all the tags from the cluster with given id.",
+            notes = "Remove all the tags from the cluster with given id.  Note that the genie name space tags" +
+                    "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
@@ -678,7 +679,8 @@ public class ClusterConfigResource {
     @Path("/{id}/tags/{tag}")
     @ApiOperation(
             value = "Remove a tag from a cluster",
-            notes = "Remove the given tag from the cluster with given id.",
+            notes = "Remove the given tag from the cluster with given id. Note that the genie name space tags" +
+                    "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {

@@ -1227,17 +1227,4 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
                 "something"
         );
     }
-
-    /**
-     * Test remove configuration for cluster.
-     *
-     * @throws GenieException
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testRemoveTagForClusterId() throws GenieException {
-        this.service.removeTagForCluster(
-                CLUSTER_1_ID,
-                CLUSTER_1_ID
-        );
-    }
 }

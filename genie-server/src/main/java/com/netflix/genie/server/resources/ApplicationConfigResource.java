@@ -615,7 +615,8 @@ public class ApplicationConfigResource {
     @Path("/{id}/tags")
     @ApiOperation(
             value = "Remove all tags from a application",
-            notes = "Remove all the tags from the application with given id.",
+            notes = "Remove all the tags from the application with given id.  Note that the genie name space tags" +
+                    "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
@@ -672,7 +673,8 @@ public class ApplicationConfigResource {
     @Path("/{id}/tags/{tag}")
     @ApiOperation(
             value = "Remove a tag from a application",
-            notes = "Remove the given tag from the application with given id.",
+            notes = "Remove the given tag from the application with given id. Note that the genie name space tags" +
+            		"prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
