@@ -19,7 +19,7 @@ define([
         self.configuration    = ko.observable();
         self.exitCode         = ko.observable();
         self.fileDependencies = ko.observable();
-        self.finishTime       = ko.observable();
+        self.finished       = ko.observable();
         self.forwarded        = ko.observable();
         self.hostName         = ko.observable();
         self.id            = ko.observable();
@@ -33,7 +33,7 @@ define([
         self.pigVersion       = ko.observable();
         self.processHandle    = ko.observable();
         self.schedule         = ko.observable();
-        self.startTime        = ko.observable();
+        self.started        = ko.observable();
         self.status           = ko.observable();
         self.statusMsg        = ko.observable();
         self.updated       = ko.observable();
@@ -51,8 +51,8 @@ define([
         }, self);
 
         self.finishTimeFormatted = ko.computed(function() {
-            if (self.finishTime() > 0) {
-                var myDate = new Date(parseInt(self.finishTime()));
+            if (self.finished() > 0) {
+                var myDate = new Date(parseInt(self.finished()));
                 return myDate.toUTCString();
             }
             return '';
@@ -60,7 +60,7 @@ define([
 
         self.startTimeFormatted = ko.computed(function() {
             //if (self.startTime() > 0) {
-            if (self.created > 0) { 	
+            if (self.created() > 0) { 	
                 var myDate = new Date(parseInt(self.created()));
                 return myDate.toUTCString();
             }

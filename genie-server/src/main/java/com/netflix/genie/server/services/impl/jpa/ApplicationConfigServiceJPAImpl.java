@@ -497,9 +497,6 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
-            if (id.equals(tag)) {
-                throw new GeniePreconditionException("Cannot delete application id from the tags list.");
-            }
             if (StringUtils.isNotBlank(tag)) {
                 application.getTags().remove(tag);
             }

@@ -44,11 +44,11 @@
         <div class="span12">
             <div class="row">
                 <div class="span1"><strong>Start:</strong></div>
-                <div class="span3" data-bind="text: $data.created"></div>
+                <div class="span3" data-bind="text: $data.created()"></div>
                 <div class="span1"><strong>Finish:</strong></div>
-                <div class="span3" data-bind="text: $data.finishTimeFormatted"></div>
+                <div class="span3" data-bind="text: $data.finished()"></div>
                 <div class="span1"><strong>Update:</strong></div>
-                <div class="span3" data-bind="text: $data.updated"></div>
+                <div class="span3" data-bind="text: $data.updated()"></div>
             </div>
         </div>
     </div>
