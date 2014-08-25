@@ -503,9 +503,6 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            if (id.equals(tag)) {
-                throw new GeniePreconditionException("Cannot delete command id from the tags list.");
-            }
             command.getTags().remove(tag);
             return command.getTags();
         } else {

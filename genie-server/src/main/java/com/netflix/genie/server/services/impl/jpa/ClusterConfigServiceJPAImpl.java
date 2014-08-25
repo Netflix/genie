@@ -559,10 +559,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         if (StringUtils.isBlank(id)) {
             throw new GeniePreconditionException("No cluster id entered. Unable to remove tag.");
         }
-        if (id.equals(tag)) {
-            throw new GeniePreconditionException("Cannot delete cluster id from the tags list.");
-        }
-
+        
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             if (StringUtils.isNotBlank(tag)) {
