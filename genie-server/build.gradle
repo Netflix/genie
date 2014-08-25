@@ -21,7 +21,7 @@ dependencies {
         exclude group: 'org.springframework', module: 'spring-context'
     }
 
-    runtime ('commons-dbcp:commons-dbcp:1.4')
+    runtime ('org.apache.commons:commons-dbcp2:2.0.1')
     runtime ('com.google.inject.extensions:guice-servlet:3.0')
     runtime ('com.mchange:mchange-commons-java:0.2.3.3')
     runtime ('mysql:mysql-connector-java:5.1.16')
