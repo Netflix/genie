@@ -57,7 +57,7 @@
             <property name="minIdle" value="5"/>
             <property name="maxIdle" value="20"/>
             <property name="maxTotal" value="20"/>
-            <property name="validationQuery" value="Select 0"/>
+            <property name="validationQuery" value="select 0;"/>
         </bean>
     </beans>
 </beans>
