@@ -73,8 +73,6 @@ class Cluster(object):
         try:
             return self._api.getCluster(cstr_id)
         except urllib2.HTTPError, http_error:
-            print http_error.msg
-            print http_error.message
             raise genie2.exception.genie_exception.GenieException(
                 'Unable to get cluster due to error code: ['
                 + str(http_error.code)
