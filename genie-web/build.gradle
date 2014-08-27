@@ -2,7 +2,7 @@ apply plugin: 'war'
 
 dependencies {
     runtime project(':genie-server')
-    runtime ('com.netflix.karyon:karyon-admin-web:1.0.25') {
+    runtime ('com.netflix.karyon:karyon-admin-web:1.0.26') {
         exclude group: 'commons-collections', module: 'commons-collections'
     }
 }
