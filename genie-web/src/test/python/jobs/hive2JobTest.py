@@ -29,7 +29,7 @@ import os
 GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/jobs'
+serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v0/jobs'
 
 def testJsonSubmitjob():
     print "Running testJsonSubmitjob "

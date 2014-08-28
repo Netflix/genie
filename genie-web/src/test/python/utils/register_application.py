@@ -1,4 +1,4 @@
-##
+# #
 #
 #  Copyright 2014 Netflix, Inc.
 #
@@ -17,56 +17,56 @@
 ##
 
 import sys
+
 sys.path.append('../utils')
 
-import time
 import eureka
 import json
 import os
-import uuid
 import restclient
 
-#ID = "app-" + str(uuid.uuid4())
 # the S3 prefix where the tests are located
 GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/applications'
+serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v2/config/applications'
 
 
-def addApplicationConfigMr1():
+def add_application_config_mr1():
     print "Creating App mr1 "
-    ID = "mr1"
+    application_id = "mr1"
     configs = json.dumps(['s3://netflix-dataoven-prod/genie/cluster/bigdataplatform_query_20140518/mapred-site.xml'])
     jars = json.dumps(['s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar'])
-    tags = json.dumps(['sla','cprod1','bdp_prod_20140101'])
+    tags = json.dumps(['sla', 'cprod1', 'bdp_prod_20140101'])
 
     payload = '''
     {
-        "id":"''' + ID +'''",
+        "id":"''' + application_id + '''",
         "name": "mapreduce1", 
         "status" : "ACTIVE",
         "user" : "amsharma", 
-        "version" : "1.0",
-        "configs": ''' + configs + ''', 
+        "version" : "1.0.3",
+        "configs": ''' + configs + ''',
+        "tags": ''' + tags + ''',
         "jars": ''' + jars + ''' 
     }
     '''
     print payload
     print "\n"
-    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+    print restclient.post(service_url=serviceUrl, payload=payload, content_type='application/json')
 
-def addApplicationConfigMr2():
+
+def add_application_config_mr2():
     print "Creating App mr2 "
-    
-    ID = "mr2"
+
+    application_id = "mr2"
     configs = json.dumps(['s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml'])
     jars = json.dumps(['s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar'])
-    tags = json.dumps(['sla','cprod1','bdp_prod_20140101'])
-    
+    tags = json.dumps(['sla', 'h2prod', 'bdp_prod_20140101'])
+
     payload = '''
     {
-        "id":"''' + ID +'''",
+        "id":"''' + application_id + '''",
         "name": "mapreduce2", 
         "status" : "ACTIVE",
         "user" : "amsharma", 
@@ -78,16 +78,17 @@ def addApplicationConfigMr2():
     '''
     print payload
     print "\n"
-    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+    print restclient.post(service_url=serviceUrl, payload=payload, content_type='application/json')
 
-def addApplicationConfigTz1():
+
+def add_application_config_tz1():
     print "Creating App tz1"
-    tags = json.dumps(['sla','cprod1','bdp_prod_20140101'])
-    
-    ID = "tz1"
+    tags = json.dumps(['sla', 'cprod1', 'bdp_prod_20140101'])
+
+    application_id = "tz1"
     payload = '''
     {
-        "id":"''' + ID +'''",
+        "id":"''' + application_id + '''",
         "name": "tez", 
         "status" : "ACTIVE",
         "user" : "amsharma",
@@ -98,15 +99,16 @@ def addApplicationConfigTz1():
 
     print payload
     print "\n"
-    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+    print restclient.post(service_url=serviceUrl, payload=payload, content_type='application/json')
 
-def addApplicationConfigTz2():
+
+def add_application_config_tz2():
     print "Creating App tz2"
-    
-    ID = "tz2"
+
+    application_id = "tz2"
     payload = '''
     {
-        "id":"''' + ID +'''",
+        "id":"''' + application_id + '''",
         "name": "tez", 
         "status" : "ACTIVE",
         "user" : "amsharma",
@@ -116,12 +118,12 @@ def addApplicationConfigTz2():
 
     print payload
     print "\n"
-    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+    print restclient.post(service_url=serviceUrl, payload=payload, content_type='application/json')
 
 # driver method for all tests                
 if __name__ == "__main__":
-   print "Creating Application Configs:\n"
-   addApplicationConfigMr1()
-   addApplicationConfigMr2()
-   addApplicationConfigTz1()
-   addApplicationConfigTz2()
+    print "Creating Application Configs:\n"
+    add_application_config_mr1()
+    add_application_config_mr2()
+    add_application_config_tz1()
+    add_application_config_tz2()

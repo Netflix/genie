@@ -27,7 +27,7 @@ import restclient
 import json
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/jobs'
+serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v0/jobs'
 
 # use this user name for job submission and queries
 user = os.getenv("USER")
@@ -41,7 +41,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -61,7 +61,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -81,7 +81,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -104,7 +104,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -127,7 +127,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -150,7 +150,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -173,7 +173,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -193,7 +193,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -213,7 +213,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -234,7 +234,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -256,7 +256,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -279,7 +279,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -302,7 +302,7 @@ class JobSubmitErrorTestCase(unittest.TestCase):
         }
         '''
         try:
-            response = restclient.post(serviceUrl=serviceUrl, payload=payload)
+            response = restclient.post(service_url=serviceUrl, payload=payload)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:

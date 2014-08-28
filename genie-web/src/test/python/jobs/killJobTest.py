@@ -30,7 +30,7 @@ import os
 GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/jobs'
+serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v0/jobs'
 
 def hiveSubmitJob():
     print "Running hiveSubmitJob"
@@ -80,7 +80,7 @@ def pigSubmitJob():
 def testKillJob(jobID):
     print "Testing job kill"
     params = '/' + jobID
-    response = restclient.delete(serviceUrl=serviceUrl, params=params)
+    response = restclient.delete(service_url=serviceUrl, params=params)
     print response.read()
         
 # driver method for all tests                
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     time.sleep(30)
     
     # refresh the base_url to maybe pick a different instance
-    serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/jobs'
+    serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v0/jobs'
     
     testKillJob(jobID)
     print "Hive job kill successful\n"
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     time.sleep(30)
     
     # refresh the base_url to maybe pick a different instance
-    serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/jobs'
+    serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v0/jobs'
       
     testKillJob(jobID)
     print "Pig job kill successful\n"

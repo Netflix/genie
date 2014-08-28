@@ -25,7 +25,7 @@ import eureka
 import jobs
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/jobs'
+serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v0/jobs'
 
 jobID = str(uuid.uuid4())
    

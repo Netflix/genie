@@ -1,6 +1,6 @@
-##
+# #
 #
-#  Copyright 2013 Netflix, Inc.
+#  Copyright 2014 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -19,25 +19,27 @@
 import restclient
 import json
 
-def submitJob(serviceUrl, payload, contentType='application/json'):
-    response = restclient.post(serviceUrl=serviceUrl, payload=payload, contentType=contentType)
+
+def submit_job(service_url, payload, content_type='application/json'):
+    response = restclient.post(service_url=service_url, payload=payload, content_type=content_type)
     results = response.read()
     json_obj = json.loads(results)
-    jobID = json_obj[u'id']
-    print "Job ID: ", jobID
+    job_id = json_obj[u'id']
+    print "Job ID: ", job_id
     print "Output URI: ", json_obj[u'outputURI']
     print "Job submission successful"
-    return jobID
+    return job_id
 
-def getJobInfo(serviceUrl, jobID):
-    params = '/' + jobID
-    response = restclient.get(serviceUrl=serviceUrl, params=params)
+
+def get_job_info(service_url, job_id):
+    params = '/' + job_id
+    response = restclient.get(service_url=service_url, params=params)
     return response.read()
 
-def getJobStatus(serviceUrl, jobID):
-    params = '/' + jobID + '/status'
-    response = restclient.get(serviceUrl=serviceUrl, params=params)
+
+def get_job_status(service_url, job_id):
+    params = '/' + job_id + '/status'
+    response = restclient.get(service_url=service_url, params=params)
     json_obj = json.loads(response.read())
     status = json_obj[u'status']
     return status
-   

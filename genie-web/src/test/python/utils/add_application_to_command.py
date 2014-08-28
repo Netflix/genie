@@ -1,4 +1,4 @@
-##
+# #
 #
 #  Copyright 2014 Netflix, Inc.
 #
@@ -17,35 +17,32 @@
 ##
 
 import sys
+
 sys.path.append('../utils')
 
-import time
 import eureka
 import json
-import os
-import uuid
 import restclient
 
 
-def addApplicationToCommand(commandId,applicationId):
-    print "Adding Application [%s] to Command [%s] " % (applicationId, commandId) 
+def add_application_to_command(command_id, application_id):
+    print "Adding Application [%s] to Command [%s] " % (application_id, command_id)
 
     # get the serviceUrl from the eureka client
-    serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/commands/' + commandId + '/applications'
-    print "Service Url isi %s" % serviceUrl 
-    
-    #cmds = json.dumps([{'id':'prodhive11_mr1'},{'id':'pig11_mr1'},{'id':'hadoop103'}])
-    cmds = json.dumps([{'id':applicationId}])
-    payload = cmds 
+    service_url = \
+        eureka.EurekaClient().get_service_base_url() + '/genie/v2/config/commands/' + command_id + '/applications'
+    print "Service Url isi %s" % service_url
+
+    payload = json.dumps([{'id': application_id}])
     print payload
     print "\n"
-    
-    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
+    print restclient.post(service_url=service_url, payload=payload, content_type='application/json')
 
 # driver method for all tests                
 if __name__ == "__main__":
-    if(len(sys.argv) != 3):
-        print "Usage: addApplicationToCommand commandId applicationId"
+    if len(sys.argv) != 3:
+        print "Usage: add_application_to_command command_id application_id"
         sys.exit(-1)
 
-    addApplicationToCommand(sys.argv[1],sys.argv[2])
+    add_application_to_command(sys.argv[1], sys.argv[2])

@@ -27,7 +27,7 @@ import restclient
 import json
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v0/jobs'
+serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v0/jobs'
 
 # use this user name for job submission and queries
 user = os.getenv("USER")
@@ -60,63 +60,63 @@ class JobInfoGetTestCase(unittest.TestCase):
         }
         '''
         try:
-            restclient.post(serviceUrl=serviceUrl, payload=payload)
+            restclient.post(service_url=serviceUrl, payload=payload)
         except urllib2.HTTPError, e:
             pass
 
     def testGetPage(self):
         print "HTTP GET - running GET for page 0: "
         params = '?page=0'
-        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        response = restclient.get(service_url=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get elements by page"
     
     def testGetByJobID(self):
         print "HTTP GET - running GET for jobID like %: "
         params = '?jobID=%&limit=3'
-        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        response = restclient.get(service_url=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get elements by jobID"
     
     def testGetByJobName(self):
         print "HTTP GET - running GET for jobName like HIVE%: "
         params = '?jobName=HIVE%&limit=3'
-        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        response = restclient.get(service_url=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get elements by jobName"
         
     def testGetByUser(self):
         print "HTTP GET - running GET for user"
         params = '?userName=' + user + '&limit=3'
-        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        response = restclient.get(service_url=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get elements by user"
     
     def testGetByJobType(self):
         print "HTTP GET - running GET for jobType hive: "
         params = '?jobType=hive&limit=3'
-        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        response = restclient.get(service_url=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get elements by type"
     
     def testGetJobByStatus(self):
         print "HTTP GET - for status FAILED: "
         params = '?status=FAILED&limit=3'
-        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        response = restclient.get(service_url=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get elements by type"
 
     def testGetJobByClusterName(self):
         print "HTTP GET - for clusterName MY_CLUSTER_NAME: "
         params = '?clusterName=MY_CLUSTER_NAME&limit=3'
-        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        response = restclient.get(service_url=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get elements by type"
 
     def testGetJobByClusterId(self):
         print "HTTP GET - for clusterId MY_CLUSTER_ID: "
         params = '?clusterId=MY_CLUSTER_ID&limit=3'
-        response = restclient.get(serviceUrl=serviceUrl, params=params)
+        response = restclient.get(service_url=serviceUrl, params=params)
         print response.code
         assert response.code == 200, "can't get elements by type"
 
@@ -124,7 +124,7 @@ class JobInfoGetTestCase(unittest.TestCase):
         print "HTTP GET - test for user DUMMY: "
         params = '?userName=does_not_exist'
         try:
-            response = restclient.get(serviceUrl=serviceUrl, params=params)
+            response = restclient.get(service_url=serviceUrl, params=params)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -135,7 +135,7 @@ class JobInfoGetTestCase(unittest.TestCase):
         print "HTTP GET - test for jobType DUMMY: "
         params = '?jobType=DUMMY&limit=3'
         try:
-            response = restclient.get(serviceUrl=serviceUrl, params=params)
+            response = restclient.get(service_url=serviceUrl, params=params)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -146,7 +146,7 @@ class JobInfoGetTestCase(unittest.TestCase):
         print "HTTP GET - test for status DUMMY: "
         params = '?status=DUMMY&limit=3'
         try:
-            response = restclient.get(serviceUrl=serviceUrl, params=params)
+            response = restclient.get(service_url=serviceUrl, params=params)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -157,7 +157,7 @@ class JobInfoGetTestCase(unittest.TestCase):
         print "HTTP GET - test for clusterName DUMMY: "
         params = '?clusterName=DUMMY&limit=3'
         try:
-            response = restclient.get(serviceUrl=serviceUrl, params=params)
+            response = restclient.get(service_url=serviceUrl, params=params)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:
@@ -168,7 +168,7 @@ class JobInfoGetTestCase(unittest.TestCase):
         print "HTTP GET - test for clusterId DUMMY: "
         params = '?clusterId=DUMMY&limit=3'
         try:
-            response = restclient.get(serviceUrl=serviceUrl, params=params)
+            response = restclient.get(service_url=serviceUrl, params=params)
             print response.read()
             assert False, "received unexpected successful response"
         except urllib2.HTTPError, e:

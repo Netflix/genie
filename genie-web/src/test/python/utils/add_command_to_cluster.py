@@ -1,4 +1,4 @@
-##
+# #
 #
 #  Copyright 2014 Netflix, Inc.
 #
@@ -17,35 +17,31 @@
 ##
 
 import sys
+
 sys.path.append('../utils')
 
-import time
 import eureka
 import json
-import os
-import uuid
 import restclient
 
 
-def addCommandToCluster(clusterId,commandId):
-    print "Adding Command [%s] to Cluster [%s] " % (clusterId, commandId) 
+def add_command_to_cluster(cluster_id, command_id):
+    print "Adding Command [%s] to Cluster [%s] " % (cluster_id, command_id)
 
     # get the serviceUrl from the eureka client
-    serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/config/clusters/' + clusterId + '/commands'
-    print "Service Url isi %s" % serviceUrl 
-    
-    #cmds = json.dumps([{'id':'prodhive11_mr1'},{'id':'pig11_mr1'},{'id':'hadoop103'}])
-    cmds = json.dumps([{'id':commandId}])
-    payload = cmds 
+    service_url = eureka.EurekaClient().get_service_base_url() + '/genie/v2/config/clusters/' + cluster_id + '/commands'
+    print "Service Url isi %s" % service_url
+
+    payload = json.dumps([{'id': command_id}])
     print payload
     print "\n"
-    
-    print restclient.post(serviceUrl=serviceUrl, payload=payload, contentType='application/json')
+
+    print restclient.post(service_url=service_url, payload=payload, content_type='application/json')
 
 # driver method for all tests                
 if __name__ == "__main__":
-    if(len(sys.argv) != 3):
-        print "Usage: addCommandToCluster clusterId commandId"
+    if len(sys.argv) != 3:
+        print "Usage: add_command_to_cluster cluster_id command_id"
         sys.exit(-1)
 
-    addCommandToCluster(sys.argv[1],sys.argv[2])
+    add_command_to_cluster(sys.argv[1], sys.argv[2])

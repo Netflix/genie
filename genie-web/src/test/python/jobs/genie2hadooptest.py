@@ -31,9 +31,9 @@ jobID = "job-" + str(uuid.uuid4())
 GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 
 # get the serviceUrl from the eureka client
-serviceUrl = eureka.EurekaClient().getServiceBaseUrl() + '/genie/v2/jobs'
+serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v2/jobs'
 # works
-clusterTags = json.dumps([{"tags" : ['x','y']},{"tags" : ['adhoc','h2query']}])
+clusterTags = json.dumps([{"tags": ['x', 'y']}, {"tags": ['adhoc', 'h2query']}])
 cmdTags = json.dumps(['hadoop240'])
 
 def testJsonSubmitjob():
