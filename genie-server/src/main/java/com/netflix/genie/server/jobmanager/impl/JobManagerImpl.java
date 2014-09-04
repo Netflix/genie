@@ -148,6 +148,9 @@ public class JobManagerImpl implements JobManager {
             this.jobService.setApplicationInfoForJob(this.job.getId(), application.getId(), application.getName());
         }
 
+        // Refresh the job in memory to get the changes
+        this.job = this.jobService.getJob(this.job.getId());
+
         this.initCalled = true;
     }
 
