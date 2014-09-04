@@ -21,9 +21,15 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.model.*;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.FileAttachment;
+import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobMonitor;
+import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -37,10 +43,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Generic base implementation of the JobManager interface.
@@ -63,49 +69,38 @@ public class JobManagerImpl implements JobManager {
      */
     protected static final char SEMI_COLON = ';';
 
-    /**
-     * The name of the Genie job id property to be passed to all jobs.
-     */
-    protected static final String GENIE_JOB_ID = "genie.job.id";
-
-    //TODO: This is netflix specific
-    /**
-     * The name of the Environment (test/prod) property to be passed to all
-     * jobs.
-     */
-    protected static final String NETFLIX_ENV = "netflix.environment";
-
+    //TODO: Move to a property file
     /**
      * Default group name for job submissions.
      */
     protected static final String DEFAULT_GROUP_NAME = "hadoop";
 
-    private final Map<String, String> env = new HashMap<>();
-    private String executable;
-    private Cluster cluster;
-    private Job job;
-
     private final JobMonitor jobMonitor;
     private final Thread jobMonitorThread;
     private final JobService jobService;
+    private final CommandConfigService commandService;
 
     private boolean initCalled;
     private String jobDir;
-    private ProcessBuilder processBuilder;
+    private Cluster cluster;
+    private Job job;
 
     /**
      * Default constructor - initializes cluster configuration and load
      * balancer.
      *
-     * @param jobMonitor The job monitor object to use.
-     * @param jobService The job service to use.
+     * @param jobMonitor     The job monitor object to use.
+     * @param jobService     The job service to use.
+     * @param commandService The command service to use.
      */
     @Inject
     public JobManagerImpl(final JobMonitor jobMonitor,
-                          final JobService jobService) {
+                          final JobService jobService,
+                          final CommandConfigService commandService) {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
         this.jobService = jobService;
+        this.commandService = commandService;
         this.initCalled = false;
     }
 
@@ -126,10 +121,8 @@ public class JobManagerImpl implements JobManager {
         this.job = job;
         this.cluster = cluster;
 
-        // construct the environment variables
-        this.initEnv();
-
-        this.initJobProcess();
+        // save the cluster name and id
+        this.jobService.setClusterInfoForJob(this.job.getId(), this.cluster.getId(), this.cluster.getName());
 
         this.initCalled = true;
     }
@@ -144,25 +137,16 @@ public class JobManagerImpl implements JobManager {
             throw new GeniePreconditionException("Init wasn't called. Unable to continue.");
         }
 
-        try {
-            // launch job, and get process handle
-            final Process proc = this.processBuilder.start();
-            final int pid = this.getProcessId(proc);
-            this.jobService.setProcessIdForJob(this.job.getId(), pid);
+        // create the ProcessBuilder for this process
+        final List<String> processArgs = this.createBaseProcessArguments();
+        processArgs.addAll(Arrays.asList(StringUtil.splitCmdLine(this.job.getCommandArgs())));
+        final ProcessBuilder processBuilder = new ProcessBuilder(processArgs);
 
-            // set off monitor thread for the job
-            this.jobMonitor.setJob(this.job);
-            this.jobMonitor.setProcess(proc);
-            this.jobMonitor.setWorkingDir(this.jobDir);
-            this.jobMonitorThread.start();
-            this.jobService.setJobStatus(this.job.getId(), JobStatus.RUNNING, "Job is running");
-            LOG.info("Successfully launched the job with PID = " + pid);
-        } catch (final IOException e) {
-            final String msg = "Failed to launch the job";
-            LOG.error(msg, e);
-            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
-            throw new GenieServerException(msg, e);
-        }
+        // construct the environment variables
+        this.setupCommonProcess(processBuilder);
+
+        // Launch the actual process
+        this.launchProcess(processBuilder);
     }
 
     /**
@@ -171,12 +155,8 @@ public class JobManagerImpl implements JobManager {
     @Override
     public void kill() throws GenieException {
         LOG.info("called");
-
-        // basic error checking
-        if (this.job == null) {
-            final String msg = "JobInfo object is null";
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
+        if (!this.initCalled) {
+            throw new GeniePreconditionException("Init wasn't called. Unable to continue.");
         }
 
         // check to ensure that the process id is actually set (which means job
@@ -207,6 +187,61 @@ public class JobManagerImpl implements JobManager {
     }
 
     /**
+     * Extract/initialize command-line arguments passed by user.
+     *
+     * @return the parsed command-line arguments as an array
+     * @throws GenieException On issue
+     */
+    protected List<String> createBaseProcessArguments() throws GenieException {
+        LOG.info("called");
+
+        final List<String> processArgs = new ArrayList<>();
+
+        // first two args are the job launcher script and job type
+        processArgs.add(getGenieHome() + File.separator + "joblauncher.sh");
+        processArgs.add(this.commandService.getCommand(this.job.getCommandId()).getExecutable());
+
+        return processArgs;
+    }
+
+    /**
+     * Actually launch a process based on the process builder.
+     *
+     * @param processBuilder The process builder to use.
+     * @throws GenieException If any issue happens launching the process.
+     */
+    protected void launchProcess(final ProcessBuilder processBuilder) throws GenieException {
+        try {
+            // launch job, and get process handle
+            final Process proc = processBuilder.start();
+            final int pid = this.getProcessId(proc);
+            this.jobService.setProcessIdForJob(this.job.getId(), pid);
+
+            // set off monitor thread for the job
+            this.jobMonitor.setJob(this.job);
+            this.jobMonitor.setProcess(proc);
+            this.jobMonitor.setWorkingDir(this.jobDir);
+            this.jobMonitorThread.start();
+            this.jobService.setJobStatus(this.job.getId(), JobStatus.RUNNING, "Job is running");
+            LOG.info("Successfully launched the job with PID = " + pid);
+        } catch (final IOException e) {
+            final String msg = "Failed to launch the job";
+            LOG.error(msg, e);
+            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
+            throw new GenieServerException(msg, e);
+        }
+    }
+
+    /**
+     * Check whether init was called or not.
+     *
+     * @return True if init was called.
+     */
+    protected boolean isInitCalled() {
+        return this.initCalled;
+    }
+
+    /**
      * Get the cluster being used for the job.
      *
      * @return The cluster
@@ -222,15 +257,6 @@ public class JobManagerImpl implements JobManager {
      */
     protected Job getJob() {
         return this.job;
-    }
-
-    /**
-     * Get the process builder being used to build the job.
-     *
-     * @return the process builder.
-     */
-    protected ProcessBuilder getProcessBuilder() {
-        return this.processBuilder;
     }
 
     /**
@@ -258,24 +284,195 @@ public class JobManagerImpl implements JobManager {
     /**
      * Set/initialize environment variables for this job.
      *
+     * @param processBuilder The process builder to use
      * @throws GenieException if there is any error in initialization
      */
-    private void initEnv() throws GenieException {
+    protected void setupCommonProcess(final ProcessBuilder processBuilder) throws GenieException {
         LOG.info("called");
+
+        //Get the directory to stage all the work out of
+        final String baseUserWorkingDir = this.getBaseUserWorkingDirectory();
+
+        //Save the base user working directory
+        processBuilder.environment().put("BASE_USER_WORKING_DIR", baseUserWorkingDir);
+
+        //Set the process working directory
+        processBuilder.directory(this.createWorkingDirectory(baseUserWorkingDir));
+
+        //Copy any attachments from the job.
+        this.copyAttachments();
+
+        LOG.info("Setting job working dir , conf dir and jar dir");
+        // setup env for current job, conf and jar directories directories
+        processBuilder.environment().put("CURRENT_JOB_WORKING_DIR", this.jobDir);
+        processBuilder.environment().put("CURRENT_JOB_CONF_DIR", this.jobDir + "/conf");
+        processBuilder.environment().put("CURRENT_JOB_JAR_DIR", this.jobDir + "/jars");
 
         if (this.job.getFileDependencies() != null
                 && !this.job.getFileDependencies().isEmpty()) {
-            this.env.put("CURRENT_JOB_FILE_DEPENDENCIES", this.job.getFileDependencies());
+            processBuilder.environment().put("CURRENT_JOB_FILE_DEPENDENCIES", this.job.getFileDependencies());
         }
 
         // set the cluster related conf files
-        final Set<String> clusterConfigs = this.cluster.getConfigs();
+        processBuilder.environment()
+                .put("S3_CLUSTER_CONF_FILES", convertCollectionToCSV(this.cluster.getConfigs()));
 
-        this.env.put("S3_CLUSTER_CONF_FILES", convertCollectionToCSV(clusterConfigs));
+        this.setCommandAndApplicationForJob(processBuilder);
 
+        if (StringUtils.isNotBlank(this.job.getEnvPropFile())) {
+            processBuilder.environment().put("JOB_ENV_FILE", this.job.getEnvPropFile());
+        }
+
+        // this is for the generic joblauncher.sh to use to create username
+        // on the machine if needed
+        processBuilder.environment().put("USER_NAME", this.job.getUser());
+
+        processBuilder.environment().put("GROUP_NAME", this.getGroupName());
+
+        // set the java home
+        final String javaHome = ConfigurationManager
+                .getConfigInstance()
+                .getString("netflix.genie.server.java.home");
+        if (StringUtils.isNotBlank(javaHome)) {
+            processBuilder.environment().put("JAVA_HOME", javaHome);
+        }
+
+        // set the genie home
+        final String genieHome = ConfigurationManager
+                .getConfigInstance()
+                .getString("netflix.genie.server.sys.home");
+        if (StringUtils.isBlank(genieHome)) {
+            final String msg = "Property netflix.genie.server.sys.home is not set correctly";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
+        processBuilder.environment().put("XS_SYSTEM_HOME", genieHome);
+
+        // set the archive location
+        // unless user has explicitly requested for it to be disabled
+        if (!this.job.isDisableLogArchival()) {
+            final String s3ArchiveLocation = ConfigurationManager
+                    .getConfigInstance()
+                    .getString("netflix.genie.server.s3.archive.location");
+            if (StringUtils.isNotBlank(s3ArchiveLocation)) {
+                processBuilder.environment().put("S3_ARCHIVE_LOCATION", s3ArchiveLocation);
+            }
+        }
+    }
+
+    /**
+     * Get the Genie home location.
+     *
+     * @return The genie home location.
+     * @throws GenieException When a home isn't set
+     */
+    private String getGenieHome() throws GenieException {
+        final String genieHome = ConfigurationManager
+                .getConfigInstance()
+                .getString("netflix.genie.server.sys.home");
+        if (StringUtils.isBlank(genieHome)) {
+            final String msg = "Property netflix.genie.server.sys.home is not set correctly";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
+        return genieHome;
+    }
+
+    /**
+     * Copy over any attachments for the job which exist.
+     *
+     * @throws GenieException
+     */
+    private void copyAttachments() throws GenieException {
+        // copy over the attachments if they exist
+        if (this.job.getAttachments() != null) {
+            for (final FileAttachment attachment : this.job.getAttachments()) {
+                // basic error checking
+                if (attachment.getName() == null || attachment.getName().isEmpty()) {
+                    final String msg = "File attachment is missing required parameter name";
+                    LOG.error(msg);
+                    throw new GeniePreconditionException(msg);
+                }
+                if (attachment.getData() == null) {
+                    final String msg = "File attachment is missing required parameter data";
+                    LOG.error(msg);
+                    throw new GeniePreconditionException(msg);
+                }
+                // good to go - copy attachments
+                // not checking for 0-byte attachments - assuming they are legitimate
+                try (final FileOutputStream output =
+                             new FileOutputStream(this.jobDir + File.separator + attachment.getName())) {
+                    output.write(attachment.getData());
+                } catch (final IOException e) {
+                    final String msg = "Unable to copy attachment correctly: " + attachment.getName();
+                    LOG.error(msg);
+                    throw new GenieServerException(msg, e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the base user working directory.
+     *
+     * @return The base user working directory if one exists.
+     * @throws GenieException If unable to get the property
+     */
+    private String getBaseUserWorkingDirectory() throws GenieException {
+        final String baseUserWorkingDir = ConfigurationManager
+                .getConfigInstance()
+                .getString("netflix.genie.server.user.working.dir");
+        if (StringUtils.isBlank(baseUserWorkingDir)) {
+            final String msg = "Property netflix.genie.server.user.working.dir is not set";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
+        return baseUserWorkingDir;
+    }
+
+    /**
+     * Get the working directory for the job. Will create folders on the system.
+     *
+     * @param baseUserWorkingDir The base directory to start from.
+     * @return The Java file reference to the directory that was created.
+     * @throws GenieException If the directory already exists or unable to create
+     */
+    private File createWorkingDirectory(final String baseUserWorkingDir) throws GenieException {
+        this.jobDir = baseUserWorkingDir + File.separator + this.job.getId();
+        final File userJobDir = new File(this.jobDir);
+
+        // check if working directory already exists
+        if (userJobDir.exists()) {
+            final String msg = "User staging directory already exists";
+            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
+            LOG.error(this.job.getStatusMsg() + ": "
+                    + userJobDir.getAbsolutePath());
+            throw new GenieServerException(msg);
+        }
+
+        // create the working directory
+        final boolean resMkDir = userJobDir.mkdirs();
+        if (!resMkDir) {
+            String msg = "User staging directory can't be created";
+            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
+            LOG.error(this.job.getStatusMsg() + ": "
+                    + userJobDir.getAbsolutePath());
+            throw new GenieServerException(msg);
+        }
+
+        return userJobDir;
+    }
+
+    /**
+     * Set the command and application for a given process and job.
+     *
+     * @param processBuilder The process builder to use.
+     * @throws GenieException On an error interacting with database.
+     */
+    private void setCommandAndApplicationForJob(final ProcessBuilder processBuilder) throws GenieException {
         Command command = null;
         for (final Command cmd : this.cluster.getCommands()) {
-            if (cmd.getTags().containsAll(job.getCommandCriteria())) {
+            if (cmd.getTags().containsAll(this.job.getCommandCriteria())) {
                 command = cmd;
                 break;
             }
@@ -291,87 +488,32 @@ public class JobManagerImpl implements JobManager {
         // save the command name, application id and application name
         this.jobService.setCommandInfoForJob(this.job.getId(), command.getId(), command.getName());
 
+        if (command.getConfigs() != null && !command.getConfigs().isEmpty()) {
+            processBuilder.environment()
+                    .put("S3_COMMAND_CONF_FILES", convertCollectionToCSV(command.getConfigs()));
+        }
+
+        if (StringUtils.isNotBlank(command.getEnvPropFile())) {
+            processBuilder.environment().put("COMMAND_ENV_FILE", command.getEnvPropFile());
+        }
+
         final Application application = command.getApplication();
         if (application != null) {
             this.jobService.setApplicationInfoForJob(this.job.getId(), application.getId(), application.getName());
 
             if (application.getConfigs() != null && !application.getConfigs().isEmpty()) {
-                this.env.put("S3_APPLICATION_CONF_FILES", convertCollectionToCSV(application.getConfigs()));
+                processBuilder.environment()
+                        .put("S3_APPLICATION_CONF_FILES", convertCollectionToCSV(application.getConfigs()));
             }
 
             if (application.getJars() != null && !application.getJars().isEmpty()) {
-                this.env.put("S3_APPLICATION_JAR_FILES", convertCollectionToCSV(application.getJars()));
+                processBuilder.environment()
+                        .put("S3_APPLICATION_JAR_FILES", convertCollectionToCSV(application.getJars()));
             }
 
             if (StringUtils.isNotBlank(application.getEnvPropFile())) {
-                this.env.put("APPLICATION_ENV_FILE", application.getEnvPropFile());
-            }
-        }
-
-        //Command ce = pmCommand.getEntity(cmdId, Command.class);
-        if (command.getConfigs() != null && !command.getConfigs().isEmpty()) {
-            this.env.put("S3_COMMAND_CONF_FILES", convertCollectionToCSV(command.getConfigs()));
-        }
-
-        this.executable = command.getExecutable();
-
-        // save the cluster name and id
-        this.jobService.setClusterInfoForJob(this.job.getId(), this.cluster.getId(), this.cluster.getName());
-
-        // Get envPropertyFile for command and job and set env variable
-        if (StringUtils.isNotBlank(command.getEnvPropFile())) {
-            this.env.put("COMMAND_ENV_FILE", command.getEnvPropFile());
-        }
-
-        if (StringUtils.isNotBlank(this.job.getEnvPropFile())) {
-            this.env.put("JOB_ENV_FILE", this.job.getEnvPropFile());
-        }
-
-        // this is for the generic joblauncher.sh to use to create username
-        // on the machine if needed
-        this.env.put("USER_NAME", this.job.getUser());
-
-        this.env.put("GROUP_NAME", this.getGroupName());
-
-        // set the java home
-        final String javaHome = ConfigurationManager
-                .getConfigInstance()
-                .getString("netflix.genie.server.java.home");
-        if (StringUtils.isNotBlank(javaHome)) {
-            this.env.put("JAVA_HOME", javaHome);
-        }
-
-        // set the genie home
-        final String genieHome = ConfigurationManager
-                .getConfigInstance()
-                .getString("netflix.genie.server.sys.home");
-        if (StringUtils.isBlank(genieHome)) {
-            final String msg = "Property netflix.genie.server.sys.home is not set correctly";
-            LOG.error(msg);
-            throw new GenieServerException(msg);
-        }
-        this.env.put("XS_SYSTEM_HOME", genieHome);
-
-        // set the base working directory
-        final String baseUserWorkingDir = ConfigurationManager
-                .getConfigInstance()
-                .getString("netflix.genie.server.user.working.dir");
-        if (StringUtils.isBlank(baseUserWorkingDir)) {
-            final String msg = "Property netflix.genie.server.user.working.dir is not set";
-            LOG.error(msg);
-            throw new GenieServerException(msg);
-        } else {
-            this.env.put("BASE_USER_WORKING_DIR", baseUserWorkingDir);
-        }
-
-        // set the archive location
-        // unless user has explicitly requested for it to be disabled
-        if (!this.job.isDisableLogArchival()) {
-            final String s3ArchiveLocation = ConfigurationManager
-                    .getConfigInstance()
-                    .getString("netflix.genie.server.s3.archive.location");
-            if (StringUtils.isNotBlank(s3ArchiveLocation)) {
-                this.env.put("S3_ARCHIVE_LOCATION", s3ArchiveLocation);
+                processBuilder.environment()
+                        .put("APPLICATION_ENV_FILE", application.getEnvPropFile());
             }
         }
     }
@@ -405,114 +547,5 @@ public class JobManagerImpl implements JobManager {
             LOG.error(msg, e);
             throw new GenieServerException(msg, e);
         }
-    }
-
-    /**
-     * Initialize the process and other things that will be used to run the job.
-     *
-     * @throws GenieException
-     */
-    private void initJobProcess() throws GenieException {
-        // create the ProcessBuilder for this process
-        this.processBuilder = new ProcessBuilder(this.createProcessArguments());
-
-        // set current working directory for the process
-        this.jobDir = this.env.get("BASE_USER_WORKING_DIR")
-                + File.separator
-                + this.job.getId();
-        final File userJobDir = new File(this.jobDir);
-
-        // check if working directory already exists
-        if (userJobDir.exists()) {
-            final String msg = "User staging directory already exists";
-            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
-            LOG.error(this.job.getStatusMsg() + ": "
-                    + userJobDir.getAbsolutePath());
-            throw new GenieServerException(msg);
-        }
-
-        // create the working directory
-        final boolean resMkDir = userJobDir.mkdirs();
-        if (!resMkDir) {
-            String msg = "User staging directory can't be created";
-            this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
-            LOG.error(this.job.getStatusMsg() + ": "
-                    + userJobDir.getAbsolutePath());
-            throw new GenieServerException(msg);
-        }
-        this.processBuilder.directory(userJobDir);
-
-        // copy over the attachments if they exist
-        if (this.job.getAttachments() != null) {
-            for (final FileAttachment attachment : this.job.getAttachments()) {
-                // basic error checking
-                if (attachment.getName() == null || attachment.getName().isEmpty()) {
-                    final String msg = "File attachment is missing required parameter name";
-                    LOG.error(msg);
-                    throw new GeniePreconditionException(msg);
-                }
-                if (attachment.getData() == null) {
-                    final String msg = "File attachment is missing required parameter data";
-                    LOG.error(msg);
-                    throw new GeniePreconditionException(msg);
-                }
-                // good to go - copy attachments
-                // not checking for 0-byte attachments - assuming they are legitimate
-                FileOutputStream output = null;
-                try {
-                    output = new FileOutputStream(this.jobDir + File.separator + attachment.getName());
-                    output.write(attachment.getData());
-                } catch (final IOException e) {
-                    final String msg = "Unable to copy attachment correctly: " + attachment.getName();
-                    LOG.error(msg);
-                    throw new GenieServerException(msg, e);
-                } finally {
-                    if (output != null) {
-                        try {
-                            output.close();
-                        } catch (final IOException ioe) {
-                            final String msg = "Unable to close the output stream for the attachment";
-                            LOG.error(msg, ioe);
-                        }
-                    }
-                }
-            }
-        }
-
-        // set environment variables for the process
-        final Map<String, String> pEnv = this.processBuilder.environment();
-
-        pEnv.putAll(this.env);
-
-        LOG.info("Setting job working dir , conf dir and jar dir");
-        // setup env for current job, conf and jar directories directories
-        pEnv.put("CURRENT_JOB_WORKING_DIR", this.jobDir);
-        pEnv.put("CURRENT_JOB_CONF_DIR", this.jobDir + "/conf");
-        pEnv.put("CURRENT_JOB_JAR_DIR", this.jobDir + "/jars");
-    }
-
-    /**
-     * Extract/initialize command-line arguments passed by user.
-     *
-     * @return the parsed command-line arguments as an array
-     * @throws GenieException On issue
-     */
-    private String[] createProcessArguments() throws GenieException {
-        LOG.info("called");
-
-        final String[] cmdArgs = StringUtil.splitCmdLine(this.job.getCommandArgs());
-
-        final String[] processArgs = new String[cmdArgs.length + 2];
-
-        // get the location where genie scripts are installed
-        final String genieHome = this.env.get("XS_SYSTEM_HOME");
-
-        // first two args are the joblauncher and job type
-        processArgs[0] = genieHome + File.separator + "joblauncher.sh";
-        processArgs[1] = this.executable;
-
-        System.arraycopy(cmdArgs, 0, processArgs, 2, cmdArgs.length);
-
-        return processArgs;
     }
 }

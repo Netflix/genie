@@ -19,10 +19,10 @@ package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.jobmanager.JobMonitor;
+import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -33,45 +33,83 @@ import org.springframework.context.annotation.Scope;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Implementation of job manager for Yarn Jobs.
  *
  * @author amsharma
- * @author skrishnan
- * @author bmundlapudi
  * @author tgianos
  */
 @Named
 @Scope("prototype")
-public class YarnJobManager extends JobManagerImpl {
+public class YarnJobManagerImpl extends JobManagerImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(YarnJobManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(YarnJobManagerImpl.class);
+
+    //TODO: Move to a property file
+    /**
+     * The name of the Genie job id property to be passed to all jobs.
+     */
+    private static final String GENIE_JOB_ID = "genie.job.id";
+
+    //TODO: Move to a property file
+    /**
+     * The name of the Environment (test/prod) property to be passed to all
+     * jobs.
+     */
+    private static final String EXECUTION_ENVIRONMENT = "netflix.environment";
 
     /**
      * Default constructor - initializes cluster configuration and load
      * balancer.
      *
-     * @param jobMonitor The job monitor object to use.
-     * @param jobService The job service to use.
+     * @param jobMonitor     The job monitor object to use.
+     * @param jobService     The job service to use.
+     * @param commandService The command service to use.
      */
     @Inject
-    public YarnJobManager(final JobMonitor jobMonitor,
-                          final JobService jobService) {
-        super(jobMonitor, jobService);
+    public YarnJobManagerImpl(final JobMonitor jobMonitor,
+                              final JobService jobService,
+                              final CommandConfigService commandService) {
+        super(jobMonitor, jobService, commandService);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void init(final Job job, final Cluster cluster) throws GenieException {
+    public void launch() throws GenieException {
         LOG.info("called");
-        super.init(job, cluster);
+        if (!this.isInitCalled()) {
+            throw new GeniePreconditionException("Init wasn't called. Unable to continue.");
+        }
 
+        // create the ProcessBuilder for this process
+        final List<String> processArgs = this.createBaseProcessArguments();
+        processArgs.addAll(Arrays.asList(StringUtil.splitCmdLine(this.getJob().getCommandArgs())));
+
+        final ProcessBuilder processBuilder = new ProcessBuilder(processArgs);
+
+        // construct the environment variables
+        this.setupCommonProcess(processBuilder);
+        this.setupYarnProcess(processBuilder);
+
+        // Launch the actual process
+        this.launchProcess(processBuilder);
+    }
+
+    /**
+     * Set up the process with specific YARN properties.
+     *
+     * @param processBuilder The process builder to modify.
+     * @throws GenieException If there are any issues.
+     */
+    private void setupYarnProcess(final ProcessBuilder processBuilder) throws GenieException {
         // setup the HADOOP specific variables
-        final Map<String, String> processEnv = this.getProcessBuilder().environment();
+        final Map<String, String> processEnv = processBuilder.environment();
         processEnv.put("HADOOP_CONF_DIR", this.getJobDir() + "/conf");
         processEnv.put("HADOOP_USER_NAME", this.getJob().getUser());
         processEnv.put("HADOOP_GROUP_NAME", this.getGroupName());
@@ -79,7 +117,7 @@ public class YarnJobManager extends JobManagerImpl {
         // set the variables to be added to the core-site xml. Format of this variable is:
         // key1=value1;key2=value2;key3=value3
         final String genieJobIDProp = GENIE_JOB_ID + "=" + this.getJob().getId();
-        final String netflixEnvProp = NETFLIX_ENV
+        final String netflixEnvProp = EXECUTION_ENVIRONMENT
                 + "="
                 + ConfigurationManager.getConfigInstance().getString("netflix.environment");
 

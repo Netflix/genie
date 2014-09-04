@@ -43,12 +43,24 @@ public class CommonEntityFields extends Auditable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommonEntityFields.class);
 
+    /**
+     * The namespace to use for genie specific tags.
+     */
     protected static final String GENIE_TAG_NAMESPACE = "genie.";
+
+    /**
+     * The namespace to use for the id.
+     */
     protected static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
+
+    /**
+     * The namespace to use for the name.
+     */
     protected static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
-    protected static final int MAX_ID_TAG_NAMESPACE = 1;
-    protected static final int MAX_NAME_TAG_NAMESPACE = 1;
-    protected static final int MAX_TAG_GENIE_NAMESPACE = 2;
+
+    private static final int MAX_ID_TAG_NAMESPACE = 1;
+    private static final int MAX_NAME_TAG_NAMESPACE = 1;
+    private static final int MAX_TAG_GENIE_NAMESPACE = 2;
 
     /**
      * Version of this entity.
