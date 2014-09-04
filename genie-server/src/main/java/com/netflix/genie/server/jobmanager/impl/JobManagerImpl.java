@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Implementation of job manager for Yarn Jobs.
+ * Generic base implementation of the JobManager interface.
  *
  * @author amsharma
  * @author skrishnan
