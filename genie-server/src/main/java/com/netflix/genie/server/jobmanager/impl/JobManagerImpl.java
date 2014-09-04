@@ -124,6 +124,30 @@ public class JobManagerImpl implements JobManager {
         // save the cluster name and id
         this.jobService.setClusterInfoForJob(this.job.getId(), this.cluster.getId(), this.cluster.getName());
 
+        // Find the command for the job
+        Command command = null;
+        for (final Command cmd : this.cluster.getCommands()) {
+            if (cmd.getTags().containsAll(this.job.getCommandCriteria())) {
+                command = cmd;
+                break;
+            }
+        }
+
+        //Avoiding NPE
+        if (command == null) {
+            final String msg = "No command found for params. Unable to continue.";
+            LOG.error(msg);
+            throw new GeniePreconditionException(msg);
+        }
+
+        // save the command name, application id and application name
+        this.jobService.setCommandInfoForJob(this.job.getId(), command.getId(), command.getName());
+
+        final Application application = command.getApplication();
+        if (application != null) {
+            this.jobService.setApplicationInfoForJob(this.job.getId(), application.getId(), application.getName());
+        }
+
         this.initCalled = true;
     }
 
@@ -470,23 +494,7 @@ public class JobManagerImpl implements JobManager {
      * @throws GenieException On an error interacting with database.
      */
     private void setCommandAndApplicationForJob(final ProcessBuilder processBuilder) throws GenieException {
-        Command command = null;
-        for (final Command cmd : this.cluster.getCommands()) {
-            if (cmd.getTags().containsAll(this.job.getCommandCriteria())) {
-                command = cmd;
-                break;
-            }
-        }
-
-        //Avoiding NPE
-        if (command == null) {
-            final String msg = "No command found for params. Unable to continue.";
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
-        }
-
-        // save the command name, application id and application name
-        this.jobService.setCommandInfoForJob(this.job.getId(), command.getId(), command.getName());
+        final Command command = this.commandService.getCommand(this.job.getCommandId());
 
         if (command.getConfigs() != null && !command.getConfigs().isEmpty()) {
             processBuilder.environment()
@@ -499,8 +507,6 @@ public class JobManagerImpl implements JobManager {
 
         final Application application = command.getApplication();
         if (application != null) {
-            this.jobService.setApplicationInfoForJob(this.job.getId(), application.getId(), application.getName());
-
             if (application.getConfigs() != null && !application.getConfigs().isEmpty()) {
                 processBuilder.environment()
                         .put("S3_APPLICATION_CONF_FILES", convertCollectionToCSV(application.getConfigs()));
