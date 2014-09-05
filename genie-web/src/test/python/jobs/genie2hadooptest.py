@@ -53,7 +53,7 @@ def testJsonSubmitjob():
     '''
     print payload
     print "\n"
-    return jobs.submitJob(serviceUrl, payload)
+    return jobs.submit_job(serviceUrl, payload)
 
 # driver method for all tests                
 if __name__ == "__main__":
@@ -61,9 +61,9 @@ if __name__ == "__main__":
    jobID = testJsonSubmitjob()
    print "\n"
    while True:
-       print jobs.getJobInfo(serviceUrl, jobID)
+       print jobs.get_job_info(serviceUrl, jobID)
        print "\n"
-       status = jobs.getJobStatus(serviceUrl, jobID)
+       status = jobs.get_job_status(serviceUrl, jobID)
        print "Status =%s" % status
        print "\n"
 

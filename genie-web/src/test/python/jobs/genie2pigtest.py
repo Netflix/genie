@@ -36,7 +36,7 @@ serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v2/jobs'
 def testConflictJob():
     print serviceUrl
     print "Running testJsonSubmitjob "
-    clusterTags = json.dumps([{"tags" : ['adhoc','h2query']}])
+    clusterTags = json.dumps([{"tags" : ['adhoc','genie.name:h2query']}])
     cmdTags = json.dumps(['pig11_mr2'])
     payload = '''
         {
@@ -45,7 +45,7 @@ def testConflictJob():
             "clusterCriterias" : ''' + clusterTags + ''',
             "user" : "genietest", 
             "group" : "hadoop", 
-            "commandArgs" : "-f pig2.q", 
+            "commandArgs" : "-x tez -f pig2.q", 
             "commandCriteria" :''' + cmdTags + ''',
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/pig2.q"
         }
@@ -81,8 +81,8 @@ def testNoClusterJob():
 def testGoodJob():
     print serviceUrl
     print "Running testJsonSubmitjob "
-    clusterTags = json.dumps([{"tags" : ['adhoc','h2query']}])
-    cmdTags = json.dumps(['pig11_mr2'])
+    clusterTags = json.dumps([{"tags" : ['adhoc','genie.name:h2query']}])
+    cmdTags = json.dumps(['pig','0.13'])
     payload = '''
         {
             "id":"''' + jobID +'''",
@@ -90,14 +90,14 @@ def testGoodJob():
             "clusterCriterias" : ''' + clusterTags + ''',
             "user" : "genietest", 
             "group" : "hadoop", 
-            "commandArgs" : "-f pig2.q", 
+            "commandArgs" : " -x tez -f pig2.q", 
             "commandCriteria" :''' + cmdTags + ''',
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/pig2.q"
         }
     '''
     print payload
     print "\n"
-    return jobs.submitJob(serviceUrl, payload)
+    return jobs.submit_job(serviceUrl, payload)
 
 # driver method for all tests                
 if __name__ == "__main__":
@@ -114,9 +114,9 @@ if __name__ == "__main__":
     sys.exit(0)
    print "\n"
    while True:
-       print jobs.getJobInfo(serviceUrl, jobID)
+       print jobs.get_job_info(serviceUrl, jobID)
        print "\n"
-       status = jobs.getJobStatus(serviceUrl, jobID)
+       status = jobs.get_job_status(serviceUrl, jobID)
        print "Status =%s" % status
        print "\n"
 
