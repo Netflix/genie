@@ -258,17 +258,17 @@ public class JobResource {
             @QueryParam("status")
             final String status,
             @ApiParam(value = "Name of the cluster on which the job ran.", required = false)
-            @QueryParam("clusterName")
+            @QueryParam("executionClusterName")
             final String clusterName,
             @ApiParam(value = "Id of the cluster on which the job ran.", required = false)
-            @QueryParam("clusterId")
+            @QueryParam("executionClusterId")
             final String clusterId,
             @ApiParam(value = "The page to start on.", required = false)
             @QueryParam("page") @DefaultValue("0") int page,
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit") @DefaultValue("1024") int limit)
             throws GenieException {
-        LOG.info("Called with [id | jobName | userName | status | clusterName | clusterId | page | limit]");
+        LOG.info("Called with [id | jobName | userName | status | executionClusterName | executionClusterId | page | limit]");
         LOG.info(id
                 + " | "
                 + name
