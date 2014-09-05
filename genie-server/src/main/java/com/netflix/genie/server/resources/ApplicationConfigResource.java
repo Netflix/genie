@@ -105,7 +105,7 @@ public class ApplicationConfigResource {
                     response = Application.class),
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid required parameter supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT,
-                            message = "An application with the supplied id already exists"),
+                    message = "An application with the supplied id already exists"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -615,8 +615,8 @@ public class ApplicationConfigResource {
     @Path("/{id}/tags")
     @ApiOperation(
             value = "Remove all tags from a application",
-            notes = "Remove all the tags from the application with given id.  Note that the genie name space tags" +
-                    "prefixed with genie.id and genie.name cannot be deleted.",
+            notes = "Remove all the tags from the application with given id.  Note that the genie name space tags"
+                    + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
@@ -673,8 +673,8 @@ public class ApplicationConfigResource {
     @Path("/{id}/tags/{tag}")
     @ApiOperation(
             value = "Remove a tag from a application",
-            notes = "Remove the given tag from the application with given id. Note that the genie name space tags" +
-            		"prefixed with genie.id and genie.name cannot be deleted.",
+            notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
+                    + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {

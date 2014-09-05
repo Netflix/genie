@@ -617,8 +617,8 @@ public class CommandConfigResource {
     @Path("/{id}/tags")
     @ApiOperation(
             value = "Remove all tags from a command",
-            notes = "Remove all the tags from the command with given id.  Note that the genie name space tags" +
-                    "prefixed with genie.id and genie.name cannot be deleted.",
+            notes = "Remove all the tags from the command with given id.  Note that the genie name space tags"
+                    + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
@@ -815,8 +815,8 @@ public class CommandConfigResource {
     @Path("/{id}/tags/{tag}")
     @ApiOperation(
             value = "Remove a tag from a command",
-            notes = "Remove the given tag from the command with given id.  Note that the genie name space tags" +
-                    "prefixed with genie.id and genie.name cannot be deleted.",
+            notes = "Remove the given tag from the command with given id.  Note that the genie name space tags"
+                    + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {

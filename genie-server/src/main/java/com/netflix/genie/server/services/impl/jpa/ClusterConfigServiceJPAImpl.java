@@ -78,7 +78,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      *
      * @param clusterRepo The cluster repository to use.
      * @param commandRepo the command repository to use.
-     * @param jobRepo The job repository to use.
+     * @param jobRepo     The job repository to use.
      */
     @Inject
     public ClusterConfigServiceJPAImpl(
@@ -559,7 +559,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         if (StringUtils.isBlank(id)) {
             throw new GeniePreconditionException("No cluster id entered. Unable to remove tag.");
         }
-        
+
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             if (StringUtils.isNotBlank(tag)) {
