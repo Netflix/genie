@@ -123,9 +123,14 @@ class Cluster(object):
             if not cluster_id:
                 raise genie2.exception.genie_exception.GenieException("No cluster id entered. Unable to continue.")
 
-            commands = set()
+            command_ids_set = set()
+            commands = list()
             for command_id in command_ids:
-                commands.add(self._api.getCommand(command_id))
+                if command_id in command_ids_set:
+                    raise genie2.exception.genie_exception.GenieException(command_id + "Entered twice. Must be unique.")
+                else:
+                    command_ids_set.add(command_id)
+                commands.append(self._api.getCommand(command_id))
             return self._api.addCommandsForCluster(cluster_id, commands)
         except urllib2.HTTPError, http_error:
             raise genie2.exception.genie_exception.GenieException(http_error.read(), http_error.code)

@@ -26,7 +26,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommonEntityFields;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
