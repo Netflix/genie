@@ -74,12 +74,6 @@ public class ClusterConfigResource {
     private final ClusterConfigService ccs;
 
     /**
-     * Uri info for gathering information on the request.
-     */
-    @Context
-    private UriInfo uriInfo;
-
-    /**
      * Constructor.
      *
      * @param ccs The cluster configuration service to use.
@@ -93,6 +87,7 @@ public class ClusterConfigResource {
      * Create cluster configuration.
      *
      * @param cluster contains the cluster information to create
+     * @param uriInfo For gathering information about the request
      * @return The created cluster
      * @throws GenieException For any error
      */
@@ -109,12 +104,13 @@ public class ClusterConfigResource {
     })
     public Response createCluster(
             @ApiParam(value = "The cluster to create.", required = true)
-            final Cluster cluster)
+            final Cluster cluster,
+            @Context UriInfo uriInfo)
             throws GenieException {
         LOG.info("Called to create new cluster " + cluster);
         final Cluster createdCluster = this.ccs.createCluster(cluster);
         return Response.created(
-                this.uriInfo.getAbsolutePathBuilder().path(createdCluster.getId()).build()).
+                uriInfo.getAbsolutePathBuilder().path(createdCluster.getId()).build()).
                 entity(createdCluster).
                 build();
     }

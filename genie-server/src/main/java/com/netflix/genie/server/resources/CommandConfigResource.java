@@ -69,12 +69,6 @@ public class CommandConfigResource {
     private final CommandConfigService ccs;
 
     /**
-     * Uri info for gathering information on the request.
-     */
-    @Context
-    private UriInfo uriInfo;
-
-    /**
      * Constructor.
      *
      * @param ccs The command configuration service to use.
@@ -88,6 +82,7 @@ public class CommandConfigResource {
      * Create a Command configuration.
      *
      * @param command The command configuration to create
+     * @param uriInfo For gathering information on the request
      * @return The command created
      * @throws GenieException For any error
      */
@@ -118,11 +113,12 @@ public class CommandConfigResource {
                     value = "The command to create.",
                     required = true
             )
-            final Command command) throws GenieException {
+            final Command command,
+            @Context final UriInfo uriInfo) throws GenieException {
         LOG.info("called to create new command configuration " + command.toString());
         final Command createdCommand = this.ccs.createCommand(command);
         return Response.created(
-                this.uriInfo.getAbsolutePathBuilder().path(createdCommand.getId()).build()).
+                uriInfo.getAbsolutePathBuilder().path(createdCommand.getId()).build()).
                 entity(createdCommand).
                 build();
     }

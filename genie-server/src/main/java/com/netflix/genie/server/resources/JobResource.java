@@ -81,12 +81,6 @@ public class JobResource {
     private final JobService jobService;
 
     /**
-     * Uri info for gathering information on the request.
-     */
-    @Context
-    private UriInfo uriInfo;
-
-    /**
      * Constructor.
      *
      * @param xs         The execution service to use.
@@ -101,8 +95,9 @@ public class JobResource {
     /**
      * Submit a new job.
      *
-     * @param job request object containing job info element for new job
-     * @param hsr servlet context
+     * @param job     request object containing job info element for new job
+     * @param hsr     servlet context
+     * @param uriInfo For getting request uri information.
      * @return The submitted job
      * @throws GenieException For any error
      */
@@ -124,7 +119,8 @@ public class JobResource {
             @ApiParam(value = "Job object to run.", required = true)
             final Job job,
             @ApiParam(value = "Http Servlet request object", required = true)
-            @Context final HttpServletRequest hsr) throws GenieException {
+            @Context final HttpServletRequest hsr,
+            @Context final UriInfo uriInfo) throws GenieException {
         LOG.info("Called to submit job: " + job);
         if (job == null) {
             throw new GenieException(
@@ -150,7 +146,7 @@ public class JobResource {
 
         final Job createdJob = this.xs.submitJob(job);
         return Response.created(
-                this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
+                uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
                 entity(createdJob).
                 build();
     }

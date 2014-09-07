@@ -1980,9 +1980,9 @@ class V2Api(object):
 
             status, str: Status of the jobs to fetch. (optional)
 
-            clusterName, str: Name of the cluster on which the job ran. (optional)
+            executionClusterName, str: Name of the cluster on which the job ran. (optional)
 
-            clusterId, str: Id of the cluster on which the job ran. (optional)
+            executionClusterId, str: Id of the cluster on which the job ran. (optional)
 
             page, int: The page to start on. (optional)
 
@@ -1993,7 +1993,7 @@ class V2Api(object):
         Returns: Array[Job]
         """
 
-        allParams = ['id', 'jobName', 'userName', 'status', 'clusterName', 'clusterId', 'page', 'limit']
+        allParams = ['id', 'jobName', 'userName', 'status', 'executionClusterName', 'executionClusterId', 'page', 'limit']
 
         params = locals()
         for (key, val) in params['kwargs'].iteritems():

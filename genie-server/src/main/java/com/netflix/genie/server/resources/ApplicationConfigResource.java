@@ -72,12 +72,6 @@ public class ApplicationConfigResource {
     private final ApplicationConfigService acs;
 
     /**
-     * Uri info for gathering information on the request.
-     */
-    @Context
-    private UriInfo uriInfo;
-
-    /**
      * Constructor.
      *
      * @param acs The application configuration service to use.
@@ -90,7 +84,8 @@ public class ApplicationConfigResource {
     /**
      * Create an Application.
      *
-     * @param app The application to create
+     * @param app     The application to create
+     * @param uriInfo For gathering information on the request
      * @return The created application configuration
      * @throws GenieException For any error
      */
@@ -111,11 +106,12 @@ public class ApplicationConfigResource {
     })
     public Response createApplication(
             @ApiParam(value = "The application to create.", required = true)
-            final Application app) throws GenieException {
+            final Application app,
+            @Context UriInfo uriInfo) throws GenieException {
         LOG.info("Called to create new application");
         final Application createdApp = this.acs.createApplication(app);
         return Response.created(
-                this.uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
+                uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
                 entity(createdApp).
                 build();
     }
