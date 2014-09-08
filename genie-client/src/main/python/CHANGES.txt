@@ -6,3 +6,4 @@
 0.1.5, 09/06/2014 -- Fixing bug in cluster_api.add_commands_to_cluster where list was being treated as set losing order
 0.1.6, 09/07/2014 -- Renaming executionClusterId, executionClusterName to match the actual REST API for searching jobs
 0.1.7, 09/07/2014 -- Missed some instances of clusterId and clusterName in the query params for jobs. Fixing.
+0.1.8, 09/07/2014 -- Misspelled execution as exection
