@@ -2017,10 +2017,10 @@ class V2Api(object):
             queryParams['userName'] = self.apiClient.toPathValue(params['userName'])
         if ('status' in params):
             queryParams['status'] = self.apiClient.toPathValue(params['status'])
-        if ('clusterName' in params):
-            queryParams['clusterName'] = self.apiClient.toPathValue(params['clusterName'])
-        if ('clusterId' in params):
-            queryParams['clusterId'] = self.apiClient.toPathValue(params['clusterId'])
+        if ('executionClusterName' in params):
+            queryParams['executionClusterName'] = self.apiClient.toPathValue(params['executionClusterName'])
+        if ('executionClusterId' in params):
+            queryParams['exectionClusterId'] = self.apiClient.toPathValue(params['executionClusterId'])
         if ('page' in params):
             queryParams['page'] = self.apiClient.toPathValue(params['page'])
         if ('limit' in params):
