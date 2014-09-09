@@ -148,7 +148,7 @@ public class YarnJobManagerImpl extends JobManagerImpl {
             String hadoopVersion = this.getCluster().getVersion();
             LOG.debug("Hadoop Version of the cluster: " + hadoopVersion);
 
-            // try exact version first
+            // try extract version first
             hadoopHome = ConfigurationManager
                     .getConfigInstance()
                     .getString("netflix.genie.server.hadoop." + hadoopVersion + ".home");
