@@ -73,8 +73,10 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
 
         // create the ProcessBuilder for this process
         final List<String> processArgs = this.createBaseProcessArguments();
-        processArgs.add("--server http://" + this.getCluster().getName() + ".master.dataeng.netflix.net:8080");
-        processArgs.add("--catalog hive");
+        processArgs.add("--server");
+        processArgs.add("http://" + this.getCluster().getName() + ".master.dataeng.netflix.net:8080");
+        processArgs.add("--catalog");
+        processArgs.add("hive");
         processArgs.add("--debug");
         processArgs.addAll(Arrays.asList(StringUtil.splitCmdLine(this.getJob().getCommandArgs())));
 
