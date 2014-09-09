@@ -416,7 +416,7 @@ public class JobManagerImpl implements JobManager {
     private void copyAttachments() throws GenieException {
         // copy over the attachments if they exist
         if (this.attachments != null) {
-            for (final FileAttachment attachment : this.job.getAttachments()) {
+            for (final FileAttachment attachment : this.attachments) {
                 // basic error checking
                 if (attachment.getName() == null || attachment.getName().isEmpty()) {
                     final String msg = "File attachment is missing required parameter name";

@@ -49,9 +49,8 @@ def test_presto_submit_job():
             "version" : "1",
             "group" : "presto",
             "forwarded" : false,
-            "commandArgs" : "-f showtables.q",
-            "commandCriteria" :''' + cmdTags + ''',
-            "fileDependencies":"s3://netflix-bigdataplatform/presto/showtables.q"
+            "commandArgs" : "--execute \\"SELECT json_array_get(cluster_alloc, 0) FROM dse.pvr_clusteredpop_account_allocations WHERE region = 'UK_IE' and dayspan = 360;\\"",
+            "commandCriteria" :''' + cmdTags + '''
         }
     '''
     print payload

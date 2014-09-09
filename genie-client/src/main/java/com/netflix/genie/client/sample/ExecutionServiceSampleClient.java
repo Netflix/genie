@@ -66,20 +66,20 @@ public final class ExecutionServiceSampleClient {
         // ExecutionServiceClient.initEureka("test");
         LOG.info("Initializing list of Genie servers");
         ConfigurationManager.getConfigInstance().setProperty("genie2Client.ribbon.listOfServers",
-                "localhost:7001");
+                "http://ec2-54-82-235-221.compute-1.amazonaws.com:7001");
 
         LOG.info("Initializing ExecutionServiceClient");
         final ExecutionServiceClient client = ExecutionServiceClient.getInstance();
 
         final String userName = "genietest";
         final String jobName = "sampleClientTestJob";
-        LOG.info("Getting jobInfos using specified filter criteria");
+        LOG.info("Getting jobs using specified filter criteria");
         final Multimap<String, String> params = ArrayListMultimap.create();
         params.put("userName", userName);
         params.put("status", JobStatus.FAILED.name());
         params.put("limit", "3");
         for (final Job ji : client.getJobs(params)) {
-            LOG.info("Job Info: {id, status, finishTime} - {"
+            LOG.info("Job: {id, status, finishTime} - {"
                     + ji.getId() + ", " + ji.getStatus() + ", "
                     + ji.getFinished() + "}");
         }
@@ -91,7 +91,7 @@ public final class ExecutionServiceSampleClient {
         final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
         final Set<String> commandCriteria = new HashSet<>();
         clusterCriterias.add(criteria);
-        commandCriteria.add("prodhive11_mr2");
+        commandCriteria.add("genie.id:prodhive11_mr2");
 
         Job job = new Job(
                 userName,
