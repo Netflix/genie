@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Generic base implementation of the JobManager interface.
@@ -84,6 +85,7 @@ public class JobManagerImpl implements JobManager {
     private String jobDir;
     private Cluster cluster;
     private Job job;
+    private Set<FileAttachment> attachments;
 
     /**
      * Default constructor - initializes cluster configuration and load
@@ -120,6 +122,7 @@ public class JobManagerImpl implements JobManager {
         this.jobMonitor.setJobManager(this);
         this.job = job;
         this.cluster = cluster;
+        this.attachments = this.job.getAttachments();
 
         // save the cluster name and id
         this.jobService.setClusterInfoForJob(this.job.getId(), this.cluster.getId(), this.cluster.getName());
@@ -412,7 +415,7 @@ public class JobManagerImpl implements JobManager {
      */
     private void copyAttachments() throws GenieException {
         // copy over the attachments if they exist
-        if (this.job.getAttachments() != null) {
+        if (this.attachments != null) {
             for (final FileAttachment attachment : this.job.getAttachments()) {
                 // basic error checking
                 if (attachment.getName() == null || attachment.getName().isEmpty()) {
