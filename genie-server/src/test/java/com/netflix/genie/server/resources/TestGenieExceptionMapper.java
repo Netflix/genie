@@ -17,7 +17,12 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.common.exceptions.*;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.exceptions.GenieConflictException;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

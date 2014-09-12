@@ -33,8 +33,7 @@ import org.slf4j.LoggerFactory;
 @Provider
 public class GenieExceptionMapper implements ExceptionMapper<GenieException> {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(GenieExceptionMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenieExceptionMapper.class);
 
     /**
      * Create a response object from the exception.
