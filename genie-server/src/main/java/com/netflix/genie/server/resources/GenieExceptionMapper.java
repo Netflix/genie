@@ -18,9 +18,6 @@
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -34,31 +31,22 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Provider
-@Named
 public class GenieExceptionMapper implements ExceptionMapper<GenieException> {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(GenieExceptionMapper.class);
 
-    @Inject
-    private GenieNodeStatistics genieNodeStatistics;
-
     /**
      * Create a response object from the exception.
      *
-     * @param cse The exception to create the HTTP response from
+     * @param ge The exception to create the HTTP response from
      * @return a Response object
      */
     @Override
-    public Response toResponse(final GenieException cse) {
-        final int code = cse.getErrorCode();
-        final String errorMessage = cse.getLocalizedMessage();
-        if (code >= 400 && code < 500) {
-            this.genieNodeStatistics.incrGenie4xxCount();
-        } else { // 5xx codes
-            this.genieNodeStatistics.incrGenie5xxCount();
-        }
-        LOG.error("Error code: " + code + " Error Message: " + errorMessage, cse);
+    public Response toResponse(final GenieException ge) {
+        final int code = ge.getErrorCode();
+        final String errorMessage = ge.getLocalizedMessage();
+        LOG.error("Error code: " + code + " Error Message: " + errorMessage, ge);
         return Response.status(code).entity(errorMessage).type(MediaType.TEXT_PLAIN).build();
     }
 }
