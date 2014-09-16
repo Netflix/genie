@@ -89,7 +89,7 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
         // create the ProcessBuilder for this process
         final List<String> processArgs = this.createBaseProcessArguments();
         processArgs.add("--server");
-        processArgs.add(PRESTO_PROTOCOL_KEY + this.getCluster().getName() + PRESTO_MASTER_DOMAIN);
+        processArgs.add(prestoProtocol + this.getCluster().getName() + prestoMasterDomain);
         processArgs.add("--catalog");
         processArgs.add("hive");
         processArgs.add("--debug");
