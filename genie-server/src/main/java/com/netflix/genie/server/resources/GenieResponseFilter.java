@@ -38,7 +38,7 @@ public class GenieResponseFilter implements ContainerResponseFilter {
     private GenieNodeStatistics statistics;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param statistics The genie node statistics to use to capture information.
      */

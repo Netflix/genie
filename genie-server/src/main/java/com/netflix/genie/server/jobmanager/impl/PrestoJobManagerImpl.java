@@ -92,6 +92,8 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
         processArgs.add(prestoProtocol + this.getCluster().getName() + prestoMasterDomain);
         processArgs.add("--catalog");
         processArgs.add("hive");
+        processArgs.add("--user");
+        processArgs.add(this.getJob().getUser());
         processArgs.add("--debug");
         processArgs.addAll(Arrays.asList(StringUtil.splitCmdLine(this.getJob().getCommandArgs())));
 
