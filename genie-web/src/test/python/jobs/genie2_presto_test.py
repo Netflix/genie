@@ -32,7 +32,7 @@ GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v2/jobs'
 # works
-clusterTags = json.dumps([{"tags": ['presto']}])
+clusterTags = json.dumps([{"tags": ['presto', 'prod']}])
 cmdTags = json.dumps(['presto'])
 
 print clusterTags
@@ -49,7 +49,7 @@ def test_presto_submit_job():
             "version" : "1",
             "group" : "presto",
             "forwarded" : false,
-            "commandArgs" : "--execute \\"SELECT json_array_get(cluster_alloc, 0) FROM dse.pvr_clusteredpop_account_allocations WHERE region = 'UK_IE' and dayspan = 360;\\"",
+            "commandArgs" : "--execute \\"select min(view_dateint) from dse.vhs_streaming_session_f;\\"",
             "commandCriteria" :''' + cmdTags + '''
         }
     '''

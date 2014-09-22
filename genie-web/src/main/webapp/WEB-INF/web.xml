@@ -34,6 +34,10 @@
                 com.fasterxml.jackson.jaxrs.json
             </param-value>
         </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+            <param-value>com.netflix.genie.server.resources.GenieResponseFilter</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     

@@ -46,6 +46,8 @@ import java.util.Map;
 public class PrestoJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(PrestoJobManagerImpl.class);
+    private static final String PRESTO_PROTOCOL_KEY = "netflix.genie.server.presto.protocol";
+    private static final String PRESTO_MASTER_DOMAIN = "netflix.genie.server.presto.master.domain";
 
     /**
      * Constructor.
@@ -71,12 +73,27 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
             throw new GeniePreconditionException("Init wasn't called. Unable to continue.");
         }
 
+        // Check the parameters
+        final String prestoProtocol = ConfigurationManager
+                .getConfigInstance().getString(PRESTO_PROTOCOL_KEY, null);
+        if (prestoProtocol == null) {
+            throw new GeniePreconditionException("Presto protocol not set. Please configure " + PRESTO_PROTOCOL_KEY);
+        }
+        final String prestoMasterDomain = ConfigurationManager
+                .getConfigInstance().getString(PRESTO_MASTER_DOMAIN, null);
+        if (prestoMasterDomain == null) {
+            throw new GeniePreconditionException("Presto protocol not set. Please configure " + PRESTO_MASTER_DOMAIN);
+        }
+
+
         // create the ProcessBuilder for this process
         final List<String> processArgs = this.createBaseProcessArguments();
         processArgs.add("--server");
-        processArgs.add("http://" + this.getCluster().getName() + ".master.dataeng.netflix.net:8080");
+        processArgs.add(prestoProtocol + this.getCluster().getName() + prestoMasterDomain);
         processArgs.add("--catalog");
         processArgs.add("hive");
+        processArgs.add("--user");
+        processArgs.add(this.getJob().getUser());
         processArgs.add("--debug");
         processArgs.addAll(Arrays.asList(StringUtil.splitCmdLine(this.getJob().getCommandArgs())));
 
