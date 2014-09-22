@@ -26,6 +26,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.util.ProcessStatus;
@@ -362,7 +363,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         if (numRunningJobs >= maxRunningJobs) {
             // if we get here, job can't be forwarded to an idle
             // instance anymore and current node is overloaded
-            throw new GeniePreconditionException(
+            throw new GenieServerUnavailableException(
                     "Number of running jobs greater than system limit ("
                             + maxRunningJobs
                             + ") - try another instance or try again later");

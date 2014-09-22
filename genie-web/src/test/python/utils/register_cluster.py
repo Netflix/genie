@@ -80,6 +80,7 @@ def add_cluster_cquery1():
 
 def add_cluster_h2query():
     print "Registering h2query"
+<<<<<<< Updated upstream:genie-web/src/test/python/utils/register_cluster.py
     cluster_id = "bdp_hquery_20140505_185527"
     tags = json.dumps(['adhoc', 'h2query', 'bdp_hquery_20140505_185527'])
     config = json.dumps(['s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml',
@@ -89,9 +90,18 @@ def add_cluster_h2query():
     {
         "id":"''' + cluster_id + '''",
         "name": "h2query", 
+=======
+    ID="bdp_h2sting_20140813_200434"
+    tags = json.dumps(['adhoc'])
+    config = json.dumps(['s3://netflix-bdp-emr-clusters/users/bdp/h2query/20140818/193336/genie/core-site.xml','s3://netflix-bdp-emr-clusters/users/bdp/h2query/20140818/193336/genie/hdfs-site.xml','s3://netflix-bdp-emr-clusters/users/bdp/h2query/20140818/193336/genie/mapred-site.xml','s3://netflix-bdp-emr-clusters/users/bdp/h2query/20140818/193336/genie/yarn-site.xml'])
+    payload = '''
+    {
+        "id":"''' + ID +'''",
+        "name": "h2sting", 
+>>>>>>> Stashed changes:genie-web/src/test/python/utils/registerCluster.py
         "status" : "UP",
         "user" : "amsharma",
-        "version" : "1.0.3",
+        "version" : "2.4.0",
         "configs": ''' + config + ''',
         "tags": ''' + tags + ''',
         "clusterType": "yarn"
@@ -103,6 +113,7 @@ def add_cluster_h2query():
 
 # driver method for all tests                
 if __name__ == "__main__":
+<<<<<<< Updated upstream:genie-web/src/test/python/utils/register_cluster.py
     print "Registering Clusters:\n"
     print "\n"
     try:
@@ -114,3 +125,14 @@ if __name__ == "__main__":
         print "code = " + str(e.code)
         print "message =" + e.msg
         print "read =" + e.read()
+=======
+   print "Registering Clusters:\n"
+   print "\n"
+   try:
+     addClusterConfigH2query()
+   except urllib2.HTTPError, e:
+    print "Caught Exception"
+    print "code = " + str(e.code)
+    print "message =" + e.msg
+    print "read =" + e.read()
+>>>>>>> Stashed changes:genie-web/src/test/python/utils/registerCluster.py

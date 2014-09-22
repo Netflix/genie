@@ -36,8 +36,8 @@ serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v2/jobs'
 def testConflictJob():
     print serviceUrl
     print "Running testJsonSubmitjob "
-    clusterTags = json.dumps([{"tags" : ['adhoc','genie.name:h2query']}])
-    cmdTags = json.dumps(['pig11_mr2'])
+    clusterTags = json.dumps([{"tags" : ['adhoc']}])
+    cmdTags = json.dumps(['pig'])
     payload = '''
         {
             "id":"testblah",
@@ -81,8 +81,8 @@ def testNoClusterJob():
 def testGoodJob():
     print serviceUrl
     print "Running testJsonSubmitjob "
-    clusterTags = json.dumps([{"tags" : ['adhoc','genie.name:h2query']}])
-    cmdTags = json.dumps(['pig','0.13'])
+    clusterTags = json.dumps([{"tags" : ['adhoc']}])
+    cmdTags = json.dumps(['pig'])
     payload = '''
         {
             "id":"''' + jobID +'''",
@@ -90,7 +90,7 @@ def testGoodJob():
             "clusterCriterias" : ''' + clusterTags + ''',
             "user" : "genietest", 
             "group" : "hadoop", 
-            "commandArgs" : " -x tez -f pig2.q", 
+            "commandArgs" : "-f pig2.q", 
             "commandCriteria" :''' + cmdTags + ''',
             "fileDependencies":"''' + GENIE_TEST_PREFIX + '''/pig2.q"
         }

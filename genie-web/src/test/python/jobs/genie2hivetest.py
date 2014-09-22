@@ -33,10 +33,8 @@ GENIE_TEST_PREFIX = os.getenv("GENIE_TEST_PREFIX")
 # get the serviceUrl from the eureka client
 serviceUrl = eureka.EurekaClient().get_service_base_url() + '/genie/v2/jobs'
 # works
-clusterTags = json.dumps([{"tags" : ['adhoc','genie.name:h2query']}])
-cmdTags = json.dumps(['genie.id:prodhive11_mr2'])
-
-print clusterTags
+clusterTags = json.dumps([{"tags" : ['adhoc']}])
+cmdTags = json.dumps(['hive'])
 
 def testJsonSubmitjob():
     print serviceUrl
@@ -45,7 +43,7 @@ def testJsonSubmitjob():
         {
             "name": "Genie2TestHiveJob", 
             "clusterCriterias" : ''' + clusterTags + ''',
-            "user" : "tgianos",
+            "user" : "amsharma",
             "version" : "1",
             "group" : "hadoop",
             "forwarded" : false,
