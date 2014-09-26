@@ -216,4 +216,10 @@
     <Job_tags
         JOB_ID="job2"
         element="genie.name:testSparkJob"/>
+    <Job_tags
+            JOB_ID="job2"
+            element="tag1"/>
+    <Job_tags
+            JOB_ID="job2"
+            element="tag2"/>
 </dataset>

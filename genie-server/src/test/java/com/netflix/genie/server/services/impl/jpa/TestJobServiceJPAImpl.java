@@ -53,6 +53,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";
+    private static final String TAG_1 = "tag1";
+    private static final String TAG_2 = "tag2";
 
     @Inject
     private JobService service;
@@ -262,7 +264,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals("2.4.3", job2.getVersion());
         Assert.assertEquals("-f -j -a", job2.getCommandArgs());
         Assert.assertEquals(JobStatus.FAILED, job2.getStatus());
-        Assert.assertEquals(2, job2.getTags().size());
+        Assert.assertEquals(4, job2.getTags().size());
         Assert.assertEquals(2, job2.getCommandCriteria().size());
         Assert.assertEquals(2, job2.getClusterCriterias().size());
     }
@@ -300,6 +302,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 null,
                 null,
                 null,
+                null,
                 0,
                 10
         );
@@ -316,6 +319,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
         final List<Job> jobs = this.service.getJobs(
                 null,
                 "testSparkJob",
+                null,
                 null,
                 null,
                 null,
@@ -340,6 +344,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 null,
                 null,
                 null,
+                null,
                 0,
                 10
         );
@@ -360,11 +365,68 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 JobStatus.FAILED,
                 null,
                 null,
+                null,
                 0,
                 10
         );
         Assert.assertEquals(1, jobs.size());
         Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
+    }
+
+    /**
+     * Test get job by tag.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testGetJobByTag()
+            throws GenieException {
+
+        Set<String> tags = new HashSet<String>();
+        tags.add(TAG_1);
+        tags.add(TAG_2);
+
+        @SuppressWarnings("unchecked")
+        final List<Job> jobs = this.service.getJobs(
+                null,
+                null,
+                null,
+                null,
+                tags,
+                null,
+                null,
+                0,
+                10
+        );
+        Assert.assertEquals(1, jobs.size());
+        Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
+    }
+
+    /**
+     * Test the get job by non-existent Tag.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testGetJobWithNonExistentTag()
+            throws GenieException {
+        Set<String> tags = new HashSet<String>();
+        tags.add("random");
+
+        @SuppressWarnings("unchecked")
+        final List<Job> jobs = this.service.getJobs(
+                null,
+                null,
+                null,
+                null,
+                tags,
+                null,
+                null,
+                0,
+                10
+        );
+
+        Assert.assertEquals(0,jobs.size());
     }
 
     /**
@@ -374,6 +436,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     public void testGetJobsByClusterName() {
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
+                null,
                 null,
                 null,
                 null,
@@ -394,6 +457,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     public void testGetJobsByClusterId() {
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
+                null,
                 null,
                 null,
                 null,

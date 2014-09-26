@@ -15,12 +15,14 @@
  */
 package com.netflix.genie.server.repository.jpa;
 
+import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.model.Job_;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -58,6 +60,7 @@ public final class JobSpecs {
             final String jobName,
             final String userName,
             final JobStatus status,
+            final Set<String> tags,
             final String clusterName,
             final String clusterId) {
         return new Specification<Job>() {
@@ -78,6 +81,11 @@ public final class JobSpecs {
                 }
                 if (status != null) {
                     predicates.add(cb.equal(root.get(Job_.status), status));
+                }
+                if (tags != null) {
+                    for (final String tag : tags) {
+                        predicates.add(cb.isMember(tag, root.get(Job_.tags)));
+                    }
                 }
                 if (StringUtils.isNotBlank(clusterName)) {
                     predicates.add(cb.equal(root.get(Job_.executionClusterName), clusterName));
