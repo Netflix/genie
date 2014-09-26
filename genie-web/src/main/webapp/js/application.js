@@ -52,11 +52,8 @@ define([
         }, self);
 
         self.statusClass = ko.computed(function() {
-            if (self.status() && self.status().toUpperCase() === 'UP') {
+            if (self.status() && self.status().toUpperCase() === 'ACTIVE') {
                 return 'label-success';
-            }
-            else if (self.status() && self.status().toUpperCase() === 'OUT_OF_SERVICE') {
-                return 'label-warning';
             }
             return '';
         }, self);
