@@ -111,6 +111,7 @@ define([
                         	}
                         });
                     });
+                    $("#applicationSearchTags").select2();
                 } else {
                     var applicationObj = data;
                     if (!(applicationObj.status in applicationCount)) {

@@ -250,7 +250,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         // We check if status code is killed. The kill thread sets this, but just to make sure we set
         // it here again to prevent a race condition problem. This just makes the status message as
         // killed and prevents some jobs that are killed being marked as failed
-        if (exitCode == ProcessStatus.JOB_KILLED.getExitCode()){
+        if (exitCode == ProcessStatus.JOB_KILLED.getExitCode()) {
             LOG.debug("Process has been killed, therefore setting the appropriate status message.");
             job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
             return JobStatus.KILLED;

@@ -58,7 +58,7 @@ public class TestCommand {
         Assert.assertNull(this.c.getExecutable());
         Assert.assertNull(this.c.getJobType());
         Assert.assertNull(this.c.getName());
-        Assert.assertEquals(CommandStatus.INACTIVE, this.c.getStatus());
+        Assert.assertNull(this.c.getStatus());
         Assert.assertNull(this.c.getUser());
         Assert.assertNull(this.c.getVersion());
     }
@@ -154,7 +154,7 @@ public class TestCommand {
      */
     @Test
     public void testSetStatus() {
-        Assert.assertEquals(CommandStatus.INACTIVE, this.c.getStatus());
+        Assert.assertNull( this.c.getStatus());
         this.c.setStatus(CommandStatus.ACTIVE);
         Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
     }

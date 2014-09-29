@@ -20,8 +20,9 @@
     <div class="control-group">
    		 <label class="control-label">Tags:</label>
    		 <div class="controls">
-    		<select name="tags" multiple="true" data-bind="options: Cluster.allTags, selectedOptions:Cluster.selectedTags">
-    	 	</select>
+   		<select id="clusterSearchTags" name="tags" multiple="true" data-bind="options: Cluster.allTags, selectedOptions:Cluster.selectedTags">
+    	 	</select> 
+  <!--           <input type="text" data-provide="typeahead" autocomplete="off" id="clusterTagsSearch" data-bind="textInput:Cluster.selectedTags"> -->
     	 </div>
     </div>
     <div class="control-group">

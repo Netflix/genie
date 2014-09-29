@@ -60,7 +60,7 @@ public class Application extends CommonEntityFields {
     @ApiModelProperty(
             value = "The current status of this application",
             required = true)
-    private ApplicationStatus status = ApplicationStatus.INACTIVE;
+    private ApplicationStatus status;
 
     /**
      * Users can specify a property file location with environment variables.

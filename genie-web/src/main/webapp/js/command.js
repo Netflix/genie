@@ -111,6 +111,7 @@ define([
                         	}
                         });
                     });
+                    $("#commandSearchTags").select2();
                 } else {
                     var commandObj = data;
                     if (!(commandObj.status in commandCount)) {
