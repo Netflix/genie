@@ -112,16 +112,11 @@ define([
                 // check to see if jobInfo is an array
                 if (data instanceof Array) {
                     _.each(data, function(jobObj, index) {
-                        if (!(jobObj.jobType in jobCount)) {
-                            jobCount[jobObj.jobType] = 0;
+                        if (!(jobObj.commandName in jobCount)) {
+                            jobCount[jobObj.commandName] = 0;
                         }
-                        jobCount[jobObj.jobType] += 1;
+                        jobCount[jobObj.commandName] += 1;
                     });
-                } else {
-                    if (!(data.jobs.jobInfo.jobType in jobCount)) {
-                        jobCount[data.jobs.jobInfo.jobType] = 0;
-                    }
-                    jobCount[data.jobs.jobInfo.jobType] += 1;
                 }
                 _.each(jobCount, function(count, type) {
                     self.runningJobs.push({type: type, count: count});
@@ -139,16 +134,20 @@ define([
             var status   = _.where(formArray, {'name': 'status'})[0].value;
             var id    = _.where(formArray, {'name': 'jobID'})[0].value;
             var name  = _.where(formArray, {'name': 'jobName'})[0].value;
+            var jobTags = _.where(formArray, {'name': 'jobTags'})[0].value;
             var executionClusterName  = _.where(formArray, {'name': 'clusterName'})[0].value;
             var executionClusterId  = _.where(formArray, {'name': 'clusterId'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
+
+            var jobTagsArray = jobTags.split(",");
             $.ajax({
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v2/jobs',
+                traditional: true,
                 data: {limit: limit, userName: user, status: status, 
-                    id: id, name: name, executionClusterName:executionClusterName, executionClusterId:executionClusterId}
+                    id: id, name: name, executionClusterName:executionClusterName, executionClusterId:executionClusterId, tag: jobTagsArray }
             }).done(function(data) {
                 self.searchResults([]);
                 self.status('results');

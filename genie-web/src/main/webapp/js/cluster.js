@@ -145,7 +145,7 @@ define([
                 headers: {'Accept':'application/json'},
                 url:  'genie/v2/config/clusters',
                 traditional: true,
-                data: {limit: limit, name: name, status: status, tag: self.selectedTags(), id: id}
+                data: {limit: limit, name: name, status: status, tag: self.selectedTags()}
             }).done(function(data) {
             	self.searchResults([]);
                 self.status('results');
