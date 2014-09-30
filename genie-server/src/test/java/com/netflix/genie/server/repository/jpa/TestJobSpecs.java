@@ -58,6 +58,9 @@ public class TestJobSpecs {
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
+
+        TAGS.add("sometag");
+
         this.root = (Root<Job>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);

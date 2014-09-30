@@ -65,7 +65,7 @@ public interface JobService {
      * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName    user who submitted job
      * @param status      status of job - possible types Type.JobStatus
-     * @param tags          tags for the cluster
+     * @param tags          tags for the job
      * @param clusterName name of cluster for job
      * @param clusterId   id of cluster for job
      * @param page        page number for job
