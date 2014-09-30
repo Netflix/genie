@@ -65,7 +65,7 @@ public class Cluster extends CommonEntityFields {
             value = "The status of the cluster",
             required = true,
             dataType = "string")
-    private ClusterStatus status = ClusterStatus.OUT_OF_SERVICE;
+    private ClusterStatus status;
 
     /**
      * The type of the cluster to use to figure out the job manager for this

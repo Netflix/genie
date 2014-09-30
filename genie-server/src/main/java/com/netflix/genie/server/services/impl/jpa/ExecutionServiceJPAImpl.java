@@ -247,8 +247,14 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         }
         job.setExitCode(exitCode);
 
-        // only update status if not KILLED
-        if (job.getStatus() != null && job.getStatus() != JobStatus.KILLED) {
+        // We check if status code is killed. The kill thread sets this, but just to make sure we set
+        // it here again to prevent a race condition problem. This just makes the status message as
+        // killed and prevents some jobs that are killed being marked as failed
+        if (exitCode == ProcessStatus.JOB_KILLED.getExitCode()) {
+            LOG.debug("Process has been killed, therefore setting the appropriate status message.");
+            job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
+            return JobStatus.KILLED;
+        } else {
             if (exitCode != ProcessStatus.SUCCESS.getExitCode()) {
                 // all other failures except s3 log archival failure
                 LOG.error("Failed to execute job, exit code: "
@@ -276,13 +282,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                 job.setArchiveLocation(NetUtil.getArchiveURI(job.getId()));
             }
 
-            // update the job status
+            // set the updated time
             job.setUpdated(new Date());
             return job.getStatus();
-        } else {
-            // if job status is killed, the kill thread will update status
-            LOG.debug("Job has been killed - will not update DB: " + job.getId());
-            return JobStatus.KILLED;
         }
     }
 

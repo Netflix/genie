@@ -10,7 +10,8 @@ define([
     'command',
     'application',
     'text!../templates/error.html',
-    'loadKoTemplate!../templates/front-page.html'
+    'loadKoTemplate!../templates/front-page.html',
+    'select2'
 ], function($, ko, mapping, pager, _, Job, Cluster, Command, Application, errorTemplate) {
     $(function() {
         function appViewModel() {

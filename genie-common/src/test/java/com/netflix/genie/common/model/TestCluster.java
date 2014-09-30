@@ -62,7 +62,7 @@ public class TestCluster {
         Assert.assertNull(this.c.getCommands());
         Assert.assertNull(this.c.getConfigs());
         Assert.assertNull(this.c.getName());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, this.c.getStatus());
+        Assert.assertNull(this.c.getStatus());
         Assert.assertNotNull(this.c.getTags());
         Assert.assertNull(this.c.getUser());
         Assert.assertNull(this.c.getVersion());
@@ -189,7 +189,7 @@ public class TestCluster {
      */
     @Test
     public void testSetStatus() {
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, this.c.getStatus());
+        Assert.assertNull(this.c.getStatus());
         this.c.setStatus(ClusterStatus.TERMINATED);
         Assert.assertEquals(ClusterStatus.TERMINATED, this.c.getStatus());
     }

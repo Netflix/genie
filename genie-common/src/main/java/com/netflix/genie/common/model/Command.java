@@ -59,7 +59,7 @@ public class Command extends CommonEntityFields {
     @ApiModelProperty(
             value = "The status of the command",
             required = true)
-    private CommandStatus status = CommandStatus.INACTIVE;
+    private CommandStatus status;
 
     /**
      * Location of the executable for this command.

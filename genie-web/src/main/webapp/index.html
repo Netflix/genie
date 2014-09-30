@@ -24,6 +24,8 @@
         <link rel="icon" href="./img/nficon2014.3.ico">
         <link rel="stylesheet" href="./bootstrap/css/bootstrap.css" />
         <link rel="stylesheet" href="./css/genie.css" />
+        <link rel="stylesheet" href="./css/select2.css" />
+        <link rel="stylesheet" href="./css/select2-bootstrap.css" />
         <script src="./vendor/js/require.js"></script>
         <script>
             requirejs.config({ baseUrl: './js', paths: {
@@ -35,6 +37,7 @@
                     'jquery':               '../vendor/js/jquery.min-2.0.2',
                     'text':                 '../vendor/js/text',
                     'stringTemplateEngine': '../vendor/js/stringTemplateEngine',
+                    'select2':       '../vendor/js/select2',
                     'loadKoTemplate':       '../vendor/js/loadKoTemplate'
                 },
                 shim: {
@@ -43,7 +46,7 @@
             });
         </script>
         <script>
-            require(['appViewModel', 'bootstrap']);
+            require(['appViewModel', 'bootstrap', 'select2']);
         </script>
     </head>
     <body>

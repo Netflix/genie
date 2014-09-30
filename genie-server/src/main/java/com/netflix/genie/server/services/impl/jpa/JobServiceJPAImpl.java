@@ -171,6 +171,7 @@ public class JobServiceJPAImpl implements JobService {
             final String jobName,
             final String userName,
             final JobStatus status,
+            final Set<String> tags,
             final String clusterName,
             final String clusterId,
             final int page,
@@ -190,6 +191,7 @@ public class JobServiceJPAImpl implements JobService {
                         jobName,
                         userName,
                         status,
+                        tags,
                         clusterName,
                         clusterId),
                 pageRequest).getContent();

@@ -113,6 +113,7 @@ define([
                         		self.allTags.push(tag);
                         	}
                         });
+                         $("#clusterSearchTags").select2();
                     });
                 } else {
                     var clusterObj = data;

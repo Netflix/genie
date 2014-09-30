@@ -53,7 +53,7 @@ public class TestApplication {
         Assert.assertNull(this.a.getCommands());
         Assert.assertNull(this.a.getConfigs());
         Assert.assertNull(this.a.getEnvPropFile());
-        Assert.assertEquals(ApplicationStatus.INACTIVE, this.a.getStatus());
+        Assert.assertNull(this.a.getStatus());
         Assert.assertNull(this.a.getJars());
         Assert.assertNull(this.a.getName());
         Assert.assertNull(this.a.getUser());
@@ -127,7 +127,7 @@ public class TestApplication {
      */
     @Test
     public void testSetStatus() {
-        Assert.assertEquals(ApplicationStatus.INACTIVE, this.a.getStatus());
+        Assert.assertNull(this.a.getStatus());
         this.a.setStatus(ApplicationStatus.ACTIVE);
         Assert.assertEquals(ApplicationStatus.ACTIVE, this.a.getStatus());
     }

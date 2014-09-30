@@ -219,6 +219,7 @@ public class JobResource {
      * @param name        name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName    user who submitted job
      * @param status      status of job - possible types Type.JobStatus
+     * @param tags          tags for the job
      * @param clusterName the name of the cluster
      * @param clusterId   the id of the cluster
      * @param page        page number for job
@@ -253,6 +254,9 @@ public class JobResource {
             @ApiParam(value = "Status of the jobs to fetch.", required = false)
             @QueryParam("status")
             final String status,
+            @ApiParam(value = "Tags for the job.", required = false)
+            @QueryParam("tag")
+            final Set<String> tags,
             @ApiParam(value = "Name of the cluster on which the job ran.", required = false)
             @QueryParam("executionClusterName")
             final String clusterName,
@@ -273,6 +277,8 @@ public class JobResource {
                 + " | "
                 + status
                 + " | "
+                + tags
+                + " | "
                 + clusterName
                 + " | "
                 + clusterId
@@ -287,6 +293,7 @@ public class JobResource {
                 name,
                 userName,
                 ((status == null) || (status.isEmpty()) ? null : JobStatus.parse(status)),
+                tags,
                 clusterName,
                 clusterId,
                 page,
