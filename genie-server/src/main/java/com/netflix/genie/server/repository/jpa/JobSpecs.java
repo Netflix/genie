@@ -52,6 +52,7 @@ public final class JobSpecs {
      * @param jobName     The job name
      * @param userName    The user who created the job
      * @param statuses    The job statuses
+     * @param tags        The tags for the jobs to find
      * @param clusterName The cluster name
      * @param clusterId   The cluster id
      * @return The specification
