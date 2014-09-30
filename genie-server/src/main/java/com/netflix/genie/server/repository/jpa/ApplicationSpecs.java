@@ -16,6 +16,7 @@
 package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Application_;
 
 import java.util.ArrayList;
@@ -26,13 +27,14 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Specifications for JPA queries.
  *
- * see http://tinyurl.com/n6nubvm
+ * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  * @author tgianos
  */
 public final class ApplicationSpecs {
@@ -46,13 +48,14 @@ public final class ApplicationSpecs {
     /**
      * Get a specification using the specified parameters.
      *
-     * @param name The name of the application
+     * @param name     The name of the application
      * @param userName The name of the user who created the application
-     * @param tags The set of tags to search the command for
+     * @param statuses The status of the application
+     * @param tags     The set of tags to search the command for
      * @return A specification object used for querying
      */
-    public static Specification<Application> findByNameAndUserAndTags(
-            final String name, final String userName, final Set<String> tags) {
+    public static Specification<Application> find(
+            final String name, final String userName, final Set<ApplicationStatus> statuses, final Set<String> tags) {
         return new Specification<Application>() {
             @Override
             public Predicate toPredicate(
@@ -66,9 +69,19 @@ public final class ApplicationSpecs {
                 if (StringUtils.isNotBlank(userName)) {
                     predicates.add(cb.equal(root.get(Application_.user), userName));
                 }
+                if (statuses != null && !statuses.isEmpty()) {
+                    //Could optimize this as we know size could use native array
+                    final List<Predicate> orPredicates = new ArrayList<>();
+                    for (final ApplicationStatus status : statuses) {
+                        orPredicates.add(cb.equal(root.get(Application_.status), status));
+                    }
+                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                }
                 if (tags != null) {
                     for (final String tag : tags) {
-                        predicates.add(cb.isMember(tag, root.get(Application_.tags)));
+                        if (StringUtils.isNotBlank(tag)) {
+                            predicates.add(cb.isMember(tag, root.get(Application_.tags)));
+                        }
                     }
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));

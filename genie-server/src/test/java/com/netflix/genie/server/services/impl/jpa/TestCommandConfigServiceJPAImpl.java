@@ -158,7 +158,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetCommandsByName() {
         final List<Command> commands = this.service.getCommands(
-                COMMAND_2_NAME, null, null, 0, 10);
+                COMMAND_2_NAME, null, null, null, 0, 10);
         Assert.assertEquals(1, commands.size());
         Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
     }
@@ -169,10 +169,25 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetCommandsByUserName() {
         final List<Command> apps = this.service.getCommands(
-                null, COMMAND_1_USER, null, -1, -5000);
+                null, COMMAND_1_USER, null, null, -1, -5000);
         Assert.assertEquals(2, apps.size());
         Assert.assertEquals(COMMAND_3_ID, apps.get(0).getId());
         Assert.assertEquals(COMMAND_1_ID, apps.get(1).getId());
+    }
+
+    /**
+     * Test the get commands method.
+     */
+    @Test
+    public void testGetCommandsByStatuses() {
+        final Set<CommandStatus> statuses = new HashSet<>();
+        statuses.add(CommandStatus.INACTIVE);
+        statuses.add(CommandStatus.DEPRECATED);
+        final List<Command> apps = this.service.getCommands(
+                null, null, statuses, null, -1, -5000);
+        Assert.assertEquals(2, apps.size());
+        Assert.assertEquals(COMMAND_2_ID, apps.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, apps.get(1).getId());
     }
 
     /**
@@ -183,7 +198,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
         List<Command> commands = this.service.getCommands(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertEquals(3, commands.size());
         Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
         Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
@@ -191,7 +206,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
 
         tags.add("pig");
         commands = this.service.getCommands(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertEquals(2, commands.size());
         Assert.assertEquals(COMMAND_3_ID, commands.get(0).getId());
         Assert.assertEquals(COMMAND_1_ID, commands.get(1).getId());
@@ -199,18 +214,18 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         tags.clear();
         tags.add("hive");
         commands = this.service.getCommands(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertEquals(1, commands.size());
         Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
 
         tags.add("somethingThatWouldNeverReallyExist");
         commands = this.service.getCommands(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertTrue(commands.isEmpty());
 
         tags.clear();
         commands = this.service.getCommands(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertEquals(3, commands.size());
         Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
         Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
@@ -422,10 +437,10 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(3,
-                this.service.getCommands(null, null, null, 0, 10).size());
+                this.service.getCommands(null, null, null, null, 0, 10).size());
         Assert.assertEquals(3, this.service.deleteAllCommands().size());
         Assert.assertTrue(
-                this.service.getCommands(null, null, null, 0, 10)
+                this.service.getCommands(null, null, null, null, 0, 10)
                 .isEmpty());
     }
 

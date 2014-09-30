@@ -19,6 +19,7 @@ package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
 
 import java.util.List;
@@ -57,6 +58,7 @@ public interface ApplicationConfigService {
      *
      * @param name     name of application. Can be null or empty.
      * @param userName The user who created the application. Can be null/empty
+     * @param statuses The statuses of the applications to find. Can be null.
      * @param tags     tags allocated to this application
      * @param page     Page number to start results on
      * @param limit    Max number of results per page
@@ -64,6 +66,7 @@ public interface ApplicationConfigService {
      */
     List<Application> getApplications(final String name,
                                       final String userName,
+                                      final Set<ApplicationStatus> statuses,
                                       final Set<String> tags,
                                       final int page,
                                       final int limit);

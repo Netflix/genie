@@ -154,7 +154,7 @@ public class TestCommand {
      */
     @Test
     public void testSetStatus() {
-        Assert.assertNull( this.c.getStatus());
+        Assert.assertNull(this.c.getStatus());
         this.c.setStatus(CommandStatus.ACTIVE);
         Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
     }

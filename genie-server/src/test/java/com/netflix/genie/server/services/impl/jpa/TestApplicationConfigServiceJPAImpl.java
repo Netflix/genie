@@ -139,7 +139,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetApplicationsByName() {
         final List<Application> apps = this.service.getApplications(
-                APP_2_NAME, null, null, 0, 10);
+                APP_2_NAME, null, null, null, 0, 10);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
     }
@@ -150,9 +150,24 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetApplicationsByUserName() {
         final List<Application> apps = this.service.getApplications(
-                null, APP_1_USER, null, -1, -5000);
+                null, APP_1_USER, null, null, -1, -5000);
         Assert.assertEquals(2, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
+        Assert.assertEquals(APP_1_ID, apps.get(1).getId());
+    }
+
+    /**
+     * Test the get applications method.
+     */
+    @Test
+    public void testGetApplicationsByStatuses() {
+        final Set<ApplicationStatus> statuses = new HashSet<>();
+        statuses.add(ApplicationStatus.ACTIVE);
+        statuses.add(ApplicationStatus.INACTIVE);
+        final List<Application> apps = this.service.getApplications(
+                null, null, statuses, null, -1, -5000);
+        Assert.assertEquals(2, apps.size());
+        Assert.assertEquals(APP_2_ID, apps.get(0).getId());
         Assert.assertEquals(APP_1_ID, apps.get(1).getId());
     }
 
@@ -164,7 +179,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
         List<Application> apps = this.service.getApplications(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertEquals(3, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
         Assert.assertEquals(APP_2_ID, apps.get(1).getId());
@@ -172,25 +187,25 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
 
         tags.add("yarn");
         apps = this.service.getApplications(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
 
         tags.clear();
         tags.add("genie.name:spark");
         apps = this.service.getApplications(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
 
         tags.add("somethingThatWouldNeverReallyExist");
         apps = this.service.getApplications(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertTrue(apps.isEmpty());
 
         tags.clear();
         apps = this.service.getApplications(
-                null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10);
         Assert.assertEquals(3, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
         Assert.assertEquals(APP_2_ID, apps.get(1).getId());
@@ -397,10 +412,10 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(3,
-                this.service.getApplications(null, null, null, 0, 10).size());
+                this.service.getApplications(null, null, null, null, 0, 10).size());
         Assert.assertEquals(3, this.service.deleteAllApplications().size());
         Assert.assertTrue(
-                this.service.getApplications(null, null, null, 0, 10)
+                this.service.getApplications(null, null, null, null, 0, 10)
                 .isEmpty());
     }
 

@@ -23,6 +23,7 @@ import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.common.model.CommandStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -74,10 +75,6 @@ public class TestClusterSpecs {
      */
     @BeforeClass
     public static void setupClass() {
-        TAGS.add(TAG_1);
-        TAGS.add(TAG_2);
-        TAGS.add(TAG_3);
-
         STATUSES.add(STATUS_1);
         STATUSES.add(STATUS_2);
 
@@ -95,6 +92,11 @@ public class TestClusterSpecs {
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
+        TAGS.clear();
+        TAGS.add(TAG_1);
+        TAGS.add(TAG_2);
+        TAGS.add(TAG_3);
+
         this.root = (Root<Cluster>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
@@ -135,12 +137,12 @@ public class TestClusterSpecs {
     }
 
     /**
-     * Test the findByNameAndStatusesAndTagsAndUpdateTime specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndStatusesAndTagsAndUpdateTimeAll() {
+    public void testFindAll() {
         final Specification<Cluster> spec = ClusterSpecs
-                .findByNameAndStatusesAndTagsAndUpdateTime(
+                .find(
                         NAME,
                         STATUSES,
                         TAGS,
@@ -170,12 +172,12 @@ public class TestClusterSpecs {
     }
 
     /**
-     * Test the findByNameAndStatusesAndTagsAndUpdateTime specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndStatusesAndTagsAndUpdateTimeNoName() {
+    public void testFindNoName() {
         final Specification<Cluster> spec = ClusterSpecs
-                .findByNameAndStatusesAndTagsAndUpdateTime(
+                .find(
                         null,
                         STATUSES,
                         TAGS,
@@ -205,12 +207,12 @@ public class TestClusterSpecs {
     }
 
     /**
-     * Test the findByNameAndStatusesAndTagsAndUpdateTime specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndStatusesAndTagsAndUpdateTimeNoStatuses() {
+    public void testFindNoStatuses() {
         final Specification<Cluster> spec = ClusterSpecs
-                .findByNameAndStatusesAndTagsAndUpdateTime(
+                .find(
                         NAME,
                         null,
                         TAGS,
@@ -240,12 +242,12 @@ public class TestClusterSpecs {
     }
 
     /**
-     * Test the findByNameAndStatusesAndTagsAndUpdateTime specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndStatusesAndTagsAndUpdateTimeEmptyStatuses() {
+    public void testFindEmptyStatuses() {
         final Specification<Cluster> spec = ClusterSpecs
-                .findByNameAndStatusesAndTagsAndUpdateTime(
+                .find(
                         NAME,
                         EnumSet.noneOf(ClusterStatus.class),
                         TAGS,
@@ -275,12 +277,12 @@ public class TestClusterSpecs {
     }
 
     /**
-     * Test the findByNameAndStatusesAndTagsAndUpdateTime specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndStatusesAndTagsAndUpdateTimeNoTags() {
+    public void testFindNoTags() {
         final Specification<Cluster> spec = ClusterSpecs
-                .findByNameAndStatusesAndTagsAndUpdateTime(
+                .find(
                         NAME,
                         STATUSES,
                         null,
@@ -310,12 +312,12 @@ public class TestClusterSpecs {
     }
 
     /**
-     * Test the findByNameAndStatusesAndTagsAndUpdateTime specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndStatusesAndTagsAndUpdateTimeNoMinTime() {
+    public void testFindNoMinTime() {
         final Specification<Cluster> spec = ClusterSpecs
-                .findByNameAndStatusesAndTagsAndUpdateTime(
+                .find(
                         NAME,
                         STATUSES,
                         TAGS,
@@ -345,12 +347,12 @@ public class TestClusterSpecs {
     }
 
     /**
-     * Test the findByNameAndStatusesAndTagsAndUpdateTime specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndStatusesAndTagsAndUpdateTimeNoMax() {
+    public void testFindNoMax() {
         final Specification<Cluster> spec = ClusterSpecs
-                .findByNameAndStatusesAndTagsAndUpdateTime(
+                .find(
                         NAME,
                         STATUSES,
                         TAGS,
@@ -372,6 +374,47 @@ public class TestClusterSpecs {
         for (final String tag : TAGS) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .isMember(tag, this.root.get(Cluster_.tags));
+        }
+        for (final ClusterStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Cluster_.status), status);
+        }
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindEmptyTag() {
+        TAGS.add("");
+        final Specification<Cluster> spec = ClusterSpecs
+                .find(
+                        NAME,
+                        STATUSES,
+                        TAGS,
+                        MIN_UPDATE_TIME,
+                        null
+                );
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(Cluster_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .greaterThanOrEqualTo(
+                        this.root.get(Cluster_.updated), new Date(MIN_UPDATE_TIME)
+                );
+        Mockito.verify(this.cb, Mockito.never())
+                .lessThan(
+                        this.root.get(Cluster_.updated), new Date(MAX_UPDATE_TIME)
+                );
+        for (final String tag : TAGS) {
+            if (StringUtils.isBlank(tag)) {
+                Mockito.verify(this.cb, Mockito.never())
+                        .isMember(tag, this.root.get(Cluster_.tags));
+            } else {
+                Mockito.verify(this.cb, Mockito.times(1))
+                        .isMember(tag, this.root.get(Cluster_.tags));
+            }
         }
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))

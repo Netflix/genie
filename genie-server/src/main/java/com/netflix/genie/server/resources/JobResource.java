@@ -31,6 +31,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
 import java.net.HttpURLConnection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -218,8 +219,8 @@ public class JobResource {
      * @param id          id for job
      * @param name        name of job (can be a SQL-style pattern such as HIVE%)
      * @param userName    user who submitted job
-     * @param status      status of job - possible types Type.JobStatus
-     * @param tags          tags for the job
+     * @param statuses    statuses of jobs to find
+     * @param tags        tags for the job
      * @param clusterName the name of the cluster
      * @param clusterId   the id of the cluster
      * @param page        page number for job
@@ -251,9 +252,9 @@ public class JobResource {
             @ApiParam(value = "Name of the user who submitted the job.", required = false)
             @QueryParam("userName")
             final String userName,
-            @ApiParam(value = "Status of the jobs to fetch.", required = false)
+            @ApiParam(value = "Statuses of the jobs to fetch.", required = false)
             @QueryParam("status")
-            final String status,
+            final Set<String> statuses,
             @ApiParam(value = "Tags for the job.", required = false)
             @QueryParam("tag")
             final Set<String> tags,
@@ -268,14 +269,14 @@ public class JobResource {
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit") @DefaultValue("1024") int limit)
             throws GenieException {
-        LOG.info("Called with [id | jobName | userName | status | executionClusterName | executionClusterId | page | limit]");
+        LOG.info("Called with [id | jobName | userName | statuses | executionClusterName | executionClusterId | page | limit]");
         LOG.info(id
                 + " | "
                 + name
                 + " | "
                 + userName
                 + " | "
-                + status
+                + statuses
                 + " | "
                 + tags
                 + " | "
@@ -286,13 +287,22 @@ public class JobResource {
                 + page
                 + " | "
                 + limit);
+        Set<JobStatus> enumStatuses = null;
+        if (!statuses.isEmpty()) {
+            enumStatuses = EnumSet.noneOf(JobStatus.class);
+            for (final String status : statuses) {
+                if (StringUtils.isNotBlank(status)) {
+                    enumStatuses.add(JobStatus.parse(status));
+                }
+            }
+        }
 
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.jobService.getJobs(
                 id,
                 name,
                 userName,
-                ((status == null) || (status.isEmpty()) ? null : JobStatus.parse(status)),
+                enumStatuses,
                 tags,
                 clusterName,
                 clusterId,

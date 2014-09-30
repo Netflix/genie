@@ -24,11 +24,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.Date;
 import java.util.UUID;
 import java.util.HashSet;
@@ -46,7 +42,9 @@ public class TestJobSpecs {
     private static final String USER_NAME = "tgianos";
     private static final String CLUSTER_NAME = "hprod2";
     private static final String CLUSTER_ID = "prod";
-    private static final Set<String> TAGS = new HashSet<String>();
+    private static final Set<String> TAGS = new HashSet<>();
+    private static final Set<JobStatus> STATUSES = new HashSet<>();
+    private static final String TAG = UUID.randomUUID().toString();
 
     private Root<Job> root;
     private CriteriaQuery<?> cq;
@@ -58,8 +56,12 @@ public class TestJobSpecs {
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
+        TAGS.clear();
+        TAGS.add(TAG);
 
-        TAGS.add("sometag");
+        STATUSES.clear();
+        STATUSES.add(JobStatus.INIT);
+        STATUSES.add(JobStatus.FAILED);
 
         this.root = (Root<Job>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
@@ -82,18 +84,16 @@ public class TestJobSpecs {
         Mockito.when(this.cb.equal(userNamePath, USER_NAME))
                 .thenReturn(equalUserNamePredicate);
 
+        final Expression<Set<String>> tagExpression = (Expression<Set<String>>) Mockito.mock(Expression.class);
+        final Predicate isMemberTagPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(Job_.tags)).thenReturn(tagExpression);
+        Mockito.when(this.cb.isMember(Mockito.any(String.class), Mockito.eq(tagExpression)))
+                .thenReturn(isMemberTagPredicate);
+
         final Path<JobStatus> statusPath = (Path<JobStatus>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(Job_.status)).thenReturn(statusPath);
-        Mockito.when(this.cb.equal(statusPath, JobStatus.INIT))
-                .thenReturn(equalStatusPredicate);
-
-        // TODO figure out how to test tags generated in the specs
-        //final Path<HashSet> tagsPath = (Path<HashSet>) Mockito.mock(Path.class);
-        //final Predicate equalTagsPredicate = Mockito.mock(Predicate.class);
-        //Mockito.when(this.root.get(Job_.tags)).thenReturn(tagsPath);
-
-        Mockito.when(this.cb.equal(statusPath, JobStatus.INIT))
+        Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(JobStatus.class)))
                 .thenReturn(equalStatusPredicate);
 
         final Path<String> clusterNamePath = (Path<String>) Mockito.mock(Path.class);
@@ -120,7 +120,7 @@ public class TestJobSpecs {
                 ID,
                 JOB_NAME,
                 USER_NAME,
-                JobStatus.INIT,
+                STATUSES,
                 TAGS,
                 CLUSTER_NAME,
                 CLUSTER_ID
@@ -133,8 +133,10 @@ public class TestJobSpecs {
                 .like(this.root.get(Job_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.user), USER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(Job_.status), JobStatus.INIT);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Job_.status), status);
+        }
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
@@ -150,7 +152,7 @@ public class TestJobSpecs {
                 null,
                 JOB_NAME,
                 USER_NAME,
-                JobStatus.INIT,
+                STATUSES,
                 TAGS,
                 CLUSTER_NAME,
                 CLUSTER_ID
@@ -163,12 +165,15 @@ public class TestJobSpecs {
                 .like(this.root.get(Job_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.user), USER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(Job_.status), JobStatus.INIT);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Job_.status), status);
+        }
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(Job_.tags));
     }
 
     /**
@@ -180,7 +185,7 @@ public class TestJobSpecs {
                 ID,
                 "",
                 USER_NAME,
-                JobStatus.INIT,
+                STATUSES,
                 TAGS,
                 CLUSTER_NAME,
                 CLUSTER_ID
@@ -193,12 +198,15 @@ public class TestJobSpecs {
                 .like(this.root.get(Job_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.user), USER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(Job_.status), JobStatus.INIT);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Job_.status), status);
+        }
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(Job_.tags));
     }
 
     /**
@@ -210,7 +218,7 @@ public class TestJobSpecs {
                 ID,
                 JOB_NAME,
                 " ",
-                JobStatus.INIT,
+                STATUSES,
                 TAGS,
                 CLUSTER_NAME,
                 CLUSTER_ID
@@ -223,12 +231,15 @@ public class TestJobSpecs {
                 .like(this.root.get(Job_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(Job_.user), USER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(Job_.status), JobStatus.INIT);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Job_.status), status);
+        }
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(Job_.tags));
     }
 
     /**
@@ -253,12 +264,48 @@ public class TestJobSpecs {
                 .like(this.root.get(Job_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.user), USER_NAME);
-        Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(Job_.status), JobStatus.INIT);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.never())
+                    .equal(this.root.get(Job_.status), status);
+        }
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(Job_.tags));
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindWithEmptyStatus() {
+        final Specification<Job> spec = JobSpecs.find(
+                ID,
+                JOB_NAME,
+                USER_NAME,
+                new HashSet<JobStatus>(),
+                TAGS,
+                CLUSTER_NAME,
+                CLUSTER_ID
+        );
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(Job_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(Job_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.user), USER_NAME);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.never())
+                    .equal(this.root.get(Job_.status), status);
+        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(Job_.tags));
     }
 
     /**
@@ -270,7 +317,7 @@ public class TestJobSpecs {
                 ID,
                 JOB_NAME,
                 USER_NAME,
-                JobStatus.INIT,
+                STATUSES,
                 TAGS,
                 null,
                 CLUSTER_ID
@@ -283,12 +330,15 @@ public class TestJobSpecs {
                 .like(this.root.get(Job_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.user), USER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(Job_.status), JobStatus.INIT);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Job_.status), status);
+        }
         Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(Job_.tags));
     }
 
     /**
@@ -300,7 +350,7 @@ public class TestJobSpecs {
                 ID,
                 JOB_NAME,
                 USER_NAME,
-                JobStatus.INIT,
+                STATUSES,
                 TAGS,
                 CLUSTER_NAME,
                 null
@@ -313,12 +363,82 @@ public class TestJobSpecs {
                 .like(this.root.get(Job_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.user), USER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(Job_.status), JobStatus.INIT);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Job_.status), status);
+        }
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(Job_.tags));
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindWithOutTags() {
+        final Specification<Job> spec = JobSpecs.find(
+                ID,
+                JOB_NAME,
+                USER_NAME,
+                STATUSES,
+                null,
+                CLUSTER_NAME,
+                CLUSTER_ID
+        );
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(Job_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(Job_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.user), USER_NAME);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Job_.status), status);
+        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.never()).isMember(TAG, this.root.get(Job_.tags));
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindWithEmptyTag() {
+        TAGS.add("");
+        final Specification<Job> spec = JobSpecs.find(
+                ID,
+                JOB_NAME,
+                USER_NAME,
+                STATUSES,
+                TAGS,
+                CLUSTER_NAME,
+                CLUSTER_ID
+        );
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(Job_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(Job_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.user), USER_NAME);
+        for (final JobStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Job_.status), status);
+        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Job_.executionClusterId), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(Job_.tags));
     }
 
     /**

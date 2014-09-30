@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -58,6 +59,7 @@ public interface CommandConfigService {
      *
      * @param name     name of command config
      * @param userName the name of the user who created the configuration
+     * @param statuses The status of the applications to get. Can be null.
      * @param tags     tags allocated to this command
      * @param page     Page number to start results on
      * @param limit    Max number of results per page
@@ -66,6 +68,7 @@ public interface CommandConfigService {
     List<Command> getCommands(
             final String name,
             final String userName,
+            final Set<CommandStatus> statuses,
             final Set<String> tags,
             final int page,
             final int limit);

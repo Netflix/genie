@@ -19,6 +19,7 @@ package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.wordnik.swagger.annotations.Api;
@@ -28,6 +29,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
 import java.net.HttpURLConnection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -47,6 +49,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,11 +151,13 @@ public class ApplicationConfigResource {
      * Get Applications based on user parameters.
      *
      * @param name     name for configuration (optional)
-     * @param userName the user who created the application (optional)
+     * @param userName The user who created the application (optional)
+     * @param statuses The statuses of the applications (optional)
      * @param tags     The set of tags you want the command for.
      * @param page     The page to start one (optional)
      * @param limit    the max number of results to return per page (optional)
      * @return All applications matching the criteria
+     * @throws GenieException For any error
      */
     @GET
     @ApiOperation(
@@ -173,6 +178,9 @@ public class ApplicationConfigResource {
             @ApiParam(value = "User who created the application.", required = false)
             @QueryParam("userName")
             final String userName,
+            @ApiParam(value = "The status of the applications to get.", required = false)
+            @QueryParam("status")
+            final Set<String> statuses,
             @ApiParam(value = "Tags for the cluster.", required = false)
             @QueryParam("tag")
             final Set<String> tags,
@@ -181,9 +189,17 @@ public class ApplicationConfigResource {
             @DefaultValue("0") int page,
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit")
-            @DefaultValue("1024") int limit) {
-        LOG.info("Called to get Applications");
-        return this.acs.getApplications(name, userName, tags, page, limit);
+            @DefaultValue("1024") int limit) throws GenieException {
+        Set<ApplicationStatus> enumStatuses = null;
+        if (!statuses.isEmpty()) {
+            enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
+            for (final String status : statuses) {
+                if (StringUtils.isNotBlank(status)) {
+                    enumStatuses.add(ApplicationStatus.parse(status));
+                }
+            }
+        }
+        return this.acs.getApplications(name, userName, enumStatuses, tags, page, limit);
     }
 
     /**

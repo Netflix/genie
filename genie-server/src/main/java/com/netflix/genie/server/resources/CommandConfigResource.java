@@ -21,12 +21,15 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -45,6 +48,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,19 +99,19 @@ public class CommandConfigResource {
             response = Command.class
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 201,
-                message = "Created",
-                response = Command.class
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid required parameter supplied"
-        ),
-        @ApiResponse(
-                code = 409,
-                message = "A command with the supplied id already exists"
-        )
+            @ApiResponse(
+                    code = 201,
+                    message = "Created",
+                    response = Command.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = 409,
+                    message = "A command with the supplied id already exists"
+            )
     })
     public Response createCommand(
             @ApiParam(
@@ -138,19 +143,19 @@ public class CommandConfigResource {
             response = Command.class
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK",
-                response = Command.class
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid id supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK",
+                    response = Command.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid id supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Command getCommand(
             @ApiParam(
@@ -165,12 +170,14 @@ public class CommandConfigResource {
     /**
      * Get Command configuration based on user parameters.
      *
-     * @param name name for command (optional)
+     * @param name     name for command (optional)
      * @param userName the user who created the configuration (optional)
-     * @param tags The set of tags you want the command for.
-     * @param page The page to start one (optional)
-     * @param limit the max number of results to return per page (optional)
+     * @param statuses The statuses of the commands to get (optional)
+     * @param tags     The set of tags you want the command for.
+     * @param page     The page to start one (optional)
+     * @param limit    the max number of results to return per page (optional)
      * @return All the Commands matching the criteria or all if no criteria
+     * @throws GenieException For any error
      */
     @GET
     @ApiOperation(
@@ -179,11 +186,11 @@ public class CommandConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK",
-                response = Command.class
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK",
+                    response = Command.class
+            )
     })
     public List<Command> getCommands(
             @ApiParam(
@@ -196,6 +203,11 @@ public class CommandConfigResource {
                     required = false
             )
             @QueryParam("userName") final String userName,
+            @ApiParam(
+                    value = "The statuses of the commands to find.",
+                    required = false
+            )
+            @QueryParam("status") final Set<String> statuses,
             @ApiParam(value = "Tags for the cluster.", required = false)
             @QueryParam("tag")
             final Set<String> tags,
@@ -210,15 +222,24 @@ public class CommandConfigResource {
                     required = false
             )
             @QueryParam("limit")
-            @DefaultValue("1024") int limit) {
+            @DefaultValue("1024") int limit) throws GenieException {
         LOG.info("Called to get commands.");
-        return this.ccs.getCommands(name, userName, tags, page, limit);
+        Set<CommandStatus> enumStatuses = null;
+        if (!statuses.isEmpty()) {
+            enumStatuses = EnumSet.noneOf(CommandStatus.class);
+            for (final String status : statuses) {
+                if (StringUtils.isNotBlank(status)) {
+                    enumStatuses.add(CommandStatus.parse(status));
+                }
+            }
+        }
+        return this.ccs.getCommands(name, userName, enumStatuses, tags, page, limit);
     }
 
     /**
      * Update command configuration.
      *
-     * @param id unique id for the configuration to update.
+     * @param id            unique id for the configuration to update.
      * @param updateCommand the information to update the command with
      * @return The updated command
      * @throws GenieException For any error
@@ -232,19 +253,19 @@ public class CommandConfigResource {
             response = Command.class
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK",
-                response = Command.class
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid Id supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command to update not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK",
+                    response = Command.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid Id supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command to update not found"
+            )
     })
     public Command updateCommand(
             @ApiParam(
@@ -275,19 +296,19 @@ public class CommandConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK",
-                response = Command.class
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid Id supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK",
+                    response = Command.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid Id supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public List<Command> deleteAllCommands() throws GenieException {
         LOG.info("called to delete all commands.");
@@ -309,19 +330,19 @@ public class CommandConfigResource {
             response = Command.class
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK",
-                response = Command.class
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid Id supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK",
+                    response = Command.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid Id supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Command deleteCommand(
             @ApiParam(
@@ -336,8 +357,8 @@ public class CommandConfigResource {
     /**
      * Add new configuration files to a given command.
      *
-     * @param id The id of the command to add the configuration file to. Not
-     * null/empty/blank.
+     * @param id      The id of the command to add the configuration file to. Not
+     *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
      * @return The active configurations for this command.
      * @throws GenieException For any error
@@ -352,18 +373,18 @@ public class CommandConfigResource {
             responseContainer = "Set"
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK"
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid ID supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Set<String> addConfigsForCommand(
             @ApiParam(
@@ -384,7 +405,7 @@ public class CommandConfigResource {
      * Get all the configuration files for a given command.
      *
      * @param id The id of the command to get the configuration files for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The active set of configuration files.
      * @throws GenieException For any error
      */
@@ -397,18 +418,18 @@ public class CommandConfigResource {
             responseContainer = "Set"
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK"
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid ID supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Set<String> getConfigsForCommand(
             @ApiParam(
@@ -423,10 +444,10 @@ public class CommandConfigResource {
     /**
      * Update the configuration files for a given command.
      *
-     * @param id The id of the command to update the configuration files for.
-     * Not null/empty/blank.
+     * @param id      The id of the command to update the configuration files for.
+     *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
-     * files with. Not null/empty/blank.
+     *                files with. Not null/empty/blank.
      * @return The new set of command configurations.
      * @throws GenieException For any error
      */
@@ -440,18 +461,18 @@ public class CommandConfigResource {
             responseContainer = "Set"
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK"
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid ID supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Set<String> updateConfigsForCommand(
             @ApiParam(
@@ -472,7 +493,7 @@ public class CommandConfigResource {
      * Delete the all configuration files from a given command.
      *
      * @param id The id of the command to delete the configuration files from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException For any error
      */
@@ -485,18 +506,18 @@ public class CommandConfigResource {
             responseContainer = "Set"
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK"
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid Id supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid Id supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Set<String> removeAllConfigsForCommand(
             @ApiParam(
@@ -511,8 +532,8 @@ public class CommandConfigResource {
     /**
      * Add new tags to a given command.
      *
-     * @param id The id of the command to add the tags to. Not
-     * null/empty/blank.
+     * @param id   The id of the command to add the tags to. Not
+     *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
      * @return The active tags for this command.
      * @throws GenieException For any error
@@ -526,9 +547,9 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Command not found")
     })
     public Set<String> addTagsForCommand(
             @ApiParam(value = "Id of the command to add configuration to.", required = true)
@@ -544,7 +565,7 @@ public class CommandConfigResource {
      * Get all the tags for a given command.
      *
      * @param id The id of the command to get the tags for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The active set of tags.
      * @throws GenieException For any error
      */
@@ -556,9 +577,9 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Command not found")
     })
     public Set<String> getTagsForCommand(
             @ApiParam(value = "Id of the command to get tags for.", required = true)
@@ -571,10 +592,10 @@ public class CommandConfigResource {
     /**
      * Update the tags for a given command.
      *
-     * @param id The id of the command to update the tags for.
-     * Not null/empty/blank.
+     * @param id   The id of the command to update the tags for.
+     *             Not null/empty/blank.
      * @param tags The tags to replace existing configuration
-     * files with. Not null/empty/blank.
+     *             files with. Not null/empty/blank.
      * @return The new set of command tags.
      * @throws GenieException For any error
      */
@@ -587,9 +608,9 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Command not found")
     })
     public Set<String> updateTagsForCommand(
             @ApiParam(value = "Id of the command to update tags for.", required = true)
@@ -605,7 +626,7 @@ public class CommandConfigResource {
      * Delete the all tags from a given command.
      *
      * @param id The id of the command to delete the tags from.
-     * Not null/empty/blank.
+     *           Not null/empty/blank.
      * @return Empty set if successful
      * @throws GenieException For any error
      */
@@ -618,9 +639,9 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid Id supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid Id supplied"),
+            @ApiResponse(code = 404, message = "Command not found")
     })
     public Set<String> removeAllTagsForCommand(
             @ApiParam(value = "Id of the command to delete from.", required = true)
@@ -633,8 +654,8 @@ public class CommandConfigResource {
     /**
      * Set the application for the given command.
      *
-     * @param id The id of the command to add the applications to. Not
-     * null/empty/blank.
+     * @param id          The id of the command to add the applications to. Not
+     *                    null/empty/blank.
      * @param application The application to set. Not null.
      * @return The active applications for this command.
      * @throws GenieException For any error
@@ -645,23 +666,23 @@ public class CommandConfigResource {
     @ApiOperation(
             value = "Set the application for a command",
             notes = "Set the supplied application to the command "
-            + "with the supplied id. Applications should already "
-            + "have been created.",
+                    + "with the supplied id. Applications should already "
+                    + "have been created.",
             response = Application.class
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK"
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid ID supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Application setApplicationForCommand(
             @ApiParam(
@@ -682,7 +703,7 @@ public class CommandConfigResource {
      * Get the application configured for a given command.
      *
      * @param id The id of the command to get the application files for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The active application for the command.
      * @throws GenieException For any error
      */
@@ -694,19 +715,19 @@ public class CommandConfigResource {
             response = Application.class
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK",
-                response = Application.class
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid ID supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Application getApplicationForCommand(
             @ApiParam(
@@ -722,7 +743,7 @@ public class CommandConfigResource {
      * Remove the application from a given command.
      *
      * @param id The id of the command to delete the application from. Not
-     * null/empty/blank.
+     *           null/empty/blank.
      * @return The active set of applications for the command.
      * @throws GenieException For any error
      */
@@ -734,19 +755,19 @@ public class CommandConfigResource {
             response = Application.class
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK",
-                response = Application.class
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid ID supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Application removeApplicationForCommand(
             @ApiParam(
@@ -762,7 +783,7 @@ public class CommandConfigResource {
      * Get all the clusters this command is associated with.
      *
      * @param id The id of the command to get the clusters for. Not
-     * NULL/empty/blank.
+     *           NULL/empty/blank.
      * @return The set of clusters.
      * @throws GenieException For any error
      */
@@ -775,18 +796,18 @@ public class CommandConfigResource {
             responseContainer = "Set"
     )
     @ApiResponses(value = {
-        @ApiResponse(
-                code = 200,
-                message = "OK"
-        ),
-        @ApiResponse(
-                code = 400,
-                message = "Invalid id supplied"
-        ),
-        @ApiResponse(
-                code = 404,
-                message = "Command not found"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid id supplied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Command not found"
+            )
     })
     public Set<Cluster> getClustersForCommand(
             @ApiParam(
@@ -801,8 +822,8 @@ public class CommandConfigResource {
     /**
      * Remove an tag from a given command.
      *
-     * @param id The id of the command to delete the tag from. Not
-     * null/empty/blank.
+     * @param id  The id of the command to delete the tag from. Not
+     *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
      * @return The active set of tags for the command.
      * @throws GenieException For any error
@@ -816,9 +837,9 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Invalid ID supplied"),
-        @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Invalid ID supplied"),
+            @ApiResponse(code = 404, message = "Command not found")
     })
     public Set<String> removeTagForCommand(
             @ApiParam(value = "Id of the command to delete from.", required = true)

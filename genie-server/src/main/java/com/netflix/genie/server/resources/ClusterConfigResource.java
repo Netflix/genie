@@ -206,7 +206,7 @@ public class ClusterConfigResource {
         if (!statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(ClusterStatus.class);
             for (final String status : statuses) {
-                if (!StringUtils.isBlank(status)) {
+                if (StringUtils.isNotBlank(status)) {
                     enumStatuses.add(ClusterStatus.parse(status));
                 }
             }

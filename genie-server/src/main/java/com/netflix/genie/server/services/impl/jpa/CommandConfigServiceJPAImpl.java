@@ -22,10 +22,7 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.common.model.*;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
@@ -126,6 +123,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     public List<Command> getCommands(
             final String name,
             final String userName,
+            final Set<CommandStatus> statuses,
             final Set<String> tags,
             final int page,
             final int limit) {
@@ -140,9 +138,10 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
         @SuppressWarnings("unchecked")
         final List<Command> commands = this.commandRepo.findAll(
-                CommandSpecs.findByNameAndUserAndTags(
+                CommandSpecs.find(
                         name,
                         userName,
+                        statuses,
                         tags
                 ),
                 pageRequest).getContent();

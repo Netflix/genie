@@ -154,7 +154,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
         @SuppressWarnings("unchecked")
         final List<Cluster> clusters = this.clusterRepo.findAll(
-                ClusterSpecs.findByNameAndStatusesAndTagsAndUpdateTime(
+                ClusterSpecs.find(
                         name,
                         statuses,
                         tags,

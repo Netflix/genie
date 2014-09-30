@@ -23,6 +23,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
@@ -100,6 +101,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     public List<Application> getApplications(
             final String name,
             final String userName,
+            final Set<ApplicationStatus> statuses,
             final Set<String> tags,
             final int page,
             final int limit) {
@@ -114,7 +116,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
         @SuppressWarnings("unchecked")
         final List<Application> apps = this.applicationRepo.findAll(
-                ApplicationSpecs.findByNameAndUserAndTags(name, userName, tags),
+                ApplicationSpecs.find(name, userName, statuses, tags),
                 pageRequest).getContent();
         return apps;
     }

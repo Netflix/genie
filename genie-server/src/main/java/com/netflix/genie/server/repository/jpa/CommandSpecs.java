@@ -16,7 +16,9 @@
 package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command_;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,13 +27,14 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Specifications for JPA queries.
  *
- * see http://tinyurl.com/n6nubvm
+ * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  * @author tgianos
  */
 public final class CommandSpecs {
@@ -45,13 +48,14 @@ public final class CommandSpecs {
     /**
      * Get a specification using the specified parameters.
      *
-     * @param name The name of the command
+     * @param name     The name of the command
      * @param userName The name of the user who created the command
-     * @param tags The set of tags to search the command for
+     * @param statuses The status of the command
+     * @param tags     The set of tags to search the command for
      * @return A specification object used for querying
      */
-    public static Specification<Command> findByNameAndUserAndTags(
-            final String name, final String userName, final Set<String> tags) {
+    public static Specification<Command> find(
+            final String name, final String userName, final Set<CommandStatus> statuses, final Set<String> tags) {
         return new Specification<Command>() {
             @Override
             public Predicate toPredicate(
@@ -65,9 +69,19 @@ public final class CommandSpecs {
                 if (StringUtils.isNotBlank(userName)) {
                     predicates.add(cb.equal(root.get(Command_.user), userName));
                 }
+                if (statuses != null && !statuses.isEmpty()) {
+                    //Could optimize this as we know size could use native array
+                    final List<Predicate> orPredicates = new ArrayList<>();
+                    for (final CommandStatus status : statuses) {
+                        orPredicates.add(cb.equal(root.get(Command_.status), status));
+                    }
+                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                }
                 if (tags != null) {
                     for (final String tag : tags) {
-                        predicates.add(cb.isMember(tag, root.get(Command_.tags)));
+                        if (StringUtils.isNotBlank(tag)) {
+                            predicates.add(cb.isMember(tag, root.get(Command_.tags)));
+                        }
                     }
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));

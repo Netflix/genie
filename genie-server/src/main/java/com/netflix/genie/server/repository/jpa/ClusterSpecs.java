@@ -39,8 +39,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Specifications for JPA queries.
- * see http://tinyurl.com/n6nubvm
  *
+ * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  * @author tgianos
  */
 public final class ClusterSpecs {
@@ -61,7 +61,7 @@ public final class ClusterSpecs {
      * @param maxUpdateTime The maximum updated time of the clusters to find
      * @return The specification
      */
-    public static Specification<Cluster> findByNameAndStatusesAndTagsAndUpdateTime(
+    public static Specification<Cluster> find(
             final String name,
             final Set<ClusterStatus> statuses,
             final Set<String> tags,
@@ -85,7 +85,9 @@ public final class ClusterSpecs {
                 }
                 if (tags != null) {
                     for (final String tag : tags) {
-                        predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
+                        if (StringUtils.isNotBlank(tag)) {
+                            predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
+                        }
                     }
                 }
                 if (statuses != null && !statuses.isEmpty()) {

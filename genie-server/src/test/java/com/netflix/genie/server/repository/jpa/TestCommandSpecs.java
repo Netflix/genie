@@ -16,10 +16,11 @@
 package com.netflix.genie.server.repository.jpa;
 
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command_;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,20 +47,11 @@ public class TestCommandSpecs {
     private static final String TAG_2 = "hive";
     private static final String TAG_3 = "11";
     private static final Set<String> TAGS = new HashSet<>();
+    private static final Set<CommandStatus> STATUSES = new HashSet<>();
 
     private Root<Command> root;
     private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
-
-    /**
-     * Setup test wide variables.
-     */
-    @BeforeClass
-    public static void setupClass() {
-        TAGS.add(TAG_1);
-        TAGS.add(TAG_2);
-        TAGS.add(TAG_3);
-    }
 
     /**
      * Setup some variables.
@@ -67,6 +59,15 @@ public class TestCommandSpecs {
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
+        TAGS.clear();
+        TAGS.add(TAG_1);
+        TAGS.add(TAG_2);
+        TAGS.add(TAG_3);
+
+        STATUSES.clear();
+        STATUSES.add(CommandStatus.ACTIVE);
+        STATUSES.add(CommandStatus.INACTIVE);
+
         this.root = (Root<Command>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
@@ -83,6 +84,12 @@ public class TestCommandSpecs {
         Mockito.when(this.cb.equal(userNamePath, USER_NAME))
                 .thenReturn(equalUserNamePredicate);
 
+        final Path<CommandStatus> statusPath = (Path<CommandStatus>) Mockito.mock(Path.class);
+        final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(Command_.status)).thenReturn(statusPath);
+        Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(CommandStatus.class)))
+                .thenReturn(equalStatusPredicate);
+
         final Expression<Set<String>> tagExpression = (Expression<Set<String>>) Mockito.mock(Expression.class);
         final Predicate isMemberTagPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(Command_.tags)).thenReturn(tagExpression);
@@ -91,12 +98,12 @@ public class TestCommandSpecs {
     }
 
     /**
-     * Test the findByNameAndUserAndTags specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndUserAndTagsAll() {
-        final Specification<Command> spec = CommandSpecs.findByNameAndUserAndTags(
-                NAME, USER_NAME, TAGS
+    public void testFindAll() {
+        final Specification<Command> spec = CommandSpecs.find(
+                NAME, USER_NAME, STATUSES, TAGS
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -104,6 +111,10 @@ public class TestCommandSpecs {
                 .equal(this.root.get(Command_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Command_.user), USER_NAME);
+        for (final CommandStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Command_.status), status);
+        }
         for (final String tag : TAGS) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .isMember(tag, this.root.get(Command_.tags));
@@ -111,12 +122,12 @@ public class TestCommandSpecs {
     }
 
     /**
-     * Test the findByNameAndUserAndTags specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndUserAndTagsNoName() {
-        final Specification<Command> spec = CommandSpecs.findByNameAndUserAndTags(
-                null, USER_NAME, TAGS
+    public void testFindNoName() {
+        final Specification<Command> spec = CommandSpecs.find(
+                null, USER_NAME, STATUSES, TAGS
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -124,6 +135,10 @@ public class TestCommandSpecs {
                 .equal(this.root.get(Command_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Command_.user), USER_NAME);
+        for (final CommandStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Command_.status), status);
+        }
         for (final String tag : TAGS) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .isMember(tag, this.root.get(Command_.tags));
@@ -131,12 +146,12 @@ public class TestCommandSpecs {
     }
 
     /**
-     * Test the findByNameAndUserAndTags specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndUserAndTagsNoUserName() {
-        final Specification<Command> spec = CommandSpecs.findByNameAndUserAndTags(
-                NAME, null, TAGS
+    public void testFindNoUserName() {
+        final Specification<Command> spec = CommandSpecs.find(
+                NAME, null, STATUSES, TAGS
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -144,6 +159,10 @@ public class TestCommandSpecs {
                 .equal(this.root.get(Command_.name), NAME);
         Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(Command_.user), USER_NAME);
+        for (final CommandStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Command_.status), status);
+        }
         for (final String tag : TAGS) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .isMember(tag, this.root.get(Command_.tags));
@@ -151,12 +170,12 @@ public class TestCommandSpecs {
     }
 
     /**
-     * Test the findByNameAndUserAndTags specification.
+     * Test the find specification.
      */
     @Test
-    public void testFindByNameAndUserAndTagsNoTags() {
-        final Specification<Command> spec = CommandSpecs.findByNameAndUserAndTags(
-                NAME, USER_NAME, null
+    public void testFindNoTags() {
+        final Specification<Command> spec = CommandSpecs.find(
+                NAME, USER_NAME, STATUSES, null
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -164,8 +183,88 @@ public class TestCommandSpecs {
                 .equal(this.root.get(Command_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(Command_.user), USER_NAME);
+        for (final CommandStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Command_.status), status);
+        }
         for (final String tag : TAGS) {
             Mockito.verify(this.cb, Mockito.never())
+                    .isMember(tag, this.root.get(Command_.tags));
+        }
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindEmptyTag() {
+        TAGS.add("");
+        final Specification<Command> spec = CommandSpecs.find(
+                NAME, USER_NAME, STATUSES, TAGS
+        );
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Command_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Command_.user), USER_NAME);
+        for (final CommandStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .equal(this.root.get(Command_.status), status);
+        }
+        for (final String tag : TAGS) {
+            if (StringUtils.isBlank(tag)) {
+                Mockito.verify(this.cb, Mockito.never())
+                        .isMember(tag, this.root.get(Command_.tags));
+            } else {
+                Mockito.verify(this.cb, Mockito.times(1))
+                        .isMember(tag, this.root.get(Command_.tags));
+            }
+        }
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindNoStatuses() {
+        final Specification<Command> spec = CommandSpecs
+                .find(NAME, USER_NAME, null, TAGS);
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Command_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Command_.user), USER_NAME);
+        for (final CommandStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.never())
+                    .equal(this.root.get(Command_.status), status);
+        }
+        for (final String tag : TAGS) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                    .isMember(tag, this.root.get(Command_.tags));
+        }
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindEmptyStatuses() {
+        final Specification<Command> spec = CommandSpecs
+                .find(NAME, USER_NAME, new HashSet<CommandStatus>(), TAGS);
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Command_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(Command_.user), USER_NAME);
+        for (final CommandStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.never())
+                    .equal(this.root.get(Command_.status), status);
+        }
+        for (final String tag : TAGS) {
+            Mockito.verify(this.cb, Mockito.times(1))
                     .isMember(tag, this.root.get(Command_.tags));
         }
     }

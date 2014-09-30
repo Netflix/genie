@@ -15,10 +15,10 @@
  */
 package com.netflix.genie.server.repository.jpa;
 
-import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.model.Job_;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,14 +27,15 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Specifications for JPA queries.
  *
- * see http://tinyurl.com/n6nubvm
  * @author tgianos
+ * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  */
 public final class JobSpecs {
 
@@ -47,19 +48,19 @@ public final class JobSpecs {
     /**
      * Find jobs based on the parameters.
      *
-     * @param id The job id
-     * @param jobName The job name
-     * @param userName The user who created the job
-     * @param status The job status
+     * @param id          The job id
+     * @param jobName     The job name
+     * @param userName    The user who created the job
+     * @param statuses    The job statuses
      * @param clusterName The cluster name
-     * @param clusterId The cluster id
+     * @param clusterId   The cluster id
      * @return The specification
      */
     public static Specification<Job> find(
             final String id,
             final String jobName,
             final String userName,
-            final JobStatus status,
+            final Set<JobStatus> statuses,
             final Set<String> tags,
             final String clusterName,
             final String clusterId) {
@@ -79,12 +80,19 @@ public final class JobSpecs {
                 if (StringUtils.isNotBlank(userName)) {
                     predicates.add(cb.equal(root.get(Job_.user), userName));
                 }
-                if (status != null) {
-                    predicates.add(cb.equal(root.get(Job_.status), status));
+                if (statuses != null && !statuses.isEmpty()) {
+                    //Could optimize this as we know size could use native array
+                    final List<Predicate> orPredicates = new ArrayList<>();
+                    for (final JobStatus status : statuses) {
+                        orPredicates.add(cb.equal(root.get(Job_.status), status));
+                    }
+                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
                 }
                 if (tags != null) {
                     for (final String tag : tags) {
-                        predicates.add(cb.isMember(tag, root.get(Job_.tags)));
+                        if (StringUtils.isNotBlank(tag)) {
+                            predicates.add(cb.isMember(tag, root.get(Job_.tags)));
+                        }
                     }
                 }
                 if (StringUtils.isNotBlank(clusterName)) {
@@ -102,7 +110,7 @@ public final class JobSpecs {
      * Find jobs that are zombies.
      *
      * @param currentTime The current time
-     * @param zombieTime The time that zombies should be marked by
+     * @param zombieTime  The time that zombies should be marked by
      * @return The specification for this query
      */
     public static Specification<Job> findZombies(

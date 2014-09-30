@@ -357,20 +357,24 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsByStatus() {
+        final Set<JobStatus> statuses = new HashSet<>();
+        statuses.add(JobStatus.FAILED);
+        statuses.add(JobStatus.INIT);
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 null,
-                JobStatus.FAILED,
+                statuses,
                 null,
                 null,
                 null,
                 0,
                 10
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
+        Assert.assertEquals(2, jobs.size());
+        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+        Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
     }
 
     /**
