@@ -99,16 +99,16 @@ public class JobMonitorImpl implements JobMonitor {
      * Constructor.
      *
      * @param xs                  The job execution service.
-     * @param jobservice          The job service API's to use.
+     * @param jobService          The job service API's to use.
      * @param genieNodeStatistics The statistics object to use
      */
     @Inject
     public JobMonitorImpl(
             final ExecutionService xs,
-            final JobService jobservice,
+            final JobService jobService,
             final GenieNodeStatistics genieNodeStatistics) {
         this.xs = xs;
-        this.jobService = jobservice;
+        this.jobService = jobService;
         this.genieNodeStatistics = genieNodeStatistics;
         this.config = ConfigurationManager.getConfigInstance();
         this.maxStdoutSize = this.config.getLong("netflix.genie.job.max.stdout.size", null);
@@ -256,7 +256,7 @@ public class JobMonitorImpl implements JobMonitor {
                     try {
                         this.jobManager.kill();
                         this.terminated = true;
-                    } catch (GenieException e) {
+                    } catch (final GenieException e) {
                         LOG.error("Can't kill job " + this.jobId
                                 + " after exceeding stdout limit", e);
                         // continue - hoping that it can get cleaned up during next iteration

@@ -56,8 +56,14 @@
 
             <property name="minIdle" value="5"/>
             <property name="maxIdle" value="20"/>
-            <property name="maxTotal" value="20"/>
+            <property name="maxTotal" value="40"/>
             <property name="validationQuery" value="select 0;"/>
+            <property name="testOnBorrow" value="true"/>
+            <property name="testOnCreate" value="true"/>
+            <property name="testWhileIdle" value="true"/>
+            <property name="testOnReturn" value="true"/>
+            <property name="minEvictableIdleTimeMillis" value="60000"/>
+            <property name="timeBetweenEvictionRunsMillis" value="10000"/>
         </bean>
     </beans>
 </beans>
