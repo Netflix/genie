@@ -208,7 +208,7 @@ public class Job extends CommonEntityFields {
     /**
      * Set of tags for a job.
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @ApiModelProperty(
             value = "Reference to all the tags"
                     + " associated with this job.")
