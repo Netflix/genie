@@ -20,6 +20,7 @@ package com.netflix.genie.common.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
@@ -414,7 +415,9 @@ public class Job extends CommonEntityFields {
         if (this.tags == null) {
             this.tags = new HashSet<>();
         }
-        this.addAndValidateSystemTags(this.tags);
+        if (ConfigurationManager.getConfigInstance().getBoolean("netflix.genie.server.jobs.tags.default", false)) {
+            this.addAndValidateSystemTags(this.tags);
+        }
     }
 
     /**

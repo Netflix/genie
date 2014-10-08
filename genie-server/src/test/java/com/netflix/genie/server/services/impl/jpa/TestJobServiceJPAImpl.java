@@ -552,7 +552,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForJob(JOB_1_ID).size());
         final Set<String> finalTags
                 = this.service.updateTagsForJob(JOB_1_ID, newTags);
-        Assert.assertEquals(5, finalTags.size());
+        Assert.assertEquals(3, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
@@ -621,8 +621,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 this.service.getTagsForJob(JOB_1_ID).size());
         final Set<String> finalTags
                 = this.service.removeAllTagsForJob(JOB_1_ID);
-        Assert.assertEquals(2,
-                finalTags.size());
+        Assert.assertTrue(finalTags.isEmpty());
     }
 
     /**
