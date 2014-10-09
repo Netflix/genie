@@ -2,7 +2,7 @@ __author__ = 'amsharma'
 
 import logging
 import urllib2
-import genie2.client.swagger
+import genie2.client.api_client
 import genie2.client.V2Api
 import genie2.exception.genie_exception
 
@@ -19,7 +19,7 @@ class Command(object):
     def __init__(self, service_base_url):
         DEBUG("Command API initialized with Service Base URL [%s]" % service_base_url)
         self._service_base_url = service_base_url
-        self._api_client = genie2.client.swagger.ApiClient("key", self._service_base_url)
+        self._api_client = genie2.client.api_client.ApiClient(api_server=self._service_base_url)
         self._api = genie2.client.V2Api.V2Api(self._api_client)
 
     def create_command(self, cmd_obj):

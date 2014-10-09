@@ -20,7 +20,8 @@
             <props>
                 <prop key="openjpa.jdbc.SynchronizeMappings">buildSchema(SchemaAction='add')</prop>
                 <prop key="openjpa.DynamicEnhancementAgent">false</prop> 
-                <prop key="openjpa.RuntimeUnenhancedClasses">unsupported</prop> 
+                <prop key="openjpa.RuntimeUnenhancedClasses">unsupported</prop>
+                <!--<prop key="openjpa.Log">DefaultLevel=WARN, Runtime=INFO, Tool=INFO, SQL=TRACE</prop> -->
             </props>
         </property>
     </bean>
