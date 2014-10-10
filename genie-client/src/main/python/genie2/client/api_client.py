@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 import re
 import urllib
@@ -17,14 +17,14 @@ import genie2.model.Job
 
 
 class ApiClient:
-    """Generic API client for Swagger client library builds"""
+    """Generic API client"""
 
-    def __init__(self, api_key=None, api_server=None):
-        if api_key is None:
-            raise Exception('You must pass an apiKey when instantiating the '
-                            'APIClient')
-        self.api_key = api_key
+    def __init__(self, api_server=None, api_key=None):
+        if api_server is None:
+            raise Exception('You must pass an api server to use')
+
         self.api_server = api_server
+        self.api_key = api_key
         self.cookie = None
 
     def callApi(self, resource_path, method, query_params, post_data,
@@ -36,7 +36,8 @@ class ApiClient:
             for param, value in header_params.iteritems():
                 headers[param] = value
 
-        headers['api_key'] = self.api_key
+        if self.api_key is not None:
+            headers['api_key'] = self.api_key
         headers['Accept'] = 'application/json'
 
         if self.cookie:
@@ -114,9 +115,11 @@ class ApiClient:
                 obj_dict = obj
             else:
                 obj_dict = obj.__dict__
-            return {key: self.sanitizeForSerialization(val)
-                    for (key, val) in obj_dict.iteritems()
-                    if key != 'swaggerTypes' and not key[0:2] == '__'}
+            return {
+                key: self.sanitizeForSerialization(val)
+                for (key, val) in obj_dict.iteritems()
+                if key != 'swaggerTypes' and not key[0:2] == '__' and val is not None
+            }
 
     def deserialize(self, obj, obj_class):
         """Derialize a JSON string into an object.

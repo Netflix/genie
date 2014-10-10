@@ -10,7 +10,7 @@ genie2/client/application_api.py
 genie2/client/cluster_api.py
 genie2/client/command_api.py
 genie2/client/job_api.py
-genie2/client/swagger.py
+genie2/client/api_client.py
 genie2/exception/__init__.py
 genie2/exception/genie_exception.py
 genie2/model/Application.py
