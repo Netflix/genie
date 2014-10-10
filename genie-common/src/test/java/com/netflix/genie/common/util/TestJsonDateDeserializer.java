@@ -67,7 +67,7 @@ public class TestJsonDateDeserializer {
      *
      * @throws IOException
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IOException.class)
     public void testDeserializeError() throws IOException {
         Mockito.when(parser.getText()).thenReturn("I am not a valid date.");
 

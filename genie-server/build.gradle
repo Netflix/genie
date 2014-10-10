@@ -1,8 +1,15 @@
 dependencies {
     compile project.parent.childProjects.get('genie-common')
-    compile ('com.netflix.archaius:archaius-core:0.6.0')
+    compile ('com.netflix.archaius:archaius-core:0.6.2')
+    compile ('com.netflix.karyon:karyon-admin:1.0.26')
+    runtime ('com.netflix.karyon:karyon-admin-web:1.0.26') {
+        exclude group: 'commons-collections', module: 'commons-collections'
+    }
+    compile ('com.netflix.karyon:karyon-core:1.0.26')
+    compile ('com.netflix.karyon:karyon-eureka:1.0.26')
     compile ('com.netflix.karyon:karyon-extensions:1.0.26')
-    compile ('com.netflix.servo:servo-core:0.7.4')
+    compile ('com.netflix.karyon:karyon-spi:1.0.26')
+    compile ('com.netflix.servo:servo-core:0.7.7')
     compile ('com.sun.jersey:jersey-core:1.11')
     compile ('com.sun.jersey:jersey-server:1.11')
     compile ('com.sun.jersey.contribs:jersey-guice:1.11')
