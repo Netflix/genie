@@ -430,7 +430,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 10
         );
 
-        Assert.assertEquals(0,jobs.size());
+        Assert.assertEquals(0, jobs.size());
     }
 
     /**

@@ -11,9 +11,9 @@ sourceSets {
 }
 
 dependencies {
-    compile ('com.fasterxml.jackson.core:jackson-core:2.4.3')
-    compile ('com.fasterxml.jackson.core:jackson-annotations:2.4.3')
-    compile ('com.fasterxml.jackson.core:jackson-databind:2.4.3')
+    compile ('com.fasterxml.jackson.core:jackson-core:2.4.1')
+    compile ('com.fasterxml.jackson.core:jackson-annotations:2.4.1')
+    compile ('com.fasterxml.jackson.core:jackson-databind:2.4.1')
     compile ('com.netflix.eureka:eureka-client:1.1.141')
     compile ('com.netflix.ribbon:ribbon-core:2.0-RC9')
     compile ('com.netflix.ribbon:ribbon-eureka:2.0-RC9')
