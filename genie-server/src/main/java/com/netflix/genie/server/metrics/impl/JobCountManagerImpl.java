@@ -19,6 +19,7 @@ package com.netflix.genie.server.metrics.impl;
 
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.appinfo.InstanceInfo.InstanceStatus;
+import com.netflix.config.ConfigurationManager;
 import com.netflix.discovery.DiscoveryClient;
 import com.netflix.discovery.DiscoveryManager;
 import com.netflix.discovery.shared.Application;
@@ -39,6 +40,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,11 +60,15 @@ public class JobCountManagerImpl implements JobCountManager {
 
     @PersistenceContext
     private EntityManager em;
+    
+    // Config Instance to get all properties
+    private final AbstractConfiguration config;
 
     /**
      * Default Constructor.
      */
     public JobCountManagerImpl() {
+        this.config = ConfigurationManager.getConfigInstance();
     }
 
     /**
@@ -140,6 +147,10 @@ public class JobCountManagerImpl implements JobCountManager {
         LOG.debug("called");
         final String localhost = NetUtil.getHostName();
 
+        // Get the App Name from Configuration
+        final String appName = this.config.getString("APPNAME", "genie2");
+        LOG.info("Using App Name" + appName);
+        
         // naive implementation where we loop through all instances in discovery
         // no need to raise any exceptions here, just return localhost if there
         // is any error
@@ -150,7 +161,7 @@ public class JobCountManagerImpl implements JobCountManager {
             LOG.warn("Can't instantiate DiscoveryClient - returning localhost");
             return localhost;
         }
-        final Application app = discoveryClient.getApplication("genie2");
+        final Application app = discoveryClient.getApplication(appName);
         if (app == null) {
             LOG.warn("Discovery client can't find genie - returning localhost");
             return localhost;
