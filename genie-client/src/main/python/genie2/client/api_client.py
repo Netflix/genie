@@ -27,7 +27,7 @@ class ApiClient:
         self.api_key = api_key
         self.cookie = None
 
-    def callApi(self, resource_path, method, query_params, post_data,
+    def callAPI(self, resource_path, method, query_params, post_data,
                 header_params=None):
 
         url = self.api_server + resource_path
