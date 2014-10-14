@@ -9,3 +9,4 @@
 0.1.8, 09/07/2014 -- Misspelled execution as execution
 0.1.9, 10/09/2014 -- Fixed data types to not serialize NONE, refactored some file names to make more sense
 0.2.0, 10/14/2014 -- Updated the V2API file to include all the latest API's
+0.2.1, 10/14/2014 -- Updating to use the wrapper rather than direct API usage

@@ -28,8 +28,8 @@ Samples
 
 Examples to use cluster API:
 
-1. TODO example 1 
+1. TODO example 1
 
-2. TODO example 2 
+2. TODO example 2
 
-Go to Genie OSS page at `<http://netflix.github.io/genie/>`_.
+Go to Genie OSS page at `<http://netflix.github.io/genie/>`.
