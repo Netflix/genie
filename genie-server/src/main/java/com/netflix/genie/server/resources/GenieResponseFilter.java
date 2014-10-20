@@ -25,6 +25,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.ext.Provider;
+import java.net.HttpURLConnection;
 
 /**
  * Used to increment various counters based on response from Jersey.
@@ -53,11 +54,11 @@ public class GenieResponseFilter implements ContainerResponseFilter {
     @Override
     public ContainerResponse filter(final ContainerRequest request, final ContainerResponse response) {
         final int status = response.getStatus();
-        if (status >= 200 && status < 300) {
+        if (status >= HttpURLConnection.HTTP_OK && status < HttpURLConnection.HTTP_MULT_CHOICE) {
             this.statistics.incrGenie2xxCount();
-        } else if (status >= 400 && status < 500) {
+        } else if (status >= HttpURLConnection.HTTP_BAD_REQUEST && status < HttpURLConnection.HTTP_INTERNAL_ERROR) {
             this.statistics.incrGenie4xxCount();
-        } else if (status >= 500) {
+        } else if (status >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             this.statistics.incrGenie5xxCount();
         }
         return response;

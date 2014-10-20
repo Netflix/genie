@@ -29,6 +29,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
+import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -100,17 +101,21 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 201,
+                    code = HttpURLConnection.HTTP_CREATED,
                     message = "Created",
                     response = Command.class
             ),
             @ApiResponse(
-                    code = 400,
+                    code = HttpURLConnection.HTTP_CONFLICT,
+                    message = "A command with the supplied id already exists"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
                     message = "Invalid required parameter supplied"
             ),
             @ApiResponse(
-                    code = 409,
-                    message = "A command with the supplied id already exists"
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Response createCommand(
@@ -144,17 +149,21 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK",
                     response = Command.class
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid id supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Command getCommand(
@@ -187,9 +196,17 @@ public class CommandConfigResource {
             responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK",
                     response = Command.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "One of the statuses was invalid"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public List<Command> getCommands(
@@ -254,17 +271,21 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK",
                     response = Command.class
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid Id supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command to update not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command to update not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Command updateCommand(
@@ -297,17 +318,21 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK",
                     response = Command.class
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid Id supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public List<Command> deleteAllCommands() throws GenieException {
@@ -331,17 +356,21 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK",
                     response = Command.class
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid Id supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Command deleteCommand(
@@ -374,16 +403,20 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK"
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid ID supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Set<String> addConfigsForCommand(
@@ -419,16 +452,20 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK"
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid ID supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Set<String> getConfigsForCommand(
@@ -462,16 +499,20 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK"
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid ID supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Set<String> updateConfigsForCommand(
@@ -507,16 +548,20 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK"
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid Id supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Set<String> removeAllConfigsForCommand(
@@ -547,9 +592,22 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> addTagsForCommand(
             @ApiParam(value = "Id of the command to add configuration to.", required = true)
@@ -577,9 +635,22 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> getTagsForCommand(
             @ApiParam(value = "Id of the command to get tags for.", required = true)
@@ -608,9 +679,22 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> updateTagsForCommand(
             @ApiParam(value = "Id of the command to update tags for.", required = true)
@@ -639,9 +723,22 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> removeAllTagsForCommand(
             @ApiParam(value = "Id of the command to delete from.", required = true)
@@ -672,16 +769,20 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK"
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid ID supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Application setApplicationForCommand(
@@ -716,17 +817,21 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK",
                     response = Application.class
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid ID supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Application getApplicationForCommand(
@@ -756,17 +861,21 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK",
                     response = Application.class
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid ID supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Application removeApplicationForCommand(
@@ -797,16 +906,20 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = 200,
+                    code = HttpURLConnection.HTTP_OK,
                     message = "OK"
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid id supplied"
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "Command not found"
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
             )
     })
     public Set<Cluster> getClustersForCommand(
@@ -837,9 +950,22 @@ public class CommandConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Command not found")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> removeTagForCommand(
             @ApiParam(value = "Id of the command to delete from.", required = true)

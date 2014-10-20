@@ -28,6 +28,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
+import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -98,9 +99,12 @@ public class ClusterConfigResource {
             notes = "Create a cluster from the supplied information.",
             response = Cluster.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Created", response = Cluster.class),
-            @ApiResponse(code = 400, message = "Invalid required parameter supplied"),
-            @ApiResponse(code = 409, message = "A cluster with the supplied id already exists")
+            @ApiResponse(code = HttpURLConnection.HTTP_CREATED, message = "Created", response = Cluster.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT,
+                    message = "A cluster with the supplied id already exists"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Response createCluster(
             @ApiParam(value = "The cluster to create.", required = true)
@@ -129,9 +133,11 @@ public class ClusterConfigResource {
             notes = "Get the cluster by id if it exists",
             response = Cluster.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Cluster.class),
-            @ApiResponse(code = 400, message = "Invalid id supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Cluster.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Cluster getCluster(
             @ApiParam(value = "Id of the cluster to get.", required = true)
@@ -162,7 +168,10 @@ public class ClusterConfigResource {
             response = Cluster.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Cluster.class)
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Cluster.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "If one of status is invalid"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public List<Cluster> getClusters(
             @ApiParam(value = "Name of the cluster.", required = false)
@@ -230,9 +239,11 @@ public class ClusterConfigResource {
             notes = "Update a cluster from the supplied information.",
             response = Cluster.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Cluster.class),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Cluster to update not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Cluster.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster to update not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Cluster updateCluster(
             @ApiParam(value = "Id of the cluster to update.", required = true)
@@ -258,9 +269,11 @@ public class ClusterConfigResource {
             notes = "Delete a cluster with the supplied id.",
             response = Cluster.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Cluster.class),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Cluster.class),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Cluster deleteCluster(
             @ApiParam(value = "Id of the cluster to delete.", required = true)
@@ -283,9 +296,11 @@ public class ClusterConfigResource {
             response = Cluster.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public List<Cluster> deleteAllClusters() throws GenieException {
         LOG.info("called");
@@ -310,9 +325,11 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> addConfigsForCluster(
             @ApiParam(value = "Id of the cluster to add configuration to.", required = true)
@@ -340,9 +357,11 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> getConfigsForCluster(
             @ApiParam(value = "Id of the cluster to get configurations for.", required = true)
@@ -371,9 +390,11 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> updateConfigsForCluster(
             @ApiParam(value = "Id of the cluster to update configurations for.", required = true)
@@ -404,9 +425,11 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public List<Command> addCommandsForCluster(
             @ApiParam(value = "Id of the cluster to add commands to.", required = true)
@@ -434,9 +457,11 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public List<Command> getCommandsForCluster(
             @ApiParam(value = "Id of the cluster to get commands for.", required = true)
@@ -465,9 +490,11 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public List<Command> updateCommandsForCluster(
             @ApiParam(value = "Id of the cluster to update commands for.", required = true)
@@ -496,9 +523,11 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public List<Command> removeAllCommandsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
@@ -525,9 +554,11 @@ public class ClusterConfigResource {
             response = Command.class,
             responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public List<Command> removeCommandForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
@@ -558,9 +589,11 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> addTagsForCluster(
             @ApiParam(value = "Id of the cluster to add configuration to.", required = true)
@@ -588,9 +621,11 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> getTagsForCluster(
             @ApiParam(value = "Id of the cluster to get tags for.", required = true)
@@ -619,9 +654,11 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> updateTagsForCluster(
             @ApiParam(value = "Id of the cluster to update tags for.", required = true)
@@ -650,9 +687,11 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid Id supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> removeAllTagsForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)
@@ -680,9 +719,11 @@ public class ClusterConfigResource {
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Invalid ID supplied"),
-            @ApiResponse(code = 404, message = "Cluster not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Cluster not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid required parameter supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> removeTagForCluster(
             @ApiParam(value = "Id of the cluster to delete from.", required = true)

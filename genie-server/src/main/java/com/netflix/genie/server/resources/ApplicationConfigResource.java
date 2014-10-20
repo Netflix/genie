@@ -101,9 +101,9 @@ public class ApplicationConfigResource {
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_CREATED, message = "Application created successfully.",
                     response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid required parameter supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT,
                     message = "An application with the supplied id already exists"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "A precondition failed"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -134,8 +134,8 @@ public class ApplicationConfigResource {
             response = Application.class)
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -167,7 +167,7 @@ public class ApplicationConfigResource {
             responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid Request."),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "If status is invalid."),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -219,8 +219,10 @@ public class ApplicationConfigResource {
             response = Application.class)
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application to update not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application to update not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Application updateApplication(
             @ApiParam(value = "Id of the application to update.", required = true)
@@ -246,8 +248,8 @@ public class ApplicationConfigResource {
             responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public List<Application> deleteAllApplications() throws GenieException {
         LOG.info("Delete all Applications");
@@ -269,8 +271,10 @@ public class ApplicationConfigResource {
             response = Application.class)
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Application deleteApplication(
             @ApiParam(value = "Id of the application to delete.", required = true)
@@ -294,13 +298,15 @@ public class ApplicationConfigResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Add new configuration files to an application",
-            notes = "Add the supplied configuration files to the applicaiton with the supplied id.",
+            notes = "Add the supplied configuration files to the application with the supplied id.",
             response = String.class,
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> addConfigsToApplication(
             @ApiParam(value = "Id of the application to add configuration to.", required = true)
@@ -329,8 +335,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> getConfigsForApplication(
             @ApiParam(value = "Id of the application to get configurations for.", required = true)
@@ -360,8 +368,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> updateConfigsForApplication(
             @ApiParam(value = "Id of the application to update configurations for.", required = true)
@@ -390,8 +400,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> removeAllConfigsForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)
@@ -420,8 +432,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> addJarsForApplication(
             @ApiParam(value = "Id of the application to add jar to.", required = true)
@@ -450,8 +464,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> getJarsForApplication(
             @ApiParam(value = "Id of the application to get the jars for.", required = true)
@@ -481,8 +497,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> updateJarsForApplication(
             @ApiParam(value = "Id of the application to update configurations for.", required = true)
@@ -511,8 +529,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> removeAllJarsForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)
@@ -541,8 +561,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> addTagsForApplication(
             @ApiParam(value = "Id of the application to add configuration to.", required = true)
@@ -571,8 +593,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> getTagsForApplication(
             @ApiParam(value = "Id of the application to get tags for.", required = true)
@@ -602,8 +626,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> updateTagsForApplication(
             @ApiParam(value = "Id of the application to update tags for.", required = true)
@@ -633,8 +659,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> removeAllTagsForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)
@@ -661,8 +689,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<Command> getCommandsForApplication(
             @ApiParam(value = "Id of the application to get the commands for.", required = true)
@@ -691,8 +721,10 @@ public class ApplicationConfigResource {
             responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found")
+            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
+            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception")
     })
     public Set<String> removeTagForApplication(
             @ApiParam(value = "Id of the application to delete from.", required = true)

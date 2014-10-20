@@ -327,6 +327,7 @@ public class JobResource {
     @ApiResponses(value = {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Job.class),
             @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job not found"),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -359,6 +360,7 @@ public class JobResource {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
             @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -391,6 +393,7 @@ public class JobResource {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
             @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -424,6 +427,7 @@ public class JobResource {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
             @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -456,6 +460,7 @@ public class JobResource {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
             @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
@@ -487,6 +492,7 @@ public class JobResource {
             @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK"),
             @ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Bad Request"),
             @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Job for id does not exist."),
+            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
             @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception")
     })
