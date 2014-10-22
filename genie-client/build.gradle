@@ -1,3 +1,20 @@
 dependencies {
     compile project.parent.childProjects.get('genie-common')
 }
+
+clean {
+    delete 'src/main/python/nflx_genie_client.egg-info'
+    delete 'src/main/python/dist'
+}
+
+task buildPythonPackage(type: Exec) {
+    dependsOn clean
+    workingDir 'src/main/python'
+    commandLine 'python', 'setup.py', 'sdist'
+}
+
+task uploadToPypi(type: Exec) {
+    dependsOn buildPythonPackage
+    workingDir 'src/main/python'
+    commandLine 'bash', '-c', 'twine upload dist/*'
+}

@@ -1,4 +1,3 @@
-#!/usr/bin/env python2.7
 """
   Copyright 2014 Netflix, Inc.
 
@@ -15,6 +14,8 @@
      limitations under the License.
 """
 import os
+
+__author__ = 'tgianos'
 
 __all__ = []
 

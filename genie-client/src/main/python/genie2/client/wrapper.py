@@ -1,4 +1,3 @@
-#!/usr/bin/env python2.7
 """
   Copyright 2014 Netflix, Inc.
 
@@ -21,6 +20,7 @@ import urllib2
 import genie2.client.api_client
 import genie2.client.V2Api
 
+__author__ = 'jcistaro'
 
 DEBUG = logging.getLogger(__name__).debug
 ERROR = logging.getLogger(__name__).error
