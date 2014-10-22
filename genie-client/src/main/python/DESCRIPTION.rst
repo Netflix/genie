@@ -57,7 +57,7 @@ This assumes the Presto cluster has already been configured with Genie and the c
     import genie2.model.ClusterCriteria
 
     # Create a Genie client which proxies API calls through wrapper which retries failures based on various return codes
-    genie = genie2.client.wrapper.Genie2("http://ec2-174-129-132-9.compute-1.amazonaws.com:7001/genie", genie2.client.wrapper.RetryPolicy(tries=8, none_on_404=True, no_retry_http_codes=range(400, 500)))
+    genie = genie2.client.wrapper.Genie2("http://localhost:7001/genie", genie2.client.wrapper.RetryPolicy(tries=8, none_on_404=True, no_retry_http_codes=range(400, 500)))
 
     # Create a job instance and fill in the required parameters
     job = genie2.model.Job.Job()
