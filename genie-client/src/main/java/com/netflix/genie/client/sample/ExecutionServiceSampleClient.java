@@ -91,7 +91,7 @@ public final class ExecutionServiceSampleClient {
         final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
         final Set<String> commandCriteria = new HashSet<>();
         clusterCriterias.add(criteria);
-        commandCriteria.add("genie.id:prodhive11_mr2");
+        commandCriteria.add("hive");
 
         Job job = new Job(
                 userName,

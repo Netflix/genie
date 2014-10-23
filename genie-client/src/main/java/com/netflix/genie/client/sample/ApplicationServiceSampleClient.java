@@ -236,11 +236,11 @@ public final class ApplicationServiceSampleClient {
         }
         app.setVersion("2.4.0");
         final Set<String> configs = new HashSet<>();
-        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/mapred-site.xml");
+        configs.add("s3://mybucket/mapred-site.xml");
         app.setConfigs(configs);
 
         final Set<String> jars = new HashSet<>();
-        jars.add("s3://netflix-dataoven-test/genie2/application/mapreduce1/foo.jar");
+        jars.add("s3://mybucket/foo.jar");
         app.setJars(jars);
 
         final Set<String> tags = new HashSet<>();

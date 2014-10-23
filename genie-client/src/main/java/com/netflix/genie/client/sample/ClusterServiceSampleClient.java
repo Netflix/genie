@@ -282,9 +282,9 @@ public final class ClusterServiceSampleClient {
     public static Cluster createSampleCluster(
             final String id) throws GenieException {
         final Set<String> configs = new HashSet<>();
-        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/core-site.xml");
-        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/hdfs-site.xml");
-        configs.add("s3://netflix-bdp-emr-clusters/users/bdp/hquery/20140505/185527/genie/yarn-site.xml");
+        configs.add("s3://mybucket/core-site.xml");
+        configs.add("s3://mybucket/hdfs-site.xml");
+        configs.add("s3://mybucketyarn-site.xml");
         final Cluster cluster = new Cluster(
                 NAME,
                 "tgianos",

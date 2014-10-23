@@ -242,7 +242,7 @@ public final class CommandServiceSampleClient {
         if (StringUtils.isNotBlank(id)) {
             command.setId(id);
         }
-        command.setEnvPropFile("s3://netflix-dataoven-test/genie2/command/pig13_mr2/envFile.sh");
+        command.setEnvPropFile("s3:/mybucket/envFile.sh");
         command.setVersion("0.13");
 
         final Set<String> tags = new HashSet<>();
