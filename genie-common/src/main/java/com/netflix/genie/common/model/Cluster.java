@@ -64,7 +64,8 @@ public class Cluster extends CommonEntityFields {
     @ApiModelProperty(
             value = "The status of the cluster",
             required = true,
-            dataType = "string")
+            dataType = "string"
+    )
     private ClusterStatus status;
 
     /**
@@ -75,19 +76,29 @@ public class Cluster extends CommonEntityFields {
      */
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "Type of the cluster - e.g. yarn",
+            value = "The type of the cluster to use to figure out the job manager for this"
+                    + " cluster. e.g.: yarn, presto, mesos etc. The mapping to a JobManager will be"
+                    + " specified using the property: netflix.genie.server.{clusterType}.JobManagerImpl",
             required = true)
     private String clusterType;
 
     /**
-     * Reference to all the configuration (xml's) needed for this cluster.
+     * Reference to all the configuration files needed for this cluster.
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "Reference to all the configuration"
-                    + " files needed for this cluster",
+            value = "All the configuration files needed for this cluster which will be downloaded pre-use",
             required = true)
     private Set<String> configs;
+
+    /**
+     * Set of tags for a cluster.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "The tags associated with this cluster",
+            required = true)
+    private Set<String> tags;
 
     /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
@@ -96,16 +107,6 @@ public class Cluster extends CommonEntityFields {
     @OrderColumn
     @JsonIgnore
     private List<Command> commands;
-
-    /**
-     * Set of tags for a cluster.
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @ApiModelProperty(
-            value = "Reference to all the tags"
-                    + " associated with this cluster.",
-            required = true)
-    private Set<String> tags;
 
     /**
      * Default Constructor.

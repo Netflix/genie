@@ -85,8 +85,9 @@ public class Job extends CommonEntityFields {
     @Lob
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "Command line arguments for the job",
-            required = true)
+            value = "Command line arguments for the job. e.g. -f hive.q",
+            required = true
+    )
     private String commandArgs;
 
     /**
@@ -94,7 +95,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Description specified for the job")
+            value = "Description specified for the job"
+    )
     private String description;
 
     /**
@@ -103,31 +105,17 @@ public class Job extends CommonEntityFields {
     @Basic
     @Column(name = "groupName")
     @ApiModelProperty(
-            value = "group name of the user who submitted this job")
+            value = "Group name of the user who submitted this job"
+    )
     private String group;
-
-    /**
-     * Alias - Cluster Name of the cluster selected to run the job.
-     */
-    @Basic
-    @ApiModelProperty(
-            value = "Name of the cluster where the job is run")
-    private String executionClusterName;
-
-    /**
-     * ID for the cluster that was selected to run the job .
-     */
-    @Basic
-    @ApiModelProperty(
-            value = "Id of the cluster where the job is run")
-    private String executionClusterId;
 
     /**
      * Users can specify a property file location with environment variables.
      */
     @Basic
     @ApiModelProperty(
-            value = "Path to a shell file which is sourced before job is run.")
+            value = "Path to a shell file which is sourced before job is run where properties can be set"
+    )
     private String envPropFile;
 
     /**
@@ -135,7 +123,9 @@ public class Job extends CommonEntityFields {
      */
     @Transient
     @ApiModelProperty(
-            value = "List of criteria containing tags to use to pick a cluster to run this job")
+            value = "List of criteria containing tags to use to pick a cluster to run this job, evaluated in order",
+            required = true
+    )
     private List<ClusterCriteria> clusterCriterias;
 
     /**
@@ -143,8 +133,62 @@ public class Job extends CommonEntityFields {
      */
     @Transient
     @ApiModelProperty(
-            value = "List of criteria containing tags to use to pick a command to run this job")
+            value = "List of criteria containing tags to use to pick a command to run this job",
+            required = true
+    )
     private Set<String> commandCriteria;
+
+    /**
+     * File dependencies.
+     */
+    @Lob
+    @ApiModelProperty(
+            value = "Dependent files for this job to run. Will be downloaded from s3/hdfs before job starts"
+    )
+    private String fileDependencies;
+
+    /**
+     * Set of file dependencies, sent as MIME attachments. This is not persisted
+     * in the DB for space reasons.
+     */
+    @Transient
+    @ApiModelProperty(
+            value = "Attachments sent as a part of job request. Can be used as command line arguments"
+    )
+    private Set<FileAttachment> attachments;
+
+    /**
+     * Whether to disable archive logs or not - default is false.
+     */
+    @Basic
+    @ApiModelProperty(
+            value = "Boolean variable to decide whether job should be archived after it finishes defaults to true"
+    )
+    private boolean disableLogArchival;
+
+    /**
+     * Email address of the user where they expects an email. This is sent once
+     * the Genie job completes.
+     */
+    @Basic
+    @ApiModelProperty(
+            value = "Email address to send notifications to on job completion"
+    )
+    private String email;
+
+    /**
+     * Set of tags for a job.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "Any tags a user wants to add to the job to help with discovery of job later"
+    )
+    private Set<String> tags;
+
+    // ------------------------------------------------------------------------
+    // GENERAL COMMON STUFF FOR ALL JOBS
+    // TO BE GENERATED/USED BY SERVER
+    // ------------------------------------------------------------------------
 
     /**
      * String representation of the the cluster criteria array list object
@@ -173,57 +217,30 @@ public class Job extends CommonEntityFields {
     private String chosenClusterCriteriaString;
 
     /**
-     * File dependencies.
-     */
-    @Lob
-    @ApiModelProperty(
-            value = "Dependent files for this job to run.")
-    private String fileDependencies;
-
-    /**
-     * Set of file dependencies, sent as MIME attachments. This is not persisted
-     * in the DB for space reasons.
-     */
-    @Transient
-    @ApiModelProperty(
-            value = "Attachments sent as a part of job request.")
-    private Set<FileAttachment> attachments;
-
-    /**
-     * Whether to disable archive logs or not - default is false.
+     * Cluster Name of the cluster selected to run the job.
      */
     @Basic
     @ApiModelProperty(
-            value = "Boolean variable to decide whether job should be archived after it finishes.")
-    private boolean disableLogArchival;
+            value = "Name of the cluster where the job is running or was run. Set automatically by system"
+    )
+    private String executionClusterName;
 
     /**
-     * Email address of the user where they expects an email. This is sent once
-     * the Genie job completes.
+     * ID for the cluster that was selected to run the job .
      */
     @Basic
     @ApiModelProperty(
-            value = "Email address to send notifications to on job completion.")
-    private String email;
+            value = "Id of the cluster where the job is running or was run. Set automatically by system"
+    )
+    private String executionClusterId;
 
-    /**
-     * Set of tags for a job.
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @ApiModelProperty(
-            value = "Reference to all the tags"
-                    + " associated with this job.")
-    private Set<String> tags;
-
-    // ------------------------------------------------------------------------
-    // Genie2 command and application combinations to be specified by the user while running jobs.
-    // ------------------------------------------------------------------------
     /**
      * Application name - e.g. mapreduce, tez
      */
     @Basic
     @ApiModelProperty(
-            value = "Name of the application that this job should use to run.")
+            value = "Name of the application that this job is using to run or ran with. Set automatically by system"
+    )
     private String applicationName;
 
     /**
@@ -231,7 +248,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Id of the application that this job should use to run.")
+            value = "Id of the application that this job is using to run or ran with. Set automatically by system"
+    )
     private String applicationId;
 
     /**
@@ -239,7 +257,7 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Name of the command that this job should run.")
+            value = "Name of the command that this job is using to run or ran with. Set automatically by system")
     private String commandName;
 
     /**
@@ -248,19 +266,16 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Id of the command that this job should run.")
+            value = "Id of the command that this job is using to run or ran with. Set automatically by system")
     private String commandId;
 
-    // ------------------------------------------------------------------------
-    // GENERAL COMMON STUFF FOR ALL JOBS
-    // TO BE GENERATED/USED BY SERVER
-    // ------------------------------------------------------------------------
     /**
      * PID for job - updated by the server.
      */
     @Basic
     @ApiModelProperty(
-            value = "The process handle.")
+            value = "The process handle. Set by system"
+    )
     private int processHandle = -1;
 
     /**
@@ -269,7 +284,8 @@ public class Job extends CommonEntityFields {
     @Basic
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
-            value = "The current status of the job.")
+            value = "The current status of the job. Set automatically by system"
+    )
     private JobStatus status;
 
     /**
@@ -277,7 +293,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "A status message about the job.")
+            value = "A status message about the job. Set automatically by system"
+    )
     private String statusMsg;
 
     /**
@@ -286,7 +303,8 @@ public class Job extends CommonEntityFields {
     @Basic
     @Temporal(TemporalType.TIMESTAMP)
     @ApiModelProperty(
-            value = "The start time of the job.")
+            value = "The start time of the job. Set automatically by system"
+    )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
     private Date started = new Date(0);
@@ -297,7 +315,8 @@ public class Job extends CommonEntityFields {
     @Basic
     @Temporal(TemporalType.TIMESTAMP)
     @ApiModelProperty(
-            value = "The end time of the job.")
+            value = "The end time of the job. Initialized at 0. Set automatically by system"
+    )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
     private Date finished = new Date(0);
@@ -307,7 +326,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The host of the client submitting the job.")
+            value = "The hostname of the client submitting the job. Set automatically by system"
+    )
     private String clientHost;
 
     /**
@@ -315,7 +335,7 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The host where the job is being run.")
+            value = "The genie host where the job is being run or was run. Set automatically by system")
     private String hostName;
 
     /**
@@ -324,7 +344,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The URI to use to kill the job.")
+            value = "The URI to use to kill the job. Set automatically by system"
+    )
     private String killURI;
 
     /**
@@ -332,7 +353,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The URI where to find job output.")
+            value = "The URI where to find job output. Set automatically by system"
+    )
     private String outputURI;
 
     /**
@@ -340,7 +362,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The exit code of the job.")
+            value = "The exit code of the job. Set automatically by system"
+    )
     private int exitCode = -1;
 
     /**
@@ -348,7 +371,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Whether this job was forwarded or not.")
+            value = "Whether this job was forwarded or not. Set automatically by system"
+    )
     private boolean forwarded = false;
 
     /**
@@ -356,7 +380,8 @@ public class Job extends CommonEntityFields {
      */
     @Lob
     @ApiModelProperty(
-            value = "Where the logs were archived in S3.")
+            value = "Where the logs were archived. Set automatically by system"
+    )
     private String archiveLocation;
 
     /**

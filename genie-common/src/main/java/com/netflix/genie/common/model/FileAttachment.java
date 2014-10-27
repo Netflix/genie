@@ -18,6 +18,8 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -29,6 +31,7 @@ import java.util.Arrays;
  * @author skrishnan
  * @author tgianos
  */
+@ApiModel(value = "An attachment for use with a job")
 public class FileAttachment implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -36,11 +39,19 @@ public class FileAttachment implements Serializable {
     /**
      * Name of the file.
      */
+    @ApiModelProperty(
+            value = "The name of the file",
+            required = true
+    )
     private String name;
 
     /**
      * The data for the attachment.
      */
+    @ApiModelProperty(
+            value = "The bytes of the attachment",
+            required = true
+    )
     private byte[] data;
 
     /**

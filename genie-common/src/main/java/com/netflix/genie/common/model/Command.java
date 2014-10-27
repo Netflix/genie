@@ -58,7 +58,8 @@ public class Command extends CommonEntityFields {
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The status of the command",
-            required = true)
+            required = true
+    )
     private CommandStatus status;
 
     /**
@@ -67,7 +68,8 @@ public class Command extends CommonEntityFields {
     @Basic(optional = false)
     @ApiModelProperty(
             value = "Location of the executable for this command",
-            required = true)
+            required = true
+    )
     private String executable;
 
     /**
@@ -75,8 +77,8 @@ public class Command extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Users can specify a property file"
-            + " location with environment variables")
+            value = "Location of a property file which will be downloaded and sourced before command execution"
+    )
     private String envPropFile;
 
     /**
@@ -84,7 +86,8 @@ public class Command extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Job type of the command. eg: hive, pig , hadoop etc")
+            value = "Job type of the command. eg: hive, pig , hadoop etc"
+    )
     private String jobType;
 
     /**
@@ -92,15 +95,22 @@ public class Command extends CommonEntityFields {
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "Reference to all the configuration"
-            + " files needed for this command")
+            value = "Locations of all the configuration files needed for this command which will be downloaded"
+    )
     private Set<String> configs;
+
+    /**
+     * Set of tags for a command.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "All the tags associated with this command",
+            required = true)
+    private Set<String> tags;
 
     /**
      * Set of applications that can run this command.
      */
-    @ApiModelProperty(
-            value = "The application this command uses.")
     @JsonIgnore
     @ManyToOne
     private Application application;
@@ -111,16 +121,6 @@ public class Command extends CommonEntityFields {
     @JsonIgnore
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
     private Set<Cluster> clusters;
-
-    /**
-     * Set of tags for a command.
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @ApiModelProperty(
-            value = "Reference to all the tags"
-            + " associated with this command.",
-            required = true)
-    private Set<String> tags;
 
     /**
      * Default Constructor.

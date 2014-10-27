@@ -60,8 +60,8 @@ public class Auditable implements Serializable, Validate {
      */
     @Id
     @ApiModelProperty(
-            value = "id",
-            notes = "The unique id of this resource. If one is not provided it is set internally.")
+            value = "The unique id of this resource. If one is not provided it is created internally"
+    )
     private String id;
 
     /**
@@ -70,9 +70,9 @@ public class Auditable implements Serializable, Validate {
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "created",
-            notes = "When this resource was created.",
-            dataType = "date")
+            value = "When this resource was created. Set automatically by system",
+            dataType = "date"
+    )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
     private Date created = new Date();
@@ -83,9 +83,9 @@ public class Auditable implements Serializable, Validate {
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "updated",
-            notes = "When this resource was last updated.",
-            dataType = "date")
+            value = "When this resource was last updated. Set automatically by system",
+            dataType = "date"
+    )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
     private Date updated = new Date();

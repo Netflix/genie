@@ -68,8 +68,9 @@ public class CommonEntityFields extends Auditable {
     @Basic(optional = false)
     @Column(name = "version")
     @ApiModelProperty(
-            value = "Version number for this entity",
-            required = true)
+            value = "The version number",
+            required = true
+    )
     private String version;
 
     /**
@@ -77,8 +78,9 @@ public class CommonEntityFields extends Auditable {
      */
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "User who created this entity",
-            required = true)
+            value = "User who created/owns this object",
+            required = true
+    )
     private String user;
 
     /**
@@ -86,8 +88,9 @@ public class CommonEntityFields extends Auditable {
      */
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "Name of this entity",
-            required = true)
+            value = "The name to use",
+            required = true
+    )
     private String name;
 
     /**

@@ -59,7 +59,9 @@ public class Application extends CommonEntityFields {
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The current status of this application",
-            required = true)
+            required = true,
+            dataType = "string"
+    )
     private ApplicationStatus status;
 
     /**
@@ -67,7 +69,9 @@ public class Application extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Users can specify a property file location with environment variables")
+            value = "A file location with environment variables or "
+                    + "other settings which will be downloaded and sourced before application used"
+    )
     private String envPropFile;
 
     /**
@@ -75,7 +79,8 @@ public class Application extends CommonEntityFields {
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "All the configuration files needed for this application")
+            value = "All the configuration files needed for this application which will be downloaded pre-use"
+    )
     private Set<String> configs;
 
     /**
@@ -83,8 +88,18 @@ public class Application extends CommonEntityFields {
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "Any jars needed to run this application")
+            value = "Any jars needed to run this application which will be downloaded pre use"
+    )
     private Set<String> jars;
+
+    /**
+     * Set of tags for a application.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @ApiModelProperty(
+            value = "the tags associated with this application",
+            required = true)
+    private Set<String> tags;
 
     /**
      * The commands this application is associated with.
@@ -92,16 +107,6 @@ public class Application extends CommonEntityFields {
     @JsonIgnore
     @OneToMany(mappedBy = "application", fetch = FetchType.LAZY)
     private Set<Command> commands;
-
-    /**
-     * Set of tags for a application.
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @ApiModelProperty(
-            value = "Reference to all the tags"
-                    + " associated with this application.",
-            required = true)
-    private Set<String> tags;
 
     /**
      * Default constructor.
