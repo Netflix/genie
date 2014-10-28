@@ -91,3 +91,4 @@ genie-client/src/main/python/dist
 genie-client/src/main/python/build
 genie-client/src/main/python/nflx_genie_client.egg-info
 genie-client/src/main/python/MANIFEST
+genie-common/src/generated
