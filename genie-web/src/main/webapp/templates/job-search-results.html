@@ -11,28 +11,28 @@
         <div class="span12">
             <div class="row">
 	            <div class="span2"><strong>Job ID:</strong></div> 
-	            <div class="span6"><a data-bind="text: $data.jobID(), attr: {href: $data.outputURI}" target="_blank"></a></div>
+	            <div class="span6"><a data-bind="text: $data.id(), attr: {href: $data.outputURI}" target="_blank"></a></div>
 	        </div>
         </div>
         <div class="span12">
             <div class="row">
 	            <div class="span2"><strong>Job Name: </strong></div>
-	            <div class="span6" data-bind="text: $data.jobName"></div>
+	            <div class="span6" data-bind="text: $data.name"></div>
 	        </div>
         </div>
         <div class="span12">
             <div class="row">
-                <div class="span1"><strong>Type:</strong></div>
-                <div class="span3" data-bind="text: $data.jobType"></div>
+                <div class="span1"><strong>Command:</strong></div>
+                <div class="span3" data-bind="text: $data.commandName"></div>
                 <div class="span1"><strong>User:</strong></div>
-                <div class="span3" data-bind="text: $data.userName"></div>
+                <div class="span3" data-bind="text: $data.user"></div>
             </div>
         </div>
         <div class="span12">
             <div class="row">
                 <div class="span1"><strong>Details:</strong></div>
                 <div class="span3">
-                    <a data-bind="attr: {href: 'genie/v0/jobs/'+$data.jobID()}" target="_blank">XML</a>
+                    <a data-bind="attr: {href: 'genie/v2/jobs/'+$data.id()}" target="_blank">RAW</a>
                 </div>
                 <div class="span1"><strong>Logs:</strong></div>
                 <div class="span3">
@@ -44,11 +44,11 @@
         <div class="span12">
             <div class="row">
                 <div class="span1"><strong>Start:</strong></div>
-                <div class="span3" data-bind="text: $data.startTimeFormatted"></div>
+                <div class="span3" data-bind="text: $data.created()"></div>
                 <div class="span1"><strong>Finish:</strong></div>
-                <div class="span3" data-bind="text: $data.finishTimeFormatted"></div>
+                <div class="span3" data-bind="text: $data.finished()"></div>
                 <div class="span1"><strong>Update:</strong></div>
-                <div class="span3" data-bind="text: $data.updateTimeFormatted"></div>
+                <div class="span3" data-bind="text: $data.updated()"></div>
             </div>
         </div>
     </div>

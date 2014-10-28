@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,39 +15,33 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.collect.Multimap;
+import com.netflix.client.http.HttpRequest;
+import com.netflix.client.http.HttpRequest.Verb;
+import com.netflix.genie.common.client.BaseGenieClient;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.model.Job;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.messages.JobInfoRequest;
-import com.netflix.genie.common.messages.JobInfoResponse;
-import com.netflix.genie.common.messages.JobStatusResponse;
-import com.netflix.genie.common.model.JobInfoElement;
-import com.netflix.genie.common.model.Types;
-
-import com.netflix.client.http.HttpRequest.Verb;
-
-import com.google.common.collect.Multimap;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Singleton class, which acts as the client library for the Genie Execution
  * Service.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
 public final class ExecutionServiceClient extends BaseGenieClient {
 
-    private static Logger logger = LoggerFactory
-            .getLogger(ExecutionServiceClient.class);
-
-    private static final String BASE_REST_URI = "/genie/v0/jobs";
+    private static final String BASE_EXECUTION_REST_URL = BASE_REST_URL + "jobs";
 
     // reference to the instance object
     private static ExecutionServiceClient instance;
@@ -58,7 +52,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws IOException if there is any error during initialization
      */
     private ExecutionServiceClient() throws IOException {
-        super();
+        super(null);
     }
 
     /**
@@ -78,195 +72,111 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     /**
      * Submits a job using given parameters.
      *
-     * @param jobInfo
-     *            for submitting job (can't be null)<br>
-     *            jobInfo.userName not null - required<br>
-     *            jobInfo.userAgent optional, e.g. UC4, search, etc (however
-     *            client wishes to categorize themselves)<br>
-     *            jobInfo.jobName optional - job name to be used<br>
-     *            jobInfo.jobID optional - will be auto-generated if it is null<br>
-     *            jobInfo.jobType required - HADOOP, HIVE or PIG<br>
-     *            jobInfo.configuration required for HIVE, PIG - PROD or TEST<br>
-     *            jobInfo.schedule required - ADHOC or SCHEDULED<br>
-     *            jobInfo.cmdArgs required - command-line arguments<br>
-     *            jobInfo.fileDependencies optional - file dependencies in S3,
-     *            represented as a CSV<br>
-     *
+     * @param job for submitting job (can't be null)<br>
      *            More details can be found on the Genie User Guide on GitHub.
-     *
      * @return updated jobInfo for submitted job, if there is no error
-     * @throws CloudServiceException
+     * @throws GenieException For any other error.
      */
-    public JobInfoElement submitJob(JobInfoElement jobInfo)
-            throws CloudServiceException {
-        if (jobInfo == null) {
-            String msg = "Required parameter jobInfo can't be NULL";
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+    public Job submitJob(final Job job) throws GenieException {
+        if (job == null) {
+            throw new GeniePreconditionException("No job entered to validate");
         }
-        if (jobInfo.getUserName() == null) {
-            String msg = "User name is missing";
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if (jobInfo.getJobType() == null) {
-            String msg = "JobType is missing";
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if ((!jobInfo.getJobType()
-                .equalsIgnoreCase(Types.JobType.HADOOP.name()))
-                && (jobInfo.getConfiguration() == null)) {
-            String msg = "Configuration is missing";
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if (jobInfo.getSchedule() == null) {
-            String msg = "Schedule is missing";
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if (jobInfo.getCmdArgs() == null) {
-            String msg = "Command-line arguments are missing";
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
-        }
-        if (jobInfo.getUserAgent() == null) {
-            jobInfo.setUserAgent("java-client-library");
-        }
-        JobInfoRequest request = new JobInfoRequest();
-        request.setJobInfo(jobInfo);
-
-        JobInfoResponse ji = executeRequest(Verb.POST, BASE_REST_URI,
-                null, null, request, JobInfoResponse.class);
-
-        if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
-            String msg = "Unable to parse job info from response";
-            logger.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // return the first (only) jobInfo
-        return ji.getJobs()[0];
+        job.validate();
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.POST,
+                BASE_EXECUTION_REST_URL,
+                null,
+                job);
+        return (Job) this.executeRequest(request, null, Job.class);
     }
 
     /**
      * Gets job information for a given jobID.
      *
-     * @param jobID
-     *            the Genie jobID (can't be null)
+     * @param id the Genie jobID (can't be null)
      * @return the jobInfo for this jobID
-     * @throws CloudServiceException
+     * @throws GenieException For any other error.
      */
-    public JobInfoElement getJob(String jobID) throws CloudServiceException {
-        if (jobID == null) {
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    "Missing required parameter: jobID");
+    public Job getJob(final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
-        JobInfoResponse ji = executeRequest(Verb.GET, BASE_REST_URI,
-                jobID, null, null, JobInfoResponse.class);
-
-        if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
-            String msg = "Unable to parse job info from response";
-            logger.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // return the first (only) jobInfo
-        return ji.getJobs()[0];
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.GET,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id},
+                        SLASH),
+                null,
+                null);
+        return (Job) this.executeRequest(request, null, Job.class);
     }
 
     /**
      * Gets a set of jobs for the given parameters.
      *
-     * @param params
-     *            key/value pairs in a map object.<br>
-     *
-     *            More details on the parameters can be found
-     *            on the Genie User Guide on GitHub.
-     * @return array of jobInfos that match the filter
-     * @throws CloudServiceException
+     * @param params key/value pairs in a map object.<br>
+     *               More details on the parameters can be found on the Genie User Guide on
+     *               GitHub.
+     * @return List of jobs that match the filter
+     * @throws GenieException For any other error.
      */
-    public JobInfoElement[] getJobs(Multimap<String, String> params)
-            throws CloudServiceException {
-        JobInfoResponse ji = executeRequest(Verb.GET, BASE_REST_URI, null,
-                params, null, JobInfoResponse.class);
+    public List<Job> getJobs(final Multimap<String, String> params) throws GenieException {
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.GET,
+                BASE_EXECUTION_REST_URL,
+                params,
+                null);
 
-        // this will only happen if 200 is returned, and parsing fails for some
-        // reason
-        if ((ji.getJobs() == null) || (ji.getJobs().length == 0)) {
-            String msg = "Unable to parse job info from response";
-            logger.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg);
-        }
-
-        // if we get here, there are non-zero jobInfos - return all
-        return ji.getJobs();
+        @SuppressWarnings("unchecked")
+        final List<Job> jobs = (List<Job>) this.executeRequest(request, List.class, Job.class);
+        return jobs;
     }
 
     /**
      * Wait for job to complete, until the given timeout.
      *
-     * @param jobID
-     *            the Genie job ID to wait for completion
-     * @param blockTimeout
-     *            the time to block for (in ms), after which a
-     *            CloudServiceException will be thrown
+     * @param id           the Genie job ID to wait for completion
+     * @param blockTimeout the time to block for (in ms), after which a
+     *                     GenieException will be thrown
      * @return the jobInfo for the job after completion
-     * @throws CloudServiceException
-     *             on service errors
-     * @throws InterruptedException
-     *             on timeout/thread errors
+     * @throws GenieException       For any other error.
+     * @throws InterruptedException on timeout/thread errors
      */
-    public JobInfoElement waitForCompletion(String jobID, long blockTimeout)
-            throws CloudServiceException, InterruptedException {
-        long pollTime = 10000;
-        return waitForCompletion(jobID, blockTimeout, pollTime);
+    public Job waitForCompletion(final String id, final long blockTimeout)
+            throws GenieException, InterruptedException {
+        //Should we use Future? See:
+        //https://github.com/Netflix/ribbon/blob/master/ribbon-examples
+        ///src/main/java/com/netflix/ribbon/examples/GetWithDeserialization.java
+        final long pollTime = 10000;
+        return waitForCompletion(id, blockTimeout, pollTime);
     }
 
     /**
      * Wait for job to complete, until the given timeout.
      *
-     * @param jobID
-     *            the Genie job ID to wait for completion
-     * @param blockTimeout
-     *            the time to block for (in ms), after which a
-     *            CloudServiceException will be thrown
-     * @param pollTime
-     *            the time to sleep between polling for job status
+     * @param id           the Genie job ID to wait for completion
+     * @param blockTimeout the time to block for (in ms), after which a
+     *                     GenieException will be thrown
+     * @param pollTime     the time to sleep between polling for job status
      * @return the jobInfo for the job after completion
-     * @throws CloudServiceException
-     *             on service errors
-     * @throws InterruptedException
-     *             on timeout/thread errors
+     * @throws GenieException       For any other error.
+     * @throws InterruptedException on timeout/thread errors
      */
-    public JobInfoElement waitForCompletion(String jobID, long blockTimeout,
-            long pollTime) throws CloudServiceException, InterruptedException {
-        if (jobID == null) {
-            String msg = "Missing required parameter: jobID";
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+    public Job waitForCompletion(final String id, final long blockTimeout, final long pollTime)
+            throws GenieException, InterruptedException {
+        if (StringUtils.isEmpty(id)) {
+            throw new GeniePreconditionException("Missing required parameter: id.");
         }
 
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
 
         while (true) {
-            JobInfoElement jobInfo = getJob(jobID);
+            final Job job = getJob(id);
 
             // wait for job to finish - and finish time to be updated
-            if (jobInfo.getFinishTime() > 0) {
-                return jobInfo;
+            if (!job.getFinished().equals(new Date(0))) {
+                return job;
             }
 
             // block until timeout
@@ -274,9 +184,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             if (currTime - startTime < blockTimeout) {
                 Thread.sleep(pollTime);
             } else {
-                String msg = "Timed out waiting for job to finish";
-                logger.error(msg);
-                throw new InterruptedException(msg);
+                throw new InterruptedException("Timed out waiting for job to finish");
             }
         }
     }
@@ -284,24 +192,173 @@ public final class ExecutionServiceClient extends BaseGenieClient {
     /**
      * Kill a job using its jobID.
      *
-     * @param jobID
-     *            the Genie jobID for the job to kill
+     * @param id the Genie jobID for the job to kill
      * @return the final job status for this job
-     * @throws CloudServiceException
+     * @throws GenieException For any other error.
      */
-    public JobStatusResponse killJob(String jobID) throws CloudServiceException {
-        if (jobID == null) {
-            String msg = "Missing required parameter: jobID";
-            logger.error(msg);
-            throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST,
-                    msg);
+    public Job killJob(final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GeniePreconditionException("Missing required parameter: id");
         }
 
         // this assumes that the service will forward the delete to the right
         // instance
-        JobStatusResponse js = executeRequest(Verb.DELETE, BASE_REST_URI,
-                jobID, null, null, JobStatusResponse.class);
-        // return the response
-        return js;
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id},
+                        SLASH),
+                null,
+                null);
+        return (Job) this.executeRequest(request, null, Job.class);
+    }
+
+    /**
+     * Add some more tags to a given job.
+     *
+     * @param id   The id of the job to add tags to. Not
+     *             Null/empty/blank.
+     * @param tags The tags to add. Not null or empty.
+     * @return The new set of tags for the given job.
+     * @throws GenieException For any other error.
+     */
+    public Set<String> addTagsToJob(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GeniePreconditionException("Missing required parameter: id");
+        }
+        if (tags == null || tags.isEmpty()) {
+            throw new GeniePreconditionException("Missing required parameter: tags");
+        }
+
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.POST,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                tags);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
+    }
+
+    /**
+     * Get the active set of tags for the given job.
+     *
+     * @param id The id of the job to get tags for. Not
+     *           Null/empty/blank.
+     * @return The set of tags for the given job.
+     * @throws GenieException For any other error.
+     */
+    public Set<String> getTagsForJob(final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GeniePreconditionException("Missing required parameter: id");
+        }
+
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.GET,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                null);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
+    }
+
+    /**
+     * Update the tags for a given job.
+     *
+     * @param id   The id of the job to update the tags for.
+     *             Not null/empty/blank.
+     * @param tags The tags to replace existing tag
+     *             files with. Not null.
+     * @return The new set of job tags.
+     * @throws GenieException For any other error.
+     */
+    public Set<String> updateTagsForJob(
+            final String id,
+            final Set<String> tags) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GeniePreconditionException("Missing required parameter: id");
+        }
+        if (tags == null) {
+            throw new GeniePreconditionException("Missing required parameter: tags");
+        }
+
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.PUT,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                tags);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> newTags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return newTags;
+    }
+
+    /**
+     * Delete all the tags from a given job.
+     *
+     * @param id The id of the job to delete the tags from.
+     *           Not null/empty/blank.
+     * @return Empty set if successful
+     * @throws GenieException For any other error.
+     */
+    public Set<String> removeAllTagsForJob(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GeniePreconditionException("Missing required parameter: id");
+        }
+
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{BASE_EXECUTION_REST_URL, id, "tags"},
+                        SLASH),
+                null,
+                null);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
+    }
+
+    /**
+     * Remove tag from a given job.
+     *
+     * @param id The id of the job to delete the tag from. Not
+     *           null/empty/blank.
+     * @return The tag for the job.
+     * @throws GenieException For any other error.
+     */
+    public Set<String> removeTagForJob(
+            final String id) throws GenieException {
+        if (StringUtils.isBlank(id)) {
+            throw new GeniePreconditionException("Missing required parameter: id");
+        }
+
+        final HttpRequest request = BaseGenieClient.buildRequest(
+                Verb.DELETE,
+                StringUtils.join(
+                        new String[]{
+                                BASE_EXECUTION_REST_URL,
+                                id,
+                                "tags"
+                        },
+                        SLASH),
+                null,
+                null);
+
+        @SuppressWarnings("unchecked")
+        final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
+        return tags;
     }
 }

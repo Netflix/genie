@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,60 +15,61 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.util;
 
-import java.net.HttpURLConnection;
+import com.netflix.genie.common.exceptions.GenieException;
 
+import com.netflix.genie.common.exceptions.GenieServerException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
 
 /**
  * Utility class to parse string (for command-line arguments, versions, etc).
  *
  * @author skrishnan
+ * @author tgianos
  */
 public final class StringUtil {
-    private static Logger logger = LoggerFactory.getLogger(StringUtil.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(StringUtil.class);
 
     /**
      * The argument delimiter, which is set to white space.
      */
-    public static final String ARG_DELIMITER = "\\s";
+    private static final String ARG_DELIMITER = "\\s";
 
-    private StringUtil() {
-        // never called
+    /**
+     * Should never be called.
+     */
+    protected StringUtil() {
     }
 
     /**
      * Mimics bash command-line parsing as close as possible.<br>
      * Caveat - only supports double quotes, not single quotes.
      *
-     * @param input
-     *            command-line arguments as a string
+     * @param input command-line arguments as a string
      * @return argument array that is split using (as to close to) bash rules as
-     *         possible
-     * @throws CloudServiceException
+     * possible
+     * @throws GenieException If there is any error
      */
-    public static String[] splitCmdLine(String input)
-            throws CloudServiceException {
-        logger.debug("Command line: " + input);
-        if (input == null) {
+    public static String[] splitCmdLine(final String input)
+            throws GenieException {
+        LOG.debug("Command line: " + input);
+        if (StringUtils.isBlank(input)) {
             return new String[0];
         }
 
-        String[] output = null;
+        final String[] output;
         try {
             // ignore delimiter if it is within quotes
             output = input.trim().split("[" + ARG_DELIMITER
                     + "]+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-        } catch (Exception e) {
-            String msg = "Invalid argument: " + input;
-            logger.error(msg, e);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_INTERNAL_ERROR, msg, e);
+        } catch (final Exception e) {
+            final String msg = "Invalid argument: " + input;
+            LOG.error(msg, e);
+            throw new GenieServerException(msg, e);
         }
 
         // "cleanse" inputs - get rid of enclosing quotes
@@ -77,7 +78,7 @@ public final class StringUtil {
             if ((output[i].startsWith("\"") && (output[i].endsWith("\"")))) {
                 output[i] = output[i].replaceAll("(^\")|(\"$)", "");
             }
-            logger.debug(i + ": " + output[i]);
+            LOG.debug(i + ": " + output[i]);
         }
         return output;
     }
@@ -85,14 +86,13 @@ public final class StringUtil {
     /**
      * Returns a canonical version number with at most 3 digits of the form
      * X.Y.Z.<br>
-     * 0.8.1.4 -> 0.8.1, 0.8.2 -> 0.8.2, 0.8 -> 0.8.
+     * 0.8.1.4 -&gt; 0.8.1, 0.8.2 -&gt; 0.8.2, 0.8 -&gt; 0.8.
      *
-     * @param fullVersion
-     *            input version number
+     * @param fullVersion input version number
      * @return trimmed version number as documented
      */
-    public static String trimVersion(String fullVersion) {
-        logger.debug("Returning canonical version for " + fullVersion);
+    public static String trimVersion(final String fullVersion) {
+        LOG.debug("Returning canonical version for " + fullVersion);
         if (fullVersion == null) {
             return null;
         }
@@ -109,7 +109,7 @@ public final class StringUtil {
                 break;
             }
         }
-        logger.debug("Canonical version for " + fullVersion + " is "
+        LOG.debug("Canonical version for " + fullVersion + " is "
                 + trimmedVersion.toString());
 
         return trimmedVersion.toString();

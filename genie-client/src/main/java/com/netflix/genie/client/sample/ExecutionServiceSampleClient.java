@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,108 +15,151 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.client.sample;
-
-import java.io.File;
-import java.io.PrintWriter;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
-import com.netflix.genie.common.messages.JobStatusResponse;
+import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.FileAttachment;
-import com.netflix.genie.common.model.JobInfoElement;
-import com.netflix.genie.common.model.Types.Configuration;
-import com.netflix.genie.common.model.Types.JobStatus;
-import com.netflix.genie.common.model.Types.JobType;
-import com.netflix.genie.common.model.Types.Schedule;
+import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.JobStatus;
+
+import java.io.ByteArrayOutputStream;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A sample client demonstrating usage of the Execution Service Client.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
 public final class ExecutionServiceSampleClient {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceSampleClient.class);
 
     private ExecutionServiceSampleClient() {
         // never called
     }
 
     /**
-     * Main for running client code.
+     * Main for running client code .
+     *
+     * @param args command line arguments
+     * @throws Exception On any issue.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
 
         // Initialize Eureka, if it is being used
-        // System.out.println("Initializing Eureka");
+        // LOG.info("Initializing Eureka");
         // ExecutionServiceClient.initEureka("test");
+        LOG.info("Initializing list of Genie servers");
+        ConfigurationManager.getConfigInstance().setProperty("genie2Client.ribbon.listOfServers",
+                "http://localhost:7001");
 
-        System.out.println("Initializing list of Genie servers");
-        ConfigurationManager.getConfigInstance().setProperty("genieClient.ribbon.listOfServers",
-                "localhost:7001");
+        LOG.info("Initializing ExecutionServiceClient");
+        final ExecutionServiceClient client = ExecutionServiceClient.getInstance();
 
-        System.out.println("Initializing ExecutionServiceClient");
-        ExecutionServiceClient client = ExecutionServiceClient.getInstance();
-
-        String userName = "genietest";
-        System.out.println("Getting jobInfos using specified filter criteria");
-        Multimap<String, String> params = ArrayListMultimap.create();
+        final String userName = "genietest";
+        final String jobName = "sampleClientTestJob";
+        LOG.info("Getting jobs using specified filter criteria");
+        final Multimap<String, String> params = ArrayListMultimap.create();
         params.put("userName", userName);
-        params.put("jobType", JobType.HIVE.name());
         params.put("status", JobStatus.FAILED.name());
         params.put("limit", "3");
-        JobInfoElement[] responses = client.getJobs(params);
-        for (JobInfoElement ji : responses) {
-            System.out.println("Job Info: {id, status, finishTime} - {"
-                    + ji.getJobID() + ", " + ji.getStatus() + ", "
-                    + ji.getFinishTime() + "}");
+        for (final Job ji : client.getJobs(params)) {
+            LOG.info("Job: {id, status, finishTime} - {"
+                    + ji.getId() + ", " + ji.getStatus() + ", "
+                    + ji.getFinished() + "}");
         }
 
-        System.out.println("Running Hive job");
-        JobInfoElement jobInfo = new JobInfoElement();
-        jobInfo.setUserName(userName);
-        jobInfo.setJobType(JobType.HIVE.name());
-        jobInfo.setDescription("This is a test");
-        jobInfo.setConfiguration(Configuration.TEST.name());
-        jobInfo.setSchedule(Schedule.ADHOC.name());
+        LOG.info("Running Hive job");
+        final Set<String> criteriaTags = new HashSet<>();
+        criteriaTags.add("adhoc");
+        final ClusterCriteria criteria = new ClusterCriteria(criteriaTags);
+        final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
+        final Set<String> commandCriteria = new HashSet<>();
+        clusterCriterias.add(criteria);
+        commandCriteria.add("hive");
+
+        Job job = new Job(
+                userName,
+                jobName,
+                "-f hive.q",
+                commandCriteria,
+                clusterCriterias,
+                null);
+
+        job.setDescription("This is a test");
+
+        // Add some tags for metadata about the job. This really helps for reporting on
+        // the jobs and categorization.
+        Set<String> jobTags = new HashSet<>();
+        jobTags.add("testgenie");
+        jobTags.add("sample");
+
+        job.setTags(jobTags);
+
         // send the query as an attachment
-        File query = File.createTempFile("hive", ".q");
-        PrintWriter pw = new PrintWriter(query, "UTF-8");
-        pw.println("select count(*) from counters where dateint=20120430 and hour=10;");
-        pw.close();
-        FileAttachment[] attachments = new FileAttachment[1];
-        attachments[0] = new FileAttachment();
-        attachments[0].setName("hive.q");
-        // Ensure that file exists, because the FileDataSource constructor doesn't
-        attachments[0].setData(new DataHandler(new FileDataSource(query.getAbsolutePath())));
-        jobInfo.setAttachments(attachments);
-        jobInfo.setCmdArgs("-f hive.q");
-        jobInfo = client.submitJob(jobInfo);
+        final File query = File.createTempFile("hive", ".q");
+        try (PrintWriter pw = new PrintWriter(query, "UTF-8")) {
+            pw.println("select count(*) from counters where dateint=20120430 and hour=10;");
+        }
+        final Set<FileAttachment> attachments = new HashSet<>();
+        final FileAttachment attachment = new FileAttachment();
+        attachment.setName("hive.q");
 
-        String jobID = jobInfo.getJobID();
-        String outputURI = jobInfo.getOutputURI();
-        System.out.println("Job ID: " + jobID);
-        System.out.println("Output URL: " + outputURI);
+        FileInputStream fin = null;
+        ByteArrayOutputStream bos = null;
+        try {
+            fin = new FileInputStream(query);
+            bos = new ByteArrayOutputStream();
+            final byte[] buf = new byte[4096];
+            int read;
+            while ((read = fin.read(buf)) != -1) {
+                bos.write(buf, 0, read);
+            }
+            attachment.setData(bos.toByteArray());
+        } finally {
+            if (fin != null) {
+                fin.close();
+            }
+            if (bos != null) {
+                bos.close();
+            }
+        }
+        attachments.add(attachment);
+        job.setAttachments(attachments);
+        job = client.submitJob(job);
 
-        System.out.println("Getting jobInfo by jobID");
-        jobInfo = client.getJob(jobID);
-        System.out.println("Job status: " + jobInfo.getStatus());
+        final String jobID = job.getId();
+        final String outputURI = job.getOutputURI();
+        LOG.info("Job ID: " + jobID);
+        LOG.info("Output URL: " + outputURI);
 
-        System.out.println("Waiting for job to finish");
-        jobInfo = client.waitForCompletion(jobID, 600000, 5000);
-        System.out.println("Job status: " + jobInfo.getStatus());
+        LOG.info("Getting jobInfo by jobID");
+        job = client.getJob(jobID);
+        LOG.info(job.toString());
 
-        System.out.println("Killing jobs using jobID");
-        JobStatusResponse jobStatus = client.killJob(jobID);
-        System.out.println("Message from server: " + jobStatus.getMessage());
-        System.out.println("Job status: " + jobStatus.getStatus());
+        LOG.info("Waiting for job to finish");
+        job = client.waitForCompletion(jobID, 600000, 5000);
+        LOG.info("Job status: " + job.getStatus());
 
-        System.out.println("Done");
+        LOG.info("Killing jobs using jobID");
+        final Job killedJob = client.killJob(jobID);
+        LOG.info("Job status: " + killedJob.getStatus());
+
+        LOG.info("Done");
     }
 }

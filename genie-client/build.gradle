@@ -1,8 +1,20 @@
-apply plugin: 'java'
-
-// we are doing this to include genie-common classes in client's javadocs
-sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
-
 dependencies {
-    compile 'commons-configuration:commons-configuration:1.8'
+    compile project.parent.childProjects.get('genie-common')
+}
+
+clean {
+    delete 'src/main/python/nflx_genie_client.egg-info'
+    delete 'src/main/python/dist'
+}
+
+task buildPythonPackage(type: Exec) {
+    dependsOn clean
+    workingDir 'src/main/python'
+    commandLine 'python', 'setup.py', 'sdist'
+}
+
+task uploadToPypi(type: Exec) {
+    dependsOn buildPythonPackage
+    workingDir 'src/main/python'
+    commandLine 'bash', '-c', 'twine upload dist/*'
 }

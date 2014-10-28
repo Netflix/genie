@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.util;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,59 +25,98 @@ import org.junit.Test;
  * Test case for StringUtil.
  *
  * @author skrishnan
+ * @author tgianos
  */
 public class TestStringUtil {
-
-    private String input;
-    private String[] output;
-    private String version;
 
     /**
      * Test various command-line argument permutations to ensure that they parse
      * correctly, including spaces, single and double quotes, etc.
      *
-     * @throws Exception if anything went wrong with the parsing.
+     * @throws GenieException if anything went wrong with the parsing.
      */
     @Test
-    public void testSplitCmdLine() throws Exception {
-        System.out.println("Testing command-line splitting:\n");
-
-        System.out.println("Testing for single quotes");
-        input = "-f ch_survey_response_f.pig -p vhs_window_start_date=20120912 "
+    public void testSplitCmdLine() throws GenieException {
+        final String input = "-f ch_survey_response_f.pig -p vhs_window_start_date=20120912 "
                 + "-p survey_date=20120919 -p now_epoch_ts=1348125009 "
                 + "-p rap_comment='/**/' -p no_rap_comment='--'";
-        output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 12);
+        final String[] output = StringUtil.splitCmdLine(input);
+        Assert.assertTrue(12 == output.length);
+    }
 
-        System.out.println("Test for spaces within quotes");
-        input = "-f pig.q -p endDateTS=\"foo bar\" ";
-        output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 4);
+    /**
+     * Test spaces within quotes.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testSplitCmdLineSpacesWithinQuotes() throws GenieException {
+        final String input = "-f pig.q -p endDateTS=\"foo bar\" ";
+        final String[] output = StringUtil.splitCmdLine(input);
+        Assert.assertTrue(4 == output.length);
+    }
 
-        System.out.println("Test for spaces at the beginning and end");
-        input = " -f pig.q -p bar ";
-        output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 4);
+    /**
+     * Test spaces at beginning and end.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testSplitCmdLineSpacesAtBeginningAndEnd() throws GenieException {
+        final String input = " -f pig.q -p bar ";
+        final String[] output = StringUtil.splitCmdLine(input);
+        Assert.assertTrue(4 == output.length);
+    }
 
-        System.out.println("Test for extra spaces in the middle");
-        input = "-f device_sum_step1.pig -p from_date=20120915     -p to_date=20120918  -p batchid=1347998107";
-        output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 8);
+    /**
+     * Test extra spaces in the middle.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testSplitCmdLineExtraSpacesInMiddle() throws GenieException {
+        final String input = "-f device_sum_step1.pig -p from_date=20120915     "
+                + "-p to_date=20120918  -p batchid=1347998107";
+        final String[] output = StringUtil.splitCmdLine(input);
+        Assert.assertTrue(8 == output.length);
+    }
 
-        System.out.println("Test for spaces and equals in the middle");
-        input = "-f hooks.q -d \"setCommandsHook=set hive.exec.reducers.bytes.per.reducer=67108864;\"";
-        output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 4);
+    /**
+     * Test spaces and equals in middle.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testSplitCmdLineSpacesAndEqualsInMiddle() throws GenieException {
+        final String input = "-f hooks.q -d \"setCommandsHook=set hive.exec.reducers.bytes.per.reducer=67108864;\"";
+        final String[] output = StringUtil.splitCmdLine(input);
+        Assert.assertTrue(4 == output.length);
+    }
 
-        System.out.println("Testing for commas in arguments");
-        input = "jar searchagg.jar searchevents "
+    /**
+     * Test commas in arguments.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testSplitCmdLineCommasInArguments() throws GenieException {
+        final String input = "jar searchagg.jar searchevents "
                 + "some_agg "
                 + "20120916 20120918 "
                 + "US,CA,GB "
                 + "20 false false";
-        output = StringUtil.splitCmdLine(input);
-        Assert.assertEquals(output.length, 10);
-        System.out.println();
+        final String[] output = StringUtil.splitCmdLine(input);
+        Assert.assertTrue(10 == output.length);
+    }
+
+    /**
+     * Test that null returns empty string.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testSplitCmdLineWithNull() throws GenieException {
+        Assert.assertEquals(0, StringUtil.splitCmdLine(null).length);
     }
 
     /**
@@ -85,37 +124,36 @@ public class TestStringUtil {
      */
     @Test
     public void testTrim() {
-        System.out.println("Testing version trimming:\n");
-
-        input = "0.8.1.3.2";
-        System.out.println("Testing for version " + input);
-        version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0.8.1");
+        String input = "0.8.1.3.2";
+        String version = StringUtil.trimVersion(input);
+        Assert.assertEquals("0.8.1", version);
 
         input = "0.8.2";
-        System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0.8.2");
+        Assert.assertEquals("0.8.2", version);
 
         input = "0.8";
-        System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0.8");
+        Assert.assertEquals("0.8", version);
 
         input = "0.8.";
-        System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0.8");
+        Assert.assertEquals("0.8", version);
 
         input = "0";
-        System.out.println("Testing for version " + input);
         version = StringUtil.trimVersion(input);
-        Assert.assertEquals(version, "0");
+        Assert.assertEquals("0", version);
 
-        input = null;
-        System.out.println("Testing for version " + input);
-        version = StringUtil.trimVersion(input);
+        version = StringUtil.trimVersion(null);
         Assert.assertEquals(version, null);
-        System.out.println();
+    }
+
+    /**
+     * Completeness.
+     */
+    @Test
+    public void testConstructor() {
+        final StringUtil util = new StringUtil();
+        Assert.assertNotNull(util);
     }
 }

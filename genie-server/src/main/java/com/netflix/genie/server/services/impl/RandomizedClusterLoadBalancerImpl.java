@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,45 +15,46 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services.impl;
 
-import java.net.HttpURLConnection;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.server.services.ClusterLoadBalancer;
+import java.util.List;
 import java.util.Random;
-
+import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ClusterConfigElement;
-import com.netflix.genie.server.services.ClusterLoadBalancer;
 
 /**
  * Basic implementation of a load balancer where a cluster is picked at random.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
+@Named
 public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
 
-    private static Logger logger = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(RandomizedClusterLoadBalancerImpl.class);
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ClusterConfigElement selectCluster(ClusterConfigElement[] ceArray)
-            throws CloudServiceException {
-        logger.info("called");
+    public Cluster selectCluster(final List<Cluster> clusters)
+            throws GenieException {
+        LOG.info("called");
 
-        if (ceArray == null || ceArray.length == 0) {
-            String msg = "No cluster configuration found to match user params";
-            logger.error(msg);
-            throw new CloudServiceException(
-                    HttpURLConnection.HTTP_PAYMENT_REQUIRED, msg);
+        if (clusters == null || clusters.isEmpty()) {
+            final String msg = "No cluster configuration found to match user params";
+            LOG.error(msg);
+            throw new GeniePreconditionException(msg);
         }
 
         // return a random one
-        Random rand = new Random();
-        return ceArray[Math.abs(rand.nextInt(ceArray.length))];
+        final Random rand = new Random();
+        return clusters.get(Math.abs(rand.nextInt(clusters.size())));
     }
 }

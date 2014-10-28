@@ -31,9 +31,6 @@ function copyFiles {
     SOURCE=$1
     DESTINATION=$2
 
-    # use hadoop for s3 copying
-    S3CP="$HADOOP_HOME/bin/hadoop fs $HADOOP_S3CP_OPTS -cp $FORCE_COPY_FLAG "
-    
     # number of retries for s3cp
     NUM_RETRIES=5
 
@@ -41,7 +38,7 @@ function copyFiles {
     SOURCE=`echo $SOURCE | sed -e 's/,/ /g'`
     
     # run hadoop fs -cp via timeout, so it doesn't hang indefinitely
-    TIMEOUT="$XS_SYSTEM_HOME/timeout3 -t $HADOOP_S3CP_TIMEOUT"
+    TIMEOUT="$XS_SYSTEM_HOME/timeout3 -t $CP_TIMEOUT"
     
     # copy over the files to/from S3 - retry $NUM_RETRIES times
     i=0
@@ -49,7 +46,7 @@ function copyFiles {
     echo "Copying files $SOURCE to $DESTINATION"
     while true
     do
-        $TIMEOUT $S3CP ${SOURCE} ${DESTINATION}/
+        $TIMEOUT $COPY_COMMAND ${SOURCE} ${DESTINATION}/
         retVal="$?"
         if [ "$retVal" -eq 0 ]; then
             break
@@ -70,84 +67,143 @@ function copyFiles {
     return $retVal
 }
 
-function executeHadoop {
-    echo "Copying Hadoop config files..." 
-    cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
-    checkError 204
-    copyFiles "$S3_HADOOP_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"
-    checkError 204
-
-    echo "Executing CMD: $CMD $@"
-    HADOOP_CONF_DIR=$CURRENT_JOB_CONF_DIR \
-	$HADOOP_HOME/bin/$CMD "$@" 1>$CURRENT_JOB_WORKING_DIR/stdout.log 2>$CURRENT_JOB_WORKING_DIR/stderr.log
-    checkError 206
-}
-
-
-function executeHive {
-    echo "Copying Hadoop config files..."
-    cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
-    checkError 204
-    copyFiles "$S3_HADOOP_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-    checkError 204
-
-    echo "Copying Hive config files..."
-    cp $HIVE_HOME/conf/* $CURRENT_JOB_CONF_DIR/
-    checkError 205
-    copyFiles "$S3_HIVE_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-    checkError 205
-
-    # create a tmp dir for java.io.tmpdir
-    mkdir tmp
-    
-    echo "Executing CMD: $CMD $@"
-    HADOOP_CONF_DIR=$CURRENT_JOB_CONF_DIR HIVE_CONF_DIR=$CURRENT_JOB_CONF_DIR \
-	$HIVE_HOME/bin/$CMD "$@" -hiveconf java.io.tmpdir=$PWD/tmp -hiveconf hive.downloaded.resources.dir=downloads \
-    	-hiveconf mapred.local.dir=tmp -hiveconf hive.log.dir=hivelogs -hiveconf hive.log.file=hive.log \
-    	-hiveconf dataoven.gateway.type=genie -hiveconf dataoven.job.id=hive_`date +%s`_`basename $PWD` \
-    	-hiveconf hive.querylog.location=hivelogs 1>$CURRENT_JOB_WORKING_DIR/stdout.log 2>$CURRENT_JOB_WORKING_DIR/stderr.log
-    checkError 206
-}
-
-function executePig {
-    echo "Copying Hadoop config files..."
-    cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
-    checkError 204
-    copyFiles "$S3_HADOOP_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-    checkError 204
-
-    echo "Copying Pig config files..."
-    copyFiles "$S3_PIG_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-    checkError 209
-
-    # create and set java.io.tmpdir for pig
-    mkdir tmp
-    export HADOOP_OPTS="-Djava.io.tmpdir=$PWD/tmp"
-    
-    export PIG_LOG_DIR=$CURRENT_JOB_WORKING_DIR/piglogs
-
-    echo "Executing CMD: $CMD $@"
-    HADOOP_CONF_DIR=$CURRENT_JOB_CONF_DIR PIG_CONF_DIR=$CURRENT_JOB_CONF_DIR \
-	$PIG_HOME/bin/$CMD -D dataoven.gateway.type=genie -D dataoven.job.id=pig_`date +%s`_`basename $PWD` \
-    	"$@" 1>$CURRENT_JOB_WORKING_DIR/stdout.log 2>$CURRENT_JOB_WORKING_DIR/stderr.log
-    checkError 206
-}
-
 function executeCommand {
-    if [ "$CMD" = "hadoop" ]; then
-        executeHadoop "$@"
-        return 0   
+
+    # Start Non-Generic Code 
+    # if HADOOP_HOME is set assume Yarn Job and copy remaining
+    # conf files from its conf. 
+    if [ -n "$HADOOP_HOME" ]; then
+        echo "Copying local Hadoop config files..."
+        cp $HADOOP_HOME/conf/* $CURRENT_JOB_CONF_DIR
+        checkError 203
+        echo "Copied local hadoop files from conf directory"
+	echo $'\n'
     fi
-    if [ "$CMD" = "hive" ]; then
-        executeHive "$@"
-        return 0   
+
+    # End Non-Generic Code
+
+    # Setting Cluster, Command and Application Env Variables if specifed
+    echo "Setting env variables by sourcing env files for resources"
+    setEnvVariables
+    checkError 205
+    echo "Done setting env variables"
+    echo $'\n'
+
+    # Assuming cluster config files HAVE to be specified
+    echo "Copying cluster Config files ..."
+    copyFiles "$S3_CLUSTER_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+    checkError 206
+    echo "Copied cluster config files"
+    echo $'\n'
+    
+    if [ -n "$S3_COMMAND_CONF_FILES" ]; then
+        echo "Copying command Config files ..."
+        copyFiles "$S3_COMMAND_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 207
+        echo "Copied command config files"
+        echo $'\n'
     fi
-    if [ "$CMD" = "pig" ]; then
-        executePig "$@"
-        return 0   
+    
+    if [ -n "$S3_APPLICATION_CONF_FILES" ]; then
+        echo "Copying application Config files ..."
+        copyFiles "$S3_APPLICATION_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 208
+        echo "Copied application config files"
+        echo $'\n'
     fi
-    echo "Wrong CMD: $CMD" 
-    exit 206
+
+    if [ -n "$S3_APPLICATION_JAR_FILES" ]; then
+        echo "Copying application jar files ..."
+        copyFiles "$S3_APPLICATION_JAR_FILES" "file://$CURRENT_JOB_JAR_DIR"/
+        checkError 209
+        echo "Copied application jars files"
+    fi
+
+    echo "Copying job dependency files: $JOB_FILE_DEPENDENCIES" 
+    # only copy file dependencies if they exist 
+    if [ "$CURRENT_JOB_FILE_DEPENDENCIES" != "" ]
+    then
+        copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "file://$CURRENT_JOB_WORKING_DIR"
+        checkError 210
+        echo "Copied job dependency files"
+        echo $'\n'
+    fi
+
+    # If core site xml env variable is set, we add all the variables
+    # we want to add to yarn job execution there. 
+    if [ -n "$CORE_SITE_XML_ARGS" ]; then
+        echo "Updating core-site xml args"
+        updateCoreSiteXml
+        checkError 204
+        echo "Updated core-site xml args"
+        echo $'\n'
+    fi
+    
+    mkdir tmp
+    echo "Executing CMD: $CMD $@"
+    $CMD "$@" 1>$CURRENT_JOB_WORKING_DIR/stdout.log 2>$CURRENT_JOB_WORKING_DIR/stderr.log
+    checkError 213
+}
+
+function updateCoreSiteXml {
+    
+    # set the following variables
+    # genie.job.id, netflix.environment, lipstick.uuid.prop.name from CORE_SITE_XML_ARGS
+    # set dataoven.gateway.type genie
+    # dataoven.job.id
+    kvarr=$(echo $CORE_SITE_XML_ARGS | tr ";" "\n")
+    for item in $kvarr
+    do
+        key=$(echo $item | awk -F'=' '{print $1}')
+        value=$(echo $item | awk -F'=' '{print $2}')
+        appendKeyValueToCoreSite $key $value
+    done
+    appendKeyValueToCoreSite "genie.version" "2" 
+return 0
+}
+
+function appendKeyValueToCoreSite {
+
+    echo "Appending $1/$2 to core-site.xml as key/value pair."
+    KEY=$1
+    VALUE=$2
+    SEARCH_PATTERN="</configuration>"
+    REPLACE_PATTERN="<property><name>$KEY</name><value>$VALUE</value></property>\n&"
+    sed -i "s|$SEARCH_PATTERN|$REPLACE_PATTERN|" $CURRENT_JOB_CONF_DIR/core-site.xml
+}
+
+function setEnvVariables {
+    
+    if [ -n "$APPLICATION_ENV_FILE" ]
+    then
+        echo "Copy down and Source Application Env File"
+        copyFiles "$APPLICATION_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        APP_FILENAME=`basename $APPLICATION_ENV_FILE`
+        echo "App Env Filename: $APP_FILENAME"
+        source "$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
+        echo "Application Name = $APPNAME"
+    fi
+
+    if [ -n "$COMMAND_ENV_FILE" ]
+    then
+        echo "Copy down and Source Command Env File"
+        copyFiles "$COMMAND_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        COMMAND_FILENAME=`basename $COMMAND_ENV_FILE`
+        echo "Command Env Filename: $COMMAND_FILENAME"
+        source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
+        echo "Command Name=$CMDNAME"
+    fi
+
+    if [ -n "$JOB_ENV_FILE" ]
+    then
+        echo "Copy down and Source Job File"
+        copyFiles "$JOB_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        JOB_FILENAME=`basename $JOB_ENV_FILE`
+        echo "Job Env Filename: $JOB_FILENAME"
+        source "$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
+        echo "Job Name = $JOBNAME"
+    fi
+    return 0
 }
 
 function archiveToS3 {
@@ -173,7 +229,7 @@ function archiveToS3 {
     fi
         
     # create a directory first
-    $HADOOP_HOME/bin/hadoop fs $HADOOP_S3CP_OPTS -mkdir $S3_PREFIX
+    $MKDIR_COMMAND $S3_PREFIX
 
     # copy over the logs to S3
     copyFiles "file://$PWD/$TARBALL" "$S3_PREFIX"
@@ -192,46 +248,33 @@ CMDLINE="$@"
 CMDLOG=$CURRENT_JOB_WORKING_DIR/cmd.log
 exec > $CMDLOG 2>&1
 
-echo "Job Execution Parameters" 
-echo "ARGS = $ARGS" 
-echo "CMD = $CMD" 
-echo "CMDLINE = $CMDLINE" 
-echo "CURRENT_JOB_FILE_DEPENDENCIES = $CURRENT_JOB_FILE_DEPENDENCIES" 
-echo "S3_HADOOP_CONF_FILES = $S3_HADOOP_CONF_FILES" 
-echo "S3_HIVE_CONF_FILES = $S3_HIVE_CONF_FILES" 
-echo "S3_PIG_CONF_FILES = $S3_PIG_CONF_FILES" 
-echo "CURRENT_JOB_WORKING_DIR = $CURRENT_JOB_WORKING_DIR" 
-echo "CURRENT_JOB_CONF_DIR = $CURRENT_JOB_CONF_DIR" 
-echo "S3_ARCHIVE_LOCATION = $S3_ARCHIVE_LOCATION"
-echo "HADOOP_USER_NAME = $HADOOP_USER_NAME"
-echo "HADOOP_GROUP_NAME = $HADOOP_GROUP_NAME"
-echo "HADOOP_HOME = $HADOOP_HOME"
-echo "HIVE_HOME = $HIVE_HOME"
-echo "PIG_HOME = $PIG_HOME"
-echo "HADOOP_S3CP_TIMEOUT = $HADOOP_S3CP_TIMEOUT"
-echo "FORCE_COPY_FLAG = $FORCE_COPY_FLAG"
+echo "Job Execution Env Variables"
+echo "****************************************************************"
+env
+echo "****************************************************************"
+echo $'\n'
+
+echo "Creating job jar dir: $CURRENT_JOB_JAR_DIR"
+mkdir -p $CURRENT_JOB_JAR_DIR 
+checkError 201
+echo "Job Jar dir created"
+echo $'\n'
 
 echo "Creating job conf dir: $CURRENT_JOB_CONF_DIR"
 mkdir -p $CURRENT_JOB_CONF_DIR 
 checkError 202
-
-echo "Copying job dependency files: $JOB_FILE_DEPENDENCIES" 
-# only copy file dependencies if they exist 
-if [ "$CURRENT_JOB_FILE_DEPENDENCIES" != "" ]
-then
-    copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "file://$CURRENT_JOB_WORKING_DIR"
-    checkError 203
-fi
+echo "Job conf directory created"
+echo $'\n'
 
 # Uncomment the following if you want Genie to create users if they don't exist already
-# echo "Create user.group $HADOOP_USER_NAME.$HADOOP_GROUP_NAME, if it doesn't exist already"
-# sudo groupadd $HADOOP_GROUP_NAME
-# sudo useradd $HADOOP_USER_NAME -g $HADOOP_GROUP_NAME
+#echo "Create user.group $USER_NAME.$GROUP_NAME, if it doesn't exist already"
+#sudo groupadd $GROUP_NAME
+#sudo useradd $USER_NAME -g $GROUP_NAME
+#echo "User and Group created"
+#echo $'\n'
 
 executeCommand "$@"
-
 archiveToS3
 
 echo "Done"
 exit 0
-

@@ -1,25 +1,68 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee ">
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+ 
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath*:genie-application.xml</param-value>
+    </context-param>
+    
+    <context-param>
+        <param-name>spring.profiles.default</param-name>
+        <param-value>dev</param-value>
+    </context-param>
+ 
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
 
-	<servlet>
-        <servlet-name>Jersey REST Service</servlet-name>
-        <servlet-class>
-            com.sun.jersey.spi.container.servlet.ServletContainer
-        </servlet-class>
+    <servlet>
+        <servlet-name>jersey</servlet-name>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
             <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>com.netflix.genie.server, com.netflix.appinfo</param-value>
+            <param-value>
+                com.netflix.genie.server,
+                com.netflix.appinfo,
+                com.wordnik.swagger.jersey.listing,
+                com.fasterxml.jackson.jaxrs.json
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+            <param-value>com.netflix.genie.server.resources.GenieResponseFilter</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    
+    <servlet>
+        <servlet-name>JerseyJaxrsConfig</servlet-name>
+        <servlet-class>com.wordnik.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>
+        <init-param>
+            <param-name>api.version</param-name>
+            <param-value>2.0.0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>swagger.api.basepath</param-name>
+            <param-value>http://localhost:7001/genie</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>SwaggerBootstrap</servlet-name>
+        <servlet-class>com.netflix.genie.server.startup.GenieSwaggerBootstrap</servlet-class>
+        <load-on-startup>3</load-on-startup>
+    </servlet>
 
     <servlet-mapping>
-        <servlet-name>Jersey REST Service</servlet-name>
+        <servlet-name>jersey</servlet-name>
         <url-pattern>/genie/*</url-pattern>
     </servlet-mapping>
 

@@ -1,1 +1,77 @@
-apply plugin: 'java'
+def metaModelIgnorePattern = '**/com/netflix/genie/common/model/*_.java'
+def generatedSources = 'src/generated'
+def generatedSourcesJava = generatedSources + '/java'
+
+sourceSets {
+    main {
+        java {
+            srcDir generatedSourcesJava
+        }
+    }
+}
+
+dependencies {
+    compile ('com.fasterxml.jackson.core:jackson-core:2.4.1')
+    compile ('com.fasterxml.jackson.core:jackson-annotations:2.4.1')
+    compile ('com.fasterxml.jackson.core:jackson-databind:2.4.1')
+    compile ('com.netflix.eureka:eureka-client:1.1.141')
+    compile ('com.netflix.ribbon:ribbon-core:2.0-RC9')
+    compile ('com.netflix.ribbon:ribbon-eureka:2.0-RC9')
+    compile ('com.netflix.ribbon:ribbon-httpclient:2.0-RC9')
+    compile ('com.wordnik:swagger-jersey-jaxrs_2.10:1.3.0') {
+        exclude group: 'com.sun.jersey'
+    }
+    compile ('org.apache.openjpa:openjpa:2.2.1')
+}
+
+task genJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA metamodels') {
+    def outputDir = file(generatedSourcesJava)
+    outputs.dir outputDir
+    source = sourceSets.main.java
+    classpath = configurations.compile
+    options.compilerArgs = [
+            "-proc:only",
+            "-Aopenjpa.metamodel=true"
+    ]
+    destinationDir = outputDir
+    dependencyCacheDir = compileJava.dependencyCacheDir
+}
+
+task enhance(description: "Enhance model classes for use with JPA") << {
+    ant.taskdef(
+        name      : 'openJPAEnhancer',
+        classpath : project.runtimeClasspath.asPath,
+        classname : 'org.apache.openjpa.ant.PCEnhancerTask'
+    )
+
+    ant.openJPAEnhancer(
+        classpath : project.runtimeClasspath.asPath
+    )
+}
+
+compileJava {
+    dependsOn genJPAMetaModel
+}
+
+jar {
+    dependsOn enhance
+}
+
+clean {
+    delete generatedSources
+}
+
+//Ignore the generated classes from all our style/coverage/bug finding tools
+tasks.withType(Checkstyle) {
+    exclude metaModelIgnorePattern
+}
+
+tasks.withType(FindBugs) {
+    classes = classes.filter {
+        !it.path.contains('_')
+    }
+}
+
+tasks.withType(Pmd) {
+    exclude metaModelIgnorePattern
+}

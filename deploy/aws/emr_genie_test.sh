@@ -2,7 +2,7 @@
 
 ##
 #
-#  Copyright 2013 Netflix, Inc.
+#  Copyright 2014 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 export SERVICE_BASE_URL=http://localhost:7001
 export GENIE_TEST_PREFIX=file:///home/hadoop
 
-cd $HOME/genie/genie-web/src/test/python/jobs
+cd ${HOME}/genie/genie-web/src/test/python/jobs
 
 # Test some jobs
 

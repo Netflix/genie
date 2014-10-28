@@ -23,100 +23,36 @@
             <td data-bind="text: id"></td>
         </tr>
         <tr>
-            <td><strong>Job Flow Id</strong></td>
-            <td data-bind="text: jobFlowId"></td>
-        </tr>
-        <tr>
             <td><strong>Create Time</strong></td>
-            <td><span data-bind="text: createTimeFormatted"></span> (<span data-bind="text: createTime"></span>)</td>
+            <td><span data-bind="text: created"></span> (<span data-bind="text: created"></span>)</td>
         </tr>
         <tr>
             <td><strong>Update Time</strong></td>
-            <td><span data-bind="text: updateTimeFormatted"></span> (<span data-bind="text: updateTime"></span>)</td>
+            <td><span data-bind="text: updated"></span> (<span data-bind="text: updated"></span>)</td>
         </tr>
         <tr>
             <td><strong>User</strong></td>
             <td data-bind="text: user"></td>
         </tr>
         <tr>
-            <td><strong>Hadoop Version</strong></td>
-            <td data-bind="text: hadoopVersion"></td>
+            <td><strong>Version</strong></td>
+            <td data-bind="text: version"></td>
         </tr>
         <tr>
-            <td><strong>Schedule</strong></td>
-            <td>
-                <form>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: adHoc()==='true'" disabled> adHoc
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: sla()==='true'" disabled> sla
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: bonus()==='true'" disabled> bonus
-                    </label>
-                </form>
-            </td>
+        	<td><strong>Configs</strong></td>
+        	<td>
+        		<table>
+                	<tbody data-bind="foreach: configs">  
+                    	<tr>   
+                        	<td data-bind="text:$data"></td>
+                        </tr>
+                    </tbody>
+        		</table>
+       		</td>
         </tr>
         <tr>
-            <td><strong>Configurations</strong></td>
-            <td>
-                <form>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: prod()==='true'" disabled> prod
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: test()==='true'" disabled> test
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-bind="checked: unitTest()==='true'" disabled> unitTest
-                    </label>
-                </form>
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Prod Hive Config Id</strong></td>
-            <td data-bind="text: prodHiveConfigId"></td>
-        </tr>
-        <tr>
-            <td><strong>Prod Pig Config Id</strong></td>
-            <td data-bind="text: prodPigConfigId"></td>
-        </tr>
-        <tr>
-            <td><strong>Test Hive Config Id</strong></td>
-            <td data-bind="text: testHiveConfigId"></td>
-        </tr>
-        <tr>
-            <td><strong>Test Pig Config Id</strong></td>
-            <td data-bind="text: testPigConfigId"></td>
-        </tr>
-        <tr>
-            <td><strong>Dev Hive Config Id</strong></td>
-            <td data-bind="text: unitTestHiveConfigId"></td>
-        </tr>
-        <tr>
-            <td><strong>Dev Pig Config Id</strong></td>
-            <td data-bind="text: unitTestPigConfigId"></td>
-        </tr>
-        <tr>
-            <td><strong>S3 Core Site Xml</strong></td>
-            <td data-bind="text: s3CoreSiteXml"></td>
-        </tr>
-        <tr>
-            <td><strong>S3 HDFS Site Xml</strong></td>
-            <td data-bind="text: s3HdfsSiteXml"></td>
-        </tr>
-        <tr>
-            <td><strong>S3 MapRed Site Xml</strong></td>
-            <td data-bind="text: s3MapredSiteXml"></td>
-        </tr>
-        <tr>
-            <td><strong>S3 Yarn Site Xml</strong></td>
-            <td data-bind="text: s3YarnSiteXml"></td>
-        </tr>
-        <tr>
-            <td><strong>Has Stats</strong></td>
-            <td data-bind="text: hasStats"></td>
-        </tr>
+            <td><strong>Tags</strong></td>
+            <td data-bind="text: tags"></td>
+        </tr>     	    
     </table>
 </div>

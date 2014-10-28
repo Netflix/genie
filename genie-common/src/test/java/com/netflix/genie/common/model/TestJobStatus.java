@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,36 +15,50 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test case for Job Status utility methods.
+ * Tests for the JobStatus enum.
  *
- * @author skrishnan
+ * @author tgianos
  */
 public class TestJobStatus {
 
     /**
-     * Tests whether a job status is updated correctly, and update time is changed accordingly.
+     * Tests whether a valid job status is parsed correctly.
+     *
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetJobStatus() {
-        JobInfoElement ji = new JobInfoElement();
+    public void testValidJobStatus() throws GeniePreconditionException {
+        Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.FAILED, JobStatus.parse(JobStatus.FAILED.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.KILLED, JobStatus.parse(JobStatus.KILLED.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.INIT, JobStatus.parse(JobStatus.INIT.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.SUCCEEDED, JobStatus.parse(JobStatus.SUCCEEDED.name().toLowerCase()));
+    }
 
-        // finish time is 0 on initialization
-        Assert.assertEquals(ji.getFinishTime(), Long.valueOf(0));
+    /**
+     * Tests whether an invalid job status returns null.
+     *
+     * @throws GeniePreconditionException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testInvalidJobStatus() throws GeniePreconditionException {
+        JobStatus.parse("DOES_NOT_EXIST");
+    }
 
-        // start time is not zero on INIT, finish time is still 0
-        ji.setJobStatus(Types.JobStatus.INIT);
-        Assert.assertNotNull(ji.getStartTime());
-        Assert.assertEquals(ji.getFinishTime(), Long.valueOf(0));
-
-        // finish time is non-zero on completion
-        ji.setJobStatus(Types.JobStatus.SUCCEEDED);
-        Assert.assertNotSame(ji.getFinishTime(), Long.valueOf(0));
+    /**
+     * Tests whether an invalid application status throws exception.
+     *
+     * @throws GeniePreconditionException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testBlankJobStatus() throws GeniePreconditionException {
+        JobStatus.parse(null);
     }
 }

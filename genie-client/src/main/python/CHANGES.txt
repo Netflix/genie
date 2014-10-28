@@ -1,0 +1,16 @@
+0.1.0,     08/20/2014 -- Initial release.
+0.1.1,     08/20/2014 -- Changes for testing.
+0.1.2,     08/21/2014 -- Reorganizing code.
+0.1.3,     08/21/2014 -- Renaming package to nflx-genie-client to match convention.
+0.1.4,     08/22/2014 -- Refactored more API's
+0.1.5,     09/06/2014 -- Fixing bug in cluster_api.add_commands_to_cluster where list was being treated as set losing order
+0.1.6,     09/07/2014 -- Renaming executionClusterId, executionClusterName to match the actual REST API for searching jobs
+0.1.7,     09/07/2014 -- Missed some instances of clusterId and clusterName in the query params for jobs. Fixing.
+0.1.8,     09/07/2014 -- Misspelled execution as execution
+0.1.9,     10/09/2014 -- Fixed data types to not serialize NONE, refactored some file names to make more sense
+0.2.0,     10/14/2014 -- Updated the V2API file to include all the latest API's
+0.2.1,     10/14/2014 -- Updating to use the wrapper rather than direct API usage
+2.0.0rc1   10/22/2014 -- Preparing for release. Uploading to Pypi
+2.0.0rc2   10/22/2014 -- Updated Manifest.in to include .rst files to prevent failure on install for file not found
+2.0.0rc3   10/22/2014 -- Updated Manifest.in to remove recursive docs location to fix warning during install
+2.0.0rc4   10/22/2014 -- Removed specific ec2 URL which will be transient and replaced with localhost for examples

@@ -7,6 +7,12 @@
 *.o
 *.so
 *.pyc
+genie-web-int-tests/bin/
+genie-web/bin/
+
+# Per Build Generated Sources #
+###############################
+**/generated
 
 # Packages #
 ############
@@ -41,18 +47,20 @@ Thumbs.db
 ################
 .gradle
 
-# Derby files
+# Derby files #
+###############
 *-db
 
-# Build output directies
+# Build output directories #
+############################
 /target
 */target
 /build
 */build
 #
-# # IntelliJ specific files/directories
 
-# IntelliJ specific files/directories
+# IntelliJ specific files/directories #
+#######################################
 out
 .idea
 *.ipr
@@ -60,13 +68,26 @@ out
 *.iml
 atlassian-ide-plugin.xml
 
-# Eclipse specific files/directories
+# Eclipse specific files/directories #
+######################################
 .classpath
 .project
 .settings
 .metadata
 
-# NetBeans specific files/directories
+# NetBeans specific files/directories #
+#######################################
 .nbattrs
 .nb-gradle-properties
 .nb-gradle/
+/private
+*/private
+
+# Temp Directory#
+######################################
+temp/*
+
+genie-client/src/main/python/dist
+genie-client/src/main/python/build
+genie-client/src/main/python/nflx_genie_client.egg-info
+genie-client/src/main/python/MANIFEST

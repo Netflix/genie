@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,80 +15,55 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.messages.JobInfoRequest;
-import com.netflix.genie.common.messages.JobInfoResponse;
-import com.netflix.genie.common.messages.JobStatusResponse;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.model.JobStatus;
 
 /**
  * Interface for the Execution Service.<br>
  * Implementations must be thread-safe.
  *
  * @author skrishnan
+ * @author amsharma
+ * @author tgianos
  */
 public interface ExecutionService {
 
     /**
      * Submit a new job.
      *
-     * @param rRequest
-     *            request object containing job info element for new job
-     * @return successful response, or one with HTTP error code
+     * @param job the job to submit
+     * @return The job that was submitted
+     * @throws GenieException if there is an error
      */
-    JobInfoResponse submitJob(JobInfoRequest rRequest);
-
-    /**
-     * Get job information for given job id.
-     *
-     * @param jobID
-     *            id for job to look up
-     * @return successful response, or one with HTTP error code
-     */
-    JobInfoResponse getJobInfo(String jobID);
-
-    /**
-     * Get job status for give job id.
-     *
-     * @param jobID
-     *            id for job to look up
-     * @return successful response, or one with HTTP error code
-     */
-    JobStatusResponse getJobStatus(String jobID);
+    Job submitJob(final Job job) throws GenieException;
 
     /**
      * Kill job based on given job iD.
      *
-     * @param jobID
-     *            id for job to kill
-     * @return successful response, or one with HTTP error code
+     * @param id id for job to kill
+     * @return The killed job
+     * @throws GenieException if there is an error
      */
-    JobStatusResponse killJob(String jobID);
+    Job killJob(final String id) throws GenieException;
 
     /**
-     * Get job info for given filter criteria.
+     * Mark jobs as zombies if status hasn't been updated for
+     * netflix.genie.server.janitor.zombie.delta.ms.
      *
-     * @param jobID
-     *            id for job
-     * @param jobName
-     *            name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName
-     *            user who submitted job
-     * @param jobType
-     *            type of job - possible types Type.JobType
-     * @param status
-     *            status of job - possible types Type.JobStatus
-     * @param clusterName
-     *            name of cluster for job
-     * @param clusterId
-     *            id of cluster for job
-     * @param limit
-     *            max number of jobs to return
-     * @param page
-     *            page number for job
-     * @return successful response, or one with HTTP error code
+     * @return Number of jobs marked as zombies
      */
-    JobInfoResponse getJobs(String jobID, String jobName, String userName, String jobType,
-            String status, String clusterName, String clusterId, Integer limit, Integer page);
+    int markZombies();
+
+    /**
+     * Finalize the status of a job.
+     *
+     * @param id       The id of the job to finalize.
+     * @param exitCode The exit code of the job process.
+     * @return The job status.
+     * @throws GenieException if there is an error
+     */
+    JobStatus finalizeJob(final String id, final int exitCode) throws GenieException;
 }

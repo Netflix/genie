@@ -20,8 +20,12 @@
     <head>
         <meta charset="UTF-8">
         <title>Genie</title>
+        <link rel="shortcut icon" href="./img/nficon2014.3.ico">
+        <link rel="icon" href="./img/nficon2014.3.ico">
         <link rel="stylesheet" href="./bootstrap/css/bootstrap.css" />
         <link rel="stylesheet" href="./css/genie.css" />
+        <link rel="stylesheet" href="./css/select2.css" />
+        <link rel="stylesheet" href="./css/select2-bootstrap.css" />
         <script src="./vendor/js/require.js"></script>
         <script>
             requirejs.config({ baseUrl: './js', paths: {
@@ -33,6 +37,7 @@
                     'jquery':               '../vendor/js/jquery.min-2.0.2',
                     'text':                 '../vendor/js/text',
                     'stringTemplateEngine': '../vendor/js/stringTemplateEngine',
+                    'select2':       '../vendor/js/select2',
                     'loadKoTemplate':       '../vendor/js/loadKoTemplate'
                 },
                 shim: {
@@ -41,7 +46,7 @@
             });
         </script>
         <script>
-            require(['appViewModel', 'bootstrap']);
+            require(['appViewModel', 'bootstrap', 'select2']);
         </script>
     </head>
     <body>
@@ -52,13 +57,15 @@
                     <ul class="nav" role="navigation">
                         <li data-bind="css: {active: $__page__.find('job').isVisible}"><a href="#job/search">Search Jobs</a></li>
                         <li data-bind="css: {active: $__page__.find('cluster').isVisible}"><a href="#cluster/search">Search Clusters</a></li>
+                        <li data-bind="css: {active: $__page__.find('command').isVisible}"><a href="#command/search">Search Commands</a></li>
+                        <li data-bind="css: {active: $__page__.find('application').isVisible}"><a href="#application/search">Search Applications</a></li>
                     </ul>
                 </div>
             </div>
         </div>
 
         <div class="container">
-            <div data-bind="page: {id: 'start', beforeShow: function(page) { $root.Job.startup(); $root.Cluster.startup(); }}">
+            <div data-bind="page: {id: 'start', beforeShow: function(page) { $root.Job.startup(); $root.Cluster.startup(); $root.Command.startup(); $root.Application.startup(); }}">
                 <div data-bind="template: {name: 'front-page-html'}"></div>
             </div>
             <div data-bind="page: {id: 'job'}">
@@ -81,6 +88,28 @@
                 </div>
                 <div data-bind="page: {id: 'register', afterHide: $root.scrollTop}">
                     <div data-bind="template: {name: 'cluster-register-form-html'}"></div>
+                </div>
+            </div>
+            <div data-bind="page: {id: 'command'}">
+                <div data-bind="page: {id: 'search', afterHide: $root.scrollTop}">
+	                <div data-bind="template: {name: 'command-search-form-html'}"></div>
+                    <div data-bind="template: {name: 'command-search-results-html'}"></div>
+                </div>
+                <div data-bind="page: {id: 'details', beforeShow: function(page) { $root.Command.update(); $root.scrollTop(); }, afterHide: $root.scrollTop}">
+                    <div data-bind="page: {id: '?', beforeShow: $root.Command.update, afterHide: function(page) { $root.Command.update(); $root.scrollTop(); }}">
+                        <div data-bind="template: {name: 'command-details-html', data: $root.Command.current}"></div>
+                    </div>
+                </div>
+            </div>
+            <div data-bind="page: {id: 'application'}">
+                <div data-bind="page: {id: 'search', afterHide: $root.scrollTop}">
+	                <div data-bind="template: {name: 'application-search-form-html'}"></div>
+                    <div data-bind="template: {name: 'application-search-results-html'}"></div>
+                </div>
+                <div data-bind="page: {id: 'details', beforeShow: function(page) { $root.Application.update(); $root.scrollTop(); }, afterHide: $root.scrollTop}">
+                    <div data-bind="page: {id: '?', beforeShow: $root.Application.update, afterHide: function(page) { $root.Application.update(); $root.scrollTop(); }}">
+                        <div data-bind="template: {name: 'application-details-html', data: $root.Application.current}"></div>
+                    </div>
                 </div>
             </div>
         </div> <!-- /container -->

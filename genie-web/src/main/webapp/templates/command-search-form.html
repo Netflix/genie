@@ -1,0 +1,37 @@
+<h3>Search commands</h3>
+<form class="form-horizontal search-form" id="commandSearchForm" data-bind="submit: Command.search">
+    <div class="control-group">
+        <label class="control-label">Name:</label>
+        <div class="controls">
+            <input type="text" name="name" class="input-large">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Status:</label>
+        <div class="controls">
+            <select name="status">
+                <option></option>
+                <option>ACTIVE</option>
+                <option>INACTIVE</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+   		 <label class="control-label">Tags:</label>
+   		 <div class="controls">
+    		<select id="commandSearchTags" name="tags" multiple="true" data-bind="options: Command.allTags, selectedOptions:Command.selectedTags">
+    	 	</select>
+    	 </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Number of commands:</label>
+        <div class="controls">
+            <input type="text" name="limit" class="input-mini" maxlength=3 value="32">
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <button data-bind="click: Command.search, disable: Command.status()==='searching'" type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</form>

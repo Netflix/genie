@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,19 +15,23 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.model;
 
-import java.io.Serializable;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.activation.DataHandler;
+import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Representation of a file attachment sent as part of the job request.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
+@ApiModel(value = "An attachment for use with a job")
 public class FileAttachment implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,12 +39,20 @@ public class FileAttachment implements Serializable {
     /**
      * Name of the file.
      */
+    @ApiModelProperty(
+            value = "The name of the file",
+            required = true
+    )
     private String name;
 
     /**
      * The data for the attachment.
      */
-    private transient DataHandler data;
+    @ApiModelProperty(
+            value = "The bytes of the attachment",
+            required = true
+    )
+    private byte[] data;
 
     /**
      * Get the name of the file for this attachment.
@@ -48,33 +60,45 @@ public class FileAttachment implements Serializable {
      * @return name of file for this attachment
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
      * Set the name of the file for this attachment.
      *
-     * @param name name of the file for this attachment
+     * @param name name of the file for this attachment. Not null/empty/blank.
+     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setName(String name) {
+    public void setName(final String name) throws GeniePreconditionException {
+        if (StringUtils.isBlank(name)) {
+            throw new GeniePreconditionException("No name entered for attachment. Unable to continue.");
+        }
         this.name = name;
     }
 
     /**
-     * Get the data handler containing the data for the attachment.
+     * Get the data for the attachment.
      *
-     * @return the data handler containing data for the attachment
+     * @return the data for the attachment
      */
-    public DataHandler getData() {
-        return data;
+    public byte[] getData() {
+        if (this.data != null) {
+            return Arrays.copyOf(this.data, this.data.length);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Set the data handler for the attachment.
+     * Set the data for the attachment.
      *
-     * @param data the data handler for the attachment.
+     * @param data the data for the attachment. Not null or empty.
+     * @throws GeniePreconditionException If preconditions aren't met.
      */
-    public void setData(DataHandler data) {
-        this.data = data;
+    public void setData(final byte[] data) throws GeniePreconditionException {
+        if (data == null || data.length == 0) {
+            throw new GeniePreconditionException("No data entered for attachment. Unable to continue.");
+        }
+        this.data = Arrays.copyOf(data, data.length);
     }
 }

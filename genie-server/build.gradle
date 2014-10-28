@@ -1,43 +1,46 @@
-apply plugin: 'java'
-
-// we are doing this rather than a dependency since we 
-// must perform build-time enhancement for OpenJPA
-sourceSets.main.java.srcDirs += '../genie-common/src/main/java'
-
 dependencies {
-    compile 'com.netflix.archaius:archaius-core:0.5.8'
-    compile 'commons-collections:commons-collections:3.2.1'
-    compile 'com.google.inject.extensions:guice-servlet:3.0'
-    compile 'com.sun.jersey.contribs:jersey-guice:1.11'
-    compile 'com.netflix.servo:servo-core:0.4.34'
-    compile 'com.netflix.karyon:karyon-extensions:1.0.22'
-    compile 'commons-httpclient:commons-httpclient:3.1'
-    compile 'javax.mail:mail:1.4.1'
-    compile 'com.googlecode.json-simple:json-simple:1.1'
+    compile project.parent.childProjects.get('genie-common')
+    compile ('com.netflix.archaius:archaius-core:0.6.2')
+    compile ('com.netflix.karyon:karyon-core:1.0.26')
+    compile ('com.netflix.karyon:karyon-eureka:1.0.26')
+    compile ('com.netflix.karyon:karyon-extensions:1.0.26')
+    compile ('com.netflix.karyon:karyon-spi:1.0.26')
+    compile ('com.netflix.servo:servo-core:0.7.7')
+    compile ('com.sun.jersey:jersey-core:1.11')
+    compile ('com.sun.jersey:jersey-server:1.11')
+    compile ('com.sun.jersey.contribs:jersey-guice:1.11')
+    compile ('commons-collections:commons-collections:3.2.1')
+    compile ('commons-httpclient:commons-httpclient:3.1')
+    compile ('javax.mail:mail:1.4.4')
+    
+    //Spring
+    compile ('org.springframework.data:spring-data-jpa:1.6.0.RELEASE')
+    compile ('org.springframework:spring-web:3.2.9.RELEASE')
+    compile ('com.google.inject.extensions:guice-spring:3.0')
+    compile ('com.sun.jersey.contribs:jersey-spring:1.11') {
+        exclude group: 'org.springframework', module: 'spring'
+        exclude group: 'org.springframework', module: 'spring-core'
+        exclude group: 'org.springframework', module: 'spring-web'
+        exclude group: 'org.springframework', module: 'spring-beans'
+        exclude group: 'org.springframework', module: 'spring-context'
+    }
 
-    runtime 'org.apache.derby:derby:10.2.2.0'
-    runtime 'mysql:mysql-connector-java:5.1.16'
-    runtime 'com.mchange:c3p0:0.9.2'
-    runtime 'com.mchange:mchange-commons-java:0.2.3.3'
+    runtime ('org.apache.commons:commons-dbcp2:2.0.1')
+    runtime ('com.google.inject.extensions:guice-servlet:3.0')
+    runtime ('com.mchange:mchange-commons-java:0.2.3.3')
+    runtime ('mysql:mysql-connector-java:5.1.16')
+    runtime ('org.apache.derby:derby:10.2.2.0')
+    runtime ('org.hsqldb:hsqldb:2.3.2')
 
-    provided 'javax.servlet:servlet-api:2.5'
+    provided ('javax.servlet:servlet-api:2.5')
+    
+    testCompile ('org.springframework:spring-test:3.2.9.RELEASE')
+    testCompile ('org.dbunit:dbunit:2.4.9')
+    testCompile ('com.github.springtestdbunit:spring-test-dbunit:1.0.1')
 }
 
-task enhance << {
-    ant.taskdef(
-        name      : 'openjpaenhancer',
-        classpath : project.runtimeClasspath.asPath,
-        classname : 'org.apache.openjpa.ant.PCEnhancerTask'
-    )
-
-    ant.openjpaenhancer(
-        classpath : project.runtimeClasspath.asPath)
-}
-
-jar {
-    it.dependsOn enhance
-}
-
-test {
-	it.dependsOn enhance
-}
+//test {
+//    testLogging {
+//        showStandardStreams = true
+//    }
+//}

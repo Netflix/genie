@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,35 +15,40 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.jobmanager;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.JobInfoElement;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.Job;
 
 /**
- * The interface to be implemented by Hadoop, Hive and Pig job manager
- * implementations.
+ * The interface to be implemented by job manager implementations.
  *
  * @author skrishnan
+ * @author amsharma
  */
 public interface JobManager {
 
     /**
-     * Initialize, and launch the job once it has been initialized.
+     * Initialize the JobManager.
      *
-     * @param ji
-     *            the JobInfo object for the job to be launched
-     * @throws CloudServiceException
+     * @param job The job this manager will be managing.
+     * @param cluster The cluster this job will run on.
+     * @throws GenieException On issue
      */
-    void launch(JobInfoElement ji) throws CloudServiceException;
+    void init(final Job job, final Cluster cluster) throws GenieException;
+
+    /**
+     * Launch the job.
+     *
+     * @throws GenieException On issue
+     */
+    void launch() throws GenieException;
 
     /**
      * Kill a job using the job information - no need to initialize this job.
      *
-     * @param ji
-     *            the JobInfo object for the job to be killed
-     * @throws CloudServiceException
+     * @throws GenieException On issue
      */
-    void kill(JobInfoElement ji) throws CloudServiceException;
+    void kill() throws GenieException;
 }

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,57 +15,111 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.jobmanager;
 
-import java.net.HttpURLConnection;
+import com.netflix.config.ConfigurationManager;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.Job;
+import com.netflix.genie.server.services.ClusterConfigService;
+import com.netflix.genie.server.services.ClusterLoadBalancer;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.Types;
-import com.netflix.genie.server.jobmanager.impl.HadoopJobManager;
-import com.netflix.genie.server.jobmanager.impl.HiveJobManager;
-import com.netflix.genie.server.jobmanager.impl.PigJobManager;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
- * Factory class to instantiate individual Hadoop/Hive/Pig job managers.
+ * Factory class to instantiate individual job managers.
  *
  * @author skrishnan
+ * @author tgianos
+ * @author amsharma
  */
-public final class JobManagerFactory {
-    private static Logger logger = LoggerFactory
-            .getLogger(JobManagerFactory.class);
+@Named
+public class JobManagerFactory implements ApplicationContextAware {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JobManagerFactory.class);
+
+    private ApplicationContext context;
 
     /**
-     * Private constructor - never called for factory.
+     * The service to discover clusters.
      */
-    private JobManagerFactory() {
+    private final ClusterConfigService ccs;
+
+    /**
+     * Reference to the cluster load balancer implementation.
+     */
+    private final ClusterLoadBalancer clb;
+
+    /**
+     * Default constructor.
+     *
+     * @param ccs The cluster config service to use
+     * @param clb The clb to use
+     */
+    @Inject
+    public JobManagerFactory(
+            final ClusterConfigService ccs,
+            final ClusterLoadBalancer clb) {
+        this.ccs = ccs;
+        this.clb = clb;
     }
 
     /**
      * Returns the right job manager for the job type.
      *
-     * @param type
-     *            the string describing the job - could be HADOOP, HIVE or PIG
+     * @param job The job this manager will be managing
      * @return instance of the appropriate job manager
-     * @throws Exception
+     * @throws GenieException On error
      */
-    public static JobManager getJobManager(String type)
-            throws CloudServiceException {
-        logger.info("called");
+    public JobManager getJobManager(final Job job) throws GenieException {
+        LOG.info("called");
 
-        if (Types.JobType.HADOOP.name().equalsIgnoreCase(type)) {
-            return new HadoopJobManager();
-        } else if (Types.JobType.HIVE.name().equalsIgnoreCase(type)) {
-            return new HiveJobManager();
-        } else if (Types.JobType.PIG.name().equalsIgnoreCase(type)) {
-            return new PigJobManager();
+        if (job == null) {
+            final String msg = "No job entered. Unable to continue";
+            LOG.error(msg);
+            throw new GeniePreconditionException(msg);
         }
 
-        String msg = String.format("JobManager [%s] is not supported", type);
-        logger.error(msg);
-        throw new CloudServiceException(HttpURLConnection.HTTP_BAD_REQUEST, msg);
+        // Figure out a cluster to run this job. Cluster selection is done based on
+        // ClusterCriteria tags and Command tags specified in the job.
+        final Cluster cluster = this.clb.selectCluster(this.ccs.chooseClusterForJob(job.getId()));
+        final String className = ConfigurationManager.getConfigInstance()
+                .getString("netflix.genie.server." + cluster.getClusterType() + ".JobManagerImpl");
+
+        try {
+            final Class jobManagerClass = Class.forName(className);
+            final Object instance = this.context.getBean(jobManagerClass);
+            if (instance instanceof JobManager) {
+                final JobManager jobManager = (JobManager) instance;
+                jobManager.init(job, cluster);
+                return jobManager;
+            } else {
+                final String msg = className + " is not of type JobManager. Unable to continue.";
+                LOG.error(msg);
+                throw new GeniePreconditionException(msg);
+            }
+        } catch (final ClassNotFoundException | BeansException e) {
+            final String msg = "Unable to create job manager for class name " + className;
+            LOG.error(msg, e);
+            throw new GenieBadRequestException(msg);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setApplicationContext(
+            final ApplicationContext appContext) throws BeansException {
+        this.context = appContext;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Netflix, Inc.
+ * Copyright 2014 Netflix, Inc.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -13,14 +13,13 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.genie.server.health;
 
 import com.netflix.karyon.spi.HealthCheckHandler;
+import java.net.HttpURLConnection;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Custom health check for Genie goes here - although it is quite non-custom
@@ -30,24 +29,26 @@ import javax.annotation.PostConstruct;
  */
 public class HealthCheck implements HealthCheckHandler {
 
-    private static Logger logger = LoggerFactory.getLogger(HealthCheck.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HealthCheck.class);
 
     /**
      * Any custom initialization goes here - but empty right now.
      */
     @PostConstruct
     public void init() {
-        logger.info("Health check initialized.");
+        LOG.info("Health check initialized.");
     }
 
     /**
-     * Should return custom status based on actual health - currently it always returns 200 (HTTP_OK).
+     * Should return custom status based on actual health - currently it always
+     * returns 200 (HTTP_OK).
+     *
      * @return HTTP health status
      */
     @Override
     public int getStatus() {
-        // Custom health check logic goes here
-        logger.debug("Health check invoked.");
-        return 200;
+        //TODO: Custom health check logic goes here
+        LOG.debug("Health check invoked.");
+        return HttpURLConnection.HTTP_OK;
     }
 }

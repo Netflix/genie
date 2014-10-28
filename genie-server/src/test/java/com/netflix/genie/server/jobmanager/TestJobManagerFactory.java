@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,33 +15,36 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.jobmanager;
 
-import java.net.HttpURLConnection;
+import com.netflix.genie.common.exceptions.GenieException;
+import javax.inject.Inject;
 
-import org.junit.Assert;
 import org.junit.Test;
-
-import com.netflix.genie.common.exceptions.CloudServiceException;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Basic tests for the JobManagerFactory.
  *
  * @author skrishnan
+ * @author tgianos
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:genie-application-test.xml")
 public class TestJobManagerFactory {
 
+    @Inject
+    private JobManagerFactory factory;
+
     /**
-     * Tests whether an invalid job type throws an exception.
+     * Tests whether an invalid class name throws an exception.
+     *
+     * @throws GenieException
      */
-    @Test
-    public void testInvalidJobType() {
-        try {
-            JobManagerFactory.getJobManager("NotSupported");
-        } catch (CloudServiceException cse) {
-            Assert.assertEquals(cse.getErrorCode(),
-                    HttpURLConnection.HTTP_BAD_REQUEST);
-        }
+    @Test(expected = GenieException.class)
+    public void testInvalidClassName() throws GenieException {
+        this.factory.getJobManager(null);
     }
 }

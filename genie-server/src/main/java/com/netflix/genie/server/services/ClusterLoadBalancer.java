@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2014 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,30 +15,28 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.server.services;
 
-import com.netflix.genie.common.exceptions.CloudServiceException;
-import com.netflix.genie.common.model.ClusterConfigElement;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.model.Cluster;
+
+import java.util.List;
 
 /**
  * Interface for the cluster load-balancer, which returns the "best" cluster to
  * run job on from an array of candidates.
  *
  * @author skrishnan
- *
+ * @author tgianos
  */
 public interface ClusterLoadBalancer {
 
     /**
      * Return best cluster to run job on.
      *
-     * @param ceArray
-     *            array of cluster to choose from
+     * @param clusters The list of available clusters to choose from
      * @return the "best" cluster to run job on
-     * @throws CloudServiceException
-     *             if there is any error
+     * @throws GenieException if there is any error
      */
-    ClusterConfigElement selectCluster(ClusterConfigElement[] ceArray)
-            throws CloudServiceException;
+    Cluster selectCluster(final List<Cluster> clusters) throws GenieException;
 }
