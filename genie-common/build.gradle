@@ -1,4 +1,5 @@
 def metaModelIgnorePattern = '**/com/netflix/genie/common/model/*_.java'
+//TODO: Move generated to build directory. Fix integration with IDE.
 def generatedSources = 'src/generated'
 def generatedSourcesJava = generatedSources + '/java'
 
