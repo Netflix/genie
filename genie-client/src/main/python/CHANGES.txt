@@ -14,3 +14,4 @@
 2.0.0rc2   10/22/2014 -- Updated Manifest.in to include .rst files to prevent failure on install for file not found
 2.0.0rc3   10/22/2014 -- Updated Manifest.in to remove recursive docs location to fix warning during install
 2.0.0rc4   10/22/2014 -- Removed specific ec2 URL which will be transient and replaced with localhost for examples
+2.0.0      10/28/2015 -- Full 2.0.0 release
