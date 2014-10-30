@@ -28,7 +28,6 @@ allprojects {
         delete 'genie-db'
         delete 'derby.log'
     }
-    project.status = 'snapshot'
 }
 
 subprojects {
