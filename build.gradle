@@ -1,6 +1,6 @@
 // Establish version and status
 // Change if github project name is not the same as the root project's name
-ext.githubProjectName = rootProject.name
+ext.githubProjectName = 'genie'
 
 buildscript {
     repositories {
@@ -28,7 +28,6 @@ allprojects {
         delete 'genie-db'
         delete 'derby.log'
     }
-    project.status = 'release'
 }
 
 subprojects {
