@@ -86,8 +86,21 @@ public class JobMonitorImpl implements JobMonitor {
     // the stdout for this job
     private File stdOutFile;
 
+    //stdout filename
+    private static final String STDOUT_FILENAME = "stdout";
+
+    // the stderr for this job
+    private File stdErrFile;
+
+    //stderr filename
+    private static final String STDERR_FILENAME = "stderr";
+
     // max specified stdout size
     private final Long maxStdoutSize;
+
+    // max specified stdout size
+    private final Long maxStderrSize;
+
 
     // whether this job has been terminated by the monitor thread
     private boolean terminated = false;
@@ -112,10 +125,12 @@ public class JobMonitorImpl implements JobMonitor {
         this.genieNodeStatistics = genieNodeStatistics;
         this.config = ConfigurationManager.getConfigInstance();
         this.maxStdoutSize = this.config.getLong("netflix.genie.job.max.stdout.size", null);
+        this.maxStderrSize = this.config.getLong("netflix.genie.job.max.stderr.size", null);
 
         this.workingDir = null;
         this.proc = null;
         this.stdOutFile = null;
+        this.stdErrFile = null;
     }
 
     /**
@@ -137,6 +152,7 @@ public class JobMonitorImpl implements JobMonitor {
         this.workingDir = workingDir;
         if (this.workingDir != null) {
             this.stdOutFile = new File(this.workingDir + File.separator + "stdout.log");
+            this.stdErrFile = new File(this.workingDir + File.separator + "stderr.log");
         }
     }
 
@@ -244,21 +260,35 @@ public class JobMonitorImpl implements JobMonitor {
             if (shouldUpdateJob()) {
                 this.lastUpdatedTimeMS = this.jobService.setUpdateTime(this.jobId);
 
-                // kill the job if it is writing out more than the max stdout limit
+                // kill the job if it is writing out more than the max stdout/stderr limit
                 // if it has been terminated already, move on and wait for it to clean up after itself
-                if (this.stdOutFile != null
-                        && this.stdOutFile.exists()
-                        && this.maxStdoutSize != null
-                        && this.stdOutFile.length() > this.maxStdoutSize
-                        && !this.terminated) {
-                    LOG.warn("Killing job " + this.jobId + " as its stdout is greater than limit");
+                String issueFile = null;
+                if (!this.terminated) {
+                    if (this.stdOutFile != null
+                            && this.stdOutFile.exists()
+                            && this.maxStdoutSize != null
+                            && this.stdOutFile.length() > this.maxStdoutSize
+                        ) {
+                        issueFile = STDOUT_FILENAME;
+                    } else if (
+                            this.stdErrFile != null
+                                    && this.stdErrFile.exists()
+                                    && this.maxStderrSize != null
+                                    && this.stdErrFile.length() > this.maxStderrSize
+                            ) {
+                        issueFile = STDERR_FILENAME;
+                    }
+                }
+
+                if (issueFile != null) {
+                    LOG.warn("Killing job " + this.jobId + " as its " + issueFile + " is greater than limit");
                     // kill the job - no need to update status, as it will be updated during next iteration
                     try {
                         this.jobManager.kill();
                         this.terminated = true;
                     } catch (final GenieException e) {
                         LOG.error("Can't kill job " + this.jobId
-                                + " after exceeding stdout limit", e);
+                                + " after exceeding " + issueFile + " limit", e);
                         // continue - hoping that it can get cleaned up during next iteration
                     }
                 }
