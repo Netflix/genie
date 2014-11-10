@@ -1,8 +1,8 @@
 Genie
 =====
 
-Genie provides REST-ful APIs to run Hadoop, Hive and Pig jobs, and to manage multiple 
-Hadoop resources and perform job submissions across them.
+Genie provides REST-ful APIs to run a variety of jobs types Hadoop, Pig, Hive, Presto, Sqoop and more. It also
+provides APIs for managing many distributed processing cluster configurations as well as commands and applications.
 
 Documentation
 -------------
@@ -21,7 +21,6 @@ Genie builds are hosted on CloudBees as follows:
 
 * [Master](https://netflixoss.ci.cloudbees.com/job/genie-master/)
 * [Pull Requests](https://netflixoss.ci.cloudbees.com/job/genie-pull-requests/)
-
 
 Support
 -------
