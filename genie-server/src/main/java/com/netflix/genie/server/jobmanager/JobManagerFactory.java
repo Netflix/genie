@@ -93,7 +93,7 @@ public class JobManagerFactory implements ApplicationContextAware {
         // ClusterCriteria tags and Command tags specified in the job.
         final Cluster cluster = this.clb.selectCluster(this.ccs.chooseClusterForJob(job.getId()));
         final String className = ConfigurationManager.getConfigInstance()
-                .getString("netflix.genie.server." + cluster.getClusterType() + ".JobManagerImpl");
+                .getString("com.netflix.genie.server." + cluster.getClusterType() + ".JobManagerImpl");
 
         try {
             final Class jobManagerClass = Class.forName(className);
