@@ -48,6 +48,8 @@ import java.util.Map;
 public class YarnJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(YarnJobManagerImpl.class);
+    private static final String COPY_COMMAND_KEY = "com.netflix.genie.server.job.manager.yarn.command.cp";
+    private static final String MAKE_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.yarn.command.mkdir";
 
     //TODO: Move to a property file
     /**
@@ -182,23 +184,27 @@ public class YarnJobManagerImpl extends JobManagerImpl {
             processEnv.put("HADOOP_HOME", hadoopHome);
         }
 
-        // populate the CP timeout and other options. Yarn jobs would use
-        // hadoop fs -cp to copy files. Prepare the copy command with the combination
-        // and set the COPY_COMMAND environment variable
-        processEnv.put("CP_TIMEOUT",
+        final String copyCommand =
                 ConfigurationManager.getConfigInstance()
-                        .getString("com.netflix.genie.server.hadoop.s3cp.timeout", "1800"));
-
-        final String cpOpts = ConfigurationManager.getConfigInstance()
-                .getString("com.netflix.genie.server.hadoop.s3cp.opts", "");
-
-        final String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp -f";
+                        .getString(COPY_COMMAND_KEY);
+        if (StringUtils.isBlank(copyCommand)) {
+            final String msg = "Required property " + COPY_COMMAND_KEY + " isn't set";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
         processEnv.put("COPY_COMMAND", copyCommand);
 
         // Force flag to overwrite required in Hadoop2
         processEnv.put("FORCE_COPY_FLAG", "-f");
 
-        final String mkdirCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -mkdir";
-        processEnv.put("MKDIR_COMMAND", mkdirCommand);
+        final String makeDirCommand =
+                ConfigurationManager.getConfigInstance()
+                        .getString(MAKE_DIRECTORY_COMMAND_KEY);
+        if (StringUtils.isBlank(makeDirCommand)) {
+            final String msg = "Required property " + MAKE_DIRECTORY_COMMAND_KEY + " isn't set";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
+        processEnv.put("MKDIR_COMMAND", makeDirCommand);
     }
 }
