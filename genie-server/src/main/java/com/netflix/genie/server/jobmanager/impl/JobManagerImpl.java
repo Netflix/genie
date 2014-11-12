@@ -451,9 +451,9 @@ public class JobManagerImpl implements JobManager {
     private String getBaseUserWorkingDirectory() throws GenieException {
         final String baseUserWorkingDir = ConfigurationManager
                 .getConfigInstance()
-                .getString("netflix.genie.server.user.working.dir");
+                .getString("com.netflix.genie.server.user.working.dir");
         if (StringUtils.isBlank(baseUserWorkingDir)) {
-            final String msg = "Property netflix.genie.server.user.working.dir is not set";
+            final String msg = "Property com.netflix.genie.server.user.working.dir is not set";
             LOG.error(msg);
             throw new GenieServerException(msg);
         }
