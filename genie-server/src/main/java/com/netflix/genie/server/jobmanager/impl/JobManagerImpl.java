@@ -362,7 +362,7 @@ public class JobManagerImpl implements JobManager {
         // set the java home
         final String javaHome = ConfigurationManager
                 .getConfigInstance()
-                .getString("netflix.genie.server.java.home");
+                .getString("com.netflix.genie.server.java.home");
         if (StringUtils.isNotBlank(javaHome)) {
             processBuilder.environment().put("JAVA_HOME", javaHome);
         }
