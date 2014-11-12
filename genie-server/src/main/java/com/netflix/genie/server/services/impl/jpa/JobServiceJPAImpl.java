@@ -76,10 +76,10 @@ public class JobServiceJPAImpl implements JobService {
         //TODO: Seem to remember something about injecting configuration using governator
         CONF = ConfigurationManager.getConfigInstance();
         SERVER_PORT = CONF.getInt("netflix.appinfo.port", 7001);
-        JOB_DIR_PREFIX = CONF.getString("netflix.genie.server.job.dir.prefix",
+        JOB_DIR_PREFIX = CONF.getString("com.netflix.genie.server.job.dir.prefix",
                 "genie-jobs");
         JOB_RESOURCE_PREFIX = CONF.getString(
-                "netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
+                "com.netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
     }
 
     /**

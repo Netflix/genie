@@ -440,7 +440,7 @@ public class Job extends CommonEntityFields {
         if (this.tags == null) {
             this.tags = new HashSet<>();
         }
-        if (ConfigurationManager.getConfigInstance().getBoolean("netflix.genie.server.jobs.tags.default", false)) {
+        if (ConfigurationManager.getConfigInstance().getBoolean("com.netflix.genie.server.jobs.tags.default", false)) {
             this.addAndValidateSystemTags(this.tags);
         }
     }

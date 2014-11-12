@@ -51,7 +51,7 @@ public interface ExecutionService {
 
     /**
      * Mark jobs as zombies if status hasn't been updated for
-     * netflix.genie.server.janitor.zombie.delta.ms.
+     * com.netflix.genie.server.janitor.zombie.delta.ms.
      *
      * @return Number of jobs marked as zombies
      */

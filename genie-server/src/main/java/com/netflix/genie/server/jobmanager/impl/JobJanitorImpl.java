@@ -90,11 +90,11 @@ public class JobJanitorImpl implements JobJanitor {
 
             // get min sleep time
             final long minSleepTime = conf.getLong(
-                    "netflix.genie.server.janitor.min.sleep.ms", 300000);
+                    "com.netflix.genie.server.janitor.min.sleep.ms", 300000);
 
             // get max sleep time
             final long maxSleepTime = conf.getLong(
-                    "netflix.genie.server.janitor.max.sleep.ms", 600000);
+                    "com.netflix.genie.server.janitor.max.sleep.ms", 600000);
 
             // calculate a random number of seconds between min and max to sleep.
             // This is done to stagger the janitor threads across multiple instances

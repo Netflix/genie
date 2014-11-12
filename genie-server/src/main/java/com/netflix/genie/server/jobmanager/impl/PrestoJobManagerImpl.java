@@ -46,8 +46,8 @@ import java.util.Map;
 public class PrestoJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(PrestoJobManagerImpl.class);
-    private static final String PRESTO_PROTOCOL_KEY = "netflix.genie.server.presto.protocol";
-    private static final String PRESTO_MASTER_DOMAIN = "netflix.genie.server.presto.master.domain";
+    private static final String PRESTO_PROTOCOL_KEY = "com.netflix.genie.server.presto.protocol";
+    private static final String PRESTO_MASTER_DOMAIN = "com.netflix.genie.server.presto.master.domain";
 
     /**
      * Constructor.
@@ -122,9 +122,9 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
         // set the default hadoop home
         final String hadoopHome = ConfigurationManager
                 .getConfigInstance()
-                .getString("netflix.genie.server.hadoop.home");
+                .getString("com.netflix.genie.server.hadoop.home");
         if (hadoopHome == null || !new File(hadoopHome).exists()) {
-            final String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
+            final String msg = "Property com.netflix.genie.server.hadoop.home is not set correctly";
             LOG.error(msg);
             throw new GenieServerException(msg);
         }
@@ -135,10 +135,10 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
         // and set the COPY_COMMAND environment variable
         processEnv.put("CP_TIMEOUT",
                 ConfigurationManager.getConfigInstance()
-                        .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
+                        .getString("com.netflix.genie.server.hadoop.s3cp.timeout", "1800"));
 
         final String cpOpts = ConfigurationManager.getConfigInstance()
-                .getString("netflix.genie.server.hadoop.s3cp.opts", "");
+                .getString("com.netflix.genie.server.hadoop.s3cp.opts", "");
 
         final String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp -f";
         processEnv.put("COPY_COMMAND", copyCommand);

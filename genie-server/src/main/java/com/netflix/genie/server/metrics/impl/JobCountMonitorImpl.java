@@ -146,7 +146,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
                 // sleep for the configured timeout
                 if (!stop) {
                     long sleepTime = ConfigurationManager.
-                            getConfigInstance().getLong("netflix.genie.server.metrics.sleep.ms", 30000);
+                            getConfigInstance().getLong("com.netflix.genie.server.metrics.sleep.ms", 30000);
                     LOG.info("JobCountMonitor daemon going to sleep");
                     Thread.sleep(sleepTime);
                 }

@@ -86,7 +86,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         CONF = ConfigurationManager.getConfigInstance();
         SERVER_PORT = CONF.getInt("netflix.appinfo.port", 7001);
         JOB_RESOURCE_PREFIX = CONF.getString(
-                "netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
+                "com.netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
     }
 
     /**
@@ -220,7 +220,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         final ProcessStatus zombie = ProcessStatus.ZOMBIE_JOB;
         final long currentTime = new Date().getTime();
         final long zombieTime = CONF.getLong(
-                "netflix.genie.server.janitor.zombie.delta.ms", 1800000);
+                "com.netflix.genie.server.janitor.zombie.delta.ms", 1800000);
 
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.jobRepo.findAll(
@@ -325,13 +325,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         // synchronize until an entry is created and INIT-ed in DB
         // throttling related parameters
         final int maxRunningJobs = CONF.getInt(
-                "netflix.genie.server.max.running.jobs", 0);
+                "com.netflix.genie.server.max.running.jobs", 0);
         final int jobForwardThreshold = CONF.getInt(
-                "netflix.genie.server.forward.jobs.threshold", 0);
+                "com.netflix.genie.server.forward.jobs.threshold", 0);
         final int maxIdleHostThreshold = CONF.getInt(
-                "netflix.genie.server.max.idle.host.threshold", 0);
+                "com.netflix.genie.server.max.idle.host.threshold", 0);
         final int idleHostThresholdDelta = CONF.getInt(
-                "netflix.genie.server.idle.host.threshold.delta", 0);
+                "com.netflix.genie.server.idle.host.threshold.delta", 0);
 
         final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
         LOG.info("Number of running jobs: " + numRunningJobs);

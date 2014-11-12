@@ -196,9 +196,9 @@ public class JobManagerImpl implements JobManager {
             LOG.info("Attempting to kill the process " + processId);
             try {
                 final String genieHome = ConfigurationManager.getConfigInstance()
-                        .getString("netflix.genie.server.sys.home");
+                        .getString("com.netflix.genie.server.sys.home");
                 if (genieHome == null || genieHome.isEmpty()) {
-                    final String msg = "Property netflix.genie.server.sys.home is not set correctly";
+                    final String msg = "Property com.netflix.genie.server.sys.home is not set correctly";
                     LOG.error(msg);
                     throw new GenieServerException(msg);
                 }
@@ -370,9 +370,9 @@ public class JobManagerImpl implements JobManager {
         // set the genie home
         final String genieHome = ConfigurationManager
                 .getConfigInstance()
-                .getString("netflix.genie.server.sys.home");
+                .getString("com.netflix.genie.server.sys.home");
         if (StringUtils.isBlank(genieHome)) {
-            final String msg = "Property netflix.genie.server.sys.home is not set correctly";
+            final String msg = "Property com.netflix.genie.server.sys.home is not set correctly";
             LOG.error(msg);
             throw new GenieServerException(msg);
         }
@@ -383,7 +383,7 @@ public class JobManagerImpl implements JobManager {
         if (!this.job.isDisableLogArchival()) {
             final String s3ArchiveLocation = ConfigurationManager
                     .getConfigInstance()
-                    .getString("netflix.genie.server.s3.archive.location");
+                    .getString("com.netflix.genie.server.s3.archive.location");
             if (StringUtils.isNotBlank(s3ArchiveLocation)) {
                 processBuilder.environment().put("S3_ARCHIVE_LOCATION", s3ArchiveLocation);
             }
@@ -399,9 +399,9 @@ public class JobManagerImpl implements JobManager {
     private String getGenieHome() throws GenieException {
         final String genieHome = ConfigurationManager
                 .getConfigInstance()
-                .getString("netflix.genie.server.sys.home");
+                .getString("com.netflix.genie.server.sys.home");
         if (StringUtils.isBlank(genieHome)) {
-            final String msg = "Property netflix.genie.server.sys.home is not set correctly";
+            final String msg = "Property com.netflix.genie.server.sys.home is not set correctly";
             LOG.error(msg);
             throw new GenieServerException(msg);
         }
