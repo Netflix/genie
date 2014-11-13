@@ -184,6 +184,10 @@ public class YarnJobManagerImpl extends JobManagerImpl {
             processEnv.put("HADOOP_HOME", hadoopHome);
         }
 
+        processEnv.put("CP_TIMEOUT",
+                ConfigurationManager.getConfigInstance()
+                        .getString("com.netflix.genie.server.hadoop.s3cp.timeout", "1800"));
+
         final String copyCommand =
                 ConfigurationManager.getConfigInstance()
                         .getString(COPY_COMMAND_KEY);
