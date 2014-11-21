@@ -367,6 +367,12 @@ public class JobManagerImpl implements JobManager {
             processBuilder.environment().put("JAVA_HOME", javaHome);
         }
 
+        // Set an ARN if one is available for role assumption with S3
+        final String arn = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.server.aws.iam.arn");
+        if (StringUtils.isNotBlank(arn)) {
+            processBuilder.environment().put("ARN", arn);
+        }
+
         // set the genie home
         final String genieHome = ConfigurationManager
                 .getConfigInstance()
