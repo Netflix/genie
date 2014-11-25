@@ -215,6 +215,11 @@ public class JobManagerImpl implements JobManager {
                         break;
                     } catch (IllegalThreadStateException e) {
                         LOG.info("Kill script not finished yet. Will retry");
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e1) {
+                            LOG.info("Sleep interrupted. Ignoring.");
+                        }
                     }
                 }
                 if (returnCode != 0) {
