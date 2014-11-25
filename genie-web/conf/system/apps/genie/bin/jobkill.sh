@@ -26,7 +26,6 @@ function executeWithRetry()
     do
         $@ && break
         n=$[$n+1]
-        sleep 1 
         echo "retrying command"
     done
     if [ $n == 3 ]; then

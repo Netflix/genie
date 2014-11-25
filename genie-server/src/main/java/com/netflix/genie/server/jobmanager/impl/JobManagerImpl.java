@@ -204,11 +204,23 @@ public class JobManagerImpl implements JobManager {
                 }
                 Process killProcessId = Runtime.getRuntime().exec(
                         genieHome + File.separator + "jobkill.sh " + processId);
-                int returnCode = killProcessId.exitValue();
+
+                int returnCode = 1;
+                int counter = 0;
+                while (counter < 3) {
+                    counter++;
+                    try {
+                        returnCode = killProcessId.exitValue();
+                        LOG.info("Kill script finished");
+                        break;
+                    } catch (IllegalThreadStateException e) {
+                        LOG.info("Kill script not finished yet. Will retry");
+                    }
+                }
                 if (returnCode != 0) {
                     throw new GenieServerException("Failed to kill the job");
                 }
-            } catch (final GenieException | IOException | IllegalThreadStateException e) {
+            } catch (final GenieException | IOException e) {
                 final String msg = "Failed to kill the job";
                 LOG.error(msg, e);
                 throw new GenieServerException(msg, e);
