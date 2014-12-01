@@ -124,8 +124,8 @@ public class JobMonitorImpl implements JobMonitor {
         this.jobService = jobService;
         this.genieNodeStatistics = genieNodeStatistics;
         this.config = ConfigurationManager.getConfigInstance();
-        this.maxStdoutSize = this.config.getLong("netflix.genie.job.max.stdout.size", null);
-        this.maxStderrSize = this.config.getLong("netflix.genie.job.max.stderr.size", null);
+        this.maxStdoutSize = this.config.getLong("com.netflix.genie.job.max.stdout.size", null);
+        this.maxStderrSize = this.config.getLong("com.netflix.genie.job.max.stderr.size", null);
 
         this.workingDir = null;
         this.proc = null;
@@ -310,18 +310,18 @@ public class JobMonitorImpl implements JobMonitor {
         LOG.debug("called");
         final Job job = this.jobService.getJob(this.jobId);
 
-        if (!this.config.getBoolean("netflix.genie.server.mail.enable", false)) {
+        if (!this.config.getBoolean("com.netflix.genie.server.mail.enable", false)) {
             LOG.warn("Email is disabled but user has specified an email address.");
             return false;
         }
 
         // Sender's email ID
-        String fromEmail = this.config.getString("netflix.genie.server.mail.smpt.from", "no-reply-genie@geniehost.com");
+        String fromEmail = this.config.getString("com.netflix.genie.server.mail.smpt.from", "no-reply-genie@geniehost.com");
         LOG.info("From email address to use to send email: "
                 + fromEmail);
 
         // Set the smtp server hostname. Use localhost as default
-        String smtpHost = this.config.getString("netflix.genie.server.mail.smtp.host", "localhost");
+        String smtpHost = this.config.getString("com.netflix.genie.server.mail.smtp.host", "localhost");
         LOG.debug("Email smtp server: "
                 + smtpHost);
 
@@ -334,14 +334,14 @@ public class JobMonitorImpl implements JobMonitor {
         // check whether authentication should be turned on
         Authenticator auth = null;
 
-        if (this.config.getBoolean("netflix.genie.server.mail.smtp.auth", false)) {
+        if (this.config.getBoolean("com.netflix.genie.server.mail.smtp.auth", false)) {
             LOG.debug("Email Authentication Enabled");
 
             properties.put("mail.smtp.starttls.enable", "true");
             properties.put("mail.smtp.auth", "true");
 
-            String userName = config.getString("netflix.genie.server.mail.smtp.user");
-            String password = config.getString("netflix.genie.server.mail.smtp.password");
+            String userName = config.getString("com.netflix.genie.server.mail.smtp.user");
+            String password = config.getString("com.netflix.genie.server.mail.smtp.password");
 
             if ((userName == null) || (password == null)) {
                 LOG.error("Authentication is enabled and username/password for smtp server is null");

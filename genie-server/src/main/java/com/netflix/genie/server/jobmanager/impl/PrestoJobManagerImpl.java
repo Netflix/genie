@@ -25,6 +25,7 @@ import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -46,8 +47,10 @@ import java.util.Map;
 public class PrestoJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(PrestoJobManagerImpl.class);
-    private static final String PRESTO_PROTOCOL_KEY = "netflix.genie.server.presto.protocol";
-    private static final String PRESTO_MASTER_DOMAIN = "netflix.genie.server.presto.master.domain";
+    private static final String PRESTO_PROTOCOL_KEY = "com.netflix.genie.server.job.manager.presto.protocol";
+    private static final String PRESTO_MASTER_DOMAIN = "com.netflix.genie.server.job.manager.presto.master.domain";
+    private static final String COPY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.cp";
+    private static final String MAKE_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.mkdir";
 
     /**
      * Constructor.
@@ -119,34 +122,43 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
         //Right now within netflix presto is run side by side with Hadoop EMR nodes so use Hadoop to copy
         //Files down from s3
 
+        //TODO: Will Hadoop home still be needed if switched to a script?
         // set the default hadoop home
         final String hadoopHome = ConfigurationManager
                 .getConfigInstance()
-                .getString("netflix.genie.server.hadoop.home");
+                .getString("com.netflix.genie.server.hadoop.home");
         if (hadoopHome == null || !new File(hadoopHome).exists()) {
-            final String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
+            final String msg = "Property com.netflix.genie.server.hadoop.home is not set correctly";
             LOG.error(msg);
             throw new GenieServerException(msg);
         }
         processEnv.put("HADOOP_HOME", hadoopHome);
 
-        // populate the CP timeout and other options. Yarn jobs would use
-        // hadoop fs -cp to copy files. Prepare the copy command with the combination
-        // and set the COPY_COMMAND environment variable
         processEnv.put("CP_TIMEOUT",
                 ConfigurationManager.getConfigInstance()
-                        .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
+                        .getString("com.netflix.genie.server.hadoop.s3cp.timeout", "1800"));
 
-        final String cpOpts = ConfigurationManager.getConfigInstance()
-                .getString("netflix.genie.server.hadoop.s3cp.opts", "");
-
-        final String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp -f";
+        final String copyCommand =
+                ConfigurationManager.getConfigInstance()
+                        .getString(COPY_COMMAND_KEY);
+        if (StringUtils.isBlank(copyCommand)) {
+            final String msg = "Required property " + COPY_COMMAND_KEY + " isn't set";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
         processEnv.put("COPY_COMMAND", copyCommand);
 
         // Force flag to overwrite required in Hadoop2
         processEnv.put("FORCE_COPY_FLAG", "-f");
 
-        final String mkdirCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -mkdir";
-        processEnv.put("MKDIR_COMMAND", mkdirCommand);
+        final String makeDirCommand =
+                ConfigurationManager.getConfigInstance()
+                        .getString(MAKE_DIRECTORY_COMMAND_KEY);
+        if (StringUtils.isBlank(makeDirCommand)) {
+            final String msg = "Required property " + MAKE_DIRECTORY_COMMAND_KEY + " isn't set";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
+        processEnv.put("MKDIR_COMMAND", makeDirCommand);
     }
 }

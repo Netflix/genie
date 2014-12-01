@@ -65,7 +65,7 @@ public final class NetUtil {
     public static String getArchiveURI(final String jobID) {
         LOG.debug("called for jobID: " + jobID);
         String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
-                .getString("netflix.genie.server.s3.archive.location");
+                .getString("com.netflix.genie.server.s3.archive.location");
         if ((s3ArchiveLocation != null) && (!s3ArchiveLocation.isEmpty())) {
             return s3ArchiveLocation + "/" + jobID;
         } else {
@@ -75,7 +75,7 @@ public final class NetUtil {
 
     /**
      * Return either the cloud or dc host name, depending on the datacenter. If
-     * the property netflix.genie.server.host is set, that value will always be
+     * the property com.netflix.genie.server.host is set, that value will always be
      * returned. If the property is not set, then the instance metadata will be
      * used in the cloud, or InetAddress.getLocalHost() will be used in the DC.
      *
@@ -87,7 +87,7 @@ public final class NetUtil {
 
         // check the fast property first
         String hostName = ConfigurationManager.getConfigInstance().getString(
-                "netflix.genie.server.host");
+                "com.netflix.genie.server.host");
         if (hostName != null && !hostName.isEmpty()) {
             return hostName;
         }

@@ -48,6 +48,8 @@ import java.util.Map;
 public class YarnJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(YarnJobManagerImpl.class);
+    private static final String COPY_COMMAND_KEY = "com.netflix.genie.server.job.manager.yarn.command.cp";
+    private static final String MAKE_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.yarn.command.mkdir";
 
     //TODO: Move to a property file
     /**
@@ -122,10 +124,10 @@ public class YarnJobManagerImpl extends JobManagerImpl {
                 + ConfigurationManager.getConfigInstance().getString("netflix.environment");
 
         final String lipstickUuidPropName = ConfigurationManager.getConfigInstance()
-                .getString("netflix.genie.server.lipstick.uuid.prop.name", "lipstick.uuid.prop.name");
+                .getString("com.netflix.genie.server.lipstick.uuid.prop.name", "lipstick.uuid.prop.name");
 
         final String lipstickUuidProp;
-        if (ConfigurationManager.getConfigInstance().getBoolean("netflix.genie.server.lipstick.enable", false)) {
+        if (ConfigurationManager.getConfigInstance().getBoolean("com.netflix.genie.server.lipstick.enable", false)) {
             lipstickUuidProp = lipstickUuidPropName + "=" + GENIE_JOB_ID;
         } else {
             lipstickUuidProp = "";
@@ -151,12 +153,12 @@ public class YarnJobManagerImpl extends JobManagerImpl {
             // try extract version first
             hadoopHome = ConfigurationManager
                     .getConfigInstance()
-                    .getString("netflix.genie.server.hadoop." + hadoopVersion + ".home");
+                    .getString("com.netflix.genie.server.hadoop." + hadoopVersion + ".home");
             // if not, trim to 3 most significant digits
             if (hadoopHome == null) {
                 hadoopVersion = StringUtil.trimVersion(hadoopVersion);
                 hadoopHome = ConfigurationManager.getConfigInstance()
-                        .getString("netflix.genie.server.hadoop." + hadoopVersion + ".home");
+                        .getString("com.netflix.genie.server.hadoop." + hadoopVersion + ".home");
             }
 
             if (hadoopHome == null || !new File(hadoopHome).exists()) {
@@ -173,32 +175,40 @@ public class YarnJobManagerImpl extends JobManagerImpl {
             // set the default hadoop home
             hadoopHome = ConfigurationManager
                     .getConfigInstance()
-                    .getString("netflix.genie.server.hadoop.home");
+                    .getString("com.netflix.genie.server.hadoop.home");
             if (hadoopHome == null || !new File(hadoopHome).exists()) {
-                final String msg = "Property netflix.genie.server.hadoop.home is not set correctly";
+                final String msg = "Property com.netflix.genie.server.hadoop.home is not set correctly";
                 LOG.error(msg);
                 throw new GenieServerException(msg);
             }
             processEnv.put("HADOOP_HOME", hadoopHome);
         }
 
-        // populate the CP timeout and other options. Yarn jobs would use
-        // hadoop fs -cp to copy files. Prepare the copy command with the combination
-        // and set the COPY_COMMAND environment variable
         processEnv.put("CP_TIMEOUT",
                 ConfigurationManager.getConfigInstance()
-                        .getString("netflix.genie.server.hadoop.s3cp.timeout", "1800"));
+                        .getString("com.netflix.genie.server.hadoop.s3cp.timeout", "1800"));
 
-        final String cpOpts = ConfigurationManager.getConfigInstance()
-                .getString("netflix.genie.server.hadoop.s3cp.opts", "");
-
-        final String copyCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -cp -f";
+        final String copyCommand =
+                ConfigurationManager.getConfigInstance()
+                        .getString(COPY_COMMAND_KEY);
+        if (StringUtils.isBlank(copyCommand)) {
+            final String msg = "Required property " + COPY_COMMAND_KEY + " isn't set";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
         processEnv.put("COPY_COMMAND", copyCommand);
 
         // Force flag to overwrite required in Hadoop2
         processEnv.put("FORCE_COPY_FLAG", "-f");
 
-        final String mkdirCommand = hadoopHome + "/bin/hadoop fs " + cpOpts + " -mkdir";
-        processEnv.put("MKDIR_COMMAND", mkdirCommand);
+        final String makeDirCommand =
+                ConfigurationManager.getConfigInstance()
+                        .getString(MAKE_DIRECTORY_COMMAND_KEY);
+        if (StringUtils.isBlank(makeDirCommand)) {
+            final String msg = "Required property " + MAKE_DIRECTORY_COMMAND_KEY + " isn't set";
+            LOG.error(msg);
+            throw new GenieServerException(msg);
+        }
+        processEnv.put("MKDIR_COMMAND", makeDirCommand);
     }
 }
