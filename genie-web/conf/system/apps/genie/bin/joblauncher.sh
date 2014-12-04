@@ -18,11 +18,13 @@
 #
 ##
 
-trap "{ archiveToS3; echo 'Job killed'; exit 211;}" SIGINT SIGTERM
+trap "{ archiveToS3; echo 'Job killed'; touch genie.done; exit 211;}" SIGINT SIGTERM
 
 function checkError {
     if [ "$?" -ne 0 ]; then
         archiveToS3
+        echo "Job Failed"
+        touch genie.done
         exit $1
     fi
 }
@@ -277,4 +279,5 @@ executeCommand "$@"
 archiveToS3
 
 echo "Done"
+touch genie.done
 exit 0
