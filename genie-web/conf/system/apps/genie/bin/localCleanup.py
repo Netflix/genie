@@ -90,8 +90,7 @@ def cleanupJobDirs(jobDir,numDays):
     pattern = re.compile('^.*genie\.done$')
     log("Cleaning up genie job dirs")
     # Find all job directories with any file not modified in the last n days
-    #findAllDirsCmd = ['find', jobDir, '-maxdepth', '1', '-mindepth', '1', '-mtime', "+%s" % numDays, '-type','d']
-    findAllDirsCmd = ['find', jobDir, '-maxdepth', '1', '-mindepth', '1', '-type','d']
+    findAllDirsCmd = ['find', jobDir, '-maxdepth', '1', '-mindepth', '1', '-mtime', "+%s" % numDays, '-type','d']
     p = Popen(findAllDirsCmd, close_fds=True, bufsize=1, stdout=PIPE)
     out,err = p.communicate()
  
