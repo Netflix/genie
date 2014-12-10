@@ -100,7 +100,12 @@ public class YarnJobManagerImpl extends JobManagerImpl {
         this.setupYarnProcess(processBuilder);
 
         // Launch the actual process
-        this.launchProcess(processBuilder);
+        this.launchProcess(
+                processBuilder,
+                ConfigurationManager
+                        .getConfigInstance()
+                        .getInt("com.netflix.genie.server.job.manager.yarn.sleeptime", 5000)
+        );
     }
 
     /**

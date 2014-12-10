@@ -132,37 +132,6 @@ public class TestCluster {
     }
 
     /**
-     * Test to make sure validation works and throws exception when no configs
-     * entered.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateClusterEmptyConfigs() throws GeniePreconditionException {
-        this.c = new Cluster(
-                NAME,
-                USER,
-                ClusterStatus.UP,
-                CLUSTER_TYPE,
-                new HashSet<String>(),
-                VERSION
-        );
-        this.c.onCreateOrUpdateCluster();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no configs
-     * entered.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateClusterNullConfigs() throws GeniePreconditionException {
-        this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, null, VERSION);
-        this.c.onCreateOrUpdateCluster();
-    }
-
-    /**
      * Make sure validation works on valid cluster.
      *
      * @throws GeniePreconditionException If any precondition isn't met.

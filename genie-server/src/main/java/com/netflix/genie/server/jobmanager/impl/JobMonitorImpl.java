@@ -68,9 +68,6 @@ public class JobMonitorImpl implements JobMonitor {
     private final ExecutionService xs;
     private final JobService jobService;
 
-    // interval to poll for process status
-    private static final int JOB_WAIT_TIME_MS = 5000;
-
     // interval to check status, and update in database if needed
     private static final int JOB_UPDATE_TIME_MS = 60000;
 
@@ -86,13 +83,13 @@ public class JobMonitorImpl implements JobMonitor {
     // the stdout for this job
     private File stdOutFile;
 
-    //stdout filename
+    // stdout filename
     private static final String STDOUT_FILENAME = "stdout";
 
     // the stderr for this job
     private File stdErrFile;
 
-    //stderr filename
+    // stderr filename
     private static final String STDERR_FILENAME = "stderr";
 
     // max specified stdout size
@@ -107,6 +104,8 @@ public class JobMonitorImpl implements JobMonitor {
 
     // Config Instance to get all properties
     private final AbstractConfiguration config;
+
+    private int sleepTime = 5000;
 
     /**
      * Constructor.
@@ -179,6 +178,17 @@ public class JobMonitorImpl implements JobMonitor {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setThreadSleepTime(int sleepTime) throws GenieException {
+        if (sleepTime < 1) {
+            throw new GeniePreconditionException("Sleep time was less than 1. Unable to sleep that little.");
+        }
+        this.sleepTime = sleepTime;
+    }
+
+    /**
      * The main run method for this thread - wait till it finishes, and manage
      * job state in DB.
      */
@@ -247,9 +257,9 @@ public class JobMonitorImpl implements JobMonitor {
      */
     private int waitForExit() throws GenieException {
         this.lastUpdatedTimeMS = System.currentTimeMillis();
-        while (isRunning()) {
+        while (this.isRunning()) {
             try {
-                Thread.sleep(JOB_WAIT_TIME_MS);
+                Thread.sleep(this.sleepTime);
             } catch (final InterruptedException e) {
                 LOG.error("Exception while waiting for job " + this.jobId
                         + " to finish", e);
