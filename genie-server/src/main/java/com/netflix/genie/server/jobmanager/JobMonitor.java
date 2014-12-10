@@ -50,7 +50,7 @@ public interface JobMonitor extends Runnable {
      * Set the amount of time, in milliseconds, to wait in between checks to the process for completion.
      *
      * @param sleepTime The time to wait in milliseconds
-     * @throws GenieException if precondition of sleepTime >= 1 isn't met.
+     * @throws GenieException if precondition of sleepTime greater than or equal to 1 isn't met.
      */
     void setThreadSleepTime(final int sleepTime) throws GenieException;
 }
