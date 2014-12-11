@@ -375,9 +375,6 @@ public class Cluster extends CommonEntityFields {
         if (StringUtils.isBlank(clusterType)) {
             builder.append("No cluster type entered and is required.\n");
         }
-        if (configs == null || configs.isEmpty()) {
-            builder.append("At least one configuration file is required for the cluster.\n");
-        }
 
         if (builder.length() > 0) {
             builder.insert(0, "Cluster configuration errors:\n");

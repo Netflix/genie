@@ -107,7 +107,12 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
         this.setupPrestoProcess(processBuilder);
 
         // Launch the actual process
-        this.launchProcess(processBuilder);
+        this.launchProcess(
+                processBuilder,
+                ConfigurationManager
+                        .getConfigInstance()
+                        .getInt("com.netflix.genie.server.job.manager.presto.sleeptime", 5000)
+        );
     }
 
     /**
@@ -118,21 +123,6 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
      */
     private void setupPrestoProcess(final ProcessBuilder processBuilder) throws GenieException {
         final Map<String, String> processEnv = processBuilder.environment();
-
-        //Right now within netflix presto is run side by side with Hadoop EMR nodes so use Hadoop to copy
-        //Files down from s3
-
-        //TODO: Will Hadoop home still be needed if switched to a script?
-        // set the default hadoop home
-        final String hadoopHome = ConfigurationManager
-                .getConfigInstance()
-                .getString("com.netflix.genie.server.hadoop.home");
-        if (hadoopHome == null || !new File(hadoopHome).exists()) {
-            final String msg = "Property com.netflix.genie.server.hadoop.home is not set correctly";
-            LOG.error(msg);
-            throw new GenieServerException(msg);
-        }
-        processEnv.put("HADOOP_HOME", hadoopHome);
 
         processEnv.put("CP_TIMEOUT",
                 ConfigurationManager.getConfigInstance()
@@ -147,9 +137,6 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
             throw new GenieServerException(msg);
         }
         processEnv.put("COPY_COMMAND", copyCommand);
-
-        // Force flag to overwrite required in Hadoop2
-        processEnv.put("FORCE_COPY_FLAG", "-f");
 
         final String makeDirCommand =
                 ConfigurationManager.getConfigInstance()

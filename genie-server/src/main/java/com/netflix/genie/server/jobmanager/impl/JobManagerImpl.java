@@ -176,7 +176,7 @@ public class JobManagerImpl implements JobManager {
         this.setupCommonProcess(processBuilder);
 
         // Launch the actual process
-        this.launchProcess(processBuilder);
+        this.launchProcess(processBuilder, 5000);
     }
 
     /**
@@ -259,9 +259,10 @@ public class JobManagerImpl implements JobManager {
      * Actually launch a process based on the process builder.
      *
      * @param processBuilder The process builder to use.
+     * @param sleepTime The time to sleep between checks of the job process status
      * @throws GenieException If any issue happens launching the process.
      */
-    protected void launchProcess(final ProcessBuilder processBuilder) throws GenieException {
+    protected void launchProcess(final ProcessBuilder processBuilder, final int sleepTime) throws GenieException {
         try {
             // launch job, and get process handle
             final Process proc = processBuilder.start();
@@ -272,6 +273,7 @@ public class JobManagerImpl implements JobManager {
             this.jobMonitor.setJob(this.job);
             this.jobMonitor.setProcess(proc);
             this.jobMonitor.setWorkingDir(this.jobDir);
+            this.jobMonitor.setThreadSleepTime(sleepTime);
             this.jobMonitorThread.start();
             this.jobService.setJobStatus(this.job.getId(), JobStatus.RUNNING, "Job is running");
             LOG.info("Successfully launched the job with PID = " + pid);
