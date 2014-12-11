@@ -1,14 +1,14 @@
 dependencies {
     compile project.parent.childProjects.get('genie-common')
     compile ('com.netflix.archaius:archaius-core:0.6.2')
-    compile ('com.netflix.karyon:karyon-core:1.0.26')
-    compile ('com.netflix.karyon:karyon-eureka:1.0.26')
-    compile ('com.netflix.karyon:karyon-extensions:1.0.26')
-    compile ('com.netflix.karyon:karyon-spi:1.0.26')
-    compile ('com.netflix.servo:servo-core:0.7.7')
-    compile ('com.sun.jersey:jersey-core:1.11')
-    compile ('com.sun.jersey:jersey-server:1.11')
-    compile ('com.sun.jersey.contribs:jersey-guice:1.11')
+    compile ('com.netflix.karyon:karyon-core:1.0.27')
+    compile ('com.netflix.karyon:karyon-eureka:1.0.27')
+    compile ('com.netflix.karyon:karyon-extensions:1.0.27')
+    compile ('com.netflix.karyon:karyon-spi:1.0.27')
+    compile ('com.netflix.servo:servo-core:0.7.9')
+    compile ('com.sun.jersey:jersey-core:1.17.1')
+    compile ('com.sun.jersey:jersey-server:1.17.1')
+    compile ('com.sun.jersey.contribs:jersey-guice:1.17.1')
     compile ('commons-collections:commons-collections:3.2.1')
     compile ('commons-httpclient:commons-httpclient:3.1')
     compile ('javax.mail:mail:1.4.4')
@@ -17,7 +17,7 @@ dependencies {
     compile ('org.springframework.data:spring-data-jpa:1.6.0.RELEASE')
     compile ('org.springframework:spring-web:3.2.9.RELEASE')
     compile ('com.google.inject.extensions:guice-spring:3.0')
-    compile ('com.sun.jersey.contribs:jersey-spring:1.11') {
+    compile ('com.sun.jersey.contribs:jersey-spring:1.17.1') {
         exclude group: 'org.springframework', module: 'spring'
         exclude group: 'org.springframework', module: 'spring-core'
         exclude group: 'org.springframework', module: 'spring-web'
