@@ -3,7 +3,7 @@ task test(overwrite:true)
 
 dependencies {
     testCompile project(':genie-web')
-    testCompile 'com.netflix.karyon:karyon-extensions-testsuite:1.0.25'
+    testCompile 'com.netflix.karyon:karyon-extensions-testsuite:1.0.27'
     testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.1.0.Final'
     testCompile 'org.jboss.shrinkwrap:shrinkwrap-impl-base:1.1.2'
     testCompile 'org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven:2.0.0'
