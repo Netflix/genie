@@ -67,7 +67,7 @@ define([
                 type: 'PUT',
                 headers: {'content-type':'application/json', 'Accept':'application/json'},
                 url: 'genie/v2/config/clusters/'+self.id(),
-                data: JSON.stringify({clusters: {user: self.user(), status: self.status()}})
+                data: JSON.stringify({status: self.status()})
             }).done(function(data) {
                 self.objStatus('ready');
                 location.reload(true);
@@ -100,7 +100,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/clusters?status=UP&status=OUT_OF_SERVICE',
+                url:  'genie/v2/config/clusters?status=UP&status=OUT_OF_SERVICE'
             }).done(function(data) {
             	if (data instanceof Array) {
                     _.each(data, function(clusterObj, index) {
