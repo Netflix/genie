@@ -98,7 +98,8 @@ public class Application extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "the tags associated with this application",
-            required = true)
+            required = true
+    )
     private Set<String> tags;
 
     /**
@@ -141,7 +142,6 @@ public class Application extends CommonEntityFields {
     @PreUpdate
     protected void onCreateOrUpdateApplication() throws GeniePreconditionException {
         this.validate(this.status, null);
-        // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<>();
         }
@@ -243,12 +243,9 @@ public class Application extends CommonEntityFields {
     /**
      * Gets the tags allocated to this application.
      *
-     * @return the tags as an unmodifiable list
+     * @return the tags
      */
     public Set<String> getTags() {
-        if (this.tags == null) {
-            this.tags = new HashSet<>();
-        }
         return this.tags;
     }
 

@@ -63,7 +63,7 @@ public class TestCluster {
         Assert.assertNull(this.c.getConfigs());
         Assert.assertNull(this.c.getName());
         Assert.assertNull(this.c.getStatus());
-        Assert.assertNotNull(this.c.getTags());
+        Assert.assertNull(this.c.getTags());
         Assert.assertNull(this.c.getUser());
         Assert.assertNull(this.c.getVersion());
     }
@@ -81,7 +81,7 @@ public class TestCluster {
         Assert.assertEquals(this.configs, this.c.getConfigs());
         Assert.assertEquals(NAME, this.c.getName());
         Assert.assertEquals(ClusterStatus.UP, this.c.getStatus());
-        Assert.assertNotNull(this.c.getTags());
+        Assert.assertNull(this.c.getTags());
         Assert.assertEquals(USER, this.c.getUser());
         Assert.assertEquals(VERSION, this.c.getVersion());
     }
@@ -180,7 +180,7 @@ public class TestCluster {
      */
     @Test
     public void testSetTags() throws GeniePreconditionException {
-        Assert.assertNotNull(this.c.getTags());
+        Assert.assertNull(this.c.getTags());
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("sla");

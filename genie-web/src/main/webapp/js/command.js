@@ -64,7 +64,7 @@ define([
                 type: 'PUT',
                 headers: {'content-type':'application/json', 'Accept':'application/json'},
                 url: 'genie/v2/config/commands/'+self.id(),
-                data: JSON.stringify({commands: {user: self.user(), status: self.status()}})
+                data: JSON.stringify({status: self.status()})
             }).done(function(data) {
                 self.objStatus('ready');
                 location.reload(true);
@@ -97,7 +97,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/commands?status=ACTIVE',
+                url:  'genie/v2/config/commands?status=ACTIVE'
             }).done(function(data) {
             	if (data instanceof Array) {
                     _.each(data, function(commandObj, index) {

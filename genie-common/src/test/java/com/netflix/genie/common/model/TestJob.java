@@ -188,7 +188,7 @@ public class TestJob {
      */
     @Test
     public void testOnCreateOrUpdateJobWithNotNullTags() throws GeniePreconditionException {
-        Assert.assertTrue(this.job.getTags().isEmpty());
+        Assert.assertNull(this.job.getTags());
         this.job.onCreateAuditable();
         this.job.onCreateOrUpdateCommonEntityFields();
         this.job.onCreateOrUpdateJob();
@@ -666,7 +666,7 @@ public class TestJob {
      */
     @Test
     public void testSetGetTags() {
-        Assert.assertTrue(this.job.getTags().isEmpty());
+        Assert.assertNull(this.job.getTags());
         final Set<String> tags = new HashSet<>();
         tags.add("someTag");
         tags.add("someOtherTag");

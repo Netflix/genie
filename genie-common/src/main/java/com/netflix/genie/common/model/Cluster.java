@@ -147,7 +147,7 @@ public class Cluster extends CommonEntityFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateCluster() throws GeniePreconditionException {
-        validate(this.status, this.clusterType, this.configs, null);
+        validate(this.status, this.clusterType, null);
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<>();
@@ -225,12 +225,9 @@ public class Cluster extends CommonEntityFields {
     /**
      * Gets the tags allocated to this cluster.
      *
-     * @return the tags as an unmodifiable list
+     * @return the tags
      */
     public Set<String> getTags() {
-        if (this.tags == null) {
-            this.tags = new HashSet<>();
-        }
         return this.tags;
     }
 
@@ -349,7 +346,8 @@ public class Cluster extends CommonEntityFields {
         this.validate(
                 this.status,
                 this.clusterType,
-                this.configs, error);
+                error
+        );
     }
 
     /**
@@ -357,13 +355,11 @@ public class Cluster extends CommonEntityFields {
      *
      * @param status      The status of the cluster
      * @param clusterType The type of cluster
-     * @param configs     The configuration files for the cluster
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     private void validate(
             final ClusterStatus status,
             final String clusterType,
-            final Set<String> configs,
             final String error) throws GeniePreconditionException {
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotBlank(error)) {
