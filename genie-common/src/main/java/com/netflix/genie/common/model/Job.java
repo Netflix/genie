@@ -1053,12 +1053,9 @@ public class Job extends CommonEntityFields {
     /**
      * Gets the tags allocated to this job.
      *
-     * @return the tags as a list
+     * @return the tags
      */
     public Set<String> getTags() {
-        if (this.tags == null) {
-            this.tags = new HashSet<>();
-        }
         return this.tags;
     }
 

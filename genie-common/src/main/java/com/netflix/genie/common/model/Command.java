@@ -105,7 +105,8 @@ public class Command extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "All the tags associated with this command",
-            required = true)
+            required = true
+    )
     private Set<String> tags;
 
     /**
@@ -270,12 +271,9 @@ public class Command extends CommonEntityFields {
     /**
      * Gets the tags allocated to this command.
      *
-     * @return the tags as an unmodifiable list
+     * @return the tags
      */
     public Set<String> getTags() {
-        if (this.tags == null) {
-            this.tags = new HashSet<>();
-        }
         return this.tags;
     }
 
