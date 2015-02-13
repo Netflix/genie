@@ -26,7 +26,7 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 setup(
     name='nflx-genie-client',
 
-    version='2.0.0',
+    version='2.1.0',
 
     author='Netflix Inc.',
 
