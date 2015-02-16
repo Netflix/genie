@@ -44,10 +44,13 @@ subprojects {
     }
     test {
         jacoco {
-            excludes = ['com.netflix.genie.common.model.*_']
+            excludes = ['com/netflix/genie/common/model/*_*']
         }
     }
     jacocoTestReport {
+        doFirst {
+            classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(['com/netflix/genie/common/model/*_*'])
+        }
         reports {
             xml.enabled = true
         }
