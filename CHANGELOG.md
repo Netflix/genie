@@ -1,32 +1,39 @@
-2.0.0
-_____
+# 2.1.0
+
+See issue report [here](https://github.com/Netflix/genie/milestones/2.1.0)
+
+# 2.0.0
+
 * Full 2.0.0 release
 
-1.0.0
-______
+# 1.0.0
+
 Upping the Version to 1.0 to start the versioning of Genie2 from 2.0.0 version number.
 
-0.25
--------------
+# 0.25
+
 * General Improvements 
 
-0.24
-----
-Enhancements:
-* Job search using cluster name and ID for web console: https://github.com/Netflix/genie/issues/51
-* Getting rid of jersey-bundle dependency: https://github.com/Netflix/genie/issues/52
+# 0.24
 
-0.23
-----
-Enhancements:
+## Enhancements:
+
+* Job search using cluster name and ID for web console [#51](https://github.com/Netflix/genie/issues/51)å
+* Getting rid of jersey-bundle dependency [#52](https://github.com/Netflix/genie/issues/52)
+
+# 0.23
+
+## Enhancements:
+
 * Upgraded ribbon client: https://github.com/Netflix/genie/issues/45
 * Patterns for cluster name/id searches: https://github.com/Netflix/genie/issues/46
 
-Bug fixes:
-* Issue #3: https://github.com/Netflix/genie/commit/54833b313a87afa3083f767003b1017de815890c
+## Bug fixes:
 
-0.22
-----
+* Issue [#3](https://github.com/Netflix/genie/commit/54833b313a87afa3083f767003b1017de815890c)
+
+# 0.22
+
 Enhancements:
 * Email notifications for jobs: https://github.com/Netflix/genie/issues/3
 * Bootstrap action for EMR: https://github.com/Netflix/genie/issues/9
@@ -47,8 +54,8 @@ Bug fixes:
 * NPE when clients send null jobInfo during job submission: https://github.com/Netflix/genie/issues/40
 * Client connection leak: https://github.com/Netflix/genie/issues/43
 
-0.21
-----
+# 0.21
+
 Enhancements:
 * Optional limits for stdout/stderr: https://github.com/Netflix/genie/issues/8
 * Updated Genie web console: https://github.com/Netflix/genie/issues/14
@@ -58,6 +65,5 @@ Bug fixes:
 * Hadoop job failure if Hive/Pig properties aren't set: https://github.com/Netflix/genie/issues/11
 * NoSuchElementException if netflix.genie.job.max.stdout.size is not set: https://github.com/Netflix/genie/issues/12
 
-0.20
-----
+# 0.20
 Genie OSS release

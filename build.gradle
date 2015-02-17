@@ -2,7 +2,6 @@ plugins {
     id 'nebula.netflixoss' version '2.2.7'
 }
 
-// Change if github project name is not the same as the root project's name
 ext.githubProjectName = rootProject.name
 
 apply plugin: 'java'
@@ -30,23 +29,34 @@ subprojects {
         mavenLocal()
     }
 
+    dependencies {
+        compile 'org.apache.commons:commons-lang3:3.2.1'
+        compile 'org.slf4j:slf4j-log4j12:1.7.0'
+
+        testCompile 'junit:junit:4.11'
+        testCompile 'org.mockito:mockito-core:1.9.5'
+    }
+
     checkstyle {
         ignoreFailures = true 
         configFile = new File(project.parent.projectDir, 'codequality/checkstyle.xml')
     }
+
     findbugs {
-        toolVersion = '3.0.0'
         ignoreFailures = true
     }
+
     tasks.withType(Pmd) {
         reports.html.enabled true
         ignoreFailures = true
     }
+
     test {
         jacoco {
             excludes = ['com/netflix/genie/common/model/*_*']
         }
     }
+
     jacocoTestReport {
         doFirst {
             classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(['com/netflix/genie/common/model/*_*'])
