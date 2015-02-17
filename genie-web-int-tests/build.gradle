@@ -2,7 +2,12 @@
 task test(overwrite:true)
 
 dependencies {
+    compile 'org.apache.commons:commons-lang3:3.2.1'
+    compile 'org.slf4j:slf4j-log4j12:1.7.0'
+
     testCompile project(':genie-web')
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'com.netflix.karyon:karyon-extensions-testsuite:1.0.27'
     testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.1.0.Final'
     testCompile 'org.jboss.shrinkwrap:shrinkwrap-impl-base:1.1.2'
