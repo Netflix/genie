@@ -38,7 +38,7 @@ Genie builds are hosted on CloudBees [here](https://netflixoss.ci.cloudbees.com/
 
 ## Support
 
-Please use the [Google Group](https://groups.google.com/d/forum/genie-hadoop) for general questions and discussion.
+Please use the [Google Group](https://groups.google.com/d/forum/genieoss) for general questions and discussion.
 
 ## Issues
 
