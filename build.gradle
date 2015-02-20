@@ -14,6 +14,10 @@ allprojects {
     }
 }
 
+nebulaRelease {
+    addReleaseBranchPattern(/(release(-|\/))?\d+(\.\d+)?\.(x|\d+)/)
+}
+
 subprojects {
     apply plugin: 'nebula.netflixoss'
     apply plugin: 'java'
