@@ -2,7 +2,7 @@
 
 ##
 #
-#  Copyright 2013 Netflix, Inc.
+#  Copyright 2015 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -18,22 +18,6 @@
 #
 ##
 
-function executeWithRetry()
-{
-    echo "Trying to execute command: [$@]"
-    n=0
-    until [ $n -ge 3 ]
-    do
-        $@ && break
-        n=$[$n+1]
-        echo "retrying command"
-    done
-    if [ $n == 3 ]; then
-        echo "Failed to execute command"
-        exit 1 
-    fi
-}
-
 # basic error checking
 if [[ $# != 1 ]]; then
 	echo "Incorrect number of arguments"
@@ -45,16 +29,16 @@ fi
 parent_pid=$1
 
 # pause the parent so it doesn't trigger any retries
-executeWithRetry "kill -STOP $parent_pid"
+kill -STOP $parent_pid
 
 # kill all the children
-executeWithRetry "pkill -P $parent_pid"
+pkill -P $parent_pid
 
 # now kill the parent - but it won't be killed yet since it is paused
-executeWithRetry "kill $parent_pid"
+kill $parent_pid
 
 # continue parent, this will kill it - and the trap will ensure that files are archived to S3
-executeWithRetry "kill -CONT $parent_pid"
+kill -CONT $parent_pid
 
 echo "Done"
 exit 0

@@ -30,7 +30,8 @@ function checkError {
 }
 
 function copyFiles {
-    SOURCE=$1
+    # Replace the comma's (expected with internal fs.py script) with spaces (expected by Hadoop fs command)
+    SOURCE=$(echo "$1" | sed 's/,/ /g')
     DESTINATION=$2
 
     # number of retries for s3cp
@@ -66,8 +67,159 @@ function copyFiles {
     return $retVal
 }
 
-function executeCommand {
+function setupCluster {
+    if [ -n "$S3_CLUSTER_CONF_FILES" ]; then
+        echo "$(date +"%F %T.%3N") Copying cluster Config files ..."
+        copyFiles "$S3_CLUSTER_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 206
+        echo "$(date +"%F %T.%3N") Copied cluster config files"
+        echo $'\n'
+    fi
 
+    return 0
+}
+
+function setupApplication {
+    if [ -n "$S3_APPLICATION_JAR_FILES" ]; then
+        echo "$(date +"%F %T.%3N") Copying application jar files ..."
+        copyFiles "$S3_APPLICATION_JAR_FILES" "file://$CURRENT_JOB_JAR_DIR"/
+        checkError 209
+        echo "$(date +"%F %T.%3N") Copied application jars files"
+    fi
+
+    if [ -n "$APPLICATION_ENV_FILE" ]
+    then
+        echo "$(date +"%F %T.%3N") Copy down and Source Application Env File"
+        copyFiles "$APPLICATION_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 205
+        APP_FILENAME=`basename $APPLICATION_ENV_FILE`
+        echo "$(date +"%F %T.%3N") App Env Filename: $APP_FILENAME"
+        source "$CURRENT_JOB_CONF_DIR/$APP_FILENAME"
+        checkError 205
+        echo "$(date +"%F %T.%3N") Application Name = $APPNAME"
+    fi
+
+    if [ -n "$S3_APPLICATION_CONF_FILES" ]; then
+        echo "$(date +"%F %T.%3N") Copying application Config files ..."
+        copyFiles "$S3_APPLICATION_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 208
+        echo "$(date +"%F %T.%3N") Copied application config files"
+        echo $'\n'
+    fi
+
+    return 0
+}
+
+function setupCommand {
+    if [ -n "$COMMAND_ENV_FILE" ]
+    then
+        echo "$(date +"%F %T.%3N") Copy down and Source Command Env File"
+        copyFiles "$COMMAND_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 205
+        COMMAND_FILENAME=`basename $COMMAND_ENV_FILE`
+        echo "$(date +"%F %T.%3N") Command Env Filename: $COMMAND_FILENAME"
+        source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME"
+        checkError 205
+        echo "$(date +"%F %T.%3N") Command Name=$CMDNAME"
+    fi
+
+    if [ -n "$S3_COMMAND_CONF_FILES" ]; then
+        echo "$(date +"%F %T.%3N") Copying command Config files ..."
+        copyFiles "$S3_COMMAND_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 207
+        echo "$(date +"%F %T.%3N") Copied command config files"
+        echo $'\n'
+    fi
+
+    return 0
+}
+
+function setupJob {
+    if [ -n "$JOB_ENV_FILE" ]
+    then
+        echo "$(date +"%F %T.%3N") Copy down and Source Job File"
+        copyFiles "$JOB_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 205
+        JOB_FILENAME=`basename $JOB_ENV_FILE`
+        echo "$(date +"%F %T.%3N") Job Env Filename: $JOB_FILENAME"
+        source "$CURRENT_JOB_CONF_DIR/$JOB_FILENAME"
+        checkError 205
+        echo "$(date +"%F %T.%3N") Job Name = $JOBNAME"
+    fi
+
+    echo "$(date +"%F %T.%3N") Copying job dependency files: $JOB_FILE_DEPENDENCIES"
+    # only copy file dependencies if they exist
+    if [ "$CURRENT_JOB_FILE_DEPENDENCIES" != "" ]
+    then
+        copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "file://$CURRENT_JOB_WORKING_DIR"
+        checkError 210
+        echo "$(date +"%F %T.%3N") Copied job dependency files"
+        echo $'\n'
+    fi
+
+    return 0
+}
+
+function updateCoreSiteXml {
+    # set the following variables
+    # genie.job.id, netflix.environment, lipstick.uuid.prop.name from CORE_SITE_XML_ARGS
+    # set dataoven.gateway.type genie
+    # dataoven.job.id
+    kvarr=$(echo $CORE_SITE_XML_ARGS | tr ";" "\n")
+    for item in $kvarr
+    do
+        key=$(echo $item | awk -F'=' '{print $1}')
+        value=$(echo $item | awk -F'=' '{print $2}')
+        appendKeyValueToCoreSite $key $value
+    done
+    appendKeyValueToCoreSite "genie.version" "2"
+    return 0
+}
+
+function appendKeyValueToCoreSite {
+    echo "$(date +"%F %T.%3N") Appending $1/$2 to core-site.xml as key/value pair."
+    KEY=$1
+    VALUE=$2
+    SEARCH_PATTERN="</configuration>"
+    REPLACE_PATTERN="<property><name>$KEY</name><value>$VALUE</value></property>\n&"
+    sed -i "s|$SEARCH_PATTERN|$REPLACE_PATTERN|" $CURRENT_JOB_CONF_DIR/core-site.xml
+}
+
+function archiveToS3 {
+    # if the s3 archive location is not set, return immediately
+    if [ "$S3_ARCHIVE_LOCATION" == "" ]
+    then
+        echo "$(date +"%F %T.%3N") Not archiving files in working directory"
+        return
+    fi
+
+    S3_PREFIX=$S3_ARCHIVE_LOCATION/`basename $PWD`
+    echo "$(date +"%F %T.%3N") Archiving all files in working directory to $S3_PREFIX"
+
+    # find the files to copy
+    SOURCE=`find . -maxdepth 2 -type f | grep -v conf`
+    TARBALL="logs.tar.gz"
+    tar -czf $TARBALL $SOURCE
+
+    # if it fails to create tarball, just move on
+    if [ "$?" -ne 0 ]; then
+        echo "$(date +"%F %T.%3N") Failed to archive logs to tarball - but moving on"
+        return
+    fi
+
+    # create a directory first
+    $MKDIR_COMMAND $S3_PREFIX
+
+    # copy over the logs to S3
+    copyFiles "file://$PWD/$TARBALL" "$S3_PREFIX/$TARBALL"
+
+    # if it fails, just move on
+    if [ "$?" -ne 0 ]; then
+        echo "$(date +"%F %T.%3N") Failed to archive logs to S3 - but moving on"
+    fi
+}
+
+function executeCommand {
     # Start Non-Generic Code 
     # if HADOOP_HOME is set assume Yarn Job and copy remaining
     # conf files from its conf. 
@@ -81,52 +233,11 @@ function executeCommand {
 
     # End Non-Generic Code
 
-    # Setting Cluster, Command and Application Env Variables if specifed
-    echo "$(date +"%F %T.%3N") Setting env variables by sourcing env files for resources"
-    setEnvVariables
-    checkError 205
-    echo "$(date +"%F %T.%3N") Done setting env variables"
-    echo $'\n'
-
-    # Assuming cluster config files HAVE to be specified
-    echo "$(date +"%F %T.%3N") Copying cluster Config files ..."
-    copyFiles "$S3_CLUSTER_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-    checkError 206
-    echo "$(date +"%F %T.%3N") Copied cluster config files"
-    echo $'\n'
-    
-    if [ -n "$S3_COMMAND_CONF_FILES" ]; then
-        echo "$(date +"%F %T.%3N") Copying command Config files ..."
-        copyFiles "$S3_COMMAND_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-        checkError 207
-        echo "$(date +"%F %T.%3N") Copied command config files"
-        echo $'\n'
-    fi
-    
-    if [ -n "$S3_APPLICATION_CONF_FILES" ]; then
-        echo "$(date +"%F %T.%3N") Copying application Config files ..."
-        copyFiles "$S3_APPLICATION_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-        checkError 208
-        echo "$(date +"%F %T.%3N") Copied application config files"
-        echo $'\n'
-    fi
-
-    if [ -n "$S3_APPLICATION_JAR_FILES" ]; then
-        echo "$(date +"%F %T.%3N") Copying application jar files ..."
-        copyFiles "$S3_APPLICATION_JAR_FILES" "file://$CURRENT_JOB_JAR_DIR"/
-        checkError 209
-        echo "$(date +"%F %T.%3N") Copied application jars files"
-    fi
-
-    echo "$(date +"%F %T.%3N") Copying job dependency files: $JOB_FILE_DEPENDENCIES" 
-    # only copy file dependencies if they exist 
-    if [ "$CURRENT_JOB_FILE_DEPENDENCIES" != "" ]
-    then
-        copyFiles "$CURRENT_JOB_FILE_DEPENDENCIES" "file://$CURRENT_JOB_WORKING_DIR"
-        checkError 210
-        echo "$(date +"%F %T.%3N") Copied job dependency files"
-        echo $'\n'
-    fi
+    # Setup all necessary parts
+    setupApplication
+    setupCommand
+    setupCluster
+    setupJob
 
     # If core site xml env variable is set, we add all the variables
     # we want to add to yarn job execution there. 
@@ -142,101 +253,6 @@ function executeCommand {
     echo "$(date +"%F %T.%3N") Executing CMD: $CMD $@"
     $CMD "$@" 1>$CURRENT_JOB_WORKING_DIR/stdout.log 2>$CURRENT_JOB_WORKING_DIR/stderr.log
     checkError 213
-}
-
-function updateCoreSiteXml {
-    
-    # set the following variables
-    # genie.job.id, netflix.environment, lipstick.uuid.prop.name from CORE_SITE_XML_ARGS
-    # set dataoven.gateway.type genie
-    # dataoven.job.id
-    kvarr=$(echo $CORE_SITE_XML_ARGS | tr ";" "\n")
-    for item in $kvarr
-    do
-        key=$(echo $item | awk -F'=' '{print $1}')
-        value=$(echo $item | awk -F'=' '{print $2}')
-        appendKeyValueToCoreSite $key $value
-    done
-    appendKeyValueToCoreSite "genie.version" "2" 
-return 0
-}
-
-function appendKeyValueToCoreSite {
-
-    echo "$(date +"%F %T.%3N") Appending $1/$2 to core-site.xml as key/value pair."
-    KEY=$1
-    VALUE=$2
-    SEARCH_PATTERN="</configuration>"
-    REPLACE_PATTERN="<property><name>$KEY</name><value>$VALUE</value></property>\n&"
-    sed -i "s|$SEARCH_PATTERN|$REPLACE_PATTERN|" $CURRENT_JOB_CONF_DIR/core-site.xml
-}
-
-function setEnvVariables {
-    
-    if [ -n "$APPLICATION_ENV_FILE" ]
-    then
-        echo "$(date +"%F %T.%3N") Copy down and Source Application Env File"
-        copyFiles "$APPLICATION_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        APP_FILENAME=`basename $APPLICATION_ENV_FILE`
-        echo "$(date +"%F %T.%3N") App Env Filename: $APP_FILENAME"
-        source "$CURRENT_JOB_CONF_DIR/$APP_FILENAME" 
-        echo "$(date +"%F %T.%3N") Application Name = $APPNAME"
-    fi
-
-    if [ -n "$COMMAND_ENV_FILE" ]
-    then
-        echo "$(date +"%F %T.%3N") Copy down and Source Command Env File"
-        copyFiles "$COMMAND_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        COMMAND_FILENAME=`basename $COMMAND_ENV_FILE`
-        echo "$(date +"%F %T.%3N") Command Env Filename: $COMMAND_FILENAME"
-        source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME" 
-        echo "$(date +"%F %T.%3N") Command Name=$CMDNAME"
-    fi
-
-    if [ -n "$JOB_ENV_FILE" ]
-    then
-        echo "$(date +"%F %T.%3N") Copy down and Source Job File"
-        copyFiles "$JOB_ENV_FILE" "file://$CURRENT_JOB_CONF_DIR"/
-        JOB_FILENAME=`basename $JOB_ENV_FILE`
-        echo "$(date +"%F %T.%3N") Job Env Filename: $JOB_FILENAME"
-        source "$CURRENT_JOB_CONF_DIR/$JOB_FILENAME" 
-        echo "$(date +"%F %T.%3N") Job Name = $JOBNAME"
-    fi
-    return 0
-}
-
-function archiveToS3 {
-    # if the s3 archive location is not set, return immediately
-    if [ "$S3_ARCHIVE_LOCATION" == "" ]
-    then
-        echo "$(date +"%F %T.%3N") Not archiving files in working directory"
-        return
-    fi
-
-    S3_PREFIX=$S3_ARCHIVE_LOCATION/`basename $PWD`
-    echo "$(date +"%F %T.%3N") Archiving all files in working directory to $S3_PREFIX"
-    
-    # find the files to copy
-    SOURCE=`find . -maxdepth 2 -type f | grep -v conf`
-    TARBALL="logs.tar.gz"
-    tar -czf $TARBALL $SOURCE 
-    
-    # if it fails to create tarball, just move on
-    if [ "$?" -ne 0 ]; then
-        echo "$(date +"%F %T.%3N") Failed to archive logs to tarball - but moving on"
-        return
-    fi
-        
-    # create a directory first
-    $MKDIR_COMMAND $S3_PREFIX
-
-    # copy over the logs to S3
-    copyFiles "file://$PWD/$TARBALL" "$S3_PREFIX"
-    
-    # if it fails, just move on
-    if [ "$?" -ne 0 ]; then
-        echo "$(date +"%F %T.%3N") Failed to archive logs to S3 - but moving on"
-    fi
 }
 
 ARGS=$#
@@ -266,11 +282,11 @@ echo "$(date +"%F %T.%3N") Job conf directory created"
 echo $'\n'
 
 # Uncomment the following if you want Genie to create users if they don't exist already
-#echo "$(date +"%F %T.%3N") Create user.group $USER_NAME.$GROUP_NAME, if it doesn't exist already"
-#sudo groupadd $GROUP_NAME
-#sudo useradd $USER_NAME -g $GROUP_NAME
-#echo "$(date +"%F %T.%3N") User and Group created"
-#echo $'\n'
+echo "$(date +"%F %T.%3N") Create user.group $USER_NAME.$GROUP_NAME, if it doesn't exist already"
+sudo groupadd $GROUP_NAME
+sudo useradd $USER_NAME -g $GROUP_NAME
+echo "$(date +"%F %T.%3N") User and Group created"
+echo $'\n'
 
 executeCommand "$@"
 archiveToS3

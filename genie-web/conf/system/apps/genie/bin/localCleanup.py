@@ -2,7 +2,7 @@
 
 ##
 #
-#  Copyright 2013 Netflix, Inc.
+# Copyright 2015 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@
 
 import datetime
 import glob
-import os
 from subprocess import *
 import re
 import subprocess
@@ -39,12 +38,12 @@ import threading
 
 # for entries that cover overlapping sets of files, their relative order is important
 dirsToClean = (
-   # dirGlob, maxDepth, fileNamePattern, compressAfterDays, removeAfterDays
-    ('/mnt/logs/apache/archive',        None,   None,       None,   7),
-    ('/mnt/logs/tomcat/archive',        None,   None,       None,   7),
-    ('/mnt/logs/genie',                 None,   None,       None,   3),
-    ('/mnt/var/lib/hadoop/tmp',         None,   None,       None,   3),
-    ('/mnt/logs/hadoop',                None,   None,       None,   3),
+    # dirGlob, maxDepth, fileNamePattern, compressAfterDays, removeAfterDays
+    ('/mnt/logs/apache/archive', None, None, None, 7),
+    ('/mnt/logs/tomcat/archive', None, None, None, 7),
+    ('/mnt/logs/genie', None, None, None, 3),
+    ('/mnt/var/lib/hadoop/tmp', None, None, None, 3),
+    ('/mnt/logs/hadoop', None, None, None, 3),
 )
 
 
@@ -73,44 +72,46 @@ def runFind(dir, maxDepth, fileNamePattern, days, execParams):
         '-type', 'f',
         '-daystart', '-mtime', '+%s' % days,
         '(',
-        '-exec', 'lsof', '{}', ';',
+        '-exec', '/usr/sbin/lsof', '{}', ';',
         '-o',
         '-exec',
-    ]
+        ]
     cmd += execParams
     cmd += [
         ';',
         ')',
-    ]
+        ]
 
     log('Executing: %s', ' '.join(cmd))
     subprocess.check_call(cmd, bufsize=1, close_fds=True)
 
-def cleanupJobDirs(jobDir,numDays):
+
+def cleanupJobDirs(jobDir, numDays):
     pattern = re.compile('^.*genie\.done$')
     log("Cleaning up genie job dirs")
     # Find all job directories with any file not modified in the last n days
-    findAllDirsCmd = ['find', jobDir, '-maxdepth', '1', '-mindepth', '1', '-mtime', "+%s" % numDays, '-type','d']
+    findAllDirsCmd = ['find', jobDir, '-maxdepth', '1', '-mindepth', '1', '-mtime', "+%s" % numDays, '-type', 'd']
     p = Popen(findAllDirsCmd, close_fds=True, bufsize=1, stdout=PIPE)
-    out,err = p.communicate()
- 
+    out, err = p.communicate()
+
     # For each directory search for genie.done file. If found delete
     for dir in out.splitlines():
-        log( "Procesing Dir %s" % dir)
+        log("Procesing Dir %s" % dir)
         findDoneFileCmd = ['find', dir, '-name', 'genie.done']
         p = Popen(findDoneFileCmd, close_fds=True, bufsize=1, stdout=PIPE)
-        out,err = p.communicate()
+        out, err = p.communicate()
         if pattern.match(out):
             print "Found Done File. Deleting dir %s" % dir
             rmCmd = ['rm', '-rf', dir]
             p = Popen(rmCmd, close_fds=True, bufsize=1, stdout=PIPE)
-            ret = p.wait() 
-            if (ret == 0):
+            ret = p.wait()
+            if ret == 0:
                 log("Deleted directory")
             else:
                 log("Could not delete directory.Will Ignore.")
         else:
             log("Not found. Will not delete directory")
+
 
 for dirGlob, maxDepth, fileNamePattern, compressAfterDays, removeAfterDays in dirsToClean:
     for dir in glob.glob(dirGlob):
@@ -124,7 +125,7 @@ for dirGlob, maxDepth, fileNamePattern, compressAfterDays, removeAfterDays in di
         if compressAfterDays and removeAfterDays:
             assert compressAfterDays < removeAfterDays, (compressAfterDays, removeAfterDays)
 
-       # remove before compress
+        # remove before compress
         if removeAfterDays > 0:
             runFind(dir, maxDepth, fileNamePattern, removeAfterDays,
                     ['rm', '-v', '{}'])
@@ -133,4 +134,4 @@ for dirGlob, maxDepth, fileNamePattern, compressAfterDays, removeAfterDays in di
             runFind(dir, maxDepth, fileNamePattern, compressAfterDays,
                     ['gzip', '-v', '--best', '{}'])
 
-cleanupJobDirs('/mnt/tomcat/genie-jobs',3)
+cleanupJobDirs('/mnt/tomcat/genie-jobs', 3)
