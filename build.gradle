@@ -6,16 +6,21 @@ ext.githubProjectName = rootProject.name
 
 apply plugin: 'java'
 
+release {
+    tagStrategy {
+        prefixNameWithV = false
+    }
+}
+
+nebulaRelease {
+    addReleaseBranchPattern(/(release(-|\/))?\d+(\.\d+)?\.(x|\d+)/)
+}
 
 allprojects {
     clean {
         delete 'genie-db'
         delete 'derby.log'
     }
-}
-
-nebulaRelease {
-    addReleaseBranchPattern(/(release(-|\/))?\d+(\.\d+)?\.(x|\d+)/)
 }
 
 subprojects {
