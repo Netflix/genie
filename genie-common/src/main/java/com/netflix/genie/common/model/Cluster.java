@@ -78,7 +78,7 @@ public class Cluster extends CommonEntityFields {
     @ApiModelProperty(
             value = "The type of the cluster to use to figure out the job manager for this"
                     + " cluster. e.g.: yarn, presto, mesos etc. The mapping to a JobManager will be"
-                    + " specified using the property: netflix.genie.server.{clusterType}.JobManagerImpl",
+                    + " specified using the property: com.netflix.genie.server.job.manager.<clusterType>.impl",
             required = true)
     private String clusterType;
 
