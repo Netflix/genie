@@ -1,5 +1,8 @@
 # Genie
 
+[ ![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg) ]
+(https://bintray.com/netflixoss/maven/genie/_latestVersion)
+
 ## Introduction
 
 Genie is a federated job execution engine developed by Netflix. Genie provides REST-ful APIs to run a variety of big
