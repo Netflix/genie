@@ -39,14 +39,14 @@ Please see the [ZeroToDocker](https://github.com/Netflix-Skunkworks/zerotodocker
 
 Genie builds are hosted on CloudBees [here](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/).
 
-[![Snapshot Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon)]
+Snapshots     [![Snapshot Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon)]
 (https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/)
 
-[![Pull Request Build Status]
+Pull Requests [![Pull Request Build Status]
 (https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/badge/icon)]
 (https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/)
 
-[![Release Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon)]
+Releases      [![Release Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon)]
 (https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/)
 
 ## Support
