@@ -39,15 +39,12 @@ Please see the [ZeroToDocker](https://github.com/Netflix-Skunkworks/zerotodocker
 
 Genie builds are hosted on CloudBees [here](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/).
 
-Snapshots     [![Snapshot Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon)]
-(https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/)
-
-Pull Requests [![Pull Request Build Status]
-(https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/badge/icon)]
-(https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/)
-
-Releases      [![Release Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon)]
-(https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/)
+|        Build       |                                                                                                   Status                                                                                                  |
+|:------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|      Snapshots     |      [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/)      |
+|    Pull Requests   | [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/) |
+| Release Candidates |     [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-candidate/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-candidate/)     |
+|      Releases      |       [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/)       |
 
 ## Support
 
