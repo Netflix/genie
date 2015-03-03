@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2014 Netflix, Inc.
+ *  Copyright 2015 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public final class StringUtil {
         // "cleanse" inputs - get rid of enclosing quotes
         for (int i = 0; i < output.length; i++) {
             // double quotes
-            if ((output[i].startsWith("\"") && (output[i].endsWith("\"")))) {
+            if (output[i].startsWith("\"") && output[i].endsWith("\"")) {
                 output[i] = output[i].replaceAll("(^\")|(\"$)", "");
             }
             LOG.debug(i + ": " + output[i]);
@@ -102,7 +102,7 @@ public final class StringUtil {
         int i = 0;
         while (true) {
             trimmedVersion.append(splits[i]);
-            if ((i < splits.length - 1) && (i < 2)) {
+            if (i < splits.length - 1 && i < 2) {
                 trimmedVersion.append(".");
                 i++;
             } else {

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2014 Netflix, Inc.
+ *  Copyright 2015 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -353,7 +353,7 @@ public class JobMonitorImpl implements JobMonitor {
             String userName = config.getString("com.netflix.genie.server.mail.smtp.user");
             String password = config.getString("com.netflix.genie.server.mail.smtp.password");
 
-            if ((userName == null) || (password == null)) {
+            if (userName == null || password == null) {
                 LOG.error("Authentication is enabled and username/password for smtp server is null");
                 return false;
             }

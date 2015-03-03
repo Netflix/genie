@@ -16,12 +16,12 @@
         h3{color : black;background-color : white;}
         body{font-family : sans-serif,Arial,Tahoma;
              color : black;background-color : white;}
-	h4{font-family : sans-serif,Arial,Tahoma;
-	     color : white;background-color : #B9090B;}
+	    h4{font-family : sans-serif,Arial,Tahoma;
+	     color : white;background-color : black;}
       </style>
     </head>
     <body>
-      <h4><img src="/img/nf_logo.png" alt="Netflix" border="0"/></h4>
+      <h4><img src="/img/netflix-oss-logo.png" alt="Netflix" border="0"/></h4>
       <h3>Genie Job Results: <xsl:value-of select="@directory"/></h3>
       <hr/>
       <table cellspacing="0"

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2014 Netflix, Inc.
+ *  Copyright 2015 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.util.NetUtil;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +61,7 @@ public class JobCountManagerImpl implements JobCountManager {
 
     @PersistenceContext
     private EntityManager em;
-    
+
     // Config Instance to get all properties
     private final AbstractConfiguration config;
 
@@ -150,7 +151,7 @@ public class JobCountManagerImpl implements JobCountManager {
         // Get the App Name from Configuration
         final String appName = this.config.getString("APPNAME", "genie2");
         LOG.info("Using App Name" + appName);
-        
+
         // naive implementation where we loop through all instances in discovery
         // no need to raise any exceptions here, just return localhost if there
         // is any error

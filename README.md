@@ -1,35 +1,58 @@
-Genie
-=====
+# Genie
 
-Genie provides REST-ful APIs to run a variety of jobs types Hadoop, Pig, Hive, Presto, Sqoop and more. It also
-provides APIs for managing many distributed processing cluster configurations as well as commands and applications.
+[![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg)]
+(https://bintray.com/netflixoss/maven/genie/_latestVersion)
 
-Documentation
--------------
+## Introduction
 
-For more details, please check out the Genie [Wiki](https://github.com/Netflix/genie/wiki).
+Genie is a federated job execution engine developed by Netflix. Genie provides REST-ful APIs to run a variety of big
+data jobs like Hadoop, Pig, Hive, Presto, Sqoop and more. It also provides APIs for managing many distributed
+processing cluster configurations and the commands and applications which run on them.
 
-Slides
-------
+## Documentation
 
-Check out our slides from the [2013 Hadoop Summit](http://www.slideshare.net/krishflix/genie-hadoop-platform-as-a-service-at-netflix).
+* Netflix Tech Blog Posts
+    * [Genie 1](http://techblog.netflix.com/2013/06/genie-is-out-of-bottle.html)
+    * [Genie 2](http://techblog.netflix.com/2014/11/genie-20-second-wish-granted.html)
+    * [All Posts](http://techblog.netflix.com/search/label/big%20data) from the Big Data Team at Netflix
+* Presentations
+    * Netflix OSS Meetups
+        * Season 3 Episode 1
+            * [Slides](http://www.slideshare.net/RuslanMeshenberg/netflixoss-meetup-season-3-episode-1/24)
+            * [YouTube](http://youtu.be/hi7BDAtjfKY?t=15m53s)
+    * [2013 Hadoop Summit](http://www.slideshare.net/krishflix/genie-hadoop-platform-as-a-service-at-netflix)
+* Genie Github
+    * [Wiki](https://github.com/Netflix/genie/wiki)
+    * [Source](https://github.com/Netflix/genie/tree/master)
+* Client API Documentation
+    * [REST](http://netflix.github.io/genie/docs/api/)
+    * [Python](https://pypi.python.org/pypi/nflx-genie-client)
+    * [Java](http://netflix.github.io/genie/docs/javadoc/client/index.html)
 
-Builds
-------
+## Example
 
-Genie builds are hosted on CloudBees as follows:
+Please see the [ZeroToDocker](https://github.com/Netflix-Skunkworks/zerotodocker) project for [instructions]
+(https://github.com/Netflix-Skunkworks/zerotodocker/wiki/Genie) of an end to end example in [Docker]
+(https://www.docker.com/).
 
-* [Master](https://netflixoss.ci.cloudbees.com/job/genie-master/)
-* [Pull Requests](https://netflixoss.ci.cloudbees.com/job/genie-pull-requests/)
+## Builds
 
-Support
--------
+Genie builds are hosted on CloudBees [here](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/).
 
-Please use the [Genie Google Group](https://groups.google.com/d/forum/genie-hadoop) for
-general questions and discussion.
+|        Build       |                                                                                                   Status                                                                                                  |
+|:------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|      Snapshots     |      [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/)      |
+|    Pull Requests   | [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/) |
+| Release Candidates |     [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-candidate/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-candidate/)     |
+|      Releases      |       [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/)       |
 
-You can request bug fixes and new features on the 
-[Issues](https://github.com/Netflix/genie/issues) page.
+## Support
+
+Please use the [Google Group](https://groups.google.com/d/forum/genieoss) for general questions and discussion.
+
+## Issues
+
+You can request bug fixes and new features [here](https://github.com/Netflix/genie/issues).
 
 
 

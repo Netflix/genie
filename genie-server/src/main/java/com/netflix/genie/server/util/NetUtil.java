@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2014 Netflix, Inc.
+ *  Copyright 2015 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public final class NetUtil {
         LOG.debug("called for jobID: " + jobID);
         String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
                 .getString("com.netflix.genie.server.s3.archive.location");
-        if ((s3ArchiveLocation != null) && (!s3ArchiveLocation.isEmpty())) {
+        if (s3ArchiveLocation != null && !s3ArchiveLocation.isEmpty()) {
             return s3ArchiveLocation + "/" + jobID;
         } else {
             return null;
@@ -93,8 +93,7 @@ public final class NetUtil {
         }
 
         // if hostName is not set by property, figure it out based on the datacenter
-        String dc = ConfigurationManager.getConfigInstance().getString(
-                "netflix.datacenter");
+        String dc = ConfigurationManager.getConfigInstance().getString("netflix.datacenter");
         if (dc != null && dc.equals("cloud")) {
             hostName = getCloudHostName();
         } else {
@@ -163,7 +162,7 @@ public final class NetUtil {
     private static String getDCHostName() throws GenieException {
         LOG.debug("called");
 
-        if ((dcHostName != null) && (!dcHostName.isEmpty())) {
+        if (dcHostName != null && !dcHostName.isEmpty()) {
             return dcHostName;
         }
 

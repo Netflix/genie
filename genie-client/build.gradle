@@ -1,5 +1,5 @@
 dependencies {
-    compile project.parent.childProjects.get('genie-common')
+    compile project(':genie-common')
 }
 
 clean {
