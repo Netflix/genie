@@ -34,7 +34,7 @@ public class GenieSwaggerBootstrap extends HttpServlet {
                 "Genie REST API", /* title */
                 "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> "
                         + "for more information. <br/>Post to our "
-                        + "<a href=\"https://groups.google.com/d/forum/genie-hadoop\">"
+                        + "<a href=\"https://groups.google.com/d/forum/genieoss\">"
                         + "Google Group</a> with any questions.<br/>"
                         + "Post any issues found "
                         + "<a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>"
