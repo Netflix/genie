@@ -6,6 +6,15 @@ ext.githubProjectName = rootProject.name
 
 apply plugin: 'java'
 
+release {
+    tagStrategy {
+        prefixNameWithV = false
+    }
+}
+
+nebulaRelease {
+    addReleaseBranchPattern(/(release(-|\/))?\d+(\.\d+)?\.(x|\d+)/)
+}
 
 allprojects {
     clean {
