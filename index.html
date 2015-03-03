@@ -1,81 +1,147 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Genie by Netflix</title>
 
-    <head>
-        <meta charset='utf-8' />
-        <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-        <meta name="description" content="Genie : Hadoop Platform as a Service" />
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Genie</h1>
+        <p class="header">Federated Job Execution Engine</p>
 
-        <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-        <link rel="shortcut icon" href="icons/nficon2014.3.ico">
-        <link rel="icon" href="icons/nficon2014.3.ico">
-        <title>Genie</title>
-    </head>
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/Netflix/genie/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/Netflix/genie/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/Netflix/genie">View On GitHub</a></li>
+        </ul>
 
-    <body>
-
-        <!-- HEADER -->
-        <div id="header_wrap" class="outer">
-            <header class="inner">
-                <a id="forkme_banner" href="https://github.com/Netflix/genie">View on GitHub</a>
-
-                <h1 id="project_title">Genie</h1>
-                <h2 id="project_tagline">Hadoop Platform as a Service</h2>
-
-                <section id="downloads">
-                    <a class="zip_download_link" href="https://github.com/Netflix/genie/zipball/master">Download this project as a .zip file</a>
-                    <a class="tar_download_link" href="https://github.com/Netflix/genie/tarball/master">Download this project as a tar.gz file</a>
-                </section>
-            </header>
-        </div>
-
-        <!-- MAIN CONTENT -->
-        <div id="main_content_wrap" class="outer">
-            <section id="main_content" class="inner">
-                <h1>
-                    <a name="genie" class="anchor" href="#genie"><span class="octicon octicon-link"></span></a>Genie</h1>
-
-                <p>Genie provides REST-ful APIs to run Hadoop, Hive and Pig jobs, and to manage multiple 
-                    Hadoop resources and perform job submissions across them.</p>
-
-                <h2>
-                    <a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
-
-                <p>For more details, please check out the Genie <a href="https://github.com/Netflix/genie/wiki">Wiki</a>.</p>
-
-                <h2>
-                    <a name="slides" class="anchor" href="#slides"><span class="octicon octicon-link"></span></a>Slides</h2>
-
-                <p>Check out our slides from the <a href="http://www.slideshare.net/krishflix/genie-hadoop-platform-as-a-service-at-netflix">2013 Hadoop Summit</a>.</p>
-
-                <h2>
-                    <a name="builds" class="anchor" href="#builds"><span class="octicon octicon-link"></span></a>Builds</h2>
-
-                <p>Genie builds are hosted on CloudBees as follows:</p>
-
-                <ul>
-                    <li><a href="https://netflixoss.ci.cloudbees.com/job/genie-master/">Master</a></li>
-                    <li><a href="https://netflixoss.ci.cloudbees.com/job/genie-pull-requests/">Pull Requests</a></li>
-                </ul><h2>
-                    <a name="support" class="anchor" href="#support"><span class="octicon octicon-link"></span></a>Support</h2>
-
-                <p>Please use the <a href="https://groups.google.com/d/forum/genie-hadoop">Genie Google Group</a> for
-                    general questions and discussion.</p>
-
-                <p>You can request bug fixes and new features on the 
-                    <a href="https://github.com/Netflix/genie/issues">Issues</a> page.</p>
-            </section>
-        </div>
-
-        <!-- FOOTER  -->
-        <div id="footer_wrap" class="outer">
-            <footer class="inner">
-                <p class="copyright">Genie maintained by <a href="https://netflix.github.com">Netflix</a></p>
-                <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-            </footer>
-        </div>
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/Netflix">Netflix</a></p>
 
 
+      </header>
+      <section>
+        <h1>
+<a id="genie" class="anchor" href="#genie" aria-hidden="true"><span class="octicon octicon-link"></span></a>Genie</h1>
 
-    </body>
+<p><a href="https://bintray.com/netflixoss/maven/genie/_latestVersion"><img src="https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg" alt="Download"></a></p>
+
+<h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>Genie is a federated job execution engine developed by Netflix. Genie provides REST-ful APIs to run a variety of big
+data jobs like Hadoop, Pig, Hive, Presto, Sqoop and more. It also provides APIs for managing many distributed
+processing cluster configurations and the commands and applications which run on them.</p>
+
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<ul>
+<li>Netflix Tech Blog Posts
+
+<ul>
+<li><a href="http://techblog.netflix.com/2013/06/genie-is-out-of-bottle.html">Genie 1</a></li>
+<li><a href="http://techblog.netflix.com/2014/11/genie-20-second-wish-granted.html">Genie 2</a></li>
+<li>
+<a href="http://techblog.netflix.com/search/label/big%20data">All Posts</a> from the Big Data Team at Netflix</li>
+</ul>
+</li>
+<li>Presentations
+
+<ul>
+<li>Netflix OSS Meetups
+
+<ul>
+<li>Season 3 Episode 1
+
+<ul>
+<li><a href="http://www.slideshare.net/RuslanMeshenberg/netflixoss-meetup-season-3-episode-1/24">Slides</a></li>
+<li><a href="http://youtu.be/hi7BDAtjfKY?t=15m53s">YouTube</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="http://www.slideshare.net/krishflix/genie-hadoop-platform-as-a-service-at-netflix">2013 Hadoop Summit</a></li>
+</ul>
+</li>
+<li>Genie Github
+
+<ul>
+<li><a href="https://github.com/Netflix/genie/wiki">Wiki</a></li>
+<li><a href="https://github.com/Netflix/genie/tree/master">Source</a></li>
+</ul>
+</li>
+<li>Client API Documentation
+
+<ul>
+<li><a href="http://netflix.github.io/genie/docs/api/">REST</a></li>
+<li><a href="https://pypi.python.org/pypi/nflx-genie-client">Python</a></li>
+<li><a href="http://netflix.github.io/genie/docs/javadoc/client/index.html">Java</a></li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<p>Please see the <a href="https://github.com/Netflix-Skunkworks/zerotodocker">ZeroToDocker</a> project for <a href="https://github.com/Netflix-Skunkworks/zerotodocker/wiki/Genie">instructions</a> of an end to end example in <a href="https://www.docker.com/">Docker</a>.</p>
+
+<h2>
+<a id="builds" class="anchor" href="#builds" aria-hidden="true"><span class="octicon octicon-link"></span></a>Builds</h2>
+
+<p>Genie builds are hosted on CloudBees <a href="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/">here</a>.</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">Build</th>
+<th align="center">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Snapshots</td>
+<td align="center"><a href="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/"><img src="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon" alt="Build Status"></a></td>
+</tr>
+<tr>
+<td align="center">Pull Requests</td>
+<td align="center"><a href="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/"><img src="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/badge/icon" alt="Build Status"></a></td>
+</tr>
+<tr>
+<td align="center">Release Candidates</td>
+<td align="center"><a href="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-candidate/"><img src="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-candidate/badge/icon" alt="Build Status"></a></td>
+</tr>
+<tr>
+<td align="center">Releases</td>
+<td align="center"><a href="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/"><img src="https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon" alt="Build Status"></a></td>
+</tr>
+</tbody>
+</table>
+
+<h2>
+<a id="support" class="anchor" href="#support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support</h2>
+
+<p>Please use the <a href="https://groups.google.com/d/forum/genieoss">Google Group</a> for general questions and discussion.</p>
+
+<h2>
+<a id="issues" class="anchor" href="#issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Issues</h2>
+
+<p>You can request bug fixes and new features <a href="https://github.com/Netflix/genie/issues">here</a>.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
 </html>
