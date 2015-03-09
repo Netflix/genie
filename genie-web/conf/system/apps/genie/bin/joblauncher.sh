@@ -87,6 +87,14 @@ function setupApplication {
         echo "$(date +"%F %T.%3N") Copied application jars files"
     fi
 
+    if [ -n "$S3_APPLICATION_CONF_FILES" ]; then
+        echo "$(date +"%F %T.%3N") Copying application Config files ..."
+        copyFiles "$S3_APPLICATION_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 208
+        echo "$(date +"%F %T.%3N") Copied application config files"
+        echo $'\n'
+    fi
+
     if [ -n "$APPLICATION_ENV_FILE" ]
     then
         echo "$(date +"%F %T.%3N") Copy down and Source Application Env File"
@@ -99,18 +107,18 @@ function setupApplication {
         echo "$(date +"%F %T.%3N") Application Name = $APPNAME"
     fi
 
-    if [ -n "$S3_APPLICATION_CONF_FILES" ]; then
-        echo "$(date +"%F %T.%3N") Copying application Config files ..."
-        copyFiles "$S3_APPLICATION_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-        checkError 208
-        echo "$(date +"%F %T.%3N") Copied application config files"
-        echo $'\n'
-    fi
-
     return 0
 }
 
 function setupCommand {
+    if [ -n "$S3_COMMAND_CONF_FILES" ]; then
+        echo "$(date +"%F %T.%3N") Copying command Config files ..."
+        copyFiles "$S3_COMMAND_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
+        checkError 207
+        echo "$(date +"%F %T.%3N") Copied command config files"
+        echo $'\n'
+    fi
+
     if [ -n "$COMMAND_ENV_FILE" ]
     then
         echo "$(date +"%F %T.%3N") Copy down and Source Command Env File"
@@ -121,14 +129,6 @@ function setupCommand {
         source "$CURRENT_JOB_CONF_DIR/$COMMAND_FILENAME"
         checkError 205
         echo "$(date +"%F %T.%3N") Command Name=$CMDNAME"
-    fi
-
-    if [ -n "$S3_COMMAND_CONF_FILES" ]; then
-        echo "$(date +"%F %T.%3N") Copying command Config files ..."
-        copyFiles "$S3_COMMAND_CONF_FILES" "file://$CURRENT_JOB_CONF_DIR"/
-        checkError 207
-        echo "$(date +"%F %T.%3N") Copied command config files"
-        echo $'\n'
     fi
 
     return 0
