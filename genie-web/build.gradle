@@ -1,8 +1,24 @@
 apply plugin: 'war'
 
 dependencies {
-    runtime project(':genie-server')
-    runtime ('com.netflix.karyon:karyon-admin-web:1.0.27') {
-        exclude group: 'commons-collections', module: 'commons-collections'
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    runtime project(":genie-server")
+    runtime ("com.netflix.karyon:karyon-admin-web:${karyon_version}") {
+        exclude group: "commons-collections", module: "commons-collections"
     }
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
 }
