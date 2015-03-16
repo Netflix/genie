@@ -18,12 +18,11 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
@@ -73,9 +72,8 @@ public class Auditable implements Serializable, Validate {
             value = "When this resource was created. Set automatically by system",
             dataType = "date"
     )
-    @JsonSerialize(using = JsonDateSerializer.class)
-    @JsonDeserialize(using = JsonDateDeserializer.class)
-    private Date created = new Date();
+    @JsonIgnore
+    private Date created;
 
     /**
      * The update timestamp.
@@ -86,9 +84,8 @@ public class Auditable implements Serializable, Validate {
             value = "When this resource was last updated. Set automatically by system",
             dataType = "date"
     )
-    @JsonSerialize(using = JsonDateSerializer.class)
-    @JsonDeserialize(using = JsonDateDeserializer.class)
-    private Date updated = new Date();
+    @JsonIgnore
+    private Date updated;
 
     /**
      * The version of this entity. Auto handled by JPA.
@@ -149,22 +146,24 @@ public class Auditable implements Serializable, Validate {
      *
      * @return The created timestamps
      */
+    @JsonProperty("created")
+    @JsonSerialize(using = JsonDateSerializer.class)
     public Date getCreated() {
-        return new Date(this.created.getTime());
+        if (this.created == null) {
+            return null;
+        } else {
+            return new Date(this.created.getTime());
+        }
     }
 
     /**
-     * Set the created timestamp.
+     * Set the created timestamp. This is a No-Op. Set once by system.
      *
      * @param created The created timestamp
      */
+    @JsonIgnore
     public void setCreated(final Date created) {
-        //This is to prevent the create time from being updated after
-        //an entity has been persisted and someone is just trying to
-        //update another field in the entity
-        if (created.before(this.created)) {
-            this.created.setTime(created.getTime());
-        }
+        LOG.info("Tried to set created time to " + created + " for entity " + this.id + ". Ignoring.");
     }
 
     /**
@@ -172,17 +171,24 @@ public class Auditable implements Serializable, Validate {
      *
      * @return The updated timestamp
      */
+    @JsonProperty("updated")
+    @JsonSerialize(using = JsonDateSerializer.class)
     public Date getUpdated() {
-        return new Date(this.updated.getTime());
+        if (this.updated == null) {
+            return null;
+        } else {
+            return new Date(this.updated.getTime());
+        }
     }
 
     /**
-     * Set the time this entity was updated.
+     * Set the time this entity was updated. This is a No-Op. Updated automatically by system.
      *
      * @param updated The updated timestamp
      */
+    @JsonIgnore
     public void setUpdated(final Date updated) {
-        this.updated.setTime(updated.getTime());
+        LOG.info("Tried to set updated time to " + updated + " for entity " + this.id + ". Ignoring.");
     }
 
     /**

@@ -18,6 +18,22 @@
 #
 ##
 
+function executeWithRetry()
+{
+    echo "Trying to execute command: [$@]"
+    n=0
+    until [ $n -ge 3 ]
+    do
+        $@ && break
+        n=$[$n+1]
+        echo "retrying command"
+    done
+    if [ $n == 3 ]; then
+        echo "Failed to execute command"
+        exit 1 
+    fi
+}
+
 # basic error checking
 if [[ $# != 1 ]]; then
 	echo "Incorrect number of arguments"
@@ -29,16 +45,16 @@ fi
 parent_pid=$1
 
 # pause the parent so it doesn't trigger any retries
-kill -STOP $parent_pid
+executeWithRetry "kill -STOP $parent_pid"
 
 # kill all the children
-pkill -P $parent_pid
+executeWithRetry "pkill -P $parent_pid"
 
 # now kill the parent - but it won't be killed yet since it is paused
-kill $parent_pid
+executeWithRetry "kill $parent_pid"
 
 # continue parent, this will kill it - and the trap will ensure that files are archived to S3
-kill -CONT $parent_pid
+executeWithRetry "kill -CONT $parent_pid"
 
 echo "Done"
 exit 0

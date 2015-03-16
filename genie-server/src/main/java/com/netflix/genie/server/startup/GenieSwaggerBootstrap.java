@@ -20,7 +20,6 @@ package com.netflix.genie.server.startup;
 import com.wordnik.swagger.config.ConfigFactory;
 import com.wordnik.swagger.model.ApiInfo;
 import javax.servlet.http.HttpServlet;
-import scala.Option;
 
 /**
  * Simple bootstrap class for Swagger startup/configuration.
@@ -30,22 +29,16 @@ import scala.Option;
 public class GenieSwaggerBootstrap extends HttpServlet {
 
     static {
-        final Option<ApiInfo> info = Option.apply(new ApiInfo(
+        final ApiInfo info = new ApiInfo(
                 "Genie REST API", /* title */
-                "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> "
-                        + "for more information. <br/>Post to our "
-                        + "<a href=\"https://groups.google.com/d/forum/genie-hadoop\">"
-                        + "Google Group</a> with any questions.<br/>"
-                        + "Post any issues found "
-                        + "<a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>"
-                        + "For more documentation see the "
-                        + "<a href=\"https://github.com/Netflix/genie/wiki\">wiki</a>.<br/>",
+                "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more documentation.<br/>"
+                        + "Post any issues found <a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
                 null, /* TOS URL */
-                null, /* Contact */
+                "genieoss@googlegroups.com", /* Contact */
                 "Apache 2.0", /* license */
                 "http://www.apache.org/licenses/LICENSE-2.0" /* license URL */
-        ));
+        );
 
-        ConfigFactory.config().setInfo(info);
+        ConfigFactory.config().setApiInfo(info);
     }
 }

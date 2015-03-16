@@ -3,42 +3,74 @@ plugins {
 }
 
 dependencies {
-    compile project(':genie-common')
-    compile 'com.netflix.archaius:archaius-core:0.6.2'
-    compile 'com.netflix.karyon:karyon-core:1.0.27'
-    compile 'com.netflix.karyon:karyon-eureka:1.0.27'
-    compile 'com.netflix.karyon:karyon-extensions:1.0.27'
-    compile 'com.netflix.karyon:karyon-spi:1.0.27'
-    compile 'com.netflix.servo:servo-core:0.7.9'
-    compile 'com.sun.jersey:jersey-core:1.17.1'
-    compile 'com.sun.jersey:jersey-server:1.17.1'
-    compile 'com.sun.jersey.contribs:jersey-guice:1.17.1'
-    compile 'commons-collections:commons-collections:3.2.1'
-    compile 'commons-httpclient:commons-httpclient:3.1'
-    compile 'javax.mail:mail:1.4.4'
-    
-    //Spring
-    compile 'org.springframework.data:spring-data-jpa:1.6.0.RELEASE'
-    compile 'org.springframework:spring-web:3.2.9.RELEASE'
-    compile 'com.google.inject.extensions:guice-spring:3.0'
-    compile ('com.sun.jersey.contribs:jersey-spring:1.17.1') {
-        exclude group: 'org.springframework', module: 'spring'
-        exclude group: 'org.springframework', module: 'spring-core'
-        exclude group: 'org.springframework', module: 'spring-web'
-        exclude group: 'org.springframework', module: 'spring-beans'
-        exclude group: 'org.springframework', module: 'spring-context'
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile project(":genie-common")
+
+    // Commons Libs
+    compile ("commons-collections:commons-collections:${commons_collections_version}")
+    compile ("commons-httpclient:commons-httpclient:${commons_httpclient_version}")
+
+    // Netflix Libs
+    compile ("com.netflix.archaius:archaius-core:${archaius_version}")
+    compile ("com.netflix.karyon:karyon-core:${karyon_version}")
+    compile ("com.netflix.karyon:karyon-eureka:${karyon_version}")
+    compile ("com.netflix.karyon:karyon-extensions:${karyon_version}")
+    compile ("com.netflix.karyon:karyon-spi:${karyon_version}")
+    compile ("com.netflix.servo:servo-core:${servo_version}")
+
+    // Java Mail
+    compile ("javax.mail:mail:${mail_version}")
+
+    // Jersey Libs
+    compile ("com.sun.jersey:jersey-server:${jersey_version}")
+
+    // Spring Libs
+    compile ("org.springframework.data:spring-data-jpa:${spring_data_jpa_version}")
+    compile ("org.springframework:spring-web:${springframework_version}")
+    compile ("com.google.inject.extensions:guice-spring:${guice_version}")
+
+    // Swagger Libs
+    compile ("com.wordnik:swagger-jersey-jaxrs_2.10:${swagger_version}") {
+        exclude group: "com.sun.jersey"
+        exclude group: "com.sun.jersey.contribs"
     }
 
-    runtime 'org.apache.commons:commons-dbcp2:2.0.1'
-    runtime 'com.google.inject.extensions:guice-servlet:3.0'
-    runtime 'com.mchange:mchange-commons-java:0.2.3.3'
-    runtime 'mysql:mysql-connector-java:5.1.16'
-    runtime 'org.apache.derby:derby:10.2.2.0'
-    runtime 'org.hsqldb:hsqldb:2.3.2'
+    /*******************************
+     * Provided Dependencies
+     *******************************/
 
-    provided 'javax.servlet:servlet-api:2.5'
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
 
-    testCompile 'org.springframework:spring-test:3.2.9.RELEASE'
-    testCompile 'org.dbunit:dbunit:2.4.9'
-    testCompile 'com.github.springtestdbunit:spring-test-dbunit:1.0.1'
+    // Database Libs
+    runtime ("mysql:mysql-connector-java:${mysql_connector_java_version}")
+    runtime ("org.apache.commons:commons-dbcp2:${commons_dhcp2_version}")
+    runtime ("org.apache.derby:derby:${derby_version}")
+    runtime ("org.hsqldb:hsqldb:${hsqldb_version}")
+
+    // Guice Libs
+    runtime ("com.google.inject.extensions:guice-servlet:${guice_version}")
+
+    // Jersey Libs
+    runtime ("com.sun.jersey.contribs:jersey-guice:${jersey_version}")
+    runtime ("com.sun.jersey.contribs:jersey-multipart:${jersey_version}")
+    runtime ("com.sun.jersey.contribs:jersey-spring:${jersey_version}") {
+        exclude group: "org.springframework", module: "spring"
+        exclude group: "org.springframework", module: "spring-core"
+        exclude group: "org.springframework", module: "spring-web"
+        exclude group: "org.springframework", module: "spring-beans"
+        exclude group: "org.springframework", module: "spring-context"
+    }
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    testCompile ("org.springframework:spring-test:${springframework_version}")
+    testCompile ("org.dbunit:dbunit:${dbunit_version}")
+    testCompile ("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
 }

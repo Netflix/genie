@@ -1,5 +1,21 @@
 dependencies {
-    compile project(':genie-common')
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile project(":genie-common")
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
 }
 
 clean {

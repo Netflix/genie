@@ -39,10 +39,8 @@ public class TestAuditable {
     public void testConstructor() {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertTrue(0 < a.getCreated().getTime());
-        Assert.assertNotNull(a.getUpdated());
-        Assert.assertTrue(0 < a.getUpdated().getTime());
+        Assert.assertNull(a.getCreated());
+        Assert.assertNull(a.getUpdated());
     }
 
     /**
@@ -85,13 +83,12 @@ public class TestAuditable {
     public void testOnCreateAuditable() throws InterruptedException, GeniePreconditionException {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
-        final Date originalCreate = a.getCreated();
-        final Date originalUpdate = a.getUpdated();
-        Thread.sleep(1);
+        Assert.assertNull(a.getCreated());
+        Assert.assertNull(a.getUpdated());
         a.onCreateAuditable();
         Assert.assertNotNull(a.getId());
-        Assert.assertTrue(originalCreate.getTime() < a.getCreated().getTime());
-        Assert.assertTrue(originalUpdate.getTime() < a.getUpdated().getTime());
+        Assert.assertNotNull(a.getCreated());
+        Assert.assertNotNull(a.getUpdated());
         Assert.assertEquals(a.getCreated(), a.getUpdated());
 
         //Test to make sure if an ID already was set we don't change it
@@ -105,12 +102,15 @@ public class TestAuditable {
     /**
      * Test to make sure the update timestamp is updated by this method.
      *
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException
      */
     @Test
     public void testOnUpdateAuditable() throws InterruptedException {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
+        Assert.assertNull(a.getCreated());
+        Assert.assertNull(a.getUpdated());
+        a.onCreateAuditable();
         final Date originalCreate = a.getCreated();
         final Date originalUpdate = a.getUpdated();
         Thread.sleep(1);
@@ -120,30 +120,28 @@ public class TestAuditable {
     }
 
     /**
-     * Test to make sure created can't just be set arbitrarily.
+     * Test to make sure the setter of created does nothing.
      */
     @Test
     public void testSetCreated() {
         final Auditable a = new Auditable();
-        final Date oc = a.getCreated();
-        final Date newer = new Date(oc.getTime() + 1);
-        final Date older = new Date(oc.getTime() - 1);
-        a.setCreated(newer);
-        Assert.assertEquals(oc, a.getCreated());
-        a.setCreated(older);
-        Assert.assertEquals(older, a.getCreated());
+        Assert.assertNull(a.getCreated());
+        a.setCreated(new Date());
+        Assert.assertNull(a.getCreated());
+        a.onCreateAuditable();
+        Assert.assertNotNull(a.getCreated());
     }
 
     /**
-     * Test to make sure updated is always changed by set.
+     * Test to make sure updated is never changed by set.
      */
     @Test
     public void testSetUpdated() {
         final Auditable a = new Auditable();
-        final Date ou = a.getUpdated();
-        final Date newer = new Date(ou.getTime() + 1);
+        Assert.assertNull(a.getUpdated());
+        final Date newer = new Date();
         a.setUpdated(newer);
-        Assert.assertEquals(newer, a.getUpdated());
+        Assert.assertNull(a.getUpdated());
     }
 
     /**
@@ -161,25 +159,25 @@ public class TestAuditable {
     /**
      * Make sure we generate valid JSON.
      *
-     * @throws com.netflix.genie.common.exceptions.GeniePreconditionException
+     * @throws GeniePreconditionException
      * @throws IOException
      */
     @Test
     public void testToString() throws GeniePreconditionException, IOException {
         final Auditable a = new Auditable();
-        final String id = UUID.randomUUID().toString();
-        final Date created = new Date(1000L);
-        final Date updated = new Date(2000L);
-        a.setId(id);
-        a.setCreated(created);
-        a.setUpdated(updated);
+        a.onCreateAuditable();
+        final String id = a.getId();
+        final Date created = a.getCreated();
+        final Date updated = a.getUpdated();
 
         final String json = a.toString();
 
         final ObjectMapper mapper = new ObjectMapper();
         final Auditable b = mapper.readValue(json, Auditable.class);
         Assert.assertEquals(id, b.getId());
-        Assert.assertEquals(created, b.getCreated());
-        Assert.assertEquals(updated, b.getUpdated());
+        Assert.assertNotEquals(created, b.getCreated());
+        Assert.assertNotEquals(updated, b.getUpdated());
+        Assert.assertNull(b.getCreated());
+        Assert.assertNull(b.getUpdated());
     }
 }

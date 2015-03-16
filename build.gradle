@@ -31,7 +31,10 @@ subprojects {
     apply plugin: 'pmd'
     apply plugin: 'jacoco'
 
-    group = "com.netflix.${githubProjectName}" // set to organization of project
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+
+    group = "com.netflix.${githubProjectName}"
     
     repositories {
         jcenter()
@@ -39,11 +42,30 @@ subprojects {
     }
 
     dependencies {
-        compile 'org.apache.commons:commons-lang3:3.2.1'
-        compile 'org.slf4j:slf4j-log4j12:1.7.0'
+        /*******************************
+         * Compile Dependencies
+         *******************************/
 
-        testCompile 'junit:junit:4.11'
-        testCompile 'org.mockito:mockito-core:1.9.5'
+        compile ("org.apache.commons:commons-lang3:${commons_lang3_version}")
+        compile ("org.slf4j:slf4j-log4j12:${slf4j_log4j12_version}")
+
+        /*******************************
+         * Provided Dependencies
+         *******************************/
+
+        /*******************************
+         * Runtime Dependencies
+         *******************************/
+
+        /*******************************
+         * Test Dependencies
+         *******************************/
+
+        // JUnit
+        testCompile ("junit:junit:${junit_version}")
+
+        // Mockito
+        testCompile ("org.mockito:mockito-core:${mockito_version}")
     }
 
     checkstyle {
