@@ -26,11 +26,11 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 setup(
     name='nflx-genie-client',
 
-    version='2.1.0',
+    version='2.1.1',
 
     author='Netflix Inc.',
 
-    author_email='genie-hadoop@googlegroups.com',
+    author_email='genieoss@googlegroups.com',
 
     packages=['genie2', 'genie2.client', 'genie2.exception', 'genie2.model'],
 
