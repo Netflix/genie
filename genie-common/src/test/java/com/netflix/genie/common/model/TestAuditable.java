@@ -39,8 +39,8 @@ public class TestAuditable {
     public void testConstructor() {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
-        Assert.assertNull(a.getCreated());
-        Assert.assertNull(a.getUpdated());
+        Assert.assertNotNull(a.getCreated());
+        Assert.assertNotNull(a.getUpdated());
     }
 
     /**
@@ -83,12 +83,17 @@ public class TestAuditable {
     public void testOnCreateAuditable() throws InterruptedException, GeniePreconditionException {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
-        Assert.assertNull(a.getCreated());
-        Assert.assertNull(a.getUpdated());
+        Assert.assertNotNull(a.getCreated());
+        Assert.assertNotNull(a.getUpdated());
+        final Date originalCreated = a.getCreated();
+        final Date originalUpdated = a.getUpdated();
+        Thread.sleep(1);
         a.onCreateAuditable();
         Assert.assertNotNull(a.getId());
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
+        Assert.assertNotEquals(originalCreated, a.getCreated());
+        Assert.assertNotEquals(originalUpdated, a.getUpdated());
         Assert.assertEquals(a.getCreated(), a.getUpdated());
 
         //Test to make sure if an ID already was set we don't change it
@@ -108,8 +113,8 @@ public class TestAuditable {
     public void testOnUpdateAuditable() throws InterruptedException {
         final Auditable a = new Auditable();
         Assert.assertNull(a.getId());
-        Assert.assertNull(a.getCreated());
-        Assert.assertNull(a.getUpdated());
+        Assert.assertNotNull(a.getCreated());
+        Assert.assertNotNull(a.getUpdated());
         a.onCreateAuditable();
         final Date originalCreate = a.getCreated();
         final Date originalUpdate = a.getUpdated();
@@ -120,28 +125,38 @@ public class TestAuditable {
     }
 
     /**
-     * Test to make sure the setter of created does nothing.
+     * Test to make sure the setter of created does nothing relative to persistence.
      */
     @Test
     public void testSetCreated() {
         final Auditable a = new Auditable();
-        Assert.assertNull(a.getCreated());
-        a.setCreated(new Date());
-        Assert.assertNull(a.getCreated());
+        Assert.assertNotNull(a.getCreated());
+        final Date date = new Date(0);
+        a.setCreated(date);
+        Assert.assertNotNull(a.getCreated());
+        Assert.assertEquals(date, a.getCreated());
         a.onCreateAuditable();
         Assert.assertNotNull(a.getCreated());
+        Assert.assertNotEquals(date, a.getCreated());
     }
 
     /**
-     * Test to make sure updated is never changed by set.
+     * Test to make sure updated is set but really is overwritten by onUpdate.
      */
     @Test
-    public void testSetUpdated() {
+    public void testSetUpdated() throws InterruptedException {
         final Auditable a = new Auditable();
-        Assert.assertNull(a.getUpdated());
-        final Date newer = new Date();
-        a.setUpdated(newer);
-        Assert.assertNull(a.getUpdated());
+        Assert.assertNotNull(a.getUpdated());
+        final Date date = new Date(0);
+        a.setUpdated(date);
+        Assert.assertNotNull(a.getUpdated());
+        Assert.assertEquals(date, a.getUpdated());
+        a.onCreateAuditable();
+        Assert.assertNotEquals(date, a.getUpdated());
+        final Date oldUpdated = a.getUpdated();
+        Thread.sleep(1);
+        a.onUpdateAuditable();
+        Assert.assertNotEquals(oldUpdated, a.getUpdated());
     }
 
     /**
@@ -166,18 +181,17 @@ public class TestAuditable {
     public void testToString() throws GeniePreconditionException, IOException {
         final Auditable a = new Auditable();
         a.onCreateAuditable();
-        final String id = a.getId();
-        final Date created = a.getCreated();
-        final Date updated = a.getUpdated();
 
         final String json = a.toString();
 
         final ObjectMapper mapper = new ObjectMapper();
         final Auditable b = mapper.readValue(json, Auditable.class);
-        Assert.assertEquals(id, b.getId());
-        Assert.assertNotEquals(created, b.getCreated());
-        Assert.assertNotEquals(updated, b.getUpdated());
-        Assert.assertNull(b.getCreated());
-        Assert.assertNull(b.getUpdated());
+        Assert.assertEquals(a.getId(), b.getId());
+
+        // Need to take off the milliseconds because they are lost anyway in the serialization/deserialization process
+        final long expectedCreated = a.getCreated().getTime() - (a.getCreated().getTime() % 1000L);
+        Assert.assertEquals(expectedCreated, b.getCreated().getTime());
+        final long expectedUpdated = a.getUpdated().getTime() - (a.getUpdated().getTime() % 1000L);
+        Assert.assertEquals(expectedUpdated, b.getUpdated().getTime());
     }
 }

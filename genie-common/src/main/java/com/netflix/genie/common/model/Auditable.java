@@ -59,6 +59,7 @@ public class Auditable implements Serializable, Validate {
      * Unique ID.
      */
     @Id
+    @Column(updatable = false)
     @ApiModelProperty(
             value = "The unique id of this resource. If one is not provided it is created internally"
     )
@@ -76,7 +77,7 @@ public class Auditable implements Serializable, Validate {
     )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
-    private Date created;
+    private Date created = new Date();
 
     /**
      * The update timestamp.
@@ -89,7 +90,7 @@ public class Auditable implements Serializable, Validate {
     )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
-    private Date updated;
+    private Date updated = new Date();
 
     /**
      * The version of this entity. Auto handled by JPA.
@@ -151,11 +152,7 @@ public class Auditable implements Serializable, Validate {
      * @return The created timestamps
      */
     public Date getCreated() {
-        if (this.created == null) {
-            return null;
-        } else {
-            return new Date(this.created.getTime());
-        }
+        return new Date(this.created.getTime());
     }
 
     /**
@@ -165,7 +162,9 @@ public class Auditable implements Serializable, Validate {
      */
     public void setCreated(final Date created) {
         LOG.info("Tried to set created to " + created + " for entity " + this.id + ". Will not be persisted.");
-        this.created = new Date(created.getTime());
+        if (created.before(this.created)) {
+            this.created = new Date(created.getTime());
+        }
     }
 
     /**
@@ -174,11 +173,7 @@ public class Auditable implements Serializable, Validate {
      * @return The updated timestamp
      */
     public Date getUpdated() {
-        if (this.updated == null) {
-            return null;
-        } else {
-            return new Date(this.updated.getTime());
-        }
+        return new Date(this.updated.getTime());
     }
 
     /**

@@ -31,6 +31,7 @@ import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -384,6 +385,27 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_2_USER, updated.getUser());
         Assert.assertEquals(CommandStatus.INACTIVE, updated.getStatus());
         Assert.assertEquals(6, updated.getTags().size());
+    }
+
+    /**
+     * Test to make sure setting the created and updated outside the system control doesn't change record in database.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testUpdateCreateAndUpdate() throws GenieException {
+        final Command init = this.service.getCommand(COMMAND_1_ID);
+        final Date created = init.getCreated();
+        final Date updated = init.getUpdated();
+
+        init.setCreated(new Date());
+        final Date zero = new Date(0);
+        init.setUpdated(zero);
+
+        final Command updatedCommand = this.service.updateCommand(COMMAND_1_ID, init);
+        Assert.assertEquals(created, updatedCommand.getCreated());
+        Assert.assertNotEquals(updated, updatedCommand.getUpdated());
+        Assert.assertNotEquals(zero, updatedCommand.getUpdated());
     }
 
     /**

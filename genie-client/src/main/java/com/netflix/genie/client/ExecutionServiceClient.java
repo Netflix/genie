@@ -26,7 +26,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Job;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 

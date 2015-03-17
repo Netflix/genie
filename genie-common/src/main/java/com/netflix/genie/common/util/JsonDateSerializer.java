@@ -38,7 +38,11 @@ public class JsonDateSerializer extends JsonSerializer<Date> {
     @Override
     public void serialize(final Date date, final JsonGenerator gen, final SerializerProvider provider)
             throws IOException {
-        gen.writeString(ISO8601Utils.format(date));
+        if (date == null) {
+            gen.writeString((String) null);
+        } else {
+            gen.writeString(ISO8601Utils.format(date));
+        }
     }
 }
 

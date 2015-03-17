@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -40,8 +41,15 @@ public class JsonDateDeserializer extends JsonDeserializer<Date> {
     public Date deserialize(final JsonParser parser,
                             final DeserializationContext context) throws IOException {
         final DateFormat format = new ISO8601DateFormat();
+
+        final String text = parser.getText();
+
+        if (StringUtils.isBlank(text)) {
+            return null;
+        }
+
         try {
-            return format.parse(parser.getText());
+            return format.parse(text);
         } catch (final ParseException pe) {
             throw new IOException(pe);
         }

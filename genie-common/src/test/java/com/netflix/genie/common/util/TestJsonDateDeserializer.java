@@ -63,6 +63,20 @@ public class TestJsonDateDeserializer {
     }
 
     /**
+     * Test the de-serialization method with null.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testDeserializeNull() throws IOException {
+        Mockito.when(this.parser.getText()).thenReturn(null);
+
+        final JsonDateDeserializer deserializer = new JsonDateDeserializer();
+        final Date date = deserializer.deserialize(this.parser, this.context);
+        Assert.assertNull(date);
+    }
+
+    /**
      * Test the de-serialization method.
      *
      * @throws IOException
