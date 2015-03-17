@@ -34,6 +34,7 @@ import com.netflix.genie.server.services.JobService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -434,6 +435,27 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_2_USER, updated.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, updated.getStatus());
         Assert.assertEquals(6, updated.getTags().size());
+    }
+
+    /**
+     * Test to make sure setting the created and updated outside the system control doesn't change record in database.
+     *
+     * @throws GenieException
+     */
+    @Test
+    public void testUpdateCreateAndUpdate() throws GenieException {
+        final Cluster init = this.service.getCluster(CLUSTER_1_ID);
+        final Date created = init.getCreated();
+        final Date updated = init.getUpdated();
+
+        init.setCreated(new Date());
+        final Date zero = new Date(0);
+        init.setUpdated(zero);
+
+        final Cluster updatedCluster = this.service.updateCluster(CLUSTER_1_ID, init);
+        Assert.assertEquals(created, updatedCluster.getCreated());
+        Assert.assertNotEquals(updated, updatedCluster.getUpdated());
+        Assert.assertNotEquals(zero, updatedCluster.getUpdated());
     }
 
     /**

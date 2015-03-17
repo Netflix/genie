@@ -60,4 +60,19 @@ public class TestJsonDateSerializer {
         serializer.serialize(DATE, gen, provider);
         Mockito.verify(gen, Mockito.times(1)).writeString(this.expectedString);
     }
+
+    /**
+     * Test the serialization method with a null date.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testSerializeNull() throws IOException {
+        final JsonGenerator gen = Mockito.mock(JsonGenerator.class);
+        final SerializerProvider provider = Mockito.mock(SerializerProvider.class);
+
+        final JsonDateSerializer serializer = new JsonDateSerializer();
+        serializer.serialize(null, gen, provider);
+        Mockito.verify(gen, Mockito.times(1)).writeString((String) null);
+    }
 }

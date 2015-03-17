@@ -108,15 +108,6 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     @Test(expected = GeniePreconditionException.class)
     public void testTryingToKillInitializingJob() throws GenieException {
         this.xs.killJob(JOB_4_ID);
-//        try {
-//            this.xs.killJob(JOB_5_ID);
-//            Assert.fail();
-//        } catch (final GenieException ge) {
-//            Assert.assertEquals(
-//                    HttpURLConnection.HTTP_PRECON_FAILED,
-//                    ge.getErrorCode()
-//            );
-//        }
     }
 
     /**
