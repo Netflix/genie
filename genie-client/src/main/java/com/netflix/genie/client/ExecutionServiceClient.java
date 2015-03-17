@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import com.netflix.genie.common.model.JobStatus;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -171,17 +172,17 @@ public final class ExecutionServiceClient extends BaseGenieClient {
 
         final long startTime = System.currentTimeMillis();
 
+        // wait for job to finish
         while (true) {
             final Job job = getJob(id);
 
-            // wait for job to finish - and finish time to be updated
-            if (!job.getFinished().equals(new Date(0))) {
+            final JobStatus status = job.getStatus();
+            if (status == JobStatus.FAILED || status == JobStatus.KILLED || status == JobStatus.SUCCEEDED) {
                 return job;
             }
 
             // block until timeout
-            long currTime = System.currentTimeMillis();
-            if (currTime - startTime < blockTimeout) {
+            if (System.currentTimeMillis() - startTime < blockTimeout) {
                 Thread.sleep(pollTime);
             } else {
                 throw new InterruptedException("Timed out waiting for job to finish");
