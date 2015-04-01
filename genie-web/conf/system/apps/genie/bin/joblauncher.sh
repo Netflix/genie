@@ -40,7 +40,7 @@ function copyFiles {
     # run hadoop fs -cp via timeout, so it doesn't hang indefinitely
     TIMEOUT="${XS_SYSTEM_HOME}/timeout3 -t ${CP_TIMEOUT}"
     
-    # copy over the files to/from S3 - retry $NUM_RETRIES times
+    # copy over the files to/from S3 - retry ${NUM_RETRIES} times
     i=0
     retVal=0
     echo "$(date +"%F %T.%3N") Copying files ${SOURCE} to ${DESTINATION}"
