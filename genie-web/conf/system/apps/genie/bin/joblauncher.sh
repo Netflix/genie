@@ -185,6 +185,11 @@ function appendKeyValueToCoreSite {
     sed -i "s|${SEARCH_PATTERN}|${REPLACE_PATTERN}|" ${CURRENT_JOB_CONF_DIR}/core-site.xml
 }
 
+function removeJars {
+    echo "$(date +"%F %T.%3N") Removing ${CURRENT_JOB_JAR_DIR}"
+    rm -rf ${CURRENT_JOB_JAR_DIR}
+}
+
 function archiveToS3 {
     # if the s3 archive location is not set, return immediately
     if [ "${S3_ARCHIVE_LOCATION}" == "" ]
@@ -289,6 +294,7 @@ echo "$(date +"%F %T.%3N") User and Group created"
 echo $'\n'
 
 executeCommand "$@"
+removeJars
 archiveToS3
 
 echo "$(date +"%F %T.%3N") Done"
