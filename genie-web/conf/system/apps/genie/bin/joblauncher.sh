@@ -22,6 +22,7 @@ trap "{ archiveToS3; echo 'Job killed'; touch genie.done; exit 211;}" SIGINT SIG
 
 function checkError {
     if [ "$?" -ne 0 ]; then
+        removeJars
         archiveToS3
         echo "$(date +"%F %T.%3N") Job Failed"
         touch genie.done
