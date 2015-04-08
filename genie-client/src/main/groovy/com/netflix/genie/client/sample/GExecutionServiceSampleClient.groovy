@@ -102,15 +102,15 @@ public final class GExecutionServiceSampleClient {
         LOG.info "Output URL: $job.outputURI"
 
         LOG.info 'Getting jobInfo by jobID'
-        job = client.getJob(jobID)
+        job = client.getJob(job.id)
         LOG.info job.toString()
 
         LOG.info 'Waiting for job to finish'
-        job = client.waitForCompletion(jobID, 600000, 5000)
+        job = client.waitForCompletion(job.id, 600000, 5000)
         LOG.info "Job status: $job.status" 
 
         LOG.info 'Killing jobs using jobID'
-        def killedJob = client.killJob(jobID)
+        def killedJob = client.killJob(job.id)
         LOG.info "Job status: $killedJob.status"
 
         LOG.info 'Done'

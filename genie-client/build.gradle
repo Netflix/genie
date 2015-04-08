@@ -1,16 +1,12 @@
 apply plugin: 'groovy'
 
-// module versions
-groovyVersion="2.3.3"
-
-
 dependencies {
     /*******************************
      * Compile Dependencies
      *******************************/
 
     compile project(":genie-common")
-    compile "org.codehaus.groovy:groovy:$groovyVersion"
+    compile "org.codehaus.groovy:groovy:2.3.3"
 
     /*******************************
      * Provided Dependencies
