@@ -6,7 +6,7 @@ dependencies {
      *******************************/
 
     compile project(":genie-common")
-    compile "org.codehaus.groovy:groovy:2.3.3"
+    compile "org.codehaus.groovy:groovy:$groovy_lang_version"
 
     /*******************************
      * Provided Dependencies

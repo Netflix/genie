@@ -40,8 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A sample client demonstrating usage of the Execution Service Client.
  *
- * @author skrishnan
- * @author tgianos
+ * @author liviutudor
  */
 public final class GExecutionServiceSampleClient {
 
