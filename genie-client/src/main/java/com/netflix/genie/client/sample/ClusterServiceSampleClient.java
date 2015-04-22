@@ -71,7 +71,6 @@ public final class ClusterServiceSampleClient {
      * @throws Exception On issue.
      */
     public static void main(final String[] args) throws Exception {
-
         // Initialize Eureka, if it is being used
         // LOG.info("Initializing Eureka");
         // ClusterServiceClient.initEureka("test");
@@ -268,7 +267,6 @@ public final class ClusterServiceSampleClient {
         final Application app4 = appClient.deleteApplication(app2.getId());
         LOG.info("Deleted application config with id: " + app2.getId());
         LOG.info(app4.toString());
-
         LOG.info("Done");
     }
 

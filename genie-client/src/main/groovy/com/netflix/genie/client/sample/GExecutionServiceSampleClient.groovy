@@ -15,24 +15,15 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.sample;
+package com.netflix.genie.client.sample
 
+import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
-
-import java.io.ByteArrayOutputStream;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class GExecutionServiceSampleClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceSampleClient.class) 
-
-    private ExecutionServiceSampleClient() {
-        // never called
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceSampleClient.class)
 
     /**
      * Main for running client code .
@@ -71,7 +58,7 @@ public final class GExecutionServiceSampleClient {
         final String userName = 'genietest'
         final String jobName = 'sampleClientTestJob'
         LOG.info 'Getting jobs using specified filter criteria'
-        def params = [userName: userName, status: JobStatus.FAILED.name(), limit: 3] as Map
+        def params = [userName: userName, status: JobStatus.FAILED.name(), limit: 3] as Multimap
         for (final Job ji : client.getJobs(params)) {
             LOG.info "Job: {id, status, finishTime} - {$ji.id, $ji.status, $ji.finished}"
         }
@@ -96,7 +83,6 @@ public final class GExecutionServiceSampleClient {
 
         job = client.submitJob(job)
 
-        final String outputURI = job.getOutputURI();
         LOG.info "Job ID: $job.id"
         LOG.info "Output URL: $job.outputURI"
 

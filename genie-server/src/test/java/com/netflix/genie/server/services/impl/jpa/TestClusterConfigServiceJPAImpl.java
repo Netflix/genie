@@ -138,7 +138,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetClustersByName() {
         final List<Cluster> clusters = this.service.getClusters(
-                CLUSTER_2_NAME, null, null, null, null, 0, 10);
+                CLUSTER_2_NAME, null, null, null, null, 0, 10, true, null);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
     }
@@ -151,7 +151,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         final Set<ClusterStatus> statuses = EnumSet.noneOf(ClusterStatus.class);
         statuses.add(ClusterStatus.UP);
         final List<Cluster> clusters = this.service.getClusters(
-                null, statuses, null, null, null, -1, -5000);
+                null, statuses, null, null, null, -1, -5000, true, null);
         Assert.assertEquals(2, clusters.size());
         Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
         Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
@@ -165,26 +165,26 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
         List<Cluster> clusters = this.service.getClusters(
-                null, null, tags, null, null, 0, 10);
+                null, null, tags, null, null, 0, 10, true, null);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
 
         tags.clear();
         tags.add("hive");
         clusters = this.service.getClusters(
-                null, null, tags, null, null, 0, 10);
+                null, null, tags, null, null, 0, 10, true, null);
         Assert.assertEquals(2, clusters.size());
         Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
         Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
 
         tags.add("somethingThatWouldNeverReallyExist");
         clusters = this.service.getClusters(
-                null, null, tags, null, null, 0, 10);
+                null, null, tags, null, null, 0, 10, true, null);
         Assert.assertTrue(clusters.isEmpty());
 
         tags.clear();
         clusters = this.service.getClusters(
-                null, null, tags, null, null, 0, 10);
+                null, null, tags, null, null, 0, 10, true, null);
         Assert.assertEquals(2, clusters.size());
         Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
         Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
@@ -199,7 +199,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         time.clear();
         time.set(2014, Calendar.JULY, 9, 2, 58, 59);
         final List<Cluster> clusters = this.service.getClusters(
-                null, null, null, time.getTimeInMillis(), null, 0, 10);
+                null, null, null, time.getTimeInMillis(), null, 0, 10, true, null);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
     }
@@ -213,9 +213,97 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         time.clear();
         time.set(2014, Calendar.JULY, 8, 3, 0, 0);
         final List<Cluster> clusters = this.service.getClusters(
-                null, null, null, null, time.getTimeInMillis(), 0, 10);
+                null, null, null, null, time.getTimeInMillis(), 0, 10, true, null);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
+    }
+
+    /**
+     * Test the get clusters method with descending sort.
+     */
+    @Test
+    public void testGetClustersDescending() {
+        //Default to order by Updated
+        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, null);
+        Assert.assertEquals(2, clusters.size());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
+    }
+
+    /**
+     * Test the get clusters method with ascending sort.
+     */
+    @Test
+    public void testGetClustersAscending() {
+        //Default to order by Updated
+        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, false, null);
+        Assert.assertEquals(2, clusters.size());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.get(1).getId());
+    }
+
+    /**
+     * Test the get clusters method default order by.
+     */
+    @Test
+    public void testGetClustersOrderBysDefault() {
+        //Default to order by Updated
+        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, null);
+        Assert.assertEquals(2, clusters.size());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
+    }
+
+    /**
+     * Test the get clusters method order by updated.
+     */
+    @Test
+    public void testGetClustersOrderBysUpdated() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("updated");
+        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(2, clusters.size());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
+    }
+
+    /**
+     * Test the get clusters method order by name.
+     */
+    @Test
+    public void testGetClustersOrderBysUser() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("user");
+        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(2, clusters.size());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.get(1).getId());
+    }
+
+    /**
+     * Test the get clusters method order by an invalid field should return the order by default value (updated).
+     */
+    @Test
+    public void testGetClustersOrderBysInvalidField() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("I'mNotAValidField");
+        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(2, clusters.size());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
+    }
+
+    /**
+     * Test the get clusters method order by a collection field should return the order by default value (updated).
+     */
+    @Test
+    public void testGetClustersOrderBysCollectionField() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("tags");
+        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(2, clusters.size());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
     }
 
     /**
@@ -509,11 +597,11 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(2,
-                this.service.getClusters(null, null, null, null, null, 0, 10)
+                this.service.getClusters(null, null, null, null, null, 0, 10, true, null)
                 .size());
         Assert.assertEquals(2, this.service.deleteAllClusters().size());
         Assert.assertTrue(
-                this.service.getClusters(null, null, null, null, null, 0, 10)
+                this.service.getClusters(null, null, null, null, null, 0, 10, true, null)
                 .isEmpty());
     }
 

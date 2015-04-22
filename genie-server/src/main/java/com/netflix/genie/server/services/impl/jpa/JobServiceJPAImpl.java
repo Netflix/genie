@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Sort.Direction;
 import com.netflix.genie.common.model.Job_;
 
 import javax.inject.Inject;
@@ -175,13 +174,13 @@ public class JobServiceJPAImpl implements JobService {
             final String clusterName,
             final String clusterId,
             final int page,
-            final int limit) {
+            final int limit,
+            final boolean descending,
+            final Set<String> orderBys) {
         LOG.debug("called");
-        final PageRequest pageRequest = new PageRequest(
-                page < 0 ? 0 : page,
-                limit < 1 ? 1024 : limit,
-                Direction.DESC,
-                Job_.updated.getName()
+
+        final PageRequest pageRequest = JPAUtils.getPageRequest(
+                page, limit, descending, orderBys, Job_.class, Job_.updated.getName()
         );
 
         @SuppressWarnings("unchecked")

@@ -35,7 +35,6 @@ import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.ClusterConfigService;
-import org.springframework.data.domain.Sort.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,15 +140,14 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final Long minUpdateTime,
             final Long maxUpdateTime,
             final int page,
-            final int limit) {
-
+            final int limit,
+            final boolean descending,
+            final Set<String> orderBys
+    ) {
         LOG.debug("called");
 
-        final PageRequest pageRequest = new PageRequest(
-                page < 0 ? 0 : page,
-                limit < 1 ? 1024 : limit,
-                Direction.DESC,
-                Cluster_.updated.getName()
+        final PageRequest pageRequest = JPAUtils.getPageRequest(
+                page, limit, descending, orderBys, Cluster_.class, Cluster_.updated.getName()
         );
 
         @SuppressWarnings("unchecked")

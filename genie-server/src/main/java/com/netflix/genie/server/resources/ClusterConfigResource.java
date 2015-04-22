@@ -158,6 +158,8 @@ public class ClusterConfigResource {
      * @param maxUpdateTime max time when cluster configuration was updated
      * @param limit         number of entries to return
      * @param page          page number
+     * @param descending    Whether results returned in descending or ascending order
+     * @param orderBys      The fields to order the results by
      * @return the Clusters found matching the criteria
      * @throws GenieException For any error
      */
@@ -191,13 +193,31 @@ public class ClusterConfigResource {
             final Long maxUpdateTime,
             @ApiParam(value = "The page to start on.", required = false)
             @QueryParam("page")
-            @DefaultValue("0") int page,
+            @DefaultValue("0")
+            int page,
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit")
-            @DefaultValue("1024") int limit)
+            @DefaultValue("1024")
+            int limit,
+            @ApiParam(
+                    value = "Whether results should be sorted in descending or ascending order. Defaults to descending",
+                    required = false
+            )
+            @QueryParam("descending")
+            @DefaultValue("true")
+            boolean descending,
+            @ApiParam(
+                    value = "The fields to order the results by. Must not be collection fields. Default is updated.",
+                    required = false
+            )
+            @QueryParam("orderBy")
+            final Set<String> orderBys)
             throws GenieException {
-        LOG.info("Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page | limit");
-        LOG.info(name
+        LOG.info(
+                "Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page | limit | descending | orderBys]"
+        );
+        LOG.info(
+                name
                 + " | "
                 + statuses
                 + " | "
@@ -209,7 +229,12 @@ public class ClusterConfigResource {
                 + " | "
                 + page
                 + " | "
-                + limit);
+                + limit
+                + " | "
+                + descending
+                + " | "
+                + orderBys
+        );
         //Create this conversion internal in case someone uses lower case by accident?
         Set<ClusterStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
@@ -220,7 +245,9 @@ public class ClusterConfigResource {
                 }
             }
         }
-        return this.ccs.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page, limit);
+        return this.ccs.getClusters(
+                name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page, limit, descending, orderBys
+        );
     }
 
     /**

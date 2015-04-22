@@ -26,11 +26,6 @@ import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 
-import java.io.ByteArrayOutputStream;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

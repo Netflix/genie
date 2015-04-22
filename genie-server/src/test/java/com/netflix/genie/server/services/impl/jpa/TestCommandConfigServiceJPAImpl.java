@@ -58,8 +58,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String COMMAND_1_VERSION = "1.2.3";
     private static final String COMMAND_1_EXECUTABLE = "pig";
     private static final String COMMAND_1_JOB_TYPE = "yarn";
-    private static final CommandStatus COMMAND_1_STATUS
-            = CommandStatus.ACTIVE;
+    private static final CommandStatus COMMAND_1_STATUS = CommandStatus.ACTIVE;
 
     private static final String COMMAND_2_ID = "command2";
     private static final String COMMAND_2_NAME = "hive_11_prod";
@@ -67,8 +66,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String COMMAND_2_VERSION = "4.5.6";
     private static final String COMMAND_2_EXECUTABLE = "hive";
     private static final String COMMAND_2_JOB_TYPE = "yarn";
-    private static final CommandStatus COMMAND_2_STATUS
-            = CommandStatus.INACTIVE;
+    private static final CommandStatus COMMAND_2_STATUS = CommandStatus.INACTIVE;
 
     private static final String COMMAND_3_ID = "command3";
     private static final String COMMAND_3_NAME = "pig_11_prod";
@@ -76,8 +74,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String COMMAND_3_VERSION = "7.8.9";
     private static final String COMMAND_3_EXECUTABLE = "pig";
     private static final String COMMAND_3_JOB_TYPE = "yarn";
-    private static final CommandStatus COMMAND_3_STATUS
-            = CommandStatus.DEPRECATED;
+    private static final CommandStatus COMMAND_3_STATUS = CommandStatus.DEPRECATED;
 
     @Inject
     private CommandConfigService service;
@@ -158,8 +155,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsByName() {
-        final List<Command> commands = this.service.getCommands(
-                COMMAND_2_NAME, null, null, null, 0, 10);
+        final List<Command> commands = this.service.getCommands(COMMAND_2_NAME, null, null, null, 0, 10, true, null);
         Assert.assertEquals(1, commands.size());
         Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
     }
@@ -169,8 +165,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsByUserName() {
-        final List<Command> apps = this.service.getCommands(
-                null, COMMAND_1_USER, null, null, -1, -5000);
+        final List<Command> apps = this.service.getCommands(null, COMMAND_1_USER, null, null, -1, -5000, true, null);
         Assert.assertEquals(2, apps.size());
         Assert.assertEquals(COMMAND_3_ID, apps.get(0).getId());
         Assert.assertEquals(COMMAND_1_ID, apps.get(1).getId());
@@ -184,8 +179,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         final Set<CommandStatus> statuses = new HashSet<>();
         statuses.add(CommandStatus.INACTIVE);
         statuses.add(CommandStatus.DEPRECATED);
-        final List<Command> apps = this.service.getCommands(
-                null, null, statuses, null, -1, -5000);
+        final List<Command> apps = this.service.getCommands(null, null, statuses, null, -1, -5000, true, null);
         Assert.assertEquals(2, apps.size());
         Assert.assertEquals(COMMAND_2_ID, apps.get(0).getId());
         Assert.assertEquals(COMMAND_3_ID, apps.get(1).getId());
@@ -198,35 +192,125 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     public void testGetCommandsByTags() {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
-        List<Command> commands = this.service.getCommands(
-                null, null, null, tags, 0, 10);
+        List<Command> commands = this.service.getCommands(null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(3, commands.size());
         Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
         Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
         Assert.assertEquals(COMMAND_1_ID, commands.get(2).getId());
 
         tags.add("pig");
-        commands = this.service.getCommands(
-                null, null, null, tags, 0, 10);
+        commands = this.service.getCommands(null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(2, commands.size());
         Assert.assertEquals(COMMAND_3_ID, commands.get(0).getId());
         Assert.assertEquals(COMMAND_1_ID, commands.get(1).getId());
 
         tags.clear();
         tags.add("hive");
-        commands = this.service.getCommands(
-                null, null, null, tags, 0, 10);
+        commands = this.service.getCommands(null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(1, commands.size());
         Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
 
         tags.add("somethingThatWouldNeverReallyExist");
-        commands = this.service.getCommands(
-                null, null, null, tags, 0, 10);
+        commands = this.service.getCommands(null, null, null, tags, 0, 10, true, null);
         Assert.assertTrue(commands.isEmpty());
 
         tags.clear();
-        commands = this.service.getCommands(
-                null, null, null, tags, 0, 10);
+        commands = this.service.getCommands(null, null, null, tags, 0, 10, true, null);
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_1_ID, commands.get(2).getId());
+    }
+
+    /**
+     * Test the get commands method with descending sort.
+     */
+    @Test
+    public void testGetClustersDescending() {
+        //Default to order by Updated
+        final List<Command> commands = this.service.getCommands(null, null, null, null, 0, 10, true, null);
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_1_ID, commands.get(2).getId());
+    }
+
+    /**
+     * Test the get commands method with ascending sort.
+     */
+    @Test
+    public void testGetClustersAscending() {
+        //Default to order by Updated
+        final List<Command> commands = this.service.getCommands(null, null, null, null, 0, 10, false, null);
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(2).getId());
+    }
+
+    /**
+     * Test the get commands method default order by.
+     */
+    @Test
+    public void testGetClustersOrderBysDefault() {
+        //Default to order by Updated
+        final List<Command> commands = this.service.getCommands(null, null, null, null, 0, 10, true, null);
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_1_ID, commands.get(2).getId());
+    }
+
+    /**
+     * Test the get commands method order by updated.
+     */
+    @Test
+    public void testGetClustersOrderBysUpdated() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("updated");
+        final List<Command> commands = this.service.getCommands(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_1_ID, commands.get(2).getId());
+    }
+
+    /**
+     * Test the get commands method order by name.
+     */
+    @Test
+    public void testGetClustersOrderBysName() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("name");
+        final List<Command> commands = this.service.getCommands(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(2).getId());
+    }
+
+    /**
+     * Test the get commands method order by an invalid field should return the order by default value (updated).
+     */
+    @Test
+    public void testGetClustersOrderBysInvalidField() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("I'mNotAValidField");
+        final List<Command> commands = this.service.getCommands(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_1_ID, commands.get(2).getId());
+    }
+
+    /**
+     * Test the get commands method order by a collection field should return the order by default value (updated).
+     */
+    @Test
+    public void testGetClustersOrderBysCollectionField() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("tags");
+        final List<Command> commands = this.service.getCommands(null, null, null, null, 0, 10, true, orderBys);
         Assert.assertEquals(3, commands.size());
         Assert.assertEquals(COMMAND_2_ID, commands.get(0).getId());
         Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
@@ -458,12 +542,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testDeleteAll() throws GenieException {
-        Assert.assertEquals(3,
-                this.service.getCommands(null, null, null, null, 0, 10).size());
+        Assert.assertEquals(3, this.service.getCommands(null, null, null, null, 0, 10, true, null).size());
         Assert.assertEquals(3, this.service.deleteAllCommands().size());
-        Assert.assertTrue(
-                this.service.getCommands(null, null, null, null, 0, 10)
-                .isEmpty());
+        Assert.assertTrue(this.service.getCommands(null, null, null, null, 0, 10, true, null).isEmpty());
     }
 
     /**

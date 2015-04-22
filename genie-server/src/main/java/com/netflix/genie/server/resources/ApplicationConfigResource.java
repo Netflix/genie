@@ -156,6 +156,8 @@ public class ApplicationConfigResource {
      * @param tags     The set of tags you want the command for.
      * @param page     The page to start one (optional)
      * @param limit    the max number of results to return per page (optional)
+     * @param descending    Whether results returned in descending or ascending order (optional)
+     * @param orderBys      The fields to order the results by (optional)
      * @return All applications matching the criteria
      * @throws GenieException For any error
      */
@@ -186,10 +188,45 @@ public class ApplicationConfigResource {
             final Set<String> tags,
             @ApiParam(value = "The page to start on.", required = false)
             @QueryParam("page")
-            @DefaultValue("0") int page,
+            @DefaultValue("0")
+            int page,
             @ApiParam(value = "Max number of results per page.", required = false)
             @QueryParam("limit")
-            @DefaultValue("1024") int limit) throws GenieException {
+            @DefaultValue("1024")
+            int limit,
+            @ApiParam(
+                    value = "Whether results should be sorted in descending or ascending order. Defaults to descending",
+                    required = false
+            )
+            @QueryParam("descending")
+            @DefaultValue("true")
+            boolean descending,
+            @ApiParam(
+                    value = "The fields to order the results by. Must not be collection fields. Default is updated.",
+                    required = false
+            )
+            @QueryParam("orderBy")
+            final Set<String> orderBys) throws GenieException {
+        LOG.info(
+                "Called [name | userName | status | tags | page | limit | descending | orderBys]"
+        );
+        LOG.info(
+                name
+                        + " | "
+                        + userName
+                        + " | "
+                        + statuses
+                        + " | "
+                        + tags
+                        + " | "
+                        + page
+                        + " | "
+                        + limit
+                        + " | "
+                        + descending
+                        + " | "
+                        + orderBys
+        );
         Set<ApplicationStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
@@ -199,7 +236,7 @@ public class ApplicationConfigResource {
                 }
             }
         }
-        return this.acs.getApplications(name, userName, enumStatuses, tags, page, limit);
+        return this.acs.getApplications(name, userName, enumStatuses, tags, page, limit, descending, orderBys);
     }
 
     /**

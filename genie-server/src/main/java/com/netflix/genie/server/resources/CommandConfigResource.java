@@ -179,12 +179,14 @@ public class CommandConfigResource {
     /**
      * Get Command configuration based on user parameters.
      *
-     * @param name     name for command (optional)
-     * @param userName the user who created the configuration (optional)
-     * @param statuses The statuses of the commands to get (optional)
-     * @param tags     The set of tags you want the command for.
-     * @param page     The page to start one (optional)
-     * @param limit    the max number of results to return per page (optional)
+     * @param name          Name for command (optional)
+     * @param userName      The user who created the configuration (optional)
+     * @param statuses      The statuses of the commands to get (optional)
+     * @param tags          The set of tags you want the command for.
+     * @param page          The page to start one (optional)
+     * @param limit         The max number of results to return per page (optional)
+     * @param descending    Whether results returned in descending or ascending order (optional)
+     * @param orderBys      The fields to order the results by (optional)
      * @return All the Commands matching the criteria or all if no criteria
      * @throws GenieException For any error
      */
@@ -214,17 +216,20 @@ public class CommandConfigResource {
                     value = "Name of the command.",
                     required = false
             )
-            @QueryParam("name") final String name,
+            @QueryParam("name")
+            final String name,
             @ApiParam(
                     value = "User who created the command.",
                     required = false
             )
-            @QueryParam("userName") final String userName,
+            @QueryParam("userName")
+            final String userName,
             @ApiParam(
                     value = "The statuses of the commands to find.",
                     required = false
             )
-            @QueryParam("status") final Set<String> statuses,
+            @QueryParam("status")
+            final Set<String> statuses,
             @ApiParam(value = "Tags for the cluster.", required = false)
             @QueryParam("tag")
             final Set<String> tags,
@@ -233,14 +238,49 @@ public class CommandConfigResource {
                     required = false
             )
             @QueryParam("page")
-            @DefaultValue("0") int page,
+            @DefaultValue("0")
+            int page,
             @ApiParam(
                     value = "Max number of results per page.",
                     required = false
             )
             @QueryParam("limit")
-            @DefaultValue("1024") int limit) throws GenieException {
-        LOG.info("Called to get commands.");
+            @DefaultValue("1024")
+            int limit,
+            @ApiParam(
+                    value = "Whether results should be sorted in descending or ascending order. Defaults to descending",
+                    required = false
+            )
+            @QueryParam("descending")
+            @DefaultValue("true")
+            boolean descending,
+            @ApiParam(
+                    value = "The fields to order the results by. Must not be collection fields. Default is updated.",
+                    required = false
+            )
+            @QueryParam("orderBy")
+            final Set<String> orderBys) throws GenieException {
+        LOG.info(
+                "Called [name | userName | status | tags | page | limit | descending | orderBys]"
+        );
+        LOG.info(
+                name
+                        + " | "
+                        + userName
+                        + " | "
+                        + statuses
+                        + " | "
+                        + tags
+                        + " | "
+                        + page
+                        + " | "
+                        + limit
+                        + " | "
+                        + descending
+                        + " | "
+                        + orderBys
+        );
+
         Set<CommandStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
@@ -250,7 +290,7 @@ public class CommandConfigResource {
                 }
             }
         }
-        return this.ccs.getCommands(name, userName, enumStatuses, tags, page, limit);
+        return this.ccs.getCommands(name, userName, enumStatuses, tags, page, limit, descending, orderBys);
     }
 
     /**

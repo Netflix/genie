@@ -265,11 +265,29 @@ public class JobResource {
             @QueryParam("executionClusterId")
             final String clusterId,
             @ApiParam(value = "The page to start on.", required = false)
-            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("page") @DefaultValue("0")
+            int page,
             @ApiParam(value = "Max number of results per page.", required = false)
-            @QueryParam("limit") @DefaultValue("1024") int limit)
+            @QueryParam("limit") @DefaultValue("1024")
+            int limit,
+            @ApiParam(
+                    value = "Whether results should be sorted in descending or ascending order. Defaults to descending",
+                    required = false
+            )
+            @QueryParam("descending")
+            @DefaultValue("true")
+            boolean descending,
+            @ApiParam(
+                    value = "The fields to order the results by. Must not be collection fields. Default is updated.",
+                    required = false
+            )
+            @QueryParam("orderBy")
+            final Set<String> orderBys)
             throws GenieException {
-        LOG.info("Called with [id | jobName | userName | statuses | executionClusterName | executionClusterId | page | limit]");
+        LOG.info(
+                "Called with [id | jobName | userName | statuses | executionClusterName "
+                        + "| executionClusterId | page | limit | descending | orderBys]"
+        );
         LOG.info(id
                 + " | "
                 + name
@@ -286,7 +304,12 @@ public class JobResource {
                 + " | "
                 + page
                 + " | "
-                + limit);
+                + limit
+                + " | "
+                + descending
+                + " | "
+                + orderBys
+        );
         Set<JobStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(JobStatus.class);
@@ -297,8 +320,7 @@ public class JobResource {
             }
         }
 
-        @SuppressWarnings("unchecked")
-        final List<Job> jobs = this.jobService.getJobs(
+        return this.jobService.getJobs(
                 id,
                 name,
                 userName,
@@ -307,8 +329,9 @@ public class JobResource {
                 clusterName,
                 clusterId,
                 page,
-                limit);
-        return jobs;
+                limit,
+                descending,
+                orderBys);
     }
 
     /**

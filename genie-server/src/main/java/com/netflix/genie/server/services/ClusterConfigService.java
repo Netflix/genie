@@ -64,6 +64,8 @@ public interface ClusterConfigService {
      * @param maxUpdateTime max time when cluster configuration was updated
      * @param page          page number
      * @param limit         number of entries to return
+     * @param descending    Whether the results should be returned in descending or ascending order
+     * @param orderBys      The fields to order the results by
      * @return All the clusters matching the criteria
      */
     List<Cluster> getClusters(
@@ -73,7 +75,9 @@ public interface ClusterConfigService {
             final Long minUpdateTime,
             final Long maxUpdateTime,
             final int page,
-            final int limit);
+            final int limit,
+            final boolean descending,
+            final Set<String> orderBys);
 
     /**
      * Get the clusters on which the job can be run.
