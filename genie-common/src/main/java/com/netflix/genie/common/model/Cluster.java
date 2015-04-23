@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
-@ApiModel(description = "A Cluster")
+@ApiModel(description = "An entity for managing a cluster in the Genie system.")
 public class Cluster extends CommonEntityFields {
 
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
@@ -63,8 +63,7 @@ public class Cluster extends CommonEntityFields {
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The status of the cluster",
-            required = true,
-            dataType = "string"
+            required = true
     )
     private ClusterStatus status;
 
@@ -79,7 +78,8 @@ public class Cluster extends CommonEntityFields {
             value = "The type of the cluster to use to figure out the job manager for this"
                     + " cluster. e.g.: yarn, presto, mesos etc. The mapping to a JobManager will be"
                     + " specified using the property: com.netflix.genie.server.job.manager.<clusterType>.impl",
-            required = true)
+            required = true
+    )
     private String clusterType;
 
     /**
@@ -88,7 +88,8 @@ public class Cluster extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "All the configuration files needed for this cluster which will be downloaded pre-use",
-            required = true)
+            required = true
+    )
     private Set<String> configs;
 
     /**
@@ -97,7 +98,8 @@ public class Cluster extends CommonEntityFields {
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
             value = "The tags associated with this cluster",
-            required = true)
+            required = true
+    )
     private Set<String> tags;
 
     /**

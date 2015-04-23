@@ -11,7 +11,7 @@
     <bean id="beanConfig" class="com.wordnik.swagger.jaxrs.config.BeanConfig">
         <property name="title" value="Genie REST API"/>
         <property name="description" value="See our &lt;a href=&quot;http://netflix.github.io/genie&quot;&gt;GitHub Page&lt;/a&gt; for more documentation.&lt;br/&gt;Post any issues found &lt;a href=&quot;https://github.com/Netflix/genie/issues&quot;>here&lt;/a&gt;.&lt;br/&gt;"/>
-        <property name="contact" value="Netflix, Inc"/>
+        <property name="contact" value="Netflix, Inc."/>
         <property name="license" value="Apache 2.0"/>
         <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0"/>
         <property name="version" value="2.2.0-SNAPSHOT"/>

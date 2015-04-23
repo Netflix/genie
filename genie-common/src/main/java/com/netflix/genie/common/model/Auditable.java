@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @MappedSuperclass
-@ApiModel(description = "An auditable item")
 public class Auditable implements Serializable, Validate {
 
     private static final Logger LOG = LoggerFactory.getLogger(Auditable.class);
@@ -73,7 +72,8 @@ public class Auditable implements Serializable, Validate {
     @Column(updatable = false)
     @ApiModelProperty(
             value = "When this resource was created. Set automatically by system",
-            dataType = "date"
+            readOnly = true,
+            dataType = "dateTime"
     )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
@@ -86,7 +86,8 @@ public class Auditable implements Serializable, Validate {
     @Basic(optional = false)
     @ApiModelProperty(
             value = "When this resource was last updated. Set automatically by system",
-            dataType = "date"
+            readOnly = true,
+            dataType = "dateTime"
     )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)

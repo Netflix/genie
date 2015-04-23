@@ -136,7 +136,7 @@ deployGenie() {
     export CATALINA_OPTS="-Darchaius.deployment.applicationId=genie -Darchaius.deployment.environment=dev"
     echo "CATALINA_OPTS = $CATALINA_OPTS"
 
-    echo "Deploying the Genie applicationn"
+    echo "Deploying the Genie application"
     ./local_deploy.sh
     echo "Successfully deployed the application"
 }
