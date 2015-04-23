@@ -33,7 +33,7 @@ dependencies {
     compile ("com.google.inject.extensions:guice-spring:${guice_version}")
 
     // Swagger Libs
-    compile ("com.wordnik:swagger-jersey-jaxrs_2.10:${swagger_version}") {
+    compile ("com.wordnik:swagger-jersey-jaxrs:${swagger_version}") {
         exclude group: "com.sun.jersey"
         exclude group: "com.sun.jersey.contribs"
     }

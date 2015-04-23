@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- See: https://github.com/swagger-api/swagger-core/wiki/Swagger-Core-Jersey-1.X-Project-Setup-1.5#using-spring -->
+
+    <bean id="apiListingResource" class="com.wordnik.swagger.jaxrs.listing.ApiListingResource"/>
+    <bean id="swaggerSerializers" class="com.wordnik.swagger.jaxrs.listing.SwaggerSerializers" scope="singleton"/>
+
+    <bean id="beanConfig" class="com.wordnik.swagger.jaxrs.config.BeanConfig">
+        <property name="title" value="Genie REST API"/>
+        <property name="description" value="See our &lt;a href=&quot;http://netflix.github.io/genie&quot;&gt;GitHub Page&lt;/a&gt; for more documentation.&lt;br/&gt;Post any issues found &lt;a href=&quot;https://github.com/Netflix/genie/issues&quot;>here&lt;/a&gt;.&lt;br/&gt;"/>
+        <property name="contact" value="Netflix, Inc"/>
+        <property name="license" value="Apache 2.0"/>
+        <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0"/>
+        <property name="version" value="2.2.0-SNAPSHOT"/>
+        <property name="schemes" value="http"/>
+        <property name="host" value="localhost:7001"/>
+        <property name="basePath" value="/genie"/>
+        <property name="resourcePackage" value="com.netflix.genie.server.resources"/>
+        <property name="scan" value="true"/>
+        <property name="prettyPrint" value="true"/>
+    </bean>
+</beans>

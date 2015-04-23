@@ -7,10 +7,15 @@
         qp = location.search.substring(1);
     }
     qp = qp ? JSON.parse('{"' + qp.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
-            function(key, value) {
+            function (key, value) {
                 return key === "" ? value : decodeURIComponent(value)
             }
     ) : {}
-    window.opener.onOAuthComplete(qp);
+
+    if (window.opener.swaggerUi.tokenUrl)
+        window.opener.processOAuthCode(qp);
+    else
+        window.opener.onOAuthComplete(qp);
+
     window.close();
 </script>

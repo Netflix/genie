@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @MappedSuperclass
-@ApiModel(value = "An auditable item")
+@ApiModel(description = "An auditable item")
 public class Auditable implements Serializable, Validate {
 
     private static final Logger LOG = LoggerFactory.getLogger(Auditable.class);

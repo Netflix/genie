@@ -61,18 +61,27 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v2/config/applications")
-@Api(value = "/v2/config/applications", description = "Manage the available applications")
+@Api(
+        value = "/v2/config/applications",
+        tags = "applications",
+        description = "Manage the available applications"
+)
 @Produces(MediaType.APPLICATION_JSON)
 @Named
 public class ApplicationConfigResource {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ApplicationConfigResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigResource.class);
 
     /**
      * The application service.
      */
     private final ApplicationConfigService acs;
+
+    /**
+     * To get URI information for return codes.
+     */
+    @Context
+    private UriInfo uriInfo;
 
     /**
      * Constructor.
@@ -88,7 +97,6 @@ public class ApplicationConfigResource {
      * Create an Application.
      *
      * @param app     The application to create
-     * @param uriInfo For gathering information on the request
      * @return The created application configuration
      * @throws GenieException For any error
      */
@@ -97,24 +105,38 @@ public class ApplicationConfigResource {
     @ApiOperation(
             value = "Create an application",
             notes = "Create an application from the supplied information.",
-            response = Application.class)
+            response = Application.class
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_CREATED, message = "Application created successfully.",
-                    response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_CONFLICT,
-                    message = "An application with the supplied id already exists"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "A precondition failed"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_CREATED,
+                    message = "Application created successfully.",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_CONFLICT,
+                    message = "An application with the supplied id already exists"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "A precondition failed"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Response createApplication(
-            @ApiParam(value = "The application to create.", required = true)
-            final Application app,
-            @Context UriInfo uriInfo) throws GenieException {
+            @ApiParam(
+                    value = "The application to create.",
+                    required = true
+            )
+            final Application app
+    ) throws GenieException {
         LOG.info("Called to create new application");
         final Application createdApp = this.acs.createApplication(app);
         return Response.created(
-                uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
+                this.uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
                 entity(createdApp).
                 build();
     }
@@ -131,18 +153,35 @@ public class ApplicationConfigResource {
     @ApiOperation(
             value = "Find an application by id",
             notes = "Get the application by id if it exists",
-            response = Application.class)
+            response = Application.class
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid id supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid id supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Application getApplication(
-            @ApiParam(value = "Id of the application to get.", required = true)
+            @ApiParam(
+                    value = "Id of the application to get.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called to get Application for id " + id);
         return this.acs.getApplication(id);
     }
@@ -164,32 +203,57 @@ public class ApplicationConfigResource {
             value = "Find applications",
             notes = "Find applications by the submitted criteria.",
             response = Application.class,
-            responseContainer = "List")
+            responseContainer = "List"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "If status is invalid."),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "If status is invalid."
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public List<Application> getApplications(
-            @ApiParam(value = "Name of the application.", required = false)
+            @ApiParam(
+                    value = "Name of the application."
+            )
             @QueryParam("name")
             final String name,
-            @ApiParam(value = "User who created the application.", required = false)
+            @ApiParam(
+                    value = "User who created the application."
+            )
             @QueryParam("userName")
             final String userName,
-            @ApiParam(value = "The status of the applications to get.", required = false)
+            @ApiParam(
+                    value = "The status of the applications to get."
+            )
             @QueryParam("status")
             final Set<String> statuses,
-            @ApiParam(value = "Tags for the cluster.", required = false)
+            @ApiParam(
+                    value = "Tags for the cluster."
+            )
             @QueryParam("tag")
             final Set<String> tags,
-            @ApiParam(value = "The page to start on.", required = false)
+            @ApiParam(
+                    value = "The page to start on."
+            )
             @QueryParam("page")
-            @DefaultValue("0") int page,
-            @ApiParam(value = "Max number of results per page.", required = false)
+            @DefaultValue("0")
+            int page,
+            @ApiParam(
+                    value = "Max number of results per page."
+            )
             @QueryParam("limit")
-            @DefaultValue("1024") int limit) throws GenieException {
+            @DefaultValue("1024")
+            int limit
+    ) throws GenieException {
         Set<ApplicationStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
@@ -216,20 +280,40 @@ public class ApplicationConfigResource {
     @ApiOperation(
             value = "Update an application",
             notes = "Update an application from the supplied information.",
-            response = Application.class)
+            response = Application.class
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application to update not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application to update not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Application updateApplication(
-            @ApiParam(value = "Id of the application to update.", required = true)
+            @ApiParam(
+                    value = "Id of the application to update.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The application information to update.", required = true)
-            final Application updateApp) throws GenieException {
+            @ApiParam(
+                    value = "The application information to update.",
+                    required = true
+            )
+            final Application updateApp
+    ) throws GenieException {
         LOG.info("called to update application config with info " + updateApp.toString());
         return this.acs.updateApplication(id, updateApp);
     }
@@ -245,11 +329,18 @@ public class ApplicationConfigResource {
             value = "Delete all applications",
             notes = "Delete all available applications and get them back.",
             response = Application.class,
-            responseContainer = "List")
+            responseContainer = "List"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public List<Application> deleteAllApplications() throws GenieException {
         LOG.info("Delete all Applications");
@@ -268,18 +359,35 @@ public class ApplicationConfigResource {
     @ApiOperation(
             value = "Delete an application",
             notes = "Delete an application with the supplied id.",
-            response = Application.class)
+            response = Application.class
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Application deleteApplication(
-            @ApiParam(value = "Id of the application to delete.", required = true)
+            @ApiParam(
+                    value = "Id of the application to delete.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Delete an application with id " + id);
         return this.acs.deleteApplication(id);
     }
@@ -300,20 +408,40 @@ public class ApplicationConfigResource {
             value = "Add new configuration files to an application",
             notes = "Add the supplied configuration files to the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> addConfigsToApplication(
-            @ApiParam(value = "Id of the application to add configuration to.", required = true)
+            @ApiParam(
+                    value = "Id of the application to add configuration to.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The configuration files to add.", required = true)
-            final Set<String> configs) throws GenieException {
+            @ApiParam(
+                    value = "The configuration files to add.",
+                    required = true
+            )
+            final Set<String> configs
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + configs);
         return this.acs.addConfigsToApplication(id, configs);
     }
@@ -332,18 +460,35 @@ public class ApplicationConfigResource {
             value = "Get the configuration files for an application",
             notes = "Get the configuration files for the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> getConfigsForApplication(
-            @ApiParam(value = "Id of the application to get configurations for.", required = true)
+            @ApiParam(
+                    value = "Id of the application to get configurations for.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.acs.getConfigsForApplication(id);
     }
@@ -365,20 +510,40 @@ public class ApplicationConfigResource {
             value = "Update configuration files for an application",
             notes = "Replace the existing configuration files for application with given id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> updateConfigsForApplication(
-            @ApiParam(value = "Id of the application to update configurations for.", required = true)
+            @ApiParam(
+                    value = "Id of the application to update configurations for.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The configuration files to replace existing with.", required = true)
-            final Set<String> configs) throws GenieException {
+            @ApiParam(
+                    value = "The configuration files to replace existing with.",
+                    required = true
+            )
+            final Set<String> configs
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and configs " + configs);
         return this.acs.updateConfigsForApplication(id, configs);
     }
@@ -397,18 +562,35 @@ public class ApplicationConfigResource {
             value = "Remove all configuration files from an application",
             notes = "Remove all the configuration files from the application with given id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> removeAllConfigsForApplication(
-            @ApiParam(value = "Id of the application to delete from.", required = true)
+            @ApiParam(
+                    value = "Id of the application to delete from.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.acs.removeAllConfigsForApplication(id);
     }
@@ -429,20 +611,40 @@ public class ApplicationConfigResource {
             value = "Add new jar files to an application",
             notes = "Add the supplied jar files to the applicaiton with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> addJarsForApplication(
-            @ApiParam(value = "Id of the application to add jar to.", required = true)
+            @ApiParam(
+                    value = "Id of the application to add jar to.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The jar files to add.", required = true)
-            final Set<String> jars) throws GenieException {
+            @ApiParam(
+                    value = "The jar files to add.",
+                    required = true
+            )
+            final Set<String> jars
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and jars " + jars);
         return this.acs.addJarsForApplication(id, jars);
     }
@@ -461,18 +663,35 @@ public class ApplicationConfigResource {
             value = "Get the jars for an application",
             notes = "Get the jars for the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> getJarsForApplication(
-            @ApiParam(value = "Id of the application to get the jars for.", required = true)
+            @ApiParam(
+                    value = "Id of the application to get the jars for.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.acs.getJarsForApplication(id);
     }
@@ -494,20 +713,40 @@ public class ApplicationConfigResource {
             value = "Update jar files for an application",
             notes = "Replace the existing jar files for application with given id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> updateJarsForApplication(
-            @ApiParam(value = "Id of the application to update configurations for.", required = true)
+            @ApiParam(
+                    value = "Id of the application to update configurations for.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The jar files to replace existing with.", required = true)
-            final Set<String> jars) throws GenieException {
+            @ApiParam(
+                    value = "The jar files to replace existing with.",
+                    required = true
+            )
+            final Set<String> jars
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and jars " + jars);
         return this.acs.updateJarsForApplication(id, jars);
     }
@@ -526,18 +765,35 @@ public class ApplicationConfigResource {
             value = "Remove all jar files from an application",
             notes = "Remove all the jar files from the application with given id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> removeAllJarsForApplication(
-            @ApiParam(value = "Id of the application to delete from.", required = true)
+            @ApiParam(
+                    value = "Id of the application to delete from.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.acs.removeAllJarsForApplication(id);
     }
@@ -558,20 +814,40 @@ public class ApplicationConfigResource {
             value = "Add new tags to a application",
             notes = "Add the supplied tags to the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> addTagsForApplication(
-            @ApiParam(value = "Id of the application to add configuration to.", required = true)
+            @ApiParam(
+                    value = "Id of the application to add configuration to.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The tags to add.", required = true)
-            final Set<String> tags) throws GenieException {
+            @ApiParam(
+                    value = "The tags to add.",
+                    required = true
+            )
+            final Set<String> tags
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + tags);
         return this.acs.addTagsForApplication(id, tags);
     }
@@ -590,18 +866,35 @@ public class ApplicationConfigResource {
             value = "Get the tags for a application",
             notes = "Get the tags for the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> getTagsForApplication(
-            @ApiParam(value = "Id of the application to get tags for.", required = true)
+            @ApiParam(
+                    value = "Id of the application to get tags for.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.acs.getTagsForApplication(id);
     }
@@ -623,20 +916,40 @@ public class ApplicationConfigResource {
             value = "Update tags for a application",
             notes = "Replace the existing tags for application with given id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> updateTagsForApplication(
-            @ApiParam(value = "Id of the application to update tags for.", required = true)
+            @ApiParam(
+                    value = "Id of the application to update tags for.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The tags to replace existing with.", required = true)
-            final Set<String> tags) throws GenieException {
+            @ApiParam(
+                    value = "The tags to replace existing with.",
+                    required = true
+            )
+            final Set<String> tags
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
         return this.acs.updateTagsForApplication(id, tags);
     }
@@ -656,18 +969,35 @@ public class ApplicationConfigResource {
             notes = "Remove all the tags from the application with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> removeAllTagsForApplication(
-            @ApiParam(value = "Id of the application to delete from.", required = true)
+            @ApiParam(
+                    value = "Id of the application to delete from.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.acs.removeAllTagsForApplication(id);
     }
@@ -686,18 +1016,35 @@ public class ApplicationConfigResource {
             value = "Get the commands this application is associated with",
             notes = "Get the commands which this application supports.",
             response = Command.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<Command> getCommandsForApplication(
-            @ApiParam(value = "Id of the application to get the commands for.", required = true)
+            @ApiParam(
+                    value = "Id of the application to get the commands for.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.acs.getCommandsForApplication(id);
     }
@@ -718,21 +1065,41 @@ public class ApplicationConfigResource {
             notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
-            @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "OK", response = Application.class),
-            @ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Application not found"),
-            @ApiResponse(code = HttpURLConnection.HTTP_PRECON_FAILED, message = "Invalid ID supplied"),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_OK,
+                    message = "OK",
+                    response = Application.class
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
     })
     public Set<String> removeTagForApplication(
-            @ApiParam(value = "Id of the application to delete from.", required = true)
+            @ApiParam(
+                    value = "Id of the application to delete from.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The tag to remove.", required = true)
+            @ApiParam(
+                    value = "The tag to remove.",
+                    required = true
+            )
             @PathParam("tag")
-            final String tag) throws GenieException {
+            final String tag
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and tag " + tag);
         return this.acs.removeTagForApplication(id, tag);
     }

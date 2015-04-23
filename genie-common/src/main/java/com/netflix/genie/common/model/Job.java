@@ -24,6 +24,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
+import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
+@ApiModel(description = "A Job")
 public class Job extends CommonEntityFields {
 
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);

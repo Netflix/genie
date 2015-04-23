@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
-@ApiModel(value = "A Command")
+@ApiModel(description = "A Command")
 public class Command extends CommonEntityFields {
 
     private static final Logger LOG = LoggerFactory.getLogger(Command.class);

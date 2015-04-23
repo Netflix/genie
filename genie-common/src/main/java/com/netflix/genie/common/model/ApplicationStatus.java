@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author tgianos
  */
-@ApiModel(value = "Available statuses for an application")
+@ApiModel(description = "Available statuses for an application")
 public enum ApplicationStatus {
 
     /**

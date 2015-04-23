@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author tgianos
  */
-@ApiModel(value = "Available statuses for a cluster")
+@ApiModel(description = "Available statuses for a cluster")
 public enum ClusterStatus {
 
     /**

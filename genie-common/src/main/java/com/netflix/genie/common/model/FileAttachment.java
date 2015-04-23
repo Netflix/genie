@@ -31,7 +31,7 @@ import java.util.Arrays;
  * @author skrishnan
  * @author tgianos
  */
-@ApiModel(value = "An attachment for use with a job")
+@ApiModel(description = "An attachment for use with a job")
 public class FileAttachment implements Serializable {
 
     private static final long serialVersionUID = 1L;

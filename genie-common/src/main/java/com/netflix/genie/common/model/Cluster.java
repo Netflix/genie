@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
-@ApiModel(value = "A Cluster")
+@ApiModel(description = "A Cluster")
 public class Cluster extends CommonEntityFields {
 
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
