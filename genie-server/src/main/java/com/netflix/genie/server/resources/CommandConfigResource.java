@@ -234,7 +234,8 @@ public class CommandConfigResource {
             @QueryParam("userName")
             final String userName,
             @ApiParam(
-                    value = "The statuses of the commands to find."
+                    value = "The statuses of the commands to find.",
+                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
             @QueryParam("status")
             final Set<String> statuses,

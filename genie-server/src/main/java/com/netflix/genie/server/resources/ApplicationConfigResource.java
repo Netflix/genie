@@ -234,7 +234,8 @@ public class ApplicationConfigResource {
             @QueryParam("userName")
             final String userName,
             @ApiParam(
-                    value = "The status of the applications to get."
+                    value = "The status of the applications to get.",
+                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
             @QueryParam("status")
             final Set<String> statuses,

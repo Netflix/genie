@@ -346,7 +346,8 @@ public class JobResource {
             @QueryParam("userName")
             final String userName,
             @ApiParam(
-                    value = "Statuses of the jobs to fetch."
+                    value = "Statuses of the jobs to fetch.",
+                    allowableValues = "INIT, RUNNING, SUCCEEDED, KILLED, FAILED"
             )
             @QueryParam("status")
             final Set<String> statuses,

@@ -235,7 +235,8 @@ public class ClusterConfigResource {
             @QueryParam("status")
             final Set<String> statuses,
             @ApiParam(
-                    value = "Tags for the cluster."
+                    value = "Tags for the cluster.",
+                    allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
             )
             @QueryParam("tag")
             final Set<String> tags,
