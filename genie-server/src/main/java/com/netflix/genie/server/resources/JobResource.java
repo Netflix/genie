@@ -48,10 +48,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -74,6 +71,7 @@ import org.slf4j.LoggerFactory;
 public class JobResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
+    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
     /**
      * The execution service.
@@ -95,7 +93,7 @@ public class JobResource {
      * To get Header information for the request.
      */
     @Context
-    private HttpServletRequest hsr;
+    private HttpServletRequest httpServletRequest;
 
     /**
      * Constructor.
@@ -153,21 +151,19 @@ public class JobResource {
             )
             final Job job
     ) throws GenieException {
-        LOG.info("Called to submit job: " + job);
         if (job == null) {
             throw new GenieException(
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No job entered. Unable to submit.");
         }
+        LOG.info("Called to submit job: " + job);
 
         // get client's host from the context
-        // TODO : See if we can find a constant string for this
-        // TODO: Where is this set?
-        String clientHost = this.hsr.getHeader("X-Forwarded-For");
+        String clientHost = this.httpServletRequest.getHeader(FORWARDED_FOR_HEADER);
         if (clientHost != null) {
             clientHost = clientHost.split(",")[0];
         } else {
-            clientHost = this.hsr.getRemoteAddr();
+            clientHost = this.httpServletRequest.getRemoteAddr();
         }
 
         // set the clientHost, if it is not overridden already
