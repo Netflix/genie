@@ -61,18 +61,27 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @Path("/v2/config/commands")
-@Api(value = "/v2/config/commands", description = "Manage the available commands")
+@Api(
+        value = "/v2/config/commands",
+        tags = "commands",
+        description = "Manage the available commands"
+)
 @Produces(MediaType.APPLICATION_JSON)
 @Named
 public class CommandConfigResource {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(CommandConfigResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CommandConfigResource.class);
 
     /**
      * The command service.
      */
     private final CommandConfigService ccs;
+
+    /**
+     * To get URI information for return codes.
+     */
+    @Context
+    private UriInfo uriInfo;
 
     /**
      * Constructor.
@@ -88,7 +97,6 @@ public class CommandConfigResource {
      * Create a Command configuration.
      *
      * @param command The command configuration to create
-     * @param uriInfo For gathering information on the request
      * @return The command created
      * @throws GenieException For any error
      */
@@ -123,12 +131,12 @@ public class CommandConfigResource {
                     value = "The command to create.",
                     required = true
             )
-            final Command command,
-            @Context final UriInfo uriInfo) throws GenieException {
+            final Command command
+    ) throws GenieException {
         LOG.info("called to create new command configuration " + command.toString());
         final Command createdCommand = this.ccs.createCommand(command);
         return Response.created(
-                uriInfo.getAbsolutePathBuilder().path(createdCommand.getId()).build()).
+                this.uriInfo.getAbsolutePathBuilder().path(createdCommand.getId()).build()).
                 entity(createdCommand).
                 build();
     }
@@ -171,7 +179,9 @@ public class CommandConfigResource {
                     value = "Id of the command to get.",
                     required = true
             )
-            @PathParam("id") final String id) throws GenieException {
+            @PathParam("id")
+            final String id
+    ) throws GenieException {
         LOG.info("Called to get command with id " + id);
         return this.ccs.getCommand(id);
     }
@@ -193,7 +203,8 @@ public class CommandConfigResource {
             value = "Find commands",
             notes = "Find commands by the submitted criteria.",
             response = Command.class,
-            responseContainer = "List")
+            responseContainer = "List"
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_OK,
@@ -211,35 +222,39 @@ public class CommandConfigResource {
     })
     public List<Command> getCommands(
             @ApiParam(
-                    value = "Name of the command.",
-                    required = false
+                    value = "Name of the command."
+
             )
-            @QueryParam("name") final String name,
+            @QueryParam("name")
+            final String name,
             @ApiParam(
-                    value = "User who created the command.",
-                    required = false
+                    value = "User who created the command."
             )
-            @QueryParam("userName") final String userName,
+            @QueryParam("userName")
+            final String userName,
             @ApiParam(
-                    value = "The statuses of the commands to find.",
-                    required = false
+                    value = "The statuses of the commands to find."
             )
-            @QueryParam("status") final Set<String> statuses,
-            @ApiParam(value = "Tags for the cluster.", required = false)
+            @QueryParam("status")
+            final Set<String> statuses,
+            @ApiParam(
+                    value = "Tags for the cluster."
+            )
             @QueryParam("tag")
             final Set<String> tags,
             @ApiParam(
-                    value = "The page to start on.",
-                    required = false
+                    value = "The page to start on."
             )
             @QueryParam("page")
-            @DefaultValue("0") int page,
+            @DefaultValue("0")
+            int page,
             @ApiParam(
-                    value = "Max number of results per page.",
-                    required = false
+                    value = "Max number of results per page."
             )
             @QueryParam("limit")
-            @DefaultValue("1024") int limit) throws GenieException {
+            @DefaultValue("1024")
+            int limit
+    ) throws GenieException {
         LOG.info("Called to get commands.");
         Set<CommandStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
@@ -293,12 +308,14 @@ public class CommandConfigResource {
                     value = "Id of the command to update.",
                     required = true
             )
-            @PathParam("id") final String id,
+            @PathParam("id")
+            final String id,
             @ApiParam(
                     value = "The command information to update.",
                     required = true
             )
-            final Command updateCommand) throws GenieException {
+            final Command updateCommand
+    ) throws GenieException {
         LOG.info("Called to create/update comamnd config");
         return this.ccs.updateCommand(id, updateCommand);
     }
@@ -378,7 +395,9 @@ public class CommandConfigResource {
                     value = "Id of the command to delete.",
                     required = true
             )
-            @PathParam("id") final String id) throws GenieException {
+            @PathParam("id")
+            final String id
+    ) throws GenieException {
         LOG.info("Called to delete command with id " + id);
         return this.ccs.deleteCommand(id);
     }
@@ -424,12 +443,14 @@ public class CommandConfigResource {
                     value = "Id of the command to add configuration to.",
                     required = true
             )
-            @PathParam("id") final String id,
+            @PathParam("id")
+            final String id,
             @ApiParam(
                     value = "The configuration files to add.",
                     required = true
             )
-            final Set<String> configs) throws GenieException {
+            final Set<String> configs
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + configs);
         return this.ccs.addConfigsForCommand(id, configs);
     }
@@ -473,7 +494,9 @@ public class CommandConfigResource {
                     value = "Id of the command to get configurations for.",
                     required = true
             )
-            @PathParam("id") final String id) throws GenieException {
+            @PathParam("id")
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.ccs.getConfigsForCommand(id);
     }
@@ -520,12 +543,14 @@ public class CommandConfigResource {
                     value = "Id of the command to update configurations for.",
                     required = true
             )
-            @PathParam("id") final String id,
+            @PathParam("id")
+            final String id,
             @ApiParam(
                     value = "The configuration files to replace existing with.",
                     required = true
             )
-            final Set<String> configs) throws GenieException {
+            final Set<String> configs
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and configs " + configs);
         return this.ccs.updateConfigsForCommand(id, configs);
     }
@@ -569,7 +594,9 @@ public class CommandConfigResource {
                     value = "Id of the command to delete from.",
                     required = true
             )
-            @PathParam("id") final String id) throws GenieException {
+            @PathParam("id")
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.ccs.removeAllConfigsForCommand(id);
     }
@@ -590,7 +617,8 @@ public class CommandConfigResource {
             value = "Add new tags to a command",
             notes = "Add the supplied tags to the command with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_OK,
@@ -610,11 +638,18 @@ public class CommandConfigResource {
             )
     })
     public Set<String> addTagsForCommand(
-            @ApiParam(value = "Id of the command to add configuration to.", required = true)
+            @ApiParam(
+                    value = "Id of the command to add configuration to.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The tags to add.", required = true)
-            final Set<String> tags) throws GenieException {
+            @ApiParam(
+                    value = "The tags to add.",
+                    required = true
+            )
+            final Set<String> tags
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
         return this.ccs.addTagsForCommand(id, tags);
     }
@@ -633,7 +668,8 @@ public class CommandConfigResource {
             value = "Get the tags for a command",
             notes = "Get the tags for the command with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_OK,
@@ -653,9 +689,13 @@ public class CommandConfigResource {
             )
     })
     public Set<String> getTagsForCommand(
-            @ApiParam(value = "Id of the command to get tags for.", required = true)
+            @ApiParam(
+                    value = "Id of the command to get tags for.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.ccs.getTagsForCommand(id);
     }
@@ -677,7 +717,8 @@ public class CommandConfigResource {
             value = "Update tags for a command",
             notes = "Replace the existing tags for command with given id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_OK,
@@ -697,11 +738,18 @@ public class CommandConfigResource {
             )
     })
     public Set<String> updateTagsForCommand(
-            @ApiParam(value = "Id of the command to update tags for.", required = true)
+            @ApiParam(
+                    value = "Id of the command to update tags for.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The tags to replace existing with.", required = true)
-            final Set<String> tags) throws GenieException {
+            @ApiParam(
+                    value = "The tags to replace existing with.",
+                    required = true
+            )
+            final Set<String> tags
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
         return this.ccs.updateTagsForCommand(id, tags);
     }
@@ -721,7 +769,8 @@ public class CommandConfigResource {
             notes = "Remove all the tags from the command with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_OK,
@@ -741,9 +790,13 @@ public class CommandConfigResource {
             )
     })
     public Set<String> removeAllTagsForCommand(
-            @ApiParam(value = "Id of the command to delete from.", required = true)
+            @ApiParam(
+                    value = "Id of the command to delete from.",
+                    required = true
+            )
             @PathParam("id")
-            final String id) throws GenieException {
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.ccs.removeAllTagsForCommand(id);
     }
@@ -790,12 +843,14 @@ public class CommandConfigResource {
                     value = "Id of the command to set application for.",
                     required = true
             )
-            @PathParam("id") final String id,
+            @PathParam("id")
+            final String id,
             @ApiParam(
                     value = "The application to add.",
                     required = true
             )
-            final Application application) throws GenieException {
+            final Application application
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and application " + application);
         return this.ccs.setApplicationForCommand(id, application);
     }
@@ -839,7 +894,9 @@ public class CommandConfigResource {
                     value = "Id of the command to get the application for.",
                     required = true
             )
-            @PathParam("id") final String id) throws GenieException {
+            @PathParam("id")
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.ccs.getApplicationForCommand(id);
     }
@@ -883,7 +940,9 @@ public class CommandConfigResource {
                     value = "Id of the command to delete from.",
                     required = true
             )
-            @PathParam("id") final String id) throws GenieException {
+            @PathParam("id")
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id '" + id + "'.");
         return this.ccs.removeApplicationForCommand(id);
     }
@@ -927,7 +986,9 @@ public class CommandConfigResource {
                     value = "Id of the command to get the clusters for.",
                     required = true
             )
-            @PathParam("id") final String id) throws GenieException {
+            @PathParam("id")
+            final String id
+    ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.ccs.getClustersForCommand(id);
     }
@@ -948,7 +1009,8 @@ public class CommandConfigResource {
             notes = "Remove the given tag from the command with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "Set"
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_OK,
@@ -968,12 +1030,19 @@ public class CommandConfigResource {
             )
     })
     public Set<String> removeTagForCommand(
-            @ApiParam(value = "Id of the command to delete from.", required = true)
+            @ApiParam(
+                    value = "Id of the command to delete from.",
+                    required = true
+            )
             @PathParam("id")
             final String id,
-            @ApiParam(value = "The tag to remove.", required = true)
+            @ApiParam(
+                    value = "The tag to remove.",
+                    required = true
+            )
             @PathParam("tag")
-            final String tag) throws GenieException {
+            final String tag
+    ) throws GenieException {
         LOG.info("Called with id " + id + " and tag " + tag);
         return this.ccs.removeTagForCommand(id, tag);
     }

@@ -24,6 +24,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
+import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
+@ApiModel(description = "An entity for submitting and monitoring a job in Genie.")
 public class Job extends CommonEntityFields {
 
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
@@ -85,7 +87,8 @@ public class Job extends CommonEntityFields {
     @Lob
     @Basic(optional = false)
     @ApiModelProperty(
-            value = "Command line arguments for the job. e.g. -f hive.q",
+            value = "Command line arguments for the job.",
+            example = "-f hive.q",
             required = true
     )
     private String commandArgs;
@@ -221,7 +224,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Name of the cluster where the job is running or was run. Set automatically by system"
+            value = "Name of the cluster where the job is running or was run. Set automatically by system",
+            readOnly = true
     )
     private String executionClusterName;
 
@@ -230,7 +234,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Id of the cluster where the job is running or was run. Set automatically by system"
+            value = "Id of the cluster where the job is running or was run. Set automatically by system",
+            readOnly = true
     )
     private String executionClusterId;
 
@@ -239,7 +244,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Name of the application that this job is using to run or ran with. Set automatically by system"
+            value = "Name of the application that this job is using to run or ran with. Set automatically by system",
+            readOnly = true
     )
     private String applicationName;
 
@@ -248,7 +254,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Id of the application that this job is using to run or ran with. Set automatically by system"
+            value = "Id of the application that this job is using to run or ran with. Set automatically by system",
+            readOnly = true
     )
     private String applicationId;
 
@@ -257,7 +264,9 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Name of the command that this job is using to run or ran with. Set automatically by system")
+            value = "Name of the command that this job is using to run or ran with. Set automatically by system",
+            readOnly = true
+    )
     private String commandName;
 
     /**
@@ -266,7 +275,9 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Id of the command that this job is using to run or ran with. Set automatically by system")
+            value = "Id of the command that this job is using to run or ran with. Set automatically by system",
+            readOnly = true
+    )
     private String commandId;
 
     /**
@@ -274,7 +285,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The process handle. Set by system"
+            value = "The process handle. Set by system",
+            readOnly = true
     )
     private int processHandle = -1;
 
@@ -284,7 +296,8 @@ public class Job extends CommonEntityFields {
     @Basic
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
-            value = "The current status of the job. Set automatically by system"
+            value = "The current status of the job. Set automatically by system",
+            readOnly = true
     )
     private JobStatus status;
 
@@ -293,7 +306,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "A status message about the job. Set automatically by system"
+            value = "A status message about the job. Set automatically by system",
+            readOnly = true
     )
     private String statusMsg;
 
@@ -303,7 +317,9 @@ public class Job extends CommonEntityFields {
     @Basic
     @Temporal(TemporalType.TIMESTAMP)
     @ApiModelProperty(
-            value = "The start time of the job. Set automatically by system"
+            value = "The start time of the job. Set automatically by system",
+            dataType = "dateTime",
+            readOnly = true
     )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
@@ -315,7 +331,9 @@ public class Job extends CommonEntityFields {
     @Basic
     @Temporal(TemporalType.TIMESTAMP)
     @ApiModelProperty(
-            value = "The end time of the job. Initialized at 0. Set automatically by system"
+            value = "The end time of the job. Initialized at 0. Set automatically by system",
+            dataType = "dateTime",
+            readOnly = true
     )
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonDeserialize(using = JsonDateDeserializer.class)
@@ -326,7 +344,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The hostname of the client submitting the job. Set automatically by system"
+            value = "The hostname of the client submitting the job. Set automatically by system",
+            readOnly = true
     )
     private String clientHost;
 
@@ -335,7 +354,9 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The genie host where the job is being run or was run. Set automatically by system")
+            value = "The genie host where the job is being run or was run. Set automatically by system",
+            readOnly = true
+    )
     private String hostName;
 
     /**
@@ -344,7 +365,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The URI to use to kill the job. Set automatically by system"
+            value = "The URI to use to kill the job. Set automatically by system",
+            readOnly = true
     )
     private String killURI;
 
@@ -353,7 +375,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The URI where to find job output. Set automatically by system"
+            value = "The URI where to find job output. Set automatically by system",
+            readOnly = true
     )
     private String outputURI;
 
@@ -362,7 +385,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "The exit code of the job. Set automatically by system"
+            value = "The exit code of the job. Set automatically by system",
+            readOnly = true
     )
     private int exitCode = -1;
 
@@ -371,7 +395,8 @@ public class Job extends CommonEntityFields {
      */
     @Basic
     @ApiModelProperty(
-            value = "Whether this job was forwarded or not. Set automatically by system"
+            value = "Whether this job was forwarded or not. Set automatically by system",
+            readOnly = true
     )
     private boolean forwarded = false;
 
@@ -380,7 +405,8 @@ public class Job extends CommonEntityFields {
      */
     @Lob
     @ApiModelProperty(
-            value = "Where the logs were archived. Set automatically by system"
+            value = "Where the logs were archived. Set automatically by system",
+            readOnly = true
     )
     private String archiveLocation;
 

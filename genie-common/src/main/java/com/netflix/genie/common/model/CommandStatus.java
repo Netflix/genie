@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author tgianos
  */
-@ApiModel(value = "Available statuses for a command")
 public enum CommandStatus {
 
     /**

@@ -38,7 +38,6 @@ import java.util.Set;
  * @author tgianos
  */
 @MappedSuperclass
-@ApiModel(value = "Command Fields for all Entities")
 public class CommonEntityFields extends Auditable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommonEntityFields.class);

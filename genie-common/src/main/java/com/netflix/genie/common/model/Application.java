@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Cacheable(false)
-@ApiModel(value = "An Application")
+@ApiModel(description = "An entity for managing an application in the Genie system.")
 public class Application extends CommonEntityFields {
 
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
@@ -59,8 +59,7 @@ public class Application extends CommonEntityFields {
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The current status of this application",
-            required = true,
-            dataType = "string"
+            required = true
     )
     private ApplicationStatus status;
 

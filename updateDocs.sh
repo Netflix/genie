@@ -136,7 +136,7 @@ deployGenie() {
     export CATALINA_OPTS="-Darchaius.deployment.applicationId=genie -Darchaius.deployment.environment=dev"
     echo "CATALINA_OPTS = $CATALINA_OPTS"
 
-    echo "Deploying the Genie applicationn"
+    echo "Deploying the Genie application"
     ./local_deploy.sh
     echo "Successfully deployed the application"
 }
@@ -222,50 +222,15 @@ updateAPIDocs() {
     shutdownTomcat
     deployGenie
     startTomcat
-    rm -rf /tmp/genie/docs/rest/api-docs/*
     #In case it didn't already exist
-    if [ ! -d "/tmp/genie/docs/rest/api-docs" ]
+    if [ ! -d "/tmp/genie/docs/rest" ]
     then
-        mkdir -p /tmp/genie/docs/rest/api-docs
+        mkdir -p /tmp/genie/docs/rest
     fi
-    curl http://localhost:7001/genie/api-docs > /tmp/genie/docs/rest/api-docs/index.html
+    curl http://localhost:7001/genie/swagger.json > /tmp/genie/docs/rest/swagger.json
     if (( $? != 0 ))
     then
-        echo "Unable to update root api docs."
-        cleanup
-        exit 1
-    fi
-
-    mkdir -p /tmp/genie/docs/rest/api-docs/v2/config
-
-    curl http://localhost:7001/genie/api-docs/v2/config/applications > /tmp/genie/docs/rest/api-docs/v2/config/applications
-    if (( $? != 0 ))
-    then
-        echo "Unable to update applications api docs."
-        cleanup
-        exit 1
-    fi
-
-    curl http://localhost:7001/genie/api-docs/v2/config/commands > /tmp/genie/docs/rest/api-docs/v2/config/commands
-    if (( $? != 0 ))
-    then
-        echo "Unable to update commands api docs."
-        cleanup
-        exit 1
-    fi
-
-    curl http://localhost:7001/genie/api-docs/v2/config/clusters > /tmp/genie/docs/rest/api-docs/v2/config/clusters
-    if (( $? != 0 ))
-    then
-        echo "Unable to update clusters api docs."
-        cleanup
-        exit 1
-    fi
-
-    curl http://localhost:7001/genie/api-docs/v2/jobs > /tmp/genie/docs/rest/api-docs/v2/jobs
-    if (( $? != 0 ))
-    then
-        echo "Unable to update jobs api docs."
+        echo "Unable to update swagger.json."
         cleanup
         exit 1
     fi
@@ -273,7 +238,7 @@ updateAPIDocs() {
     #Update Git
     pushd /tmp/genie
     git add --all
-    git commit -m "Updating REST API docs for latest version of Genie"
+    git commit -m "Updating Swagger documentation for latest version of Genie"
     popd
     shutdownTomcat
 }

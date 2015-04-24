@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-@ApiModel(value = "A set of cluster criteria for a job")
+@ApiModel(description = "A set of cluster criteria for a job.")
 public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;
