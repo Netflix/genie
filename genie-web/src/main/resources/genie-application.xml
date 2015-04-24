@@ -24,4 +24,5 @@
     
     <!-- Broken up context for clarity of purpose" -->
     <import resource="classpath:genie-jpa.xml"/>
+    <import resource="genie-swagger.xml"/>
 </beans>
