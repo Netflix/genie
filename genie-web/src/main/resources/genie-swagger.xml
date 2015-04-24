@@ -14,7 +14,7 @@
         <property name="contact" value="Netflix, Inc."/>
         <property name="license" value="Apache 2.0"/>
         <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0"/>
-        <property name="version" value="2.2.0-SNAPSHOT"/>
+        <property name="version" value="@project.version@"/>
         <property name="schemes" value="http"/>
         <property name="host" value="localhost:7001"/>
         <property name="basePath" value="/genie"/>
