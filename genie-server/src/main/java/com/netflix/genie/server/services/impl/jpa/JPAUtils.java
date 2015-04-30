@@ -37,6 +37,12 @@ public final class JPAUtils {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceJPAImpl.class);
 
     /**
+     * Private constructor for Utility class to prevent instantiation.
+     */
+    private JPAUtils() {
+    }
+
+    /**
      * Get a page request to be used when querying the database which sets the page, limit, order direction and
      * order by parameters for querying the databases.
      *
