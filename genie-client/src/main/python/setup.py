@@ -26,7 +26,7 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 setup(
     name='nflx-genie-client',
 
-    version='2.1.2',
+    version='2.2.0',
 
     author='Netflix Inc.',
 
@@ -45,7 +45,7 @@ setup(
     long_description=long_description,
 
     install_requires=[
-        "python-dateutil >= 2.2",
+        "python-dateutil >= 2.4",
     ],
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
