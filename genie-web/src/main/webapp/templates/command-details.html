@@ -3,16 +3,8 @@
     <table class="table condensed">
         <tr>
             <td><strong>Status</strong></td>
-            <td>
-                <form class="form-inline">
-                    <select data-bind="value: status" class="command-status">
-                        <option>ACTIVE</option>
-                        <option>INACTIVE</option>
-                    </select>
-                    <button data-bind="visible: status()!==originalStatus, click: updateStatus, enable: objStatus()!=='updating'" class="btn btn-small btn-primary">Update</button>
-                </form>
-            </td>
-        </tr>
+            <td data-bind="text: status"></td>
+            </tr>
         <tr>
             <td><strong>Name</strong></td>
             <td data-bind="text: name"></td>
