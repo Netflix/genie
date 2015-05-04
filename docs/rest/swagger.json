@@ -2,7 +2,7 @@
   "swagger" : "2.0",
   "info" : {
     "description" : "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more documentation.<br/>Post any issues found <a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
-    "version" : "2.1.2",
+    "version" : "2.2.0-SNAPSHOT",
     "title" : "Genie REST API",
     "contact" : {
       "name" : "Netflix, Inc."
@@ -15,13 +15,13 @@
   "host" : "localhost:7001",
   "basePath" : "/genie",
   "tags" : [ {
-    "name" : "applications"
-  }, {
-    "name" : "jobs"
+    "name" : "clusters"
   }, {
     "name" : "commands"
   }, {
-    "name" : "clusters"
+    "name" : "applications"
+  }, {
+    "name" : "jobs"
   } ],
   "schemes" : [ "http" ],
   "paths" : {
@@ -50,7 +50,8 @@
           "in" : "query",
           "description" : "The status of the applications to get.",
           "required" : false,
-          "type" : "array"
+          "type" : "array",
+          "enum" : [ "ACTIVE", "DEPRECATED", "INACTIVE" ]
         }, {
           "name" : "tag",
           "in" : "query",
@@ -71,12 +72,27 @@
           "required" : false,
           "type" : "integer",
           "format" : "int32"
+        }, {
+          "name" : "descending",
+          "in" : "query",
+          "description" : "Whether results should be sorted in descending or ascending order. Defaults to descending",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "orderBy",
+          "in" : "query",
+          "description" : "The fields to order the results by. Must not be collection fields. Default is updated.",
+          "required" : false,
+          "type" : "array"
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Application"
+              }
             }
           },
           "412" : {
@@ -137,9 +153,12 @@
         "parameters" : [ ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Application"
+              }
             }
           },
           "500" : {
@@ -204,7 +223,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Application"
             }
@@ -236,7 +255,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Application"
             }
@@ -270,9 +289,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Command"
+              }
             }
           },
           "412" : {
@@ -304,9 +326,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -344,9 +369,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -384,9 +412,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -416,9 +447,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -450,9 +484,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -490,9 +527,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -530,9 +570,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -562,9 +605,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -596,9 +642,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -636,9 +685,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -676,9 +728,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -708,9 +763,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -748,9 +806,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Application"
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
             }
           },
           "412" : {
@@ -790,7 +851,8 @@
           "in" : "query",
           "description" : "Tags for the cluster.",
           "required" : false,
-          "type" : "array"
+          "type" : "array",
+          "enum" : [ "UP", "OUT_OF_SERVICE", "TERMINATED" ]
         }, {
           "name" : "minUpdateTime",
           "in" : "query",
@@ -819,12 +881,27 @@
           "required" : false,
           "type" : "integer",
           "format" : "int32"
+        }, {
+          "name" : "descending",
+          "in" : "query",
+          "description" : "Whether results should be sorted in descending or ascending order. Defaults to descending",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "orderBy",
+          "in" : "query",
+          "description" : "The fields to order the results by. Must not be collection fields. Default is updated.",
+          "required" : false,
+          "type" : "array"
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Cluster"
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Cluster"
+              }
             }
           },
           "412" : {
@@ -885,7 +962,13 @@
         "parameters" : [ ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Cluster"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -915,7 +998,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Cluster"
             }
@@ -955,7 +1038,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Cluster"
             }
@@ -987,7 +1070,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Cluster"
             }
@@ -1021,9 +1104,12 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Command"
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Command"
+              }
             }
           },
           "412" : {
@@ -1064,7 +1150,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Command"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1104,7 +1196,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Command"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1133,7 +1231,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Command"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1170,7 +1274,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Command"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1201,7 +1311,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1238,7 +1354,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1275,7 +1397,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1306,7 +1434,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1343,7 +1477,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1380,7 +1520,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1409,7 +1555,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1446,7 +1598,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1485,7 +1643,8 @@
           "in" : "query",
           "description" : "The statuses of the commands to find.",
           "required" : false,
-          "type" : "array"
+          "type" : "array",
+          "enum" : [ "ACTIVE", "DEPRECATED", "INACTIVE" ]
         }, {
           "name" : "tag",
           "in" : "query",
@@ -1506,12 +1665,27 @@
           "required" : false,
           "type" : "integer",
           "format" : "int32"
+        }, {
+          "name" : "descending",
+          "in" : "query",
+          "description" : "Whether results should be sorted in descending or ascending order. Defaults to descending",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "orderBy",
+          "in" : "query",
+          "description" : "The fields to order the results by. Must not be collection fields. Default is updated.",
+          "required" : false,
+          "type" : "array"
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Command"
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Command"
+              }
             }
           },
           "412" : {
@@ -1572,9 +1746,12 @@
         "parameters" : [ ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Command"
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Command"
+              }
             }
           },
           "412" : {
@@ -1606,7 +1783,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Command"
             }
@@ -1646,7 +1823,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Command"
             }
@@ -1678,7 +1855,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Command"
             }
@@ -1712,7 +1889,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Application"
             }
@@ -1752,7 +1929,10 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Application"
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1781,7 +1961,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Application"
             }
@@ -1815,7 +1995,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Cluster"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1846,7 +2032,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1883,7 +2075,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1920,7 +2118,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1949,7 +2153,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -1980,7 +2190,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -2017,7 +2233,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -2054,7 +2276,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -2083,7 +2311,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -2120,7 +2354,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "412" : {
             "description" : "Invalid required parameter supplied"
@@ -2164,7 +2404,8 @@
           "in" : "query",
           "description" : "Statuses of the jobs to fetch.",
           "required" : false,
-          "type" : "array"
+          "type" : "array",
+          "enum" : [ "INIT", "RUNNING", "SUCCEEDED", "KILLED", "FAILED" ]
         }, {
           "name" : "tag",
           "in" : "query",
@@ -2197,12 +2438,27 @@
           "required" : false,
           "type" : "integer",
           "format" : "int32"
+        }, {
+          "name" : "descending",
+          "in" : "query",
+          "description" : "Whether results should be sorted in descending or ascending order. Defaults to descending",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "orderBy",
+          "in" : "query",
+          "description" : "The fields to order the results by. Must not be collection fields. Default is updated.",
+          "required" : false,
+          "type" : "array"
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
-              "$ref" : "#/definitions/Job"
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Job"
+              }
             }
           },
           "400" : {
@@ -2279,7 +2535,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Job"
             }
@@ -2303,7 +2559,6 @@
         "summary" : "Delete a job",
         "description" : "Delete the job with the id specified.",
         "operationId" : "killJob",
-        "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
         "parameters" : [ {
           "name" : "id",
@@ -2314,7 +2569,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "successful operation",
             "schema" : {
               "$ref" : "#/definitions/Job"
             }
@@ -2348,7 +2603,10 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "string"
+            }
           },
           "400" : {
             "description" : "Bad Request"
@@ -2382,7 +2640,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "400" : {
             "description" : "Bad Request"
@@ -2422,7 +2686,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "400" : {
             "description" : "Bad Request"
@@ -2462,7 +2732,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "400" : {
             "description" : "Bad Request"
@@ -2494,7 +2770,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "400" : {
             "description" : "Bad Request"
@@ -2534,7 +2816,13 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
           },
           "400" : {
             "description" : "Bad Request"
