@@ -75,7 +75,7 @@ public class CommandConfigResource {
     /**
      * The command service.
      */
-    private final CommandConfigService ccs;
+    private final CommandConfigService commandConfigService;
 
     /**
      * To get URI information for return codes.
@@ -86,11 +86,11 @@ public class CommandConfigResource {
     /**
      * Constructor.
      *
-     * @param ccs The command configuration service to use.
+     * @param commandConfigService The command configuration service to use.
      */
     @Inject
-    public CommandConfigResource(final CommandConfigService ccs) {
-        this.ccs = ccs;
+    public CommandConfigResource(final CommandConfigService commandConfigService) {
+        this.commandConfigService = commandConfigService;
     }
 
     /**
@@ -134,7 +134,7 @@ public class CommandConfigResource {
             final Command command
     ) throws GenieException {
         LOG.info("called to create new command configuration " + command.toString());
-        final Command createdCommand = this.ccs.createCommand(command);
+        final Command createdCommand = this.commandConfigService.createCommand(command);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdCommand.getId()).build()).
                 entity(createdCommand).
@@ -157,11 +157,6 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Command.class
-            ),
-            @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
             ),
@@ -183,7 +178,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called to get command with id " + id);
-        return this.ccs.getCommand(id);
+        return this.commandConfigService.getCommand(id);
     }
 
     /**
@@ -208,11 +203,6 @@ public class CommandConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Command.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_PRECON_FAILED,
                     message = "One of the statuses was invalid"
@@ -298,7 +288,8 @@ public class CommandConfigResource {
                 }
             }
         }
-        return this.ccs.getCommands(name, userName, enumStatuses, tags, page, limit, descending, orderBys);
+        return this.commandConfigService.getCommands(
+                name, userName, enumStatuses, tags, page, limit, descending, orderBys);
     }
 
     /**
@@ -318,11 +309,6 @@ public class CommandConfigResource {
             response = Command.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Command.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command to update not found"
@@ -350,7 +336,7 @@ public class CommandConfigResource {
             final Command updateCommand
     ) throws GenieException {
         LOG.info("Called to create/update comamnd config");
-        return this.ccs.updateCommand(id, updateCommand);
+        return this.commandConfigService.updateCommand(id, updateCommand);
     }
 
     /**
@@ -368,11 +354,6 @@ public class CommandConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Command.class
-            ),
-            @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
             ),
@@ -387,7 +368,7 @@ public class CommandConfigResource {
     })
     public List<Command> deleteAllCommands() throws GenieException {
         LOG.info("called to delete all commands.");
-        return this.ccs.deleteAllCommands();
+        return this.commandConfigService.deleteAllCommands();
     }
 
     /**
@@ -405,11 +386,6 @@ public class CommandConfigResource {
             response = Command.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Command.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -432,7 +408,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called to delete command with id " + id);
-        return this.ccs.deleteCommand(id);
+        return this.commandConfigService.deleteCommand(id);
     }
 
     /**
@@ -451,13 +427,9 @@ public class CommandConfigResource {
             value = "Add new configuration files to a command",
             notes = "Add the supplied configuration files to the command with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -485,7 +457,7 @@ public class CommandConfigResource {
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + configs);
-        return this.ccs.addConfigsForCommand(id, configs);
+        return this.commandConfigService.addConfigsForCommand(id, configs);
     }
 
     /**
@@ -502,13 +474,9 @@ public class CommandConfigResource {
             value = "Get the configuration files for a command",
             notes = "Get the configuration files for the command with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -531,7 +499,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.getConfigsForCommand(id);
+        return this.commandConfigService.getConfigsForCommand(id);
     }
 
     /**
@@ -551,13 +519,9 @@ public class CommandConfigResource {
             value = "Update configuration files for an command",
             notes = "Replace the existing configuration files for command with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -585,7 +549,7 @@ public class CommandConfigResource {
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and configs " + configs);
-        return this.ccs.updateConfigsForCommand(id, configs);
+        return this.commandConfigService.updateConfigsForCommand(id, configs);
     }
 
     /**
@@ -602,13 +566,9 @@ public class CommandConfigResource {
             value = "Remove all configuration files from an command",
             notes = "Remove all the configuration files from the command with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -631,7 +591,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.removeAllConfigsForCommand(id);
+        return this.commandConfigService.removeAllConfigsForCommand(id);
     }
 
     /**
@@ -650,13 +610,9 @@ public class CommandConfigResource {
             value = "Add new tags to a command",
             notes = "Add the supplied tags to the command with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -684,7 +640,7 @@ public class CommandConfigResource {
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
-        return this.ccs.addTagsForCommand(id, tags);
+        return this.commandConfigService.addTagsForCommand(id, tags);
     }
 
     /**
@@ -701,13 +657,9 @@ public class CommandConfigResource {
             value = "Get the tags for a command",
             notes = "Get the tags for the command with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -730,7 +682,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.getTagsForCommand(id);
+        return this.commandConfigService.getTagsForCommand(id);
     }
 
     /**
@@ -750,13 +702,9 @@ public class CommandConfigResource {
             value = "Update tags for a command",
             notes = "Replace the existing tags for command with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -784,7 +732,7 @@ public class CommandConfigResource {
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
-        return this.ccs.updateTagsForCommand(id, tags);
+        return this.commandConfigService.updateTagsForCommand(id, tags);
     }
 
     /**
@@ -802,13 +750,9 @@ public class CommandConfigResource {
             notes = "Remove all the tags from the command with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -831,7 +775,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.removeAllTagsForCommand(id);
+        return this.commandConfigService.removeAllTagsForCommand(id);
     }
 
     /**
@@ -854,10 +798,6 @@ public class CommandConfigResource {
             response = Application.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -885,7 +825,7 @@ public class CommandConfigResource {
             final Application application
     ) throws GenieException {
         LOG.info("Called with id " + id + " and application " + application);
-        return this.ccs.setApplicationForCommand(id, application);
+        return this.commandConfigService.setApplicationForCommand(id, application);
     }
 
     /**
@@ -904,11 +844,6 @@ public class CommandConfigResource {
             response = Application.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -931,7 +866,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.getApplicationForCommand(id);
+        return this.commandConfigService.getApplicationForCommand(id);
     }
 
     /**
@@ -950,11 +885,6 @@ public class CommandConfigResource {
             response = Application.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -977,7 +907,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id '" + id + "'.");
-        return this.ccs.removeApplicationForCommand(id);
+        return this.commandConfigService.removeApplicationForCommand(id);
     }
 
     /**
@@ -994,13 +924,9 @@ public class CommandConfigResource {
             value = "Get the clusters this command is associated with",
             notes = "Get the clusters which this command exists on supports.",
             response = Cluster.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -1023,7 +949,7 @@ public class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.getClustersForCommand(id);
+        return this.commandConfigService.getClustersForCommand(id);
     }
 
     /**
@@ -1042,13 +968,9 @@ public class CommandConfigResource {
             notes = "Remove the given tag from the command with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -1077,6 +999,6 @@ public class CommandConfigResource {
             final String tag
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tag " + tag);
-        return this.ccs.removeTagForCommand(id, tag);
+        return this.commandConfigService.removeTagForCommand(id, tag);
     }
 }

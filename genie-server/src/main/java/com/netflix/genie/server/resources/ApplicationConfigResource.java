@@ -75,7 +75,7 @@ public class ApplicationConfigResource {
     /**
      * The application service.
      */
-    private final ApplicationConfigService acs;
+    private final ApplicationConfigService applicationConfigService;
 
     /**
      * To get URI information for return codes.
@@ -86,11 +86,11 @@ public class ApplicationConfigResource {
     /**
      * Constructor.
      *
-     * @param acs The application configuration service to use.
+     * @param applicationConfigService The application configuration service to use.
      */
     @Inject
-    public ApplicationConfigResource(final ApplicationConfigService acs) {
-        this.acs = acs;
+    public ApplicationConfigResource(final ApplicationConfigService applicationConfigService) {
+        this.applicationConfigService = applicationConfigService;
     }
 
     /**
@@ -134,7 +134,7 @@ public class ApplicationConfigResource {
             final Application app
     ) throws GenieException {
         LOG.info("Called to create new application");
-        final Application createdApp = this.acs.createApplication(app);
+        final Application createdApp = this.applicationConfigService.createApplication(app);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
                 entity(createdApp).
@@ -183,7 +183,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called to get Application for id " + id);
-        return this.acs.getApplication(id);
+        return this.applicationConfigService.getApplication(id);
     }
 
     /**
@@ -208,11 +208,6 @@ public class ApplicationConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_PRECON_FAILED,
                     message = "If status is invalid."
@@ -297,7 +292,8 @@ public class ApplicationConfigResource {
                 }
             }
         }
-        return this.acs.getApplications(name, userName, enumStatuses, tags, page, limit, descending, orderBys);
+        return this.applicationConfigService.getApplications(
+                name, userName, enumStatuses, tags, page, limit, descending, orderBys);
     }
 
     /**
@@ -317,11 +313,6 @@ public class ApplicationConfigResource {
             response = Application.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application to update not found"
@@ -349,7 +340,7 @@ public class ApplicationConfigResource {
             final Application updateApp
     ) throws GenieException {
         LOG.info("called to update application config with info " + updateApp.toString());
-        return this.acs.updateApplication(id, updateApp);
+        return this.applicationConfigService.updateApplication(id, updateApp);
     }
 
     /**
@@ -367,18 +358,13 @@ public class ApplicationConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
-            @ApiResponse(
                     code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
     public List<Application> deleteAllApplications() throws GenieException {
         LOG.info("Delete all Applications");
-        return this.acs.deleteAllApplications();
+        return this.applicationConfigService.deleteAllApplications();
     }
 
     /**
@@ -396,11 +382,6 @@ public class ApplicationConfigResource {
             response = Application.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -423,7 +404,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Delete an application with id " + id);
-        return this.acs.deleteApplication(id);
+        return this.applicationConfigService.deleteApplication(id);
     }
 
     /**
@@ -442,14 +423,9 @@ public class ApplicationConfigResource {
             value = "Add new configuration files to an application",
             notes = "Add the supplied configuration files to the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -477,7 +453,7 @@ public class ApplicationConfigResource {
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + configs);
-        return this.acs.addConfigsToApplication(id, configs);
+        return this.applicationConfigService.addConfigsToApplication(id, configs);
     }
 
     /**
@@ -494,14 +470,9 @@ public class ApplicationConfigResource {
             value = "Get the configuration files for an application",
             notes = "Get the configuration files for the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -524,7 +495,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.acs.getConfigsForApplication(id);
+        return this.applicationConfigService.getConfigsForApplication(id);
     }
 
     /**
@@ -544,14 +515,9 @@ public class ApplicationConfigResource {
             value = "Update configuration files for an application",
             notes = "Replace the existing configuration files for application with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -579,7 +545,7 @@ public class ApplicationConfigResource {
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and configs " + configs);
-        return this.acs.updateConfigsForApplication(id, configs);
+        return this.applicationConfigService.updateConfigsForApplication(id, configs);
     }
 
     /**
@@ -596,14 +562,9 @@ public class ApplicationConfigResource {
             value = "Remove all configuration files from an application",
             notes = "Remove all the configuration files from the application with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -626,7 +587,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.acs.removeAllConfigsForApplication(id);
+        return this.applicationConfigService.removeAllConfigsForApplication(id);
     }
 
     /**
@@ -645,14 +606,9 @@ public class ApplicationConfigResource {
             value = "Add new jar files to an application",
             notes = "Add the supplied jar files to the applicaiton with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -680,7 +636,7 @@ public class ApplicationConfigResource {
             final Set<String> jars
     ) throws GenieException {
         LOG.info("Called with id " + id + " and jars " + jars);
-        return this.acs.addJarsForApplication(id, jars);
+        return this.applicationConfigService.addJarsForApplication(id, jars);
     }
 
     /**
@@ -697,14 +653,9 @@ public class ApplicationConfigResource {
             value = "Get the jars for an application",
             notes = "Get the jars for the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -727,7 +678,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.acs.getJarsForApplication(id);
+        return this.applicationConfigService.getJarsForApplication(id);
     }
 
     /**
@@ -747,14 +698,9 @@ public class ApplicationConfigResource {
             value = "Update jar files for an application",
             notes = "Replace the existing jar files for application with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -782,7 +728,7 @@ public class ApplicationConfigResource {
             final Set<String> jars
     ) throws GenieException {
         LOG.info("Called with id " + id + " and jars " + jars);
-        return this.acs.updateJarsForApplication(id, jars);
+        return this.applicationConfigService.updateJarsForApplication(id, jars);
     }
 
     /**
@@ -799,14 +745,9 @@ public class ApplicationConfigResource {
             value = "Remove all jar files from an application",
             notes = "Remove all the jar files from the application with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -829,7 +770,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.acs.removeAllJarsForApplication(id);
+        return this.applicationConfigService.removeAllJarsForApplication(id);
     }
 
     /**
@@ -848,14 +789,9 @@ public class ApplicationConfigResource {
             value = "Add new tags to a application",
             notes = "Add the supplied tags to the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -883,7 +819,7 @@ public class ApplicationConfigResource {
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + tags);
-        return this.acs.addTagsForApplication(id, tags);
+        return this.applicationConfigService.addTagsForApplication(id, tags);
     }
 
     /**
@@ -900,14 +836,9 @@ public class ApplicationConfigResource {
             value = "Get the tags for a application",
             notes = "Get the tags for the application with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -930,7 +861,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.acs.getTagsForApplication(id);
+        return this.applicationConfigService.getTagsForApplication(id);
     }
 
     /**
@@ -950,14 +881,9 @@ public class ApplicationConfigResource {
             value = "Update tags for a application",
             notes = "Replace the existing tags for application with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -985,7 +911,7 @@ public class ApplicationConfigResource {
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
-        return this.acs.updateTagsForApplication(id, tags);
+        return this.applicationConfigService.updateTagsForApplication(id, tags);
     }
 
     /**
@@ -1003,14 +929,9 @@ public class ApplicationConfigResource {
             notes = "Remove all the tags from the application with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -1033,7 +954,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.acs.removeAllTagsForApplication(id);
+        return this.applicationConfigService.removeAllTagsForApplication(id);
     }
 
     /**
@@ -1050,14 +971,9 @@ public class ApplicationConfigResource {
             value = "Get the commands this application is associated with",
             notes = "Get the commands which this application supports.",
             response = Command.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -1080,7 +996,7 @@ public class ApplicationConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.acs.getCommandsForApplication(id);
+        return this.applicationConfigService.getCommandsForApplication(id);
     }
 
     /**
@@ -1099,14 +1015,9 @@ public class ApplicationConfigResource {
             notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -1135,6 +1046,6 @@ public class ApplicationConfigResource {
             final String tag
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tag " + tag);
-        return this.acs.removeTagForApplication(id, tag);
+        return this.applicationConfigService.removeTagForApplication(id, tag);
     }
 }

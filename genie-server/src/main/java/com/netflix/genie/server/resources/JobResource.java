@@ -79,7 +79,7 @@ public class JobResource {
     /**
      * The execution service.
      */
-    private final ExecutionService xs;
+    private final ExecutionService executionService;
 
     /**
      * The job service.
@@ -101,12 +101,12 @@ public class JobResource {
     /**
      * Constructor.
      *
-     * @param xs         The execution service to use.
+     * @param executionService The execution service to use.
      * @param jobService The job service to use.
      */
     @Inject
-    public JobResource(final ExecutionService xs, final JobService jobService) {
-        this.xs = xs;
+    public JobResource(final ExecutionService executionService, final JobService jobService) {
+        this.executionService = executionService;
         this.jobService = jobService;
     }
 
@@ -175,7 +175,7 @@ public class JobResource {
             job.setClientHost(clientHost);
         }
 
-        final Job createdJob = this.xs.submitJob(job);
+        final Job createdJob = this.executionService.submitJob(job);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
                 entity(createdJob).
@@ -197,11 +197,6 @@ public class JobResource {
             response = Job.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Job.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
                     message = "Bad Request"
@@ -246,11 +241,6 @@ public class JobResource {
             response = String.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = String.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
                     message = "Bad Request"
@@ -306,11 +296,6 @@ public class JobResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Job.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
                     message = "Bad Request"
@@ -455,11 +440,6 @@ public class JobResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Job.class
-            ),
-            @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Job not found"
             ),
@@ -481,7 +461,7 @@ public class JobResource {
             final String id
     ) throws GenieException {
         LOG.info("Called for job id: " + id);
-        return this.xs.killJob(id);
+        return this.executionService.killJob(id);
     }
 
     /**
@@ -500,13 +480,9 @@ public class JobResource {
             value = "Add new tags to a job",
             notes = "Add the supplied tags to the job with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
                     message = "Bad Request"
@@ -553,13 +529,9 @@ public class JobResource {
             value = "Get the tags for a job",
             notes = "Get the tags for the job with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
                     message = "Bad Request"
@@ -606,13 +578,9 @@ public class JobResource {
             value = "Update tags for a job",
             notes = "Replace the existing tags for job with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
                     message = "Bad Request"
@@ -661,13 +629,9 @@ public class JobResource {
             value = "Remove all tags from a job",
             notes = "Remove all the tags from the job with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
                     message = "Bad Request"
@@ -712,13 +676,9 @@ public class JobResource {
             value = "Remove a tag from a job",
             notes = "Remove the given tag from the job with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
                     message = "Bad Request"
