@@ -31,8 +31,8 @@ subprojects {
     apply plugin: 'pmd'
     apply plugin: 'jacoco'
 
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     group = "com.netflix.${githubProjectName}"
     
