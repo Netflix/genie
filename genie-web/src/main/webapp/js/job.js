@@ -107,7 +107,7 @@ define([
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v2/jobs',
-                data: {limit: 64, status: 'RUNNING'}
+                data: {status: 'RUNNING'}
             }).done(function(data) {
                 // check to see if jobInfo is an array
                 if (data instanceof Array) {
