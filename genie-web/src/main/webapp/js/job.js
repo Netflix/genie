@@ -98,6 +98,9 @@ define([
         self.runningJobCount = ko.computed(function() {
             return _.reduce(self.runningJobs(), function(sum, obj, index) { return sum + obj.count; }, 0);
         }, self);
+        self.jobOrderByFields = ko.observableArray(['user','started','created','id','name','status','executionClusterName','executionClusterId']);
+        self.jobOrderBySelectedFields = ko.observableArray();
+        self.sortOrder = ko.observable();
 
         self.startup = function() {
             self.runningJobs([]);
@@ -121,6 +124,7 @@ define([
                 _.each(jobCount, function(count, type) {
                     self.runningJobs.push({type: type, count: count});
                 });
+                $("#jobOrderFields").select2();
             });
         };
 
@@ -138,6 +142,12 @@ define([
             var executionClusterName  = _.where(formArray, {'name': 'clusterName'})[0].value;
             var executionClusterId  = _.where(formArray, {'name': 'clusterId'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
+            var sortOrder = _.where(formArray, {'name': 'sortOrder'})[0].value;
+            var bDescending =  true
+
+            if (sortOrder != 'descending') {
+                bDescending = false;
+            }
 
             var jobTagsArray = jobTags.split(",");
             $.ajax({
@@ -147,7 +157,7 @@ define([
                 url:  'genie/v2/jobs',
                 traditional: true,
                 data: {limit: limit, userName: user, status: status, 
-                    id: id, name: name, executionClusterName:executionClusterName, executionClusterId:executionClusterId, tag: jobTagsArray }
+                    id: id, name: name, executionClusterName:executionClusterName, executionClusterId:executionClusterId, tag: jobTagsArray, orderBy: self.jobOrderBySelectedFields(), descending: bDescending }
             }).done(function(data) {
                 self.searchResults([]);
                 self.status('results');
