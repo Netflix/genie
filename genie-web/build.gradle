@@ -14,7 +14,7 @@ dependencies {
      *******************************/
 
     runtime project(":genie-server")
-    runtime ("com.netflix.karyon:karyon-admin-web:${karyon_version}") {
+    runtime("com.netflix.karyon:karyon-admin-web:${karyon_version}") {
         exclude group: "commons-collections", module: "commons-collections"
     }
 

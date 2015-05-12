@@ -51,8 +51,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String APP_1_NAME = "tez";
     private static final String APP_1_USER = "tgianos";
     private static final String APP_1_VERSION = "1.2.3";
-    private static final ApplicationStatus APP_1_STATUS
-            = ApplicationStatus.INACTIVE;
+    private static final ApplicationStatus APP_1_STATUS = ApplicationStatus.INACTIVE;
 
     private static final String COMMAND_1_ID = "command1";
 
@@ -60,15 +59,13 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String APP_2_NAME = "spark";
     private static final String APP_2_USER = "amsharma";
     private static final String APP_2_VERSION = "4.5.6";
-    private static final ApplicationStatus APP_2_STATUS
-            = ApplicationStatus.ACTIVE;
+    private static final ApplicationStatus APP_2_STATUS = ApplicationStatus.ACTIVE;
 
     private static final String APP_3_ID = "app3";
     private static final String APP_3_NAME = "storm";
     private static final String APP_3_USER = "tgianos";
     private static final String APP_3_VERSION = "7.8.9";
-    private static final ApplicationStatus APP_3_STATUS
-            = ApplicationStatus.DEPRECATED;
+    private static final ApplicationStatus APP_3_STATUS = ApplicationStatus.DEPRECATED;
 
     @Inject
     private ApplicationConfigService service;
@@ -140,7 +137,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetApplicationsByName() {
         final List<Application> apps = this.service.getApplications(
-                APP_2_NAME, null, null, null, 0, 10);
+                APP_2_NAME, null, null, null, 0, 10, true, null);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
     }
@@ -151,7 +148,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetApplicationsByUserName() {
         final List<Application> apps = this.service.getApplications(
-                null, APP_1_USER, null, null, -1, -5000);
+                null, APP_1_USER, null, null, -1, -5000, true, null);
         Assert.assertEquals(2, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
         Assert.assertEquals(APP_1_ID, apps.get(1).getId());
@@ -166,7 +163,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         statuses.add(ApplicationStatus.ACTIVE);
         statuses.add(ApplicationStatus.INACTIVE);
         final List<Application> apps = this.service.getApplications(
-                null, null, statuses, null, -1, -5000);
+                null, null, statuses, null, -1, -5000, true, null);
         Assert.assertEquals(2, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
         Assert.assertEquals(APP_1_ID, apps.get(1).getId());
@@ -180,7 +177,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
         List<Application> apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(3, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
         Assert.assertEquals(APP_2_ID, apps.get(1).getId());
@@ -188,29 +185,128 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
 
         tags.add("yarn");
         apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
 
         tags.clear();
         tags.add("genie.name:spark");
         apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
 
         tags.add("somethingThatWouldNeverReallyExist");
         apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertTrue(apps.isEmpty());
 
         tags.clear();
         apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(3, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
         Assert.assertEquals(APP_2_ID, apps.get(1).getId());
         Assert.assertEquals(APP_1_ID, apps.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method with descending sort.
+     */
+    @Test
+    public void testGetClustersDescending() {
+        //Default to order by Updated
+        final List<Application> applications = this.service.getApplications(null, null, null, null, 0, 10, true, null);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method with ascending sort.
+     */
+    @Test
+    public void testGetClustersAscending() {
+        //Default to order by Updated
+        final List<Application> applications = this.service.getApplications(null, null, null, null, 0, 10, false, null);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_1_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_3_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method default order by.
+     */
+    @Test
+    public void testGetClustersOrderBysDefault() {
+        //Default to order by Updated
+        final List<Application> applications = this.service.getApplications(null, null, null, null, 0, 10, true, null);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method order by updated.
+     */
+    @Test
+    public void testGetClustersOrderBysUpdated() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("updated");
+        final List<Application> applications =
+                this.service.getApplications(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method order by name.
+     */
+    @Test
+    public void testGetClustersOrderBysName() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("name");
+        final List<Application> applications =
+                this.service.getApplications(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_1_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_3_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method order by an invalid field should return the order by default value (updated).
+     */
+    @Test
+    public void testGetClustersOrderBysInvalidField() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("I'mNotAValidField");
+        final List<Application> applications =
+                this.service.getApplications(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method order by a collection field should return the order by default value (updated).
+     */
+    @Test
+    public void testGetClustersOrderBysCollectionField() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("tags");
+        final List<Application> applications =
+                this.service.getApplications(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
     }
 
     /**
@@ -434,10 +530,10 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(3,
-                this.service.getApplications(null, null, null, null, 0, 10).size());
+                this.service.getApplications(null, null, null, null, 0, 10, true, null).size());
         Assert.assertEquals(3, this.service.deleteAllApplications().size());
         Assert.assertTrue(
-                this.service.getApplications(null, null, null, null, 0, 10)
+                this.service.getApplications(null, null, null, null, 0, 10, true, null)
                 .isEmpty());
     }
 

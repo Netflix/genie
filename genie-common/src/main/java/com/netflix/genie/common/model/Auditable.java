@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
-import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.Date;
@@ -162,7 +161,7 @@ public class Auditable implements Serializable, Validate {
      * @param created The created timestamp
      */
     public void setCreated(final Date created) {
-        LOG.info("Tried to set created to " + created + " for entity " + this.id + ". Will not be persisted.");
+        LOG.debug("Tried to set created to " + created + " for entity " + this.id + ". Will not be persisted.");
         if (created.before(this.created)) {
             this.created = new Date(created.getTime());
         }

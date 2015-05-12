@@ -189,9 +189,9 @@ public class TestAuditable {
         Assert.assertEquals(a.getId(), b.getId());
 
         // Need to take off the milliseconds because they are lost anyway in the serialization/deserialization process
-        final long expectedCreated = a.getCreated().getTime() - (a.getCreated().getTime() % 1000L);
+        final long expectedCreated = a.getCreated().getTime() - a.getCreated().getTime() % 1000L;
         Assert.assertEquals(expectedCreated, b.getCreated().getTime());
-        final long expectedUpdated = a.getUpdated().getTime() - (a.getUpdated().getTime() % 1000L);
+        final long expectedUpdated = a.getUpdated().getTime() - a.getUpdated().getTime() % 1000L;
         Assert.assertEquals(expectedUpdated, b.getUpdated().getTime());
     }
 }

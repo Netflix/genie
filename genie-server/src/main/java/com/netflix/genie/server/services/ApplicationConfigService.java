@@ -69,7 +69,9 @@ public interface ApplicationConfigService {
                                       final Set<ApplicationStatus> statuses,
                                       final Set<String> tags,
                                       final int page,
-                                      final int limit);
+                                      final int limit,
+                                      final boolean descending,
+                                      final Set<String> orderBys);
 
     /**
      * Update an application.

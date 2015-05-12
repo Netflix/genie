@@ -74,7 +74,7 @@ public class ClusterConfigResource {
     /**
      * The Cluster Configuration Service.
      */
-    private final ClusterConfigService ccs;
+    private final ClusterConfigService clusterConfigService;
 
     /**
      * To get URI information for return codes.
@@ -85,11 +85,11 @@ public class ClusterConfigResource {
     /**
      * Constructor.
      *
-     * @param ccs The cluster configuration service to use.
+     * @param clusterConfigService The cluster configuration service to use.
      */
     @Inject
-    public ClusterConfigResource(final ClusterConfigService ccs) {
-        this.ccs = ccs;
+    public ClusterConfigResource(final ClusterConfigService clusterConfigService) {
+        this.clusterConfigService = clusterConfigService;
     }
 
     /**
@@ -133,7 +133,7 @@ public class ClusterConfigResource {
             final Cluster cluster
     ) throws GenieException {
         LOG.info("Called to create new cluster " + cluster);
-        final Cluster createdCluster = this.ccs.createCluster(cluster);
+        final Cluster createdCluster = this.clusterConfigService.createCluster(cluster);
         return Response.created(
                 this.uriInfo.getAbsolutePathBuilder().path(createdCluster.getId()).build()).
                 entity(createdCluster).
@@ -156,11 +156,6 @@ public class ClusterConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Cluster.class
-            ),
-            @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
             ),
@@ -182,7 +177,7 @@ public class ClusterConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id: " + id);
-        return this.ccs.getCluster(id);
+        return this.clusterConfigService.getCluster(id);
     }
 
     /**
@@ -196,6 +191,8 @@ public class ClusterConfigResource {
      * @param maxUpdateTime max time when cluster configuration was updated
      * @param limit         number of entries to return
      * @param page          page number
+     * @param descending    Whether results returned in descending or ascending order
+     * @param orderBys      The fields to order the results by
      * @return the Clusters found matching the criteria
      * @throws GenieException For any error
      */
@@ -207,11 +204,6 @@ public class ClusterConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Cluster.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_PRECON_FAILED,
                     message = "If one of status is invalid"
@@ -233,7 +225,8 @@ public class ClusterConfigResource {
             @QueryParam("status")
             final Set<String> statuses,
             @ApiParam(
-                    value = "Tags for the cluster."
+                    value = "Tags for the cluster.",
+                    allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
             )
             @QueryParam("tag")
             final Set<String> tags,
@@ -258,10 +251,24 @@ public class ClusterConfigResource {
             )
             @QueryParam("limit")
             @DefaultValue("1024")
-            int limit
+            int limit,
+            @ApiParam(
+                    value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
+            )
+            @QueryParam("descending")
+            @DefaultValue("true")
+            boolean descending,
+            @ApiParam(
+                    value = "The fields to order the results by. Must not be collection fields. Default is updated."
+            )
+            @QueryParam("orderBy")
+            final Set<String> orderBys
     ) throws GenieException {
-        LOG.info("Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page | limit");
-        LOG.info(name
+        LOG.info(
+                "Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page | limit | descending | orderBys]"
+        );
+        LOG.info(
+                name
                 + " | "
                 + statuses
                 + " | "
@@ -273,7 +280,12 @@ public class ClusterConfigResource {
                 + " | "
                 + page
                 + " | "
-                + limit);
+                + limit
+                + " | "
+                + descending
+                + " | "
+                + orderBys
+        );
         //Create this conversion internal in case someone uses lower case by accident?
         Set<ClusterStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
@@ -284,7 +296,9 @@ public class ClusterConfigResource {
                 }
             }
         }
-        return this.ccs.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page, limit);
+        return this.clusterConfigService.getClusters(
+                name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page, limit, descending, orderBys
+        );
     }
 
     /**
@@ -304,11 +318,6 @@ public class ClusterConfigResource {
             response = Cluster.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Cluster.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster to update not found"
@@ -336,7 +345,7 @@ public class ClusterConfigResource {
             final Cluster updateCluster
     ) throws GenieException {
         LOG.info("Called to update cluster with id " + id + " update fields " + updateCluster);
-        return this.ccs.updateCluster(id, updateCluster);
+        return this.clusterConfigService.updateCluster(id, updateCluster);
     }
 
     /**
@@ -354,11 +363,6 @@ public class ClusterConfigResource {
             response = Cluster.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Cluster.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -381,7 +385,7 @@ public class ClusterConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Delete called for id: " + id);
-        return this.ccs.deleteCluster(id);
+        return this.clusterConfigService.deleteCluster(id);
     }
 
     /**
@@ -399,10 +403,6 @@ public class ClusterConfigResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
-            @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
             ),
@@ -417,7 +417,7 @@ public class ClusterConfigResource {
     })
     public List<Cluster> deleteAllClusters() throws GenieException {
         LOG.info("called");
-        return this.ccs.deleteAllClusters();
+        return this.clusterConfigService.deleteAllClusters();
     }
 
     /**
@@ -436,13 +436,9 @@ public class ClusterConfigResource {
             value = "Add new configuration files to a cluster",
             notes = "Add the supplied configuration files to the cluster with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -470,7 +466,7 @@ public class ClusterConfigResource {
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + configs);
-        return this.ccs.addConfigsForCluster(id, configs);
+        return this.clusterConfigService.addConfigsForCluster(id, configs);
     }
 
     /**
@@ -487,13 +483,9 @@ public class ClusterConfigResource {
             value = "Get the configuration files for a cluster",
             notes = "Get the configuration files for the cluster with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -516,7 +508,7 @@ public class ClusterConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.getConfigsForCluster(id);
+        return this.clusterConfigService.getConfigsForCluster(id);
     }
 
     /**
@@ -536,13 +528,9 @@ public class ClusterConfigResource {
             value = "Update configuration files for an cluster",
             notes = "Replace the existing configuration files for cluster with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -570,7 +558,7 @@ public class ClusterConfigResource {
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and configs " + configs);
-        return this.ccs.updateConfigsForCluster(id, configs);
+        return this.clusterConfigService.updateConfigsForCluster(id, configs);
     }
 
     /**
@@ -593,10 +581,6 @@ public class ClusterConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "cluster not found"
@@ -624,7 +608,7 @@ public class ClusterConfigResource {
             final List<Command> commands
     ) throws GenieException {
         LOG.info("Called with id " + id + " and commands " + commands);
-        return this.ccs.addCommandsForCluster(id, commands);
+        return this.clusterConfigService.addCommandsForCluster(id, commands);
     }
 
     /**
@@ -644,11 +628,6 @@ public class ClusterConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Command.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -671,7 +650,7 @@ public class ClusterConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.getCommandsForCluster(id);
+        return this.clusterConfigService.getCommandsForCluster(id);
     }
 
     /**
@@ -694,10 +673,6 @@ public class ClusterConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -725,7 +700,7 @@ public class ClusterConfigResource {
             final List<Command> commands
     ) throws GenieException {
         LOG.info("Called with id " + id + " and commands " + commands);
-        return this.ccs.updateCommandsForCluster(id, commands);
+        return this.clusterConfigService.updateCommandsForCluster(id, commands);
     }
 
     /**
@@ -745,10 +720,6 @@ public class ClusterConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -771,7 +742,7 @@ public class ClusterConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.removeAllCommandsForCluster(id);
+        return this.clusterConfigService.removeAllCommandsForCluster(id);
     }
 
     /**
@@ -792,10 +763,6 @@ public class ClusterConfigResource {
             responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -824,7 +791,7 @@ public class ClusterConfigResource {
             final String cmdId
     ) throws GenieException {
         LOG.info("Called with id " + id + " and command id " + cmdId);
-        return this.ccs.removeCommandForCluster(id, cmdId);
+        return this.clusterConfigService.removeCommandForCluster(id, cmdId);
     }
 
     /**
@@ -843,13 +810,9 @@ public class ClusterConfigResource {
             value = "Add new tags to a cluster",
             notes = "Add the supplied tags to the cluster with the supplied id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -877,7 +840,7 @@ public class ClusterConfigResource {
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
-        return this.ccs.addTagsForCluster(id, tags);
+        return this.clusterConfigService.addTagsForCluster(id, tags);
     }
 
     /**
@@ -894,12 +857,8 @@ public class ClusterConfigResource {
             value = "Get the tags for a cluster",
             notes = "Get the tags for the cluster with the supplied id.",
             response = String.class,
-            responseContainer = "Set")
+            responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -922,7 +881,7 @@ public class ClusterConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.getTagsForCluster(id);
+        return this.clusterConfigService.getTagsForCluster(id);
     }
 
     /**
@@ -942,13 +901,9 @@ public class ClusterConfigResource {
             value = "Update tags for a cluster",
             notes = "Replace the existing tags for cluster with given id.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -976,7 +931,7 @@ public class ClusterConfigResource {
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
-        return this.ccs.updateTagsForCluster(id, tags);
+        return this.clusterConfigService.updateTagsForCluster(id, tags);
     }
 
     /**
@@ -994,13 +949,9 @@ public class ClusterConfigResource {
             notes = "Remove all the tags from the cluster with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -1023,7 +974,7 @@ public class ClusterConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.ccs.removeAllTagsForCluster(id);
+        return this.clusterConfigService.removeAllTagsForCluster(id);
     }
 
     /**
@@ -1042,13 +993,9 @@ public class ClusterConfigResource {
             notes = "Remove the given tag from the cluster with given id. Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "Set"
+            responseContainer = "List"
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK"
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Cluster not found"
@@ -1077,6 +1024,6 @@ public class ClusterConfigResource {
             final String tag
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tag " + tag);
-        return this.ccs.removeTagForCluster(id, tag);
+        return this.clusterConfigService.removeTagForCluster(id, tag);
     }
 }

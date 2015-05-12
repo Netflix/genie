@@ -70,9 +70,11 @@ public interface JobService {
      * @param clusterId   id of cluster for job
      * @param page        page number for job
      * @param limit       max number of jobs to return
+     * @param descending  Whether the results should be returned in descending or ascending order
+     * @param orderBys    The fields to order the results by
      * @return All jobs which match the criteria
      */
-    List getJobs(
+    List<Job> getJobs(
             final String id,
             final String jobName,
             final String userName,
@@ -81,7 +83,9 @@ public interface JobService {
             final String clusterName,
             final String clusterId,
             final int page,
-            final int limit);
+            final int limit,
+            final boolean descending,
+            final Set<String> orderBys);
 
     /**
      * Add tags to the job.

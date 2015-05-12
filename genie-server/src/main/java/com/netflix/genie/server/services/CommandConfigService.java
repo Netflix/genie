@@ -57,12 +57,14 @@ public interface CommandConfigService {
     /**
      * Get command configurations for given filter criteria.
      *
-     * @param name     name of command config
-     * @param userName the name of the user who created the configuration
-     * @param statuses The status of the applications to get. Can be null.
-     * @param tags     tags allocated to this command
-     * @param page     Page number to start results on
-     * @param limit    Max number of results per page
+     * @param name          Name of command config
+     * @param userName      The name of the user who created the configuration
+     * @param statuses      The status of the applications to get. Can be null.
+     * @param tags          tags allocated to this command
+     * @param page          Page number to start results on
+     * @param limit         Max number of results per page
+     * @param descending    Whether the results should be returned in descending or ascending order
+     * @param orderBys      The fields to order the results by
      * @return All the commands matching the specified criteria
      */
     List<Command> getCommands(
@@ -71,7 +73,9 @@ public interface CommandConfigService {
             final Set<CommandStatus> statuses,
             final Set<String> tags,
             final int page,
-            final int limit);
+            final int limit,
+            final boolean descending,
+            final Set<String> orderBys);
 
     /**
      * Update command configuration.

@@ -85,6 +85,9 @@ define([
         self.runningCommands = ko.observableArray();
         self.allTags = ko.observableArray();
         self.selectedTags = ko.observableArray();
+
+        self.commandOrderByFields = ko.observableArray(['user','started','created','id','name','status']);
+        self.commandOrderBySelectedFields = ko.observableArray();
         
         self.runningCommandCount = ko.computed(function() {
             return _.reduce(self.runningCommands(), function(sum, obj, index) { return sum + obj.count; }, 0);
@@ -122,6 +125,7 @@ define([
                 _.each(commandCount, function(count, status) {
                     self.runningCommands.push({status: status, count: count});
                 });
+                $("#commandOrderFields").select2();
             });
         };
 
@@ -135,14 +139,21 @@ define([
             var name     = _.where(formArray, {'name': 'name'})[0].value;
             var status   = _.where(formArray, {'name': 'status'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
-            
+
+            var sortOrder = _.where(formArray, {'name': 'sortOrder'})[0].value;
+            var bDescending =  true;
+
+            if (sortOrder != 'descending') {
+                bDescending = false;
+            }
+
             $.ajax({
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
                 url:  'genie/v2/config/commands',
                 traditional: true,
-                data: {limit: limit, name: name, status: status, tag: self.selectedTags()}
+                data: {limit: limit, name: name, status: status, tag: self.selectedTags(), orderBy: self.commandOrderBySelectedFields(), descending: bDescending }
             }).done(function(data) {
             	self.searchResults([]);
                 self.status('results');

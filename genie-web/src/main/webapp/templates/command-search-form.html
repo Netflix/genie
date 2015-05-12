@@ -24,6 +24,23 @@
     	 </div>
     </div>
     <div class="control-group">
+        <label class="control-label">Order By:</label>
+        <div class="controls">
+            <select id="commandOrderFields" name="tags" multiple="true" data-bind="options: Command.commandOrderByFields, selectedOptions:Command.commandOrderBySelectedFields">
+            </select>
+            <!--           <input type="text" data-provide="typeahead" autocomplete="off" id="clusterTagsSearch" data-bind="textInput:Cluster.selectedTags"> -->
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Order Type:</label>
+        <div class="controls">
+            <select name="sortOrder">
+                <option>descending</option>
+                <option>ascending</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label">Number of commands:</label>
         <div class="controls">
             <input type="text" name="limit" class="input-mini" maxlength=3 value="32">
