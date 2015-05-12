@@ -100,7 +100,6 @@ define([
         }, self);
         self.jobOrderByFields = ko.observableArray(['user','started','created','id','name','status','executionClusterName','executionClusterId']);
         self.jobOrderBySelectedFields = ko.observableArray();
-        self.sortOrder = ko.observable();
 
         self.startup = function() {
             self.runningJobs([]);
@@ -143,7 +142,7 @@ define([
             var executionClusterId  = _.where(formArray, {'name': 'clusterId'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
             var sortOrder = _.where(formArray, {'name': 'sortOrder'})[0].value;
-            var bDescending =  true
+            var bDescending =  true;
 
             if (sortOrder != 'descending') {
                 bDescending = false;
