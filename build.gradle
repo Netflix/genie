@@ -1,5 +1,3 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
 plugins {
     id 'nebula.netflixoss' version '2.2.7'
 }
@@ -68,12 +66,6 @@ subprojects {
 
         // Mockito
         testCompile ("org.mockito:mockito-core:${mockito_version}")
-    }
-
-    processResources {
-        filter ReplaceTokens, tokens: [
-                "project.version": project.getVersion().toString()
-        ]
     }
 
     checkstyle {

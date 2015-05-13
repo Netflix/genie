@@ -2,6 +2,11 @@ plugins {
     id 'nebula.provided-base' version '2.2.0'
 }
 
+license {
+    exclude 'META-INF/resources/*'
+//    excludes(["**/*.jpg", "**/*.png"])
+}
+
 dependencies {
     /*******************************
      * Compile Dependencies
