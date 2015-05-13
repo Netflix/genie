@@ -3,8 +3,7 @@ plugins {
 }
 
 license {
-    exclude 'META-INF/resources/*'
-//    excludes(["**/*.jpg", "**/*.png"])
+    excludes (["META-INF/resources/*"])
 }
 
 dependencies {
