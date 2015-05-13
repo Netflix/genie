@@ -32,7 +32,7 @@ function checkError {
 
 function copyFiles {
     # Replace the comma's (expected with internal fs.py script) with spaces (expected by Hadoop fs command)
-    SOURCE=$(echo "$1" | sed 's/,/ /g')
+    SOURCE=$1
     DESTINATION=$2
 
     # number of retries for s3cp
