@@ -363,7 +363,10 @@ public class JobManagerImpl implements JobManager {
 
         if (this.job.getFileDependencies() != null
                 && !this.job.getFileDependencies().isEmpty()) {
-            processBuilder.environment().put("CURRENT_JOB_FILE_DEPENDENCIES", this.job.getFileDependencies());
+            processBuilder.environment().put(
+                    "CURRENT_JOB_FILE_DEPENDENCIES",
+                    StringUtils.replaceChars(this.job.getFileDependencies(), ',', ' ')
+            );
         }
 
         // set the cluster related conf files

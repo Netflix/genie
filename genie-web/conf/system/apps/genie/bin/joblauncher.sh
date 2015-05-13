@@ -31,7 +31,6 @@ function checkError {
 }
 
 function copyFiles {
-    # Replace the comma's (expected with internal fs.py script) with spaces (expected by Hadoop fs command)
     SOURCE=$1
     DESTINATION=$2
 
