@@ -2,6 +2,10 @@ plugins {
     id 'nebula.provided-base' version '2.2.0'
 }
 
+license {
+    excludes (["META-INF/resources/*"])
+}
+
 dependencies {
     /*******************************
      * Compile Dependencies

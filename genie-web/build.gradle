@@ -1,4 +1,12 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: 'war'
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "project.version": project.getVersion().toString()
+    ]
+}
 
 dependencies {
     /*******************************
