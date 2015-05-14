@@ -42,8 +42,6 @@ define([
         self.created = ko.observable();
         self.user         = ko.observable();
         self.outputURILink = '';
-        self.stderrLink = '';
-        self.stdoutLink = '';
         self.idLink = '';
 
         ko.mapping.fromJS(json, {}, self);
@@ -172,10 +170,19 @@ define([
                         if (! jobObj.name) {
                             jobObj.name = 'undefined';
                         }
-                        jobObj.idLink = jobObj.id.link(jobObj.outputURI);
-                        jobObj.stderrLink = "link".link(jobObj.outputURI+"/stderr.log");
-                        jobObj.stdoutLink = "link".link(jobObj.outputURI+"/stdout.log");
-                        jobObj.rawLink = "link".link( "genie/v2/jobs/" + jobObj.id);
+
+                        jobObj.idLink  = $("<div />").append($("<a />", {
+                            href : jobObj.outputURI,
+                            text : "dir",
+                            target: "_blank"
+                        })).html();
+
+                        jobObj.rawLink  = $("<div />").append($("<a />", {
+                            href : "genie/v2/jobs/" + jobObj.id,
+                            text : "json",
+                            target: "_blank"
+                        })).html();
+
                         self.searchResults.push(new Job(jobObj));
                     });
                 } else {
@@ -184,38 +191,20 @@ define([
                     }
                     self.searchResults.push(new Job(data));                
                 }
-                var data = [
-                    {
-                        "name":       "Tiger Nixon",
-                        "position":   "System Architect",
-                        "salary":     "$3,120",
-                        "start_date": "2011/04/25",
-                        "office":     "Edinburgh",
-                        "extn":       "5421"
-                    },
-                    {
-                        "name":       "Garrett Winters",
-                        "position":   "Director",
-                        "salary":     "$5,300",
-                        "start_date": "2011/07/25",
-                        "office":     "Edinburgh",
-                        "extn":       "8422"
-                    }
-                ];
 
                 $("#jobDataTable").DataTable ( {
                         data: self.searchResults(),
                         columns: [
-                            { data: 'idLink' },
+                            { data: 'id' },
                             { data: 'name' },
                             { data: 'commandName'},
                             { data: 'user'},
+                            { data: 'executionClusterName'},
                             { data: 'created'},
                             { data: 'updated'},
                             { data: 'finished'},
-                            { data: 'stdoutLink'},
-                            { data: 'stderrLink'},
-                            {data: 'rawLink'}
+                            { data: 'idLink'},
+                            { data: 'rawLink'}
                         ]
                     }
                 )
