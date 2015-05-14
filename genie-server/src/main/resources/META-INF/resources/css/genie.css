@@ -229,3 +229,13 @@ td > select {
     padding: 15px;
     background-color: white;
 }
+
+table th {
+
+    width: auto !important;
+}
+
+.genie-icon, .json-icon {
+    width: 20px;
+    height: 20px;
+}

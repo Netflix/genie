@@ -173,15 +173,13 @@ define([
 
                         jobObj.idLink  = $("<div />").append($("<a />", {
                             href : jobObj.outputURI,
-                            text : "dir",
                             target: "_blank"
-                        })).html();
+                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
                         jobObj.rawLink  = $("<div />").append($("<a />", {
                             href : "genie/v2/jobs/" + jobObj.id,
-                            text : "json",
                             target: "_blank"
-                        })).html();
+                        }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
 
                         self.searchResults.push(new Job(jobObj));
                     });
