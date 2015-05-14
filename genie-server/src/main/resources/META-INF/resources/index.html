@@ -20,12 +20,14 @@
     <head>
         <meta charset="UTF-8">
         <title>Genie</title>
-        <link rel="shortcut icon" href="img/nficon2014.4.ico">
-        <link rel="icon" href="img/nficon2014.4.ico">
+        <link rel="shortcut icon" href="images/nficon2014.4.ico">
+        <link rel="icon" href="images/nficon2014.4.ico">
         <link rel="stylesheet" href="bootstrap/css/bootstrap.css" />
         <link rel="stylesheet" href="css/genie.css" />
         <link rel="stylesheet" href="css/select2.css" />
         <link rel="stylesheet" href="css/select2-bootstrap.css" />
+        <link rel="stylesheet" href="css/jquery.dataTables.min.css" />
+        <link rel="stylesheet" href="css/dataTables.bootstrap.css" />
         <script src="vendor/js/require.js"></script>
         <script>
             requirejs.config({ baseUrl: './js', paths: {
@@ -38,7 +40,9 @@
                     'text':                 '../vendor/js/text',
                     'stringTemplateEngine': '../vendor/js/stringTemplateEngine',
                     'select2':              '../vendor/js/select2',
-                    'loadKoTemplate':       '../vendor/js/loadKoTemplate'
+                    'loadKoTemplate':       '../vendor/js/loadKoTemplate',
+                    'jqdatatables':    '../vendor/js/jquery.dataTables.min',
+                    'dtbootstrap': '../vendor/js/dataTables.bootstrap.min'
                 },
                 shim: {
                     'bootstrap': ['jquery'],
