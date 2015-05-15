@@ -251,8 +251,8 @@ table th {
 .site-footer {
     position: fixed;
     bottom: 0;
-    background: black;
-    color: white;
+    background-color: black;
+    color: grey;
     width: 100%;
     text-align: right;
 }
