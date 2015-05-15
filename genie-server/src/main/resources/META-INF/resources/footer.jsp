@@ -19,6 +19,6 @@
 <%@ page language="java" pageEncoding="UTF-8" session="false"%>
 <!DOCTYPE html>
 <footer class="site-footer">
-    <p>Version: <%= ConfigurationManager.getConfigInstance().getString("com.netflix.genie.version")%>
-        Environment: <%= ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment")%></p>
+    <p><%= ConfigurationManager.getConfigInstance().getString("com.netflix.genie.version")%>
+        <%= ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment")%></p>
 </footer>
