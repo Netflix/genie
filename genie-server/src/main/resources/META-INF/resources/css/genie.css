@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2013 Netflix, Inc.
+ *  Copyright 2015 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,38 +16,38 @@
  *
  */
 
-body{
-    font-family:"Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
-    font-size:12px;
+body {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
     padding-top: 60px;
 }
 
-p, h1, form, button{
-    border:0;
-    margin:0;
-    padding:0;
+p, h1, form, button {
+    border: 0;
+    margin: 0;
+    padding: 0;
 }
 
-.spacer{
-    clear:both; height:1px;
+.spacer {
+    clear: both;
+    height: 1px;
 }
-
 
 /* ----------- My Form ----------- */
 h1 {
-    font-size:16px;
-    font-weight:bold;
-    margin-bottom:8px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
 }
 
 h3 {
-    font-size:14px;
+    font-size: 14px;
 }
 
-.genie{
-    margin:0 auto;
-    width:540px;
-    padding:14px;
+.genie {
+    margin: 0 auto;
+    width: 540px;
+    padding: 14px;
 }
 
 .search-form .control-label {
@@ -55,87 +55,96 @@ h3 {
 }
 
 /* ----------- stylized ----------- */
-#stylized{
-    border:solid 2px red;
-    background:#fbecec;
+#stylized {
+    border: solid 2px red;
+    background: #fbecec;
 }
+
 #stylized h1 {
-    font-size:14px;
-    font-weight:bold;
-    margin-bottom:8px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
 }
-#stylized p{
-    font-size:11px;
-    color:#666666;
-    margin-bottom:20px;
-    border-bottom:solid 1px red;
-    padding-bottom:10px;
+
+#stylized p {
+    font-size: 11px;
+    color: #666666;
+    margin-bottom: 20px;
+    border-bottom: solid 1px red;
+    padding-bottom: 10px;
 }
-#stylized label{
-    display:block;
-    font-weight:bold;
-    text-align:right;
-    width:200px;
-    float:left;
+
+#stylized label {
+    display: block;
+    font-weight: bold;
+    text-align: right;
+    width: 200px;
+    float: left;
 }
-#stylized .small{
-    color:#666666;
-    display:block;
-    font-size:11px;
-    font-weight:normal;
-    text-align:right;
-    width:200px;
+
+#stylized .small {
+    color: #666666;
+    display: block;
+    font-size: 11px;
+    font-weight: normal;
+    text-align: right;
+    width: 200px;
 }
-#stylized input{
-    float:left;
-    font-size:12px;
-    padding:4px 2px;
-    border:solid 1px red;
-    width:200px;
-    margin:2px 0 20px 10px;
+
+#stylized input {
+    float: left;
+    font-size: 12px;
+    padding: 4px 2px;
+    border: solid 1px red;
+    width: 200px;
+    margin: 2px 0 20px 10px;
 }
-#stylized button{
-    clear:both;
-    margin-left:150px;
-    width:125px;
-    height:31px;
-    background:#666666 url(images/button.png) no-repeat;
-    text-align:center;
-    line-height:31px;
-    color:#FFFFFF;
-    font-size:11px;
-    font-weight:bold;
+
+#stylized button {
+    clear: both;
+    margin-left: 150px;
+    width: 125px;
+    height: 31px;
+    background: #666666 url(images/button.png) no-repeat;
+    text-align: center;
+    line-height: 31px;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: bold;
 }
-#stylized .footer{
-    color:#666666;
-    display:block;
-    font-size:11px;
-    font-weight:normal;
-    text-align:center;
+
+#stylized .footer {
+    color: #666666;
+    display: block;
+    font-size: 11px;
+    font-weight: normal;
+    text-align: center;
 }
 
 /* ---- table style -- */
 table.results {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 0px;
-	border-color: #999999;
-	border-collapse: collapse;
+    font-family: verdana, arial, sans-serif;
+    font-size: 11px;
+    color: #333333;
+    border-width: 0px;
+    border-color: #999999;
+    border-collapse: collapse;
 }
+
 table.results th {
-	background:#b5cfd2;
-	border-width: 0px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #999999;
+    background: #b5cfd2;
+    border-width: 0px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #999999;
 }
+
 table.results td {
-	background:#fbecec;
-	border-width: 0px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #999999;
+    background: #fbecec;
+    border-width: 0px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #999999;
 }
 
 label,
@@ -182,11 +191,11 @@ td > select {
     border-color: lightgrey;
     margin-bottom: 15px;
     -webkit-border-radius: 5px;
-       -moz-border-radius: 5px;
-            border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 
-.job-info h4,h5 {
+.job-info h4, h5 {
     margin-bottom: 0px;
 }
 
@@ -201,11 +210,11 @@ td > select {
     border-color: lightgrey;
     margin-bottom: 15px;
     -webkit-border-radius: 5px;
-       -moz-border-radius: 5px;
-            border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 
-.cluster-info h4,h5 {
+.cluster-info h4, h5 {
     margin-bottom: 0px;
 }
 
@@ -222,7 +231,7 @@ td > select {
 }
 
 .span12 {
-  width: 1000px;
+    width: 1000px;
 }
 
 .affix {
@@ -231,11 +240,19 @@ td > select {
 }
 
 table th {
-
     width: auto !important;
 }
 
 .genie-icon, .json-icon {
     width: 20px;
     height: 20px;
+}
+
+.site-footer {
+    position: fixed;
+    bottom: 0;
+    background: black;
+    color: white;
+    width: 100%;
+    text-align: right;
 }
