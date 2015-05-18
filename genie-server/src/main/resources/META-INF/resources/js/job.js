@@ -190,6 +190,8 @@ define([
                     self.searchResults.push(new Job(data));                
                 }
 
+                var table = $("#jobDataTable").DataTable ();
+                table.destroy();
                 $("#jobDataTable").DataTable ( {
                         data: self.searchResults(),
                         columns: [
