@@ -195,14 +195,14 @@ define([
                         columns: [
                             { data: 'id' },
                             { data: 'name' },
-                            { data: 'commandName'},
-                            { data: 'user'},
-                            { data: 'executionClusterName'},
-                            { data: 'created'},
-                            { data: 'updated'},
-                            { data: 'finished'},
-                            { data: 'idLink'},
-                            { data: 'rawLink'}
+                            { data: 'commandName', className: "dt-center"},
+                            { data: 'user', className: "dt-center"},
+                            { data: 'executionClusterName', className: "dt-center"},
+                            { data: 'created', className: "dt-center"},
+                            { data: 'updated', className: "dt-center"},
+                            { data: 'finished', className: "dt-center"},
+                            { data: 'idLink', className: "dt-center"},
+                            { data: 'rawLink', className: "dt-center"}
                         ]
                     }
                 )
