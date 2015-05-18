@@ -180,6 +180,7 @@ define([
                 table.destroy();
                 $("#commandDataTable").DataTable ( {
                         data: self.searchResults(),
+                        "aaSorting": [],
                         columns: [
                             { data: 'id' },
                             { data: 'name' },

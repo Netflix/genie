@@ -182,6 +182,7 @@ define([
                 table.destroy();
                 $("#clusterDataTable").DataTable ( {
                         data: self.searchResults(),
+                        "aaSorting": [],
                         columns: [
                             { data: 'id' },
                             { data: 'name' },
