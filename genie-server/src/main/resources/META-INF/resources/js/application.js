@@ -159,11 +159,41 @@ define([
                 self.status('results');
                 if (data instanceof Array) {
                     _.each(data, function(applicationObj, index) {
+
+                        applicationObj.idLink  = $("<div />").append($("<a />", {
+                            href : '/#application/details/'+applicationObj.id,
+                            target: "_blank"
+                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
+
+                        applicationObj.rawLink  = $("<div />").append($("<a />", {
+                            href : "genie/v2/config/applications/" + applicationObj.id,
+                            target: "_blank"
+                        }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
+
                         self.searchResults.push(new Application(applicationObj));
                     });
                 } else {
                     self.searchResults.push(new Application(data));
                 }
+
+                var table = $("#applicationDataTable").DataTable ();
+                table.destroy();
+                $("#applicationDataTable").DataTable ( {
+                        data: self.searchResults(),
+                        columns: [
+                            { data: 'id' },
+                            { data: 'name' },
+                            { data: 'user', className: "dt-center"},
+                            { data: 'version', className: "dt-center"},
+                            { data: 'tags'},
+                            { data: 'created', className: "dt-center"},
+                            { data: 'updated', className: "dt-center"},
+                            { data: 'idLink', className: "dt-center"},
+                            { data: 'rawLink', className: "dt-center"}
+                        ]
+                    }
+                )
+
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR, textStatus, errorThrown);
                 self.status('results');

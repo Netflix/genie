@@ -159,11 +159,41 @@ define([
                 self.status('results');
                 if (data instanceof Array) {
                     _.each(data, function(commandObj, index) {
+
+                        commandObj.idLink  = $("<div />").append($("<a />", {
+                            href : '/#command/details/'+commandObj.id,
+                            target: "_blank"
+                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
+
+                        commandObj.rawLink  = $("<div />").append($("<a />", {
+                            href : "genie/v2/config/commands/" + commandObj.id,
+                            target: "_blank"
+                        }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
+
                         self.searchResults.push(new Command(commandObj));
                     });
                 } else {
                     self.searchResults.push(new Command(data));
                 }
+
+                var table = $("#commandDataTable").DataTable ();
+                table.destroy();
+                $("#commandDataTable").DataTable ( {
+                        data: self.searchResults(),
+                        columns: [
+                            { data: 'id' },
+                            { data: 'name' },
+                            { data: 'user', className: "dt-center"},
+                            { data: 'version', className: "dt-center"},
+                            { data: 'tags'},
+                            { data: 'created', className: "dt-center"},
+                            { data: 'updated', className: "dt-center"},
+                            { data: 'idLink', className: "dt-center"},
+                            { data: 'rawLink', className: "dt-center"}
+                        ]
+                    }
+                )
+
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR, textStatus, errorThrown);
                 self.status('results');

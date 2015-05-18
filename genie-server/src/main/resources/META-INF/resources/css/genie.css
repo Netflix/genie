@@ -105,7 +105,7 @@ h3 {
     margin-left: 150px;
     width: 125px;
     height: 31px;
-    background: #666666 url(img/button.png) no-repeat;
+    background: #666666 url(images/button.png) no-repeat;
     text-align: center;
     line-height: 31px;
     color: #FFFFFF;
@@ -239,11 +239,20 @@ td > select {
     background-color: white;
 }
 
+table th {
+    width: auto !important;
+}
+
+.genie-icon, .json-icon {
+    width: 20px;
+    height: 20px;
+}
+
 .site-footer {
     position: fixed;
     bottom: 0;
-    background: black;
-    color: white;
+    background-color: black;
+    color: grey;
     width: 100%;
     text-align: right;
 }

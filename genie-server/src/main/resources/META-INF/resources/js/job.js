@@ -4,6 +4,8 @@ define([
     'knockout',
     'knockout.mapping',
     'pager',
+    'jqdatatables',
+    'dtbootstrap',
     'loadKoTemplate!../templates/job-search-form.html',
     'loadKoTemplate!../templates/job-search-results.html'
 ], function($, _, ko, mapping, pager) {
@@ -39,6 +41,8 @@ define([
         self.updated       = ko.observable();
         self.created = ko.observable();
         self.user         = ko.observable();
+        self.outputURILink = '';
+        self.idLink = '';
 
         ko.mapping.fromJS(json, {}, self);
 
@@ -166,6 +170,17 @@ define([
                         if (! jobObj.name) {
                             jobObj.name = 'undefined';
                         }
+
+                        jobObj.idLink  = $("<div />").append($("<a />", {
+                            href : jobObj.outputURI,
+                            target: "_blank"
+                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
+
+                        jobObj.rawLink  = $("<div />").append($("<a />", {
+                            href : "genie/v2/jobs/" + jobObj.id,
+                            target: "_blank"
+                        }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
+
                         self.searchResults.push(new Job(jobObj));
                     });
                 } else {
@@ -174,6 +189,25 @@ define([
                     }
                     self.searchResults.push(new Job(data));                
                 }
+
+                var table = $("#jobDataTable").DataTable ();
+                table.destroy();
+                $("#jobDataTable").DataTable ( {
+                        data: self.searchResults(),
+                        columns: [
+                            { data: 'id' },
+                            { data: 'name' },
+                            { data: 'commandName', className: "dt-center"},
+                            { data: 'user', className: "dt-center"},
+                            { data: 'executionClusterName', className: "dt-center"},
+                            { data: 'created', className: "dt-center"},
+                            { data: 'updated', className: "dt-center"},
+                            { data: 'finished', className: "dt-center"},
+                            { data: 'idLink', className: "dt-center"},
+                            { data: 'rawLink', className: "dt-center"}
+                        ]
+                    }
+                )
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR, textStatus, errorThrown);
                 self.status('results');

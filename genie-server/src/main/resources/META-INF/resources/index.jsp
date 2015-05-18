@@ -15,32 +15,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 -->
-<%@ page language="java" pageEncoding="UTF-8" session="false"%>
+<%@ page language="java" pageEncoding="UTF-8" session="false" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Genie</title>
-    <link rel="shortcut icon" href="img/nficon2014.4.ico">
-    <link rel="icon" href="img/nficon2014.4.ico">
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.css" />
-    <link rel="stylesheet" href="css/genie.css" />
-    <link rel="stylesheet" href="css/select2.css" />
-    <link rel="stylesheet" href="css/select2-bootstrap.css" />
+    <link rel="shortcut icon" href="images/nficon2014.4.ico">
+    <link rel="icon" href="images/nficon2014.4.ico">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="css/select2.css"/>
+    <link rel="stylesheet" href="css/select2-bootstrap.css"/>
+    <link rel="stylesheet" href="css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap.css"/>
+    <link rel="stylesheet" href="css/genie.css"/>
     <script src="vendor/js/require.js"></script>
     <script>
-        requirejs.config({ baseUrl: './js', paths: {
-            'bootstrap':            '../bootstrap/js/bootstrap',
-            'underscore':           '../vendor/js/lodash.min',
-            'pager':                '../vendor/js/pager',
-            'knockout':             '../vendor/js/knockout-2.2.1',
-            'knockout.mapping':     '../vendor/js/knockout.mapping',
-            'jquery':               '../vendor/js/jquery.min-2.0.2',
-            'text':                 '../vendor/js/text',
-            'stringTemplateEngine': '../vendor/js/stringTemplateEngine',
-            'select2':              '../vendor/js/select2',
-            'loadKoTemplate':       '../vendor/js/loadKoTemplate'
-        },
+        requirejs.config({
+            baseUrl: './js', paths: {
+                'bootstrap': '../bootstrap/js/bootstrap',
+                'underscore': '../vendor/js/lodash.min',
+                'pager': '../vendor/js/pager',
+                'knockout': '../vendor/js/knockout-2.2.1',
+                'knockout.mapping': '../vendor/js/knockout.mapping',
+                'jquery': '../vendor/js/jquery.min-2.0.2',
+                'text': '../vendor/js/text',
+                'stringTemplateEngine': '../vendor/js/stringTemplateEngine',
+                'select2': '../vendor/js/select2',
+                'loadKoTemplate': '../vendor/js/loadKoTemplate',
+                'jqdatatables': '../vendor/js/jquery.dataTables.min',
+                'dtbootstrap': '../vendor/js/dataTables.bootstrap.min'
+            },
             shim: {
                 'bootstrap': ['jquery'],
                 'select2': ['jquery']
@@ -55,12 +60,16 @@ limitations under the License.
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <a class="brand" href="#">Genie</a>
+            <a class="brand" href="#">GENIE</a>
             <ul class="nav" role="navigation">
                 <li data-bind="css: {active: $__page__.find('job').isVisible}"><a href="#job/search">Jobs</a></li>
-                <li data-bind="css: {active: $__page__.find('cluster').isVisible}"><a href="#cluster/search">Clusters</a></li>
-                <li data-bind="css: {active: $__page__.find('command').isVisible}"><a href="#command/search">Commands</a></li>
-                <li data-bind="css: {active: $__page__.find('application').isVisible}"><a href="#application/search">Applications</a></li>
+                <li data-bind="css: {active: $__page__.find('cluster').isVisible}"><a
+                        href="#cluster/search">Clusters</a></li>
+                <li data-bind="css: {active: $__page__.find('command').isVisible}"><a
+                        href="#command/search">Commands</a></li>
+                <li data-bind="css: {active: $__page__.find('application').isVisible}"><a
+                        href="#application/search">Applications</a>
+                </li>
             </ul>
         </div>
     </div>
@@ -114,7 +123,8 @@ limitations under the License.
             </div>
         </div>
     </div>
-</div> <!-- /container -->
+</div>
+<!-- /container -->
 </body>
 <jsp:include page="footer.jsp"/>
 </html>
