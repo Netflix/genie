@@ -41,6 +41,10 @@ subprojects {
         mavenLocal()
     }
 
+    configurations {
+        all*.exclude group: "javax.servlet", module: "servlet-api"
+    }
+
     dependencies {
         /*******************************
          * Compile Dependencies

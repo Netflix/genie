@@ -46,6 +46,8 @@ dependencies {
      * Provided Dependencies
      *******************************/
 
+    provided ("javax.servlet:javax.servlet-api:${servlet_version}")
+
     /*******************************
      * Runtime Dependencies
      *******************************/
