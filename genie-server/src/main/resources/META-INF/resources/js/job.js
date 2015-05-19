@@ -195,18 +195,31 @@ define([
                 $("#jobDataTable").DataTable ( {
                         data: self.searchResults(),
                         "aaSorting": [],
+                        "bFilter":true,
                         columns: [
-                            { data: 'id' },
-                            { data: 'name' },
-                            { data: 'commandName', className: "dt-center"},
-                            { data: 'user', className: "dt-center"},
-                            { data: 'executionClusterName', className: "dt-center"},
-                            { data: 'created', className: "dt-center"},
-                            { data: 'updated', className: "dt-center"},
-                            { data: 'finished', className: "dt-center"},
-                            { data: 'idLink', className: "dt-center"},
-                            { data: 'rawLink', className: "dt-center"}
-                        ]
+                            { title: 'Id', data: 'id',  className: "dt-head-center" },
+                            { title: 'Name', data: 'name', className: "dt-head-center" },
+                            { title: 'Command', data: 'commandName', className: "dt-center"},
+                            { title: 'User', data: 'user', className: "dt-center"},
+                            { title: 'Cluster', data: 'executionClusterName', className: "dt-center"},
+                            { title: 'Start Time', data: 'created', className: "dt-center"},
+                            { title: 'Finish Time', data: 'finished', className: "dt-center"},
+                            { title: 'Output', data: 'idLink', className: "dt-center"},
+                            { title: 'JSON', data: 'rawLink', className: "dt-center"},
+                            { title: 'Status', name: 'status', data: 'status', className: "dt-center"},
+                        ],
+                        "createdRow": function ( row, data, index ) {
+                            if (data.status() == 'SUCCEEDED') {
+                                $('td', row).eq(9).addClass('text-success');
+                            } else if (data.status() == 'FAILED') {
+                                $('td', row).eq(9).addClass('text-error');
+                            } else if (data.status() == 'KILLED') {
+                                $('td', row).eq(9).addClass('text-warning');
+                            }
+                            else {
+                                $('td', row).eq(9).addClass('text-muted');
+                            }
+                        }
                     }
                 )
             }).fail(function(jqXHR, textStatus, errorThrown) {

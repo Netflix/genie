@@ -53,20 +53,30 @@
         <!--</div>-->
     <!--</div>-->
 <!--</div>-->
-<div>
+<div data-bind="visible: $root.Job.status()==='results' && $root.page()==='#job/search'"    >
         <table  id="jobDataTable" class="table table-striped table-bordered table-hover table-responsive">
         <thead>
             <tr>
-                <th> Id </th>
-                <th> Name </th>
-                <th> Command </th>
-                <th> User </th>
-                <th> Cluster </th>
-                <th> Start Time </th>
-                <th> Update Time </th>
-                <th> Finish Time </th>
-                <th> Output </th>
-                <th> JSON </th>
+                <!--<th> Id </th>-->
+                <!--<th> Name </th>-->
+                <!--<th> Command </th>-->
+                <!--<th> User </th>-->
+                <!--<th> Cluster </th>-->
+                <!--<th> Start Time </th>-->
+                <!--<th> Update Time </th>-->
+                <!--<th> Finish Time </th>-->
+                <!--<th> Output </th>-->
+                <!--<th> JSON </th>-->
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
