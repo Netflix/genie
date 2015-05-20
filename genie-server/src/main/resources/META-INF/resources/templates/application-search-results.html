@@ -54,19 +54,20 @@
         <!--</div>-->
     <!--</div>-->
 <!--</div>-->
-<div>
+<div data-bind="visible: $root.Application.status()==='results' && $root.page()==='#application/search'">
     <table id="applicationDataTable" class="table table-striped table-bordered table-hover table-responsive">
         <thead>
         <tr>
-            <th> Id </th>
-            <th> Name </th>
-            <th> User </th>
-            <th> Version </th>
-            <th> Tags </th>
-            <th> Created </th>
-            <th> Updated </th>
-            <th> Details </th>
-            <th> JSON </th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -80,6 +81,7 @@
             <td></td>
             <td></td>
             <td></td>
+            <th></th>
         </tr>
         </tbody>
     </table>

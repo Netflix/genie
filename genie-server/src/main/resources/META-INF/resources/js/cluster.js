@@ -4,10 +4,12 @@ define([
     'knockout',
     'knockout.mapping',
     'pager',
+    'moment',
+    'momentDurationFormat',
     'loadKoTemplate!../templates/cluster-search-form.html',
     'loadKoTemplate!../templates/cluster-search-results.html',
     'loadKoTemplate!../templates/cluster-details.html'
-], function($, _, ko, mapping, pager) {
+], function($, _, ko, mapping, pager, moment) {
     ko.mapping = mapping;
 
     function Cluster(json) {
@@ -33,22 +35,6 @@ define([
                 return self.id().substring(0,20) + '...' + self.id().substring(idLength-10);
             }
             return self.id();
-        }, self);
-        
-        self.createTimeFormatted = ko.computed(function() {
-            if (self.created() > 0) {
-                var myDate = new Date(parseInt(self.created()));
-                return myDate.toUTCString();
-            }
-            return '';
-        }, self);
-
-        self.updateTimeFormatted = ko.computed(function() {
-            if (self.updated() > 0) {
-                var myDate = new Date(parseInt(self.updated()));
-                return myDate.toUTCString();
-            }
-            return '';
         }, self);
 
         self.statusClass = ko.computed(function() {
@@ -172,6 +158,12 @@ define([
                             target: "_blank"
                         }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
 
+                        var createdDt = new Date(clusterObj.created);
+                        clusterObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+
+                        var updatedDt = new Date(clusterObj.updated);
+                        clusterObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+
                         self.searchResults.push(new Cluster(clusterObj));
                     });
                 } else {
@@ -183,17 +175,31 @@ define([
                 $("#clusterDataTable").DataTable ( {
                         data: self.searchResults(),
                         "aaSorting": [],
+                        "oLanguage": {
+                            "sSearch": "Filter Results: "
+                        },
                         columns: [
-                            { data: 'id' },
-                            { data: 'name' },
-                            { data: 'user', className: "dt-center"},
-                            { data: 'version', className: "dt-center"},
-                            { data: 'tags'},
-                            { data: 'created', className: "dt-center"},
-                            { data: 'updated', className: "dt-center"},
-                            { data: 'idLink', className: "dt-center"},
-                            { data: 'rawLink', className: "dt-center"}
-                        ]
+                            { title: 'Id', data: 'id' },
+                            { title: 'Name', data: 'name' },
+                            { title: 'User', data: 'user', className: "dt-center"},
+                            { title: 'Version', data: 'version', className: "dt-center"},
+                            { title: 'Tags', data: 'tags'},
+                            { title: 'Create Time (UTC)', data: 'createTimeFormatted', className: "dt-center"},
+                            { title: 'Update Time (UTC)', data: 'updateTimeFormatted', className: "dt-center"},
+                            { title: 'Details', data: 'idLink', className: "dt-center"},
+                            { title: 'JSON', data: 'rawLink', className: "dt-center"},
+                            { title: 'Status', name: 'status', data: 'status', className: "dt-center"}
+                        ],
+                        // TODO use names of datatable columns to change class instead of static index 10
+                        "createdRow": function ( row, data, index ) {
+                            if (data.status() == 'UP') {
+                                $('td', row).eq(9).addClass('text-success');
+                            } else if (data.status() == 'TERMINATED') {
+                                $('td', row).eq(9).addClass('text-error');
+                            } else if (data.status() == 'OUT_OF_SERVICE') {
+                                $('td', row).eq(9).addClass('text-warning');
+                            }
+                        }
                     }
                 )
 

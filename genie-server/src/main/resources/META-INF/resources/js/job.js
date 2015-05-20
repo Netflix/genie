@@ -57,31 +57,6 @@ define([
             return self.name();
         }, self);
 
-        self.finishTimeFormatted = ko.computed(function() {
-            if (self.finished() > 0) {
-                var myDate = new Date(parseInt(self.finished()));
-                return myDate.toUTCString();
-            }
-            return '';
-        }, self);
-
-        //self.startTimeFormatted = ko.computed(function() {
-        //    //if (self.startTime() > 0) {
-        //    if (self.created() > 0) {
-        //        var myDate = new Date(parseInt(self.created()));
-        //        return myDate.toUTCString();
-        //    }
-        //    return '';
-        //}, self);
-
-        self.updateTimeFormatted = ko.computed(function() {
-            if (self.updated() > 0) {
-                var myDate = new Date(parseInt(self.updated()));
-                return myDate.toUTCString();
-            }
-            return '';
-        }, self);
-
         self.statusClass = ko.computed(function() {
             if (self.status().toUpperCase() === 'SUCCEEDED') {
                 //return 'text-success';
