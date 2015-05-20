@@ -164,6 +164,8 @@ define([
                         var updatedDt = new Date(clusterObj.updated);
                         clusterObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
 
+                        clusterObj.formattedTags = clusterObj.tags.join("<br />");
+
                         self.searchResults.push(new Cluster(clusterObj));
                     });
                 } else {
@@ -183,7 +185,7 @@ define([
                             { title: 'Name', data: 'name' },
                             { title: 'User', data: 'user', className: "dt-center"},
                             { title: 'Version', data: 'version', className: "dt-center"},
-                            { title: 'Tags', data: 'tags'},
+                            { title: 'Tags', data: 'formattedTags'},
                             { title: 'Create Time (UTC)', data: 'createTimeFormatted', className: "dt-center"},
                             { title: 'Update Time (UTC)', data: 'updateTimeFormatted', className: "dt-center"},
                             { title: 'Details', data: 'idLink', className: "dt-center"},

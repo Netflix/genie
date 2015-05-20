@@ -162,6 +162,8 @@ define([
                         var updatedDt = new Date(applicationObj.updated);
                         applicationObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
 
+                        applicationObj.formattedTags = applicationObj.tags.join("<br />");
+
                         self.searchResults.push(new Application(applicationObj));
                     });
                 } else {
@@ -181,7 +183,7 @@ define([
                             { title: 'Name', data: 'name' },
                             { title: 'User', data: 'user', className: "dt-center"},
                             { title: 'Version', data: 'version', className: "dt-center"},
-                            { title: 'Tags', data: 'tags'},
+                            { title: 'Tags', data: 'formattedTags'},
                             { title: 'Create Time (UTC)', data: 'createTimeFormatted', className: "dt-center"},
                             { title: 'Update Time (UTC)', data: 'updateTimeFormatted', className: "dt-center"},
                             { title: 'Details', data: 'idLink', className: "dt-center"},
