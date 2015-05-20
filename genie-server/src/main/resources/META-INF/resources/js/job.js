@@ -213,7 +213,9 @@ define([
                 $("#jobDataTable").DataTable ( {
                         data: self.searchResults(),
                         "aaSorting": [],
-                        "bFilter":true,
+                        "oLanguage": {
+                            "sSearch": "Filter Results: "
+                        },
                         columns: [
                             { title: 'Id', data: 'id',  className: "dt-head-center" },
                             { title: 'Name', data: 'name', className: "dt-head-center" },
