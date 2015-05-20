@@ -41,8 +41,9 @@ define([
         self.updated       = ko.observable();
         self.created = ko.observable();
         self.user         = ko.observable();
-        self.outputURILink = '';
-        self.idLink = '';
+        //self.outputURILink = '';
+        //self.idLink = '';
+        //self.startTimeFormatted = '';
 
         ko.mapping.fromJS(json, {}, self);
 
@@ -62,14 +63,14 @@ define([
             return '';
         }, self);
 
-        self.startTimeFormatted = ko.computed(function() {
-            //if (self.startTime() > 0) {
-            if (self.created() > 0) { 	
-                var myDate = new Date(parseInt(self.created()));
-                return myDate.toUTCString();
-            }
-            return '';
-        }, self);
+        //self.startTimeFormatted = ko.computed(function() {
+        //    //if (self.startTime() > 0) {
+        //    if (self.created() > 0) {
+        //        var myDate = new Date(parseInt(self.created()));
+        //        return myDate.toUTCString();
+        //    }
+        //    return '';
+        //}, self);
 
         self.updateTimeFormatted = ko.computed(function() {
             if (self.updated() > 0) {
@@ -181,6 +182,23 @@ define([
                             target: "_blank"
                         }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
 
+                        var startDt = new Date(jobObj.created);
+                        jobObj.startTimeFormatted = startDt.getUTCFullYear()  + '/' + startDt.getUTCMonth() + '/' + startDt.getUTCDate() + ' ' + startDt.getUTCHours() + ':' + startDt.getUTCMinutes() + ':' + startDt.getUTCSeconds();
+
+                        var endDt = new Date(jobObj.finished);
+                        var diffDt = null;
+                        if (endDt.getMilliseconds != 0) {
+                            jobObj.endTimeFormatted = endDt.getUTCFullYear()  + '/' + endDt.getUTCMonth() + '/' + endDt.getUTCDate() + ' ' + endDt.getUTCHours() + ':' + endDt.getUTCMinutes() + ':' + endDt.getUTCSeconds();
+                            diffDt = new Date(endDt - startDt);
+                        } else {
+                            jobObj.endTimeFormatted = '';
+                        }
+
+                        if (diffDt != null) {
+                            jobObj.diffTimeFormatted = diffDt.getUTCFullYear()  + '/' + diffDt.getUTCMonth() + '/' + diffDt.getUTCDate() + ' ' + diffDt.getUTCHours() + ':' + diffDt.getUTCMinutes() + ':' + diffDt.getUTCSeconds();
+                        } else {
+                            jobObj.diffTimeFormatted = '';
+                        }
                         self.searchResults.push(new Job(jobObj));
                     });
                 } else {
@@ -202,8 +220,9 @@ define([
                             { title: 'Command', data: 'commandName', className: "dt-center"},
                             { title: 'User', data: 'user', className: "dt-center"},
                             { title: 'Cluster', data: 'executionClusterName', className: "dt-center"},
-                            { title: 'Start Time', data: 'created', className: "dt-center"},
-                            { title: 'Finish Time', data: 'finished', className: "dt-center"},
+                            { title: 'Start Time (UTC)', data: 'startTimeFormatted', className: "dt-center"},
+                            { title: 'Finish Time', data: 'endTimeFormatted', className: "dt-center"},
+                            { title: 'RunTime', data: 'diffTimeFormatted', className: "dt-center"},
                             { title: 'Output', data: 'idLink', className: "dt-center"},
                             { title: 'JSON', data: 'rawLink', className: "dt-center"},
                             { title: 'Status', name: 'status', data: 'status', className: "dt-center"},
