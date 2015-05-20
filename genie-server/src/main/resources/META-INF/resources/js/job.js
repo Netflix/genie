@@ -4,11 +4,13 @@ define([
     'knockout',
     'knockout.mapping',
     'pager',
+    'moment',
+    'momentDurationFormat',
     'jqdatatables',
     'dtbootstrap',
     'loadKoTemplate!../templates/job-search-form.html',
     'loadKoTemplate!../templates/job-search-results.html'
-], function($, _, ko, mapping, pager) {
+], function($, _, ko, mapping, pager, moment) {
     ko.mapping = mapping;
 
     function Job(json) {
@@ -183,22 +185,26 @@ define([
                         }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
 
                         var startDt = new Date(jobObj.created);
-                        jobObj.startTimeFormatted = startDt.getUTCFullYear()  + '/' + startDt.getUTCMonth() + '/' + startDt.getUTCDate() + ' ' + startDt.getUTCHours() + ':' + startDt.getUTCMinutes() + ':' + startDt.getUTCSeconds();
+                        //jobObj.startTimeFormatted = startDt.getUTCFullYear()  + '/' + startDt.getUTCMonth() + '/' + startDt.getUTCDate() + ' ' + startDt.getUTCHours() + ':' + startDt.getUTCMinutes() + ':' + startDt.getUTCSeconds();
+                        jobObj.startTimeFormatted = moment(startDt).format('MM/DD/YYYY HH:mm:ss');
 
                         var endDt = new Date(jobObj.finished);
-                        var diffDt = null;
+                        //var diffDt = null;
                         if (endDt.getMilliseconds != 0) {
-                            jobObj.endTimeFormatted = endDt.getUTCFullYear()  + '/' + endDt.getUTCMonth() + '/' + endDt.getUTCDate() + ' ' + endDt.getUTCHours() + ':' + endDt.getUTCMinutes() + ':' + endDt.getUTCSeconds();
-                            diffDt = new Date(endDt - startDt);
+                            //jobObj.endTimeFormatted = endDt.getUTCFullYear()  + '/' + endDt.getUTCMonth() + '/' + endDt.getUTCDate() + ' ' + endDt.getUTCHours() + ':' + endDt.getUTCMinutes() + ':' + endDt.getUTCSeconds();
+                            jobObj.endTimeFormatted = moment (endDt).format('MM/DD/YYYY HH:mm:ss');
+                            jobObj.diffTimeFormatted = moment.duration(moment(startDt).diff(moment(endDt))).format("d[d] h:mm:ss");
+                            //moment.duration(123, "minutes").format("d[d] h:mm:ss");
+                            //diffDt = new Date(endDt - startDt);
                         } else {
                             jobObj.endTimeFormatted = '';
                         }
 
-                        if (diffDt != null) {
-                            jobObj.diffTimeFormatted = diffDt.getUTCFullYear()  + '/' + diffDt.getUTCMonth() + '/' + diffDt.getUTCDate() + ' ' + diffDt.getUTCHours() + ':' + diffDt.getUTCMinutes() + ':' + diffDt.getUTCSeconds();
-                        } else {
-                            jobObj.diffTimeFormatted = '';
-                        }
+                        //if (diffDt != null) {
+                        //    jobObj.diffTimeFormatted = diffDt.getUTCFullYear()  + '/' + diffDt.getUTCMonth() + '/' + diffDt.getUTCDate() + ' ' + diffDt.getUTCHours() + ':' + diffDt.getUTCMinutes() + ':' + diffDt.getUTCSeconds();
+                        //} else {
+                        //    jobObj.diffTimeFormatted = '';
+                        //}
                         self.searchResults.push(new Job(jobObj));
                     });
                 } else {

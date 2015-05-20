@@ -44,11 +44,14 @@ limitations under the License.
                 'select2': '../vendor/js/select2',
                 'loadKoTemplate': '../vendor/js/loadKoTemplate',
                 'jqdatatables': '../vendor/js/jquery.dataTables.min',
-                'dtbootstrap': '../vendor/js/dataTables.bootstrap.min'
+                'dtbootstrap': '../vendor/js/dataTables.bootstrap.min',
+                'moment': '../vendor/js/moment.min',
+                'momentDurationFormat': '../vendor/js/moment-duration-format'
             },
             shim: {
                 'bootstrap': ['jquery'],
-                'select2': ['jquery']
+                'select2': ['jquery'],
+                'momentDurationFormat': ['moment']
             }
         });
     </script>
