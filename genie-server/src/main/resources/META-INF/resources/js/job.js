@@ -192,7 +192,7 @@ define([
                         // TODO checking against PST Epoch time. This should be changed once we fix the server side.
                         if (jobObj.status != 'RUNNING') {
                             jobObj.endTimeFormatted = moment (endDt).format('MM/DD/YYYY HH:mm:ss');
-                            jobObj.diffTimeFormatted = moment.duration(moment(startDt).diff(moment(endDt))).format("d[d] hh:mm:ss");
+                            jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] hh:mm:ss");
                         } else {
                             jobObj.endTimeFormatted = '';
                             jobObj.diffTimeFormatted ='';
@@ -216,8 +216,8 @@ define([
                             "sSearch": "Filter Results: "
                         },
                         columns: [
-                            { title: 'Id', data: 'id',  className: "dt-head-center" },
-                            { title: 'Name', data: 'name', className: "dt-head-center" },
+                            { title: 'Id', data: 'id' },
+                            { title: 'Name', data: 'name' },
                             { title: 'Command', data: 'commandName', className: "dt-center"},
                             { title: 'User', data: 'user', className: "dt-center"},
                             { title: 'Cluster', data: 'executionClusterName', className: "dt-center"},
