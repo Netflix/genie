@@ -185,26 +185,19 @@ define([
                         }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
 
                         var startDt = new Date(jobObj.created);
-                        //jobObj.startTimeFormatted = startDt.getUTCFullYear()  + '/' + startDt.getUTCMonth() + '/' + startDt.getUTCDate() + ' ' + startDt.getUTCHours() + ':' + startDt.getUTCMinutes() + ':' + startDt.getUTCSeconds();
                         jobObj.startTimeFormatted = moment(startDt).format('MM/DD/YYYY HH:mm:ss');
 
                         var endDt = new Date(jobObj.finished);
-                        //var diffDt = null;
-                        if (endDt.getMilliseconds != 0) {
-                            //jobObj.endTimeFormatted = endDt.getUTCFullYear()  + '/' + endDt.getUTCMonth() + '/' + endDt.getUTCDate() + ' ' + endDt.getUTCHours() + ':' + endDt.getUTCMinutes() + ':' + endDt.getUTCSeconds();
+
+                        // TODO checking against PST Epoch time. This should be changed once we fix the server side.
+                        if (jobObj.status != 'RUNNING') {
                             jobObj.endTimeFormatted = moment (endDt).format('MM/DD/YYYY HH:mm:ss');
-                            jobObj.diffTimeFormatted = moment.duration(moment(startDt).diff(moment(endDt))).format("d[d] h:mm:ss");
-                            //moment.duration(123, "minutes").format("d[d] h:mm:ss");
-                            //diffDt = new Date(endDt - startDt);
+                            jobObj.diffTimeFormatted = moment.duration(moment(startDt).diff(moment(endDt))).format("d[d] hh:mm:ss");
                         } else {
                             jobObj.endTimeFormatted = '';
+                            jobObj.diffTimeFormatted ='';
                         }
 
-                        //if (diffDt != null) {
-                        //    jobObj.diffTimeFormatted = diffDt.getUTCFullYear()  + '/' + diffDt.getUTCMonth() + '/' + diffDt.getUTCDate() + ' ' + diffDt.getUTCHours() + ':' + diffDt.getUTCMinutes() + ':' + diffDt.getUTCSeconds();
-                        //} else {
-                        //    jobObj.diffTimeFormatted = '';
-                        //}
                         self.searchResults.push(new Job(jobObj));
                     });
                 } else {
@@ -235,16 +228,17 @@ define([
                             { title: 'JSON', data: 'rawLink', className: "dt-center"},
                             { title: 'Status', name: 'status', data: 'status', className: "dt-center"},
                         ],
+                        // TODO use names of datatable columns to change class instead of static index 10
                         "createdRow": function ( row, data, index ) {
                             if (data.status() == 'SUCCEEDED') {
-                                $('td', row).eq(9).addClass('text-success');
+                                $('td', row).eq(10).addClass('text-success');
                             } else if (data.status() == 'FAILED') {
-                                $('td', row).eq(9).addClass('text-error');
+                                $('td', row).eq(10).addClass('text-error');
                             } else if (data.status() == 'KILLED') {
-                                $('td', row).eq(9).addClass('text-warning');
+                                $('td', row).eq(10).addClass('text-warning');
                             }
                             else {
-                                $('td', row).eq(9).addClass('text-muted');
+                                $('td', row).eq(10).addClass('text-muted');
                             }
                         }
                     }
