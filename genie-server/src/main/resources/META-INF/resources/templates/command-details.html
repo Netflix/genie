@@ -45,6 +45,10 @@
             <td><strong>Clusters</strong></td>
             <td>
                 <table>
+                    <thead>
+                        <th> Cluster Id </th>
+                        <th> Cluster Name </th>
+                    </thead>
                     <tbody data-bind="foreach: clusters">
                     <tr>
                         <td data-bind="text:$data.id"></td>
@@ -58,11 +62,14 @@
             <td><strong>Application</strong></td>
             <td>
             <table>
+                <thead>
+                    <th> Application Id </th>
+                    <th> Application Name </th>
+                </thead>
                 <tbody>
                     <tr>
-                        <td data-bind="text:application"></td>
-                        <td data-bind="text:application.id"></td>
-                        <td data-bind="text:application.name"></td>
+                        <td data-bind="text:applicationId"></td>
+                        <td data-bind="text:applicationName"></td>
                     </tr>
                 </tbody>
             </table>

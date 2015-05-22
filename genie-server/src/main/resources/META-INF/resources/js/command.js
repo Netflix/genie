@@ -39,6 +39,20 @@ define([
             return self.id();
         }, self);
 
+        self.applicationId = ko.computed(function() {
+            if (self.application() !== undefined) {
+                return self.application().id;
+            }
+            return '';s
+        },self);
+
+        self.applicationName = ko.computed(function() {
+            if (self.application() !== undefined) {
+                return self.application().name;
+            }
+            return '';
+        },self);
+
         self.statusClass = ko.computed(function() {
             if (self.status() && self.status().toUpperCase() === 'ACTIVE') {
                 return 'label-success';
