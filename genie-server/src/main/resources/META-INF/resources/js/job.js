@@ -167,7 +167,8 @@ define([
                         // TODO checking against PST Epoch time. This should be changed once we fix the server side.
                         if (jobObj.status != 'RUNNING') {
                             jobObj.endTimeFormatted = moment (endDt).format('MM/DD/YYYY HH:mm:ss');
-                            jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] hh:mm:ss");
+                            //jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] hh:mm:ss", {trim: false});
+                            jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] h[h] m[m] s[s]");
                         } else {
                             jobObj.endTimeFormatted = '';
                             jobObj.diffTimeFormatted ='';
@@ -197,8 +198,8 @@ define([
                             { title: 'User', data: 'user', className: "dt-center"},
                             { title: 'Cluster', data: 'executionClusterName', className: "dt-center"},
                             { title: 'Start Time (UTC)', data: 'startTimeFormatted', className: "dt-center"},
-                            { title: 'Finish Time', data: 'endTimeFormatted', className: "dt-center"},
-                            { title: 'RunTime', data: 'diffTimeFormatted', className: "dt-center"},
+                            { title: 'Finish Time (UTC)', data: 'endTimeFormatted', className: "dt-center"},
+                            { title: 'RunTime', data: 'diffTimeFormatted', className: "dt-body-right"},
                             { title: 'Output', data: 'idLink', className: "dt-center"},
                             { title: 'JSON', data: 'rawLink', className: "dt-center"},
                             { title: 'Status', name: 'status', data: 'status', className: "dt-center"},
