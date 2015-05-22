@@ -86,7 +86,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
             throw new GeniePreconditionException(
                     "No cluster entered. Unable to validate.");
         }
-        cluster.validate();
+
         final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 BASE_CONFIG_CLUSTER_REST_URL,

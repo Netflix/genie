@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
+@Named
 @Path("/v2/config/commands")
 @Api(
         value = "/v2/config/commands",
@@ -67,8 +68,7 @@ import org.slf4j.LoggerFactory;
         description = "Manage the available commands"
 )
 @Produces(MediaType.APPLICATION_JSON)
-@Named
-public class CommandConfigResource {
+public final class CommandConfigResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandConfigResource.class);
 

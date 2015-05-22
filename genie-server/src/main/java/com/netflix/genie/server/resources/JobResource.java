@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
+@Named
 @Path("/v2/jobs")
 @Api(
         value = "/v2/jobs",
@@ -70,8 +71,7 @@ import org.slf4j.LoggerFactory;
         description = "Manage Genie Jobs."
 )
 @Produces(MediaType.APPLICATION_JSON)
-@Named
-public class JobResource {
+public final class JobResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
@@ -102,7 +102,7 @@ public class JobResource {
      * Constructor.
      *
      * @param executionService The execution service to use.
-     * @param jobService The job service to use.
+     * @param jobService       The job service to use.
      */
     @Inject
     public JobResource(final ExecutionService executionService, final JobService jobService) {
@@ -379,26 +379,26 @@ public class JobResource {
                         + "| executionClusterId | page | limit | descending | orderBys]"
         );
         LOG.info(id
-                + " | "
-                + name
-                + " | "
-                + userName
-                + " | "
-                + statuses
-                + " | "
-                + tags
-                + " | "
-                + clusterName
-                + " | "
-                + clusterId
-                + " | "
-                + page
-                + " | "
-                + limit
-                + " | "
-                + descending
-                + " | "
-                + orderBys
+                        + " | "
+                        + name
+                        + " | "
+                        + userName
+                        + " | "
+                        + statuses
+                        + " | "
+                        + tags
+                        + " | "
+                        + clusterName
+                        + " | "
+                        + clusterId
+                        + " | "
+                        + page
+                        + " | "
+                        + limit
+                        + " | "
+                        + descending
+                        + " | "
+                        + orderBys
         );
         Set<JobStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {

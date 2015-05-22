@@ -27,6 +27,7 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.common.model.CommandStatus;
+import com.netflix.genie.common.validation.GenieValidator;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
@@ -36,12 +37,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -53,42 +57,42 @@ import org.springframework.transaction.annotation.Transactional;
  * @author amsharma
  * @author tgianos
  */
-@Named
-@Transactional(rollbackFor = GenieException.class)
+@Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
 public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandConfigServiceJPAImpl.class);
-
-    @PersistenceContext
-    private EntityManager em;
-
     private final CommandRepository commandRepo;
     private final ApplicationRepository appRepo;
+    private final GenieValidator genieValidator;
+    @PersistenceContext
+    private EntityManager em;
 
     /**
      * Default constructor.
      *
-     * @param commandRepo the command repository to use
-     * @param appRepo     the application repository to use
+     * @param commandRepo    the command repository to use
+     * @param appRepo        the application repository to use
+     * @param genieValidator The validator to use.
      */
-    @Inject
     public CommandConfigServiceJPAImpl(
             final CommandRepository commandRepo,
-            final ApplicationRepository appRepo) {
+            final ApplicationRepository appRepo,
+            final GenieValidator genieValidator
+    ) {
         this.commandRepo = commandRepo;
         this.appRepo = appRepo;
+        this.genieValidator = genieValidator;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Command createCommand(final Command command) throws GenieException {
-        if (command == null) {
-            throw new GeniePreconditionException("No command entered to create");
-        }
-        command.validate();
-
+    public Command createCommand(
+            @NotNull(message = "No command entered. Unable to create.")
+            @Valid
+            final Command command
+    ) throws GenieException {
         LOG.debug("Called to create command " + command.toString());
         if (StringUtils.isEmpty(command.getId())) {
             command.setId(UUID.randomUUID().toString());
@@ -105,11 +109,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Command getCommand(final String id) throws GenieException {
+    public Command getCommand(
+            @NotBlank(message = "No id entered unable to get.")
+            final String id
+    ) throws GenieException {
         LOG.debug("called");
-        if (StringUtils.isEmpty(id)) {
-            throw new GeniePreconditionException("Id can't be null or empty.");
-        }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command;
@@ -155,14 +159,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Command updateCommand(
+            @NotBlank(message = "No id entered. Unable to update.")
             final String id,
-            final Command updateCommand) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No id entered. Unable to update.");
-        }
-        if (updateCommand == null) {
-            throw new GeniePreconditionException("No command information entered. Unable to update.");
-        }
+            @NotNull(message = "No command information entered. Unable to update.")
+            final Command updateCommand
+    ) throws GenieException {
         if (!this.commandRepo.exists(id)) {
             throw new GenieNotFoundException("No command exists with the given id. Unable to update.");
         }
@@ -177,7 +178,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         }
         LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
         final Command command = this.em.merge(updateCommand);
-        command.validate();
+        this.genieValidator.validate(command);
         return command;
     }
 
@@ -199,11 +200,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
-    public Command deleteCommand(final String id) throws GenieException {
+    public Command deleteCommand(
+            @NotBlank(message = "No id entered. Unable to delete.")
+            final String id
+    ) throws GenieException {
         LOG.debug("Called to delete command config with id " + id);
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No id entered. Unable to delete.");
-        }
         final Command command = this.commandRepo.findOne(id);
         if (command == null) {
             throw new GenieNotFoundException("No command with id " + id + " exists to delete.");
@@ -225,14 +226,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Set<String> addConfigsForCommand(
+            @NotBlank(message = "No command id entered. Unable to add configurations.")
             final String id,
-            final Set<String> configs) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to add configurations.");
-        }
-        if (configs == null) {
-            throw new GeniePreconditionException("No configuration files entered.");
-        }
+            @NotEmpty(message = "No configuration files entered. Unable to add.")
+            final Set<String> configs
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getConfigs().addAll(configs);
@@ -248,10 +246,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForCommand(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to get configs.");
-        }
+            @NotBlank(message = "No command id entered. Unable to get configs.")
+            final String id
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command.getConfigs();
@@ -265,11 +262,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Set<String> updateConfigsForCommand(
+            @NotBlank(message = "No command id entered. Unable to update configurations.")
             final String id,
-            final Set<String> configs) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to update configurations.");
-        }
+            @NotEmpty(message = "No configs entered. Unable to update.")
+            final Set<String> configs
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.setConfigs(configs);
@@ -284,10 +281,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Set<String> removeAllConfigsForCommand(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to remove configs.");
-        }
+            @NotBlank(message = "No command id entered. Unable to remove configs.")
+            final String id
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getConfigs().clear();
@@ -302,11 +298,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Set<String> removeConfigForCommand(
+            @NotBlank(message = "No command id entered. Unable to remove configuration.")
             final String id,
-            final String config) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to remove configuration.");
-        }
+            @NotBlank(message = "No config entered. Unable to remove.")
+            final String config
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             if (StringUtils.isNotBlank(config)) {
@@ -323,14 +319,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Application setApplicationForCommand(
+            @NotBlank(message = "No command id entered. Unable to add applications.")
             final String id,
-            final Application application) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to add applications.");
-        }
-        if (application == null) {
-            throw new GeniePreconditionException("No application entered. Unable to set application.");
-        }
+            @NotNull(message = "No application entered. Unable to set application.")
+            final Application application
+    ) throws GenieException {
         if (StringUtils.isBlank(application.getId())) {
             throw new GeniePreconditionException("No application id entered. Unable to set application.");
         }
@@ -354,10 +347,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     @Override
     @Transactional(readOnly = true)
     public Application getApplicationForCommand(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to get applications.");
-        }
+            @NotBlank(message = "No command id entered. Unable to get applications.")
+            final String id
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             final Application app = command.getApplication();
@@ -376,10 +368,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Application removeApplicationForCommand(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to remove application.");
-        }
+            @NotBlank(message = "No command id entered. Unable to remove application.")
+            final String id
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             final Application app = command.getApplication();
@@ -399,14 +390,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Set<String> addTagsForCommand(
+            @NotBlank(message = "No command id entered. Unable to add tags.")
             final String id,
-            final Set<String> tags) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to add tags.");
-        }
-        if (tags == null) {
-            throw new GeniePreconditionException("No tags entered.");
-        }
+            @NotEmpty(message = "No tags entered. Unable to add.")
+            final Set<String> tags
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getTags().addAll(tags);
@@ -422,13 +410,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getTagsForCommand(
-            final String id)
-            throws GenieException {
-
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id sent. Cannot retrieve tags.");
-        }
-
+            @NotBlank(message = "No command id sent. Cannot retrieve tags.")
+            final String id
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command.getTags();
@@ -442,11 +426,11 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Set<String> updateTagsForCommand(
+            @NotBlank(message = "No command id entered. Unable to update tags.")
             final String id,
-            final Set<String> tags) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to update tags.");
-        }
+            @NotEmpty(message = "No tags entered. Unable to update.")
+            final Set<String> tags
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.setTags(tags);
@@ -461,10 +445,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public Set<String> removeAllTagsForCommand(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to remove tags.");
-        }
+            @NotBlank(message = "No command id entered. Unable to remove tags.")
+            final String id
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             command.getTags().clear();
@@ -478,15 +461,16 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
-    public Set<Cluster> getClustersForCommand(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to get clusters.");
-        }
+    public Set<String> removeTagForCommand(
+            @NotBlank(message = "No command id entered. Unable to remove tag.")
+            final String id,
+            @NotBlank(message = "No tag entered. Unable to remove.")
+            final String tag
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            return command.getClusters();
+            command.getTags().remove(tag);
+            return command.getTags();
         } else {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
@@ -496,16 +480,14 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeTagForCommand(final String id, final String tag)
-            throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No command id entered. Unable to remove tag.");
-        }
-
+    @Transactional(readOnly = true)
+    public Set<Cluster> getClustersForCommand(
+            @NotBlank(message = "No command id entered. Unable to get clusters.")
+            final String id
+    ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            command.getTags().remove(tag);
-            return command.getTags();
+            return command.getClusters();
         } else {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }

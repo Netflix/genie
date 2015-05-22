@@ -28,10 +28,7 @@ import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -43,8 +40,6 @@ import java.util.Map;
  * @author amsharma
  * @author tgianos
  */
-@Named
-@Scope("prototype")
 public class YarnJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(YarnJobManagerImpl.class);
@@ -72,7 +67,6 @@ public class YarnJobManagerImpl extends JobManagerImpl {
      * @param jobService     The job service to use.
      * @param commandService The command service to use.
      */
-    @Inject
     public YarnJobManagerImpl(final JobMonitor jobMonitor,
                               final JobService jobService,
                               final CommandConfigService commandService) {

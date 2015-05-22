@@ -15,20 +15,23 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.common.model;
+package com.netflix.genie.common.validation;
 
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieException;
 
 /**
- * Interface all Model classes should implement.
+ * An interface for validating Genie beans based on JRS-303/JSR-349 and throwing GeniePrecondition if it fails
+ * validation.
  *
  * @author tgianos
  */
-public interface Validate {
+public interface GenieValidator {
+
     /**
-     * Validate that this instance is valid for database storage.
+     * The validate method throws exception if validation fails.
      *
-     * @throws GeniePreconditionException When Preconditions aren't met.
+     * @param bean The bean to validate. Should be annotated with 303/349 annotations. Not Null.
+     * @throws GenieException
      */
-    void validate() throws GeniePreconditionException;
+    <T> void validate(final T bean) throws GenieException;
 }

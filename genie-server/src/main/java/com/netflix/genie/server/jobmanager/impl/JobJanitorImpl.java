@@ -22,12 +22,9 @@ import java.util.Random;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.server.jobmanager.JobJanitor;
 import com.netflix.genie.server.services.ExecutionService;
-import javax.inject.Inject;
-import javax.inject.Named;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 
 /**
  * Janitor thread that marks jobs as zombies if status hasn't been updated for
@@ -36,8 +33,6 @@ import org.springframework.context.annotation.Scope;
  * @author skrishnan
  * @author tgianos
  */
-@Named
-@Scope("prototype")
 public class JobJanitorImpl implements JobJanitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobJanitorImpl.class);
@@ -52,7 +47,6 @@ public class JobJanitorImpl implements JobJanitor {
      *
      * @param xs The execution service to use.
      */
-    @Inject
     public JobJanitorImpl(final ExecutionService xs) {
         this.xs = xs;
         this.conf = ConfigurationManager.getConfigInstance();

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +32,7 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-public class TestCommonEntityFields {
+public class TestCommonEntityFields extends TestEntityBase {
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final String VERSION = "1.0";
@@ -70,65 +71,51 @@ public class TestCommonEntityFields {
     /**
      * Test to make sure validation works.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateCommonEntityFields() throws GeniePreconditionException {
-        this.c.onCreateOrUpdateCommonEntityFields();
+    public void testValidate() throws GenieException {
+        this.validate(this.c);
     }
 
     /**
      * Test to make sure validation works.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateCommonEntityFieldsWithNothing() throws GeniePreconditionException {
-        final CommonEntityFields local = new CommonEntityFields();
-        local.onCreateOrUpdateCommonEntityFields();
+    public void testValidateWithNothing() throws GenieException {
+        this.validate(new CommonEntityFields());
     }
 
     /**
      * Test to make sure validation works and throws exception when no name entered.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateCommonEntityFieldsNoName() throws GeniePreconditionException {
-        final CommonEntityFields local = new CommonEntityFields(null, USER, VERSION);
-        local.onCreateOrUpdateCommonEntityFields();
+    public void testValidateNoName() throws GenieException {
+        this.validate(new CommonEntityFields(null, USER, VERSION));
     }
 
     /**
-     * Test to make sure validation works and throws exception when no user entered.
+     * Test to make sure validation works and throws exception when no name entered.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateCommonEntityFieldsNoUser() throws GeniePreconditionException {
-        final CommonEntityFields local = new CommonEntityFields(null, USER, VERSION);
-        local.onCreateOrUpdateCommonEntityFields();
+    public void testValidateNoUser() throws GenieException {
+        this.validate(new CommonEntityFields(NAME, "     ", VERSION));
     }
 
     /**
-     * Test to make sure validation works and throws exception when no user entered.
+     * Test to make sure validation works and throws exception when no name entered.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateCommonEntityFieldsNoVersion() throws GeniePreconditionException {
-        final CommonEntityFields local = new CommonEntityFields(NAME, USER, null);
-        local.onCreateOrUpdateCommonEntityFields();
-    }
-
-    /**
-     * Make sure validation works on valid commands.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    public void testValidate() throws GeniePreconditionException {
-        this.c.validate();
+    public void testValidateNoVersion() throws GenieException {
+        this.validate(new CommonEntityFields(NAME, USER, ""));
     }
 
     /**

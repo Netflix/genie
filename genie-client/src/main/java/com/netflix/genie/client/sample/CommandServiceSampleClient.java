@@ -44,18 +44,15 @@ import org.slf4j.LoggerFactory;
  */
 public final class CommandServiceSampleClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CommandServiceSampleClient.class);
-
     /**
      * Unique id for the sample command.
      */
     protected static final String ID = "pig13_mr2";
-
     /**
      * Name for the sample command.
      */
     protected static final String CMD_NAME = "pig";
-
+    private static final Logger LOG = LoggerFactory.getLogger(CommandServiceSampleClient.class);
     private static final String CMD_VERSION = "1.0";
 
     /**
@@ -236,9 +233,10 @@ public final class CommandServiceSampleClient {
         final Command command = new Command(
                 CMD_NAME,
                 "tgianos",
+                CMD_VERSION,
                 CommandStatus.ACTIVE,
-                "/apps/pig/0.13/bin/pig",
-                CMD_VERSION);
+                "/apps/pig/0.13/bin/pig"
+        );
         if (StringUtils.isNotBlank(id)) {
             command.setId(id);
         }

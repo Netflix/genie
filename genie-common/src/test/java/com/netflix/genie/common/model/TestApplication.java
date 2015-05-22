@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,7 +31,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class TestApplication {
+public class TestApplication extends TestEntityBase {
     private static final String NAME = "pig";
     private static final String USER = "tgianos";
     private static final String VERSION = "1.0";
@@ -67,7 +68,7 @@ public class TestApplication {
      */
     @Test
     public void testConstructor() throws GeniePreconditionException {
-        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
+        this.a = new Application(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         Assert.assertNull(this.a.getCommands());
         Assert.assertNull(this.a.getConfigs());
         Assert.assertNull(this.a.getEnvPropFile());
@@ -85,41 +86,65 @@ public class TestApplication {
      */
     @Test
     public void testOnCreateOrUpdateApplication() throws GeniePreconditionException {
-        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
+        this.a = new Application(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        Assert.assertNull(this.a.getTags());
         this.a.onCreateOrUpdateApplication();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no status entered.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateApplicationNoStatus() throws GeniePreconditionException {
-        this.a = new Application(NAME, USER, null, VERSION);
-        this.a.onCreateOrUpdateApplication();
+        Assert.assertEquals(2, this.a.getTags().size());
     }
 
     /**
      * Make sure validation works on valid apps.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GeniePreconditionException {
-        this.a = new Application(NAME, USER, ApplicationStatus.ACTIVE, VERSION);
-        this.a.validate();
+    public void testValidate() throws GenieException {
+        this.a = new Application(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        this.validate(this.a);
     }
 
     /**
      * Make sure validation works on with failure from super class.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test(expected = GeniePreconditionException.class)
-    public void testValidateSuperFail() throws GeniePreconditionException {
-        this.a = new Application(null, USER, ApplicationStatus.ACTIVE, VERSION);
-        this.a.validate();
+    public void testValidateNoName() throws GenieException {
+        this.a = new Application(null, USER, VERSION, ApplicationStatus.ACTIVE);
+        this.validate(this.a);
+    }
+
+    /**
+     * Make sure validation works on with failure from super class.
+     *
+     * @throws GenieException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNoUser() throws GenieException {
+        this.a = new Application(NAME, "", VERSION, ApplicationStatus.ACTIVE);
+        this.validate(this.a);
+    }
+
+    /**
+     * Make sure validation works on with failure from super class.
+     *
+     * @throws GenieException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNoVersion() throws GenieException {
+        this.a = new Application(NAME, USER, " ", ApplicationStatus.ACTIVE);
+        this.validate(this.a);
+    }
+
+    /**
+     * Make sure validation works on with failure from application.
+     *
+     * @throws GenieException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNoStatus() throws GenieException {
+        this.a = new Application(NAME, USER, VERSION, null);
+        this.validate(this.a);
     }
 
     /**

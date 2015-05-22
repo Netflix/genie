@@ -48,17 +48,15 @@ import org.slf4j.LoggerFactory;
  */
 public final class ClusterServiceSampleClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterServiceSampleClient.class);
-
     /**
      * ID for the sample cluster.
      */
     protected static final String ID = "bdp_hquery_20140505_185527";
-
     /**
      * Name for the sample cluster.
      */
     protected static final String NAME = "h2query";
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterServiceSampleClient.class);
 
     private ClusterServiceSampleClient() {
         // never called
@@ -286,10 +284,11 @@ public final class ClusterServiceSampleClient {
         final Cluster cluster = new Cluster(
                 NAME,
                 "tgianos",
+                "2.4.0",
                 ClusterStatus.OUT_OF_SERVICE,
-                "com.netflix.genie.server.jobmanager.impl.YarnJobManager",
-                configs,
-                "2.4.0");
+                "com.netflix.genie.server.jobmanager.impl.YarnJobManager"
+        );
+        cluster.setConfigs(configs);
         if (StringUtils.isNotBlank(id)) {
             cluster.setId(id);
         }

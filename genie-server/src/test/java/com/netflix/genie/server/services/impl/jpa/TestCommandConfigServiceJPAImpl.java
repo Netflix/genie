@@ -30,16 +30,19 @@ import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
+
 import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 
 /**
  * Tests for the CommandConfigServiceJPAImpl.
@@ -135,7 +138,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetCommandNull() throws GenieException {
         this.service.getCommand(null);
     }
@@ -327,9 +330,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         final Command command = new Command(
                 COMMAND_1_NAME,
                 COMMAND_1_USER,
+                COMMAND_1_VERSION,
                 CommandStatus.ACTIVE,
-                COMMAND_1_EXECUTABLE,
-                COMMAND_1_VERSION
+                COMMAND_1_EXECUTABLE
         );
         final String id = UUID.randomUUID().toString();
         command.setId(id);
@@ -362,9 +365,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         final Command command = new Command(
                 COMMAND_1_NAME,
                 COMMAND_1_USER,
+                COMMAND_1_VERSION,
                 CommandStatus.ACTIVE,
-                COMMAND_1_EXECUTABLE,
-                COMMAND_1_VERSION
+                COMMAND_1_EXECUTABLE
         );
         final Command created = this.service.createCommand(command);
         Assert.assertNotNull(this.service.getCommand(created.getId()));
@@ -389,7 +392,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testCreateCommandNull() throws GenieException {
         this.service.createCommand(null);
     }
@@ -404,9 +407,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         final Command command = new Command(
                 COMMAND_1_NAME,
                 COMMAND_1_USER,
+                COMMAND_1_VERSION,
                 CommandStatus.ACTIVE,
-                COMMAND_1_EXECUTABLE,
-                COMMAND_1_VERSION
+                COMMAND_1_EXECUTABLE
         );
         command.setId(COMMAND_1_ID);
         this.service.createCommand(command);
@@ -497,7 +500,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandNullId() throws GenieException {
         this.service.updateCommand(null, new Command());
     }
@@ -507,7 +510,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandNullUpdateCommand() throws GenieException {
         this.service.updateCommand(COMMAND_1_ID, null);
     }
@@ -605,7 +608,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testDeleteNoId() throws GenieException {
         this.service.deleteCommand(null);
     }
@@ -651,7 +654,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToCommandNoId() throws GenieException {
         this.service.addConfigsForCommand(null, new HashSet<String>());
     }
@@ -661,7 +664,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToCommandNoConfigs() throws GenieException {
         this.service.addConfigsForCommand(COMMAND_1_ID, null);
     }
@@ -673,8 +676,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToCommandNoCommand() throws GenieException {
-        this.service.addConfigsForCommand(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> configs = new HashSet<>();
+        configs.add(UUID.randomUUID().toString());
+        this.service.addConfigsForCommand(UUID.randomUUID().toString(), configs);
     }
 
     /**
@@ -708,7 +712,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForCommandNoId() throws GenieException {
         this.service.updateConfigsForCommand(null, new HashSet<String>());
     }
@@ -720,8 +724,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForCommandNoCommand() throws GenieException {
-        this.service.updateConfigsForCommand(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> configs = new HashSet<>();
+        configs.add(UUID.randomUUID().toString());
+        this.service.updateConfigsForCommand(UUID.randomUUID().toString(), configs);
     }
 
     /**
@@ -740,7 +745,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetConfigsForCommandNoId() throws GenieException {
         this.service.getConfigsForCommand(null);
     }
@@ -773,7 +778,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllConfigsForCommandNoId() throws GenieException {
         this.service.removeAllConfigsForCommand(null);
     }
@@ -809,15 +814,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
-    public void testRemoveConfigForCommandNullConfig()
-            throws GenieException {
-        final Set<String> configs
-                = this.service.getConfigsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(2,
-                this.service.removeConfigForCommand(
-                        COMMAND_1_ID, null).size());
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveConfigForCommandNullConfig() throws GenieException {
+        this.service.removeConfigForCommand(COMMAND_1_ID, null);
     }
 
     /**
@@ -825,7 +824,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveConfigForCommandNoId() throws GenieException {
         this.service.removeConfigForCommand(null, "something");
     }
@@ -871,7 +870,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testSetApplicationForCommandNoId() throws GenieException {
         this.service.setApplicationForCommand(null, new Application());
     }
@@ -881,7 +880,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testSetApplicationForCommandNoCommand() throws GenieException {
         this.service.setApplicationForCommand(COMMAND_2_ID, null);
     }
@@ -938,7 +937,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetApplicationForCommandNoId() throws GenieException {
         this.service.getApplicationForCommand(null);
     }
@@ -986,7 +985,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveApplicationForCommandNoId() throws GenieException {
         this.service.removeApplicationForCommand(null);
     }
@@ -1042,7 +1041,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToCommandNoId() throws GenieException {
         this.service.addTagsForCommand(null, new HashSet<String>());
     }
@@ -1052,7 +1051,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToCommandNoTags() throws GenieException {
         this.service.addTagsForCommand(COMMAND_1_ID, null);
     }
@@ -1064,8 +1063,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForCommandNoCommand() throws GenieException {
-        this.service.addTagsForCommand(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> tags = new HashSet<>();
+        tags.add(UUID.randomUUID().toString());
+        this.service.addTagsForCommand(UUID.randomUUID().toString(), tags);
     }
 
     /**
@@ -1099,7 +1099,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForCommandNoId() throws GenieException {
         this.service.updateTagsForCommand(null, new HashSet<String>());
     }
@@ -1111,8 +1111,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForCommandNoCommand() throws GenieException {
-        this.service.updateTagsForCommand(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> tags = new HashSet<>();
+        tags.add(UUID.randomUUID().toString());
+        this.service.updateTagsForCommand(UUID.randomUUID().toString(), tags);
     }
 
     /**
@@ -1131,7 +1132,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetTagsForCommandNoId() throws GenieException {
         this.service.getTagsForCommand(null);
     }
@@ -1166,7 +1167,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllTagsForCommandNoId() throws GenieException {
         this.service.removeAllTagsForCommand(null);
     }
@@ -1203,15 +1204,9 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
-    public void testRemoveTagForCommandNullTag()
-            throws GenieException {
-        final Set<String> tags
-                = this.service.getTagsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(5, tags.size());
-        Assert.assertEquals(5,
-                this.service.removeTagForCommand(
-                        COMMAND_1_ID, null).size());
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveTagForCommandNullTag() throws GenieException {
+        this.service.removeTagForCommand(COMMAND_1_ID, null);
     }
 
     /**
@@ -1219,7 +1214,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForCommandNoId() throws GenieException {
         this.service.removeTagForCommand(null, "something");
     }
@@ -1255,7 +1250,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetClustersForCommandNoId() throws GenieException {
         this.service.getClustersForCommand("");
     }

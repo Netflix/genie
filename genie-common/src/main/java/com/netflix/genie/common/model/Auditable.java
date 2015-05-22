@@ -38,6 +38,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 @MappedSuperclass
-public class Auditable implements Serializable, Validate {
+public class Auditable implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Auditable.class);
     private static final long serialVersionUID = 7526472297322776147L;
@@ -201,13 +202,6 @@ public class Auditable implements Serializable, Validate {
      */
     protected void setEntityVersion(final Long entityVersion) {
         this.entityVersion = entityVersion;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validate() throws GeniePreconditionException {
     }
 
     /**

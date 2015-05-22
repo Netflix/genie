@@ -54,7 +54,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author skrishnan
  * @author tgianos
  */
-@Named
 public class JobCountManagerImpl implements JobCountManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobCountManagerImpl.class);

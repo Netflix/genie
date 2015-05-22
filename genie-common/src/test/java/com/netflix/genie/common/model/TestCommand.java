@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,7 +31,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class TestCommand {
+public class TestCommand extends TestEntityBase {
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final String EXECUTABLE = "/bin/pig13";
@@ -70,7 +71,7 @@ public class TestCommand {
      */
     @Test
     public void testConstructor() throws GeniePreconditionException {
-        c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
+        c = new Command(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
         Assert.assertNull(this.c.getApplication());
         Assert.assertNull(this.c.getClusters());
         Assert.assertNull(this.c.getConfigs());
@@ -90,63 +91,76 @@ public class TestCommand {
      */
     @Test
     public void testOnCreateOrUpdateCommand() throws GeniePreconditionException {
-        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
+        this.c = new Command(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        Assert.assertNull(this.c.getTags());
         this.c.onCreateOrUpdateCommand();
+        Assert.assertEquals(2, this.c.getTags().size());
     }
 
     /**
-     * Test to make sure validation works.
+     * Make sure validation works on valid apps.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateCommandWithNothing() throws GeniePreconditionException {
-        this.c.onCreateOrUpdateCommand();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no status entered.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateCommandNoStatus() throws GeniePreconditionException {
-        this.c = new Command(NAME, USER, null, EXECUTABLE, VERSION);
-        this.c.onCreateOrUpdateCommand();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no executable
-     * entered.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateCommandNoExecutable() throws GeniePreconditionException {
-        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, null, VERSION);
-        this.c.onCreateOrUpdateCommand();
-    }
-
-    /**
-     * Make sure validation works on valid commands.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GeniePreconditionException {
-        this.c = new Command(NAME, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
-        this.c.validate();
+    public void testValidate() throws GenieException {
+        this.c = new Command(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        this.validate(this.c);
     }
 
     /**
-     * Make sure validation works on valid commands.
+     * Make sure validation works on with failure from super class.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test(expected = GeniePreconditionException.class)
-    public void testValidateSuperFails() throws GeniePreconditionException {
-        this.c = new Command(null, USER, CommandStatus.ACTIVE, EXECUTABLE, VERSION);
-        this.c.validate();
+    public void testValidateNoName() throws GenieException {
+        this.c = new Command(null, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        this.validate(this.c);
+    }
+
+    /**
+     * Make sure validation works on with failure from super class.
+     *
+     * @throws GenieException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNoUser() throws GenieException {
+        this.c = new Command(NAME, "   ", VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        this.validate(this.c);
+    }
+
+    /**
+     * Make sure validation works on with failure from super class.
+     *
+     * @throws GenieException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNoVersion() throws GenieException {
+        this.c = new Command(NAME, USER, "", CommandStatus.ACTIVE, EXECUTABLE);
+        this.validate(this.c);
+    }
+
+    /**
+     * Make sure validation works on with failure from command.
+     *
+     * @throws GenieException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNoStatus() throws GenieException {
+        this.c = new Command(NAME, USER, VERSION, null, EXECUTABLE);
+        this.validate(this.c);
+    }
+
+    /**
+     * Make sure validation works on with failure from command.
+     *
+     * @throws GenieException If any precondition isn't met.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testValidateNoExecutable() throws GenieException {
+        this.c = new Command(NAME, USER, VERSION, CommandStatus.ACTIVE, "    ");
+        this.validate(this.c);
     }
 
     /**
