@@ -25,6 +25,7 @@ define([
         self.clusterType = ko.observable();
         self.configs = ko.observableArray();
         self.tags = ko.observableArray();
+        self.commands = ko.observableArray();
 
         ko.mapping.fromJS(json, {}, self);
         self.originalStatus = self.status();
@@ -218,9 +219,18 @@ define([
                     type: 'GET',
                     headers: {'Accept':'application/json'},
                     url:  'genie/v2/config/clusters/'+clusterId
-                }).done(function(data) {
-                	console.log(data);
-                    self.current(new Cluster(data));
+                }).done(function(cluster) {
+                	console.log(cluster);
+                    $.ajax({
+                        type: 'GET',
+                        headers: {'Accept':'application/json'},
+                        url:  'genie/v2/config/clusters/'+clusterId+'/commands'
+                    }).done(function(commands) {
+                        console.log(commands);
+                        cluster.commands = commands;
+                        self.current(new Cluster(cluster));
+                    });
+                    //self.current(new Cluster(data));
                 });
             } else {
                 self.current(new Cluster());

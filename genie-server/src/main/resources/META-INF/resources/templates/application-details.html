@@ -55,6 +55,19 @@
        		</td>
         </tr>
         <tr>
+            <td><strong>Commands</strong></td>
+            <td>
+                <table>
+                    <tbody data-bind="foreach: commands">
+                    <tr>
+                        <td data-bind="text:$data.id"></td>
+                        <td data-bind="text:$data.name"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
             <td><strong>Tags</strong></td>
             <td data-bind="text: tags"></td>
         </tr>     	    

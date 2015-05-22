@@ -25,6 +25,7 @@ define([
         self.configs = ko.observableArray();
         self.jars = ko.observableArray();
         self.tags = ko.observableArray();
+        self.commands = ko.observableArray();
 
         ko.mapping.fromJS(json, {}, self);
         self.originalStatus = self.status();
@@ -214,9 +215,18 @@ define([
                     type: 'GET',
                     headers: {'Accept':'application/json'},
                     url:  'genie/v2/config/applications/'+applicationId
-                }).done(function(data) {
-                	console.log(data);
-                    self.current(new Application(data));
+                }).done(function(application) {
+                	console.log(application);
+                    self.current(new Application(application));
+
+                    $.ajax({
+                        type: 'GET',
+                        headers: {'Accept':'application/json'},
+                        url:  'genie/v2/config/applications/'+applicationId+'/commands'
+                    }).done(function(commands) {
+                        console.log(commands);
+                        self.current().commands(commands);
+                    });
                 });
             } else {
                 self.current(new Application());

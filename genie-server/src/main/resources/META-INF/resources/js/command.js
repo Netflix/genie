@@ -25,6 +25,8 @@ define([
         self.jobType = ko.observable();
         self.configs = ko.observableArray();
         self.tags = ko.observableArray();
+        self.clusters = ko.observableArray();
+        self.application = ko.observable();
 
         ko.mapping.fromJS(json, {}, self);
         self.originalStatus = self.status();
@@ -214,9 +216,30 @@ define([
                     type: 'GET',
                     headers: {'Accept':'application/json'},
                     url:  'genie/v2/config/commands/'+commandId
-                }).done(function(data) {
-                	console.log(data);
-                    self.current(new Command(data));
+                }).done(function(command) {
+                	//console.log(command);
+
+                    self.current(new Command(command));
+                    $.ajax({
+                        type: 'GET',
+                        headers: {'Accept':'application/json'},
+                        url:  'genie/v2/config/commands/'+commandId+'/clusters'
+                    }).done(function(clusters) {
+                        self.current().clusters(clusters);
+                    });
+
+                    $.ajax({
+                        type: 'GET',
+                        headers: {'Accept':'application/json'},
+                        url:  'genie/v2/config/commands/'+commandId+'/application'
+                    }).done(function(application) {
+                        console.log("Application: " + application);
+                        self.current().application(application);
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR, textStatus, errorThrown);
+                        var application = {id:"None", name:"None"};
+                        self.current().application(application);
+                    });
                 });
             } else {
                 self.current(new Command());
