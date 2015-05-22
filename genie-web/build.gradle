@@ -1,6 +1,17 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.2'
+    }
+}
+
 apply plugin: 'war'
+apply plugin: 'com.bmuschko.tomcat'
 
 processResources {
     filter ReplaceTokens, tokens: [
@@ -30,4 +41,27 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
+
+    def tomcat_version = "7.0.62"
+    tomcat("org.apache.tomcat.embed:tomcat-embed-core:${tomcat_version}")
+    tomcat("org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcat_version}")
+    tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcat_version}")
+}
+
+tomcat {
+    contextPath = "/"
+}
+
+def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
+
+[tomcatRun, tomcatRunWar].each { task ->
+    task.doFirst {
+        System.setProperty("archaius.deployment.applicationId", "genie")
+        System.setProperty("archaius.deployment.environment", env)
+    }
+
+    task.doLast {
+        System.getProperties().remove("archaius.deployment.applicationId")
+        System.getProperties().remove("archaius.deployment.environment")
+    }
 }
