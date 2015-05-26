@@ -42,6 +42,9 @@ dependencies {
      * Test Dependencies
      *******************************/
 
+    /*******************************
+     * Tomcat Plugin Dependencies
+     *******************************/
     def tomcat_version = "7.0.62"
     tomcat("org.apache.tomcat.embed:tomcat-embed-core:${tomcat_version}")
     tomcat("org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcat_version}")
@@ -61,7 +64,7 @@ def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
     }
 
     task.doLast {
-        System.getProperties().remove("archaius.deployment.applicationId")
-        System.getProperties().remove("archaius.deployment.environment")
+        System.clearProperty("archaius.deployment.applicationId")
+        System.clearProperty("archaius.deployment.environment")
     }
 }
