@@ -21,8 +21,4 @@
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
     <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
 
-    <bean id="genieValidator" class="com.netflix.genie.common.validation.impl.GenieValidatorImpl">
-        <constructor-arg name="validator" ref="validator"/>
-    </bean>
-
 </beans>

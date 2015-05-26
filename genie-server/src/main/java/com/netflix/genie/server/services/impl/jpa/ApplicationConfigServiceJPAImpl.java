@@ -25,7 +25,6 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Application_;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.validation.GenieValidator;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.ApplicationSpecs;
 import com.netflix.genie.server.services.ApplicationConfigService;
@@ -54,12 +53,16 @@ import org.springframework.transaction.annotation.Transactional;
  * @author amsharma
  * @author tgianos
  */
-@Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+@Transactional(
+        rollbackFor = {
+                GenieException.class,
+                ConstraintViolationException.class
+        }
+)
 public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigServiceJPAImpl.class);
     private final ApplicationRepository applicationRepo;
-    private final GenieValidator genieValidator;
     @PersistenceContext
     private EntityManager em;
 
@@ -67,14 +70,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * Default constructor.
      *
      * @param applicationRepo The application repository to use
-     * @param genieValidator  The validator resource to use
      */
-    public ApplicationConfigServiceJPAImpl(
-            final ApplicationRepository applicationRepo,
-            final GenieValidator genieValidator
-    ) {
+    public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo) {
         this.applicationRepo = applicationRepo;
-        this.genieValidator = genieValidator;
     }
 
     /**
@@ -160,11 +158,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             updateApp.setId(id);
         }
         LOG.debug("Called with app " + updateApp.toString());
-        final Application app = this.em.merge(updateApp);
-
-        // Validate the merged app and throw exception if not valid
-        this.genieValidator.validate(app);
-        return app;
+        return this.em.merge(updateApp);
     }
 
     /**

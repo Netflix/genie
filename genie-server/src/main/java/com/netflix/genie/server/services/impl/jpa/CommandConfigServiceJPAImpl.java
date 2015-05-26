@@ -27,7 +27,6 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Command_;
 import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.common.validation.GenieValidator;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
@@ -57,31 +56,32 @@ import org.springframework.transaction.annotation.Transactional;
  * @author amsharma
  * @author tgianos
  */
-@Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+@Transactional(
+        rollbackFor = {
+                GenieException.class,
+                ConstraintViolationException.class
+        }
+)
 public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandConfigServiceJPAImpl.class);
     private final CommandRepository commandRepo;
     private final ApplicationRepository appRepo;
-    private final GenieValidator genieValidator;
     @PersistenceContext
     private EntityManager em;
 
     /**
      * Default constructor.
      *
-     * @param commandRepo    the command repository to use
-     * @param appRepo        the application repository to use
-     * @param genieValidator The validator to use.
+     * @param commandRepo the command repository to use
+     * @param appRepo     the application repository to use
      */
     public CommandConfigServiceJPAImpl(
             final CommandRepository commandRepo,
-            final ApplicationRepository appRepo,
-            final GenieValidator genieValidator
+            final ApplicationRepository appRepo
     ) {
         this.commandRepo = commandRepo;
         this.appRepo = appRepo;
-        this.genieValidator = genieValidator;
     }
 
     /**
@@ -177,9 +177,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             updateCommand.setId(id);
         }
         LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
-        final Command command = this.em.merge(updateCommand);
-        this.genieValidator.validate(command);
-        return command;
+        return this.em.merge(updateCommand);
     }
 
     /**

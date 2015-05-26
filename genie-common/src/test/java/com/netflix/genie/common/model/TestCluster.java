@@ -17,12 +17,12 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -101,66 +101,54 @@ public class TestCluster extends TestEntityBase {
 
     /**
      * Make sure validation works on valid apps.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GenieException {
+    public void testValidate() {
         this.c = new Cluster(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         this.validate(this.c);
     }
 
     /**
      * Make sure validation works on with failure from super class.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNoName() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoName() {
         this.c = new Cluster(null, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         this.validate(this.c);
     }
 
     /**
      * Make sure validation works on with failure from super class.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNoUser() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoUser() {
         this.c = new Cluster(NAME, " ", VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         this.validate(this.c);
     }
 
     /**
      * Make sure validation works on with failure from super class.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNoVersion() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoVersion() {
         this.c = new Cluster(NAME, USER, "", ClusterStatus.UP, CLUSTER_TYPE);
         this.validate(this.c);
     }
 
     /**
      * Make sure validation works on with failure from cluster.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNoStatus() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoStatus() {
         this.c = new Cluster(NAME, USER, VERSION, null, CLUSTER_TYPE);
         this.validate(this.c);
     }
 
     /**
      * Make sure validation works on with failure from cluster.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNoClusterType() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoClusterType() {
         this.c = new Cluster(NAME, USER, VERSION, ClusterStatus.UP, null);
         this.validate(this.c);
     }

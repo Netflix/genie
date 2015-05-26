@@ -44,7 +44,7 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
     private static final String PRESTO_PROTOCOL_KEY = "com.netflix.genie.server.job.manager.presto.protocol";
     private static final String PRESTO_MASTER_DOMAIN = "com.netflix.genie.server.job.manager.presto.master.domain";
     private static final String COPY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.cp";
-    private static final String MAKE_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.mkdir";
+    private static final String MK_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.mkdir";
 
     /**
      * Constructor.
@@ -133,9 +133,9 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
 
         final String makeDirCommand =
                 ConfigurationManager.getConfigInstance()
-                        .getString(MAKE_DIRECTORY_COMMAND_KEY);
+                        .getString(MK_DIRECTORY_COMMAND_KEY);
         if (StringUtils.isBlank(makeDirCommand)) {
-            final String msg = "Required property " + MAKE_DIRECTORY_COMMAND_KEY + " isn't set";
+            final String msg = "Required property " + MK_DIRECTORY_COMMAND_KEY + " isn't set";
             LOG.error(msg);
             throw new GenieServerException(msg);
         }

@@ -71,7 +71,7 @@ public class JobServiceJPAImpl implements JobService {
     static {
         //TODO: Seem to remember something about injecting configuration using governator
         CONF = ConfigurationManager.getConfigInstance();
-        SERVER_PORT = CONF.getInt("netflix.appinfo.port", 7001);
+        SERVER_PORT = CONF.getInt("netflix.appinfo.port", 8080);
         JOB_DIR_PREFIX = CONF.getString("com.netflix.genie.server.job.dir.prefix",
                 "genie-jobs");
         JOB_RESOURCE_PREFIX = CONF.getString(
@@ -216,7 +216,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public void setJobStatus(
             @NotBlank(message = "No id entered for the job. Unable to update the status.")
             final String id,
@@ -237,7 +242,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public Set<String> addTagsForJob(
             @NotBlank(message = "No id entered. Unable to add tags.")
             final String id,
@@ -274,7 +284,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public Set<String> updateTagsForJob(
             @NotBlank(message = "No job id entered. Unable to update tags.")
             final String id,
@@ -294,7 +309,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public Set<String> removeAllTagsForJob(
             @NotBlank(message = "No job id entered. Unable to remove tags.")
             final String id
@@ -312,7 +332,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public Set<String> removeTagForJob(
             @NotBlank(message = "No id entered for job. Unable to remove tag.")
             final String id,
@@ -339,7 +364,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public long setUpdateTime(
             @NotBlank(message = "No job id entered. Unable to set update time.")
             final String id
@@ -362,7 +392,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public void setProcessIdForJob(
             @NotBlank(message = "No job id entered. Unable to set process id")
             final String id,
@@ -381,7 +416,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public void setCommandInfoForJob(
             @NotBlank(message = "No job id entered. Unable to set command info for job.")
             final String id,
@@ -405,7 +445,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public void setApplicationInfoForJob(
             @NotBlank(message = "No job id entered. Unable to update app info for job.")
             final String id,
@@ -428,7 +473,12 @@ public class JobServiceJPAImpl implements JobService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public void setClusterInfoForJob(
             @NotBlank(message = "No job id entered. Unable to update cluster info for job.")
             final String id,

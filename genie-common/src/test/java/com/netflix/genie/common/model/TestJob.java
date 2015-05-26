@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.validation.ConstraintViolationException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -688,31 +689,25 @@ public class TestJob extends TestEntityBase {
 
     /**
      * Test Validate ok.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GenieException {
+    public void testValidate() {
         this.validate(this.job);
     }
 
     /**
      * Test validate with exception from super class.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testValidateBadSuperClass() throws GenieException {
         this.validate(new Job());
     }
 
     /**
      * Test validate with null command criteria.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNullCommandCriteria() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNullCommandCriteria() {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -726,11 +721,9 @@ public class TestJob extends TestEntityBase {
 
     /**
      * Test validate with empty command criteria.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateEmptyCommandCriteria() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateEmptyCommandCriteria() {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -744,11 +737,9 @@ public class TestJob extends TestEntityBase {
 
     /**
      * Test validate with null command args.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNullCommandArgs() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNullCommandArgs() {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -762,11 +753,9 @@ public class TestJob extends TestEntityBase {
 
     /**
      * Test validate with empty command args.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateEmptyCommandArgs() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateEmptyCommandArgs() {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -780,11 +769,9 @@ public class TestJob extends TestEntityBase {
 
     /**
      * Test validate with blank command args.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateBlankCommandArgs() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateBlankCommandArgs() {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -798,11 +785,9 @@ public class TestJob extends TestEntityBase {
 
     /**
      * Test validate with null Cluster criteria.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNullClusterCriteria() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNullClusterCriteria() {
         final Job localJob = new Job(
                 USER,
                 NAME,
@@ -816,11 +801,9 @@ public class TestJob extends TestEntityBase {
 
     /**
      * Test validate with empty Cluster criteria.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateEmptyClusterCriteria() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateEmptyClusterCriteria() {
         final Job localJob = new Job(
                 USER,
                 NAME,

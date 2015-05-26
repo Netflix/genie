@@ -40,7 +40,7 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
 /**
- * Tests for the ApplicationConfigServiceJPAImpl.
+ * Tests for the ApplicationConfigServiceJPAImpl. Really these are integration tests.
  *
  * @author tgianos
  */
@@ -456,6 +456,25 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(APP_2_USER, updated.getUser());
         Assert.assertEquals(ApplicationStatus.ACTIVE, updated.getStatus());
         Assert.assertEquals(6, updated.getTags().size());
+    }
+
+    /**
+     * Test to update an application that makes it invalid. Should throw exception.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateApplicationNotValid() throws GenieException {
+        final Application init = this.service.getApplication(APP_1_ID);
+        Assert.assertEquals(APP_1_USER, init.getUser());
+        Assert.assertEquals(ApplicationStatus.INACTIVE, init.getStatus());
+        Assert.assertEquals(3, init.getTags().size());
+
+        final Application updateApp = new Application();
+        updateApp.setId(APP_1_ID);
+        updateApp.setStatus(ApplicationStatus.ACTIVE);
+        updateApp.setUser("");
+        this.service.updateApplication(APP_1_ID, updateApp);
     }
 
     /**

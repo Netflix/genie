@@ -150,7 +150,12 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public Job killJob(
             @NotBlank(message = "No id entered unable to kill job.")
             final String id
@@ -235,7 +240,12 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
     public JobStatus finalizeJob(
             @NotBlank(message = "No job id entered. Unable to finalize.")
             final String id,

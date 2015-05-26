@@ -304,7 +304,10 @@ public class JobMonitorImpl implements JobMonitor {
         }
 
         // Sender's email ID
-        String fromEmail = this.config.getString("com.netflix.genie.server.mail.smpt.from", "no-reply-genie@geniehost.com");
+        String fromEmail = this.config.getString(
+                "com.netflix.genie.server.mail.smpt.from",
+                "no-reply-genie@geniehost.com"
+        );
         LOG.info("From email address to use to send email: "
                 + fromEmail);
 

@@ -41,18 +41,15 @@
     <bean id="clusterLoadBalancer" class="com.netflix.genie.server.services.impl.RandomizedClusterLoadBalancerImpl"/>
     <bean id="applicationService" class="com.netflix.genie.server.services.impl.jpa.ApplicationConfigServiceJPAImpl">
         <constructor-arg name="applicationRepo" ref="applicationRepository"/>
-        <constructor-arg name="genieValidator" ref="genieValidator"/>
     </bean>
     <bean id="clusterService" class="com.netflix.genie.server.services.impl.jpa.ClusterConfigServiceJPAImpl">
         <constructor-arg name="clusterRepo" ref="clusterRepository"/>
         <constructor-arg name="commandRepo" ref="commandRepository"/>
-        <constructor-arg name="genieValidator" ref="genieValidator"/>
         <constructor-arg name="jobRepo" ref="jobRepository"/>
     </bean>
     <bean id="commandService" class="com.netflix.genie.server.services.impl.jpa.CommandConfigServiceJPAImpl">
         <constructor-arg name="appRepo" ref="applicationRepository"/>
         <constructor-arg name="commandRepo" ref="commandRepository"/>
-        <constructor-arg name="genieValidator" ref="genieValidator"/>
     </bean>
     <bean id="executionService" class="com.netflix.genie.server.services.impl.jpa.ExecutionServiceJPAImpl">
         <constructor-arg name="jobCountManager" ref="jobCountManager"/>

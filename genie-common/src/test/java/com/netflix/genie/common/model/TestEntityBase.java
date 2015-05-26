@@ -17,14 +17,14 @@
  */
 package com.netflix.genie.common.model;
 
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.validation.GenieValidator;
-import com.netflix.genie.common.validation.impl.GenieValidatorImpl;
 import org.junit.BeforeClass;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.util.Set;
 
 /**
  * Base class for all test classes for entities in the model package.
@@ -33,7 +33,7 @@ import javax.validation.ValidatorFactory;
  */
 public class TestEntityBase {
 
-    private static GenieValidator genieValidator;
+    private static Validator validator;
 
     /**
      * Setup the validator.
@@ -41,17 +41,18 @@ public class TestEntityBase {
     @BeforeClass
     public static void setupClass() {
         final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        final Validator validator = factory.getValidator();
-        genieValidator = new GenieValidatorImpl(validator);
+        validator = factory.getValidator();
     }
 
     /**
      * Get the validator object.
      *
      * @param entity The entity to validate
-     * @throws GenieException When validation fails
      */
-    public <E> void validate(final E entity) throws GenieException {
-        genieValidator.validate(entity);
+    public <E> void validate(final E entity) {
+        final Set<ConstraintViolation<E>> violations = validator.validate(entity);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
     }
 }

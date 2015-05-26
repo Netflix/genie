@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -70,51 +71,41 @@ public class TestCommonEntityFields extends TestEntityBase {
 
     /**
      * Test to make sure validation works.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GenieException {
+    public void testValidate() {
         this.validate(this.c);
     }
 
     /**
      * Test to make sure validation works.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testValidateWithNothing() throws GenieException {
         this.validate(new CommonEntityFields());
     }
 
     /**
      * Test to make sure validation works and throws exception when no name entered.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNoName() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoName() {
         this.validate(new CommonEntityFields(null, USER, VERSION));
     }
 
     /**
      * Test to make sure validation works and throws exception when no name entered.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNoUser() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoUser() {
         this.validate(new CommonEntityFields(NAME, "     ", VERSION));
     }
 
     /**
      * Test to make sure validation works and throws exception when no name entered.
-     *
-     * @throws GenieException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNoVersion() throws GenieException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoVersion() {
         this.validate(new CommonEntityFields(NAME, USER, ""));
     }
 

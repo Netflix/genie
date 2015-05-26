@@ -48,7 +48,7 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
 /**
- * Tests for the CommandConfigServiceJPAImpl.
+ * Tests for the CommandConfigServiceJPAImpl. Basically integration tests.
  *
  * @author tgianos
  */
@@ -525,6 +525,25 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_2_USER, updated.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, updated.getStatus());
         Assert.assertEquals(6, updated.getTags().size());
+    }
+
+    /**
+     * Test to update an cluster with invalid content. Should throw ConstraintViolationException from JPA layer.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateClusterWithInvalidCluster() throws GenieException {
+        final Cluster init = this.service.getCluster(CLUSTER_1_ID);
+        Assert.assertEquals(CLUSTER_1_USER, init.getUser());
+        Assert.assertEquals(ClusterStatus.UP, init.getStatus());
+        Assert.assertEquals(5, init.getTags().size());
+
+        final Cluster updateApp = new Cluster();
+        updateApp.setId(CLUSTER_1_ID);
+        updateApp.setStatus(ClusterStatus.OUT_OF_SERVICE);
+        updateApp.setName("");
+        this.service.updateCluster(CLUSTER_1_ID, updateApp);
     }
 
     /**

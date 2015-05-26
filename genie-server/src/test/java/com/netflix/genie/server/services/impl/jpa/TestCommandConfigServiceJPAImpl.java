@@ -45,7 +45,7 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
 /**
- * Tests for the CommandConfigServiceJPAImpl.
+ * Tests for the CommandConfigServiceJPAImpl. Most of these are basically integration tests.
  *
  * @author tgianos
  */
@@ -472,6 +472,31 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_2_USER, updated.getUser());
         Assert.assertEquals(CommandStatus.INACTIVE, updated.getStatus());
         Assert.assertEquals(6, updated.getTags().size());
+    }
+
+    /**
+     * Test to update a command with invalid content. Should throw ConstraintViolationException from JPA layer.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateCommandWithInvalidCommand() throws GenieException {
+        final Command init = this.service.getCommand(COMMAND_1_ID);
+        Assert.assertEquals(COMMAND_1_USER, init.getUser());
+        Assert.assertEquals(CommandStatus.ACTIVE, init.getStatus());
+        Assert.assertEquals(5, init.getTags().size());
+
+        final Command updateApp = new Command();
+        updateApp.setId(COMMAND_1_ID);
+        updateApp.setStatus(CommandStatus.INACTIVE);
+        updateApp.setVersion("");
+        final Set<String> tags = new HashSet<>();
+        tags.add("prod");
+        tags.add("tez");
+        tags.add("yarn");
+        tags.add("hadoop");
+        updateApp.setTags(tags);
+        this.service.updateCommand(COMMAND_1_ID, updateApp);
     }
 
     /**

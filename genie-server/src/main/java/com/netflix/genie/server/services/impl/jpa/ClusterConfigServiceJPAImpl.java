@@ -29,7 +29,6 @@ import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.ClusterStatus;
 
-import com.netflix.genie.common.validation.GenieValidator;
 import com.netflix.genie.server.repository.jpa.ClusterRepository;
 import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
@@ -61,14 +60,18 @@ import org.springframework.transaction.annotation.Transactional;
  * @author amsharma
  * @author tgianos
  */
-@Transactional(rollbackFor = {GenieException.class, ConstraintViolationException.class})
+@Transactional(
+        rollbackFor = {
+                GenieException.class,
+                ConstraintViolationException.class
+        }
+)
 public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceJPAImpl.class);
     private static final char CRITERIA_DELIMITER = ',';
     private final ClusterRepository clusterRepo;
     private final CommandRepository commandRepo;
-    private final GenieValidator genieValidator;
     private final JobRepository jobRepo;
     @PersistenceContext
     private EntityManager em;
@@ -76,21 +79,18 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     /**
      * Default constructor - initialize all required dependencies.
      *
-     * @param clusterRepo    The cluster repository to use.
-     * @param commandRepo    The command repository to use.
-     * @param jobRepo        The job repository to use.
-     * @param genieValidator The validator to use.
+     * @param clusterRepo The cluster repository to use.
+     * @param commandRepo The command repository to use.
+     * @param jobRepo     The job repository to use.
      */
     public ClusterConfigServiceJPAImpl(
             final ClusterRepository clusterRepo,
             final CommandRepository commandRepo,
-            final JobRepository jobRepo,
-            final GenieValidator genieValidator
+            final JobRepository jobRepo
     ) {
         this.clusterRepo = clusterRepo;
         this.commandRepo = commandRepo;
         this.jobRepo = jobRepo;
-        this.genieValidator = genieValidator;
     }
 
     /**
@@ -194,7 +194,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             );
 
             if (!clusters.isEmpty()) {
-                // Add the succesfully criteria to the job object in string form.
+                // Add the successfully criteria to the job object in string form.
                 job.setChosenClusterCriteriaString(
                         StringUtils.join(
                                 clusterCriteria.getTags(),
@@ -232,9 +232,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         if (StringUtils.isBlank(updateCluster.getId())) {
             updateCluster.setId(id);
         }
-        final Cluster cluster = this.em.merge(updateCluster);
-        this.genieValidator.validate(cluster);
-        return cluster;
+        return this.em.merge(updateCluster);
     }
 
     /**
