@@ -20,6 +20,11 @@ package com.netflix.genie.server.services;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
+import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * Interface for the Execution Service.<br>
@@ -29,6 +34,7 @@ import com.netflix.genie.common.model.JobStatus;
  * @author amsharma
  * @author tgianos
  */
+@Validated
 public interface ExecutionService {
 
     /**
@@ -38,7 +44,11 @@ public interface ExecutionService {
      * @return The job that was submitted
      * @throws GenieException if there is an error
      */
-    Job submitJob(final Job job) throws GenieException;
+    Job submitJob(
+            @NotNull(message = "No job entered to run")
+            @Valid
+            final Job job
+    ) throws GenieException;
 
     /**
      * Kill job based on given job iD.
@@ -47,7 +57,10 @@ public interface ExecutionService {
      * @return The killed job
      * @throws GenieException if there is an error
      */
-    Job killJob(final String id) throws GenieException;
+    Job killJob(
+            @NotBlank(message = "No id entered unable to kill job.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Mark jobs as zombies if status hasn't been updated for
@@ -65,5 +78,9 @@ public interface ExecutionService {
      * @return The job status.
      * @throws GenieException if there is an error
      */
-    JobStatus finalizeJob(final String id, final int exitCode) throws GenieException;
+    JobStatus finalizeJob(
+            @NotBlank(message = "No job id entered. Unable to finalize.")
+            final String id,
+            final int exitCode
+    ) throws GenieException;
 }

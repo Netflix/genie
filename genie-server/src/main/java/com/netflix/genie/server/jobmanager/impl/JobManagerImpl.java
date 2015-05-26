@@ -35,10 +35,7 @@ import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -57,25 +54,21 @@ import java.util.Set;
  * @author bmundlapudi
  * @author tgianos
  */
-@Named
-@Scope("prototype")
 public class JobManagerImpl implements JobManager {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JobManagerImpl.class);
-    private static final String PID = "pid";
-    private static final char SPACE = ' ';
 
     /**
      * Constant for reuse of semi-colon.
      */
     protected static final char SEMI_COLON = ';';
-
-    //TODO: Move to a property file
     /**
      * Default group name for job submissions.
      */
     protected static final String DEFAULT_GROUP_NAME = "hadoop";
+    private static final Logger LOG = LoggerFactory.getLogger(JobManagerImpl.class);
+    private static final String PID = "pid";
 
+    //TODO: Move to a property file
+    private static final char SPACE = ' ';
     private final JobMonitor jobMonitor;
     private final Thread jobMonitorThread;
     private final JobService jobService;
@@ -95,7 +88,6 @@ public class JobManagerImpl implements JobManager {
      * @param jobService     The job service to use.
      * @param commandService The command service to use.
      */
-    @Inject
     public JobManagerImpl(final JobMonitor jobMonitor,
                           final JobService jobService,
                           final CommandConfigService commandService) {
@@ -259,7 +251,7 @@ public class JobManagerImpl implements JobManager {
      * Actually launch a process based on the process builder.
      *
      * @param processBuilder The process builder to use.
-     * @param sleepTime The time to sleep between checks of the job process status
+     * @param sleepTime      The time to sleep between checks of the job process status
      * @throws GenieException If any issue happens launching the process.
      */
     protected void launchProcess(final ProcessBuilder processBuilder, final int sleepTime) throws GenieException {

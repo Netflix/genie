@@ -91,10 +91,11 @@ public final class ExecutionServiceSampleClient {
         Job job = new Job(
                 userName,
                 jobName,
+                "1.0",
                 "-f hive.q",
                 commandCriteria,
-                clusterCriterias,
-                null);
+                clusterCriterias
+        );
 
         job.setDescription("This is a test");
 

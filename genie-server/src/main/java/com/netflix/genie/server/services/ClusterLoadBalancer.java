@@ -19,6 +19,7 @@ package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ import java.util.List;
  * @author skrishnan
  * @author tgianos
  */
+@Validated
 public interface ClusterLoadBalancer {
 
     /**
@@ -38,5 +40,7 @@ public interface ClusterLoadBalancer {
      * @return the "best" cluster to run job on
      * @throws GenieException if there is any error
      */
-    Cluster selectCluster(final List<Cluster> clusters) throws GenieException;
+    Cluster selectCluster(
+            final List<Cluster> clusters
+    ) throws GenieException;
 }

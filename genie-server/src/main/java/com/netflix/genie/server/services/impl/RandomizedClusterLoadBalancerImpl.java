@@ -21,9 +21,10 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
+
 import java.util.List;
 import java.util.Random;
-import javax.inject.Named;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,18 +34,17 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
-@Named
 public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(RandomizedClusterLoadBalancerImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RandomizedClusterLoadBalancerImpl.class);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cluster selectCluster(final List<Cluster> clusters)
-            throws GenieException {
+    public Cluster selectCluster(
+            final List<Cluster> clusters
+    ) throws GenieException {
         LOG.info("called");
 
         if (clusters == null || clusters.isEmpty()) {

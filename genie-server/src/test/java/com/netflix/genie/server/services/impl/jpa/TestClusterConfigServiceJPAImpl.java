@@ -22,7 +22,6 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
@@ -31,6 +30,7 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.JobService;
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,13 +40,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 
 /**
- * Tests for the CommandConfigServiceJPAImpl.
+ * Tests for the CommandConfigServiceJPAImpl. Basically integration tests.
  *
  * @author tgianos
  */
@@ -117,7 +119,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetClusterNull() throws GenieException {
         this.service.getCluster(null);
     }
@@ -329,7 +331,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testChooseClusterForJobNoId() throws GenieException {
         this.service.chooseClusterForJob(null);
     }
@@ -368,11 +370,11 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         final Cluster cluster = new Cluster(
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
+                CLUSTER_1_VERSION,
                 ClusterStatus.OUT_OF_SERVICE,
-                CLUSTER_1_TYPE,
-                configs,
-                CLUSTER_1_VERSION
+                CLUSTER_1_TYPE
         );
+        cluster.setConfigs(configs);
         final String id = UUID.randomUUID().toString();
         cluster.setId(id);
         final Cluster created = this.service.createCluster(cluster);
@@ -409,11 +411,11 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         final Cluster cluster = new Cluster(
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
+                CLUSTER_1_VERSION,
                 ClusterStatus.OUT_OF_SERVICE,
-                CLUSTER_1_TYPE,
-                configs,
-                CLUSTER_1_VERSION
+                CLUSTER_1_TYPE
         );
+        cluster.setConfigs(configs);
         final Cluster created = this.service.createCluster(cluster);
         Assert.assertNotNull(created.getId());
         Assert.assertEquals(CLUSTER_1_NAME, created.getName());
@@ -438,7 +440,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testCreateClusterNull() throws GenieException {
         this.service.createCluster(null);
     }
@@ -457,11 +459,11 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         final Cluster cluster = new Cluster(
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
+                CLUSTER_1_VERSION,
                 ClusterStatus.OUT_OF_SERVICE,
-                CLUSTER_1_TYPE,
-                configs,
-                CLUSTER_1_VERSION
+                CLUSTER_1_TYPE
         );
+        cluster.setConfigs(configs);
         cluster.setId(CLUSTER_1_ID);
         this.service.createCluster(cluster);
     }
@@ -526,6 +528,25 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     }
 
     /**
+     * Test to update an cluster with invalid content. Should throw ConstraintViolationException from JPA layer.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateClusterWithInvalidCluster() throws GenieException {
+        final Cluster init = this.service.getCluster(CLUSTER_1_ID);
+        Assert.assertEquals(CLUSTER_1_USER, init.getUser());
+        Assert.assertEquals(ClusterStatus.UP, init.getStatus());
+        Assert.assertEquals(5, init.getTags().size());
+
+        final Cluster updateApp = new Cluster();
+        updateApp.setId(CLUSTER_1_ID);
+        updateApp.setStatus(ClusterStatus.OUT_OF_SERVICE);
+        updateApp.setName("");
+        this.service.updateCluster(CLUSTER_1_ID, updateApp);
+    }
+
+    /**
      * Test to make sure setting the created and updated outside the system control doesn't change record in database.
      *
      * @throws GenieException
@@ -551,7 +572,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateClusterNullId() throws GenieException {
         this.service.updateCluster(null, new Cluster());
     }
@@ -561,7 +582,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateClusterNullUpdateCluster() throws GenieException {
         this.service.updateCluster(CLUSTER_1_ID, null);
     }
@@ -598,11 +619,11 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(2,
                 this.service.getClusters(null, null, null, null, null, 0, 10, true, null)
-                .size());
+                        .size());
         Assert.assertEquals(2, this.service.deleteAllClusters().size());
         Assert.assertTrue(
                 this.service.getClusters(null, null, null, null, null, 0, 10, true, null)
-                .isEmpty());
+                        .isEmpty());
     }
 
     /**
@@ -626,17 +647,17 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
                 this.commandService.getClustersForCommand(COMMAND_1_ID).size());
         Assert.assertEquals(CLUSTER_2_ID,
                 this.commandService.getClustersForCommand(COMMAND_1_ID)
-                .iterator().next().getId());
+                        .iterator().next().getId());
         Assert.assertEquals(1,
                 this.commandService.getClustersForCommand(COMMAND_2_ID).size());
         Assert.assertEquals(CLUSTER_2_ID,
                 this.commandService.getClustersForCommand(COMMAND_2_ID)
-                .iterator().next().getId());
+                        .iterator().next().getId());
         Assert.assertEquals(1,
                 this.commandService.getClustersForCommand(COMMAND_3_ID).size());
         Assert.assertEquals(CLUSTER_2_ID,
                 this.commandService.getClustersForCommand(COMMAND_3_ID)
-                .iterator().next().getId());
+                        .iterator().next().getId());
     }
 
     /**
@@ -644,7 +665,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testDeleteNoId() throws GenieException {
         this.service.deleteCluster(null);
     }
@@ -690,7 +711,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToClusterNoId() throws GenieException {
         this.service.addConfigsForCluster(null, new HashSet<String>());
     }
@@ -700,7 +721,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToClusterNoConfigs() throws GenieException {
         this.service.addConfigsForCluster(CLUSTER_1_ID, null);
     }
@@ -712,8 +733,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToClusterNoCluster() throws GenieException {
-        this.service.addConfigsForCluster(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> configs = new HashSet<>();
+        configs.add(UUID.randomUUID().toString());
+        this.service.addConfigsForCluster(UUID.randomUUID().toString(), configs);
     }
 
     /**
@@ -747,7 +769,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForClusterNoId() throws GenieException {
         this.service.updateConfigsForCluster(null, new HashSet<String>());
     }
@@ -759,8 +781,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForClusterNoCluster() throws GenieException {
-        this.service.updateConfigsForCluster(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> configs = new HashSet<>();
+        configs.add(UUID.randomUUID().toString());
+        this.service.updateConfigsForCluster(UUID.randomUUID().toString(), configs);
     }
 
     /**
@@ -779,7 +802,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetConfigsForClusterNoId() throws GenieException {
         this.service.getConfigsForCluster(null);
     }
@@ -805,18 +828,18 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
                 new Command(
                         "name",
                         "user",
+                        "23.1.0",
                         CommandStatus.ACTIVE,
-                        "pig",
-                        "23.1.0"
+                        "pig"
                 )
         );
         final Command command2 = this.commandService.createCommand(
                 new Command(
                         "name2",
                         "user2",
+                        "23.1.1",
                         CommandStatus.INACTIVE,
-                        "pig2",
-                        "23.1.1"
+                        "pig2"
                 )
         );
         final List<Command> newCommands = new ArrayList<>();
@@ -839,7 +862,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddCommandsForClusterNoId() throws GenieException {
         this.service.addCommandsForCluster(null, new ArrayList<Command>());
     }
@@ -849,7 +872,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddCommandsForClusterNoCommands() throws GenieException {
         this.service.addCommandsForCluster(UUID.randomUUID().toString(), null);
     }
@@ -860,10 +883,10 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testAddCommandsForClusterClusterDoesntExist()
-            throws GenieException {
-        this.service.addCommandsForCluster(
-                UUID.randomUUID().toString(), new ArrayList<Command>());
+    public void testAddCommandsForClusterClusterDoesntExist() throws GenieException {
+        final List<Command> commands = new ArrayList<>();
+        commands.add(new Command());
+        this.service.addCommandsForCluster(UUID.randomUUID().toString(), commands);
     }
 
     /**
@@ -902,7 +925,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetCommandsForClusterNoId() throws GenieException {
         this.service.getCommandsForCluster("");
     }
@@ -928,18 +951,18 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
                 new Command(
                         "name",
                         "user",
+                        "23.1.0",
                         CommandStatus.ACTIVE,
-                        "pig",
-                        "23.1.0"
+                        "pig"
                 )
         );
         final Command command2 = this.commandService.createCommand(
                 new Command(
                         "name2",
                         "user2",
+                        "23.1.1",
                         CommandStatus.INACTIVE,
-                        "pig2",
-                        "23.1.1"
+                        "pig2"
                 )
         );
         final List<Command> newCommands = new ArrayList<>();
@@ -951,9 +974,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         );
         final List<Command> commands
                 = this.service.updateCommandsForCluster(
-                        CLUSTER_1_ID,
-                        newCommands
-                );
+                CLUSTER_1_ID,
+                newCommands
+        );
         Assert.assertEquals(
                 2,
                 commands.size()
@@ -965,7 +988,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandsForClusterNoId() throws GenieException {
         this.service.updateCommandsForCluster(null, new ArrayList<Command>());
     }
@@ -975,7 +998,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandsForClusterNoCommands() throws GenieException {
         this.service.updateCommandsForCluster(UUID.randomUUID().toString(), null);
     }
@@ -986,10 +1009,10 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testUpdateCommandsForClusterClusterDoesntExist()
-            throws GenieException {
-        this.service.updateCommandsForCluster(
-                UUID.randomUUID().toString(), new ArrayList<Command>());
+    public void testUpdateCommandsForClusterClusterDoesntExist() throws GenieException {
+        final List<Command> commands = new ArrayList<>();
+        commands.add(new Command());
+        this.service.updateCommandsForCluster(UUID.randomUUID().toString(), commands);
     }
 
     /**
@@ -1034,7 +1057,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllCommandsForClusterNoId() throws GenieException {
         this.service.removeAllCommandsForCluster(null);
     }
@@ -1075,7 +1098,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveCommandForClusterNoId() throws GenieException {
         this.service.removeCommandForCluster(null, COMMAND_1_ID);
     }
@@ -1085,7 +1108,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveCommandForClusterNoCmdId() throws GenieException {
         this.service.removeCommandForCluster(CLUSTER_1_ID, null);
     }
@@ -1143,7 +1166,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToClusterNoId() throws GenieException {
         this.service.addTagsForCluster(null, new HashSet<String>());
     }
@@ -1153,7 +1176,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToClusterNoTags() throws GenieException {
         this.service.addTagsForCluster(CLUSTER_1_ID, null);
     }
@@ -1165,8 +1188,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForClusterNoCluster() throws GenieException {
-        this.service.addTagsForCluster(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> tags = new HashSet<>();
+        tags.add(UUID.randomUUID().toString());
+        this.service.addTagsForCluster(UUID.randomUUID().toString(), tags);
     }
 
     /**
@@ -1200,7 +1224,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForClusterNoId() throws GenieException {
         this.service.updateTagsForCluster(null, new HashSet<String>());
     }
@@ -1212,8 +1236,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForClusterNoApp() throws GenieException {
-        this.service.updateTagsForCluster(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> tags = new HashSet<>();
+        tags.add(UUID.randomUUID().toString());
+        this.service.updateTagsForCluster(UUID.randomUUID().toString(), tags);
     }
 
     /**
@@ -1232,7 +1257,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetTagsForClusterNoId() throws GenieException {
         this.service.getTagsForCluster(null);
     }
@@ -1267,7 +1292,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllTagsForClusterNoId() throws GenieException {
         this.service.removeAllTagsForCluster(null);
     }
@@ -1304,15 +1329,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
-    public void testRemoveTagForClusterNullTag()
-            throws GenieException {
-        final Set<String> tags
-                = this.service.getTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(5, tags.size());
-        Assert.assertEquals(5,
-                this.service.removeTagForCluster(
-                        CLUSTER_1_ID, null).size());
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveTagForClusterNullTag() throws GenieException {
+        this.service.removeTagForCluster(CLUSTER_1_ID, null);
     }
 
     /**
@@ -1320,7 +1339,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForClusterNoId() throws GenieException {
         this.service.removeTagForCluster(null, "something");
     }

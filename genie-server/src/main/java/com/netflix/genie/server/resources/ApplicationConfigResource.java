@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
+@Named
 @Path("/v2/config/applications")
 @Api(
         value = "/v2/config/applications",
@@ -67,8 +68,7 @@ import org.slf4j.LoggerFactory;
         description = "Manage the available applications"
 )
 @Produces(MediaType.APPLICATION_JSON)
-@Named
-public class ApplicationConfigResource {
+public final class ApplicationConfigResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigResource.class);
 
@@ -96,7 +96,7 @@ public class ApplicationConfigResource {
     /**
      * Create an Application.
      *
-     * @param app     The application to create
+     * @param app The application to create
      * @return The created application configuration
      * @throws GenieException For any error
      */
@@ -189,14 +189,14 @@ public class ApplicationConfigResource {
     /**
      * Get Applications based on user parameters.
      *
-     * @param name     name for configuration (optional)
-     * @param userName The user who created the application (optional)
-     * @param statuses The statuses of the applications (optional)
-     * @param tags     The set of tags you want the command for.
-     * @param page     The page to start one (optional)
-     * @param limit    the max number of results to return per page (optional)
-     * @param descending    Whether results returned in descending or ascending order (optional)
-     * @param orderBys      The fields to order the results by (optional)
+     * @param name       name for configuration (optional)
+     * @param userName   The user who created the application (optional)
+     * @param statuses   The statuses of the applications (optional)
+     * @param tags       The set of tags you want the command for.
+     * @param page       The page to start one (optional)
+     * @param limit      the max number of results to return per page (optional)
+     * @param descending Whether results returned in descending or ascending order (optional)
+     * @param orderBys   The fields to order the results by (optional)
      * @return All applications matching the criteria
      * @throws GenieException For any error
      */

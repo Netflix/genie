@@ -59,6 +59,7 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
+@Named
 @Path("/v2/config/clusters")
 @Api(
         value = "/v2/config/clusters",
@@ -66,8 +67,7 @@ import java.util.Set;
         description = "Manage the available clusters"
 )
 @Produces(MediaType.APPLICATION_JSON)
-@Named
-public class ClusterConfigResource {
+public final class ClusterConfigResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigResource.class);
 
@@ -269,22 +269,22 @@ public class ClusterConfigResource {
         );
         LOG.info(
                 name
-                + " | "
-                + statuses
-                + " | "
-                + tags
-                + " | "
-                + minUpdateTime
-                + " | "
-                + maxUpdateTime
-                + " | "
-                + page
-                + " | "
-                + limit
-                + " | "
-                + descending
-                + " | "
-                + orderBys
+                        + " | "
+                        + statuses
+                        + " | "
+                        + tags
+                        + " | "
+                        + minUpdateTime
+                        + " | "
+                        + maxUpdateTime
+                        + " | "
+                        + page
+                        + " | "
+                        + limit
+                        + " | "
+                        + descending
+                        + " | "
+                        + orderBys
         );
         //Create this conversion internal in case someone uses lower case by accident?
         Set<ClusterStatus> enumStatuses = null;

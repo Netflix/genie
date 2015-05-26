@@ -33,7 +33,6 @@ import com.netflix.genie.server.util.NetUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -54,7 +53,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author skrishnan
  * @author tgianos
  */
-@Named
 public class JobCountManagerImpl implements JobCountManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobCountManagerImpl.class);

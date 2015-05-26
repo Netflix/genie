@@ -15,6 +15,9 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
+    // Hibernate Validator Libs
+    compile ("org.hibernate:hibernate-validator:${hibernate_validator_version}")
+
     // Jackson Libs
     compile ("com.fasterxml.jackson.core:jackson-annotations:${jackson_version}")
     compile ("com.fasterxml.jackson.core:jackson-core:${jackson_version}")
@@ -48,6 +51,9 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
+
+    testRuntime ("javax.el:javax.el-api:${expression_language_version}")
+    testRuntime ("org.glassfish.web:javax.el:${expression_language_version}")
 }
 
 task genJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA metamodels') {

@@ -37,10 +37,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Representation of the state of the Cluster object.
@@ -54,8 +53,6 @@ import org.slf4j.LoggerFactory;
 @ApiModel(description = "An entity for managing a cluster in the Genie system.")
 public class Cluster extends CommonEntityFields {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
-
     /**
      * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
      */
@@ -65,6 +62,7 @@ public class Cluster extends CommonEntityFields {
             value = "The status of the cluster",
             required = true
     )
+    @NotNull(message = "No cluster status entered and is required.")
     private ClusterStatus status;
 
     /**
@@ -80,6 +78,7 @@ public class Cluster extends CommonEntityFields {
                     + " specified using the property: com.netflix.genie.server.job.manager.<clusterType>.impl",
             required = true
     )
+    @NotBlank(message = "No cluster type entered and is required.")
     private String clusterType;
 
     /**
@@ -87,8 +86,7 @@ public class Cluster extends CommonEntityFields {
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "All the configuration files needed for this cluster which will be downloaded pre-use",
-            required = true
+            value = "All the configuration files needed for this cluster which will be downloaded pre-use"
     )
     private Set<String> configs;
 
@@ -122,23 +120,19 @@ public class Cluster extends CommonEntityFields {
      *
      * @param name        The name of the cluster. Not null/empty/blank.
      * @param user        The user who created the cluster. Not null/empty/blank.
+     * @param version     The version of the cluster. Not null/empty/blank.
      * @param status      The status of the cluster. Not null.
      * @param clusterType The type of the cluster. Not null/empty/blank.
-     * @param configs     The configuration files for the cluster. Not null or
-     *                    empty.
-     * @param version     The version of the cluster. Not null/empty/blank.
      */
     public Cluster(
             final String name,
             final String user,
+            final String version,
             final ClusterStatus status,
-            final String clusterType,
-            final Set<String> configs,
-            final String version) {
+            final String clusterType) {
         super(name, user, version);
         this.status = status;
         this.clusterType = clusterType;
-        this.configs = configs;
     }
 
     /**
@@ -149,7 +143,6 @@ public class Cluster extends CommonEntityFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateCluster() throws GeniePreconditionException {
-        validate(this.status, this.clusterType, null);
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<>();
@@ -331,54 +324,6 @@ public class Cluster extends CommonEntityFields {
             for (final Command command : locCommands) {
                 this.removeCommand(command);
             }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validate() throws GeniePreconditionException {
-        String error = null;
-        try {
-            super.validate();
-        } catch (final GeniePreconditionException ge) {
-            error = ge.getMessage();
-        }
-        this.validate(
-                this.status,
-                this.clusterType,
-                error
-        );
-    }
-
-    /**
-     * Helper method to ensure that values are valid for a cluster.
-     *
-     * @param status      The status of the cluster
-     * @param clusterType The type of cluster
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    private void validate(
-            final ClusterStatus status,
-            final String clusterType,
-            final String error) throws GeniePreconditionException {
-        final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(error)) {
-            builder.append(error);
-        }
-        if (status == null) {
-            builder.append("No cluster status entered and is required.\n");
-        }
-        if (StringUtils.isBlank(clusterType)) {
-            builder.append("No cluster type entered and is required.\n");
-        }
-
-        if (builder.length() > 0) {
-            builder.insert(0, "Cluster configuration errors:\n");
-            final String msg = builder.toString();
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
         }
     }
 }

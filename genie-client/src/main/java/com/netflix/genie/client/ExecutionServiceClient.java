@@ -81,7 +81,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         if (job == null) {
             throw new GeniePreconditionException("No job entered to validate");
         }
-        job.validate();
+
         final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 BASE_EXECUTION_REST_URL,

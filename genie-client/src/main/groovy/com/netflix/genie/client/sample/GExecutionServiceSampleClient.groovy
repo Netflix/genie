@@ -73,10 +73,11 @@ public final class GExecutionServiceSampleClient {
         def job = new Job(
                 userName,
                 jobName,
+                "1.0",
                 '-f hive.q',
                 commandCriteria,
-                clusterCriterias,
-                null)
+                clusterCriterias
+        )
         job.with {
             (description, tags, attachments) = ['This is a test', ['testgenie', 'sample'] as Set, [fa]]
         }

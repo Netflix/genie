@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class TestCluster {
+public class TestCluster extends TestEntityBase {
 
     private static final String NAME = "h2prod";
     private static final String USER = "tgianos";
@@ -75,10 +76,9 @@ public class TestCluster {
      */
     @Test
     public void testConstructor() throws GeniePreconditionException {
-        this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
+        this.c = new Cluster(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         Assert.assertEquals(CLUSTER_TYPE, this.c.getClusterType());
         Assert.assertNull(this.c.getCommands());
-        Assert.assertEquals(this.configs, this.c.getConfigs());
         Assert.assertEquals(NAME, this.c.getName());
         Assert.assertEquals(ClusterStatus.UP, this.c.getStatus());
         Assert.assertNull(this.c.getTags());
@@ -93,64 +93,64 @@ public class TestCluster {
      */
     @Test
     public void testOnCreateOrUpdateCluster() throws GeniePreconditionException {
-        this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
+        this.c = new Cluster(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        Assert.assertNull(this.c.getTags());
         this.c.onCreateOrUpdateCluster();
+        Assert.assertEquals(2, this.c.getTags().size());
     }
 
     /**
-     * Test to make sure validation works.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateClusterWithNothing() throws GeniePreconditionException {
-        this.c.onCreateOrUpdateCluster();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no status
-     * entered.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateClusterNoStatus() throws GeniePreconditionException {
-        this.c = new Cluster(NAME, USER, null, CLUSTER_TYPE, this.configs, VERSION);
-        this.c.onCreateOrUpdateCluster();
-    }
-
-    /**
-     * Test to make sure validation works and throws exception when no type
-     * entered.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testOnCreateOrUpdateClusterNoType() throws GeniePreconditionException {
-        this.c = new Cluster(NAME, USER, ClusterStatus.UP, null, this.configs, VERSION);
-        this.c.onCreateOrUpdateCluster();
-    }
-
-    /**
-     * Make sure validation works on valid cluster.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * Make sure validation works on valid apps.
      */
     @Test
-    public void testValidate() throws GeniePreconditionException {
-        this.c = new Cluster(NAME, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
-        this.c.validate();
+    public void testValidate() {
+        this.c = new Cluster(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        this.validate(this.c);
     }
 
     /**
-     * Make sure validation works on valid cluster.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * Make sure validation works on with failure from super class.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateSuperFails() throws GeniePreconditionException {
-        this.c = new Cluster(null, USER, ClusterStatus.UP, CLUSTER_TYPE, this.configs, VERSION);
-        this.c.validate();
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoName() {
+        this.c = new Cluster(null, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        this.validate(this.c);
+    }
+
+    /**
+     * Make sure validation works on with failure from super class.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoUser() {
+        this.c = new Cluster(NAME, " ", VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        this.validate(this.c);
+    }
+
+    /**
+     * Make sure validation works on with failure from super class.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoVersion() {
+        this.c = new Cluster(NAME, USER, "", ClusterStatus.UP, CLUSTER_TYPE);
+        this.validate(this.c);
+    }
+
+    /**
+     * Make sure validation works on with failure from cluster.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoStatus() {
+        this.c = new Cluster(NAME, USER, VERSION, null, CLUSTER_TYPE);
+        this.validate(this.c);
+    }
+
+    /**
+     * Make sure validation works on with failure from cluster.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoClusterType() {
+        this.c = new Cluster(NAME, USER, VERSION, ClusterStatus.UP, null);
+        this.validate(this.c);
     }
 
     /**

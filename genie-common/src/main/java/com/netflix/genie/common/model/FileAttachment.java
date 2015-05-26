@@ -21,6 +21,8 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -43,6 +45,7 @@ public class FileAttachment implements Serializable {
             value = "The name of the file",
             required = true
     )
+    @NotBlank(message = "No name entered for the attachment and is required.")
     private String name;
 
     /**
@@ -52,6 +55,7 @@ public class FileAttachment implements Serializable {
             value = "The bytes of the attachment",
             required = true
     )
+    @NotEmpty(message = "No data entered for the attachment and is required")
     private byte[] data;
 
     /**

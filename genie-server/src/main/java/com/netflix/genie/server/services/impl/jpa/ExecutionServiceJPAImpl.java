@@ -40,12 +40,14 @@ import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.NetUtil;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -60,11 +62,9 @@ import java.util.List;
  * @author amsharma
  * @author tgianos
  */
-@Named
 public class ExecutionServiceJPAImpl implements ExecutionService {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ExecutionServiceJPAImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceJPAImpl.class);
 
     // instance of the netflix configuration object
     private static final AbstractConfiguration CONF;
@@ -72,13 +72,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     // these can be over-ridden in the properties file
     private static final int SERVER_PORT;
     private static final String JOB_RESOURCE_PREFIX;
-
-    // per-instance variables
-    private final GenieNodeStatistics stats;
-    private final JobRepository jobRepo;
-    private final JobCountManager jobCountManager;
-    private final JobManagerFactory jobManagerFactory;
-    private final JobService jobService;
 
     // initialize static variables
     static {
@@ -88,6 +81,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         JOB_RESOURCE_PREFIX = CONF.getString(
                 "com.netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
     }
+
+    // per-instance variables
+    private final GenieNodeStatistics stats;
+    private final JobRepository jobRepo;
+    private final JobCountManager jobCountManager;
+    private final JobManagerFactory jobManagerFactory;
+    private final JobService jobService;
 
     /**
      * Default constructor - initializes persistence manager, and other utility
@@ -99,7 +99,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @param jobManagerFactory The the job manager factory to use
      * @param jobService        The job service to use.
      */
-    @Inject
     public ExecutionServiceJPAImpl(
             final JobRepository jobRepo,
             final GenieNodeStatistics stats,
@@ -117,15 +116,13 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    public Job submitJob(final Job job) throws GenieException {
+    public Job submitJob(
+            @NotNull(message = "No job entered to run")
+            @Valid
+            final Job job
+    ) throws GenieException {
         LOG.debug("Called");
-
-        if (job == null) {
-            throw new GeniePreconditionException("No job entered to run");
-        }
-
-        if (StringUtils.isNotBlank(job.getId())
-                && this.jobRepo.exists(job.getId())) {
+        if (StringUtils.isNotBlank(job.getId()) && this.jobRepo.exists(job.getId())) {
             throw new GenieConflictException("Job with ID specified already exists.");
         }
 
@@ -153,11 +150,16 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public Job killJob(final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No id entered unable to kill job.");
-        }
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
+    public Job killJob(
+            @NotBlank(message = "No id entered unable to kill job.")
+            final String id
+    ) throws GenieException {
         LOG.debug("called for id: " + id);
         final Job job = this.jobRepo.findOne(id);
 
@@ -219,8 +221,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         LOG.debug("called");
         final ProcessStatus zombie = ProcessStatus.ZOMBIE_JOB;
         final long currentTime = new Date().getTime();
-        final long zombieTime = CONF.getLong(
-                "com.netflix.genie.server.janitor.zombie.delta.ms", 1800000);
+        final long zombieTime = CONF.getLong("com.netflix.genie.server.janitor.zombie.delta.ms", 1800000);
 
         @SuppressWarnings("unchecked")
         final List<Job> jobs = this.jobRepo.findAll(
@@ -239,8 +240,17 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(rollbackFor = GenieException.class)
-    public JobStatus finalizeJob(final String id, final int exitCode) throws GenieException {
+    @Transactional(
+            rollbackFor = {
+                    GenieException.class,
+                    ConstraintViolationException.class
+            }
+    )
+    public JobStatus finalizeJob(
+            @NotBlank(message = "No job id entered. Unable to finalize.")
+            final String id,
+            final int exitCode
+    ) throws GenieException {
         final Job job = this.jobRepo.findOne(id);
         if (job == null) {
             throw new GenieNotFoundException("No job with id " + id + " exists");

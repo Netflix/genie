@@ -24,19 +24,15 @@ import com.netflix.genie.server.metrics.JobCountMonitor;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * This class bootstraps some common Genie spring stuff.
  *
  * @author tgianos
  */
-//Using @Component specifically Keeps Karyon/Governator from picking up this bean
-@Component
 public class GenieSpringBootstrap {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenieSpringBootstrap.class);
@@ -55,7 +51,6 @@ public class GenieSpringBootstrap {
      * @param jobCountManager The job count manager to use
      * @param jobCountMonitor The job count monitor to use
      */
-    @Inject
     public GenieSpringBootstrap(
             final JobJanitor janitor,
             final JobCountManager jobCountManager,
