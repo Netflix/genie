@@ -176,6 +176,8 @@ public class JobServiceJPAImpl implements JobService {
             final Set<String> tags,
             final String clusterName,
             final String clusterId,
+            final String commandName,
+            final String commandId,
             final int page,
             final int limit,
             final boolean descending,
@@ -195,7 +197,9 @@ public class JobServiceJPAImpl implements JobService {
                         statuses,
                         tags,
                         clusterName,
-                        clusterId),
+                        clusterId,
+                        commandName,
+                        commandId),
                 pageRequest).getContent();
         return jobs;
     }
