@@ -20,6 +20,7 @@ body {
     font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
     font-size: 12px;
     padding-top: 60px;
+    padding-bottom: 30px;
 }
 
 p, h1, form, button {
@@ -251,8 +252,10 @@ table th {
 .site-footer {
     position: fixed;
     bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 30px;
     background-color: black;
     color: grey;
-    width: 100%;
     text-align: right;
 }
