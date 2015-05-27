@@ -483,6 +483,54 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      * Test the get jobs function.
      */
     @Test
+    public void testGetJobsByCommandName() {
+        final List<Job> jobs = this.service.getJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "pig_13_prod",
+                null,
+                -1,
+                0,
+                true,
+                null
+        );
+        Assert.assertEquals(1, jobs.size());
+        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+    }
+
+    /**
+     * Test the get jobs function.
+     */
+    @Test
+    public void testGetJobsByCommandId() {
+        final List<Job> jobs = this.service.getJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "command1",
+                -1,
+                0,
+                true,
+                null
+        );
+        Assert.assertEquals(1, jobs.size());
+        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+    }
+
+    /**
+     * Test the get jobs function.
+     */
+    @Test
     public void testGetJobsByClusterId() {
         final List<Job> jobs = this.service.getJobs(
                 null,

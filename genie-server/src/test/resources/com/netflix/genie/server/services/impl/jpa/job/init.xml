@@ -200,6 +200,8 @@
             clusterCriteriasString="prod,pig|h2prod|h2query"
             executionClusterId="cluster1"
             executionClusterName="h2prod"
+            commandId="command1"
+            commandName="pig_13_prod"
             processHandle="-1"/>
     <Job_tags
             JOB_ID="job1"
