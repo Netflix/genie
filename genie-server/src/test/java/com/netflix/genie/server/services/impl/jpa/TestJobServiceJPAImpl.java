@@ -304,6 +304,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 null,
                 null,
                 null,
+                null,
+                null,
                 0,
                 10,
                 true,
@@ -321,6 +323,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
         final List<Job> jobs = this.service.getJobs(
                 null,
                 "testSparkJob",
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -348,6 +352,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 null,
                 null,
                 null,
+                null,
+                null,
                 0,
                 10,
                 true,
@@ -371,6 +377,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 null,
                 null,
                 statuses,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -406,6 +414,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 tags,
                 null,
                 null,
+                null,
+                null,
                 0,
                 10,
                 true,
@@ -434,6 +444,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 tags,
                 null,
                 null,
+                null,
+                null,
                 0,
                 10,
                 true,
@@ -456,6 +468,56 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 null,
                 "h2prod",
                 null,
+                null,
+                null,
+                -1,
+                0,
+                true,
+                null
+        );
+        Assert.assertEquals(1, jobs.size());
+        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+    }
+
+    /**
+     * Test the get jobs function.
+     */
+    @Test
+    public void testGetJobsByCommandName() {
+        final List<Job> jobs = this.service.getJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "pig_13_prod",
+                null,
+                -1,
+                0,
+                true,
+                null
+        );
+        Assert.assertEquals(1, jobs.size());
+        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+    }
+
+    /**
+     * Test the get jobs function.
+     */
+    @Test
+    public void testGetJobsByCommandId() {
+        final List<Job> jobs = this.service.getJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "command1",
                 -1,
                 0,
                 true,
@@ -478,6 +540,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
                 null,
                 null,
                 "cluster2",
+                null,
+                null,
                 0,
                 10,
                 true,
@@ -493,7 +557,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetClustersDescending() {
         //Default to order by Updated
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, 0, 10, true, null);
+        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, 0, 10, true, null);
         Assert.assertEquals(2, jobs.size());
         Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
         Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
@@ -505,7 +569,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetClustersAscending() {
         //Default to order by Updated
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, 0, 10, false, null);
+        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, 0, 10, false, null);
         Assert.assertEquals(2, jobs.size());
         Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
         Assert.assertEquals(JOB_1_ID, jobs.get(1).getId());
@@ -517,7 +581,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetClustersOrderBysDefault() {
         //Default to order by Updated
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, 0, 10, true, null);
+        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, 0, 10, true, null);
         Assert.assertEquals(2, jobs.size());
         Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
         Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
@@ -530,7 +594,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     public void testGetClustersOrderBysUpdated() {
         final Set<String> orderBys = new HashSet<>();
         orderBys.add("updated");
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, 0, 10, true, orderBys);
+        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, 0, 10, true, orderBys);
         Assert.assertEquals(2, jobs.size());
         Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
         Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
@@ -543,7 +607,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     public void testGetClustersOrderBysName() {
         final Set<String> orderBys = new HashSet<>();
         orderBys.add("name");
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, 0, 10, true, orderBys);
+        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, 0, 10, true, orderBys);
         Assert.assertEquals(2, jobs.size());
         Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
         Assert.assertEquals(JOB_1_ID, jobs.get(1).getId());
@@ -556,7 +620,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     public void testGetClustersOrderBysInvalidField() {
         final Set<String> orderBys = new HashSet<>();
         orderBys.add("I'mNotAValidField");
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, 0, 10, true, orderBys);
+        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, 0, 10, true, orderBys);
         Assert.assertEquals(2, jobs.size());
         Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
         Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
@@ -569,7 +633,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     public void testGetClustersOrderBysCollectionField() {
         final Set<String> orderBys = new HashSet<>();
         orderBys.add("tags");
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, 0, 10, true, orderBys);
+        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, 0, 10, true, orderBys);
         Assert.assertEquals(2, jobs.size());
         Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
         Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());

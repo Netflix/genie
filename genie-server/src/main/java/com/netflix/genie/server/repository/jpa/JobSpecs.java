@@ -64,7 +64,9 @@ public final class JobSpecs {
             final Set<JobStatus> statuses,
             final Set<String> tags,
             final String clusterName,
-            final String clusterId) {
+            final String clusterId,
+            final String commandName,
+            final String commandId) {
         return new Specification<Job>() {
             @Override
             public Predicate toPredicate(
@@ -101,6 +103,12 @@ public final class JobSpecs {
                 }
                 if (StringUtils.isNotBlank(clusterId)) {
                     predicates.add(cb.equal(root.get(Job_.executionClusterId), clusterId));
+                }
+                if (StringUtils.isNotBlank(commandName)) {
+                    predicates.add(cb.equal(root.get(Job_.commandName), commandName));
+                }
+                if (StringUtils.isNotBlank(commandId)) {
+                    predicates.add(cb.equal(root.get(Job_.commandId), commandId));
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }

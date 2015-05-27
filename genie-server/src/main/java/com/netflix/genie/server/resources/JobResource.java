@@ -283,6 +283,8 @@ public final class JobResource {
      * @param tags        tags for the job
      * @param clusterName the name of the cluster
      * @param clusterId   the id of the cluster
+     * @param commandName the name of the command run by the job
+     * @param commandId   the id of the command run by the job
      * @param page        page number for job
      * @param limit       max number of jobs to return
      * @return successful response, or one with HTTP error code
@@ -353,6 +355,16 @@ public final class JobResource {
             @ApiParam(
                     value = "The page to start on."
             )
+            @QueryParam("commandName")
+            final String commandName,
+            @ApiParam(
+                    value = "Id of the cluster on which the job ran."
+            )
+            @QueryParam("commandId")
+            final String commandId,
+            @ApiParam(
+                    value = "The page to start on."
+            )
             @QueryParam("page")
             @DefaultValue("0")
             int page,
@@ -392,6 +404,10 @@ public final class JobResource {
                         + " | "
                         + clusterId
                         + " | "
+                        + commandName
+                        + " | "
+                        + commandId
+                        + " | "
                         + page
                         + " | "
                         + limit
@@ -418,6 +434,8 @@ public final class JobResource {
                 tags,
                 clusterName,
                 clusterId,
+                commandName,
+                commandId,
                 page,
                 limit,
                 descending,

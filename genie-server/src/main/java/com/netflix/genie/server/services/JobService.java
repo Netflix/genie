@@ -72,6 +72,8 @@ public interface JobService {
      * @param tags        tags for the job
      * @param clusterName name of cluster for job
      * @param clusterId   id of cluster for job
+     * @param commandName name of the command run in the job
+     * @param commandId   id of the command run in the job
      * @param page        page number for job
      * @param limit       max number of jobs to return
      * @param descending  Whether the results should be returned in descending or ascending order
@@ -86,6 +88,8 @@ public interface JobService {
             final Set<String> tags,
             final String clusterName,
             final String clusterId,
+            final String commandName,
+            final String commandId,
             final int page,
             final int limit,
             final boolean descending,

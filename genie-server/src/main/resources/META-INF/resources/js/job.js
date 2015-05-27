@@ -122,6 +122,8 @@ define([
             var jobTags = _.where(formArray, {'name': 'jobTags'})[0].value;
             var executionClusterName  = _.where(formArray, {'name': 'clusterName'})[0].value;
             var executionClusterId  = _.where(formArray, {'name': 'clusterId'})[0].value;
+            var commandName  = _.where(formArray, {'name': 'commandName'})[0].value;
+            var commandId  = _.where(formArray, {'name': 'commandId'})[0].value;
             var limit    = _.where(formArray, {'name': 'limit'})[0].value;
             var sortOrder = _.where(formArray, {'name': 'sortOrder'})[0].value;
             var bDescending =  true;
@@ -137,8 +139,18 @@ define([
                 headers: {'Accept':'application/json'},
                 url:  'genie/v2/jobs',
                 traditional: true,
-                data: {limit: limit, userName: user, status: status, 
-                    id: id, name: name, executionClusterName:executionClusterName, executionClusterId:executionClusterId, tag: jobTagsArray, orderBy: self.jobOrderBySelectedFields(), descending: bDescending }
+                data: {limit: limit,
+                        userName: user,
+                        status: status,
+                        id: id,
+                        name: name,
+                        executionClusterName:executionClusterName,
+                        executionClusterId:executionClusterId,
+                        commandName:commandName,
+                        commandId:commandId,
+                        tag: jobTagsArray,
+                        orderBy: self.jobOrderBySelectedFields(),
+                        descending: bDescending }
             }).done(function(data) {
                 self.searchResults([]);
                 self.status('results');
