@@ -15,9 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 -->
+<%@ page import="com.netflix.config.ConfigurationManager" %>
 <%@ page language="java" pageEncoding="UTF-8" session="false" %>
 <!DOCTYPE html>
 <html lang="en">
+<%
+    final String env = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment");
+%>
 <head>
     <meta charset="UTF-8">
     <title>Genie</title>
@@ -61,7 +65,7 @@ limitations under the License.
 </head>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
+    <div class="navbar-inner site-header-<%=env%>">
         <div class="container">
             <a class="brand" href="#">GENIE</a>
             <ul class="nav" role="navigation">
