@@ -251,8 +251,36 @@ table th {
 .site-footer {
     position: fixed;
     bottom: 0;
-    background-color: black;
-    color: grey;
     width: 100%;
     text-align: right;
+}
+
+.site-footer-prod {
+    background-color: red;
+    color: black;
+}
+
+.site-footer-test {
+     background-color: black;
+     color: grey;
+}
+
+.site-footer-dev {
+    background-color: grey;
+    color: black;
+}
+
+.site-header-prod {
+     background-color: red;
+     color: black;
+ }
+
+.site-header-test {
+    background-color: black;
+    color: grey;
+}
+
+.site-header-dev {
+    background-color: grey;
+    color: black;
 }

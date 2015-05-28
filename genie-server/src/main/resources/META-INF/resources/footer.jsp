@@ -18,7 +18,10 @@
 <%@ page import="com.netflix.config.ConfigurationManager" %>
 <%@ page language="java" pageEncoding="UTF-8" session="false"%>
 <!DOCTYPE html>
-<footer class="site-footer">
-    <p><%= ConfigurationManager.getConfigInstance().getString("com.netflix.genie.version")%>
-        <%= ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment")%></p>
+<%
+    final String env = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment");
+    final String version = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.version");
+%>
+<footer class="site-footer site-footer-<%=env%>">
+    <p><%=version%> <%=env%></p>
 </footer>
