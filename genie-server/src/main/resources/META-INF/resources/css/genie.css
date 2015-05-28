@@ -253,6 +253,7 @@ table th {
     bottom: 0;
     width: 100%;
     text-align: right;
+    color: white
 }
 
 .site-header-prod {
@@ -276,7 +277,6 @@ table th {
 
 .site-footer-prod {
     background-color: #b9090b;
-    color: black;
 }
 
 .site-header-test, .site-header-test .nav .active > a {
@@ -300,7 +300,6 @@ table th {
 
 .site-footer-test {
     background-color: black;
-    color: grey;
 }
 
 .site-header-dev {
@@ -324,5 +323,4 @@ table th {
 
 .site-footer-dev {
     background-color: grey;
-    color: white;
 }
