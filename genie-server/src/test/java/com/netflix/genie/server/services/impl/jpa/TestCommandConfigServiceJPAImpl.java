@@ -1264,8 +1264,8 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsForCommand() throws GenieException {
-        final Set<Cluster> clusters
-                = this.service.getClustersForCommand(COMMAND_1_ID);
+        final List<Cluster> clusters
+                = this.service.getClustersForCommand(COMMAND_1_ID,null);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_1_ID, clusters.iterator().next().getId());
     }
@@ -1277,7 +1277,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetClustersForCommandNoId() throws GenieException {
-        this.service.getClustersForCommand("");
+        this.service.getClustersForCommand("", null);
     }
 
     /**
@@ -1287,6 +1287,6 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetClustersForCommandNoCommand() throws GenieException {
-        this.service.getClustersForCommand(UUID.randomUUID().toString());
+        this.service.getClustersForCommand(UUID.randomUUID().toString(), null);
     }
 }

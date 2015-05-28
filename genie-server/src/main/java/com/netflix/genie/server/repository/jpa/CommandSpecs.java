@@ -15,18 +15,13 @@
  */
 package com.netflix.genie.server.repository.jpa;
 
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.common.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -84,6 +79,45 @@ public final class CommandSpecs {
                         }
                     }
                 }
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+    }
+
+    /**
+     * Get all the clusters given the specified parameters.
+     *
+     * @param commandId The id of the command that is registered with this cluster
+     * @param statuses The status of the cluster
+     * @return The specification
+     */
+    public static Specification<Cluster> findClusterForCommand(
+            final String commandId,
+            final Set<ClusterStatus> statuses) {
+        return new Specification<Cluster>() {
+            @Override
+            public Predicate toPredicate(
+                    final Root<Cluster> root,
+                    final CriteriaQuery<?> cq,
+                    final CriteriaBuilder cb) {
+                final List<Predicate> predicates = new ArrayList<>();
+                final Join<Cluster, Command> commands = root.join(Cluster_.commands);
+
+                cq.distinct(true);
+
+                if (commandId != null) {
+                    predicates.add(cb.equal(commands.get(Command_.id), commandId));
+                }
+
+                if (statuses != null && !statuses.isEmpty()) {
+                    //Could optimize this as we know size could use native array
+                    final List<Predicate> orPredicates = new ArrayList<>();
+                    for (final ClusterStatus status : statuses) {
+                        orPredicates.add(cb.equal(root.get(Cluster_.status), status));
+                    }
+                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                }
+
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };

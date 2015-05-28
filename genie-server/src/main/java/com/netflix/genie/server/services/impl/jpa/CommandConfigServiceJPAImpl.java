@@ -22,14 +22,8 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Command_;
-import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.server.repository.jpa.ApplicationRepository;
-import com.netflix.genie.server.repository.jpa.CommandRepository;
-import com.netflix.genie.server.repository.jpa.CommandSpecs;
+import com.netflix.genie.common.model.*;
+import com.netflix.genie.server.repository.jpa.*;
 import com.netflix.genie.server.services.CommandConfigService;
 
 import java.util.ArrayList;
@@ -67,6 +61,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     private static final Logger LOG = LoggerFactory.getLogger(CommandConfigServiceJPAImpl.class);
     private final CommandRepository commandRepo;
     private final ApplicationRepository appRepo;
+    private final ClusterRepository clusterRepo;
     @PersistenceContext
     private EntityManager em;
 
@@ -75,13 +70,16 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      *
      * @param commandRepo the command repository to use
      * @param appRepo     the application repository to use
+     * @param clusterRepo the cluster repository to use
      */
     public CommandConfigServiceJPAImpl(
             final CommandRepository commandRepo,
-            final ApplicationRepository appRepo
+            final ApplicationRepository appRepo,
+            final ClusterRepository clusterRepo
     ) {
         this.commandRepo = commandRepo;
         this.appRepo = appRepo;
+        this.clusterRepo = clusterRepo;
     }
 
     /**
@@ -479,13 +477,20 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<Cluster> getClustersForCommand(
+    public List<Cluster> getClustersForCommand(
             @NotBlank(message = "No command id entered. Unable to get clusters.")
-            final String id
+            final String id,
+            final Set<ClusterStatus> statuses
     ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            return command.getClusters();
+            @SuppressWarnings("unchecked")
+            final List<Cluster> clusters = this.clusterRepo.findAll(
+                    CommandSpecs.findClusterForCommand(
+                            id,
+                            statuses
+                    ));
+            return clusters;
         } else {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }

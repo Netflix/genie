@@ -18,10 +18,7 @@
 package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
+import com.netflix.genie.common.model.*;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
@@ -326,11 +323,13 @@ public interface CommandConfigService {
      * Get all the clusters the command with given id is associated with.
      *
      * @param id The id of the command to get the clusters for.
+     * @param statuses The status of the clusters returned
      * @return The clusters the command is available on.
      * @throws GenieException if there is an error
      */
-    Set<Cluster> getClustersForCommand(
+    List<Cluster> getClustersForCommand(
             @NotBlank(message = "No command id entered. Unable to get clusters.")
-            final String id
+            final String id,
+            final Set<ClusterStatus> statuses
     ) throws GenieException;
 }

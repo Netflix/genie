@@ -634,29 +634,29 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDelete() throws GenieException {
         Assert.assertEquals(2,
-                this.commandService.getClustersForCommand(COMMAND_1_ID).size());
+                this.commandService.getClustersForCommand(COMMAND_1_ID, null).size());
         Assert.assertEquals(2,
-                this.commandService.getClustersForCommand(COMMAND_2_ID).size());
+                this.commandService.getClustersForCommand(COMMAND_2_ID, null).size());
         Assert.assertEquals(2,
-                this.commandService.getClustersForCommand(COMMAND_3_ID).size());
+                this.commandService.getClustersForCommand(COMMAND_3_ID, null).size());
 
         Assert.assertEquals(CLUSTER_1_ID,
                 this.service.deleteCluster(CLUSTER_1_ID).getId());
 
         Assert.assertEquals(1,
-                this.commandService.getClustersForCommand(COMMAND_1_ID).size());
+                this.commandService.getClustersForCommand(COMMAND_1_ID, null).size());
         Assert.assertEquals(CLUSTER_2_ID,
-                this.commandService.getClustersForCommand(COMMAND_1_ID)
+                this.commandService.getClustersForCommand(COMMAND_1_ID, null)
                         .iterator().next().getId());
         Assert.assertEquals(1,
-                this.commandService.getClustersForCommand(COMMAND_2_ID).size());
+                this.commandService.getClustersForCommand(COMMAND_2_ID, null).size());
         Assert.assertEquals(CLUSTER_2_ID,
-                this.commandService.getClustersForCommand(COMMAND_2_ID)
+                this.commandService.getClustersForCommand(COMMAND_2_ID, null)
                         .iterator().next().getId());
         Assert.assertEquals(1,
-                this.commandService.getClustersForCommand(COMMAND_3_ID).size());
+                this.commandService.getClustersForCommand(COMMAND_3_ID, null).size());
         Assert.assertEquals(CLUSTER_2_ID,
-                this.commandService.getClustersForCommand(COMMAND_3_ID)
+                this.commandService.getClustersForCommand(COMMAND_3_ID, null)
                         .iterator().next().getId());
     }
 

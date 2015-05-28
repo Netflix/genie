@@ -22,6 +22,7 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -915,7 +916,7 @@ public final class CommandConfigResource {
      *
      * @param id The id of the command to get the clusters for. Not
      *           NULL/empty/blank.
-     * @return The set of clusters.
+     * @return The list of clusters.
      * @throws GenieException For any error
      */
     @GET
@@ -940,16 +941,33 @@ public final class CommandConfigResource {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<Cluster> getClustersForCommand(
+    public List<Cluster> getClustersForCommand(
             @ApiParam(
                     value = "Id of the command to get the clusters for.",
                     required = true
             )
             @PathParam("id")
-            final String id
+            final String id,
+            @ApiParam(
+                    value = "The statuses of the commands to find.",
+                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
+            )
+            @QueryParam("status")
+            final Set<String> statuses
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.commandConfigService.getClustersForCommand(id);
+        LOG.info("Called with id " + id + " and statuses " + statuses);
+
+        Set<ClusterStatus> enumStatuses = null;
+        if (!statuses.isEmpty()) {
+            enumStatuses = EnumSet.noneOf(ClusterStatus.class);
+            for (final String status : statuses) {
+                if (StringUtils.isNotBlank(status)) {
+                    enumStatuses.add(ClusterStatus.parse(status));
+                }
+            }
+        }
+
+        return this.commandConfigService.getClustersForCommand(id,enumStatuses);
     }
 
     /**
