@@ -64,8 +64,8 @@ limitations under the License.
     </script>
 </head>
 <body>
-<div class="navbar navbar-inverse navbar-fixed-top site-header-<%=env%>">
-    <div class="navbar-inner">
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner site-header-<%=env%>">
         <div class="container">
             <a class="brand" href="#">GENIE</a>
             <ul class="nav" role="navigation">

@@ -255,32 +255,74 @@ table th {
     text-align: right;
 }
 
-.site-footer-prod {
-    background-color: red;
+.site-header-prod {
+    background-color: #b9090b;
+    color: white;
+    background-image: linear-gradient(to bottom, #b9090b, #b9090b) !important;
+    border-color: white !important;
+}
+
+.site-header-prod .nav .active > a {
+    background-image: linear-gradient(to bottom, black, black) !important;
+}
+
+.site-header-prod .brand, .site-header-prod .nav > li > a {
+    color: white;
+}
+
+.site-header-prod .brand:hover, .site-header-prod .nav > li > a:hover {
     color: black;
+}
+
+.site-footer-prod {
+    background-color: #b9090b;
+    color: black;
+}
+
+.site-header-test, .site-header-test .nav .active > a {
+    background-color: black;
+    color: white;
+    background-image: linear-gradient(to bottom, black, black) !important;
+    border-color: white !important;
+}
+
+.site-header-test .nav .active > a {
+    background-image: linear-gradient(to bottom, #b9090b, #b9090b) !important;
+}
+
+.site-header-test .brand, .site-header-test .nav > li > a {
+    color: white;
+}
+
+.site-header-test .brand:hover, .site-header-test .nav > li > a:hover {
+    color: #b9090b;
 }
 
 .site-footer-test {
-     background-color: black;
-     color: grey;
-}
-
-.site-footer-dev {
-    background-color: grey;
-    color: black;
-}
-
-.site-header-prod {
-     background-color: red;
-     color: black;
- }
-
-.site-header-test {
     background-color: black;
     color: grey;
 }
 
 .site-header-dev {
     background-color: grey;
+    color: white;
+    background-image: linear-gradient(to bottom, grey, grey) !important;
+    border-color: white !important;
+}
+
+.site-header-prod .nav .active > a {
+    background-image: linear-gradient(to bottom, black, black) !important;
+}
+
+.site-header-dev .brand, .site-header-dev .nav > li > a {
+    color: white;
+}
+
+.site-header-dev .brand:hover, .site-header-dev .nav > li > a:hover {
     color: black;
+}
+
+.site-footer-dev {
+    background-color: grey;
+    color: white;
 }
