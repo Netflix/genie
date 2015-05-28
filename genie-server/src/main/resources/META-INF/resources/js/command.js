@@ -43,7 +43,7 @@ define([
             if (self.application() !== undefined) {
                 return self.application().id;
             }
-            return '';s
+            return '';
         },self);
 
         self.applicationName = ko.computed(function() {
@@ -237,7 +237,7 @@ define([
                     $.ajax({
                         type: 'GET',
                         headers: {'Accept':'application/json'},
-                        url:  'genie/v2/config/commands/'+commandId+'/clusters'
+                        url:  'genie/v2/config/commands/'+commandId+'/clusters?status=UP'
                     }).done(function(clusters) {
                         self.current().clusters(clusters);
                     });
