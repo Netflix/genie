@@ -1,2 +1,3 @@
 gitflow=true
+environment_variables=GRADLE_OPTS=-Xmx512m
 
