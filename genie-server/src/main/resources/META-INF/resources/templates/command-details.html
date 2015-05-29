@@ -1,6 +1,6 @@
 <div class="command-details">
-    <h3>command Details</h3>
-    <table class="table condensed">
+    <h3>Command Details</h3>
+    <table class="table table-condensed table-bordered table-striped table-responsive">
         <tr>
             <td><strong>Status</strong></td>
             <td data-bind="text: status"></td>
@@ -15,11 +15,11 @@
         </tr>
         <tr>
             <td><strong>Create Time</strong></td>
-            <td><span data-bind="text: created"></span> (<span data-bind="text: created"></span>)</td>
+            <td><span data-bind="text: createTimeFormatted"></span></td>
         </tr>
         <tr>
             <td><strong>Update Time</strong></td>
-            <td><span data-bind="text: updated"></span> (<span data-bind="text: updated"></span>)</td>
+            <td><span data-bind="text: updateTimeFormatted"></span></td>
         </tr>
         <tr>
             <td><strong>User</strong></td>
@@ -42,12 +42,12 @@
        		</td>
         </tr>
         <tr>
-            <td><strong>Clusters</strong></td>
+            <td><strong>Clusters Linked (UP)</strong></td>
             <td>
-                <table>
+                <table class="table table-condensed table-responsive">
                     <thead>
-                        <th> Cluster Id </th>
-                        <th> Cluster Name </th>
+                        <th> Id </th>
+                        <th> Name </th>
                     </thead>
                     <tbody data-bind="foreach: clusters">
                     <tr>
@@ -78,7 +78,19 @@
         </tr>
         <tr>
             <td><strong>Tags</strong></td>
-            <td data-bind="text: tags"></td>
-        </tr>     	    
+            <td>
+                <table>
+                    <tbody data-bind="foreach: tags">
+                    <tr>
+                        <td data-bind="text:$data"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <!--<tr>-->
+            <!--<td><strong>Tags</strong></td>-->
+            <!--<td data-bind="text: formattedTags"></td>-->
+        <!--</tr>     	    -->
     </table>
 </div>
