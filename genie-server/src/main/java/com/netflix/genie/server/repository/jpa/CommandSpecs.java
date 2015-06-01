@@ -83,4 +83,39 @@ public final class CommandSpecs {
             }
         };
     }
+
+    /**
+     * Get all the clusters given the specified parameters.
+     *
+     * @param applicationId The id of the application that is registered with these commands
+     * @param statuses The status of the commands
+     * @return The specification
+     */
+    public static Specification<Command> findCommandsForApplication(
+            final String applicationId,
+            final Set<CommandStatus> statuses) {
+        return new Specification<Command>() {
+            @Override
+            public Predicate toPredicate(
+                    final Root<Command> root,
+                    final CriteriaQuery<?> cq,
+                    final CriteriaBuilder cb) {
+                final List<Predicate> predicates = new ArrayList<>();
+                final Join<Command, Application> application = root.join(Command_.application);
+
+                predicates.add(cb.equal(application.get(Application_.id), applicationId));
+
+                if (statuses != null && !statuses.isEmpty()) {
+                    //Could optimize this as we know size could use native array
+                    final List<Predicate> orPredicates = new ArrayList<>();
+                    for (final CommandStatus status : statuses) {
+                        orPredicates.add(cb.equal(root.get(Command_.status), status));
+                    }
+                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                }
+
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+    }
 }

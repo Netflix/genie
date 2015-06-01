@@ -26,6 +26,9 @@ define([
         self.configs = ko.observableArray();
         self.tags = ko.observableArray();
         self.commands = ko.observableArray();
+        self.createTimeFormatted = ko.observable();
+        self.updateTimeFormatted = ko.observable();
+        self.formattedTags = ko.observable();
 
         ko.mapping.fromJS(json, {}, self);
         self.originalStatus = self.status();
@@ -219,16 +222,25 @@ define([
                     type: 'GET',
                     headers: {'Accept':'application/json'},
                     url:  'genie/v2/config/clusters/'+clusterId
-                }).done(function(cluster) {
-                	console.log(cluster);
+                }).done(function(clusterObj) {
+                	console.log(clusterObj);
+
+                    var createdDt = new Date(clusterObj.created);
+                    clusterObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+
+                    var updatedDt = new Date(clusterObj.updated);
+                    clusterObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+
+                    clusterObj.formattedTags = ck=clusterObj.tags.join("<br />");
+
                     $.ajax({
                         type: 'GET',
                         headers: {'Accept':'application/json'},
-                        url:  'genie/v2/config/clusters/'+clusterId+'/commands'
+                        url:  'genie/v2/config/clusters/'+clusterId+'/commands?status=ACTIVE'
                     }).done(function(commands) {
                         console.log(commands);
-                        cluster.commands = commands;
-                        self.current(new Cluster(cluster));
+                        clusterObj.commands = commands;
+                        self.current(new Cluster(clusterObj));
                     });
                     //self.current(new Cluster(data));
                 });

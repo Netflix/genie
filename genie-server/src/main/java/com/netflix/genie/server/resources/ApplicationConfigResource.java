@@ -20,6 +20,7 @@ package com.netflix.genie.server.resources;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.wordnik.swagger.annotations.Api;
@@ -987,16 +988,32 @@ public final class ApplicationConfigResource {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<Command> getCommandsForApplication(
+    public List<Command> getCommandsForApplication(
             @ApiParam(
                     value = "Id of the application to get the commands for.",
                     required = true
             )
             @PathParam("id")
-            final String id
+            final String id,
+            @ApiParam(
+                    value = "The statuses of the commands to find.",
+                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
+            )
+            @QueryParam("status")
+            final Set<String> statuses
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.applicationConfigService.getCommandsForApplication(id);
+
+        Set<CommandStatus> enumStatuses = null;
+        if (!statuses.isEmpty()) {
+            enumStatuses = EnumSet.noneOf(CommandStatus.class);
+            for (final String status : statuses) {
+                if (StringUtils.isNotBlank(status)) {
+                    enumStatuses.add(CommandStatus.parse(status));
+                }
+            }
+        }
+        return this.applicationConfigService.getCommandsForApplication(id, enumStatuses);
     }
 
     /**

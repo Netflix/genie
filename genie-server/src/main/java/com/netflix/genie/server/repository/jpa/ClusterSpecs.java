@@ -175,7 +175,7 @@ public final class ClusterSpecs {
                     }
                     predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
                 }
-                
+
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };

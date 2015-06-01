@@ -26,6 +26,9 @@ define([
         self.jars = ko.observableArray();
         self.tags = ko.observableArray();
         self.commands = ko.observableArray();
+        self.createTimeFormatted = ko.observable();
+        self.updateTimeFormatted = ko.observable();
+        self.formattedTags = ko.observable();
 
         ko.mapping.fromJS(json, {}, self);
         self.originalStatus = self.status();
@@ -215,14 +218,23 @@ define([
                     type: 'GET',
                     headers: {'Accept':'application/json'},
                     url:  'genie/v2/config/applications/'+applicationId
-                }).done(function(application) {
-                	console.log(application);
-                    self.current(new Application(application));
+                }).done(function(applicationObj) {
+                	console.log(applicationObj);
+
+                    var createdDt = new Date(applicationObj.created);
+                    applicationObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+
+                    var updatedDt = new Date(applicationObj.updated);
+                    applicationObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+
+                    applicationObj.formattedTags = applicationObj.tags.join("<br />");
+
+                    self.current(new Application(applicationObj));
 
                     $.ajax({
                         type: 'GET',
                         headers: {'Accept':'application/json'},
-                        url:  'genie/v2/config/applications/'+applicationId+'/commands'
+                        url:  'genie/v2/config/applications/'+applicationId+'/commands?status=ACTIVE'
                     }).done(function(commands) {
                         console.log(commands);
                         self.current().commands(commands);
