@@ -486,7 +486,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
         if (command != null) {
             @SuppressWarnings("unchecked")
             final List<Cluster> clusters = this.clusterRepo.findAll(
-                    CommandSpecs.findClusterForCommand(
+                    ClusterSpecs.findClustersForCommand(
                             id,
                             statuses
                     ));

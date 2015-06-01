@@ -583,7 +583,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDelete() throws GenieException {
         List<Command> commands
-                = this.clusterService.getCommandsForCluster(CLUSTER_1_ID);
+                = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(3, commands.size());
         boolean found = false;
         for (final Command command : commands) {
@@ -609,7 +609,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_1_ID,
                 this.service.deleteCommand(COMMAND_1_ID).getId());
 
-        commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID);
+        commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(2, commands.size());
         found = false;
         for (final Command command : commands) {

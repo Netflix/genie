@@ -847,7 +847,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         newCommands.add(command2);
         Assert.assertEquals(
                 3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
         );
         final List<Command> commands
                 = this.service.addCommandsForCluster(CLUSTER_1_ID, newCommands);
@@ -913,7 +913,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetCommandsForCluster() throws GenieException {
         final List<Command> commands
-                = this.service.getCommandsForCluster(CLUSTER_1_ID);
+                = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(3, commands.size());
         Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId());
         Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
@@ -927,7 +927,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetCommandsForClusterNoId() throws GenieException {
-        this.service.getCommandsForCluster("");
+        this.service.getCommandsForCluster("", null);
     }
 
     /**
@@ -937,7 +937,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForClusterNoCluster() throws GenieException {
-        this.service.getCommandsForCluster(UUID.randomUUID().toString());
+        this.service.getCommandsForCluster(UUID.randomUUID().toString(), null);
     }
 
     /**
@@ -970,7 +970,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         newCommands.add(command2);
         Assert.assertEquals(
                 3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
         );
         final List<Command> commands
                 = this.service.updateCommandsForCluster(
@@ -1040,7 +1040,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     public void testRemoveAllCommandsForCluster() throws GenieException {
         Assert.assertEquals(
                 3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
         );
         Assert.assertEquals(
                 0,
@@ -1048,7 +1048,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         );
         Assert.assertEquals(
                 0,
-                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
         );
     }
 
@@ -1082,7 +1082,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     public void testRemoveCommandForCluster() throws GenieException {
         Assert.assertEquals(
                 3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID).size()
+                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
         );
         Assert.assertEquals(
                 2,

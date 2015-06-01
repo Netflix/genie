@@ -28,12 +28,11 @@ import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.ClusterStatus;
+import com.netflix.genie.common.model.CommandStatus;
 
-import com.netflix.genie.server.repository.jpa.ClusterRepository;
-import com.netflix.genie.server.repository.jpa.ClusterSpecs;
-import com.netflix.genie.server.repository.jpa.CommandRepository;
-import com.netflix.genie.server.repository.jpa.JobRepository;
+import com.netflix.genie.server.repository.jpa.*;
 import com.netflix.genie.server.services.ClusterConfigService;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +50,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -365,11 +366,25 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     @Transactional(readOnly = true)
     public List<Command> getCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to get commands.")
-            final String id
+            final String id,
+            final Set<CommandStatus> statuses
     ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
+        List<Command> filteredCommandList = new ArrayList<Command>();
+
         if (cluster != null) {
-            return cluster.getCommands();
+            List<Command> commands = cluster.getCommands();
+            if (statuses != null) {
+                for (Command command: commands) {
+                    if (statuses.contains(command.getStatus())) {
+                        filteredCommandList.add(command);
+                    }
+                }
+                return filteredCommandList;
+            } else {
+                return commands;
+            }
+
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
