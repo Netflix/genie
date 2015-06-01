@@ -583,7 +583,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDelete() throws GenieException {
         List<Command> commands
-                = this.clusterService.getCommandsForCluster(CLUSTER_1_ID);
+                = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(3, commands.size());
         boolean found = false;
         for (final Command command : commands) {
@@ -593,8 +593,8 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
             }
         }
         Assert.assertTrue(found);
-        Set<Command> appCommands
-                = this.appService.getCommandsForApplication(APP_1_ID);
+        List<Command> appCommands
+                = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, appCommands.size());
         found = false;
         for (final Command command : appCommands) {
@@ -609,7 +609,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_1_ID,
                 this.service.deleteCommand(COMMAND_1_ID).getId());
 
-        commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID);
+        commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(2, commands.size());
         found = false;
         for (final Command command : commands) {
@@ -619,7 +619,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
             }
         }
         Assert.assertFalse(found);
-        appCommands = this.appService.getCommandsForApplication(APP_1_ID);
+        appCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertTrue(appCommands.isEmpty());
 
         //Test a case where the app has no commands to
@@ -877,15 +877,15 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertNull(command2.getApplication());
 
         final Application app = this.appService.getApplication(APP_1_ID);
-        final Set<Command> preCommands
-                = this.appService.getCommandsForApplication(APP_1_ID);
+        final List<Command> preCommands
+                = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(COMMAND_1_ID, preCommands.iterator().next().getId());
 
         this.service.setApplicationForCommand(COMMAND_2_ID, app);
 
-        final Set<Command> savedCommands
-                = this.appService.getCommandsForApplication(APP_1_ID);
+        final List<Command> savedCommands
+                = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(2, savedCommands.size());
         Assert.assertNotNull(this.service.getApplicationForCommand(COMMAND_2_ID));
     }
@@ -1264,8 +1264,8 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsForCommand() throws GenieException {
-        final Set<Cluster> clusters
-                = this.service.getClustersForCommand(COMMAND_1_ID);
+        final List<Cluster> clusters
+                = this.service.getClustersForCommand(COMMAND_1_ID,null);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_1_ID, clusters.iterator().next().getId());
     }
@@ -1277,7 +1277,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetClustersForCommandNoId() throws GenieException {
-        this.service.getClustersForCommand("");
+        this.service.getClustersForCommand("", null);
     }
 
     /**
@@ -1287,6 +1287,6 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetClustersForCommandNoCommand() throws GenieException {
-        this.service.getClustersForCommand(UUID.randomUUID().toString());
+        this.service.getClustersForCommand(UUID.randomUUID().toString(), null);
     }
 }

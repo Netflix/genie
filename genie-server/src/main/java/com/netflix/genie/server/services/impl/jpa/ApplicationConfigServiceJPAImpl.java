@@ -21,18 +21,14 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.ApplicationStatus;
-import com.netflix.genie.common.model.Application_;
-import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.*;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.ApplicationSpecs;
+import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.ApplicationConfigService;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.ConstraintViolationException;
@@ -63,6 +59,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigServiceJPAImpl.class);
     private final ApplicationRepository applicationRepo;
+    private final CommandRepository commandRepo;
     @PersistenceContext
     private EntityManager em;
 
@@ -71,8 +68,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      *
      * @param applicationRepo The application repository to use
      */
-    public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo) {
+    public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo, final CommandRepository commandRepo) {
         this.applicationRepo = applicationRepo;
+        this.commandRepo = commandRepo;
     }
 
     /**
@@ -479,13 +477,20 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<Command> getCommandsForApplication(
+    public List<Command> getCommandsForApplication(
             @NotBlank(message = "No application id entered. Unable to get commands.")
-            final String id
+            final String id,
+            final Set<CommandStatus> statuses
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            return app.getCommands();
+            @SuppressWarnings("unchecked")
+            final List<Command> commands = this.commandRepo.findAll(
+                    CommandSpecs.findCommandsForApplication(
+                            id,
+                            statuses
+                    ));
+            return commands;
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }

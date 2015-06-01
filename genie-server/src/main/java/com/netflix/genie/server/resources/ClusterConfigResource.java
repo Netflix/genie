@@ -20,6 +20,7 @@ package com.netflix.genie.server.resources;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.wordnik.swagger.annotations.Api;
@@ -647,10 +648,23 @@ public final class ClusterConfigResource {
                     required = true
             )
             @PathParam("id")
-            final String id
+            final String id,
+            @QueryParam("status")
+            final Set<String> statuses
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.clusterConfigService.getCommandsForCluster(id);
+        LOG.info("Called with id " + id + " status " + statuses);
+
+        Set<CommandStatus> enumStatuses = null;
+        if (!statuses.isEmpty()) {
+            enumStatuses = EnumSet.noneOf(CommandStatus.class);
+            for (final String status : statuses) {
+                if (StringUtils.isNotBlank(status)) {
+                    enumStatuses.add(CommandStatus.parse(status));
+                }
+            }
+        }
+
+        return this.clusterConfigService.getCommandsForCluster(id, enumStatuses);
     }
 
     /**

@@ -20,6 +20,7 @@ package com.netflix.genie.server.services;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -354,11 +355,13 @@ public interface ApplicationConfigService {
      * Get all the commands the application with given id is associated with.
      *
      * @param id The id of the application to get the commands for.
+     * @param statuses The status of the commands returned
      * @return The commands the application is a part of.
      * @throws GenieException if there is an error
      */
-    Set<Command> getCommandsForApplication(
+    List<Command> getCommandsForApplication(
             @NotBlank(message = "No application id entered. Unable to get commands.")
-            final String id
+            final String id,
+            final Set<CommandStatus> statuses
     ) throws GenieException;
 }

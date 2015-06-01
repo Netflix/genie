@@ -1260,8 +1260,8 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsForApplication() throws GenieException {
-        final Set<Command> commands
-                = this.service.getCommandsForApplication(APP_1_ID);
+        final List<Command> commands
+                = this.service.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, commands.size());
         Assert.assertEquals(COMMAND_1_ID, commands.iterator().next().getId());
     }
@@ -1273,7 +1273,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetCommandsForApplicationNoId() throws GenieException {
-        this.service.getCommandsForApplication("");
+        this.service.getCommandsForApplication("", null);
     }
 
     /**
@@ -1283,6 +1283,6 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForApplicationNoApp() throws GenieException {
-        this.service.getCommandsForApplication(UUID.randomUUID().toString());
+        this.service.getCommandsForApplication(UUID.randomUUID().toString(), null);
     }
 }

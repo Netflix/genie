@@ -145,4 +145,39 @@ public final class ClusterSpecs {
             }
         };
     }
+
+    /**
+     * Get all the clusters given the specified parameters.
+     *
+     * @param commandId The id of the command that is registered with this cluster
+     * @param statuses The status of the cluster
+     * @return The specification
+     */
+    public static Specification<Cluster> findClustersForCommand(
+            final String commandId,
+            final Set<ClusterStatus> statuses) {
+        return new Specification<Cluster>() {
+            @Override
+            public Predicate toPredicate(
+                    final Root<Cluster> root,
+                    final CriteriaQuery<?> cq,
+                    final CriteriaBuilder cb) {
+                final List<Predicate> predicates = new ArrayList<>();
+                final Join<Cluster, Command> commands = root.join(Cluster_.commands);
+
+                predicates.add(cb.equal(commands.get(Command_.id), commandId));
+
+                if (statuses != null && !statuses.isEmpty()) {
+                    //Could optimize this as we know size could use native array
+                    final List<Predicate> orPredicates = new ArrayList<>();
+                    for (final ClusterStatus status : statuses) {
+                        orPredicates.add(cb.equal(root.get(Cluster_.status), status));
+                    }
+                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                }
+
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+    }
 }

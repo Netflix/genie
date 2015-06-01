@@ -27,6 +27,9 @@ define([
         self.tags = ko.observableArray();
         self.clusters = ko.observableArray();
         self.application = ko.observable();
+        self.createTimeFormatted = ko.observable();
+        self.updateTimeFormatted = ko.observable();
+        self.formattedTags = ko.observable();
 
         ko.mapping.fromJS(json, {}, self);
         self.originalStatus = self.status();
@@ -43,7 +46,7 @@ define([
             if (self.application() !== undefined) {
                 return self.application().id;
             }
-            return '';s
+            return '';
         },self);
 
         self.applicationName = ko.computed(function() {
@@ -230,14 +233,22 @@ define([
                     type: 'GET',
                     headers: {'Accept':'application/json'},
                     url:  'genie/v2/config/commands/'+commandId
-                }).done(function(command) {
+                }).done(function(commandObj) {
                 	//console.log(command);
 
-                    self.current(new Command(command));
+                    var createdDt = new Date(commandObj.created);
+                    commandObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+
+                    var updatedDt = new Date(commandObj.updated);
+                    commandObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+
+                    commandObj.formattedTags = commandObj.tags.join("<br />");
+
+                    self.current(new Command(commandObj));
                     $.ajax({
                         type: 'GET',
                         headers: {'Accept':'application/json'},
-                        url:  'genie/v2/config/commands/'+commandId+'/clusters'
+                        url:  'genie/v2/config/commands/'+commandId+'/clusters?status=UP'
                     }).done(function(clusters) {
                         self.current().clusters(clusters);
                     });
