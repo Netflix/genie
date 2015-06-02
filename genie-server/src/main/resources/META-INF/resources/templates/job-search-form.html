@@ -1,93 +1,93 @@
 <!--<h3>Search Jobs</h3>-->
 <form class="form-horizontal search-form" id="jobSearchForm" data-bind="submit: Job.search">
     <div data-bind="visible: $root.Job.status()!=='results' || $root.Job.status()==='searchAndResults'">
-    <div class="control-group">
-        <label class="control-label">Username:</label>
-        <div class="controls">
-            <input type="text" name="userName" class="input-large">
+        <div class="control-group">
+            <label class="control-label">Username:</label>
+            <div class="controls">
+                <input type="text" name="userName" class="input-large">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Status:</label>
-        <div class="controls">
-            <select name="status">
-                <option></option>
-                <option>Running</option>
-                <option>Succeeded</option>
-                <option>Failed</option>
-                <option>Killed</option>
-            </select>
+        <div class="control-group">
+            <label class="control-label">Status:</label>
+            <div class="controls">
+                <select name="status">
+                    <option></option>
+                    <option>Running</option>
+                    <option>Succeeded</option>
+                    <option>Failed</option>
+                    <option>Killed</option>
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Job ID (Pattern):</label>
-        <div class="controls">
-            <input type="text" name="jobID" class="input-large">
+        <div class="control-group">
+            <label class="control-label">Job ID (Pattern):</label>
+            <div class="controls">
+                <input type="text" name="jobID" class="input-large">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Job Name (Pattern):</label>
-        <div class="controls">
-            <input type="text" name="jobName" class="input-large">
+        <div class="control-group">
+            <label class="control-label">Job Name (Pattern):</label>
+            <div class="controls">
+                <input type="text" name="jobName" class="input-large">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Tags (csv):</label>
-        <div class="controls">
-            <input type="text" name="jobTags" class="input-large">
+        <div class="control-group">
+            <label class="control-label">Tags (csv):</label>
+            <div class="controls">
+                <input type="text" name="jobTags" class="input-large">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Cluster Name:</label>
-        <div class="controls">
-            <input type="text" name="clusterName" class="input-large">
+        <div class="control-group">
+            <label class="control-label">Cluster Name:</label>
+            <div class="controls">
+                <input type="text" name="clusterName" class="input-large">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Cluster ID:</label>
-        <div class="controls">
-            <input type="text" name="clusterId" class="input-large">
+        <div class="control-group">
+            <label class="control-label">Cluster ID:</label>
+            <div class="controls">
+                <input type="text" name="clusterId" class="input-large">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Command Name:</label>
-        <div class="controls">
-            <input type="text" name="commandName" class="input-large">
+        <div class="control-group">
+            <label class="control-label">Command Name:</label>
+            <div class="controls">
+                <input type="text" name="commandName" class="input-large">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Command ID:</label>
-        <div class="controls">
-            <input type="text" name="commandId" class="input-large">
+        <div class="control-group">
+            <label class="control-label">Command ID:</label>
+            <div class="controls">
+                <input type="text" name="commandId" class="input-large">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Order By:</label>
-        <div class="controls">
-            <select id="jobOrderFields" name="tags" multiple="true" data-bind="options: Job.jobOrderByFields, selectedOptions:Job.jobOrderBySelectedFields">
-            </select>
-            <!--           <input type="text" data-provide="typeahead" autocomplete="off" id="clusterTagsSearch" data-bind="textInput:Cluster.selectedTags"> -->
+        <div class="control-group">
+            <label class="control-label">Order By:</label>
+            <div class="controls">
+                <select id="jobOrderFields" name="tags" multiple="true" data-bind="options: Job.jobOrderByFields, selectedOptions:Job.jobOrderBySelectedFields">
+                </select>
+                <!--           <input type="text" data-provide="typeahead" autocomplete="off" id="clusterTagsSearch" data-bind="textInput:Cluster.selectedTags"> -->
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Order Type:</label>
-        <div class="controls">
-            <select name="sortOrder">
-                <option>descending</option>
-                <option>ascending</option>
-            </select>
+        <div class="control-group">
+            <label class="control-label">Order Type:</label>
+            <div class="controls">
+                <select name="sortOrder">
+                    <option>descending</option>
+                    <option>ascending</option>
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Number of jobs:</label>
-        <div class="controls">
-            <input type="text" name="limit" class="input-mini" maxlength=3 value="32">
+        <div class="control-group">
+            <label class="control-label">Number of jobs:</label>
+            <div class="controls">
+                <input type="text" name="limit" class="input-mini" maxlength=3 value="32">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <div class="controls">
-            <button data-bind="click: Job.search, disable: Job.status()==='searching'" type="submit" class="btn btn-danger">Search</button>
+        <div class="control-group">
+            <div class="controls">
+                <button data-bind="click: Job.search, disable: Job.status()==='searching'" type="submit" class="btn btn-danger">Search</button>
+            </div>
         </div>
-    </div>
     </div>
 </form>

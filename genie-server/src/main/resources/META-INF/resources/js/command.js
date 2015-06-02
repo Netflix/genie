@@ -134,6 +134,10 @@ define([
             });
         };
 
+        self.showForm = function() {
+            self.status('searchAndResults');
+        }
+
         self.search = function() {
             var d = new Date();
             self.searchResults([]);
