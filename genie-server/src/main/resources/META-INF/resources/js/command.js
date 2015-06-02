@@ -172,12 +172,12 @@ define([
                         commandObj.idLink  = $("<div />").append($("<a />", {
                             href : '/#command/details/'+commandObj.id,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/folder_red_open.png', class: 'genie-icon'}))).html();
 
                         commandObj.rawLink  = $("<div />").append($("<a />", {
                             href : "genie/v2/config/commands/" + commandObj.id,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
                         var createdDt = new Date(commandObj.created);
                         commandObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');

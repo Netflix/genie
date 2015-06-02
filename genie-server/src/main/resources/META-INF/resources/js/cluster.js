@@ -159,12 +159,12 @@ define([
                         clusterObj.idLink  = $("<div />").append($("<a />", {
                             href : '/#cluster/details/'+clusterObj.id,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/folder_red_open.png', class: 'genie-icon'}))).html();
 
                         clusterObj.rawLink  = $("<div />").append($("<a />", {
                             href : "genie/v2/config/clusters/" + clusterObj.id,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
                         var createdDt = new Date(clusterObj.created);
                         clusterObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');

@@ -1,5 +1,7 @@
 <div data-bind="visible: $root.Cluster.status()==='results' && $root.page()==='#cluster/search'">
-    <button class="btn, btn-danger" type="submit" data-bind="click: Cluster.showForm"> Display Search Form </button>
+    <button class="btn, btn-danger" type="submit" data-bind="click: Cluster.showForm">
+        <i class="icon-white icon-search"></i> Search Form
+    </button>
 </div>
 <div data-bind="visible: ($root.Cluster.status()==='results' || $root.Cluster.status()==='searchAndResults') && $root.page()==='#cluster/search'" class="search-results-counter">
     <h3 style="font-family:cursive"><span data-bind="text: $root.Cluster.searchResults().length"></span> results (<span data-bind="text: $root.Cluster.searchDateTime()"></span>)</h3>

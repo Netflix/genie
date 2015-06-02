@@ -1,5 +1,7 @@
 <div data-bind="visible: $root.Command.status()==='results' && $root.page()==='#command/search'">
-    <button class="btn, btn-danger" type="submit" data-bind="click: Command.showForm"> Display Search Form </button>
+    <button class="btn, btn-danger" type="submit" data-bind="click: Command.showForm">
+        <i class="icon-white icon-search"></i> Search Form
+    </button>
 </div>
 <div data-bind="visible: ($root.Command.status()==='results' || $root.Command.status()==='searchAndResults') && $root.page()==='#command/search'" class="search-results-counter">
     <h3 style="font-family:cursive"><span data-bind="text: $root.Command.searchResults().length"></span> results (<span data-bind="text: $root.Command.searchDateTime()"></span>)</h3>

@@ -168,12 +168,12 @@ define([
                         jobObj.idLink  = $("<div />").append($("<a />", {
                             href : jobObj.outputURI,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/folder_red_open.png', class: 'genie-icon'}))).html();
 
                         jobObj.rawLink  = $("<div />").append($("<a />", {
                             href : "genie/v2/jobs/" + jobObj.id,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/json_logo.png', class: 'json-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
                         var startDt = new Date(jobObj.created);
                         jobObj.startTimeFormatted = moment(startDt).format('MM/DD/YYYY HH:mm:ss');
