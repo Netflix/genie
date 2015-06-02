@@ -47,8 +47,8 @@ public class TestJobSpecs {
     private static final String USER_NAME = "tgianos";
     private static final String CLUSTER_NAME = "hprod2";
     private static final String CLUSTER_ID = "prod";
-    private static final String COMMAND_NAME="pig";
-    private static final String COMMAND_ID="pig14";
+    private static final String COMMAND_NAME = "pig";
+    private static final String COMMAND_ID = "pig14";
     private static final Set<String> TAGS = new HashSet<>();
     private static final Set<JobStatus> STATUSES = new HashSet<>();
     private static final String TAG = UUID.randomUUID().toString();

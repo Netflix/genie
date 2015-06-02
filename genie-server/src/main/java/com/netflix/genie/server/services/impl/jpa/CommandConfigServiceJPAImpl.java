@@ -22,8 +22,18 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.*;
-import com.netflix.genie.server.repository.jpa.*;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.CommandStatus;
+import com.netflix.genie.common.model.ClusterStatus;
+import com.netflix.genie.common.model.Command_;
+
+import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.repository.jpa.ApplicationRepository;
+import com.netflix.genie.server.repository.jpa.ClusterRepository;
+import com.netflix.genie.server.repository.jpa.CommandSpecs;
+import com.netflix.genie.server.repository.jpa.ClusterSpecs ;
 import com.netflix.genie.server.services.CommandConfigService;
 
 import java.util.ArrayList;

@@ -32,7 +32,6 @@ import com.netflix.genie.common.model.CommandStatus;
 
 import com.netflix.genie.server.repository.jpa.*;
 import com.netflix.genie.server.services.ClusterConfigService;
-import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +49,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.JpaSort;
+
 import org.springframework.transaction.annotation.Transactional;
 
 /**
