@@ -327,3 +327,7 @@ table th {
 .site-footer-dev {
     background-color: grey;
 }
+
+.paginate_button > a {
+    color:#da4f49;
+}

@@ -109,6 +109,10 @@ define([
             });
         };
 
+        self.showForm = function() {
+            self.status('searchAndResults');
+        }
+
         self.search = function() {
             var d = new Date();
             self.searchResults([]);
@@ -180,7 +184,7 @@ define([
                         if (jobObj.status != 'RUNNING') {
                             jobObj.endTimeFormatted = moment (endDt).format('MM/DD/YYYY HH:mm:ss');
                             //jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] hh:mm:ss", {trim: false});
-                            jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] h[h] m[m] s[s]");
+                            jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] h[h] m[m] s[s]", {trim:false});
                         } else {
                             jobObj.endTimeFormatted = '';
                             jobObj.diffTimeFormatted ='';

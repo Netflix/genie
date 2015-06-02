@@ -1,5 +1,6 @@
 <!--<h3>Search Jobs</h3>-->
 <form class="form-horizontal search-form" id="jobSearchForm" data-bind="submit: Job.search">
+    <div data-bind="visible: $root.Job.status()!=='results' || $root.Job.status()==='searchAndResults'">
     <div class="control-group">
         <label class="control-label">Username:</label>
         <div class="controls">
@@ -87,5 +88,6 @@
         <div class="controls">
             <button data-bind="click: Job.search, disable: Job.status()==='searching'" type="submit" class="btn btn-danger">Search</button>
         </div>
+    </div>
     </div>
 </form>
