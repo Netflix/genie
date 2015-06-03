@@ -80,7 +80,8 @@ define([
         self.selectedTags = ko.observableArray();
         self.clusterOrderByFields = ko.observableArray(['user','started','created','id','name','status']);
         self.clusterOrderBySelectedFields = ko.observableArray();
-        
+        self.displayForm = ko.observable(true);
+
         self.runningClusterCount = ko.computed(function() {
             return _.reduce(self.runningClusters(), function(sum, obj, index) { return sum + obj.count; }, 0);
         }, self);
@@ -122,7 +123,11 @@ define([
         };
 
         self.showForm = function() {
-            self.status('searchAndResults');
+            self.displayForm(true);
+        }
+
+        self.hideForm = function() {
+            self.displayForm(false);
         }
 
         self.search = function() {
@@ -153,6 +158,7 @@ define([
             }).done(function(data) {
             	self.searchResults([]);
                 self.status('results');
+                self.displayForm(false);
                 if (data instanceof Array) {
                     _.each(data, function(clusterObj, index) {
 

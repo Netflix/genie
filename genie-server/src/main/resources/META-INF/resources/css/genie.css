@@ -331,3 +331,8 @@ table th {
 .paginate_button > a {
     color:#000000;
 }
+
+.showhide {
+    margin-left: -5px;
+    padding-bottom: 10px;
+}

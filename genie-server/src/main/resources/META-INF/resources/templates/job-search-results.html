@@ -1,12 +1,8 @@
+<!--<div data-bind="visible: $root.Job.status()==='results' && $root.page()==='#job/search'">-->
+<div data-bind="visible: $root.Job.status()==='results' && $root.page()==='#job/search'" class="search-results-counter">
+    <h3><span data-bind="text: $root.Job.searchResults().length"></span> Results (<span data-bind="text: $root.Job.searchDateTime()"></span>)</h3>
+</div>
 <div data-bind="visible: $root.Job.status()==='results' && $root.page()==='#job/search'">
-    <button class="btn, btn-danger" type="submit" data-bind="click: Job.showForm">
-        <i class="icon-white icon-search"></i> Search Form
-    </button>
-</div>
-<div data-bind="visible: ($root.Job.status()==='results' || $root.Job.status()==='searchAndResults') && $root.page()==='#job/search'" class="search-results-counter">
-    <h3 style="font-family:cursive"><span data-bind="text: $root.Job.searchResults().length"></span> Results (<span data-bind="text: $root.Job.searchDateTime()"></span>)</h3>
-</div>
-<div data-bind="visible: ($root.Job.status()==='results' || $root.Job.status()==='searchAndResults') && $root.page()==='#job/search'">
         <table  id="jobDataTable" class="table table-striped table-bordered table-hover table-responsive">
         <thead>
             <tr>

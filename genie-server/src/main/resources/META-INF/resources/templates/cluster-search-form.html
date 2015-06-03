@@ -1,5 +1,15 @@
 <form class="form-horizontal search-form" id="clusterSearchForm" data-bind="submit: Cluster.search">
-    <div data-bind="visible: $root.Cluster.status()!=='results' || $root.Cluster.status()==='searchAndResults'">
+    <div class="showhide" data-bind="visible: $root.page()==='#cluster/search' && !$root.Cluster.displayForm()">
+        <a href="#" data-bind="click: Cluster.showForm">
+            <img src="../images/plusicon.png", class="genie-icon">
+        </a>Show Search Form
+    </div>
+    <div class="showhide" data-bind="visible: $root.page()==='#cluster/search' && $root.Cluster.displayForm()">
+        <a href="#" data-bind="click: Cluster.hideForm">
+            <img src="../images/minusicon.png", class="genie-icon">
+        </a>Hide Search Form
+    </div>
+    <div data-bind="visible: $root.Cluster.displayForm()">
         <div class="control-group">
             <label class="control-label">Name:</label>
             <div class="controls">
@@ -50,7 +60,7 @@
         </div>
         <div class="control-group">
             <div class="controls">
-                <button data-bind="click: Cluster.search, disable: Cluster.status()==='searching'" type="submit" class="btn btn-danger">Search</button>
+                <button data-bind="click: Cluster.search, disable: Cluster.status()==='searching'" type="submit" class="btn btn-default">Search</button>
             </div>
         </div>
     </div>

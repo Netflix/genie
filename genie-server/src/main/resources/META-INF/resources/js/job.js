@@ -82,6 +82,7 @@ define([
         }, self);
         self.jobOrderByFields = ko.observableArray(['user','started','created','id','name','status','executionClusterName','executionClusterId']);
         self.jobOrderBySelectedFields = ko.observableArray();
+        self.displayForm = ko.observable(true);
 
         self.startup = function() {
             self.runningJobs([]);
@@ -110,7 +111,11 @@ define([
         };
 
         self.showForm = function() {
-            self.status('searchAndResults');
+            self.displayForm(true);
+        }
+
+        self.hideForm = function() {
+            self.displayForm(false);
         }
 
         self.search = function() {
@@ -158,6 +163,7 @@ define([
             }).done(function(data) {
                 self.searchResults([]);
                 self.status('results');
+                self.displayForm(false);
                 // check to see if jobInfo is an array
                 if (data instanceof Array) {
                     _.each(data, function(jobObj, index) {
