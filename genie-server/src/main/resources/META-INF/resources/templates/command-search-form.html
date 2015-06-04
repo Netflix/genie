@@ -1,12 +1,12 @@
 <form class="form-horizontal search-form" id="commandSearchForm" data-bind="submit: Command.search">
     <div class="showhide" data-bind="visible: $root.page()==='#command/search' && !$root.Command.displayForm()">
         <a href="#" data-bind="click: Command.showForm">
-            <img src="../images/plusicon.png", class="genie-icon">
+            <img src="../images/plus.svg", class="open-icon">
         </a>Show Search Form
     </div>
     <div class="showhide"  data-bind="visible: $root.page()==='#command/search' && $root.Command.displayForm()">
         <a href="#" data-bind="click: Command.hideForm">
-            <img src="../images/minusicon.png", class="genie-icon">
+            <img src="../images/minus.svg", class="open-icon">
         </a>Hide Search Form
     </div>
     <div data-bind="visible: $root.Command.displayForm()">
