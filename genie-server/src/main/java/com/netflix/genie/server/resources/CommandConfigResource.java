@@ -967,7 +967,7 @@ public final class CommandConfigResource {
             }
         }
 
-        return this.commandConfigService.getClustersForCommand(id,enumStatuses);
+        return this.commandConfigService.getClustersForCommand(id, enumStatuses);
     }
 
     /**
