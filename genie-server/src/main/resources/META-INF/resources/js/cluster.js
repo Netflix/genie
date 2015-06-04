@@ -165,7 +165,7 @@ define([
                         clusterObj.idLink  = $("<div />").append($("<a />", {
                             href : '/#cluster/details/'+clusterObj.id,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/folder_red_open.png', class: 'genie-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/folder.svg', class: 'open-icon'}))).html();
 
                         clusterObj.rawLink  = $("<div />").append($("<a />", {
                             href : "genie/v2/config/clusters/" + clusterObj.id,
