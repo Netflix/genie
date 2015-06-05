@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
 
@@ -29,27 +28,28 @@ import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.ClusterStatus;
+import com.netflix.genie.common.model.CommandStatus;
 
-import com.netflix.genie.server.repository.jpa.ClusterRepository;
-import com.netflix.genie.server.repository.jpa.ClusterSpecs;
-import com.netflix.genie.server.repository.jpa.CommandRepository;
-import com.netflix.genie.server.repository.jpa.JobRepository;
+import com.netflix.genie.server.repository.jpa.*;
 import com.netflix.genie.server.services.ClusterConfigService;
-import org.springframework.data.domain.Sort.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -59,32 +59,34 @@ import org.springframework.transaction.annotation.Transactional;
  * @author amsharma
  * @author tgianos
  */
-@Named
-@Transactional(rollbackFor = GenieException.class)
+@Transactional(
+        rollbackFor = {
+                GenieException.class,
+                ConstraintViolationException.class
+        }
+)
 public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceJPAImpl.class);
-
-    @PersistenceContext
-    private EntityManager em;
-
+    private static final char CRITERIA_DELIMITER = ',';
     private final ClusterRepository clusterRepo;
     private final CommandRepository commandRepo;
     private final JobRepository jobRepo;
-    private static final char CRITERIA_DELIMITER = ',';
+    @PersistenceContext
+    private EntityManager em;
 
     /**
      * Default constructor - initialize all required dependencies.
      *
      * @param clusterRepo The cluster repository to use.
-     * @param commandRepo the command repository to use.
+     * @param commandRepo The command repository to use.
      * @param jobRepo     The job repository to use.
      */
-    @Inject
     public ClusterConfigServiceJPAImpl(
             final ClusterRepository clusterRepo,
             final CommandRepository commandRepo,
-            final JobRepository jobRepo) {
+            final JobRepository jobRepo
+    ) {
         this.clusterRepo = clusterRepo;
         this.commandRepo = commandRepo;
         this.jobRepo = jobRepo;
@@ -94,12 +96,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    public Cluster createCluster(final Cluster cluster) throws GenieException {
-        if (cluster == null) {
-            throw new GeniePreconditionException("No cluster entered. Unable to validate.");
-        }
-        cluster.validate();
-
+    public Cluster createCluster(
+            @NotNull(message = "No cluster entered. Unable to create.")
+            @Valid
+            final Cluster cluster
+    ) throws GenieException {
         LOG.debug("Called to create cluster " + cluster.toString());
         if (StringUtils.isEmpty(cluster.getId())) {
             cluster.setId(UUID.randomUUID().toString());
@@ -116,10 +117,10 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Cluster getCluster(final String id) throws GenieException {
-        if (StringUtils.isEmpty(id)) {
-            throw new GeniePreconditionException("No id entered.");
-        }
+    public Cluster getCluster(
+            @NotBlank(message = "No id entered. Unable to get.")
+            final String id
+    ) throws GenieException {
         LOG.debug("Called with id " + id);
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
@@ -141,15 +142,14 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final Long minUpdateTime,
             final Long maxUpdateTime,
             final int page,
-            final int limit) {
-
+            final int limit,
+            final boolean descending,
+            final Set<String> orderBys
+    ) {
         LOG.debug("called");
 
-        final PageRequest pageRequest = new PageRequest(
-                page < 0 ? 0 : page,
-                limit < 1 ? 1024 : limit,
-                Direction.DESC,
-                Cluster_.updated.getName()
+        final PageRequest pageRequest = JPAUtils.getPageRequest(
+                page, limit, descending, orderBys, Cluster_.class, Cluster_.updated.getName()
         );
 
         @SuppressWarnings("unchecked")
@@ -170,12 +170,10 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     @Override
     @Transactional(readOnly = true)
     public List<Cluster> chooseClusterForJob(
-            final String jobId) throws GenieException {
+            @NotBlank(message = "No job id entered. Unable to continue.")
+            final String jobId
+    ) throws GenieException {
         LOG.debug("Called");
-        if (StringUtils.isBlank(jobId)) {
-            throw new GeniePreconditionException("No job id entered. Unable to continue"
-            );
-        }
         final Job job = this.jobRepo.findOne(jobId);
         if (job == null) {
             throw new GenieNotFoundException("No job with id " + jobId + " exists. Unable to continue."
@@ -195,7 +193,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             );
 
             if (!clusters.isEmpty()) {
-                // Add the succesfully criteria to the job object in string form.
+                // Add the successfully criteria to the job object in string form.
                 job.setChosenClusterCriteriaString(
                         StringUtils.join(
                                 clusterCriteria.getTags(),
@@ -215,15 +213,12 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public Cluster updateCluster(
+            @NotBlank(message = "No cluster id entered. Unable to update.")
             final String id,
-            final Cluster updateCluster) throws GenieException {
+            @NotNull(message = "No cluster information entered. Unable to update.")
+            final Cluster updateCluster
+    ) throws GenieException {
         LOG.debug("Called with id " + id + " and cluster " + updateCluster);
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to update.");
-        }
-        if (updateCluster == null) {
-            throw new GeniePreconditionException("No cluster information entered. Unable to update.");
-        }
         if (!this.clusterRepo.exists(id)) {
             throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
@@ -236,19 +231,30 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         if (StringUtils.isBlank(updateCluster.getId())) {
             updateCluster.setId(id);
         }
-        final Cluster cluster = this.em.merge(updateCluster);
-        cluster.validate();
-        return cluster;
+        return this.em.merge(updateCluster);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cluster deleteCluster(final String id) throws GenieException {
-        if (StringUtils.isEmpty(id)) {
-            throw new GeniePreconditionException("No id entered unable to delete.");
+    public List<Cluster> deleteAllClusters() throws GenieException {
+        LOG.debug("Called to delete all clusters");
+        final List<Cluster> clusters = this.clusterRepo.findAll();
+        for (final Cluster cluster : clusters) {
+            this.deleteCluster(cluster.getId());
         }
+        return clusters;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cluster deleteCluster(
+            @NotBlank(message = "No id entered unable to delete.")
+            final String id
+    ) throws GenieException {
         LOG.debug("Called");
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster == null) {
@@ -271,28 +277,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    public List<Cluster> deleteAllClusters() throws GenieException {
-        LOG.debug("Called to delete all clusters");
-        final List<Cluster> clusters = this.clusterRepo.findAll();
-        for (final Cluster cluster : clusters) {
-            this.deleteCluster(cluster.getId());
-        }
-        return clusters;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Set<String> addConfigsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to add configurations.")
             final String id,
-            final Set<String> configs) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to add configurations.");
-        }
-        if (configs == null) {
-            throw new GeniePreconditionException("No configuration files entered.");
-        }
+            @NotEmpty(message = "No configuration files entered. Unable to add.")
+            final Set<String> configs
+    ) throws GenieException {
+        LOG.debug("called");
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getConfigs().addAll(configs);
@@ -308,13 +299,10 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForCluster(
-            final String id)
-            throws GenieException {
-
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id sent. Cannot retrieve configurations.");
-        }
-
+            @NotBlank(message = "No cluster id sent. Cannot retrieve configurations.")
+            final String id
+    ) throws GenieException {
+        LOG.debug("called");
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             return cluster.getConfigs();
@@ -328,11 +316,12 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public Set<String> updateConfigsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to update configurations.")
             final String id,
-            final Set<String> configs) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to update configurations.");
-        }
+            @NotEmpty(message = "No configs entered. Unable to update.")
+            final Set<String> configs
+    ) throws GenieException {
+        LOG.debug("called with id " + id + " and configs " + configs);
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.setConfigs(configs);
@@ -347,14 +336,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public List<Command> addCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to add commands.")
             final String id,
-            final List<Command> commands) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to add commands.");
-        }
-        if (commands == null) {
-            throw new GeniePreconditionException("No commands entered. Unable to add commands.");
-        }
+            @NotEmpty(message = "No commands entered. Unable to add commands.")
+            final List<Command> commands
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             for (final Command detached : commands) {
@@ -377,13 +363,26 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     @Override
     @Transactional(readOnly = true)
     public List<Command> getCommandsForCluster(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to get commands.");
-        }
+            @NotBlank(message = "No cluster id entered. Unable to get commands.")
+            final String id,
+            final Set<CommandStatus> statuses
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
+        List<Command> filteredCommandList = new ArrayList<Command>();
+
         if (cluster != null) {
-            return cluster.getCommands();
+            List<Command> commands = cluster.getCommands();
+            if (statuses != null) {
+                for (Command command: commands) {
+                    if (statuses.contains(command.getStatus())) {
+                        filteredCommandList.add(command);
+                    }
+                }
+                return filteredCommandList;
+            } else {
+                return commands;
+            }
+
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
@@ -395,14 +394,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     @Override
     //TODO: Shares a lot of code with the add, should be able to refactor
     public List<Command> updateCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to update commands.")
             final String id,
-            final List<Command> commands) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to update commands.");
-        }
-        if (commands == null) {
-            throw new GeniePreconditionException("No commands entered. Unable to add commands.");
-        }
+            @NotEmpty(message = "No commands entered. Unable to add commands.")
+            final List<Command> commands
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             final List<Command> cmds = new ArrayList<>();
@@ -426,10 +422,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public List<Command> removeAllCommandsForCluster(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to remove commands.");
-        }
+            @NotBlank(message = "No cluster id entered. Unable to remove commands.")
+            final String id
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             final List<Command> cmdList = new ArrayList<>();
@@ -448,14 +443,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public List<Command> removeCommandForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to remove command.")
             final String id,
-            final String cmdId) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to remove command.");
-        }
-        if (StringUtils.isBlank(cmdId)) {
-            throw new GeniePreconditionException("No command id entered. Unable to remove command.");
-        }
+            @NotBlank(message = "No command id entered. Unable to remove command.")
+            final String cmdId
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             final Command cmd = this.commandRepo.findOne(cmdId);
@@ -475,14 +467,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public Set<String> addTagsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to add tags.")
             final String id,
-            final Set<String> tags) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to add tags.");
-        }
-        if (tags == null) {
-            throw new GeniePreconditionException("No tags entered.");
-        }
+            @NotEmpty(message = "No tags entered. Unable to add to tags.")
+            final Set<String> tags
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getTags().addAll(tags);
@@ -498,13 +487,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getTagsForCluster(
-            final String id)
-            throws GenieException {
-
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id sent. Cannot retrieve tags.");
-        }
-
+            @NotBlank(message = "No cluster id sent. Cannot retrieve tags.")
+            final String id
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             return cluster.getTags();
@@ -518,11 +503,11 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public Set<String> updateTagsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to update tags.")
             final String id,
-            final Set<String> tags) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to update tags.");
-        }
+            @NotEmpty(message = "No tags entered. Unable to update.")
+            final Set<String> tags
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.setTags(tags);
@@ -537,10 +522,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public Set<String> removeAllTagsForCluster(
-            final String id) throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to remove tags.");
-        }
+            @NotBlank(message = "No cluster id entered. Unable to remove tags.")
+            final String id
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getTags().clear();
@@ -554,12 +538,12 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeTagForCluster(final String id, final String tag)
-            throws GenieException {
-        if (StringUtils.isBlank(id)) {
-            throw new GeniePreconditionException("No cluster id entered. Unable to remove tag.");
-        }
-
+    public Set<String> removeTagForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to remove tag.")
+            final String id,
+            @NotBlank(message = "No tag entered. Unable to remove.")
+            final String tag
+    ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             if (StringUtils.isNotBlank(tag)) {

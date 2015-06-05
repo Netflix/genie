@@ -75,6 +75,10 @@ class V2Api(object):
 
             limit, int: Max number of results per page. (optional)
 
+            descending, bool: Whether results should be sorted in descending. Defaults to true. (optional)
+
+            orderBy, str: The fields to order the results by, must not be collection fields. (optional)
+
             
 
         Returns: Array[Cluster]
@@ -110,6 +114,10 @@ class V2Api(object):
             queryParams['page'] = self.apiClient.toPathValue(params['page'])
         if ('limit' in params):
             queryParams['limit'] = self.apiClient.toPathValue(params['limit'])
+        if ('descending' in params):
+            queryParams['descending'] = self.apiClient.toPathValue(params['descending'])
+        if ('orderBy' in params):
+            queryParams['orderBy'] = self.apiClient.toPathValue(params['orderBy'])
         postData = (params['body'] if 'body' in params else None)
 
         response = self.apiClient.callAPI(resourcePath, method, queryParams,
@@ -909,6 +917,10 @@ class V2Api(object):
 
             limit, int: Max number of results per page. (optional)
 
+            descending, bool: Whether results should be sorted in descending. Defaults to true. (optional)
+
+            orderBy, str: The fields to order the results by, must not be collection fields. (optional)
+
             
 
         Returns: Array[Command]
@@ -942,6 +954,10 @@ class V2Api(object):
             queryParams['page'] = self.apiClient.toPathValue(params['page'])
         if ('limit' in params):
             queryParams['limit'] = self.apiClient.toPathValue(params['limit'])
+        if ('descending' in params):
+            queryParams['descending'] = self.apiClient.toPathValue(params['descending'])
+        if ('orderBy' in params):
+            queryParams['orderBy'] = self.apiClient.toPathValue(params['orderBy'])
         postData = (params['body'] if 'body' in params else None)
 
         response = self.apiClient.callAPI(resourcePath, method, queryParams,
@@ -1827,6 +1843,10 @@ class V2Api(object):
 
             limit, int: Max number of results per page. (optional)
 
+            descending, bool: Whether results should be sorted in descending. Defaults to true. (optional)
+
+            orderBy, str: The fields to order the results by, must not be collection fields. (optional)
+
             
 
         Returns: Array[Job]
@@ -1867,6 +1887,10 @@ class V2Api(object):
             queryParams['page'] = self.apiClient.toPathValue(params['page'])
         if ('limit' in params):
             queryParams['limit'] = self.apiClient.toPathValue(params['limit'])
+        if ('descending' in params):
+            queryParams['descending'] = self.apiClient.toPathValue(params['descending'])
+        if ('orderBy' in params):
+            queryParams['orderBy'] = self.apiClient.toPathValue(params['orderBy'])
         postData = (params['body'] if 'body' in params else None)
 
         response = self.apiClient.callAPI(resourcePath, method, queryParams,
@@ -2280,6 +2304,10 @@ class V2Api(object):
 
             limit, int: Max number of results per page. (optional)
 
+            descending, bool: Whether results should be sorted in descending. Defaults to true. (optional)
+
+            orderBy, str: The fields to order the results by, must not be collection fields. (optional)
+
             
 
         Returns: Array[Application]
@@ -2313,6 +2341,10 @@ class V2Api(object):
             queryParams['page'] = self.apiClient.toPathValue(params['page'])
         if ('limit' in params):
             queryParams['limit'] = self.apiClient.toPathValue(params['limit'])
+        if ('descending' in params):
+            queryParams['descending'] = self.apiClient.toPathValue(params['descending'])
+        if ('orderBy' in params):
+            queryParams['orderBy'] = self.apiClient.toPathValue(params['orderBy'])
         postData = (params['body'] if 'body' in params else None)
 
         response = self.apiClient.callAPI(resourcePath, method, queryParams,

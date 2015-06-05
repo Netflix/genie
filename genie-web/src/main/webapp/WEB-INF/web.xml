@@ -1,6 +1,24 @@
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Copyright 2015 Netflix, Inc.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+-->
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
  
     <context-param>
         <param-name>contextConfigLocation</param-name>
@@ -30,7 +48,6 @@
             <param-value>
                 com.netflix.genie.server,
                 com.netflix.appinfo,
-                com.wordnik.swagger.jersey.listing,
                 com.fasterxml.jackson.jaxrs.json
             </param-value>
         </init-param>
@@ -39,26 +56,6 @@
             <param-value>com.netflix.genie.server.resources.GenieResponseFilter</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet>
-        <servlet-name>JerseyJaxrsConfig</servlet-name>
-        <servlet-class>com.wordnik.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>
-        <init-param>
-            <param-name>api.version</param-name>
-            <param-value>2.1.2</param-value>
-        </init-param>
-        <init-param>
-            <param-name>swagger.api.basepath</param-name>
-            <param-value>http://localhost:7001/genie</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
-    
-    <servlet>
-        <servlet-name>SwaggerBootstrap</servlet-name>
-        <servlet-class>com.netflix.genie.server.startup.GenieSwaggerBootstrap</servlet-class>
-        <load-on-startup>3</load-on-startup>
     </servlet>
 
     <servlet-mapping>

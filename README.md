@@ -6,7 +6,7 @@
 ## Introduction
 
 Genie is a federated job execution engine developed by Netflix. Genie provides REST-ful APIs to run a variety of big
-data jobs like Hadoop, Pig, Hive, Presto, Sqoop and more. It also provides APIs for managing many distributed
+data jobs like Hadoop, Pig, Hive, Spark, Presto, Sqoop and more. It also provides APIs for managing many distributed
 processing cluster configurations and the commands and applications which run on them.
 
 ## Documentation
@@ -35,6 +35,11 @@ Please see the [ZeroToDocker](https://github.com/Netflix-Skunkworks/zerotodocker
 (https://github.com/Netflix-Skunkworks/zerotodocker/wiki/Genie) of an end to end example in [Docker]
 (https://www.docker.com/).
 
+## API Validation
+
+[![Swagger Validation](http://online.swagger.io/validator?url=http://netflix.github.io/genie/docs/rest/swagger.json)]
+(http://netflix.github.io/genie/docs/rest/swagger.json)
+
 ## Builds
 
 Genie builds are hosted on CloudBees [here](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/).
@@ -43,7 +48,6 @@ Genie builds are hosted on CloudBees [here](https://netflixoss.ci.cloudbees.com/
 |:------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 |      Snapshots     |      [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/)      |
 |    Pull Requests   | [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/) |
-| Release Candidates |     [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-candidate/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-candidate/)     |
 |      Releases      |       [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/)       |
 
 ## Support

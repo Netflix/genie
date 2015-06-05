@@ -18,17 +18,12 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import java.util.Set;
 
 /**
@@ -38,10 +33,7 @@ import java.util.Set;
  * @author tgianos
  */
 @MappedSuperclass
-@ApiModel(value = "Command Fields for all Entities")
 public class CommonEntityFields extends Auditable {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CommonEntityFields.class);
 
     /**
      * The namespace to use for genie specific tags.
@@ -71,6 +63,7 @@ public class CommonEntityFields extends Auditable {
             value = "The version number",
             required = true
     )
+    @NotBlank(message = "Version is missing and is required.")
     private String version;
 
     /**
@@ -81,6 +74,7 @@ public class CommonEntityFields extends Auditable {
             value = "User who created/owns this object",
             required = true
     )
+    @NotBlank(message = "User name is missing and is required.")
     private String user;
 
     /**
@@ -91,6 +85,7 @@ public class CommonEntityFields extends Auditable {
             value = "The name to use",
             required = true
     )
+    @NotBlank(message = "Name is missing and is required.")
     private String name;
 
     /**
@@ -115,17 +110,6 @@ public class CommonEntityFields extends Auditable {
         this.name = name;
         this.user = user;
         this.version = version;
-    }
-
-    /**
-     * Before modifying database make sure everything is ok.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @PrePersist
-    @PreUpdate
-    protected void onCreateOrUpdateCommonEntityFields() throws GeniePreconditionException {
-        this.validate(this.name, this.user, this.version, null);
     }
 
     /**
@@ -181,20 +165,6 @@ public class CommonEntityFields extends Auditable {
      */
     public void setName(final String name) {
         this.name = name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validate() throws GeniePreconditionException {
-        String error = null;
-        try {
-            super.validate();
-        } catch (final GeniePreconditionException ge) {
-            error = ge.getMessage();
-        }
-        this.validate(this.name, this.user, this.version, error);
     }
 
     /**
@@ -262,39 +232,6 @@ public class CommonEntityFields extends Auditable {
                             + MAX_TAG_GENIE_NAMESPACE
                             + ")."
             );
-        }
-    }
-
-    /**
-     * Helper method for checking the validity of required parameters.
-     *
-     * @param name The name of the application
-     * @param user The user who created the application
-     * @throws GeniePreconditionException
-     */
-    private void validate(
-            final String name,
-            final String user,
-            final String version,
-            final String error) throws GeniePreconditionException {
-        final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(error)) {
-            builder.append(error);
-        }
-        if (StringUtils.isBlank(user)) {
-            builder.append("User name is missing and is required.\n");
-        }
-        if (StringUtils.isBlank(name)) {
-            builder.append("Name is missing and is required.\n");
-        }
-        if (StringUtils.isBlank(version)) {
-            builder.append("Version is missing and is required.\n");
-        }
-        if (builder.length() > 0) {
-            builder.insert(0, "CommonEntityFields configuration errors:\n");
-            final String msg = builder.toString();
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
         }
     }
 }

@@ -1,5 +1,5 @@
-plugins {
-    id 'nebula.provided-base' version '2.2.0'
+license {
+    excludes (["META-INF/resources/*"])
 }
 
 dependencies {
@@ -33,7 +33,7 @@ dependencies {
     compile ("com.google.inject.extensions:guice-spring:${guice_version}")
 
     // Swagger Libs
-    compile ("com.wordnik:swagger-jersey-jaxrs_2.10:${swagger_version}") {
+    compile ("com.wordnik:swagger-jersey-jaxrs:${swagger_version}") {
         exclude group: "com.sun.jersey"
         exclude group: "com.sun.jersey.contribs"
     }
@@ -41,6 +41,8 @@ dependencies {
     /*******************************
      * Provided Dependencies
      *******************************/
+
+    provided ("javax.servlet:javax.servlet-api:${servlet_version}")
 
     /*******************************
      * Runtime Dependencies
@@ -73,4 +75,7 @@ dependencies {
     testCompile ("org.springframework:spring-test:${springframework_version}")
     testCompile ("org.dbunit:dbunit:${dbunit_version}")
     testCompile ("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
+
+    testRuntime ("javax.el:javax.el-api:${expression_language_version}")
+    testRuntime ("org.glassfish.web:javax.el:${expression_language_version}")
 }

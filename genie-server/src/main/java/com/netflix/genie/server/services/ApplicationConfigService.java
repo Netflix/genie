@@ -20,8 +20,14 @@ package com.netflix.genie.server.services;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +38,7 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
+@Validated
 public interface ApplicationConfigService {
 
     /**
@@ -42,7 +49,10 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Application createApplication(
-            final Application app) throws GenieException;
+            @NotNull(message = "No application entered to create.")
+            @Valid
+            final Application app
+    ) throws GenieException;
 
     /**
      * Gets application for given id.
@@ -51,7 +61,10 @@ public interface ApplicationConfigService {
      * @return The application if one exists or null if not.
      * @throws GenieException if there is an error
      */
-    Application getApplication(final String id) throws GenieException;
+    Application getApplication(
+            @NotBlank(message = "No id entered. Unable to get")
+            final String id
+    ) throws GenieException;
 
     /**
      * Get applications for given filter criteria.
@@ -69,7 +82,9 @@ public interface ApplicationConfigService {
                                       final Set<ApplicationStatus> statuses,
                                       final Set<String> tags,
                                       final int page,
-                                      final int limit);
+                                      final int limit,
+                                      final boolean descending,
+                                      final Set<String> orderBys);
 
     /**
      * Update an application.
@@ -81,8 +96,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Application updateApplication(
+            @NotBlank(message = "No application id entered. Unable to update.")
             final String id,
-            final Application updateApp) throws GenieException;
+            @NotNull(message = "No application information entered. Unable to update.")
+            final Application updateApp
+    ) throws GenieException;
 
     /**
      * Delete all applications from database.
@@ -99,7 +117,10 @@ public interface ApplicationConfigService {
      * @return The deleted application
      * @throws GenieException if there is an error
      */
-    Application deleteApplication(final String id) throws GenieException;
+    Application deleteApplication(
+            @NotBlank(message = "No application id entered. Unable to delete.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Add a configuration file to the application.
@@ -111,8 +132,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> addConfigsToApplication(
+            @NotBlank(message = "No application id entered. Unable to add configurations.")
             final String id,
-            final Set<String> configs) throws GenieException;
+            @NotEmpty(message = "No configuration files entered.")
+            final Set<String> configs
+    ) throws GenieException;
 
     /**
      * Get the set of configuration files associated with the application with
@@ -124,7 +148,9 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> getConfigsForApplication(
-            final String id) throws GenieException;
+            @NotBlank(message = "No application id entered. Unable to get configs.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Update the set of configuration files associated with the application
@@ -138,8 +164,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> updateConfigsForApplication(
+            @NotBlank(message = "No application id entered. Unable to update configurations.")
             final String id,
-            final Set<String> configs) throws GenieException;
+            @NotNull(message = "No configs entered. Unable to update. If you want, use delete API.")
+            final Set<String> configs
+    ) throws GenieException;
 
     /**
      * Remove all configuration files from the application.
@@ -150,7 +179,9 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> removeAllConfigsForApplication(
-            final String id) throws GenieException;
+            @NotBlank(message = "No application id entered. Unable to remove configs.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Remove a configuration file from the application.
@@ -162,8 +193,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> removeConfigForApplication(
+            @NotBlank(message = "No application id entered. Unable to remove configuration.")
             final String id,
-            final String config) throws GenieException;
+            @NotBlank(message = "No config entered. Unable to remove.")
+            final String config
+    ) throws GenieException;
 
     /**
      * Add a jar file to the application.
@@ -175,8 +209,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> addJarsForApplication(
+            @NotBlank(message = "No application id entered. Unable to add jars.")
             final String id,
-            final Set<String> jars) throws GenieException;
+            @NotEmpty(message = "No jars entered. Unable to add jars.")
+            final Set<String> jars
+    ) throws GenieException;
 
     /**
      * Get the set of jar files associated with the application with given id.
@@ -187,7 +224,9 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> getJarsForApplication(
-            final String id) throws GenieException;
+            @NotBlank(message = "No application id entered. Unable to get jars.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Update the set of jar files associated with the application with given
@@ -200,8 +239,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> updateJarsForApplication(
+            @NotBlank(message = "No application id entered. Unable to update jars.")
             final String id,
-            final Set<String> jars) throws GenieException;
+            @NotNull(message = "No jars entered. Unable to update.")
+            final Set<String> jars
+    ) throws GenieException;
 
     /**
      * Remove all jar files from the application.
@@ -212,7 +254,9 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> removeAllJarsForApplication(
-            final String id) throws GenieException;
+            @NotBlank(message = "No application id entered. Unable to remove jars.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Remove a jar file from the application.
@@ -224,8 +268,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> removeJarForApplication(
+            @NotBlank(message = "No application id entered. Unable to remove jar.")
             final String id,
-            final String jar) throws GenieException;
+            @NotBlank(message = "No jar entiered. Unable to remove jar.")
+            final String jar
+    ) throws GenieException;
 
     /**
      * Add tags to the application.
@@ -237,8 +284,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> addTagsForApplication(
+            @NotBlank(message = "No application id entered. Unable to add tags.")
             final String id,
-            final Set<String> tags) throws GenieException;
+            @NotEmpty(message = "No tags entered. Unable to add.")
+            final Set<String> tags
+    ) throws GenieException;
 
     /**
      * Get the set of tags associated with the application with given
@@ -250,7 +300,9 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> getTagsForApplication(
-            final String id) throws GenieException;
+            @NotBlank(message = "No application id entered. Cannot retrieve tags.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Update the set of tags associated with the application with
@@ -264,8 +316,11 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> updateTagsForApplication(
+            @NotBlank(message = "No application id entered. Unable to update tags.")
             final String id,
-            final Set<String> tags) throws GenieException;
+            @NotNull(message = "No tags entered unable to update tags.")
+            final Set<String> tags
+    ) throws GenieException;
 
     /**
      * Remove all tags from the application.
@@ -276,17 +331,9 @@ public interface ApplicationConfigService {
      * @throws GenieException if there is an error
      */
     Set<String> removeAllTagsForApplication(
-            final String id) throws GenieException;
-
-    /**
-     * Get all the commands the application with given id is associated with.
-     *
-     * @param id The id of the application to get the commands for.
-     * @return The commands the application is a part of.
-     * @throws GenieException if there is an error
-     */
-    Set<Command> getCommandsForApplication(
-            final String id) throws GenieException;
+            @NotBlank(message = "No application id entered. Unable to remove tags.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Remove a tag from the application.
@@ -297,5 +344,24 @@ public interface ApplicationConfigService {
      * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> removeTagForApplication(final String id, final String tag) throws GenieException;
+    Set<String> removeTagForApplication(
+            @NotBlank(message = "No application id entered. Unable to remove tag.")
+            final String id,
+            @NotBlank(message = "No tag entered. Unable to remove.")
+            final String tag
+    ) throws GenieException;
+
+    /**
+     * Get all the commands the application with given id is associated with.
+     *
+     * @param id The id of the application to get the commands for.
+     * @param statuses The status of the commands returned
+     * @return The commands the application is a part of.
+     * @throws GenieException if there is an error
+     */
+    List<Command> getCommandsForApplication(
+            @NotBlank(message = "No application id entered. Unable to get commands.")
+            final String id,
+            final Set<CommandStatus> statuses
+    ) throws GenieException;
 }

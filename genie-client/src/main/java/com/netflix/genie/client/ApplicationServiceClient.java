@@ -83,7 +83,6 @@ public final class ApplicationServiceClient extends BaseGenieClient {
             throw new GeniePreconditionException("No application passed in. Unable to validate.");
         }
 
-        application.validate();
         final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 BASE_CONFIG_APPLICATION_REST_URL,

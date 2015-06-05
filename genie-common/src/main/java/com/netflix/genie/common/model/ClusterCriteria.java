@@ -24,6 +24,7 @@ import java.util.Set;
 
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
-@ApiModel(value = "A set of cluster criteria for a job")
+@ApiModel(description = "A set of cluster criteria for a job.")
 public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;
@@ -43,6 +44,7 @@ public class ClusterCriteria implements Serializable {
             value = "The tags which are ANDed together to select a viable cluster for the job",
             required = true
     )
+    @NotEmpty(message = "No tags passed in to set and are required")
     private Set<String> tags = new HashSet<>();
 
     /**

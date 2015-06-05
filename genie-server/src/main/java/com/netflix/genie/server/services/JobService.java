@@ -20,7 +20,12 @@ package com.netflix.genie.server.services;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +34,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
+@Validated
 public interface JobService {
 
     /**
@@ -38,7 +44,11 @@ public interface JobService {
      * @return The validated/saved job object
      * @throws GenieException if there is an error
      */
-    Job createJob(final Job job) throws GenieException;
+    Job createJob(
+            @NotNull(message = "No job entered. Unable to create.")
+            @Valid
+            final Job job
+    ) throws GenieException;
 
     /**
      * Get job information for given job id.
@@ -47,16 +57,10 @@ public interface JobService {
      * @return the job
      * @throws GenieException if there is an error
      */
-    Job getJob(final String id) throws GenieException;
-
-    /**
-     * Get job status for give job id.
-     *
-     * @param id id for job to look up
-     * @return successful response, or one with HTTP error code
-     * @throws GenieException if there is an error
-     */
-    JobStatus getJobStatus(final String id) throws GenieException;
+    Job getJob(
+            @NotBlank(message = "No id entered. Unable to get job.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Get job info for given filter criteria.
@@ -68,11 +72,15 @@ public interface JobService {
      * @param tags        tags for the job
      * @param clusterName name of cluster for job
      * @param clusterId   id of cluster for job
+     * @param commandName name of the command run in the job
+     * @param commandId   id of the command run in the job
      * @param page        page number for job
      * @param limit       max number of jobs to return
+     * @param descending  Whether the results should be returned in descending or ascending order
+     * @param orderBys    The fields to order the results by
      * @return All jobs which match the criteria
      */
-    List getJobs(
+    List<Job> getJobs(
             final String id,
             final String jobName,
             final String userName,
@@ -80,8 +88,41 @@ public interface JobService {
             final Set<String> tags,
             final String clusterName,
             final String clusterId,
+            final String commandName,
+            final String commandId,
             final int page,
-            final int limit);
+            final int limit,
+            final boolean descending,
+            final Set<String> orderBys
+    );
+
+    /**
+     * Get job status for give job id.
+     *
+     * @param id id for job to look up
+     * @return successful response, or one with HTTP error code
+     * @throws GenieException if there is an error
+     */
+    JobStatus getJobStatus(
+            @NotBlank(message = "No id entered. Unable to get status.")
+            final String id
+    ) throws GenieException;
+
+    /**
+     * Set the status for a given job.
+     *
+     * @param id     The id of the job to fail.
+     * @param status The status to set.
+     * @param msg    The message of the failure.
+     * @throws GenieException if there is an error
+     */
+    void setJobStatus(
+            @NotBlank(message = "No id entered for the job. Unable to update the status.")
+            final String id,
+            @NotNull(message = "No status entered unable to update.")
+            final JobStatus status,
+            final String msg
+    ) throws GenieException;
 
     /**
      * Add tags to the job.
@@ -92,8 +133,11 @@ public interface JobService {
      * @throws GenieException if there is an error
      */
     Set<String> addTagsForJob(
+            @NotBlank(message = "No id entered. Unable to add tags.")
             final String id,
-            final Set<String> tags) throws GenieException;
+            @NotEmpty(message = "No tags entered to add.")
+            final Set<String> tags
+    ) throws GenieException;
 
     /**
      * Get the set of tags associated with the job with given id.
@@ -103,7 +147,9 @@ public interface JobService {
      * @throws GenieException if there is an error
      */
     Set<String> getTagsForJob(
-            final String id) throws GenieException;
+            @NotBlank(message = "No job id entered. Unable to get tags.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Update the set of tags associated with the job with given id.
@@ -114,8 +160,11 @@ public interface JobService {
      * @throws GenieException if there is an error
      */
     Set<String> updateTagsForJob(
+            @NotBlank(message = "No job id entered. Unable to update tags.")
             final String id,
-            final Set<String> tags) throws GenieException;
+            @NotEmpty(message = "No tags entered. Unable to update tags.")
+            final Set<String> tags
+    ) throws GenieException;
 
     /**
      * Remove all tags from the job.
@@ -126,7 +175,9 @@ public interface JobService {
      * @throws GenieException if there is an error
      */
     Set<String> removeAllTagsForJob(
-            final String id) throws GenieException;
+            @NotBlank(message = "No job id entered. Unable to remove tags.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Remove a tag from the job.
@@ -136,7 +187,12 @@ public interface JobService {
      * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> removeTagForJob(final String id, final String tag) throws GenieException;
+    Set<String> removeTagForJob(
+            @NotBlank(message = "No id entered for job. Unable to remove tag.")
+            final String id,
+            @NotBlank(message = "No tag entered. Unable to remove")
+            final String tag
+    ) throws GenieException;
 
     /**
      * Update a job with the last updated time.
@@ -145,17 +201,10 @@ public interface JobService {
      * @return The time in milliseconds when the job was updated.
      * @throws GenieException if there is an error
      */
-    long setUpdateTime(final String id) throws GenieException;
-
-    /**
-     * Set the status for a given job.
-     *
-     * @param id     The id of the job to fail.
-     * @param status The status to set.
-     * @param msg    The message of the failure.
-     * @throws GenieException if there is an error
-     */
-    void setJobStatus(final String id, final JobStatus status, final String msg) throws GenieException;
+    long setUpdateTime(
+            @NotBlank(message = "No job id entered. Unable to set update time.")
+            final String id
+    ) throws GenieException;
 
     /**
      * Set the java process id that will run the given job.
@@ -164,7 +213,11 @@ public interface JobService {
      * @param pid The id of the process that will run the job.
      * @throws GenieException if there is an error
      */
-    void setProcessIdForJob(final String id, final int pid) throws GenieException;
+    void setProcessIdForJob(
+            @NotBlank(message = "No job id entered. Unable to set process id")
+            final String id,
+            final int pid
+    ) throws GenieException;
 
     /**
      * Set the command information for a given job.
@@ -174,7 +227,14 @@ public interface JobService {
      * @param commandName The name of the command used to run the job.
      * @throws GenieException if there is an error
      */
-    void setCommandInfoForJob(final String id, final String commandId, final String commandName) throws GenieException;
+    void setCommandInfoForJob(
+            @NotBlank(message = "No job id entered. Unable to set command info for job.")
+            final String id,
+            @NotBlank(message = "No command id entered. Unable to set command info for job.")
+            final String commandId,
+            @NotBlank(message = "No command name entered. Unable to set command info for job.")
+            final String commandName
+    ) throws GenieException;
 
     /**
      * Set the application information for a given job.
@@ -184,7 +244,14 @@ public interface JobService {
      * @param appName The name of the application used to run the job.
      * @throws GenieException if there is an error
      */
-    void setApplicationInfoForJob(final String id, final String appId, final String appName) throws GenieException;
+    void setApplicationInfoForJob(
+            @NotBlank(message = "No job id entered. Unable to update app info for job.")
+            final String id,
+            @NotBlank(message = "No app id entered. Unable to update app info for job.")
+            final String appId,
+            @NotBlank(message = "No app name entered. unable to update app info for job.")
+            final String appName
+    ) throws GenieException;
 
     /**
      * Set the cluster information for a given job.
@@ -194,7 +261,14 @@ public interface JobService {
      * @param clusterName The name of the cluster used to run the job.
      * @throws GenieException if there is an error
      */
-    void setClusterInfoForJob(final String id, final String clusterId, final String clusterName) throws GenieException;
+    void setClusterInfoForJob(
+            @NotBlank(message = "No job id entered. Unable to update cluster info for job.")
+            final String id,
+            @NotBlank(message = "No cluster id entered. Unable to update cluster info for job.")
+            final String clusterId,
+            @NotBlank(message = "No cluster name entered. Unable to update cluster info for job.")
+            final String clusterName
+    ) throws GenieException;
 
     /**
      * Run the job using a JobLauncher.
@@ -203,5 +277,9 @@ public interface JobService {
      * @return The job object that's returned after launch
      * @throws GenieException if there is an error
      */
-    Job runJob(final Job job) throws GenieException;
+    Job runJob(
+            @NotNull(message = "No job entered unable to run")
+            @Valid
+            final Job job
+    ) throws GenieException;
 }

@@ -18,16 +18,13 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.wordnik.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.StringUtils;
-
 
 /**
  * The available statuses for Commands.
  *
  * @author tgianos
  */
-@ApiModel(value = "Available statuses for a command")
 public enum CommandStatus {
 
     /**

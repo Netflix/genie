@@ -15,18 +15,13 @@
  */
 package com.netflix.genie.server.repository.jpa;
 
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.common.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -84,6 +79,41 @@ public final class CommandSpecs {
                         }
                     }
                 }
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+    }
+
+    /**
+     * Get all the clusters given the specified parameters.
+     *
+     * @param applicationId The id of the application that is registered with these commands
+     * @param statuses The status of the commands
+     * @return The specification
+     */
+    public static Specification<Command> findCommandsForApplication(
+            final String applicationId,
+            final Set<CommandStatus> statuses) {
+        return new Specification<Command>() {
+            @Override
+            public Predicate toPredicate(
+                    final Root<Command> root,
+                    final CriteriaQuery<?> cq,
+                    final CriteriaBuilder cb) {
+                final List<Predicate> predicates = new ArrayList<>();
+                final Join<Command, Application> application = root.join(Command_.application);
+
+                predicates.add(cb.equal(application.get(Application_.id), applicationId));
+
+                if (statuses != null && !statuses.isEmpty()) {
+                    //Could optimize this as we know size could use native array
+                    final List<Predicate> orPredicates = new ArrayList<>();
+                    for (final CommandStatus status : statuses) {
+                        orPredicates.add(cb.equal(root.get(Command_.status), status));
+                    }
+                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                }
+
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };

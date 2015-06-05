@@ -17,12 +17,14 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.validation.ConstraintViolationException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,11 +36,10 @@ import java.util.UUID;
 /**
  * Test case for Job Status utility methods.
  *
- * @author skrishnan
  * @author amsharma
  * @author tgianos
  */
-public class TestJob {
+public class TestJob extends TestEntityBase {
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
     private static final String USER = "tgianos";
@@ -78,7 +79,7 @@ public class TestJob {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @BeforeClass
-    public static void setupClass() throws GeniePreconditionException {
+    public static void setupTestJobClass() throws GeniePreconditionException {
         COMMAND_CRITERIA.add(COMMAND_CRITERIA_1);
         COMMAND_CRITERIA.add(COMMAND_CRITERIA_2);
 
@@ -105,10 +106,11 @@ public class TestJob {
         this.job = new Job(
                 USER,
                 NAME,
+                VERSION,
                 COMMAND_ARGS,
                 COMMAND_CRITERIA,
-                CLUSTER_CRITERIAS,
-                VERSION);
+                CLUSTER_CRITERIAS
+        );
     }
 
     /**
@@ -143,10 +145,11 @@ public class TestJob {
         final Job localJob = new Job(
                 USER,
                 NAME,
+                null,
                 COMMAND_ARGS,
                 COMMAND_CRITERIA,
-                CLUSTER_CRITERIAS,
-                null);
+                CLUSTER_CRITERIAS
+        );
         Assert.assertNull(localJob.getId());
         Assert.assertEquals(NAME, localJob.getName());
         Assert.assertEquals(USER, localJob.getUser());
@@ -169,7 +172,6 @@ public class TestJob {
         Assert.assertNull(this.job.getCommandCriteriaString());
         //Simulate the call stack JPA will make on persist
         this.job.onCreateAuditable();
-        this.job.onCreateOrUpdateCommonEntityFields();
         this.job.onCreateOrUpdateJob();
         Assert.assertNotNull(this.job.getId());
         Assert.assertNotNull(this.job.getClusterCriteriasString());
@@ -190,7 +192,6 @@ public class TestJob {
     public void testOnCreateOrUpdateJobWithNotNullTags() throws GeniePreconditionException {
         Assert.assertNull(this.job.getTags());
         this.job.onCreateAuditable();
-        this.job.onCreateOrUpdateCommonEntityFields();
         this.job.onCreateOrUpdateJob();
         Assert.assertNotNull(this.job.getTags());
         Assert.assertNotNull(this.job.getId());
@@ -688,142 +689,130 @@ public class TestJob {
 
     /**
      * Test Validate ok.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidate() throws GeniePreconditionException {
-        this.job.validate();
+    public void testValidate() {
+        this.validate(this.job);
     }
 
     /**
      * Test validate with exception from super class.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateBadSuperClass() throws GeniePreconditionException {
-        final Job localJob = new Job();
-        localJob.validate();
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateBadSuperClass() throws GenieException {
+        this.validate(new Job());
     }
 
     /**
      * Test validate with null command criteria.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNullCommandCriteria() throws GeniePreconditionException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNullCommandCriteria() {
         final Job localJob = new Job(
                 USER,
                 NAME,
+                VERSION,
                 COMMAND_ARGS,
                 null,
-                CLUSTER_CRITERIAS,
-                VERSION);
-        localJob.validate();
+                CLUSTER_CRITERIAS
+        );
+        this.validate(localJob);
     }
 
     /**
      * Test validate with empty command criteria.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateEmptyCommandCriteria() throws GeniePreconditionException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateEmptyCommandCriteria() {
         final Job localJob = new Job(
                 USER,
                 NAME,
+                VERSION,
                 COMMAND_ARGS,
                 new HashSet<String>(),
-                CLUSTER_CRITERIAS,
-                VERSION);
-        localJob.validate();
+                CLUSTER_CRITERIAS
+        );
+        this.validate(localJob);
     }
 
     /**
      * Test validate with null command args.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNullCommandArgs() throws GeniePreconditionException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNullCommandArgs() {
         final Job localJob = new Job(
                 USER,
                 NAME,
+                VERSION,
                 null,
                 COMMAND_CRITERIA,
-                CLUSTER_CRITERIAS,
-                VERSION);
-        localJob.validate();
+                CLUSTER_CRITERIAS
+        );
+        this.validate(localJob);
     }
 
     /**
      * Test validate with empty command args.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateEmptyCommandArgs() throws GeniePreconditionException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateEmptyCommandArgs() {
         final Job localJob = new Job(
                 USER,
                 NAME,
+                VERSION,
                 "",
                 COMMAND_CRITERIA,
-                CLUSTER_CRITERIAS,
-                VERSION);
-        localJob.validate();
+                CLUSTER_CRITERIAS
+        );
+        this.validate(localJob);
     }
 
     /**
      * Test validate with blank command args.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateBlankCommandArgs() throws GeniePreconditionException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateBlankCommandArgs() {
         final Job localJob = new Job(
                 USER,
                 NAME,
+                VERSION,
                 "  ",
                 COMMAND_CRITERIA,
-                CLUSTER_CRITERIAS,
-                VERSION);
-        localJob.validate();
+                CLUSTER_CRITERIAS
+        );
+        this.validate(localJob);
     }
 
     /**
      * Test validate with null Cluster criteria.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateNullClusterCriteria() throws GeniePreconditionException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNullClusterCriteria() {
         final Job localJob = new Job(
                 USER,
                 NAME,
+                VERSION,
                 COMMAND_ARGS,
                 COMMAND_CRITERIA,
-                null,
-                VERSION);
-        localJob.validate();
+                null
+        );
+        this.validate(localJob);
     }
 
     /**
      * Test validate with empty Cluster criteria.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testValidateEmptyClusterCriteria() throws GeniePreconditionException {
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateEmptyClusterCriteria() {
         final Job localJob = new Job(
                 USER,
                 NAME,
+                VERSION,
                 COMMAND_ARGS,
                 COMMAND_CRITERIA,
-                new ArrayList<ClusterCriteria>(),
-                VERSION);
-        localJob.validate();
+                new ArrayList<ClusterCriteria>()
+        );
+        this.validate(localJob);
     }
 
     /**

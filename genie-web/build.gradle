@@ -1,4 +1,23 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.2'
+    }
+}
+
 apply plugin: 'war'
+apply plugin: 'com.bmuschko.tomcat'
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "project.version": project.getVersion().toString()
+    ]
+}
 
 dependencies {
     /*******************************
@@ -14,11 +33,38 @@ dependencies {
      *******************************/
 
     runtime project(":genie-server")
-    runtime ("com.netflix.karyon:karyon-admin-web:${karyon_version}") {
+    runtime("com.netflix.karyon:karyon-admin-web:${karyon_version}") {
         exclude group: "commons-collections", module: "commons-collections"
+        exclude group: "org.eclipse.jetty.orbit", module: "javax.servlet"
     }
 
     /*******************************
      * Test Dependencies
      *******************************/
+
+    /*******************************
+     * Tomcat Plugin Dependencies
+     *******************************/
+    def tomcat_version = "7.0.62"
+    tomcat("org.apache.tomcat.embed:tomcat-embed-core:${tomcat_version}")
+    tomcat("org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcat_version}")
+    tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcat_version}")
+}
+
+tomcat {
+    contextPath = "/"
+}
+
+def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
+
+[tomcatRun, tomcatRunWar].each { task ->
+    task.doFirst {
+        System.setProperty("archaius.deployment.applicationId", "genie")
+        System.setProperty("archaius.deployment.environment", env)
+    }
+
+    task.doLast {
+        System.clearProperty("archaius.deployment.applicationId")
+        System.clearProperty("archaius.deployment.environment")
+    }
 }

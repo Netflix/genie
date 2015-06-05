@@ -18,7 +18,6 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.wordnik.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -26,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author tgianos
  */
-@ApiModel(value = "Available statuses for an application")
 public enum ApplicationStatus {
 
     /**

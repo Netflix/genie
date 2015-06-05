@@ -1,9 +1,12 @@
+apply plugin: 'groovy'
+
 dependencies {
     /*******************************
      * Compile Dependencies
      *******************************/
 
     compile project(":genie-common")
+    compile ("org.codehaus.groovy:groovy:${groovy_lang_version}")
 
     /*******************************
      * Provided Dependencies
