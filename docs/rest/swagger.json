@@ -2,7 +2,7 @@
   "swagger" : "2.0",
   "info" : {
     "description" : "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more documentation.<br/>Post any issues found <a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
-    "version" : "2.3.0-SNAPSHOT",
+    "version" : "2.2.0",
     "title" : "Genie REST API",
     "contact" : {
       "name" : "Netflix, Inc."
