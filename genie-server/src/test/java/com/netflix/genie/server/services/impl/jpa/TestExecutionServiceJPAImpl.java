@@ -25,9 +25,13 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
+
 import java.util.Calendar;
 import java.util.UUID;
 import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
+
+import com.netflix.genie.server.services.JobService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,18 +48,21 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     private static final String JOB_2_ID = "job2";
     private static final String JOB_3_ID = "job3";
     private static final String JOB_4_ID = "job4";
-//    private static final String JOB_5_ID = "job5";
+    //    private static final String JOB_5_ID = "job5";
     private static final String JOB_6_ID = "job6";
 
     @Inject
     private ExecutionService xs;
+
+    @Inject
+    private JobService jobService;
 
     /**
      * Test submitting a null job.
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testSubmitJobNoJob() throws GenieException {
         this.xs.submitJob(null);
     }
@@ -67,8 +74,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieConflictException.class)
     public void testSubmitJobThatExists() throws GenieException {
-        final Job job = new Job();
-        job.setId(JOB_1_ID);
+        final Job job = this.jobService.getJob(JOB_1_ID);
         this.xs.submitJob(job);
     }
 
@@ -115,7 +121,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testKillJobNoId() throws GenieException {
         this.xs.killJob(null);
     }

@@ -28,10 +28,7 @@ import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -41,15 +38,13 @@ import java.util.Map;
  *
  * @author tgianos
  */
-@Named
-@Scope("prototype")
 public class PrestoJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(PrestoJobManagerImpl.class);
     private static final String PRESTO_PROTOCOL_KEY = "com.netflix.genie.server.job.manager.presto.protocol";
     private static final String PRESTO_MASTER_DOMAIN = "com.netflix.genie.server.job.manager.presto.master.domain";
     private static final String COPY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.cp";
-    private static final String MAKE_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.mkdir";
+    private static final String MK_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.mkdir";
 
     /**
      * Constructor.
@@ -58,7 +53,6 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
      * @param jobService     The job service to use.
      * @param commandService The command service to use.
      */
-    @Inject
     public PrestoJobManagerImpl(final JobMonitor jobMonitor,
                                 final JobService jobService,
                                 final CommandConfigService commandService) {
@@ -139,9 +133,9 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
 
         final String makeDirCommand =
                 ConfigurationManager.getConfigInstance()
-                        .getString(MAKE_DIRECTORY_COMMAND_KEY);
+                        .getString(MK_DIRECTORY_COMMAND_KEY);
         if (StringUtils.isBlank(makeDirCommand)) {
-            final String msg = "Required property " + MAKE_DIRECTORY_COMMAND_KEY + " isn't set";
+            final String msg = "Required property " + MK_DIRECTORY_COMMAND_KEY + " isn't set";
             LOG.error(msg);
             throw new GenieServerException(msg);
         }

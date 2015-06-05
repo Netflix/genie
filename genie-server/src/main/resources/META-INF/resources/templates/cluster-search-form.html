@@ -1,0 +1,67 @@
+<form class="form-horizontal search-form" id="clusterSearchForm" data-bind="submit: Cluster.search">
+    <div class="showhide" data-bind="visible: $root.page()==='#cluster/search' && !$root.Cluster.displayForm()">
+        <a href="#" data-bind="click: Cluster.showForm">
+            <img src="../images/plus.svg", class="open-icon">
+        </a>Show Search Form
+    </div>
+    <div class="showhide" data-bind="visible: $root.page()==='#cluster/search' && $root.Cluster.displayForm()">
+        <a href="#" data-bind="click: Cluster.hideForm">
+            <img src="../images/minus.svg", class="open-icon">
+        </a>Hide Search Form
+    </div>
+    <div data-bind="visible: $root.Cluster.displayForm()">
+        <div class="control-group">
+            <label class="control-label">Name:</label>
+            <div class="controls">
+                <input type="text" name="name" class="input-large">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Status:</label>
+            <div class="controls">
+                <select name="status">
+                    <option></option>
+                    <option>UP</option>
+                    <option>OUT_OF_SERVICE</option>
+                    <option>TERMINATED</option>
+                </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Tags:</label>
+            <div class="controls">
+                <select id="clusterSearchTags" name="tags" multiple="true" data-bind="options: Cluster.allTags, selectedOptions:Cluster.selectedTags">
+                </select>
+                <!--           <input type="text" data-provide="typeahead" autocomplete="off" id="clusterTagsSearch" data-bind="textInput:Cluster.selectedTags"> -->
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Order By:</label>
+            <div class="controls">
+                <select id="clusterOrderFields" name="tags" multiple="true" data-bind="options: Cluster.clusterOrderByFields, selectedOptions:Cluster.clusterOrderBySelectedFields">
+                </select>
+                <!--           <input type="text" data-provide="typeahead" autocomplete="off" id="clusterTagsSearch" data-bind="textInput:Cluster.selectedTags"> -->
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Order Type:</label>
+            <div class="controls">
+                <select name="sortOrder">
+                    <option>descending</option>
+                    <option>ascending</option>
+                </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Number of clusters:</label>
+            <div class="controls">
+                <input type="text" name="limit" class="input-mini" maxlength=3 value="32">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button data-bind="click: Cluster.search, disable: Cluster.status()==='searching'" type="submit" class="btn btn-default">Search</button>
+            </div>
+        </div>
+    </div>
+</form>

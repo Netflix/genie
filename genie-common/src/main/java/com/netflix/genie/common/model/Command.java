@@ -34,9 +34,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Representation of the state of the Command Object.
@@ -49,8 +49,6 @@ import org.slf4j.LoggerFactory;
 @ApiModel(description = "An entity for managing a Command in the Genie system.")
 public class Command extends CommonEntityFields {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Command.class);
-
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
@@ -60,6 +58,7 @@ public class Command extends CommonEntityFields {
             value = "The status of the command",
             required = true
     )
+    @NotNull(message = "No command status entered and is required.")
     private CommandStatus status;
 
     /**
@@ -70,6 +69,7 @@ public class Command extends CommonEntityFields {
             value = "Location of the executable for this command",
             required = true
     )
+    @NotBlank(message = "No executable entered for command and is required.")
     private String executable;
 
     /**
@@ -135,16 +135,16 @@ public class Command extends CommonEntityFields {
      *
      * @param name The name of the command. Not null/empty/blank.
      * @param user The user who created the command. Not null/empty/blank.
+     * @param version The version of this command. Not null/empty/blank.
      * @param status The status of the command. Not null.
      * @param executable The executable of the command. Not null/empty/blank.
-     * @param version The version of this command
      */
     public Command(
             final String name,
             final String user,
+            final String version,
             final CommandStatus status,
-            final String executable,
-            final String version) {
+            final String executable) {
         super(name, user, version);
         this.status = status;
         this.executable = executable;
@@ -158,7 +158,6 @@ public class Command extends CommonEntityFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateCommand() throws GeniePreconditionException {
-        validate(this.status, this.executable, null);
         // Add the id to the tags
         if (this.tags == null) {
            this.tags = new HashSet<>();
@@ -329,53 +328,5 @@ public class Command extends CommonEntityFields {
      */
     protected void setClusters(final Set<Cluster> clusters) {
         this.clusters = clusters;
-    }
-
-    /**
-     * Check to make sure that the required parameters exist.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Override
-    public void validate() throws GeniePreconditionException {
-        String error = null;
-        try {
-            super.validate();
-        } catch (final GeniePreconditionException ge) {
-            error = ge.getMessage();
-        }
-        this.validate(this.status, this.executable, error);
-    }
-
-    /**
-     * Helper method for checking the validity of required parameters.
-     *
-     * @param status The status of the command
-     * @param executable The executable of the command.
-     * @param error The existing errors if any exist.
-     * @throws GeniePreconditionException
-     */
-    private void validate(
-            final CommandStatus status,
-            final String executable,
-            final String error)
-            throws GeniePreconditionException {
-        final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(error)) {
-            builder.append(error);
-        }
-        if (status == null) {
-            builder.append("No command status entered and is required.\n");
-        }
-        if (StringUtils.isBlank(executable)) {
-            builder.append("No executable entered for command and is required.\n");
-        }
-
-        if (builder.length() != 0) {
-            builder.insert(0, "Command configuration errors:\n");
-            final String msg = builder.toString();
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
-        }
     }
 }

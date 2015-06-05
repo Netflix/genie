@@ -34,10 +34,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.validation.constraints.NotNull;
 
 /**
  * Representation of the state of Application Configuration object.
@@ -50,8 +47,6 @@ import org.slf4j.LoggerFactory;
 @ApiModel(description = "An entity for managing an application in the Genie system.")
 public class Application extends CommonEntityFields {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Application.class);
-
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
@@ -61,6 +56,7 @@ public class Application extends CommonEntityFields {
             value = "The current status of this application",
             required = true
     )
+    @NotNull(message = "No application status entered and is required.")
     private ApplicationStatus status;
 
     /**
@@ -96,7 +92,7 @@ public class Application extends CommonEntityFields {
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @ApiModelProperty(
-            value = "the tags associated with this application",
+            value = "The tags associated with this application",
             required = true
     )
     private Set<String> tags;
@@ -120,14 +116,14 @@ public class Application extends CommonEntityFields {
      *
      * @param name    The name of the application. Not null/empty/blank.
      * @param user    The user who created the application. Not null/empty/blank.
+     * @param version The version of this application. Not null/empty/blank.
      * @param status  The status of the application. Not null.
-     * @param version The version of this application
      */
     public Application(
             final String name,
             final String user,
-            final ApplicationStatus status,
-            final String version) {
+            final String version,
+            final ApplicationStatus status) {
         super(name, user, version);
         this.status = status;
     }
@@ -140,7 +136,6 @@ public class Application extends CommonEntityFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateApplication() throws GeniePreconditionException {
-        this.validate(this.status, null);
         if (this.tags == null) {
             this.tags = new HashSet<>();
         }
@@ -255,44 +250,5 @@ public class Application extends CommonEntityFields {
      */
     public void setTags(final Set<String> tags) {
         this.tags = tags;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validate() throws GeniePreconditionException {
-        String error = null;
-        try {
-            super.validate();
-        } catch (final GeniePreconditionException ge) {
-            error = ge.getMessage();
-        }
-        this.validate(this.getStatus(), error);
-    }
-
-    /**
-     * Helper method for checking the validity of required parameters.
-     *
-     * @param status The status of the application
-     * @param error  Any pre-existing error condition
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    private void validate(
-            final ApplicationStatus status, final String error) throws GeniePreconditionException {
-        final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(error)) {
-            builder.append(error);
-        }
-        if (status == null) {
-            builder.append("No application status entered and is required.\n");
-        }
-
-        if (builder.length() > 0) {
-            builder.insert(0, "Application configuration errors:\n");
-            final String msg = builder.toString();
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
-        }
     }
 }

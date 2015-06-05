@@ -172,7 +172,7 @@ checkoutGhPages() {
 startTomcat() {
     echo "Starting Tomcat"
     ${CATALINA_HOME}/bin/startup.sh
-    until [ $(curl -s -o /dev/null -w "%{http_code}" http://localhost:7001) == "200" ];
+    until [ $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080) == "200" ];
     do
         echo "Waiting for Tomcat to start. Sleeping."
         sleep 1
@@ -227,7 +227,7 @@ updateAPIDocs() {
     then
         mkdir -p /tmp/genie/docs/rest
     fi
-    curl http://localhost:7001/genie/swagger.json > /tmp/genie/docs/rest/swagger.json
+    curl http://localhost:8080/genie/swagger.json > /tmp/genie/docs/rest/swagger.json
     if (( $? != 0 ))
     then
         echo "Unable to update swagger.json."

@@ -32,8 +32,8 @@ import java.net.HttpURLConnection;
  *
  * @author tgianos
  */
-@Provider
 @Named
+@Provider
 public class GenieResponseFilter implements ContainerResponseFilter {
 
     private GenieNodeStatistics statistics;

@@ -26,9 +26,6 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -42,22 +39,12 @@ import org.springframework.context.ApplicationContextAware;
  * @author tgianos
  * @author amsharma
  */
-@Named
 public class JobManagerFactory implements ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobManagerFactory.class);
-
-    private ApplicationContext context;
-
-    /**
-     * The service to discover clusters.
-     */
     private final ClusterConfigService ccs;
-
-    /**
-     * Reference to the cluster load balancer implementation.
-     */
     private final ClusterLoadBalancer clb;
+    private ApplicationContext context;
 
     /**
      * Default constructor.
@@ -65,7 +52,6 @@ public class JobManagerFactory implements ApplicationContextAware {
      * @param ccs The cluster config service to use
      * @param clb The clb to use
      */
-    @Inject
     public JobManagerFactory(
             final ClusterConfigService ccs,
             final ClusterLoadBalancer clb) {
@@ -118,8 +104,7 @@ public class JobManagerFactory implements ApplicationContextAware {
      * {@inheritDoc}
      */
     @Override
-    public void setApplicationContext(
-            final ApplicationContext appContext) throws BeansException {
+    public void setApplicationContext(final ApplicationContext appContext) throws BeansException {
         this.context = appContext;
     }
 }

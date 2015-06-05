@@ -65,8 +65,8 @@ public class TestBaseGenieClient {
     private static final Application APPLICATION = new Application(
             "Firefly",
             "Malcolm",
-            ApplicationStatus.ACTIVE,
-            "1.0"
+            "1.0",
+            ApplicationStatus.ACTIVE
     );
     private static String eurekaEnv = null;
 
@@ -235,9 +235,9 @@ public class TestBaseGenieClient {
                     new Command(
                             "name" + i,
                             "user" + i,
+                            "" + i,
                             CommandStatus.ACTIVE,
-                            "executable" + i,
-                            "" + i
+                            "executable" + i
                     )
             );
         }

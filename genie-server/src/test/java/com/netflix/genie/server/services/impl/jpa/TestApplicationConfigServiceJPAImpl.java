@@ -22,7 +22,6 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
@@ -38,9 +37,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 
 /**
- * Tests for the ApplicationConfigServiceJPAImpl.
+ * Tests for the ApplicationConfigServiceJPAImpl. Really these are integration tests.
  *
  * @author tgianos
  */
@@ -51,8 +51,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String APP_1_NAME = "tez";
     private static final String APP_1_USER = "tgianos";
     private static final String APP_1_VERSION = "1.2.3";
-    private static final ApplicationStatus APP_1_STATUS
-            = ApplicationStatus.INACTIVE;
+    private static final ApplicationStatus APP_1_STATUS = ApplicationStatus.INACTIVE;
 
     private static final String COMMAND_1_ID = "command1";
 
@@ -60,15 +59,13 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String APP_2_NAME = "spark";
     private static final String APP_2_USER = "amsharma";
     private static final String APP_2_VERSION = "4.5.6";
-    private static final ApplicationStatus APP_2_STATUS
-            = ApplicationStatus.ACTIVE;
+    private static final ApplicationStatus APP_2_STATUS = ApplicationStatus.ACTIVE;
 
     private static final String APP_3_ID = "app3";
     private static final String APP_3_NAME = "storm";
     private static final String APP_3_USER = "tgianos";
     private static final String APP_3_VERSION = "7.8.9";
-    private static final ApplicationStatus APP_3_STATUS
-            = ApplicationStatus.DEPRECATED;
+    private static final ApplicationStatus APP_3_STATUS = ApplicationStatus.DEPRECATED;
 
     @Inject
     private ApplicationConfigService service;
@@ -119,7 +116,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetApplicationNull() throws GenieException {
         this.service.getApplication(null);
     }
@@ -140,7 +137,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetApplicationsByName() {
         final List<Application> apps = this.service.getApplications(
-                APP_2_NAME, null, null, null, 0, 10);
+                APP_2_NAME, null, null, null, 0, 10, true, null);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
     }
@@ -151,7 +148,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetApplicationsByUserName() {
         final List<Application> apps = this.service.getApplications(
-                null, APP_1_USER, null, null, -1, -5000);
+                null, APP_1_USER, null, null, -1, -5000, true, null);
         Assert.assertEquals(2, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
         Assert.assertEquals(APP_1_ID, apps.get(1).getId());
@@ -166,7 +163,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         statuses.add(ApplicationStatus.ACTIVE);
         statuses.add(ApplicationStatus.INACTIVE);
         final List<Application> apps = this.service.getApplications(
-                null, null, statuses, null, -1, -5000);
+                null, null, statuses, null, -1, -5000, true, null);
         Assert.assertEquals(2, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
         Assert.assertEquals(APP_1_ID, apps.get(1).getId());
@@ -180,7 +177,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
         List<Application> apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(3, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
         Assert.assertEquals(APP_2_ID, apps.get(1).getId());
@@ -188,29 +185,128 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
 
         tags.add("yarn");
         apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
 
         tags.clear();
         tags.add("genie.name:spark");
         apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(1, apps.size());
         Assert.assertEquals(APP_2_ID, apps.get(0).getId());
 
         tags.add("somethingThatWouldNeverReallyExist");
         apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertTrue(apps.isEmpty());
 
         tags.clear();
         apps = this.service.getApplications(
-                null, null, null, tags, 0, 10);
+                null, null, null, tags, 0, 10, true, null);
         Assert.assertEquals(3, apps.size());
         Assert.assertEquals(APP_3_ID, apps.get(0).getId());
         Assert.assertEquals(APP_2_ID, apps.get(1).getId());
         Assert.assertEquals(APP_1_ID, apps.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method with descending sort.
+     */
+    @Test
+    public void testGetClustersDescending() {
+        //Default to order by Updated
+        final List<Application> applications = this.service.getApplications(null, null, null, null, 0, 10, true, null);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method with ascending sort.
+     */
+    @Test
+    public void testGetClustersAscending() {
+        //Default to order by Updated
+        final List<Application> applications = this.service.getApplications(null, null, null, null, 0, 10, false, null);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_1_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_3_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method default order by.
+     */
+    @Test
+    public void testGetClustersOrderBysDefault() {
+        //Default to order by Updated
+        final List<Application> applications = this.service.getApplications(null, null, null, null, 0, 10, true, null);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method order by updated.
+     */
+    @Test
+    public void testGetClustersOrderBysUpdated() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("updated");
+        final List<Application> applications =
+                this.service.getApplications(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method order by name.
+     */
+    @Test
+    public void testGetClustersOrderBysName() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("name");
+        final List<Application> applications =
+                this.service.getApplications(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_1_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_3_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method order by an invalid field should return the order by default value (updated).
+     */
+    @Test
+    public void testGetClustersOrderBysInvalidField() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("I'mNotAValidField");
+        final List<Application> applications =
+                this.service.getApplications(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
+    }
+
+    /**
+     * Test the get applications method order by a collection field should return the order by default value (updated).
+     */
+    @Test
+    public void testGetClustersOrderBysCollectionField() {
+        final Set<String> orderBys = new HashSet<>();
+        orderBys.add("tags");
+        final List<Application> applications =
+                this.service.getApplications(null, null, null, null, 0, 10, true, orderBys);
+        Assert.assertEquals(3, applications.size());
+        Assert.assertEquals(APP_3_ID, applications.get(0).getId());
+        Assert.assertEquals(APP_2_ID, applications.get(1).getId());
+        Assert.assertEquals(APP_1_ID, applications.get(2).getId());
     }
 
     /**
@@ -223,8 +319,8 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Application app = new Application(
                 APP_1_NAME,
                 APP_1_USER,
-                ApplicationStatus.ACTIVE,
-                APP_1_VERSION
+                APP_1_VERSION,
+                ApplicationStatus.ACTIVE
         );
         final String id = UUID.randomUUID().toString();
         app.setId(id);
@@ -256,8 +352,8 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Application app = new Application(
                 APP_1_NAME,
                 APP_1_USER,
-                ApplicationStatus.ACTIVE,
-                APP_1_VERSION
+                APP_1_VERSION,
+                ApplicationStatus.ACTIVE
         );
         final Application created = this.service.createApplication(app);
         Assert.assertNotNull(this.service.getApplication(created.getId()));
@@ -281,7 +377,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testCreateApplicationNull() throws GenieException {
         this.service.createApplication(null);
     }
@@ -296,8 +392,8 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         final Application app = new Application(
                 APP_1_NAME,
                 APP_1_USER,
-                ApplicationStatus.ACTIVE,
-                APP_1_VERSION
+                APP_1_VERSION,
+                ApplicationStatus.ACTIVE
         );
         app.setId(APP_1_ID);
         this.service.createApplication(app);
@@ -363,6 +459,25 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     }
 
     /**
+     * Test to update an application that makes it invalid. Should throw exception.
+     *
+     * @throws GenieException
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateApplicationNotValid() throws GenieException {
+        final Application init = this.service.getApplication(APP_1_ID);
+        Assert.assertEquals(APP_1_USER, init.getUser());
+        Assert.assertEquals(ApplicationStatus.INACTIVE, init.getStatus());
+        Assert.assertEquals(3, init.getTags().size());
+
+        final Application updateApp = new Application();
+        updateApp.setId(APP_1_ID);
+        updateApp.setStatus(ApplicationStatus.ACTIVE);
+        updateApp.setUser("");
+        this.service.updateApplication(APP_1_ID, updateApp);
+    }
+
+    /**
      * Test to make sure setting the created and updated outside the system control doesn't change record in database.
      *
      * @throws GenieException
@@ -388,7 +503,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateApplicationNullId() throws GenieException {
         this.service.updateApplication(null, new Application());
     }
@@ -398,7 +513,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateApplicationNullUpdateApp() throws GenieException {
         this.service.updateApplication(APP_1_ID, null);
     }
@@ -434,10 +549,10 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(3,
-                this.service.getApplications(null, null, null, null, 0, 10).size());
+                this.service.getApplications(null, null, null, null, 0, 10, true, null).size());
         Assert.assertEquals(3, this.service.deleteAllApplications().size());
         Assert.assertTrue(
-                this.service.getApplications(null, null, null, null, 0, 10)
+                this.service.getApplications(null, null, null, null, 0, 10, true, null)
                 .isEmpty());
     }
 
@@ -468,7 +583,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GenieException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testDeleteNoId() throws GenieException {
         this.service.deleteApplication(null);
     }
@@ -514,7 +629,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToApplicationNoId() throws GenieException {
         this.service.addConfigsToApplication(null, new HashSet<String>());
     }
@@ -524,7 +639,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToApplicationNoConfigs() throws GenieException {
         this.service.addConfigsToApplication(APP_1_ID, null);
     }
@@ -536,8 +651,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToApplicationNoApp() throws GenieException {
-        this.service.addConfigsToApplication(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> configs = new HashSet<>();
+        configs.add(UUID.randomUUID().toString());
+        this.service.addConfigsToApplication(UUID.randomUUID().toString(), configs);
     }
 
     /**
@@ -571,7 +687,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForApplicationNoId() throws GenieException {
         this.service.updateConfigsForApplication(null, new HashSet<String>());
     }
@@ -603,7 +719,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetConfigsForApplicationNoId() throws GenieException {
         this.service.getConfigsForApplication(null);
     }
@@ -636,7 +752,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllConfigsForApplicationNoId() throws GenieException {
         this.service.removeAllConfigsForApplication(null);
     }
@@ -672,15 +788,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
-    public void testRemoveConfigForApplicationNullConfig()
-            throws GenieException {
-        final Set<String> configs
-                = this.service.getConfigsForApplication(APP_1_ID);
-        Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(2,
-                this.service.removeConfigForApplication(
-                        APP_1_ID, null).size());
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveConfigForApplicationNullConfig() throws GenieException {
+        this.service.removeConfigForApplication(APP_1_ID, null);
     }
 
     /**
@@ -688,7 +798,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveConfigForApplicationNoId() throws GenieException {
         this.service.removeConfigForApplication(null, "something");
     }
@@ -736,7 +846,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddJarsToApplicationNoId() throws GenieException {
         this.service.addJarsForApplication(null, new HashSet<String>());
     }
@@ -746,7 +856,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddJarsToApplicationNoJars() throws GenieException {
         this.service.addJarsForApplication(APP_1_ID, null);
     }
@@ -758,8 +868,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddJarsForApplicationNoApp() throws GenieException {
-        this.service.addJarsForApplication(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> jars = new HashSet<>();
+        jars.add(UUID.randomUUID().toString());
+        this.service.addJarsForApplication(UUID.randomUUID().toString(), jars);
     }
 
     /**
@@ -793,7 +904,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateJarsForApplicationNoId() throws GenieException {
         this.service.updateJarsForApplication(null, new HashSet<String>());
     }
@@ -825,7 +936,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetJarsForApplicationNoId() throws GenieException {
         this.service.getJarsForApplication(null);
     }
@@ -858,7 +969,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllJarsForApplicationNoId() throws GenieException {
         this.service.removeAllJarsForApplication(null);
     }
@@ -894,15 +1005,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
-    public void testRemoveJarForApplicationNullJar()
-            throws GenieException {
-        final Set<String> jars
-                = this.service.getJarsForApplication(APP_1_ID);
-        Assert.assertEquals(2, jars.size());
-        Assert.assertEquals(2,
-                this.service.removeJarForApplication(
-                        APP_1_ID, null).size());
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveJarForApplicationNullJar() throws GenieException {
+        this.service.removeJarForApplication(APP_1_ID, null);
     }
 
     /**
@@ -910,7 +1015,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveJarForApplicationNoId() throws GenieException {
         this.service.removeJarForApplication(null, "something");
     }
@@ -958,7 +1063,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToApplicationNoId() throws GenieException {
         this.service.addTagsForApplication(null, new HashSet<String>());
     }
@@ -968,7 +1073,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToApplicationNoTags() throws GenieException {
         this.service.addTagsForApplication(APP_1_ID, null);
     }
@@ -980,8 +1085,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForApplicationNoApp() throws GenieException {
-        this.service.addTagsForApplication(UUID.randomUUID().toString(),
-                new HashSet<String>());
+        final Set<String> tags = new HashSet<>();
+        tags.add(UUID.randomUUID().toString());
+        this.service.addTagsForApplication(UUID.randomUUID().toString(), tags);
     }
 
     /**
@@ -1015,7 +1121,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForApplicationNoId() throws GenieException {
         this.service.updateTagsForApplication(null, new HashSet<String>());
     }
@@ -1047,7 +1153,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetTagsForApplicationNoId() throws GenieException {
         this.service.getTagsForApplication(null);
     }
@@ -1082,7 +1188,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllTagsForApplicationNoId() throws GenieException {
         this.service.removeAllTagsForApplication(null);
     }
@@ -1119,15 +1225,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test
-    public void testRemoveTagForApplicationNullTag()
-            throws GenieException {
-        final Set<String> tags
-                = this.service.getTagsForApplication(APP_1_ID);
-        Assert.assertEquals(3, tags.size());
-        Assert.assertEquals(3,
-                this.service.removeTagForApplication(
-                        APP_1_ID, null).size());
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveTagForApplicationNullTag() throws GenieException {
+        this.service.removeTagForApplication(APP_1_ID, null).size();
     }
 
     /**
@@ -1135,7 +1235,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForApplicationNoId() throws GenieException {
         this.service.removeTagForApplication(null, "something");
     }
@@ -1160,8 +1260,8 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsForApplication() throws GenieException {
-        final Set<Command> commands
-                = this.service.getCommandsForApplication(APP_1_ID);
+        final List<Command> commands
+                = this.service.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, commands.size());
         Assert.assertEquals(COMMAND_1_ID, commands.iterator().next().getId());
     }
@@ -1171,9 +1271,9 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException
      */
-    @Test(expected = GeniePreconditionException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetCommandsForApplicationNoId() throws GenieException {
-        this.service.getCommandsForApplication("");
+        this.service.getCommandsForApplication("", null);
     }
 
     /**
@@ -1183,6 +1283,6 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForApplicationNoApp() throws GenieException {
-        this.service.getCommandsForApplication(UUID.randomUUID().toString());
+        this.service.getCommandsForApplication(UUID.randomUUID().toString(), null);
     }
 }

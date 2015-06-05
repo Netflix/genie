@@ -41,18 +41,15 @@ import org.slf4j.LoggerFactory;
  */
 public final class ApplicationServiceSampleClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationServiceSampleClient.class);
-
     /**
      * The id for the sample application.
      */
     protected static final String ID = "mr2";
-
     /**
      * The name for the sample application.
      */
     protected static final String APP_NAME = "MapReduce2";
-
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationServiceSampleClient.class);
     private static final String APP_VERSION = "1.0";
 
     /**
@@ -230,7 +227,7 @@ public final class ApplicationServiceSampleClient {
      * @throws GenieException For any issue
      */
     public static Application getSampleApplication(final String id) throws GenieException {
-        final Application app = new Application(APP_NAME, "tgianos", ApplicationStatus.ACTIVE, APP_VERSION);
+        final Application app = new Application(APP_NAME, "tgianos", APP_VERSION, ApplicationStatus.ACTIVE);
         if (StringUtils.isNotBlank(id)) {
             app.setId(id);
         }

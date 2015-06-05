@@ -20,8 +20,85 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="com.netflix.genie"/>
+    <context:component-scan base-package="com.netflix.genie.server.resources"/>
     
     <!-- Broken up context for clarity of purpose" -->
     <import resource="genie-jpa-test.xml"/>
+    <import resource="genie-swagger-test.xml"/>
+    <import resource="genie-validator-test.xml"/>
+
+    <!-- Metrics -->
+    <bean id="genieNodeStatistics" class="com.netflix.genie.server.metrics.impl.GenieNodeStatisticsImpl"/>
+    <bean id="jobCountManager" class="com.netflix.genie.server.metrics.impl.JobCountManagerImpl"/>
+    <!-- Was a prototype bean but only one thread launched. May need to be again? -->
+    <bean id="jobCountMonitor" class="com.netflix.genie.server.metrics.impl.JobCountMonitorImpl">
+        <constructor-arg name="jobCountManager" ref="jobCountManager"/>
+        <constructor-arg name="stats" ref="genieNodeStatistics"/>
+    </bean>
+
+    <!-- Services -->
+    <bean id="clusterLoadBalancer" class="com.netflix.genie.server.services.impl.RandomizedClusterLoadBalancerImpl"/>
+    <bean id="applicationService" class="com.netflix.genie.server.services.impl.jpa.ApplicationConfigServiceJPAImpl">
+        <constructor-arg name="applicationRepo" ref="applicationRepository"/>
+        <constructor-arg name="commandRepo" ref="commandRepository"/>
+    </bean>
+    <bean id="clusterService" class="com.netflix.genie.server.services.impl.jpa.ClusterConfigServiceJPAImpl">
+        <constructor-arg name="clusterRepo" ref="clusterRepository"/>
+        <constructor-arg name="commandRepo" ref="commandRepository"/>
+        <constructor-arg name="jobRepo" ref="jobRepository"/>
+    </bean>
+    <bean id="commandService" class="com.netflix.genie.server.services.impl.jpa.CommandConfigServiceJPAImpl">
+        <constructor-arg name="appRepo" ref="applicationRepository"/>
+        <constructor-arg name="commandRepo" ref="commandRepository"/>
+        <constructor-arg name="clusterRepo" ref="clusterRepository"/>
+    </bean>
+    <bean id="executionService" class="com.netflix.genie.server.services.impl.jpa.ExecutionServiceJPAImpl">
+        <constructor-arg name="jobCountManager" ref="jobCountManager"/>
+        <constructor-arg name="jobManagerFactory" ref="jobManagerFactory"/>
+        <constructor-arg name="jobRepo" ref="jobRepository"/>
+        <constructor-arg name="jobService" ref="jobService"/>
+        <constructor-arg name="stats" ref="genieNodeStatistics"/>
+    </bean>
+    <bean id="jobService" class="com.netflix.genie.server.services.impl.jpa.JobServiceJPAImpl">
+        <constructor-arg name="jobManagerFactory" ref="jobManagerFactory"/>
+        <constructor-arg name="jobRepo" ref="jobRepository"/>
+        <constructor-arg name="stats" ref="genieNodeStatistics"/>
+    </bean>
+
+    <!-- Job Management -->
+    <bean id="jobManagerFactory" class="com.netflix.genie.server.jobmanager.JobManagerFactory">
+        <constructor-arg name="ccs" ref="clusterService"/>
+        <constructor-arg name="clb" ref="clusterLoadBalancer"/>
+    </bean>
+    <!-- Was scope prototype but I don't think it needs to be -->
+    <bean id="jobJanitor" class="com.netflix.genie.server.jobmanager.impl.JobJanitorImpl">
+        <constructor-arg name="xs" ref="executionService"/>
+    </bean>
+    <bean id="jobMonitor" class="com.netflix.genie.server.jobmanager.impl.JobMonitorImpl" scope="prototype">
+        <constructor-arg name="genieNodeStatistics" ref="genieNodeStatistics"/>
+        <constructor-arg name="jobService" ref="jobService"/>
+        <constructor-arg name="xs" ref="executionService"/>
+    </bean>
+    <bean id="jobManager" class="com.netflix.genie.server.jobmanager.impl.JobManagerImpl" scope="prototype">
+        <constructor-arg name="commandService" ref="commandService"/>
+        <constructor-arg name="jobMonitor" ref="jobMonitor"/>
+        <constructor-arg name="jobService" ref="jobService"/>
+    </bean>
+    <bean id="prestoJobManager" class="com.netflix.genie.server.jobmanager.impl.PrestoJobManagerImpl" scope="prototype">
+        <constructor-arg name="commandService" ref="commandService"/>
+        <constructor-arg name="jobMonitor" ref="jobMonitor"/>
+        <constructor-arg name="jobService" ref="jobService"/>
+    </bean>
+    <bean id="yarnJobManager" class="com.netflix.genie.server.jobmanager.impl.YarnJobManagerImpl" scope="prototype">
+        <constructor-arg name="commandService" ref="commandService"/>
+        <constructor-arg name="jobMonitor" ref="jobMonitor"/>
+        <constructor-arg name="jobService" ref="jobService"/>
+    </bean>
+
+    <!-- Startup -->
+    <bean id="genieSpringBootstrap" class="com.netflix.genie.server.startup.GenieSpringBootstrap">
+        <constructor-arg name="janitor" ref="jobJanitor"/>
+        <constructor-arg name="jobCountManager" ref="jobCountManager"/>
+        <constructor-arg name="jobCountMonitor" ref="jobCountMonitor"/>
+    </bean>
 </beans>

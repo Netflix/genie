@@ -29,8 +29,6 @@ import com.netflix.genie.server.services.ExecutionService;
 
 import java.io.File;
 import java.util.Properties;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -45,7 +43,6 @@ import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 
 /**
  * The monitor thread that gets launched for each job.
@@ -54,57 +51,38 @@ import org.springframework.context.annotation.Scope;
  * @author amsharma
  * @author tgianos
  */
-@Named
-@Scope("prototype")
 public class JobMonitorImpl implements JobMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobMonitorImpl.class);
-
-    private String jobId;
-
-    private JobManager jobManager;
-
+    // interval to check status, and update in database if needed
+    private static final int JOB_UPDATE_TIME_MS = 60000;
+    // stdout filename
+    private static final String STDOUT_FILENAME = "stdout";
+    // stderr filename
+    private static final String STDERR_FILENAME = "stderr";
     private final GenieNodeStatistics genieNodeStatistics;
     private final ExecutionService xs;
     private final JobService jobService;
-
-    // interval to check status, and update in database if needed
-    private static final int JOB_UPDATE_TIME_MS = 60000;
-
-    // last updated time in DB
-    private long lastUpdatedTimeMS;
-
-    // the handle to the process for the running job
-    private Process proc;
-
-    // the working directory for this job
-    private String workingDir;
-
-    // the stdout for this job
-    private File stdOutFile;
-
-    // stdout filename
-    private static final String STDOUT_FILENAME = "stdout";
-
-    // the stderr for this job
-    private File stdErrFile;
-
-    // stderr filename
-    private static final String STDERR_FILENAME = "stderr";
-
     // max specified stdout size
     private final Long maxStdoutSize;
-
     // max specified stdout size
     private final Long maxStderrSize;
-
-
-    // whether this job has been terminated by the monitor thread
-    private boolean terminated = false;
-
     // Config Instance to get all properties
     private final AbstractConfiguration config;
-
+    private String jobId;
+    private JobManager jobManager;
+    // last updated time in DB
+    private long lastUpdatedTimeMS;
+    // the handle to the process for the running job
+    private Process proc;
+    // the working directory for this job
+    private String workingDir;
+    // the stdout for this job
+    private File stdOutFile;
+    // the stderr for this job
+    private File stdErrFile;
+    // whether this job has been terminated by the monitor thread
+    private boolean terminated = false;
     private int sleepTime = 5000;
 
     /**
@@ -114,11 +92,11 @@ public class JobMonitorImpl implements JobMonitor {
      * @param jobService          The job service API's to use.
      * @param genieNodeStatistics The statistics object to use
      */
-    @Inject
     public JobMonitorImpl(
             final ExecutionService xs,
             final JobService jobService,
-            final GenieNodeStatistics genieNodeStatistics) {
+            final GenieNodeStatistics genieNodeStatistics
+    ) {
         this.xs = xs;
         this.jobService = jobService;
         this.genieNodeStatistics = genieNodeStatistics;
@@ -278,7 +256,7 @@ public class JobMonitorImpl implements JobMonitor {
                             && this.stdOutFile.exists()
                             && this.maxStdoutSize != null
                             && this.stdOutFile.length() > this.maxStdoutSize
-                        ) {
+                            ) {
                         issueFile = STDOUT_FILENAME;
                     } else if (
                             this.stdErrFile != null
@@ -326,7 +304,10 @@ public class JobMonitorImpl implements JobMonitor {
         }
 
         // Sender's email ID
-        String fromEmail = this.config.getString("com.netflix.genie.server.mail.smpt.from", "no-reply-genie@geniehost.com");
+        String fromEmail = this.config.getString(
+                "com.netflix.genie.server.mail.smpt.from",
+                "no-reply-genie@geniehost.com"
+        );
         LOG.info("From email address to use to send email: "
                 + fromEmail);
 

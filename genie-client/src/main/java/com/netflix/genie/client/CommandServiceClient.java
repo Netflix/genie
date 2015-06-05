@@ -83,7 +83,7 @@ public final class CommandServiceClient extends BaseGenieClient {
         if (command == null) {
             throw new GeniePreconditionException("No command entered to validate");
         }
-        command.validate();
+
         final HttpRequest request = BaseGenieClient.buildRequest(
                 Verb.POST,
                 BASE_CONFIG_COMMAND_REST_URL,

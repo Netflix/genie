@@ -50,8 +50,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * Representation of the state of a Genie 2.0 job.
@@ -63,8 +63,6 @@ import org.slf4j.LoggerFactory;
 @Cacheable(false)
 @ApiModel(description = "An entity for submitting and monitoring a job in Genie.")
 public class Job extends CommonEntityFields {
-
-    private static final Logger LOG = LoggerFactory.getLogger(Job.class);
     /**
      * Used to split between cluster criteria sets.
      */
@@ -91,6 +89,7 @@ public class Job extends CommonEntityFields {
             example = "-f hive.q",
             required = true
     )
+    @NotBlank(message = "Command arguments are required.")
     private String commandArgs;
 
     /**
@@ -129,6 +128,7 @@ public class Job extends CommonEntityFields {
             value = "List of criteria containing tags to use to pick a cluster to run this job, evaluated in order",
             required = true
     )
+    @NotEmpty(message = "No cluster criteria entered. At least one required.")
     private List<ClusterCriteria> clusterCriterias;
 
     /**
@@ -139,6 +139,7 @@ public class Job extends CommonEntityFields {
             value = "List of criteria containing tags to use to pick a command to run this job",
             required = true
     )
+    @NotEmpty(message = "No command criteria entered. At least one required.")
     private Set<String> commandCriteria;
 
     /**
@@ -425,20 +426,20 @@ public class Job extends CommonEntityFields {
      * Construct a new Job.
      *
      * @param user             The name of the user running the job. Not null/empty/blank.
-     * @param name             The name specifed for the job
+     * @param name             The name specified for the job. Not null/empty/blank.
+     * @param version          The version of this job. Not null/empty/blank.
      * @param commandArgs      The command line arguments for the job. Not
      *                         null/empty/blank.
      * @param commandCriteria  The criteria for the command. Not null/empty.
      * @param clusterCriterias The cluster criteria for the job. Not null/empty.
-     * @param version          The version of this job
      */
     public Job(
             final String user,
             final String name,
+            final String version,
             final String commandArgs,
             final Set<String> commandCriteria,
-            final List<ClusterCriteria> clusterCriterias,
-            final String version) {
+            final List<ClusterCriteria> clusterCriterias) {
         super(name, user, version);
 
         this.commandArgs = commandArgs;
@@ -459,7 +460,6 @@ public class Job extends CommonEntityFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateJob() throws GeniePreconditionException {
-        this.validate(this.commandCriteria, this.commandArgs, this.clusterCriterias, null);
         this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
         this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
         // Add the id to the tags
@@ -1112,63 +1112,6 @@ public class Job extends CommonEntityFields {
      */
     public void setChosenClusterCriteriaString(String chosenClusterCriteriaString) {
         this.chosenClusterCriteriaString = chosenClusterCriteriaString;
-    }
-
-    /**
-     * Check to make sure that the required parameters exist.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Override
-    public void validate() throws GeniePreconditionException {
-        String error = null;
-        try {
-            super.validate();
-        } catch (final GeniePreconditionException ge) {
-            error = ge.getMessage();
-        }
-        this.validate(
-                this.commandCriteria,
-                this.commandArgs,
-                this.clusterCriterias,
-                error);
-    }
-
-    /**
-     * Validate that required parameters are present for a Job.
-     *
-     * @param commandCriteria The criteria for the command..
-     * @param commandArgs     The command line arguments for the job
-     * @param criteria        The cluster criteria for the job
-     * @param error           Any pre-existing error.
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    private void validate(
-            final Set<String> commandCriteria,
-            final String commandArgs,
-            final List<ClusterCriteria> criteria,
-            final String error) throws GeniePreconditionException {
-        final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(error)) {
-            builder.append(error);
-        }
-        if (commandCriteria == null || commandCriteria.isEmpty()) {
-            builder.append("Command criteria is mandatory to figure out a command to run the job.\n");
-        }
-
-        if (StringUtils.isBlank(commandArgs)) {
-            builder.append("Command arguments are required\n");
-        }
-        if (criteria == null || criteria.isEmpty()) {
-            builder.append("At least one cluster criteria is required in order to figure out where to run this job.\n");
-        }
-
-        if (builder.length() != 0) {
-            builder.insert(0, "Job configuration errors:\n");
-            final String msg = builder.toString();
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
-        }
     }
 
     /**
