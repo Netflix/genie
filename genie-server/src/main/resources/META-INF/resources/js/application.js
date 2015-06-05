@@ -164,7 +164,7 @@ define([
                         applicationObj.idLink  = $("<div />").append($("<a />", {
                             href : '/#application/details/'+applicationObj.id,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/folder_red_open.png', class: 'genie-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/folder.svg', class: 'open-icon'}))).html();
 
                         applicationObj.rawLink  = $("<div />").append($("<a />", {
                             href : "genie/v2/config/applications/" + applicationObj.id,

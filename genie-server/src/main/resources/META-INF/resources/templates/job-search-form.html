@@ -2,12 +2,12 @@
 <form class="form-horizontal search-form" id="jobSearchForm" data-bind="submit: Job.search">
     <div class="showhide" data-bind="visible: $root.page()==='#job/search' && !$root.Job.displayForm()">
         <a href="#" data-bind="click: Job.showForm">
-            <img src="../images/plusicon.png", class="genie-icon">
+            <img src="../images/plus.svg", class="open-icon">
         </a>Show Search Form
     </div>
     <div class="showhide" data-bind="visible: $root.page()==='#job/search' && $root.Job.displayForm()">
         <a href="#" data-bind="click: Job.hideForm">
-            <img src="../images/minusicon.png", class="genie-icon">
+            <img src="../images/minus.svg", class="open-icon">
         </a>Hide Search Form
     </div>
     <div data-bind="visible: $root.Job.displayForm()">

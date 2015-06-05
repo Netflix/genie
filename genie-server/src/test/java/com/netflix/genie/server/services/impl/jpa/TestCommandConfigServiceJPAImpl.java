@@ -1265,7 +1265,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testGetCommandsForCommand() throws GenieException {
         final List<Cluster> clusters
-                = this.service.getClustersForCommand(COMMAND_1_ID,null);
+                = this.service.getClustersForCommand(COMMAND_1_ID, null);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_1_ID, clusters.iterator().next().getId());
     }

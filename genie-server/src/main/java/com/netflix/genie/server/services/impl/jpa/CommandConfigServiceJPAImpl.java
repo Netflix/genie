@@ -33,7 +33,7 @@ import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.ClusterRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
-import com.netflix.genie.server.repository.jpa.ClusterSpecs ;
+import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.services.CommandConfigService;
 
 import java.util.ArrayList;

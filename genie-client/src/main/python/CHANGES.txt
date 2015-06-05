@@ -17,4 +17,4 @@
 2.0.0      10/28/2014 -- Full 2.0.0 release
 2.1.0      02/13/2015 -- 2.1.0 Release. No real changes just keeping in line with Genie release
 2.1.1      03/16/2015 -- 2.1.1 Release
-2.2.0      05/01/2015 -- 2.2.0 Release. https://github.com/Netflix/genie/milestones/2.2.0
+2.2.0      06/04/2015 -- 2.2.0 Release. https://github.com/Netflix/genie/milestones/2.2.0

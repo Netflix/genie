@@ -68,7 +68,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      *
      * @param applicationRepo The application repository to use
      */
-    public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo, final CommandRepository commandRepo) {
+    public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo,
+                                           final CommandRepository commandRepo) {
         this.applicationRepo = applicationRepo;
         this.commandRepo = commandRepo;
     }

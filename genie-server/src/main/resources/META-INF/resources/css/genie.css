@@ -249,6 +249,12 @@ table th {
     height: 20px;
 }
 
+.open-icon {
+    width: 12px;
+    height: 12px;
+    padding-left: 6px;
+}
+
 .site-footer {
     position: fixed;
     bottom: 0;

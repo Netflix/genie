@@ -174,7 +174,7 @@ define([
                         jobObj.idLink  = $("<div />").append($("<a />", {
                             href : jobObj.outputURI,
                             target: "_blank"
-                        }).append($("<img/>", {src: '../images/folder_red_open.png', class: 'genie-icon'}))).html();
+                        }).append($("<img/>", {src: '../images/folder.svg', class: 'open-icon'}))).html();
 
                         jobObj.rawLink  = $("<div />").append($("<a />", {
                             href : "genie/v2/jobs/" + jobObj.id,
