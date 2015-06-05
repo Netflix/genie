@@ -2,7 +2,7 @@
   "swagger" : "2.0",
   "info" : {
     "description" : "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more documentation.<br/>Post any issues found <a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
-    "version" : "2.2.0-SNAPSHOT",
+    "version" : "2.3.0-SNAPSHOT",
     "title" : "Genie REST API",
     "contact" : {
       "name" : "Netflix, Inc."
@@ -12,16 +12,16 @@
       "url" : "http://www.apache.org/licenses/LICENSE-2.0"
     }
   },
-  "host" : "localhost:7001",
+  "host" : "localhost:8080",
   "basePath" : "/genie",
   "tags" : [ {
-    "name" : "clusters"
-  }, {
-    "name" : "commands"
-  }, {
     "name" : "applications"
   }, {
     "name" : "jobs"
+  }, {
+    "name" : "commands"
+  }, {
+    "name" : "clusters"
   } ],
   "schemes" : [ "http" ],
   "paths" : {
@@ -31,7 +31,6 @@
         "summary" : "Find applications",
         "description" : "Find applications by the submitted criteria.",
         "operationId" : "getApplications",
-        "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
         "parameters" : [ {
           "name" : "name",
@@ -286,6 +285,13 @@
           "description" : "Id of the application to get the commands for.",
           "required" : true,
           "type" : "string"
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "The statuses of the commands to find.",
+          "required" : false,
+          "type" : "array",
+          "enum" : [ "ACTIVE", "DEPRECATED", "INACTIVE" ]
         } ],
         "responses" : {
           "200" : {
@@ -1101,6 +1107,11 @@
           "description" : "Id of the cluster to get commands for.",
           "required" : true,
           "type" : "string"
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "required" : false,
+          "type" : "array"
         } ],
         "responses" : {
           "200" : {
@@ -1992,6 +2003,13 @@
           "description" : "Id of the command to get the clusters for.",
           "required" : true,
           "type" : "string"
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "The statuses of the commands to find.",
+          "required" : false,
+          "type" : "array",
+          "enum" : [ "ACTIVE", "DEPRECATED", "INACTIVE" ]
         } ],
         "responses" : {
           "200" : {
@@ -2420,6 +2438,18 @@
           "type" : "string"
         }, {
           "name" : "executionClusterId",
+          "in" : "query",
+          "description" : "Id of the cluster on which the job ran.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "commandName",
+          "in" : "query",
+          "description" : "The page to start on.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "commandId",
           "in" : "query",
           "description" : "Id of the cluster on which the job ran.",
           "required" : false,
@@ -2927,7 +2957,7 @@
       "description" : "An attachment for use with a job."
     },
     "Cluster" : {
-      "required" : [ "clusterType", "configs", "name", "status", "tags", "user", "version" ],
+      "required" : [ "clusterType", "name", "status", "tags", "user", "version" ],
       "properties" : {
         "id" : {
           "type" : "string",
@@ -3246,7 +3276,7 @@
         },
         "tags" : {
           "type" : "array",
-          "description" : "the tags associated with this application",
+          "description" : "The tags associated with this application",
           "uniqueItems" : true,
           "items" : {
             "type" : "string"
