@@ -32,7 +32,13 @@ dependencies {
      * Runtime Dependencies
      *******************************/
 
-    runtime project(":genie-server")
+    runtime(project(":genie-server")) {
+        // These are included from genie-common for people not running in servlet container like Tomcat they're
+        // required to enable validation but servlet container like tomcat provides them so we're not going to include
+        // them to avoid conflicts on deployment.
+        exclude group: "javax.el", module:"javax.el-api"
+        exclude group: "org.glassfish.web", module: "javax.el"
+    }
     runtime("com.netflix.karyon:karyon-admin-web:${karyon_version}") {
         exclude group: "commons-collections", module: "commons-collections"
         exclude group: "org.eclipse.jetty.orbit", module: "javax.servlet"
