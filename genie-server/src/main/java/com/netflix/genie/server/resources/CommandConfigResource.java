@@ -949,8 +949,8 @@ public final class CommandConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(
-                    value = "The statuses of the commands to find.",
-                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
+                    value = "Status of the cluster.",
+                    allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
             )
             @QueryParam("status")
             final Set<String> statuses

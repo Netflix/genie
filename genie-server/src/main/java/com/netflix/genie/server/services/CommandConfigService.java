@@ -18,7 +18,13 @@
 package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.*;
+//import com.netflix.genie.common.model.*;
+import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.Cluster;
+import com.netflix.genie.common.model.CommandStatus;
+import com.netflix.genie.common.model.ClusterStatus;
+
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
