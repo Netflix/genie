@@ -30,7 +30,11 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.CommandStatus;
 
-import com.netflix.genie.server.repository.jpa.*;
+import com.netflix.genie.server.repository.jpa.ClusterRepository;
+import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.repository.jpa.JobRepository;
+import com.netflix.genie.server.repository.jpa.ClusterSpecs;
+
 import com.netflix.genie.server.services.ClusterConfigService;
 
 import java.util.ArrayList;

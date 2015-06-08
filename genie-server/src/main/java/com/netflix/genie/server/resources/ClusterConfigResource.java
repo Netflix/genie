@@ -649,6 +649,10 @@ public final class ClusterConfigResource {
             )
             @PathParam("id")
             final String id,
+            @ApiParam(
+                    value = "The statuses of the commands to find.",
+                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
+            )
             @QueryParam("status")
             final Set<String> statuses
     ) throws GenieException {
