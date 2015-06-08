@@ -37,7 +37,7 @@ subprojects {
     targetCompatibility = 1.7
 
     group = "com.netflix.${githubProjectName}"
-    
+
     repositories {
         jcenter()
         mavenLocal()
@@ -52,8 +52,8 @@ subprojects {
          * Compile Dependencies
          *******************************/
 
-        compile ("org.apache.commons:commons-lang3:${commons_lang3_version}")
-        compile ("org.slf4j:slf4j-log4j12:${slf4j_log4j12_version}")
+        compile("org.apache.commons:commons-lang3:${commons_lang3_version}")
+        compile("org.slf4j:slf4j-log4j12:${slf4j_log4j12_version}")
 
         /*******************************
          * Provided Dependencies
@@ -68,14 +68,14 @@ subprojects {
          *******************************/
 
         // JUnit
-        testCompile ("junit:junit:${junit_version}")
+        testCompile("junit:junit:${junit_version}")
 
         // Mockito
-        testCompile ("org.mockito:mockito-core:${mockito_version}")
+        testCompile("org.mockito:mockito-core:${mockito_version}")
     }
 
     checkstyle {
-        ignoreFailures = true 
+        ignoreFailures = true
         configFile = new File(project.parent.projectDir, 'codequality/checkstyle.xml')
     }
 
