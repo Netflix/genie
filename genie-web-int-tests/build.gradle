@@ -1,5 +1,5 @@
 // dummy test - since integration tests are run by build task
-task test(overwrite:true)
+task test(overwrite: true)
 
 dependencies {
     /*******************************
@@ -18,15 +18,18 @@ dependencies {
      * Test Dependencies
      *******************************/
 
-    testCompile project(":genie-web")
-    testCompile "com.netflix.karyon:karyon-extensions-testsuite:${karyon_version}"
-    testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.1.0.Final'
-    testCompile 'org.jboss.shrinkwrap:shrinkwrap-impl-base:1.1.2'
-    testCompile 'org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven:2.0.0'
-    testRuntime 'org.jboss.arquillian.container:arquillian-tomcat-embedded-7:1.0.0.CR5'
-    testRuntime 'org.apache.tomcat.embed:tomcat-embed-core:7.0.42'
-    testRuntime 'org.apache.tomcat.embed:tomcat-embed-logging-juli:7.0.42'
-    testRuntime ('org.apache.tomcat.embed:tomcat-embed-jasper:7.0.42') {
-        exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+    testCompile(project(":genie-web")) {
+        exclude group: "javax.el", module: "javax.el-api"
+        exclude group: "org.glassfish.web", module: "javax.el"
+    }
+    testCompile("com.netflix.karyon:karyon-extensions-testsuite:${karyon_version}")
+    testCompile("org.jboss.arquillian.junit:arquillian-junit-container:1.1.0.Final")
+    testCompile("org.jboss.shrinkwrap:shrinkwrap-impl-base:1.1.2")
+    testCompile("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven:2.0.0")
+    testRuntime("org.jboss.arquillian.container:arquillian-tomcat-embedded-7:1.0.0.CR5")
+    testRuntime("org.apache.tomcat.embed:tomcat-embed-core:7.0.42")
+    testRuntime("org.apache.tomcat.embed:tomcat-embed-logging-juli:7.0.42")
+    testRuntime("org.apache.tomcat.embed:tomcat-embed-jasper:7.0.42") {
+        exclude group: "org.eclipse.jdt.core.compiler", module: "ecj"
     }
 }

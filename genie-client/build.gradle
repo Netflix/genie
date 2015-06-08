@@ -6,7 +6,7 @@ dependencies {
      *******************************/
 
     compile project(":genie-common")
-    compile ("org.codehaus.groovy:groovy:${groovy_lang_version}")
+    compile("org.codehaus.groovy:groovy:${groovy_lang_version}")
 
     /*******************************
      * Provided Dependencies
@@ -22,18 +22,18 @@ dependencies {
 }
 
 clean {
-    delete 'src/main/python/nflx_genie_client.egg-info'
-    delete 'src/main/python/dist'
+    delete "src/main/python/nflx_genie_client.egg-info"
+    delete "src/main/python/dist"
 }
 
 task buildPythonPackage(type: Exec) {
     dependsOn clean
-    workingDir 'src/main/python'
-    commandLine 'python', 'setup.py', 'sdist'
+    workingDir "src/main/python"
+    commandLine "python", "setup.py", "sdist"
 }
 
 task uploadToPypi(type: Exec) {
     dependsOn buildPythonPackage
-    workingDir 'src/main/python'
-    commandLine 'bash', '-c', 'twine upload dist/*'
+    workingDir "src/main/python"
+    commandLine "bash", "-c", "twine upload dist/*"
 }
