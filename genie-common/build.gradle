@@ -48,12 +48,12 @@ dependencies {
      * Runtime Dependencies
      *******************************/
 
-    runtime("javax.el:javax.el-api:${expression_language_version}")
-    runtime("org.glassfish.web:javax.el:${expression_language_version}")
-
     /*******************************
      * Test Dependencies
      *******************************/
+
+    testRuntime("javax.el:javax.el-api:${expression_language_version}")
+    testRuntime("org.glassfish.web:javax.el:${expression_language_version}")
 }
 
 task genJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA metamodels') {
