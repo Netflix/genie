@@ -75,6 +75,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * Default constructor.
      *
      * @param applicationRepo The application repository to use
+     * @param commandRepo     The command repository to use
      */
     public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo,
                                            final CommandRepository commandRepo) {

@@ -47,6 +47,7 @@ public class TestEntityBase {
     /**
      * Get the validator object.
      *
+     * @param <E> The type of entity to validate
      * @param entity The entity to validate
      */
     public <E> void validate(final E entity) {

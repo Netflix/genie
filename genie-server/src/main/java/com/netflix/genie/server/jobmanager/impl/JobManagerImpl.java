@@ -102,18 +102,18 @@ public class JobManagerImpl implements JobManager {
      * {@inheritDoc}
      */
     @Override
-    public void init(final Job job, final Cluster cluster) throws GenieException {
-        if (job == null) {
+    public void init(final Job jobToManage, final Cluster clusterToUse) throws GenieException {
+        if (jobToManage == null) {
             throw new GeniePreconditionException("No job entered.");
         }
-        if (cluster == null) {
+        if (clusterToUse == null) {
             throw new GeniePreconditionException("No cluster entered.");
         }
 
         //TODO: Get rid of this circular dependency
         this.jobMonitor.setJobManager(this);
-        this.job = job;
-        this.cluster = cluster;
+        this.job = jobToManage;
+        this.cluster = clusterToUse;
         this.attachments = this.job.getAttachments();
 
         // save the cluster name and id
@@ -194,7 +194,7 @@ public class JobManagerImpl implements JobManager {
                     LOG.error(msg);
                     throw new GenieServerException(msg);
                 }
-                Process killProcessId = Runtime.getRuntime().exec(
+                final Process killProcessId = Runtime.getRuntime().exec(
                         genieHome + File.separator + "jobkill.sh " + processId);
 
                 int returnCode = 1;
@@ -506,7 +506,7 @@ public class JobManagerImpl implements JobManager {
         // create the working directory
         final boolean resMkDir = userJobDir.mkdirs();
         if (!resMkDir) {
-            String msg = "User staging directory can't be created";
+            final String msg = "User staging directory can't be created";
             this.jobService.setJobStatus(this.job.getId(), JobStatus.FAILED, msg);
             LOG.error(this.job.getStatusMsg() + ": " + userJobDir.getAbsolutePath());
             throw new GenieServerException(msg);
@@ -575,7 +575,7 @@ public class JobManagerImpl implements JobManager {
             f.setAccessible(true);
             return f.getInt(proc);
         } catch (final IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
-            String msg = "Can't get process id for job";
+            final String msg = "Can't get process id for job";
             LOG.error(msg, e);
             throw new GenieServerException(msg, e);
         }

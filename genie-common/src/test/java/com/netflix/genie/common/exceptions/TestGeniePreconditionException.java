@@ -36,7 +36,7 @@ public class TestGeniePreconditionException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GeniePreconditionException
+     * @throws GeniePreconditionException On a precondition issue
      */
     @Test(expected = GeniePreconditionException.class)
     public void testTwoArgConstructor() throws GeniePreconditionException {
@@ -50,7 +50,7 @@ public class TestGeniePreconditionException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws com.netflix.genie.common.exceptions.GeniePreconditionException
+     * @throws GeniePreconditionException On a precondition issue
      */
     @Test(expected = GeniePreconditionException.class)
     public void testMessageArgConstructor() throws GeniePreconditionException {
@@ -64,7 +64,7 @@ public class TestGeniePreconditionException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws com.netflix.genie.common.exceptions.GeniePreconditionException
+     * @throws GeniePreconditionException On a precondition issue
      */
     @Test(expected = GeniePreconditionException.class)
     public void testThrowableArgConstructor() throws GeniePreconditionException {

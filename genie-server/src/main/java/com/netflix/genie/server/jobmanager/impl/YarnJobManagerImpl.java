@@ -137,7 +137,7 @@ public class YarnJobManagerImpl extends JobManagerImpl {
                         new String[]{
                                 genieJobIDProp,
                                 netflixEnvProp,
-                                lipstickUuidProp
+                                lipstickUuidProp,
                         },
                         JobManagerImpl.SEMI_COLON)
         );
@@ -161,7 +161,7 @@ public class YarnJobManagerImpl extends JobManagerImpl {
             }
 
             if (hadoopHome == null || !new File(hadoopHome).exists()) {
-                String msg = "This genie instance doesn't support Hadoop version: "
+                final String msg = "This genie instance doesn't support Hadoop version: "
                         + hadoopVersion;
                 LOG.error(msg);
                 throw new GenieServerException(msg);

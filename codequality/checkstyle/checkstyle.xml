@@ -1,0 +1,303 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+
+<!-- See: http://checkstyle.sourceforge.net/checks.html -->
+<module name="Checker">
+
+    <!-- Checks for long source files. -->
+    <module name="FileLength"/>
+
+    <!-- Checks to see if a file contains a tab character. -->
+    <module name="FileTabCharacter"/>
+
+    <!-- Checks that all packages have a package documentation. -->
+    <module name="JavadocPackage">
+        <property name="allowLegacy" value="true"/>
+    </module>
+
+    <!-- Checks that there is a newline at the end of each file. -->
+    <module name="NewlineAtEndOfFile"/>
+
+    <!-- Implementation of a check that looks for a single line in any file type. -->
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="minimum" value="0"/>
+        <property name="maximum" value="0"/>
+        <property name="message" value="Line has trailing spaces."/>
+        <property name="severity" value="info"/>
+    </module>
+
+    <!-- The TranslationCheck class helps to ensure the correct translation of code by checking property files for
+         consistency regarding their keys. -->
+    <module name="Translation"/>
+
+    <module name="TreeWalker">
+        <!-- Checks the style of array type definitions. -->
+        <module name="ArrayTypeStyle"/>
+
+        <!-- Checks if array initialization contains optional trailing comma. -->
+        <module name="ArrayTrailingComma"/>
+
+        <!-- Finds nested blocks. -->
+        <module name="AvoidNestedBlocks"/>
+
+        <!-- Check that finds import statements that use the * notation. -->
+        <module name="AvoidStarImport"/>
+
+        <!-- Check that finds static imports. -->
+        <module name="AvoidStaticImport"/>
+
+        <!-- Checks that constant names conform to a format specified by the format property. -->
+        <module name="ConstantName"/>
+
+        <!-- Checks cyclomatic complexity against a specified limit. -->
+        <!--<module name="CyclomaticComplexity"/>-->
+
+        <!-- Checks that the parts of a class or interface declaration appear in the order suggested by the Code
+             Conventions for the Java Programming Language. -->
+        <module name="DeclarationOrder"/>
+
+        <!-- Checks for empty blocks. -->
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+        </module>
+
+        <!-- Checks the padding of an empty for iterator; that is whether a space is required at an empty for iterator,
+             or such spaces are forbidden. -->
+        <module name="EmptyForIteratorPad"/>
+
+        <!-- Detects empty statements (standalone ';'). -->
+        <module name="EmptyStatement"/>
+
+        <!-- Checks that classes that override equals() also override hashCode(). -->
+        <module name="EqualsHashCode"/>
+
+        <!-- Checks if any class or object member explicitly initialized to default for its type value (null for
+             object references, zero for numeric types and char and false for boolean. -->
+        <module name="ExplicitInitialization"/>
+
+        <!-- Checks for fall through in switch statements Finds locations where a case contains Java code - but lacks a
+             break, return, throw or continue statement. -->
+        <module name="FallThrough"/>
+
+        <!-- Required by comment suppression filters -->
+        <module name="FileContentsHolder"/>
+
+        <!-- Checks that class which has only private ctors is declared as final. -->
+        <module name="FinalClass"/>
+
+        <!-- Ensures that local variables that never get their values changed, must be declared final. -->
+        <module name="FinalLocalVariable"/>
+
+        <!-- Check that method/constructor/catch/foreach parameters are final. -->
+        <module name="FinalParameters"/>
+
+        <!-- Checks that the whitespace around the Generic tokens < and > are correct to the typical convention. -->
+        <module name="GenericWhitespace"/>
+
+        <!-- Checks that a local variable or a parameter does not shadow a field that is defined in the same class. -->
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true"/>
+            <property name="ignoreSetter" value="true"/>
+        </module>
+
+        <!-- Make sure that utility classes (classes that contain only static methods) do not have a public
+             constructor. -->
+        <module name="HideUtilityClassConstructor"/>
+
+        <!-- Catching java.lang.Exception, java.lang.Error or java.lang.RuntimeException is almost never acceptable. -->
+        <!--<module name="IllegalCatch"/>-->
+
+        <!-- Checks for imports from a set of illegal packages. -->
+        <module name="IllegalImport"/>
+
+        <!-- Checks for illegal instantiations where a factory method is preferred. -->
+        <module name="IllegalInstantiation"/>
+
+        <!-- Throwing java.lang.Error or java.lang.RuntimeException is almost never acceptable. -->
+        <module name="IllegalThrows"/>
+
+        <!-- Checks for assignments in subexpressions, such as in String s = Integer.toString(i = 2);. -->
+        <module name="InnerAssignment"/>
+
+        <!-- Implements Bloch, Effective Java, Item 17 - Use Interfaces only to define types. -->
+        <module name="InterfaceIsType"/>
+
+        <!-- Checks the Javadoc of a method or constructor. -->
+        <module name="JavadocMethod">
+            <property name="scope" value="public"/>
+            <property name="allowThrowsTagsForSubclasses" value="true"/>
+            <property name="allowUndeclaredRTE" value="true"/>
+            <property name="allowMissingPropertyJavadoc" value="true"/>
+        </module>
+
+        <!-- Custom Checkstyle Check to validate Javadoc. -->
+        <module name="JavadocStyle">
+            <property name="checkEmptyJavadoc" value="true"/>
+        </module>
+
+        <!-- Checks the Javadoc of a type. -->
+        <module name="JavadocType">
+            <property name="scope" value="public"/>
+        </module>
+
+        <!-- Checks that a variable has Javadoc comment. -->
+        <module name="JavadocVariable">
+            <property name="scope" value="public"/>
+        </module>
+
+        <!-- Checks the placement of left curly braces on types, methods and other blocks. -->
+        <module name="LeftCurly"/>
+
+        <!-- Checks for long lines. -->
+        <module name="LineLength">
+            <property name="max" value="120"/>
+            <property name="ignorePattern" value="\$File.*\$"/>
+        </module>
+
+        <!-- Checks that local final variable names conform to a format specified by the format property. -->
+        <module name="LocalFinalVariableName"/>
+
+        <!-- Checks that local, non-final variable names conform to a format specified by the format property. -->
+        <module name="LocalVariableName"/>
+
+        <!-- Checks for magic numbers. -->
+        <!--<module name="MagicNumber"/>-->
+
+        <!-- Checks that instance variable names conform to a format specified by the format property. -->
+        <module name="MemberName"/>
+
+        <!-- Checks for long methods. -->
+        <module name="MethodLength">
+            <property name="max" value="200"/>
+        </module>
+
+        <!-- Checks that method names conform to a format specified by the format property. -->
+        <module name="MethodName"/>
+
+        <!-- Checks the padding between the identifier of a method definition, constructor definition, method call, or
+             constructor invocation; and the left parenthesis of the parameter list. -->
+        <module name="MethodParamPad"/>
+
+        <!-- This class is used to verify that the java.lang.Override annotation is present when the {@inheritDoc}
+             javadoc tag is present. -->
+        <module name="MissingOverride"/>
+
+        <!-- Checks that switch statement has "default" clause. -->
+        <module name="MissingSwitchDefault"/>
+
+        <!-- Check for ensuring that for loop control variables are not modified inside the for block. -->
+        <module name="ModifiedControlVariable"/>
+
+        <!-- Checks that the order of modifiers conforms to the suggestions in the Java Language specification,
+             sections 8.1.1, 8.3.1 and 8.4.3. -->
+        <module name="ModifierOrder"/>
+
+        <!-- Checks that each variable declaration is in its own statement and on its own line. -->
+        <module name="MultipleVariableDeclarations"/>
+
+        <!-- Checks for braces around code blocks. -->
+        <module name="NeedBraces"/>
+
+        <!-- Checks that there is no whitespace after a token. -->
+        <module name="NoWhitespaceAfter"/>
+
+        <!-- Checks that there is no whitespace before a token. -->
+        <module name="NoWhitespaceBefore"/>
+
+        <!-- Checks the npath complexity against a specified limit (default = 200). -->
+        <!--<module name="NPathComplexity"/>-->
+
+        <!-- Checks there is only one statement per line. -->
+        <module name="OneStatementPerLine"/>
+
+        <!-- Checks line wrapping for operators. -->
+        <module name="OperatorWrap"/>
+
+        <!-- Checks that package names conform to a format specified by the format property. -->
+        <module name="PackageName"/>
+
+        <!-- Checks that parameter names conform to a format specified by the format property. -->
+        <module name="ParameterName"/>
+
+        <!-- Checks the number of parameters that a method or constructor has. -->
+        <module name="ParameterNumber">
+            <property name="max" value="15"/>
+        </module>
+
+        <!-- Checks the padding of parentheses; that is whether a space is required after a left parenthesis and before
+             a right parenthesis, or such spaces are forbidden, with the exception that it does not check for padding
+             of the right parenthesis at an empty for iterator. -->
+        <module name="ParenPad"/>
+
+        <!-- Checks for imports that are redundant. -->
+        <module name="RedundantImport"/>
+
+        <!-- Checks for redundant modifiers in interface and annotation definitions. -->
+        <module name="RedundantModifier"/>
+
+        <!-- Checks the placement of right curly braces. -->
+        <module name="RightCurly"/>
+
+        <!-- Checks for overly complicated boolean expressions. -->
+        <module name="SimplifyBooleanExpression"/>
+
+        <!-- Checks for overly complicated boolean return statements. -->
+        <module name="SimplifyBooleanReturn"/>
+
+        <!-- Checks that static, non-final variable names conform to a format specified by the format property. -->
+        <module name="StaticVariableName"/>
+
+        <!-- Checks that string literals are not used with == or !=. -->
+        <module name="StringLiteralEquality"/>
+
+        <!-- A check for TODO comments. -->
+        <!--<module name="TodoComment">-->
+        <!--<property name="format" value="TODO"/>-->
+        <!--<property name="severity" value="info"/>-->
+        <!--</module>-->
+
+        <!-- Checks the padding of parentheses for typecasts. -->
+        <module name="TypecastParenPad"/>
+
+        <!-- Checks that type names conform to a format specified by the format property. -->
+        <module name="TypeName"/>
+
+        <!-- Checks for unused import statements. -->
+        <module name="UnusedImports"/>
+
+        <!-- Checks that long constants are defined with an upper ell. -->
+        <module name="UpperEll"/>
+
+        <!-- Checks visibility of class members. -->
+        <module name="VisibilityModifier">
+            <property name="protectedAllowed" value="true"/>
+        </module>
+
+        <!-- Checks that a token is followed by whitespace, with the exception that it does not check for whitespace
+             after the semicolon of an empty for iterator. -->
+        <module name="WhitespaceAfter"/>
+
+        <!-- Checks that a token is surrounded by whitespace. -->
+        <module name="WhitespaceAround"/>
+    </module>
+
+    <!-- Enable suppression comments -->
+    <module name="SuppressionCommentFilter">
+        <property name="offCommentFormat" value="CHECKSTYLE IGNORE\s+(\S+)"/>
+        <property name="onCommentFormat" value="CHECKSTYLE END IGNORE\s+(\S+)"/>
+        <property name="checkFormat" value="$1"/>
+    </module>
+
+    <module name="SuppressWithNearbyCommentFilter">
+        <!-- Syntax is "SUPPRESS CHECKSTYLE name" -->
+        <property name="commentFormat" value="SUPPRESS CHECKSTYLE (\w+)"/>
+        <property name="checkFormat" value="$1"/>
+        <property name="influenceFormat" value="1"/>
+    </module>
+
+    <!-- Detects duplicated keys in properties files. -->
+    <module name="UniqueProperties"/>
+</module>

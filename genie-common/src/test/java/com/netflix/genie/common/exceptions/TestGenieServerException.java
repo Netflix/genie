@@ -36,7 +36,7 @@ public class TestGenieServerException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieServerException
+     * @throws GenieServerException On a server issue
      */
     @Test(expected = GenieServerException.class)
     public void testTwoArgConstructor() throws GenieServerException {
@@ -50,7 +50,7 @@ public class TestGenieServerException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieServerException
+     * @throws GenieServerException On a server issue
      */
     @Test(expected = GenieServerException.class)
     public void testMessageArgConstructor() throws GenieServerException {
@@ -64,7 +64,7 @@ public class TestGenieServerException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieServerException
+     * @throws GenieServerException On a server issue
      */
     @Test(expected = GenieServerException.class)
     public void testThrowableArgConstructor() throws GenieServerException {

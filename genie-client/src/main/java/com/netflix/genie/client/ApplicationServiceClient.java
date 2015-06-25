@@ -605,7 +605,7 @@ public final class ApplicationServiceClient extends BaseGenieClient {
                                 BASE_CONFIG_APPLICATION_REST_URL,
                                 id,
                                 "tags",
-                                tag
+                                tag,
                         },
                         SLASH),
                 null,

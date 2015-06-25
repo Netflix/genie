@@ -240,19 +240,19 @@ public final class CommandConfigResource {
             )
             @QueryParam("page")
             @DefaultValue("0")
-            int page,
+            final int page,
             @ApiParam(
                     value = "Max number of results per page."
             )
             @QueryParam("limit")
             @DefaultValue("1024")
-            int limit,
+            final int limit,
             @ApiParam(
                     value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
             )
             @QueryParam("descending")
             @DefaultValue("true")
-            boolean descending,
+            final boolean descending,
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
@@ -914,8 +914,9 @@ public final class CommandConfigResource {
     /**
      * Get all the clusters this command is associated with.
      *
-     * @param id The id of the command to get the clusters for. Not
-     *           NULL/empty/blank.
+     * @param id       The id of the command to get the clusters for. Not
+     *                 NULL/empty/blank.
+     * @param statuses The statuses of the clusters to get
      * @return The list of clusters.
      * @throws GenieException For any error
      */

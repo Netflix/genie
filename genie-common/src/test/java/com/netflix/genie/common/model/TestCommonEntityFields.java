@@ -79,6 +79,8 @@ public class TestCommonEntityFields extends TestEntityBase {
 
     /**
      * Test to make sure validation works.
+     *
+     * @throws GenieException For any issue
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateWithNothing() throws GenieException {
@@ -145,7 +147,7 @@ public class TestCommonEntityFields extends TestEntityBase {
     /**
      * Test the method which adds system tags.
      *
-     * @throws GeniePreconditionException
+     * @throws GeniePreconditionException If a precondition isn't met
      */
     @Test
     public void testAddAndValidateSystemTags() throws GeniePreconditionException {
@@ -172,7 +174,7 @@ public class TestCommonEntityFields extends TestEntityBase {
     /**
      * Test the method which adds system tags.
      *
-     * @throws GeniePreconditionException
+     * @throws GeniePreconditionException If a precondition isn't met
      */
     @Test
     public void testAddAndValidateSystemTagsWithChangedName() throws GeniePreconditionException {
@@ -210,7 +212,7 @@ public class TestCommonEntityFields extends TestEntityBase {
     /**
      * Test the method which adds system tags.
      *
-     * @throws GeniePreconditionException
+     * @throws GeniePreconditionException If a precondition isn't met
      */
     @Test(expected = GeniePreconditionException.class)
     public void testAddAndValidateSystemTagsNullTags() throws GeniePreconditionException {
@@ -220,7 +222,7 @@ public class TestCommonEntityFields extends TestEntityBase {
     /**
      * Test the method which adds system tags.
      *
-     * @throws GeniePreconditionException
+     * @throws GeniePreconditionException If a precondition isn't met
      */
     @Test(expected = GeniePreconditionException.class)
     public void testAddAndValidateSystemTagsWithTooManyIdTags() throws GeniePreconditionException {
@@ -242,7 +244,7 @@ public class TestCommonEntityFields extends TestEntityBase {
     /**
      * Test the method which adds system tags.
      *
-     * @throws GeniePreconditionException
+     * @throws GeniePreconditionException If a precondition isn't met
      */
     @Test(expected = GeniePreconditionException.class)
     public void testAddAndValidateSystemTagsWithTooManyNameTags() throws GeniePreconditionException {
@@ -265,7 +267,7 @@ public class TestCommonEntityFields extends TestEntityBase {
     /**
      * Test the method which adds system tags.
      *
-     * @throws GeniePreconditionException
+     * @throws GeniePreconditionException If a precondition isn't met
      */
     @Test(expected = GeniePreconditionException.class)
     public void testAddAndValidateSystemTagsWithTooManyGenieNamespaceTags() throws GeniePreconditionException {

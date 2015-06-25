@@ -57,7 +57,7 @@ public class TestGenieSpringBootstrap {
     /**
      * Test that the initialize method is called after construction.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testInitialize() throws GenieException {

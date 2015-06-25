@@ -33,7 +33,7 @@ public class TestStringUtil {
      * Test various command-line argument permutations to ensure that they parse
      * correctly, including spaces, single and double quotes, etc.
      *
-     * @throws GenieException if anything went wrong with the parsing.
+     * @throws GenieException For any problem if anything went wrong with the parsing.
      */
     @Test
     public void testSplitCmdLine() throws GenieException {
@@ -47,7 +47,7 @@ public class TestStringUtil {
     /**
      * Test spaces within quotes.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSplitCmdLineSpacesWithinQuotes() throws GenieException {
@@ -59,7 +59,7 @@ public class TestStringUtil {
     /**
      * Test spaces at beginning and end.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSplitCmdLineSpacesAtBeginningAndEnd() throws GenieException {
@@ -71,7 +71,7 @@ public class TestStringUtil {
     /**
      * Test extra spaces in the middle.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSplitCmdLineExtraSpacesInMiddle() throws GenieException {
@@ -84,7 +84,7 @@ public class TestStringUtil {
     /**
      * Test spaces and equals in middle.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSplitCmdLineSpacesAndEqualsInMiddle() throws GenieException {
@@ -96,7 +96,7 @@ public class TestStringUtil {
     /**
      * Test commas in arguments.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSplitCmdLineCommasInArguments() throws GenieException {
@@ -112,7 +112,7 @@ public class TestStringUtil {
     /**
      * Test that null returns empty string.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSplitCmdLineWithNull() throws GenieException {

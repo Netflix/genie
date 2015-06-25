@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import static org.junit.Assert.assertNotNull;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -51,7 +51,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
     /**
      * Test whether a cluster is returned from a set of candidates.
      *
-     * @throws GenieException if anything went wrong with the test.
+     * @throws GenieException For any problem if anything went wrong with the test.
      */
     @Test
     public void testValidCluster() throws GenieException {
@@ -59,13 +59,13 @@ public class TestRandomizedClusterLoadBalancerImpl {
         configs.add("SomeConfig");
         final Cluster cce = new Cluster("name", "tgianos", "2.4.0", ClusterStatus.UP, "jobManager");
         cce.setConfigs(configs);
-        assertNotNull(this.clb.selectCluster(Arrays.asList(cce, cce, cce)));
+        Assert.assertNotNull(this.clb.selectCluster(Arrays.asList(cce, cce, cce)));
     }
 
     /**
      * Ensure exception is thrown if no cluster is found.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GeniePreconditionException.class)
     public void testEmptyList() throws GenieException {
@@ -75,7 +75,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
     /**
      * Ensure exception is thrown if no cluster is found.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GeniePreconditionException.class)
     public void testNullList() throws GenieException {

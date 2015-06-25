@@ -69,12 +69,14 @@ public interface ApplicationConfigService {
     /**
      * Get applications for given filter criteria.
      *
-     * @param name     name of application. Can be null or empty.
-     * @param userName The user who created the application. Can be null/empty
-     * @param statuses The statuses of the applications to find. Can be null.
-     * @param tags     tags allocated to this application
-     * @param page     Page number to start results on
-     * @param limit    Max number of results per page
+     * @param name       name of application. Can be null or empty.
+     * @param userName   The user who created the application. Can be null/empty
+     * @param statuses   The statuses of the applications to find. Can be null.
+     * @param tags       tags allocated to this application
+     * @param page       Page number to start results on
+     * @param limit      Max number of results per page
+     * @param descending Whether to sort the results by descending or ascending order
+     * @param orderBys   How to order the results
      * @return successful response, or one with HTTP error code
      */
     List<Application> getApplications(final String name,
@@ -354,7 +356,7 @@ public interface ApplicationConfigService {
     /**
      * Get all the commands the application with given id is associated with.
      *
-     * @param id The id of the application to get the commands for.
+     * @param id       The id of the application to get the commands for.
      * @param statuses The status of the commands returned
      * @return The commands the application is a part of.
      * @throws GenieException if there is an error

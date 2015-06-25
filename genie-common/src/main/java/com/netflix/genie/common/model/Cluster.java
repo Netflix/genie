@@ -184,7 +184,7 @@ public class Cluster extends CommonEntityFields {
      *
      * @param clusterType The type of this cluster. Not null/empty/blank.
      */
-    public void setClusterType(String clusterType) {
+    public void setClusterType(final String clusterType) {
         this.clusterType = clusterType;
     }
 

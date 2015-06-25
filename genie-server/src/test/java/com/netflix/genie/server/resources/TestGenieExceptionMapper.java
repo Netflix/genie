@@ -36,8 +36,8 @@ import java.net.HttpURLConnection;
  * @author tgianos
  */
 public class TestGenieExceptionMapper {
-    private GenieExceptionMapper mapper;
     private static final String ERROR_MESSAGE = "Genie error";
+    private GenieExceptionMapper mapper;
 
     /**
      * Setup the tests.

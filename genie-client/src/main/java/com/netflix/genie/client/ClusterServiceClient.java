@@ -588,7 +588,7 @@ public final class ClusterServiceClient extends BaseGenieClient {
                                 BASE_CONFIG_CLUSTER_REST_URL,
                                 id,
                                 "tags",
-                                tag
+                                tag,
                         },
                         SLASH),
                 null,

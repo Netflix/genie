@@ -64,7 +64,7 @@ public final class NetUtil {
      */
     public static String getArchiveURI(final String jobID) {
         LOG.debug("called for jobID: " + jobID);
-        String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
+        final String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
                 .getString("com.netflix.genie.server.s3.archive.location");
         if (s3ArchiveLocation != null && !s3ArchiveLocation.isEmpty()) {
             return s3ArchiveLocation + "/" + jobID;
@@ -93,7 +93,7 @@ public final class NetUtil {
         }
 
         // if hostName is not set by property, figure it out based on the datacenter
-        String dc = ConfigurationManager.getConfigInstance().getString("netflix.datacenter");
+        final String dc = ConfigurationManager.getConfigInstance().getString("netflix.datacenter");
         if (dc != null && dc.equals("cloud")) {
             hostName = getCloudHostName();
         } else {
@@ -101,7 +101,7 @@ public final class NetUtil {
         }
 
         if (hostName == null || hostName.isEmpty()) {
-            String msg = "Can't figure out host name for instance";
+            final String msg = "Can't figure out host name for instance";
             LOG.error(msg);
             throw new GenieServerException(msg);
         }
@@ -120,7 +120,7 @@ public final class NetUtil {
         try {
             cloudHostName = httpGet(PUBLIC_HOSTNAME_URI);
         } catch (IOException ioe) {
-            String msg = "Unable to get public hostname from instance metadata";
+            final String msg = "Unable to get public hostname from instance metadata";
             LOG.error(msg, ioe);
             throw new GenieServerException(msg, ioe);
         }
@@ -128,7 +128,7 @@ public final class NetUtil {
             try {
                 cloudHostName = httpGet(LOCAL_IPV4_URI);
             } catch (final IOException ioe) {
-                String msg = "Unable to get local IP from instance metadata";
+                final String msg = "Unable to get local IP from instance metadata";
                 LOG.error(msg, ioe);
                 throw new GenieServerException(msg, ioe);
             }
@@ -149,10 +149,10 @@ public final class NetUtil {
     private static String httpGet(final String uri) throws IOException {
         String response = null;
         //TODO: Use one of other http clients to remove dependency
-        HttpClient client = new HttpClient();
-        HttpMethod method = new GetMethod(uri);
+        final HttpClient client = new HttpClient();
+        final HttpMethod method = new GetMethod(uri);
         client.executeMethod(method);
-        int status = method.getStatusCode();
+        final int status = method.getStatusCode();
         if (status == HttpURLConnection.HTTP_OK) {
             response = method.getResponseBodyAsString();
         }
@@ -168,10 +168,10 @@ public final class NetUtil {
 
         try {
             // gets the local instance hostname
-            InetAddress addr = InetAddress.getLocalHost();
+            final InetAddress addr = InetAddress.getLocalHost();
             dcHostName = addr.getCanonicalHostName();
         } catch (final UnknownHostException e) {
-            String msg = "Unable to get the hostname";
+            final String msg = "Unable to get the hostname";
             LOG.error(msg, e);
             throw new GenieServerException(msg, e);
         }

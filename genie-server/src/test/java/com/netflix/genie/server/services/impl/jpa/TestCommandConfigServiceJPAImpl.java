@@ -91,7 +91,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get command method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetCommand() throws GenieException {
@@ -136,7 +136,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get command method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetCommandNull() throws GenieException {
@@ -146,7 +146,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get command method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandNotExists() throws GenieException {
@@ -323,7 +323,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the create method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testCreateCommand() throws GenieException {
@@ -358,7 +358,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the create method when no id is entered.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testCreateCommandNoId() throws GenieException {
@@ -390,7 +390,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure an exception is thrown when null is entered.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testCreateCommandNull() throws GenieException {
@@ -400,7 +400,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure an exception is thrown when command already exists.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieConflictException.class)
     public void testCreateCommandAlreadyExists() throws GenieException {
@@ -418,7 +418,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateCommandNoId() throws GenieException {
@@ -447,7 +447,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateCommandWithId() throws GenieException {
@@ -477,7 +477,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update a command with invalid content. Should throw ConstraintViolationException from JPA layer.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandWithInvalidCommand() throws GenieException {
@@ -502,7 +502,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure setting the created and updated outside the system control doesn't change record in database.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
@@ -523,7 +523,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandNullId() throws GenieException {
@@ -533,7 +533,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandNullUpdateCommand() throws GenieException {
@@ -543,7 +543,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateCommandNoCommandExists() throws GenieException {
@@ -554,7 +554,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieBadRequestException.class)
     public void testUpdateCommandIdsDontMatch() throws GenieException {
@@ -566,7 +566,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete all.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testDeleteAll() throws GenieException {
@@ -578,7 +578,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testDelete() throws GenieException {
@@ -631,7 +631,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testDeleteNoId() throws GenieException {
@@ -641,7 +641,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testDeleteNoCommandToDelete() throws GenieException {
@@ -651,7 +651,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddConfigsToCommand() throws GenieException {
@@ -677,7 +677,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToCommandNoId() throws GenieException {
@@ -687,7 +687,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToCommandNoConfigs() throws GenieException {
@@ -697,7 +697,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToCommandNoCommand() throws GenieException {
@@ -709,7 +709,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateConfigsForCommand() throws GenieException {
@@ -735,7 +735,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForCommandNoId() throws GenieException {
@@ -745,7 +745,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForCommandNoCommand() throws GenieException {
@@ -757,7 +757,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetConfigsForCommand() throws GenieException {
@@ -768,7 +768,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetConfigsForCommandNoId() throws GenieException {
@@ -778,7 +778,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetConfigsForCommandNoApp() throws GenieException {
@@ -788,7 +788,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all configurations for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveAllConfigsForCommand() throws GenieException {
@@ -801,7 +801,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all configurations for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllConfigsForCommandNoId() throws GenieException {
@@ -811,7 +811,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all configurations for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllConfigsForCommandNoCommand() throws GenieException {
@@ -821,7 +821,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveConfigForCommand() throws GenieException {
@@ -837,7 +837,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveConfigForCommandNullConfig() throws GenieException {
@@ -847,7 +847,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveConfigForCommandNoId() throws GenieException {
@@ -857,7 +857,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveConfigForCommandNoCommand() throws GenieException {
@@ -869,7 +869,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application for a given command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSetApplicationForCommand() throws GenieException {
@@ -893,7 +893,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application for a given command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetApplicationForCommandNoId() throws GenieException {
@@ -903,7 +903,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application for a given command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetApplicationForCommandNoCommand() throws GenieException {
@@ -913,7 +913,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application for a given command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GeniePreconditionException.class)
     public void testSetApplicationForCommandNoAppId() throws GenieException {
@@ -923,7 +923,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application for a given command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetApplicationForCommandNoCommandExists() throws GenieException {
@@ -936,7 +936,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application for a given command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetApplicationForCommandNoAppExists() throws GenieException {
@@ -949,7 +949,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get application for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetApplicationForCommand() throws GenieException {
@@ -960,7 +960,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get application for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetApplicationForCommandNoId() throws GenieException {
@@ -970,7 +970,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get application for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetApplicationForCommandNoCommand() throws GenieException {
@@ -980,7 +980,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get application for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetApplicationForCommandNoApp() throws GenieException {
@@ -990,7 +990,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove application for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveApplicationForCommand() throws GenieException {
@@ -1008,7 +1008,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove application for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveApplicationForCommandNoId() throws GenieException {
@@ -1018,7 +1018,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove application for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveApplicationForCommandNoCommandExists() throws GenieException {
@@ -1028,7 +1028,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove application for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveApplicationForCommandNoAppExists() throws GenieException {
@@ -1038,7 +1038,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddTagsToCommand() throws GenieException {
@@ -1064,7 +1064,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToCommandNoId() throws GenieException {
@@ -1074,7 +1074,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToCommandNoTags() throws GenieException {
@@ -1084,7 +1084,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForCommandNoCommand() throws GenieException {
@@ -1096,7 +1096,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateTagsForCommand() throws GenieException {
@@ -1122,7 +1122,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForCommandNoId() throws GenieException {
@@ -1132,7 +1132,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForCommandNoCommand() throws GenieException {
@@ -1144,7 +1144,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetTagsForCommand() throws GenieException {
@@ -1155,7 +1155,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetTagsForCommandNoId() throws GenieException {
@@ -1165,7 +1165,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags to command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForCommandNoCommand() throws GenieException {
@@ -1175,7 +1175,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveAllTagsForCommand() throws GenieException {
@@ -1190,7 +1190,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllTagsForCommandNoId() throws GenieException {
@@ -1200,7 +1200,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForCommandNoCommand() throws GenieException {
@@ -1210,7 +1210,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove tag for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveTagForCommand() throws GenieException {
@@ -1227,7 +1227,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove tag for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForCommandNullTag() throws GenieException {
@@ -1237,7 +1237,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForCommandNoId() throws GenieException {
@@ -1247,7 +1247,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for command.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForCommandNoCommand() throws GenieException {
@@ -1260,7 +1260,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get clusters for command function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetCommandsForCommand() throws GenieException {
@@ -1273,7 +1273,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get clusters for command function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetClustersForCommandNoId() throws GenieException {
@@ -1283,7 +1283,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get clusters for command function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetClustersForCommandNoCommand() throws GenieException {

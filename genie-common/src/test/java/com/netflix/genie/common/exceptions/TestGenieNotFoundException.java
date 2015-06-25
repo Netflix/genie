@@ -36,7 +36,7 @@ public class TestGenieNotFoundException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieNotFoundException
+     * @throws GenieNotFoundException When not found
      */
     @Test(expected = GenieNotFoundException.class)
     public void testTwoArgConstructor() throws GenieNotFoundException {
@@ -50,7 +50,7 @@ public class TestGenieNotFoundException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieNotFoundException
+     * @throws GenieNotFoundException When not found
      */
     @Test(expected = GenieNotFoundException.class)
     public void testMessageArgConstructor() throws GenieNotFoundException {
@@ -64,7 +64,7 @@ public class TestGenieNotFoundException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieNotFoundException
+     * @throws GenieNotFoundException When not found
      */
     @Test(expected = GenieNotFoundException.class)
     public void testThrowableArgConstructor() throws GenieNotFoundException {

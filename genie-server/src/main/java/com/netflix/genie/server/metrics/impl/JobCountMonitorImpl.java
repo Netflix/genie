@@ -65,7 +65,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     @Override
     public int getNumInstanceJobs15Mins() throws GenieException {
         LOG.debug("called");
-        long time = System.currentTimeMillis();
+        final long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 15 * 60 * 1000, null);
     }
 
@@ -75,7 +75,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     @Override
     public int getNumInstanceJobs2Hrs() throws GenieException {
         LOG.debug("called");
-        long time = System.currentTimeMillis();
+        final long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 2 * 60 * 60 * 1000,
                 time - 15 * 60 * 1000);
     }
@@ -86,7 +86,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     @Override
     public int getNumInstanceJobs8Hrs() throws GenieException {
         LOG.debug("called");
-        long time = System.currentTimeMillis();
+        final long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 8 * 60 * 60 * 1000,
                 time - 2 * 60 * 60 * 1000);
     }
@@ -97,7 +97,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     @Override
     public int getNumInstanceJobs8HrsPlus() throws GenieException {
         LOG.debug("called");
-        long time = System.currentTimeMillis();
+        final long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(null, time - 8 * 60 * 60
                 * 1000);
     }
@@ -111,35 +111,35 @@ public class JobCountMonitorImpl implements JobCountMonitor {
         while (true) {
             try {
                 LOG.info("JobCountMonitor daemon waking up");
-                if (stop) {
+                if (this.stop) {
                     LOG.info("JobCountMonitor stopping as per request");
                     return;
                 }
 
                 // set the metrics - check if thread is stopped at every point
-                if (!stop) {
-                    stats.setGenieRunningJobs(getNumInstanceJobs());
+                if (!this.stop) {
+                    this.stats.setGenieRunningJobs(getNumInstanceJobs());
                 }
 
                 if (!stop) {
-                    stats.setGenieRunningJobs0To15m(getNumInstanceJobs15Mins());
+                    this.stats.setGenieRunningJobs0To15m(getNumInstanceJobs15Mins());
                 }
 
                 if (!stop) {
-                    stats.setGenieRunningJobs15mTo2h(getNumInstanceJobs2Hrs());
+                    this.stats.setGenieRunningJobs15mTo2h(getNumInstanceJobs2Hrs());
                 }
 
                 if (!stop) {
-                    stats.setGenieRunningJobs2hTo8h(getNumInstanceJobs8Hrs());
+                    this.stats.setGenieRunningJobs2hTo8h(getNumInstanceJobs8Hrs());
                 }
 
                 if (!stop) {
-                    stats.setGenieRunningJobs8hPlus(getNumInstanceJobs8HrsPlus());
+                    this.stats.setGenieRunningJobs8hPlus(getNumInstanceJobs8HrsPlus());
                 }
 
                 // sleep for the configured timeout
-                if (!stop) {
-                    long sleepTime = ConfigurationManager.
+                if (!this.stop) {
+                    final long sleepTime = ConfigurationManager.
                             getConfigInstance().getLong("com.netflix.genie.server.metrics.sleep.ms", 30000);
                     LOG.info("JobCountMonitor daemon going to sleep");
                     Thread.sleep(sleepTime);
@@ -158,7 +158,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
      * {@inheritDoc}
      */
     @Override
-    public void setStop(boolean stop) {
+    public void setStop(final boolean stop) {
         this.stop = stop;
     }
 }

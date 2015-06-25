@@ -36,7 +36,7 @@ public class TestGenieServerUnavailableException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws com.netflix.genie.common.exceptions.GeniePreconditionException
+     * @throws GenieServerUnavailableException When the server is unavailable
      */
     @Test(expected = GenieServerUnavailableException.class)
     public void testTwoArgConstructor() throws GenieServerUnavailableException {
@@ -50,7 +50,7 @@ public class TestGenieServerUnavailableException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GeniePreconditionException
+     * @throws GenieServerUnavailableException When the server is unavailable
      */
     @Test(expected = GenieServerUnavailableException.class)
     public void testMessageArgConstructor() throws GenieServerUnavailableException {
@@ -64,7 +64,7 @@ public class TestGenieServerUnavailableException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GeniePreconditionException
+     * @throws GenieServerUnavailableException When the server is unavailable
      */
     @Test(expected = GenieServerUnavailableException.class)
     public void testThrowableArgConstructor() throws GenieServerUnavailableException {
