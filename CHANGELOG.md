@@ -1,10 +1,26 @@
+# 2.2.1
+
+See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.2.1)
+
+# 2.2.0
+
+See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.2.0)
+
+# 2.1.2
+
+See issues [here](hhttps://github.com/Netflix/genie/issues?q=milestone%3A2.1.2)
+
+# 2.1.1
+
+See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.1.1)
+
 # 2.1.0
 
-See issue report [here](https://github.com/Netflix/genie/milestones/2.1.0)
+See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.1.0)
 
 # 2.0.0
 
-* Full 2.0.0 release
+See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.0.0)
 
 # 1.0.0
 
