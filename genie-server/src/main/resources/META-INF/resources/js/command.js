@@ -186,10 +186,10 @@ define([
                         }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
                         var createdDt = new Date(commandObj.created);
-                        commandObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+                        commandObj.createTimeFormatted = moment(createdDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                         var updatedDt = new Date(commandObj.updated);
-                        commandObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+                        commandObj.updateTimeFormatted = moment(updatedDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                         commandObj.formattedTags = commandObj.tags.join("<br />");
 
@@ -247,10 +247,10 @@ define([
                 	//console.log(command);
 
                     var createdDt = new Date(commandObj.created);
-                    commandObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+                    commandObj.createTimeFormatted = moment(createdDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                     var updatedDt = new Date(commandObj.updated);
-                    commandObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+                    commandObj.updateTimeFormatted = moment(updatedDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                     commandObj.formattedTags = commandObj.tags.join("<br />");
 
