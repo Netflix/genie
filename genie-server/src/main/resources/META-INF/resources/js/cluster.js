@@ -173,10 +173,10 @@ define([
                         }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
                         var createdDt = new Date(clusterObj.created);
-                        clusterObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+                        clusterObj.createTimeFormatted = moment(createdDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                         var updatedDt = new Date(clusterObj.updated);
-                        clusterObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+                        clusterObj.updateTimeFormatted = moment(updatedDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                         clusterObj.formattedTags = clusterObj.tags.join("<br />");
 
@@ -236,10 +236,10 @@ define([
                 	console.log(clusterObj);
 
                     var createdDt = new Date(clusterObj.created);
-                    clusterObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+                    clusterObj.createTimeFormatted = moment(createdDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                     var updatedDt = new Date(clusterObj.updated);
-                    clusterObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+                    clusterObj.updateTimeFormatted = moment(updatedDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                     clusterObj.formattedTags = ck=clusterObj.tags.join("<br />");
 

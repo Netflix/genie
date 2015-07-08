@@ -172,10 +172,10 @@ define([
                         }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
                         var createdDt = new Date(applicationObj.created);
-                        applicationObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+                        applicationObj.createTimeFormatted = moment(createdDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                         var updatedDt = new Date(applicationObj.updated);
-                        applicationObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+                        applicationObj.updateTimeFormatted = moment(updatedDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                         applicationObj.formattedTags = applicationObj.tags.join("<br />");
 
@@ -233,10 +233,10 @@ define([
                 	console.log(applicationObj);
 
                     var createdDt = new Date(applicationObj.created);
-                    applicationObj.createTimeFormatted = moment(createdDt).format('MM/DD/YYYY HH:mm:ss');
+                    applicationObj.createTimeFormatted = moment(createdDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                     var updatedDt = new Date(applicationObj.updated);
-                    applicationObj.updateTimeFormatted = moment(updatedDt).format('MM/DD/YYYY HH:mm:ss');
+                    applicationObj.updateTimeFormatted = moment(updatedDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                     applicationObj.formattedTags = applicationObj.tags.join("<br />");
 
