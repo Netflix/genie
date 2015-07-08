@@ -182,14 +182,13 @@ define([
                         }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
                         var startDt = new Date(jobObj.created);
-                        jobObj.startTimeFormatted = moment(startDt).format('MM/DD/YYYY HH:mm:ss');
+                        jobObj.startTimeFormatted = moment(startDt).utc().format('MM/DD/YYYY HH:mm:ss');
 
                         var endDt = new Date(jobObj.finished);
 
                         // TODO checking against PST Epoch time. This should be changed once we fix the server side.
                         if (jobObj.status != 'RUNNING') {
-                            jobObj.endTimeFormatted = moment (endDt).format('MM/DD/YYYY HH:mm:ss');
-                            //jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] hh:mm:ss", {trim: false});
+                            jobObj.endTimeFormatted = moment (endDt).utc().format('MM/DD/YYYY HH:mm:ss');
                             jobObj.diffTimeFormatted = moment.duration(moment(endDt).diff(moment(startDt))).format("d[d] hh[h] mm[m] ss[s]", {trim:false});
                         } else {
                             jobObj.endTimeFormatted = '';
