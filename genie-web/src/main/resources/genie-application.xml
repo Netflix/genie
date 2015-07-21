@@ -24,6 +24,7 @@
     <context:component-scan base-package="com.netflix.genie.server.resources"/>
     
     <!-- Broken up context for clarity of purpose" -->
+    <import resource="genie-aop.xml"/>
     <import resource="genie-jpa.xml"/>
     <import resource="genie-swagger.xml"/>
     <import resource="genie-validator.xml"/>
