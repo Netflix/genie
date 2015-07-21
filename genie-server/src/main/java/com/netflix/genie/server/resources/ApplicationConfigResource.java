@@ -245,19 +245,19 @@ public final class ApplicationConfigResource {
             )
             @QueryParam("page")
             @DefaultValue("0")
-            int page,
+            final int page,
             @ApiParam(
                     value = "Max number of results per page."
             )
             @QueryParam("limit")
             @DefaultValue("1024")
-            int limit,
+            final int limit,
             @ApiParam(
                     value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
             )
             @QueryParam("descending")
             @DefaultValue("true")
-            boolean descending,
+            final boolean descending,
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
@@ -961,8 +961,9 @@ public final class ApplicationConfigResource {
     /**
      * Get all the commands this application is associated with.
      *
-     * @param id The id of the application to get the commands for. Not
-     *           NULL/empty/blank.
+     * @param id       The id of the application to get the commands for. Not
+     *                 NULL/empty/blank.
+     * @param statuses The various statuses of the commands to retrieve
      * @return The set of commands.
      * @throws GenieException For any error
      */

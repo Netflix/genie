@@ -74,7 +74,7 @@ public class JobMonitorImpl implements JobMonitor {
     // last updated time in DB
     private long lastUpdatedTimeMS;
     // the handle to the process for the running job
-    private Process proc;
+    private Process process;
     // the working directory for this job
     private String workingDir;
     // the stdout for this job
@@ -82,8 +82,8 @@ public class JobMonitorImpl implements JobMonitor {
     // the stderr for this job
     private File stdErrFile;
     // whether this job has been terminated by the monitor thread
-    private boolean terminated = false;
-    private int sleepTime = 5000;
+    private boolean terminated;
+    private int threadSleepTime = 5000;
 
     /**
      * Constructor.
@@ -105,7 +105,7 @@ public class JobMonitorImpl implements JobMonitor {
         this.maxStderrSize = this.config.getLong("com.netflix.genie.job.max.stderr.size", null);
 
         this.workingDir = null;
-        this.proc = null;
+        this.process = null;
         this.stdOutFile = null;
         this.stdErrFile = null;
     }
@@ -137,11 +137,11 @@ public class JobMonitorImpl implements JobMonitor {
      * {@inheritDoc}
      */
     @Override
-    public void setProcess(final Process proc) throws GenieException {
-        if (proc == null) {
+    public void setProcess(final Process process) throws GenieException {
+        if (process == null) {
             throw new GeniePreconditionException("No process entered.");
         }
-        this.proc = proc;
+        this.process = process;
     }
 
     /**
@@ -159,11 +159,11 @@ public class JobMonitorImpl implements JobMonitor {
      * {@inheritDoc}
      */
     @Override
-    public void setThreadSleepTime(int sleepTime) throws GenieException {
-        if (sleepTime < 1) {
+    public void setThreadSleepTime(final int threadSleepTime) throws GenieException {
+        if (threadSleepTime < 1) {
             throw new GeniePreconditionException("Sleep time was less than 1. Unable to sleep that little.");
         }
-        this.sleepTime = sleepTime;
+        this.threadSleepTime = threadSleepTime;
     }
 
     /**
@@ -205,7 +205,7 @@ public class JobMonitorImpl implements JobMonitor {
      */
     private boolean isRunning() {
         try {
-            this.proc.exitValue();
+            this.process.exitValue();
         } catch (final IllegalThreadStateException e) {
             return true;
         }
@@ -219,8 +219,8 @@ public class JobMonitorImpl implements JobMonitor {
      * otherwise
      */
     private boolean shouldUpdateJob() {
-        long curTimeMS = System.currentTimeMillis();
-        long timeSinceStartMS = curTimeMS - this.lastUpdatedTimeMS;
+        final long curTimeMS = System.currentTimeMillis();
+        final long timeSinceStartMS = curTimeMS - this.lastUpdatedTimeMS;
 
         return timeSinceStartMS >= JOB_UPDATE_TIME_MS;
     }
@@ -237,7 +237,7 @@ public class JobMonitorImpl implements JobMonitor {
         this.lastUpdatedTimeMS = System.currentTimeMillis();
         while (this.isRunning()) {
             try {
-                Thread.sleep(this.sleepTime);
+                Thread.sleep(this.threadSleepTime);
             } catch (final InterruptedException e) {
                 LOG.error("Exception while waiting for job " + this.jobId
                         + " to finish", e);
@@ -283,7 +283,7 @@ public class JobMonitorImpl implements JobMonitor {
             }
         }
 
-        return this.proc.exitValue();
+        return this.process.exitValue();
     }
 
     /**
@@ -294,7 +294,7 @@ public class JobMonitorImpl implements JobMonitor {
      * @return 0 for success, -1 for failure
      * @throws GenieException on issue
      */
-    private boolean sendEmail(String emailTo, boolean killed) throws GenieException {
+    private boolean sendEmail(final String emailTo, final boolean killed) throws GenieException {
         LOG.debug("called");
         final Job job = this.jobService.getJob(this.jobId);
 
@@ -304,7 +304,7 @@ public class JobMonitorImpl implements JobMonitor {
         }
 
         // Sender's email ID
-        String fromEmail = this.config.getString(
+        final String fromEmail = this.config.getString(
                 "com.netflix.genie.server.mail.smpt.from",
                 "no-reply-genie@geniehost.com"
         );
@@ -312,12 +312,12 @@ public class JobMonitorImpl implements JobMonitor {
                 + fromEmail);
 
         // Set the smtp server hostname. Use localhost as default
-        String smtpHost = this.config.getString("com.netflix.genie.server.mail.smtp.host", "localhost");
+        final String smtpHost = this.config.getString("com.netflix.genie.server.mail.smtp.host", "localhost");
         LOG.debug("Email smtp server: "
                 + smtpHost);
 
         // Get system properties
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
 
         // Setup mail server
         properties.setProperty("mail.smtp.host", smtpHost);
@@ -331,8 +331,8 @@ public class JobMonitorImpl implements JobMonitor {
             properties.put("mail.smtp.starttls.enable", "true");
             properties.put("mail.smtp.auth", "true");
 
-            String userName = config.getString("com.netflix.genie.server.mail.smtp.user");
-            String password = config.getString("com.netflix.genie.server.mail.smtp.password");
+            final String userName = config.getString("com.netflix.genie.server.mail.smtp.user");
+            final String password = config.getString("com.netflix.genie.server.mail.smtp.password");
 
             if (userName == null || password == null) {
                 LOG.error("Authentication is enabled and username/password for smtp server is null");
@@ -349,11 +349,11 @@ public class JobMonitorImpl implements JobMonitor {
         }
 
         // Get the default Session object.
-        Session session = Session.getInstance(properties, auth);
+        final Session session = Session.getInstance(properties, auth);
 
         try {
             // Create a default MimeMessage object.
-            MimeMessage message = new MimeMessage(session);
+            final MimeMessage message = new MimeMessage(session);
 
             // Set From: header field of the header.
             message.setFrom(new InternetAddress(fromEmail));
@@ -377,7 +377,7 @@ public class JobMonitorImpl implements JobMonitor {
                     + jobStatus);
 
             // Now set the actual message
-            String body = "Your Genie Job is complete\n\n"
+            final String body = "Your Genie Job is complete\n\n"
                     + "Job ID: "
                     + job.getId()
                     + "\n"

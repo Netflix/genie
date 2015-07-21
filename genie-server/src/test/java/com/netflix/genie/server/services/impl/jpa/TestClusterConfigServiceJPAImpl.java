@@ -87,7 +87,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get cluster method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetCluster() throws GenieException {
@@ -117,7 +117,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get cluster method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetClusterNull() throws GenieException {
@@ -127,7 +127,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get cluster method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetClusterNotExists() throws GenieException {
@@ -311,7 +311,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the choseClusterForJob function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testChooseClusterForJob() throws GenieException {
@@ -329,7 +329,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the choseClusterForJob function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testChooseClusterForJobNoId() throws GenieException {
@@ -339,7 +339,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the choseClusterForJob function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testChooseClusterForJobNoJobExists() throws GenieException {
@@ -349,7 +349,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the choseClusterForJob function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testChooseClusterForJobNonChosen() throws GenieException {
@@ -359,7 +359,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the create method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testCreateCluster() throws GenieException {
@@ -400,7 +400,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the create method when no id is entered.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testCreateClusterNoId() throws GenieException {
@@ -438,7 +438,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure an exception is thrown when null is entered.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testCreateClusterNull() throws GenieException {
@@ -448,7 +448,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure an exception is thrown when cluster already exists.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieConflictException.class)
     public void testCreateClusterAlreadyExists() throws GenieException {
@@ -471,7 +471,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateClusterNoId() throws GenieException {
@@ -500,7 +500,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateClusterWithId() throws GenieException {
@@ -530,7 +530,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an cluster with invalid content. Should throw ConstraintViolationException from JPA layer.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateClusterWithInvalidCluster() throws GenieException {
@@ -549,7 +549,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure setting the created and updated outside the system control doesn't change record in database.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
@@ -570,7 +570,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateClusterNullId() throws GenieException {
@@ -580,7 +580,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateClusterNullUpdateCluster() throws GenieException {
@@ -590,7 +590,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateClusterNoClusterExists() throws GenieException {
@@ -601,7 +601,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieBadRequestException.class)
     public void testUpdateClusterIdsDontMatch() throws GenieException {
@@ -613,7 +613,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete all.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testDeleteAll() throws GenieException {
@@ -629,7 +629,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testDelete() throws GenieException {
@@ -663,7 +663,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testDeleteNoId() throws GenieException {
@@ -673,7 +673,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testDeleteNoClusterToDelete() throws GenieException {
@@ -683,7 +683,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddConfigsToCluster() throws GenieException {
@@ -709,7 +709,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToClusterNoId() throws GenieException {
@@ -719,7 +719,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToClusterNoConfigs() throws GenieException {
@@ -729,7 +729,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToClusterNoCluster() throws GenieException {
@@ -741,7 +741,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateConfigsForCluster() throws GenieException {
@@ -767,7 +767,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForClusterNoId() throws GenieException {
@@ -777,7 +777,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForClusterNoCluster() throws GenieException {
@@ -789,7 +789,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetConfigsForCluster() throws GenieException {
@@ -800,7 +800,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetConfigsForClusterNoId() throws GenieException {
@@ -810,7 +810,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetConfigsForClusterNoCluster() throws GenieException {
@@ -820,7 +820,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test adding commands to the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddCommandsForCluster() throws GenieException {
@@ -860,7 +860,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test adding commands to the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddCommandsForClusterNoId() throws GenieException {
@@ -870,7 +870,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test adding commands to the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddCommandsForClusterNoCommands() throws GenieException {
@@ -880,7 +880,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test adding commands to the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddCommandsForClusterClusterDoesntExist() throws GenieException {
@@ -892,7 +892,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test adding commands to the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddCommandsForClusterCommandDoesntExist()
@@ -908,7 +908,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get commands for cluster function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetCommandsForCluster() throws GenieException {
@@ -923,7 +923,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get clusters for cluster function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetCommandsForClusterNoId() throws GenieException {
@@ -933,7 +933,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get clusters for cluster function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForClusterNoCluster() throws GenieException {
@@ -943,7 +943,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test updating commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateCommandsForCluster() throws GenieException {
@@ -986,7 +986,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test updating commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandsForClusterNoId() throws GenieException {
@@ -996,7 +996,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test updating commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandsForClusterNoCommands() throws GenieException {
@@ -1006,7 +1006,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test updating commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateCommandsForClusterClusterDoesntExist() throws GenieException {
@@ -1018,7 +1018,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test updating commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateCommandsForClusterCommandDoesntExist()
@@ -1034,7 +1034,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test removing all commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveAllCommandsForCluster() throws GenieException {
@@ -1055,7 +1055,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test removing all commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllCommandsForClusterNoId() throws GenieException {
@@ -1065,7 +1065,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test removing all commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllCommandsForClusterNoCluster()
@@ -1076,7 +1076,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test removing all commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveCommandForCluster() throws GenieException {
@@ -1096,7 +1096,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test removing all commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveCommandForClusterNoId() throws GenieException {
@@ -1106,7 +1106,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test removing all commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveCommandForClusterNoCmdId() throws GenieException {
@@ -1116,7 +1116,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test removing all commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveCommandForClusterNoCluster() throws GenieException {
@@ -1127,7 +1127,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test removing all commands for the cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveCommandForClusterNoCommand() throws GenieException {
@@ -1138,7 +1138,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddTagsToCluster() throws GenieException {
@@ -1164,7 +1164,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToClusterNoId() throws GenieException {
@@ -1174,7 +1174,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToClusterNoTags() throws GenieException {
@@ -1184,7 +1184,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForClusterNoCluster() throws GenieException {
@@ -1196,7 +1196,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateTagsForCluster() throws GenieException {
@@ -1222,7 +1222,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForClusterNoId() throws GenieException {
@@ -1232,7 +1232,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForClusterNoApp() throws GenieException {
@@ -1244,7 +1244,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetTagsForCluster() throws GenieException {
@@ -1255,7 +1255,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetTagsForClusterNoId() throws GenieException {
@@ -1265,7 +1265,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags to cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForClusterNoCluster() throws GenieException {
@@ -1275,7 +1275,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveAllTagsForCluster() throws GenieException {
@@ -1290,7 +1290,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllTagsForClusterNoId() throws GenieException {
@@ -1300,7 +1300,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForClusterNoCluster() throws GenieException {
@@ -1310,7 +1310,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove tag for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveTagForCluster() throws GenieException {
@@ -1327,7 +1327,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove tag for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForClusterNullTag() throws GenieException {
@@ -1337,7 +1337,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForClusterNoId() throws GenieException {
@@ -1347,7 +1347,7 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for cluster.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForClusterNoCluster() throws GenieException {

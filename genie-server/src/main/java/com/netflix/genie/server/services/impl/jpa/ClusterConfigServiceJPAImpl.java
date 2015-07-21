@@ -30,7 +30,11 @@ import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.CommandStatus;
 
-import com.netflix.genie.server.repository.jpa.*;
+import com.netflix.genie.server.repository.jpa.ClusterRepository;
+import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.repository.jpa.JobRepository;
+import com.netflix.genie.server.repository.jpa.ClusterSpecs;
+
 import com.netflix.genie.server.services.ClusterConfigService;
 
 import java.util.ArrayList;
@@ -368,10 +372,10 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final Set<CommandStatus> statuses
     ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
-        List<Command> filteredCommandList = new ArrayList<Command>();
+        final List<Command> filteredCommandList = new ArrayList<Command>();
 
         if (cluster != null) {
-            List<Command> commands = cluster.getCommands();
+            final List<Command> commands = cluster.getCommands();
             if (statuses != null) {
                 for (Command command: commands) {
                     if (statuses.contains(command.getStatus())) {

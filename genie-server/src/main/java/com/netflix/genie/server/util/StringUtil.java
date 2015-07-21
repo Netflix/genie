@@ -97,8 +97,8 @@ public final class StringUtil {
             return null;
         }
 
-        String[] splits = fullVersion.split("\\.");
-        StringBuilder trimmedVersion = new StringBuilder();
+        final String[] splits = fullVersion.split("\\.");
+        final StringBuilder trimmedVersion = new StringBuilder();
         int i = 0;
         while (true) {
             trimmedVersion.append(splits[i]);

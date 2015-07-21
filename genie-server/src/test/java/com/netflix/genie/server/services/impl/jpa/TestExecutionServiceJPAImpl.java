@@ -60,7 +60,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test submitting a null job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSubmitJobNoJob() throws GenieException {
@@ -70,7 +70,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test submitting a job that already exists.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieConflictException.class)
     public void testSubmitJobThatExists() throws GenieException {
@@ -81,7 +81,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure already failed/finished jobs don't get killed again.
      *
-     * @throws GenieException if anything went wrong with the test.
+     * @throws GenieException For any problem if anything went wrong with the test.
      */
     @Test
     public void testKillJob() throws GenieException {
@@ -109,7 +109,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test whether a job kill returns immediately for a finished job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GeniePreconditionException.class)
     public void testTryingToKillInitializingJob() throws GenieException {
@@ -119,7 +119,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test killing a job with no id passed in.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testKillJobNoId() throws GenieException {
@@ -129,7 +129,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test killing a job with no job exists.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testKillJobNoJob() throws GenieException {
@@ -139,7 +139,7 @@ public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test killing a job with no kill URI.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GeniePreconditionException.class)
     public void testKillJobNoKillURI() throws GenieException {

@@ -174,7 +174,7 @@ public class JobCountManagerImpl implements JobCountManager {
             }
 
             // if instance is UP, check if job can be forwarded to it
-            String hostName = instance.getHostName();
+            final String hostName = instance.getHostName();
             LOG.debug("Trying host name: " + hostName);
             final int numInstanceJobs = getNumInstanceJobs(hostName, null, null);
             if (numInstanceJobs <= minJobThreshold) {

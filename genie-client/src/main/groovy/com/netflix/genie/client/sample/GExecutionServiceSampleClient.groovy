@@ -46,7 +46,7 @@ public final class GExecutionServiceSampleClient {
     public static void main(final String[] args) throws Exception {
 
         // Initialize Eureka, if it is being used
-        // LOG.info("Initializing Eureka");
+        // LOGGER.info("Initializing Eureka");
         // ExecutionServiceClient.initEureka("test");
         LOG.info 'Initializing list of Genie servers'
         ConfigurationManager.getConfigInstance().setProperty('genie2Client.ribbon.listOfServers',

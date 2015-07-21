@@ -21,14 +21,22 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.model.*;
+import com.netflix.genie.common.model.Application;
+import com.netflix.genie.common.model.ApplicationStatus;
+import com.netflix.genie.common.model.Application_;
+import com.netflix.genie.common.model.CommandStatus;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.ApplicationSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.ApplicationConfigService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.ConstraintViolationException;
@@ -67,6 +75,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * Default constructor.
      *
      * @param applicationRepo The application repository to use
+     * @param commandRepo     The command repository to use
      */
     public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo,
                                            final CommandRepository commandRepo) {

@@ -76,7 +76,7 @@ public class TestAuditable {
     /**
      * Test to make sure @PrePersist annotation will do what we want before persistence.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException       If the process is interrupted
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
@@ -107,7 +107,7 @@ public class TestAuditable {
     /**
      * Test to make sure the update timestamp is updated by this method.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException If the process is interrupted
      */
     @Test
     public void testOnUpdateAuditable() throws InterruptedException {
@@ -142,6 +142,8 @@ public class TestAuditable {
 
     /**
      * Test to make sure updated is set but really is overwritten by onUpdate.
+     *
+     * @throws InterruptedException If processing is interrupted
      */
     @Test
     public void testSetUpdated() throws InterruptedException {
@@ -174,8 +176,8 @@ public class TestAuditable {
     /**
      * Make sure we generate valid JSON.
      *
-     * @throws GeniePreconditionException
-     * @throws IOException
+     * @throws GeniePreconditionException If a precondition isn't met
+     * @throws IOException                If an exception happens during serialization
      */
     @Test
     public void testToString() throws GeniePreconditionException, IOException {

@@ -36,7 +36,7 @@ public class TestGenieBadRequestException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieBadRequestException
+     * @throws GenieBadRequestException For a bad request
      */
     @Test(expected = GenieBadRequestException.class)
     public void testTwoArgConstructor() throws GenieBadRequestException {
@@ -50,7 +50,7 @@ public class TestGenieBadRequestException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieBadRequestException
+     * @throws GenieBadRequestException For a bad request
      */
     @Test(expected = GenieBadRequestException.class)
     public void testMessageArgConstructor() throws GenieBadRequestException {
@@ -64,7 +64,7 @@ public class TestGenieBadRequestException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieBadRequestException
+     * @throws GenieBadRequestException For a bad request
      */
     @Test(expected = GenieBadRequestException.class)
     public void testThrowableArgConstructor() throws GenieBadRequestException {

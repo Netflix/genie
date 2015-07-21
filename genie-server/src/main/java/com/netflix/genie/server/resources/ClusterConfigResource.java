@@ -221,13 +221,13 @@ public final class ClusterConfigResource {
             @QueryParam("name")
             final String name,
             @ApiParam(
-                    value = "Status of the cluster."
+                    value = "Status of the cluster.",
+                    allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
             )
             @QueryParam("status")
             final Set<String> statuses,
             @ApiParam(
-                    value = "Tags for the cluster.",
-                    allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
+                    value = "Tags for the cluster."
             )
             @QueryParam("tag")
             final Set<String> tags,
@@ -246,19 +246,19 @@ public final class ClusterConfigResource {
             )
             @QueryParam("page")
             @DefaultValue("0")
-            int page,
+            final int page,
             @ApiParam(
                     value = "Max number of results per page."
             )
             @QueryParam("limit")
             @DefaultValue("1024")
-            int limit,
+            final int limit,
             @ApiParam(
                     value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
             )
             @QueryParam("descending")
             @DefaultValue("true")
-            boolean descending,
+            final boolean descending,
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
@@ -615,8 +615,9 @@ public final class ClusterConfigResource {
     /**
      * Get all the commands configured for a given cluster.
      *
-     * @param id The id of the cluster to get the command files for. Not
-     *           NULL/empty/blank.
+     * @param id       The id of the cluster to get the command files for. Not
+     *                 NULL/empty/blank.
+     * @param statuses The various statuses to return commands for.
      * @return The active set of commands for the cluster.
      * @throws GenieException For any error
      */
@@ -649,6 +650,10 @@ public final class ClusterConfigResource {
             )
             @PathParam("id")
             final String id,
+            @ApiParam(
+                    value = "The statuses of the commands to find.",
+                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
+            )
             @QueryParam("status")
             final Set<String> statuses
     ) throws GenieException {

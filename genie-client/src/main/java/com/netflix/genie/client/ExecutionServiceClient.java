@@ -143,8 +143,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      * @throws GenieException       For any other error.
      * @throws InterruptedException on timeout/thread errors
      */
-    public Job waitForCompletion(final String id, final long blockTimeout)
-            throws GenieException, InterruptedException {
+    public Job waitForCompletion(final String id, final long blockTimeout) throws GenieException, InterruptedException {
         //Should we use Future? See:
         //https://github.com/Netflix/ribbon/blob/master/ribbon-examples
         ///src/main/java/com/netflix/ribbon/examples/GetWithDeserialization.java
@@ -351,7 +350,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                         new String[]{
                                 BASE_EXECUTION_REST_URL,
                                 id,
-                                "tags"
+                                "tags",
                         },
                         SLASH),
                 null,

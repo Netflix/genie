@@ -76,7 +76,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get application method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetApplication() throws GenieException {
@@ -114,7 +114,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get application method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetApplicationNull() throws GenieException {
@@ -124,7 +124,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get application method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetApplicationNotExists() throws GenieException {
@@ -312,7 +312,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the create method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testCreateApplication() throws GenieException {
@@ -345,7 +345,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the create method when no id is entered.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testCreateApplicationNoId() throws GenieException {
@@ -375,7 +375,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure an exception is thrown when null is entered.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testCreateApplicationNull() throws GenieException {
@@ -385,7 +385,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure an exception is thrown when application already exists.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieConflictException.class)
     public void testCreateApplicationAlreadyExists() throws GenieException {
@@ -402,7 +402,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateApplicationNoId() throws GenieException {
@@ -431,7 +431,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateApplicationWithId() throws GenieException {
@@ -461,7 +461,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an application that makes it invalid. Should throw exception.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateApplicationNotValid() throws GenieException {
@@ -480,7 +480,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to make sure setting the created and updated outside the system control doesn't change record in database.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
@@ -501,7 +501,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateApplicationNullId() throws GenieException {
@@ -511,7 +511,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateApplicationNullUpdateApp() throws GenieException {
@@ -521,7 +521,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateApplicationNoAppExists() throws GenieException {
@@ -532,7 +532,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test to update an application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieBadRequestException.class)
     public void testUpdateApplicationIdsDontMatch() throws GenieException {
@@ -544,7 +544,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete all.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testDeleteAll() throws GenieException {
@@ -559,7 +559,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testDelete() throws GenieException {
@@ -581,7 +581,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testDeleteNoId() throws GenieException {
@@ -591,7 +591,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test delete.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieException.class)
     public void testDeleteNoAppToDelete() throws GenieException {
@@ -601,7 +601,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddConfigsToApplication() throws GenieException {
@@ -627,7 +627,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToApplicationNoId() throws GenieException {
@@ -637,7 +637,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToApplicationNoConfigs() throws GenieException {
@@ -647,7 +647,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add configurations to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToApplicationNoApp() throws GenieException {
@@ -659,7 +659,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateConfigsForApplication() throws GenieException {
@@ -685,7 +685,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForApplicationNoId() throws GenieException {
@@ -695,7 +695,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update configurations for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForApplicationNoApp() throws GenieException {
@@ -706,7 +706,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetConfigsForApplication() throws GenieException {
@@ -717,7 +717,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetConfigsForApplicationNoId() throws GenieException {
@@ -727,7 +727,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get configurations to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetConfigsForApplicationNoApp() throws GenieException {
@@ -737,7 +737,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all configurations for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveAllConfigsForApplication() throws GenieException {
@@ -750,7 +750,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all configurations for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllConfigsForApplicationNoId() throws GenieException {
@@ -760,7 +760,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all configurations for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllConfigsForApplicationNoApp() throws GenieException {
@@ -770,7 +770,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveConfigForApplication() throws GenieException {
@@ -786,7 +786,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveConfigForApplicationNullConfig() throws GenieException {
@@ -796,7 +796,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveConfigForApplicationNoId() throws GenieException {
@@ -806,7 +806,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveConfigForApplicationNoApp() throws GenieException {
@@ -818,7 +818,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add jars to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddJarsToApplication() throws GenieException {
@@ -844,7 +844,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add jars to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddJarsToApplicationNoId() throws GenieException {
@@ -854,7 +854,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add jars to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddJarsToApplicationNoJars() throws GenieException {
@@ -864,7 +864,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add jars to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddJarsForApplicationNoApp() throws GenieException {
@@ -876,7 +876,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update jars for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateJarsForApplication() throws GenieException {
@@ -902,7 +902,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update jars for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateJarsForApplicationNoId() throws GenieException {
@@ -912,7 +912,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update jars for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateJarsForApplicationNoApp() throws GenieException {
@@ -923,7 +923,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get jars for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetJarsForApplication() throws GenieException {
@@ -934,7 +934,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get jars to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetJarsForApplicationNoId() throws GenieException {
@@ -944,7 +944,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get jars to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetJarsForApplicationNoApp() throws GenieException {
@@ -954,7 +954,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all jars for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveAllJarsForApplication() throws GenieException {
@@ -967,7 +967,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all jars for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllJarsForApplicationNoId() throws GenieException {
@@ -977,7 +977,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all jars for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllJarsForApplicationNoApp() throws GenieException {
@@ -987,7 +987,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveJarForApplication() throws GenieException {
@@ -1003,7 +1003,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveJarForApplicationNullJar() throws GenieException {
@@ -1013,7 +1013,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveJarForApplicationNoId() throws GenieException {
@@ -1023,7 +1023,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveJarForApplicationNoApp() throws GenieException {
@@ -1035,7 +1035,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddTagsToApplication() throws GenieException {
@@ -1061,7 +1061,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToApplicationNoId() throws GenieException {
@@ -1071,7 +1071,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToApplicationNoTags() throws GenieException {
@@ -1081,7 +1081,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForApplicationNoApp() throws GenieException {
@@ -1093,7 +1093,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateTagsForApplication() throws GenieException {
@@ -1119,7 +1119,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForApplicationNoId() throws GenieException {
@@ -1129,7 +1129,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForApplicationNoApp() throws GenieException {
@@ -1140,7 +1140,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetTagsForApplication() throws GenieException {
@@ -1151,7 +1151,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetTagsForApplicationNoId() throws GenieException {
@@ -1161,7 +1161,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags to application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForApplicationNoApp() throws GenieException {
@@ -1171,7 +1171,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveAllTagsForApplication() throws GenieException {
@@ -1186,7 +1186,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllTagsForApplicationNoId() throws GenieException {
@@ -1196,7 +1196,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForApplicationNoApp() throws GenieException {
@@ -1206,7 +1206,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove tag for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveTagForApplication() throws GenieException {
@@ -1223,7 +1223,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove tag for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForApplicationNullTag() throws GenieException {
@@ -1233,7 +1233,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForApplicationNoId() throws GenieException {
@@ -1243,7 +1243,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for application.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForApplicationNoApp() throws GenieException {
@@ -1256,7 +1256,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get commands for application method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetCommandsForApplication() throws GenieException {
@@ -1269,7 +1269,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get commands for application method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetCommandsForApplicationNoId() throws GenieException {
@@ -1279,7 +1279,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the Get commands for application method.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForApplicationNoApp() throws GenieException {

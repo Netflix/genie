@@ -36,7 +36,7 @@ public class TestGenieConflictException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieConflictException
+     * @throws GenieConflictException On conflict
      */
     @Test(expected = GenieConflictException.class)
     public void testTwoArgConstructor() throws GenieConflictException {
@@ -50,7 +50,7 @@ public class TestGenieConflictException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieConflictException
+     * @throws GenieConflictException On conflict
      */
     @Test(expected = GenieConflictException.class)
     public void testMessageArgConstructor() throws GenieConflictException {
@@ -64,7 +64,7 @@ public class TestGenieConflictException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieConflictException
+     * @throws GenieConflictException On conflict
      */
     @Test(expected = GenieConflictException.class)
     public void testThrowableArgConstructor() throws GenieConflictException {

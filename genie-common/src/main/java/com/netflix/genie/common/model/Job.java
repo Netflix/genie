@@ -399,7 +399,7 @@ public class Job extends CommonEntityFields {
             value = "Whether this job was forwarded or not. Set automatically by system",
             readOnly = true
     )
-    private boolean forwarded = false;
+    private boolean forwarded;
 
     /**
      * Location of logs being archived to s3.
@@ -874,7 +874,7 @@ public class Job extends CommonEntityFields {
      *
      * @param hostName The host name.
      */
-    public void setHostName(String hostName) {
+    public void setHostName(final String hostName) {
         this.hostName = hostName;
     }
 
@@ -1004,7 +1004,7 @@ public class Job extends CommonEntityFields {
      * @param commandCriteria The criteria list
      * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setCommandCriteria(Set<String> commandCriteria) throws GeniePreconditionException {
+    public void setCommandCriteria(final Set<String> commandCriteria) throws GeniePreconditionException {
         this.commandCriteria = commandCriteria;
         this.commandCriteriaString = commandCriteriaToString(commandCriteria);
     }
@@ -1024,7 +1024,7 @@ public class Job extends CommonEntityFields {
      * @param commandCriteriaString A set of command criteria tags
      * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setCommandCriteriaString(String commandCriteriaString) throws GeniePreconditionException {
+    public void setCommandCriteriaString(final String commandCriteriaString) throws GeniePreconditionException {
         this.commandCriteriaString = commandCriteriaString;
         this.commandCriteria = stringToCommandCriteria(commandCriteriaString);
     }
@@ -1049,11 +1049,11 @@ public class Job extends CommonEntityFields {
     /**
      * Sets job status and human-readable message.
      *
-     * @param status predefined status
-     * @param msg    human-readable message
+     * @param newStatus predefined status
+     * @param msg       human-readable message
      */
-    public void setJobStatus(final JobStatus status, final String msg) {
-        setJobStatus(status);
+    public void setJobStatus(final JobStatus newStatus, final String msg) {
+        setJobStatus(newStatus);
         setStatusMsg(msg);
     }
 
@@ -1110,7 +1110,7 @@ public class Job extends CommonEntityFields {
      * @param chosenClusterCriteriaString he criteria used to select cluster to
      *                                    run this job.
      */
-    public void setChosenClusterCriteriaString(String chosenClusterCriteriaString) {
+    public void setChosenClusterCriteriaString(final String chosenClusterCriteriaString) {
         this.chosenClusterCriteriaString = chosenClusterCriteriaString;
     }
 
@@ -1137,14 +1137,14 @@ public class Job extends CommonEntityFields {
     /**
      * Helper method for building the cluster criteria string.
      *
-     * @param commandCriteria The criteria to build up from
+     * @param commandCriteriaToConvert The criteria to build up from
      * @return The cluster criteria string
      */
-    protected String commandCriteriaToString(final Set<String> commandCriteria) {
-        if (commandCriteria == null || commandCriteria.isEmpty()) {
+    protected String commandCriteriaToString(final Set<String> commandCriteriaToConvert) {
+        if (commandCriteriaToConvert == null || commandCriteriaToConvert.isEmpty()) {
             return null;
         } else {
-            return StringUtils.join(this.commandCriteria, CRITERIA_DELIMITER);
+            return StringUtils.join(commandCriteriaToConvert, CRITERIA_DELIMITER);
         }
     }
 

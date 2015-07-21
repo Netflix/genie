@@ -445,7 +445,7 @@ public class TestClusterSpecs {
     /**
      * Test to all predicates are added.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testFindByClusterAndCommandCriteria() throws GenieException {

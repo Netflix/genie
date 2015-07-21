@@ -55,7 +55,7 @@ public class TestJobJanitorImpl {
     /**
      * Test whether the janitor cleans up zombie jobs correctly.
      *
-     * @throws Exception
+     * @throws Exception For any issue
      */
     @Test
     @DatabaseSetup("testMarkZombies.xml")

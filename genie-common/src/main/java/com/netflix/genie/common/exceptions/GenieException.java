@@ -26,10 +26,10 @@ package com.netflix.genie.common.exceptions;
  */
 public class GenieException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     /* the HTTP error code */
     private final int errorCode;
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
