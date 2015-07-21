@@ -46,7 +46,7 @@
     <bean id="operationRetryPolicy" class="org.springframework.retry.policy.ExceptionClassifierRetryPolicy">
         <property name="policyMap">
             <map>
-                <entry key="org.springframework.dao.OptimisticLockingFailureException">
+                <entry key="org.springframework.orm.jpa.JpaOptimisticLockingFailureException">
                     <bean class="org.springframework.retry.policy.SimpleRetryPolicy">
                         <property name="maxAttempts" value="3" />
                     </bean>
