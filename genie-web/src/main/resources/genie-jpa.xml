@@ -19,10 +19,12 @@
        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
             http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
-            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
     
     <bean id="entityManagerFactory"
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -40,6 +42,35 @@
             </props>
         </property>
     </bean>
+
+    <bean id="operationRetryPolicy" class="org.springframework.retry.policy.ExceptionClassifierRetryPolicy">
+        <property name="policyMap">
+            <map>
+                <entry key="org.springframework.dao.OptimisticLockingFailureException">
+                    <bean class="org.springframework.retry.policy.SimpleRetryPolicy">
+                        <property name="maxAttempts" value="3" />
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="operationRetryTemplate" class="org.springframework.retry.support.RetryTemplate">
+        <property name="retryPolicy" ref="operationRetryPolicy"></property>
+        <property name="backOffPolicy" >
+            <bean class="org.springframework.retry.backoff.FixedBackOffPolicy">
+                <property name="backOffPeriod" value="1000" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="operationRetryAdvice" class="org.springframework.retry.interceptor.RetryOperationsInterceptor">
+        <property name="retryOperations" ref="operationRetryTemplate"></property>
+    </bean>
+
+    <aop:config>
+        <aop:advisor advice-ref="operationRetryAdvice" pointcut="execution(* com.netflix.genie.server.services.impl.jpa.JobServiceJPAImpl.setUpdateTime(..))" order="-1"/>
+    </aop:config>
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
@@ -82,4 +113,6 @@
             <property name="timeBetweenEvictionRunsMillis" value="10000"/>
         </bean>
     </beans>
+
+
 </beans>

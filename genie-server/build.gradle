@@ -30,7 +30,10 @@ dependencies {
     // Spring Libs
     compile("org.springframework.data:spring-data-jpa:${spring_data_jpa_version}")
     compile("org.springframework:spring-web:${springframework_version}")
+    compile("org.springframework.retry:spring-retry:${spring_retry_version}")
     compile("com.google.inject.extensions:guice-spring:${guice_version}")
+    compile("org.springframework:spring-aspects:4.1.7.RELEASE")
+    compile("org.aspectj:aspectjweaver:1.6.10")
 
     // Swagger Libs
     compile("com.wordnik:swagger-jersey-jaxrs:${swagger_version}") {
