@@ -51,7 +51,7 @@ public class TestJsonDateDeserializer {
     /**
      * Test the de-serialization method.
      *
-     * @throws IOException
+     * @throws IOException When exception happens during serialization
      */
     @Test
     public void testDeserialize() throws IOException {
@@ -65,7 +65,7 @@ public class TestJsonDateDeserializer {
     /**
      * Test the de-serialization method with null.
      *
-     * @throws IOException
+     * @throws IOException When exception happens during serialization
      */
     @Test
     public void testDeserializeNull() throws IOException {
@@ -79,7 +79,7 @@ public class TestJsonDateDeserializer {
     /**
      * Test the de-serialization method.
      *
-     * @throws IOException
+     * @throws IOException When exception happens during serialization
      */
     @Test(expected = IOException.class)
     public void testDeserializeError() throws IOException {

@@ -148,8 +148,8 @@ public class TestGenieNodeStatisticsImpl {
     /**
      * Test the counter that sets running job.
      *
-     * @throws InterruptedException
-     * @throws GenieException
+     * @throws InterruptedException If the process is interrupted
+     * @throws GenieException For any problem
      */
     @Test
     public void testRunningJobs() throws InterruptedException, GenieException {

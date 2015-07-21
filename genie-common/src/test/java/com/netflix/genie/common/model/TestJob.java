@@ -697,6 +697,8 @@ public class TestJob extends TestEntityBase {
 
     /**
      * Test validate with exception from super class.
+     *
+     * @throws GenieException For any non-runtime issue
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateBadSuperClass() throws GenieException {

@@ -287,6 +287,8 @@ public final class JobResource {
      * @param commandId   the id of the command run by the job
      * @param page        page number for job
      * @param limit       max number of jobs to return
+     * @param descending  Whether the order of the results should be descending or ascending
+     * @param orderBys    Fields to order the results by
      * @return successful response, or one with HTTP error code
      * @throws GenieException For any error
      */
@@ -367,19 +369,19 @@ public final class JobResource {
             )
             @QueryParam("page")
             @DefaultValue("0")
-            int page,
+            final int page,
             @ApiParam(
                     value = "Max number of results per page."
             )
             @QueryParam("limit")
             @DefaultValue("1024")
-            int limit,
+            final int limit,
             @ApiParam(
                     value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
             )
             @QueryParam("descending")
             @DefaultValue("true")
-            boolean descending,
+            final boolean descending,
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )

@@ -87,11 +87,11 @@ public class ClusterCriteria implements Serializable {
     /**
      * Helper method for checking the tags.
      *
-     * @param tags The tags to check
+     * @param tagsToCheck The tags to check
      * @throws GeniePreconditionException If the tags are null or empty.
      */
-    private void checkTags(final Set<String> tags) throws GeniePreconditionException {
-        if (tags == null || tags.isEmpty()) {
+    private void checkTags(final Set<String> tagsToCheck) throws GeniePreconditionException {
+        if (tagsToCheck == null || tagsToCheck.isEmpty()) {
             final String msg = "No tags passed in to set. Unable to continue.";
             LOG.error(msg);
             throw new GeniePreconditionException(msg);

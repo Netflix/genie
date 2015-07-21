@@ -345,7 +345,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                         new String[]{
                                 BASE_CONFIG_COMMAND_REST_URL,
                                 id,
-                                "application"
+                                "application",
                         },
                         SLASH),
                 null,
@@ -373,7 +373,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                         new String[]{
                                 BASE_CONFIG_COMMAND_REST_URL,
                                 id,
-                                "application"
+                                "application",
                         },
                         SLASH),
                 null,
@@ -401,7 +401,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                         new String[]{
                                 BASE_CONFIG_COMMAND_REST_URL,
                                 id,
-                                "application"
+                                "application",
                         },
                         SLASH),
                 null,
@@ -577,7 +577,7 @@ public final class CommandServiceClient extends BaseGenieClient {
                                 BASE_CONFIG_COMMAND_REST_URL,
                                 id,
                                 "tags",
-                                tag
+                                tag,
                         },
                         SLASH),
                 null,

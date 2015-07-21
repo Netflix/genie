@@ -49,7 +49,7 @@ public class TestJsonDateSerializer {
     /**
      * Test the serialization method.
      *
-     * @throws IOException
+     * @throws IOException When exception happens during serialization
      */
     @Test
     public void testSerialize() throws IOException {
@@ -64,7 +64,7 @@ public class TestJsonDateSerializer {
     /**
      * Test the serialization method with a null date.
      *
-     * @throws IOException
+     * @throws IOException When exception happens during serialization
      */
     @Test
     public void testSerializeNull() throws IOException {

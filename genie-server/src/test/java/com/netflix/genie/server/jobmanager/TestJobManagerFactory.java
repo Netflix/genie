@@ -41,7 +41,7 @@ public class TestJobManagerFactory {
     /**
      * Tests whether an invalid class name throws an exception.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem For any problem
      */
     @Test(expected = GenieException.class)
     public void testInvalidClassName() throws GenieException {

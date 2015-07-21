@@ -75,7 +75,7 @@ public class JobJanitorImpl implements JobJanitor {
             }
 
             try {
-                int numRowsUpdated = markZombies();
+                final int numRowsUpdated = markZombies();
                 LOG.info("Total jobs marked as zombies: " + numRowsUpdated);
             } catch (Exception e) {
                 // log error message and move on to next iteration
@@ -92,9 +92,9 @@ public class JobJanitorImpl implements JobJanitor {
 
             // calculate a random number of seconds between min and max to sleep.
             // This is done to stagger the janitor threads across multiple instances
-            Random randomGenerator = new Random();
+            final Random randomGenerator = new Random();
             // Since its a few seconds the long to int cast is fine
-            long randomSleepTime = randomGenerator.nextInt((int) (maxSleepTime - minSleepTime)) + minSleepTime;
+            final long randomSleepTime = randomGenerator.nextInt((int) (maxSleepTime - minSleepTime)) + minSleepTime;
 
             LOG.info("Job janitor daemon going to sleep for " + randomSleepTime / 1000 + " seconds.");
             try {

@@ -62,31 +62,28 @@ import org.slf4j.LoggerFactory;
  * @author tgianos
  */
 public class BaseGenieClient {
-
-    private static final Logger LOG = LoggerFactory
-            .getLogger(BaseGenieClient.class);
-
-    private static final String CLOUD = "cloud";
-
+    /**
+     * Standard root for all rest services.
+     */
+    protected static final String BASE_REST_URL = "/genie/v2/";
     /**
      * The eureka environment.
      */
     protected static final String EUREKA_ENVIRONMENT_PROPERTY = "eureka.environment";
 
     /**
-     * The name with this this REST client is registered.
-     */
-    private static final String CLIENT_NAME_GENIE = "genie2Client";
-
-    /**
-     * Standard root for all rest services.
-     */
-    protected static final String BASE_REST_URL = "/genie/v2/";
-
-    /**
      * Reusable String for /.
      */
     protected static final String SLASH = "/";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseGenieClient.class);
+
+    private static final String CLOUD = "cloud";
+
+    /**
+     * The name with this this REST client is registered.
+     */
+    private static final String CLIENT_NAME_GENIE = "genie2Client";
 
     /**
      * The rest client to use for all requests.
@@ -145,7 +142,7 @@ public class BaseGenieClient {
         }
         try (final HttpResponse response = this.client.executeWithLoadBalancer(request)) {
             if (response.isSuccess()) {
-                LOG.debug("Response returned success.");
+                LOGGER.debug("Response returned success.");
                 final ObjectMapper mapper = new ObjectMapper();
                 if (collectionClass != null) {
                     final CollectionType type = mapper.
@@ -164,7 +161,7 @@ public class BaseGenieClient {
             if (e instanceof GenieException) {
                 throw (GenieException) e;
             } else {
-                LOG.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
                 throw new GenieServerException(e);
             }
         }
@@ -208,7 +205,7 @@ public class BaseGenieClient {
             }
             return builder.build();
         } catch (final URISyntaxException use) {
-            LOG.error(use.getMessage(), use);
+            LOGGER.error(use.getMessage(), use);
             throw new GenieBadRequestException(use);
         }
     }

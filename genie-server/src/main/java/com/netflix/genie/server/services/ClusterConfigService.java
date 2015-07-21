@@ -207,8 +207,9 @@ public interface ClusterConfigService {
     /**
      * Get the set of commands associated with the cluster with given id.
      *
-     * @param id The id of the cluster to get the commands for. Not
-     *           null/empty/blank.
+     * @param id       The id of the cluster to get the commands for. Not
+     *                 null/empty/blank.
+     * @param statuses The statuses to get commands for
      * @return The list of commands
      * @throws GenieException if there is an error
      */

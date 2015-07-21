@@ -1,5 +1,5 @@
 plugins {
-    id 'nebula.netflixoss' version '2.2.9'
+    id 'nebula.netflixoss' version '2.2.10'
     id 'nebula.provided-base' version '2.2.2'
 }
 
@@ -75,17 +75,15 @@ subprojects {
     }
 
     checkstyle {
-        ignoreFailures = true
-        configFile = new File(project.parent.projectDir, 'codequality/checkstyle.xml')
+        configFile = new File(project.parent.projectDir, "codequality/checkstyle/checkstyle.xml")
     }
 
     findbugs {
-        ignoreFailures = true
+        excludeFilter = new File(project.parent.projectDir, "codequality/findbugs/excludeFilter.xml")
     }
 
     tasks.withType(Pmd) {
         reports.html.enabled true
-        ignoreFailures = true
     }
 
     test {

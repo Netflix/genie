@@ -33,10 +33,10 @@ import java.net.HttpURLConnection;
  */
 public class TestGenieResponseFilter {
 
+    private static final ContainerRequest REQUEST = Mockito.mock(ContainerRequest.class);
     private GenieNodeStatistics statistics;
     private GenieResponseFilter genieResponseFilter;
     private ContainerResponse response;
-    private static final ContainerRequest REQUEST = Mockito.mock(ContainerRequest.class);
 
     /**
      * Setup for tests.

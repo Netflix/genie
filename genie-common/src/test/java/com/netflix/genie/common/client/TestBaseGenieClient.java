@@ -58,17 +58,18 @@ import java.util.Set;
  */
 public class TestBaseGenieClient {
 
-    private RestClient restClient;
-    private BaseGenieClient client;
-    private HttpRequest request;
-    private HttpResponse response;
     private static final Application APPLICATION = new Application(
             "Firefly",
             "Malcolm",
             "1.0",
             ApplicationStatus.ACTIVE
     );
-    private static String eurekaEnv = null;
+    private static String eurekaEnv;
+
+    private RestClient restClient;
+    private BaseGenieClient client;
+    private HttpRequest request;
+    private HttpResponse response;
 
     /**
      * Setup variables that will be used constantly across tests.
@@ -164,8 +165,7 @@ public class TestBaseGenieClient {
      * @throws ClientException Some http request failed.
      */
     @Test(expected = GenieServerException.class)
-    public void testExecuteRequestNoResponseReturned()
-            throws GenieException, ClientException {
+    public void testExecuteRequestNoResponseReturned() throws GenieException, ClientException {
         Mockito.when(this.restClient.executeWithLoadBalancer(this.request)).thenReturn(null);
         this.client.executeRequest(this.request, Set.class, String.class);
     }
@@ -173,7 +173,7 @@ public class TestBaseGenieClient {
     /**
      * Test to make sure if response isn't success an Exception is thrown.
      *
-     * @throws Exception
+     * @throws Exception For any problems
      */
     @Test(expected = GenieException.class)
     public void testExecuteRequestNotSuccessful() throws Exception {
@@ -192,8 +192,7 @@ public class TestBaseGenieClient {
      * @throws IOException     IOException.
      */
     @Test
-    public void testExecuteRequestSuccessSingleEntity()
-            throws GenieException, ClientException, IOException {
+    public void testExecuteRequestSuccessSingleEntity() throws GenieException, ClientException, IOException {
         Mockito.when(this.response.isSuccess()).thenReturn(true);
 
         final ObjectMapper mapper = new ObjectMapper();
@@ -225,8 +224,7 @@ public class TestBaseGenieClient {
      * @throws IOException                IOException.
      */
     @Test
-    public void testExecuteRequestSuccessCollection()
-            throws GenieException, ClientException, IOException {
+    public void testExecuteRequestSuccessCollection() throws GenieException, ClientException, IOException {
         Mockito.when(this.response.isSuccess()).thenReturn(true);
 
         final List<Command> commands = new ArrayList<>();

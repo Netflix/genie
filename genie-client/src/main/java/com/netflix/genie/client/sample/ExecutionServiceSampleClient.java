@@ -101,7 +101,7 @@ public final class ExecutionServiceSampleClient {
 
         // Add some tags for metadata about the job. This really helps for reporting on
         // the jobs and categorization.
-        Set<String> jobTags = new HashSet<>();
+        final Set<String> jobTags = new HashSet<>();
         jobTags.add("testgenie");
         jobTags.add("sample");
 
@@ -127,7 +127,9 @@ public final class ExecutionServiceSampleClient {
         LOG.info(job.toString());
 
         LOG.info("Waiting for job to finish");
-        job = client.waitForCompletion(jobID, 600000, 5000);
+        final int blockTimeout = 600000;
+        final int pollTime = 5000;
+        job = client.waitForCompletion(jobID, blockTimeout, pollTime);
         LOG.info("Job status: " + job.getStatus());
 
         LOG.info("Killing jobs using jobID");

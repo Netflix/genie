@@ -64,7 +64,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get job function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testCreateJob() throws GenieException {
@@ -119,7 +119,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get job function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testCreateJobWithIdAlreadySet() throws GenieException {
@@ -177,7 +177,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get job function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieConflictException.class)
     public void testCreateJobAlreadyExists() throws GenieException {
@@ -244,7 +244,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get job function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetJob() throws GenieException {
@@ -274,7 +274,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get job function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetJobNoId() throws GenieException {
@@ -284,7 +284,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get job function.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetJobNoJobExists() throws GenieException {
@@ -395,7 +395,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get job by tag.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetJobByTag()
@@ -428,7 +428,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test the get job by non-existent Tag.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetJobWithNonExistentTag()
@@ -649,7 +649,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testAddTagsToJob() throws GenieException {
@@ -675,7 +675,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToJobNoId() throws GenieException {
@@ -685,7 +685,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToJobNoTags() throws GenieException {
@@ -695,7 +695,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test add tags to job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForJobNoJob() throws GenieException {
@@ -707,7 +707,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testUpdateTagsForJob() throws GenieException {
@@ -733,7 +733,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForJobNoId() throws GenieException {
@@ -743,7 +743,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test update tags for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForJobNoJob() throws GenieException {
@@ -755,7 +755,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetTagsForJob() throws GenieException {
@@ -766,7 +766,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags to job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testGetTagsForJobNoId() throws GenieException {
@@ -776,7 +776,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test get tags to job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForJobNoJob() throws GenieException {
@@ -786,7 +786,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveAllTagsForJob() throws GenieException {
@@ -800,7 +800,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveAllTagsForJobNoId() throws GenieException {
@@ -810,7 +810,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove all tags for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForJobNoJob() throws GenieException {
@@ -820,7 +820,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove tag for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRemoveTagForJob() throws GenieException {
@@ -837,7 +837,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove tag for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForJobNullTag() throws GenieException {
@@ -847,7 +847,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForJobNoId() throws GenieException {
@@ -857,7 +857,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForJobNoJob() throws GenieException {
@@ -870,7 +870,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test remove configuration for job.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GeniePreconditionException.class)
     public void testRemoveTagForJobId() throws GenieException {
@@ -883,7 +883,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test touching the job to update the update time.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSetUpdateTime() throws GenieException {
@@ -895,7 +895,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test touching the job to update the update time.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetUpdateTimeNoId() throws GenieException {
@@ -905,7 +905,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test touching the job to update the update time.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetUpdateTimeNoJob() throws GenieException {
@@ -915,7 +915,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the job status.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSetJobStatus() throws GenieException {
@@ -929,7 +929,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test touching the job to update the update time.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetJobStatusNoId() throws GenieException {
@@ -939,7 +939,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test touching the job to update the update time.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetJobStatusNoStatus() throws GenieException {
@@ -949,7 +949,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test touching the job to update the update time.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSetJobStatusNoMessage() throws GenieException {
@@ -962,7 +962,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test touching the job to update the update time.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetJobStatusNoJob() throws GenieException {
@@ -976,7 +976,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the process id.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSetProcessIdForJob() throws GenieException {
@@ -993,7 +993,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the process id.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetProcessIdForJobNoId() throws GenieException {
@@ -1003,7 +1003,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the process id.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetProcessIdForJobNoJob() throws GenieException {
@@ -1013,7 +1013,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the command info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSetCommandInfoForJob() throws GenieException {
@@ -1028,7 +1028,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the command info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetCommandInfoForJobNoId() throws GenieException {
@@ -1038,7 +1038,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the command info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetCommandInfoForJobNoJob() throws GenieException {
@@ -1048,7 +1048,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSetApplicationInfoForJob() throws GenieException {
@@ -1063,7 +1063,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetApplicationInfoForJobNoId() throws GenieException {
@@ -1073,7 +1073,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the application info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetApplicationInfoForJobNoJob() throws GenieException {
@@ -1083,7 +1083,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the cluster info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testSetClusterInfoForJob() throws GenieException {
@@ -1098,7 +1098,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the cluster info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetClusterInfoForJobNoId() throws GenieException {
@@ -1108,7 +1108,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test setting the cluster info.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetClusterInfoForJobNoJob() throws GenieException {
@@ -1118,7 +1118,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test getting the job status.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testGetJobStatus() throws GenieException {
@@ -1128,7 +1128,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test running the job. Mock interactions as this isn't integration test.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test
     public void testRunJob() throws GenieException {
@@ -1155,7 +1155,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
     /**
      * Test running the job. Mock interactions as this isn't integration test.
      *
-     * @throws GenieException
+     * @throws GenieException For any problem
      */
     @Test(expected = GenieException.class)
     public void testRunJobThrowsException() throws GenieException {

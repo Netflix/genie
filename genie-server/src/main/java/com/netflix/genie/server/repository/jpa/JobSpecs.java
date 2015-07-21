@@ -55,6 +55,8 @@ public final class JobSpecs {
      * @param tags        The tags for the jobs to find
      * @param clusterName The cluster name
      * @param clusterId   The cluster id
+     * @param commandName The command name
+     * @param commandId   The command id
      * @return The specification
      */
     public static Specification<Job> find(

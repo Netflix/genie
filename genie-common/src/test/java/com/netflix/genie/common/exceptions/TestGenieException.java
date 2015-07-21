@@ -36,7 +36,7 @@ public class TestGenieException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieException
+     * @throws GenieException On exception
      */
     @Test(expected = GenieException.class)
     public void testThreeArgConstructor() throws GenieException {
@@ -50,7 +50,7 @@ public class TestGenieException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieException
+     * @throws GenieException On exception
      */
     @Test(expected = GenieException.class)
     public void testTwoArgConstructorWithMessage() throws GenieException {
@@ -64,7 +64,7 @@ public class TestGenieException extends Exception {
     /**
      * Test the constructor.
      *
-     * @throws GenieException
+     * @throws GenieException On exception
      */
     @Test(expected = GenieException.class)
     public void testTwoArgConstructorWithThrowable() throws GenieException {
