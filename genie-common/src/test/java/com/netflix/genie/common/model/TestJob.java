@@ -296,7 +296,7 @@ public class TestJob extends TestEntityBase {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testSetClusterCriteriasWithEmpty() throws GeniePreconditionException {
-        this.job.setClusterCriterias(new ArrayList<ClusterCriteria>());
+        this.job.setClusterCriterias(new ArrayList<>());
     }
 
     /**
@@ -731,7 +731,7 @@ public class TestJob extends TestEntityBase {
                 NAME,
                 VERSION,
                 COMMAND_ARGS,
-                new HashSet<String>(),
+                new HashSet<>(),
                 CLUSTER_CRITERIAS
         );
         this.validate(localJob);
@@ -812,7 +812,7 @@ public class TestJob extends TestEntityBase {
                 VERSION,
                 COMMAND_ARGS,
                 COMMAND_CRITERIA,
-                new ArrayList<ClusterCriteria>()
+                new ArrayList<>()
         );
         this.validate(localJob);
     }
@@ -824,7 +824,7 @@ public class TestJob extends TestEntityBase {
     public void testClusterCriteriasToString() {
         Assert.assertNull(this.job.clusterCriteriasToString(null));
         Assert.assertNull(this.job.clusterCriteriasToString(
-                new ArrayList<ClusterCriteria>()));
+                new ArrayList<>()));
 
         final String criterias = this.job.clusterCriteriasToString(CLUSTER_CRITERIAS);
         Assert.assertTrue(criterias.contains(CLUSTER_CRITERIA_2));
@@ -839,8 +839,7 @@ public class TestJob extends TestEntityBase {
     @Test
     public void testCommandCriteriaToString() {
         Assert.assertNull(this.job.commandCriteriaToString(null));
-        Assert.assertNull(this.job.commandCriteriaToString(
-                new HashSet<String>()));
+        Assert.assertNull(this.job.commandCriteriaToString(new HashSet<>()));
 
         Assert.assertEquals(EXPECTED_COMMAND_CRITERIA_STRING,
                 this.job.commandCriteriaToString(COMMAND_CRITERIA));

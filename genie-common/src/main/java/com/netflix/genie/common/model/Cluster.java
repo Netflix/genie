@@ -21,11 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
@@ -38,8 +35,10 @@ import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Representation of the state of the Cluster object.
@@ -243,11 +242,10 @@ public class Cluster extends CommonEntityFields {
     public void setCommands(final List<Command> commands) {
         //Clear references to this cluster in existing commands
         if (this.commands != null) {
-            for (final Command command : this.commands) {
-                if (command.getClusters() != null) {
-                    command.getClusters().remove(this);
-                }
-            }
+            this.commands
+                    .stream()
+                    .filter(command -> command.getClusters() != null)
+                    .forEach(command -> command.getClusters().remove(this));
         }
         //set the commands for this command
         this.commands = commands;

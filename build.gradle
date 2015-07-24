@@ -75,6 +75,7 @@ subprojects {
     }
 
     checkstyle {
+        toolVersion = "6.0"
         configFile = new File(project.parent.projectDir, "codequality/checkstyle/checkstyle.xml")
     }
 
