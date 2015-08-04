@@ -195,7 +195,7 @@ public class TestApplicationSpecs {
     @Test
     public void testFindEmptyStatuses() {
         final Specification<Application> spec = ApplicationSpecs
-                .find(NAME, USER_NAME, new HashSet<ApplicationStatus>(), TAGS);
+                .find(NAME, USER_NAME, new HashSet<>(), TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))

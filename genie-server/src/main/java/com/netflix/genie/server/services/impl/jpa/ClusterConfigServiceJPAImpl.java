@@ -23,38 +23,34 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterCriteria;
-
+import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Cluster_;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.CommandStatus;
-
+import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.repository.jpa.ClusterRepository;
+import com.netflix.genie.server.repository.jpa.ClusterSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.JobRepository;
-import com.netflix.genie.server.repository.jpa.ClusterSpecs;
-
 import com.netflix.genie.server.services.ClusterConfigService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
-
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the PersistentClusterConfig interface.
@@ -372,17 +368,12 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final Set<CommandStatus> statuses
     ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
-        final List<Command> filteredCommandList = new ArrayList<Command>();
-
         if (cluster != null) {
             final List<Command> commands = cluster.getCommands();
             if (statuses != null) {
-                for (Command command: commands) {
-                    if (statuses.contains(command.getStatus())) {
-                        filteredCommandList.add(command);
-                    }
-                }
-                return filteredCommandList;
+                return commands.stream()
+                        .filter(command -> statuses.contains(command.getStatus()))
+                        .collect(Collectors.toList());
             } else {
                 return commands;
             }

@@ -22,11 +22,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +29,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Test for the cluster load balancer.
@@ -69,7 +68,7 @@ public class TestRandomizedClusterLoadBalancerImpl {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testEmptyList() throws GenieException {
-        this.clb.selectCluster(new ArrayList<Cluster>());
+        this.clb.selectCluster(new ArrayList<>());
     }
 
     /**

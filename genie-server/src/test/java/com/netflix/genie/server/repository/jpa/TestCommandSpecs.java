@@ -252,7 +252,7 @@ public class TestCommandSpecs {
     @Test
     public void testFindEmptyStatuses() {
         final Specification<Command> spec = CommandSpecs
-                .find(NAME, USER_NAME, new HashSet<CommandStatus>(), TAGS);
+                .find(NAME, USER_NAME, new HashSet<>(), TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
