@@ -18,24 +18,23 @@ package com.netflix.genie.server.repository.jpa;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Application_;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.jpa.domain.Specification;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Specifications for JPA queries.
  *
- * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  * @author tgianos
+ * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  */
 public final class ApplicationSpecs {
 
@@ -56,36 +55,28 @@ public final class ApplicationSpecs {
      */
     public static Specification<Application> find(
             final String name, final String userName, final Set<ApplicationStatus> statuses, final Set<String> tags) {
-        return new Specification<Application>() {
-            @Override
-            public Predicate toPredicate(
-                    final Root<Application> root,
-                    final CriteriaQuery<?> cq,
-                    final CriteriaBuilder cb) {
-                final List<Predicate> predicates = new ArrayList<>();
-                if (StringUtils.isNotBlank(name)) {
-                    predicates.add(cb.equal(root.get(Application_.name), name));
-                }
-                if (StringUtils.isNotBlank(userName)) {
-                    predicates.add(cb.equal(root.get(Application_.user), userName));
-                }
-                if (statuses != null && !statuses.isEmpty()) {
-                    //Could optimize this as we know size could use native array
-                    final List<Predicate> orPredicates = new ArrayList<>();
-                    for (final ApplicationStatus status : statuses) {
-                        orPredicates.add(cb.equal(root.get(Application_.status), status));
-                    }
-                    predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
-                }
-                if (tags != null) {
-                    for (final String tag : tags) {
-                        if (StringUtils.isNotBlank(tag)) {
-                            predicates.add(cb.isMember(tag, root.get(Application_.tags)));
-                        }
-                    }
-                }
-                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+        return (final Root<Application> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+            final List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotBlank(name)) {
+                predicates.add(cb.equal(root.get(Application_.name), name));
             }
+            if (StringUtils.isNotBlank(userName)) {
+                predicates.add(cb.equal(root.get(Application_.user), userName));
+            }
+            if (statuses != null && !statuses.isEmpty()) {
+                final List<Predicate> orPredicates =
+                        statuses
+                                .stream()
+                                .map(status -> cb.equal(root.get(Application_.status), status))
+                                .collect(Collectors.toList());
+                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+            }
+            if (tags != null) {
+                tags.stream()
+                        .filter(StringUtils::isNotBlank)
+                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(Application_.tags))));
+            }
+            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
     }
 }

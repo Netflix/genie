@@ -30,6 +30,12 @@ import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.JobService;
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,12 +44,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 /**
  * Tests for the JobServiceJPAImpl class.
@@ -679,7 +679,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToJobNoId() throws GenieException {
-        this.service.addTagsForJob(null, new HashSet<String>());
+        this.service.addTagsForJob(null, new HashSet<>());
     }
 
     /**
@@ -737,7 +737,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForJobNoId() throws GenieException {
-        this.service.updateTagsForJob(null, new HashSet<String>());
+        this.service.updateTagsForJob(null, new HashSet<>());
     }
 
     /**

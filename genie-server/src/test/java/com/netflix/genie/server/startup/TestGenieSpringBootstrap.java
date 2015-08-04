@@ -63,8 +63,6 @@ public class TestGenieSpringBootstrap {
     public void testInitialize() throws GenieException {
         this.genieSpringBootstrap.initialize();
         Mockito.verify(this.manager, Mockito.times(1)).getNumInstanceJobs();
-//        Mockito.verify(this.janitor, Mockito.times(1)).run();
-//        Mockito.verify(this.monitor, Mockito.times(1)).run();
     }
 
     /**

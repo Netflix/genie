@@ -33,8 +33,8 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'nebula.provided-base'
 
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     group = "com.netflix.${githubProjectName}"
 
@@ -75,6 +75,7 @@ subprojects {
     }
 
     checkstyle {
+        toolVersion = "6.0"
         configFile = new File(project.parent.projectDir, "codequality/checkstyle/checkstyle.xml")
     }
 

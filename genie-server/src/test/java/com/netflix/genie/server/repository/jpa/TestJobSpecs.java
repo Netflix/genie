@@ -335,7 +335,7 @@ public class TestJobSpecs {
                 ID,
                 JOB_NAME,
                 USER_NAME,
-                new HashSet<JobStatus>(),
+                new HashSet<>(),
                 TAGS,
                 CLUSTER_NAME,
                 CLUSTER_ID,
