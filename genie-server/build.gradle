@@ -10,16 +10,19 @@ dependencies {
     compile project(":genie-common")
 
     // Commons Libs
-    compile("commons-collections:commons-collections:${commons_collections_version}")
+    compile("org.apache.commons:commons-collections4:${commons_collections4_version}")
     compile("commons-httpclient:commons-httpclient:${commons_httpclient_version}")
 
     // Netflix Libs
-    compile("com.netflix.archaius:archaius-core:${archaius_version}")
-    compile("com.netflix.karyon:karyon-core:${karyon_version}")
-    compile("com.netflix.karyon:karyon-eureka:${karyon_version}")
-    compile("com.netflix.karyon:karyon-extensions:${karyon_version}")
-    compile("com.netflix.karyon:karyon-spi:${karyon_version}")
-    compile("com.netflix.servo:servo-core:${servo_version}")
+    compile("com.netflix.karyon:karyon2-archaius:${karyon_version}")
+    compile("com.netflix.karyon:karyon2-core:${karyon_version}")
+    compile("com.netflix.karyon:karyon2-eureka:${karyon_version}")
+    compile("com.netflix.karyon:karyon2-governator:${karyon_version}")
+    compile("com.netflix.karyon:karyon2-jersey-blocking:${karyon_version}")
+    compile("com.netflix.karyon:karyon2-servo:${karyon_version}")
+
+    // Jackson Libs
+    compile("com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${jackson_version}")
 
     // Java Mail
     compile("javax.mail:mail:${mail_version}")
@@ -52,7 +55,7 @@ dependencies {
 
     // Database Libs
     runtime("mysql:mysql-connector-java:${mysql_connector_java_version}")
-    runtime("org.apache.commons:commons-dbcp2:${commons_dhcp2_version}")
+    runtime("org.apache.commons:commons-dbcp2:${commons_dbcp2_version}")
     runtime("org.apache.derby:derby:${derby_version}")
     runtime("org.hsqldb:hsqldb:${hsqldb_version}")
 

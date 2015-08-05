@@ -25,12 +25,11 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Singleton class, which acts as the client library for the Application
@@ -40,8 +39,11 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class ApplicationServiceClient extends BaseGenieClient {
 
-    private static final String BASE_CONFIG_APPLICATION_REST_URL
-            = BASE_REST_URL + "config/applications";
+    private static final String BASE_CONFIG_APPLICATION_REST_URL = BASE_REST_URL + "config/applications";
+
+    private interface ApplicationService {
+
+    }
 
     // reference to the instance object
     private static ApplicationServiceClient instance;

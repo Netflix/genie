@@ -74,6 +74,6 @@
     </filter-mapping>
 
     <listener>
-        <listener-class>com.netflix.karyon.server.guice.KaryonGuiceContextListener</listener-class>
+        <listener-class>com.netflix.governator.lifecycle.DefaultLifecycleListener</listener-class>
     </listener>
 </web-app>

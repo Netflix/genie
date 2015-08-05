@@ -24,6 +24,13 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
+    compile(project(":genie-server"))
+    compile("com.netflix.karyon:karyon2-admin-web:${karyon_version}") {
+        exclude group: "commons-collections", module: "commons-collections"
+        exclude group: "org.eclipse.jetty.orbit", module: "javax.servlet"
+        exclude group: "org.mortbay.jetty", module: "servlet-api"
+    }
+
     /*******************************
      * Provided Dependencies
      *******************************/
@@ -31,12 +38,6 @@ dependencies {
     /*******************************
      * Runtime Dependencies
      *******************************/
-
-    runtime(project(":genie-server"))
-    runtime("com.netflix.karyon:karyon-admin-web:${karyon_version}") {
-        exclude group: "commons-collections", module: "commons-collections"
-        exclude group: "org.eclipse.jetty.orbit", module: "javax.servlet"
-    }
 
     /*******************************
      * Test Dependencies
