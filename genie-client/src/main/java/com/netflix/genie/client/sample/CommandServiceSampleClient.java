@@ -240,7 +240,7 @@ public final class CommandServiceSampleClient {
         if (StringUtils.isNotBlank(id)) {
             command.setId(id);
         }
-        command.setEnvPropFile("s3:/mybucket/envFile.sh");
+        command.setSetupFile("s3:/mybucket/envFile.sh");
         command.setVersion("0.13");
 
         final Set<String> tags = new HashSet<>();

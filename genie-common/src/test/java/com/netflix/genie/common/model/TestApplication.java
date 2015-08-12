@@ -53,9 +53,9 @@ public class TestApplication extends TestEntityBase {
     public void testDefaultConstructor() {
         Assert.assertNull(this.a.getCommands());
         Assert.assertNull(this.a.getConfigs());
-        Assert.assertNull(this.a.getEnvPropFile());
+        Assert.assertNull(this.a.getSetupFile());
         Assert.assertNull(this.a.getStatus());
-        Assert.assertNull(this.a.getJars());
+        Assert.assertNull(this.a.getDependencies());
         Assert.assertNull(this.a.getName());
         Assert.assertNull(this.a.getUser());
         Assert.assertNull(this.a.getVersion());
@@ -71,9 +71,9 @@ public class TestApplication extends TestEntityBase {
         this.a = new Application(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         Assert.assertNull(this.a.getCommands());
         Assert.assertNull(this.a.getConfigs());
-        Assert.assertNull(this.a.getEnvPropFile());
+        Assert.assertNull(this.a.getSetupFile());
         Assert.assertEquals(ApplicationStatus.ACTIVE, this.a.getStatus());
-        Assert.assertNull(this.a.getJars());
+        Assert.assertNull(this.a.getDependencies());
         Assert.assertEquals(NAME, this.a.getName());
         Assert.assertEquals(USER, this.a.getUser());
         Assert.assertEquals(VERSION, this.a.getVersion());
@@ -152,10 +152,10 @@ public class TestApplication extends TestEntityBase {
      */
     @Test
     public void testSetEnvPropFile() {
-        Assert.assertNull(this.a.getEnvPropFile());
+        Assert.assertNull(this.a.getSetupFile());
         final String propFile = "s3://netflix.propFile";
-        this.a.setEnvPropFile(propFile);
-        Assert.assertEquals(propFile, this.a.getEnvPropFile());
+        this.a.setSetupFile(propFile);
+        Assert.assertEquals(propFile, this.a.getSetupFile());
     }
 
     /**
@@ -175,11 +175,11 @@ public class TestApplication extends TestEntityBase {
      */
     @Test
     public void testSetJars() {
-        Assert.assertNull(this.a.getJars());
+        Assert.assertNull(this.a.getDependencies());
         final Set<String> jars = new HashSet<>();
         jars.add("s3://netflix/jars/myJar.jar");
-        this.a.setJars(jars);
-        Assert.assertEquals(jars, this.a.getJars());
+        this.a.setDependencies(jars);
+        Assert.assertEquals(jars, this.a.getDependencies());
     }
 
     /**

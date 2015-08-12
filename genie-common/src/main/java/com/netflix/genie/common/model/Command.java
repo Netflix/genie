@@ -21,22 +21,26 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import java.util.HashSet;
-import java.util.Set;
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Representation of the state of the Command Object.
@@ -45,14 +49,16 @@ import org.hibernate.validator.constraints.NotBlank;
  * @author tgianos
  */
 @Entity
+@Table(name = "commands")
 @Cacheable(false)
 @ApiModel(description = "An entity for managing a Command in the Genie system.")
-public class Command extends CommonEntityFields {
+public class Command extends CommonFields {
 
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
     @Basic(optional = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The status of the command",
@@ -65,6 +71,7 @@ public class Command extends CommonEntityFields {
      * Location of the executable for this command.
      */
     @Basic(optional = false)
+    @Column(name = "executable", nullable = false)
     @ApiModelProperty(
             value = "Location of the executable for this command",
             required = true
@@ -76,15 +83,17 @@ public class Command extends CommonEntityFields {
      * Users can specify a property file location with environment variables.
      */
     @Basic
+    @Column(name = "setupFile")
     @ApiModelProperty(
-            value = "Location of a property file which will be downloaded and sourced before command execution"
+            value = "Location of a setup file which will be downloaded and run before command execution"
     )
-    private String envPropFile;
+    private String setupFile;
 
     /**
      * Job type of the command. eg: hive, pig , hadoop etc.
      */
     @Basic
+    @Column(name = "jobType")
     @ApiModelProperty(
             value = "Job type of the command. eg: hive, pig , hadoop etc"
     )
@@ -94,6 +103,11 @@ public class Command extends CommonEntityFields {
      * Reference to all the configuration (xml's) needed for this command.
      */
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "command_configs",
+            joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
+    )
+    @Column(name = "config", nullable = false)
     @ApiModelProperty(
             value = "Locations of all the configuration files needed for this command which will be downloaded"
     )
@@ -103,6 +117,11 @@ public class Command extends CommonEntityFields {
      * Set of tags for a command.
      */
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "command_tags",
+            joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
+    )
+    @Column(name = "tag", nullable = false)
     @ApiModelProperty(
             value = "All the tags associated with this command",
             required = true
@@ -113,7 +132,8 @@ public class Command extends CommonEntityFields {
      * Set of applications that can run this command.
      */
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "application_id")
     private Application application;
 
     /**
@@ -206,20 +226,19 @@ public class Command extends CommonEntityFields {
     /**
      * Gets the envPropFile name.
      *
-     * @return envPropFile - file name containing environment variables.
+     * @return setupFile - file location containing setup steps.
      */
-    public String getEnvPropFile() {
-        return this.envPropFile;
+    public String getSetupFile() {
+        return this.setupFile;
     }
 
     /**
-     * Sets the env property file name in string form.
+     * Sets the setup file for this command.
      *
-     * @param envPropFile contains the list of env variables to set while
-     * running this command.
+     * @param setupFile The file to run during command setup
      */
-    public void setEnvPropFile(final String envPropFile) {
-        this.envPropFile = envPropFile;
+    public void setSetupFile(final String setupFile) {
+        this.setupFile = setupFile;
     }
 
     /**

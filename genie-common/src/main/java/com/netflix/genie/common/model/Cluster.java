@@ -25,15 +25,20 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,14 +53,16 @@ import java.util.Set;
  * @author tgianos
  */
 @Entity
+@Table(name = "clusters")
 @Cacheable(false)
 @ApiModel(description = "An entity for managing a cluster in the Genie system.")
-public class Cluster extends CommonEntityFields {
+public class Cluster extends CommonFields {
 
     /**
      * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
      */
     @Basic(optional = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The status of the cluster",
@@ -71,6 +78,7 @@ public class Cluster extends CommonEntityFields {
      * netflix.genie.server.{clusterType}.JobManagerImpl
      */
     @Basic(optional = false)
+    @Column(name = "clusterType", nullable = false)
     @ApiModelProperty(
             value = "The type of the cluster to use to figure out the job manager for this"
                     + " cluster. e.g.: yarn, presto, mesos etc. The mapping to a JobManager will be"
@@ -84,6 +92,11 @@ public class Cluster extends CommonEntityFields {
      * Reference to all the configuration files needed for this cluster.
      */
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "cluster_configs",
+            joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
+    )
+    @Column(name = "config", nullable = false)
     @ApiModelProperty(
             value = "All the configuration files needed for this cluster which will be downloaded pre-use"
     )
@@ -93,6 +106,11 @@ public class Cluster extends CommonEntityFields {
      * Set of tags for a cluster.
      */
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "cluster_tags",
+            joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
+    )
+    @Column(name = "tag", nullable = false)
     @ApiModelProperty(
             value = "The tags associated with this cluster",
             required = true
@@ -103,7 +121,17 @@ public class Cluster extends CommonEntityFields {
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
      */
     @ManyToMany(fetch = FetchType.EAGER)
-    @OrderColumn
+    @JoinTable(
+            name = "clusters_commands",
+
+            joinColumns = {
+                    @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false)
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false)
+            }
+    )
+    @OrderColumn(name = "command_order", nullable = false)
     @JsonIgnore
     private List<Command> commands;
 

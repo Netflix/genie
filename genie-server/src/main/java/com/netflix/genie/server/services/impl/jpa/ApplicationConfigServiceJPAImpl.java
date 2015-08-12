@@ -311,8 +311,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            app.getJars().addAll(jars);
-            return app.getJars();
+            app.getDependencies().addAll(jars);
+            return app.getDependencies();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -330,7 +330,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            return app.getJars();
+            return app.getDependencies();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -348,8 +348,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            app.setJars(jars);
-            return app.getJars();
+            app.setDependencies(jars);
+            return app.getDependencies();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -365,8 +365,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            app.getJars().clear();
-            return app.getJars();
+            app.getDependencies().clear();
+            return app.getDependencies();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -384,8 +384,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            app.getJars().remove(jar);
-            return app.getJars();
+            app.getDependencies().remove(jar);
+            return app.getDependencies();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }

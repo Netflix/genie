@@ -15,7 +15,7 @@
     limitations under the License.
 -->
 <dataset>
-    <Application
+    <applications
             id="app1"
             created="2014-08-08 01:45:00"
             updated="2014-08-08 01:50:00"
@@ -23,32 +23,32 @@
             name="tez"
             version="1.2.3"
             status="ACTIVE"/>
-    <Application_tags
-            APPLICATION_ID="app1"
-            element="genie.id:app1"/>
-    <Application_tags
-            APPLICATION_ID="app1"
-            element="genie.name:tez"/>
-    <Application_tags
-            APPLICATION_ID="app1"
-            element="prod"/>
-    <Application_tags
-            APPLICATION_ID="app1"
-            element="yarn"/>
-    <Application_configs
-            APPLICATION_ID="app1"
-            element="s3://some/config/file"/>
-    <Application_configs
-            APPLICATION_ID="app1"
-            element="s3://some/other/config/file"/>
-    <Application_jars
-            APPLICATION_ID="app1"
-            element="tez.jar"/>
-    <Application_jars
-            APPLICATION_ID="app1"
-            element="yarn.jar"/>
+    <application_tags
+            application_id="app1"
+            tag="genie.id:app1"/>
+    <application_tags
+            application_id="app1"
+            tag="genie.name:tez"/>
+    <application_tags
+            application_id="app1"
+            tag="prod"/>
+    <application_tags
+            application_id="app1"
+            tag="yarn"/>
+    <application_configs
+            application_id="app1"
+            config="s3://some/config/file"/>
+    <application_configs
+            application_id="app1"
+            config="s3://some/other/config/file"/>
+    <application_dependencies
+            application_id="app1"
+            dependency="tez.jar"/>
+    <application_dependencies
+            application_id="app1"
+            dependency="yarn.jar"/>
 
-    <Command
+    <commands
             id="command1"
             created="2014-08-08 01:47:00"
             updated="2014-08-08 01:59:00"
@@ -58,30 +58,30 @@
             executable="pig"
             jobType="yarn"
             status="ACTIVE"
-            APPLICATION_ID="app1"/>
-    <Command_configs
-            COMMAND_ID="command1"
-            element="s3://some/config/file"/>
-    <Command_configs
-            COMMAND_ID="command1"
-            element="s3://some/other/config/file"/>
-    <Command_tags
-            COMMAND_ID="command1"
-            element="genie.id:command1"/>
-    <Command_tags
-            COMMAND_ID="command1"
-            element="genie.name:pig_13_prod"/>
-    <Command_tags
-            COMMAND_ID="command1"
-            element="pig"/>
-    <Command_tags
-            COMMAND_ID="command1"
-            element="prod"/>
-    <Command_tags
-            COMMAND_ID="command1"
-            element="tez"/>
+            application_id="app1"/>
+    <command_configs
+            command_id="command1"
+            config="s3://some/config/file"/>
+    <command_configs
+            command_id="command1"
+            config="s3://some/other/config/file"/>
+    <command_tags
+            command_id="command1"
+            tag="genie.id:command1"/>
+    <command_tags
+            command_id="command1"
+            tag="genie.name:pig_13_prod"/>
+    <command_tags
+            command_id="command1"
+            tag="pig"/>
+    <command_tags
+            command_id="command1"
+            tag="prod"/>
+    <command_tags
+            command_id="command1"
+            tag="tez"/>
 
-    <Command
+    <commands
             id="command2"
             created="2014-08-08 01:46:00"
             updated="2014-08-08 03:12:00"
@@ -91,23 +91,23 @@
             executable="hive"
             jobType="yarn"
             status="INACTIVE"/>
-    <Command_configs
-            COMMAND_ID="command2"
-            element="s3://some/config/file"/>
-    <Command_tags
-            COMMAND_ID="command2"
-            element="genie.id:command2"/>
-    <Command_tags
-            COMMAND_ID="command2"
-            element="genie.name:hive_11_prod"/>
-    <Command_tags
-            COMMAND_ID="command2"
-            element="hive"/>
-    <Command_tags
-            COMMAND_ID="command2"
-            element="prod"/>
+    <command_configs
+            command_id="command2"
+            config="s3://some/config/file"/>
+    <command_tags
+            command_id="command2"
+            tag="genie.id:command2"/>
+    <command_tags
+            command_id="command2"
+            tag="genie.name:hive_11_prod"/>
+    <command_tags
+            command_id="command2"
+            tag="hive"/>
+    <command_tags
+            command_id="command2"
+            tag="prod"/>
 
-    <Command
+    <commands
             id="command3"
             created="2014-08-08 01:49:00"
             updated="2014-08-08 02:59:00"
@@ -117,26 +117,26 @@
             executable="pig"
             jobType="yarn"
             status="DEPRECATED"/>
-    <Command_configs
-            COMMAND_ID="command3"
-            element="s3://some/config/file"/>
-    <Command_tags
-            COMMAND_ID="command3"
-            element="genie.id:command3"/>
-    <Command_tags
-            COMMAND_ID="command3"
-            element="genie.name:pig_11_prod"/>
-    <Command_tags
-            COMMAND_ID="command3"
-            element="pig"/>
-    <Command_tags
-            COMMAND_ID="command3"
-            element="prod"/>
-    <Command_tags
-            COMMAND_ID="command3"
-            element="deprecated"/>
+    <command_configs
+            command_id="command3"
+            config="s3://some/config/file"/>
+    <command_tags
+            command_id="command3"
+            tag="genie.id:command3"/>
+    <command_tags
+            command_id="command3"
+            tag="genie.name:pig_11_prod"/>
+    <command_tags
+            command_id="command3"
+            tag="pig"/>
+    <command_tags
+            command_id="command3"
+            tag="prod"/>
+    <command_tags
+            command_id="command3"
+            tag="deprecated"/>
 
-    <Cluster
+    <clusters
             id="cluster1"
             created="2014-07-08 01:49:00"
             updated="2014-07-08 02:59:00"
@@ -145,35 +145,35 @@
             version="2.4.0"
             clusterType="yarn"
             status="UP"/>
-    <Cluster_configs
-            CLUSTER_ID="cluster1"
-            element="s3://some/config/file"/>
-    <Cluster_tags
-            CLUSTER_ID="cluster1"
-            element="genie.id:cluster1"/>
-    <Cluster_tags
-            CLUSTER_ID="cluster1"
-            element="genie.name:h2prod"/>
-    <Cluster_tags
-            CLUSTER_ID="cluster1"
-            element="pig"/>
-    <Cluster_tags
-            CLUSTER_ID="cluster1"
-            element="prod"/>
-    <Cluster_tags
-            CLUSTER_ID="cluster1"
-            element="hive"/>
+    <cluster_configs
+            cluster_id="cluster1"
+            config="s3://some/config/file"/>
+    <cluster_tags
+            cluster_id="cluster1"
+            tag="genie.id:cluster1"/>
+    <cluster_tags
+            cluster_id="cluster1"
+            tag="genie.name:h2prod"/>
+    <cluster_tags
+            cluster_id="cluster1"
+            tag="pig"/>
+    <cluster_tags
+            cluster_id="cluster1"
+            tag="prod"/>
+    <cluster_tags
+            cluster_id="cluster1"
+            tag="hive"/>
 
-    <Cluster_Command
-            CLUSTERS_ID="cluster1"
-            COMMANDS_ID="command1"
-            commands_ORDER="0"/>
-    <Cluster_Command
-            CLUSTERS_ID="cluster1"
-            COMMANDS_ID="command2"
-            commands_ORDER="2"/>
-    <Cluster_Command
-            CLUSTERS_ID="cluster1"
-            COMMANDS_ID="command3"
-            commands_ORDER="1"/>
+    <clusters_commands
+            cluster_id="cluster1"
+            command_id="command1"
+            command_order="0"/>
+    <clusters_commands
+            cluster_id="cluster1"
+            command_id="command2"
+            command_order="2"/>
+    <clusters_commands
+            cluster_id="cluster1"
+            command_id="command3"
+            command_order="1"/>
 </dataset>

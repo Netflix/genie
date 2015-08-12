@@ -55,7 +55,7 @@ public class TestCommand extends TestEntityBase {
         Assert.assertNull(this.c.getApplication());
         Assert.assertNull(this.c.getClusters());
         Assert.assertNull(this.c.getConfigs());
-        Assert.assertNull(this.c.getEnvPropFile());
+        Assert.assertNull(this.c.getSetupFile());
         Assert.assertNull(this.c.getExecutable());
         Assert.assertNull(this.c.getJobType());
         Assert.assertNull(this.c.getName());
@@ -75,7 +75,7 @@ public class TestCommand extends TestEntityBase {
         Assert.assertNull(this.c.getApplication());
         Assert.assertNull(this.c.getClusters());
         Assert.assertNull(this.c.getConfigs());
-        Assert.assertNull(this.c.getEnvPropFile());
+        Assert.assertNull(this.c.getSetupFile());
         Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
         Assert.assertNull(this.c.getJobType());
         Assert.assertEquals(NAME, this.c.getName());
@@ -166,10 +166,10 @@ public class TestCommand extends TestEntityBase {
      */
     @Test
     public void testSetEnvPropFile() {
-        Assert.assertNull(this.c.getEnvPropFile());
+        Assert.assertNull(this.c.getSetupFile());
         final String propFile = "s3://netflix.propFile";
-        this.c.setEnvPropFile(propFile);
-        Assert.assertEquals(propFile, this.c.getEnvPropFile());
+        this.c.setSetupFile(propFile);
+        Assert.assertEquals(propFile, this.c.getSetupFile());
     }
 
     /**

@@ -238,7 +238,7 @@ public final class ApplicationServiceSampleClient {
 
         final Set<String> jars = new HashSet<>();
         jars.add("s3://mybucket/foo.jar");
-        app.setJars(jars);
+        app.setDependencies(jars);
 
         final Set<String> tags = new HashSet<>();
         tags.add("tag0");

@@ -26,9 +26,10 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -38,10 +39,9 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * Abstract class to support basic columns for all entities for genie.
@@ -58,7 +58,7 @@ public class Auditable implements Serializable {
      * Unique ID.
      */
     @Id
-    @Column(updatable = false)
+    @Column(name = "id", updatable = false)
     @ApiModelProperty(
             value = "The unique id of this resource. If one is not provided it is created internally"
     )
@@ -69,7 +69,7 @@ public class Auditable implements Serializable {
      */
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
-    @Column(updatable = false)
+    @Column(name = "created", nullable = false, updatable = false)
     @ApiModelProperty(
             value = "When this resource was created. Set automatically by system",
             readOnly = true,
@@ -84,6 +84,7 @@ public class Auditable implements Serializable {
      */
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
+    @Column(name = "updated", nullable = false)
     @ApiModelProperty(
             value = "When this resource was last updated. Set automatically by system",
             readOnly = true,

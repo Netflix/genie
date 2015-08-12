@@ -88,7 +88,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(APP_1_STATUS, app.getStatus());
         Assert.assertEquals(3, app.getTags().size());
         Assert.assertEquals(2, app.getConfigs().size());
-        Assert.assertEquals(2, app.getJars().size());
+        Assert.assertEquals(2, app.getDependencies().size());
 
         final Application app2 = this.service.getApplication(APP_2_ID);
         Assert.assertEquals(APP_2_ID, app2.getId());
@@ -98,7 +98,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(APP_2_STATUS, app2.getStatus());
         Assert.assertEquals(4, app2.getTags().size());
         Assert.assertEquals(2, app2.getConfigs().size());
-        Assert.assertEquals(1, app2.getJars().size());
+        Assert.assertEquals(1, app2.getDependencies().size());
 
         final Application app3 = this.service.getApplication(APP_3_ID);
         Assert.assertEquals(APP_3_ID, app3.getId());
@@ -108,7 +108,7 @@ public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(APP_3_STATUS, app3.getStatus());
         Assert.assertEquals(3, app3.getTags().size());
         Assert.assertEquals(1, app3.getConfigs().size());
-        Assert.assertEquals(2, app3.getJars().size());
+        Assert.assertEquals(2, app3.getDependencies().size());
     }
 
     /**

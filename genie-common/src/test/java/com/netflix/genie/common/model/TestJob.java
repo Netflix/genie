@@ -177,9 +177,9 @@ public class TestJob extends TestEntityBase {
         Assert.assertNotNull(this.job.getClusterCriteriasString());
         Assert.assertNotNull(this.job.getCommandCriteriaString());
         Assert.assertFalse(this.job.getTags().contains(
-                CommonEntityFields.GENIE_ID_TAG_NAMESPACE + this.job.getId()));
+                CommonFields.GENIE_ID_TAG_NAMESPACE + this.job.getId()));
         Assert.assertFalse(this.job.getTags().contains(
-                CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + this.job.getName()));
+                CommonFields.GENIE_NAME_TAG_NAMESPACE + this.job.getName()));
     }
 
     /**
@@ -197,8 +197,8 @@ public class TestJob extends TestEntityBase {
         Assert.assertNotNull(this.job.getId());
         Assert.assertNotNull(this.job.getClusterCriteriasString());
         Assert.assertNotNull(this.job.getCommandCriteriaString());
-        Assert.assertFalse(this.job.getTags().contains(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + this.job.getId()));
-        Assert.assertFalse(this.job.getTags().contains(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE
+        Assert.assertFalse(this.job.getTags().contains(CommonFields.GENIE_ID_TAG_NAMESPACE + this.job.getId()));
+        Assert.assertFalse(this.job.getTags().contains(CommonFields.GENIE_NAME_TAG_NAMESPACE
                 + this.job.getName()));
     }
 
@@ -218,17 +218,6 @@ public class TestJob extends TestEntityBase {
         job2.onLoadJob();
         Assert.assertEquals(CLUSTER_CRITERIAS.size(), job2.getClusterCriterias().size());
         Assert.assertEquals(COMMAND_CRITERIA, job2.getCommandCriteria());
-    }
-
-    /**
-     * Test the description get/set.
-     */
-    @Test
-    public void testSetGetDescription() {
-        Assert.assertNull(this.job.getDescription());
-        final String description = "Test description";
-        this.job.setDescription(description);
-        Assert.assertEquals(description, this.job.getDescription());
     }
 
     /**
@@ -656,10 +645,10 @@ public class TestJob extends TestEntityBase {
      */
     @Test
     public void testSetGetEnvPropFile() {
-        Assert.assertNull(this.job.getEnvPropFile());
+        Assert.assertNull(this.job.getSetupFile());
         final String envPropFile = "/some/property/file";
-        this.job.setEnvPropFile(envPropFile);
-        Assert.assertEquals(envPropFile, this.job.getEnvPropFile());
+        this.job.setSetupFile(envPropFile);
+        Assert.assertEquals(envPropFile, this.job.getSetupFile());
     }
 
     /**

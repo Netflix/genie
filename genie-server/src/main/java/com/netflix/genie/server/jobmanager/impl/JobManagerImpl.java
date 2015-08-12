@@ -367,8 +367,8 @@ public class JobManagerImpl implements JobManager {
 
         this.setCommandAndApplicationForJob(processBuilder);
 
-        if (StringUtils.isNotBlank(this.job.getEnvPropFile())) {
-            processBuilder.environment().put("JOB_ENV_FILE", this.job.getEnvPropFile());
+        if (StringUtils.isNotBlank(this.job.getSetupFile())) {
+            processBuilder.environment().put("JOB_ENV_FILE", this.job.getSetupFile());
         }
 
         // this is for the generic joblauncher.sh to use to create username
@@ -528,8 +528,8 @@ public class JobManagerImpl implements JobManager {
             processBuilder.environment().put("S3_COMMAND_CONF_FILES", convertCollectionToString(command.getConfigs()));
         }
 
-        if (StringUtils.isNotBlank(command.getEnvPropFile())) {
-            processBuilder.environment().put("COMMAND_ENV_FILE", command.getEnvPropFile());
+        if (StringUtils.isNotBlank(command.getSetupFile())) {
+            processBuilder.environment().put("COMMAND_ENV_FILE", command.getSetupFile());
         }
 
         final Application application = command.getApplication();
@@ -539,13 +539,13 @@ public class JobManagerImpl implements JobManager {
                         .put("S3_APPLICATION_CONF_FILES", convertCollectionToString(application.getConfigs()));
             }
 
-            if (application.getJars() != null && !application.getJars().isEmpty()) {
+            if (application.getDependencies() != null && !application.getDependencies().isEmpty()) {
                 processBuilder.environment()
-                        .put("S3_APPLICATION_JAR_FILES", convertCollectionToString(application.getJars()));
+                        .put("S3_APPLICATION_JAR_FILES", convertCollectionToString(application.getDependencies()));
             }
 
-            if (StringUtils.isNotBlank(application.getEnvPropFile())) {
-                processBuilder.environment().put("APPLICATION_ENV_FILE", application.getEnvPropFile());
+            if (StringUtils.isNotBlank(application.getSetupFile())) {
+                processBuilder.environment().put("APPLICATION_ENV_FILE", application.getSetupFile());
             }
         }
     }

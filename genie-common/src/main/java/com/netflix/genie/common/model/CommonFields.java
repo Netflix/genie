@@ -23,6 +23,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ import java.util.Set;
  * @author tgianos
  */
 @MappedSuperclass
-public class CommonEntityFields extends Auditable {
+public class CommonFields extends Auditable {
 
     /**
      * The namespace to use for genie specific tags.
@@ -54,11 +55,8 @@ public class CommonEntityFields extends Auditable {
     private static final int MAX_NAME_TAG_NAMESPACE = 1;
     private static final int MAX_TAG_GENIE_NAMESPACE = 2;
 
-    /**
-     * Version of this entity.
-     */
     @Basic(optional = false)
-    @Column(name = "version")
+    @Column(name = "version", nullable = false)
     @ApiModelProperty(
             value = "The version number",
             required = true
@@ -66,10 +64,8 @@ public class CommonEntityFields extends Auditable {
     @NotBlank(message = "Version is missing and is required.")
     private String version;
 
-    /**
-     * User who created this entity.
-     */
     @Basic(optional = false)
+    @Column(name = "user", nullable = false)
     @ApiModelProperty(
             value = "User who created/owns this object",
             required = true
@@ -77,10 +73,8 @@ public class CommonEntityFields extends Auditable {
     @NotBlank(message = "User name is missing and is required.")
     private String user;
 
-    /**
-     * Name of this entity.
-     */
     @Basic(optional = false)
+    @Column(name = "name", nullable = false)
     @ApiModelProperty(
             value = "The name to use",
             required = true
@@ -88,21 +82,30 @@ public class CommonEntityFields extends Auditable {
     @NotBlank(message = "Name is missing and is required.")
     private String name;
 
+    @Lob
+    @Basic
+    @Column(name = "description")
+    @ApiModelProperty(
+            value = "The description of this entity",
+            required = true
+    )
+    private String description;
+
     /**
      * Default constructor.
      */
-    public CommonEntityFields() {
+    public CommonFields() {
         super();
     }
 
     /**
      * Construct a new CommonEntity Object with all required parameters.
      *
-     * @param name    The name of the entity. Not null/empty/blank.
-     * @param user    The user who created the entity. Not null/empty/blank.
-     * @param version The version of this entity. Not null/empty/blank.
+     * @param name        The name of the entity. Not null/empty/blank.
+     * @param user        The user who created the entity. Not null/empty/blank.
+     * @param version     The version of this entity. Not null/empty/blank.
      */
-    public CommonEntityFields(
+    public CommonFields(
             final String name,
             final String user,
             final String version) {
@@ -165,6 +168,24 @@ public class CommonEntityFields extends Auditable {
      */
     public void setName(final String name) {
         this.name = name;
+    }
+
+    /**
+     * Gets the description of this entity.
+     *
+     * @return description
+     */
+    public String getDescription() {
+        return this.description;
+    }
+
+    /**
+     * Sets the description for this entity.
+     *
+     * @param description description for the entity. Not null/empty/blank
+     */
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     /**

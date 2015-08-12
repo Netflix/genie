@@ -15,39 +15,42 @@
     limitations under the License.
 -->
 <dataset>
-    <Job id="job1" 
-         created="2014-01-02 01:45:00" 
-         updated="2014-01-02 01:50:00" 
-         user="tgianos" 
-         commandId="15" 
-         commandName="pig" 
-         status="RUNNING" 
-         name="one" 
-		 clusterCriteriasString="y,x|h2query,adhoc" 
-    	 commandCriteriaString="tag2,tag1"   
-         commandArgs="-tez"/>
-    
-    <Job id="job2" 
-         created="2014-01-05 01:45:00" 
-         updated="2014-01-06 01:50:00" 
-         user="tgianos" 
-         commandId="16" 
-         commandName="hive" 
-         status="INIT" 
-         name="two" 
-    	 clusterCriteriasString="y,x|h2query,adhoc" 
-    	 commandCriteriaString="tag2,tag1"
-         commandArgs="-tez"/>
-    
-    <Job id="job3"
-         created="2014-06-01 15:00:00"
-         updated="2014-06-01 15:00:00"
-         user="tgianos"
-         commandId="15"
-         commandName="pig"
-         status="SUCCEEDED"
-         clusterCriteriasString="y,x|h2query,adhoc" 
-    	 commandCriteriaString="tag2,tag1"    
-         name="one"
-         commandArgs="-tez"/>
+    <jobs id="job1"
+          created="2014-01-02 01:45:00"
+          updated="2014-01-02 01:50:00"
+          user="tgianos"
+          version="1.0.0"
+          commandId="15"
+          commandName="pig"
+          status="RUNNING"
+          name="one"
+          clusterCriteriasString="y,x|h2query,adhoc"
+          commandCriteriaString="tag2,tag1"
+          commandArgs="-tez"/>
+
+    <jobs id="job2"
+          created="2014-01-05 01:45:00"
+          updated="2014-01-06 01:50:00"
+          user="tgianos"
+          version="1.0.0"
+          commandId="16"
+          commandName="hive"
+          status="INIT"
+          name="two"
+          clusterCriteriasString="y,x|h2query,adhoc"
+          commandCriteriaString="tag2,tag1"
+          commandArgs="-tez"/>
+
+    <jobs id="job3"
+          created="2014-06-01 15:00:00"
+          updated="2014-06-01 15:00:00"
+          user="tgianos"
+          version="1.0.0"
+          commandId="15"
+          commandName="pig"
+          status="SUCCEEDED"
+          clusterCriteriasString="y,x|h2query,adhoc"
+          commandCriteriaString="tag2,tag1"
+          name="one"
+          commandArgs="-tez"/>
 </dataset>

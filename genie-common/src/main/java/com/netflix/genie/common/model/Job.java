@@ -18,6 +18,7 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.config.ConfigurationManager;
@@ -26,32 +27,34 @@ import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Representation of the state of a Genie 2.0 job.
@@ -60,9 +63,10 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author tgianos
  */
 @Entity
+@Table(name = "jobs")
 @Cacheable(false)
 @ApiModel(description = "An entity for submitting and monitoring a job in Genie.")
-public class Job extends CommonEntityFields {
+public class Job extends CommonFields {
     /**
      * Used to split between cluster criteria sets.
      */
@@ -84,6 +88,7 @@ public class Job extends CommonEntityFields {
      */
     @Lob
     @Basic(optional = false)
+    @Column(name = "commandArgs", nullable = false)
     @ApiModelProperty(
             value = "Command line arguments for the job.",
             example = "-f hive.q",
@@ -91,15 +96,6 @@ public class Job extends CommonEntityFields {
     )
     @NotBlank(message = "Command arguments are required.")
     private String commandArgs;
-
-    /**
-     * Human readable description.
-     */
-    @Basic
-    @ApiModelProperty(
-            value = "Description specified for the job"
-    )
-    private String description;
 
     /**
      * The group user belongs.
@@ -115,10 +111,11 @@ public class Job extends CommonEntityFields {
      * Users can specify a property file location with environment variables.
      */
     @Basic
+    @Column(name = "setupFile")
     @ApiModelProperty(
-            value = "Path to a shell file which is sourced before job is run where properties can be set"
+            value = "Location of a file which is sourced before job is run where properties can be set"
     )
-    private String envPropFile;
+    private String setupFile;
 
     /**
      * Set of tags to use for scheduling (REQUIRED).
@@ -146,8 +143,9 @@ public class Job extends CommonEntityFields {
      * File dependencies.
      */
     @Lob
+    @Column(name = "fileDependencies")
     @ApiModelProperty(
-            value = "Dependent files for this job to run. Will be downloaded from s3/hdfs before job starts"
+            value = "Dependent files for this job to run. Will be downloaded before job starts"
     )
     private String fileDependencies;
 
@@ -165,6 +163,7 @@ public class Job extends CommonEntityFields {
      * Whether to disable archive logs or not - default is false.
      */
     @Basic
+    @Column(name = "disableLogArchival")
     @ApiModelProperty(
             value = "Boolean variable to decide whether job should be archived after it finishes defaults to true"
     )
@@ -175,6 +174,7 @@ public class Job extends CommonEntityFields {
      * the Genie job completes.
      */
     @Basic
+    @Column(name = "email")
     @ApiModelProperty(
             value = "Email address to send notifications to on job completion"
     )
@@ -183,7 +183,12 @@ public class Job extends CommonEntityFields {
     /**
      * Set of tags for a job.
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "job_tags",
+            joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "id")
+    )
+    @Column(name = "tag", nullable = false)
     @ApiModelProperty(
             value = "Any tags a user wants to add to the job to help with discovery of job later"
     )
@@ -201,6 +206,7 @@ public class Job extends CommonEntityFields {
     @JsonIgnore
     @Lob
     @Basic(optional = false)
+    @Column(name = "clusterCriteriasString", nullable = false)
     private String clusterCriteriasString;
 
     /**
@@ -209,6 +215,7 @@ public class Job extends CommonEntityFields {
     @JsonIgnore
     @Lob
     @Basic(optional = false)
+    @Column(name = "commandCriteriaString", nullable = false)
     private String commandCriteriaString;
 
     /**
@@ -218,12 +225,14 @@ public class Job extends CommonEntityFields {
     @JsonIgnore
     @Lob
     @Basic
+    @Column(name = "chosenClusterCriteriaString")
     private String chosenClusterCriteriaString;
 
     /**
      * Cluster Name of the cluster selected to run the job.
      */
     @Basic
+    @Column(name = "executionClusterName")
     @ApiModelProperty(
             value = "Name of the cluster where the job is running or was run. Set automatically by system",
             readOnly = true
@@ -234,6 +243,7 @@ public class Job extends CommonEntityFields {
      * ID for the cluster that was selected to run the job .
      */
     @Basic
+    @Column(name = "executionClusterId")
     @ApiModelProperty(
             value = "Id of the cluster where the job is running or was run. Set automatically by system",
             readOnly = true
@@ -244,6 +254,7 @@ public class Job extends CommonEntityFields {
      * Application name - e.g. mapreduce, tez
      */
     @Basic
+    @Column(name = "applicationName")
     @ApiModelProperty(
             value = "Name of the application that this job is using to run or ran with. Set automatically by system",
             readOnly = true
@@ -254,6 +265,7 @@ public class Job extends CommonEntityFields {
      * Application Id to pin to specific application id e.g. mr1
      */
     @Basic
+    @Column(name = "applicationId")
     @ApiModelProperty(
             value = "Id of the application that this job is using to run or ran with. Set automatically by system",
             readOnly = true
@@ -264,6 +276,7 @@ public class Job extends CommonEntityFields {
      * Command name to run - e.g. prodhive, testhive, prodpig, testpig.
      */
     @Basic
+    @Column(name = "commandName")
     @ApiModelProperty(
             value = "Name of the command that this job is using to run or ran with. Set automatically by system",
             readOnly = true
@@ -275,6 +288,7 @@ public class Job extends CommonEntityFields {
      * prodhive11_mr1
      */
     @Basic
+    @Column(name = "commandId")
     @ApiModelProperty(
             value = "Id of the command that this job is using to run or ran with. Set automatically by system",
             readOnly = true
@@ -285,6 +299,7 @@ public class Job extends CommonEntityFields {
      * PID for job - updated by the server.
      */
     @Basic
+    @Column(name = "processHandle")
     @ApiModelProperty(
             value = "The process handle. Set by system",
             readOnly = true
@@ -294,7 +309,8 @@ public class Job extends CommonEntityFields {
     /**
      * Job status - INIT, RUNNING, SUCCEEDED, KILLED, FAILED (upper case in DB).
      */
-    @Basic
+    @Basic(optional = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The current status of the job. Set automatically by system",
@@ -306,6 +322,7 @@ public class Job extends CommonEntityFields {
      * More verbose status message.
      */
     @Basic
+    @Column(name = "statusMsg")
     @ApiModelProperty(
             value = "A status message about the job. Set automatically by system",
             readOnly = true
@@ -316,6 +333,7 @@ public class Job extends CommonEntityFields {
      * Start time for job - initialized to null.
      */
     @Basic
+    @Column(name = "started")
     @Temporal(TemporalType.TIMESTAMP)
     @ApiModelProperty(
             value = "The start time of the job. Set automatically by system",
@@ -330,6 +348,7 @@ public class Job extends CommonEntityFields {
      * Finish time for job - initialized to zero (for historic reasons).
      */
     @Basic
+    @Column(name = "finished")
     @Temporal(TemporalType.TIMESTAMP)
     @ApiModelProperty(
             value = "The end time of the job. Initialized at 0. Set automatically by system",
@@ -344,6 +363,7 @@ public class Job extends CommonEntityFields {
      * The host/IP address of the client submitting job.
      */
     @Basic
+    @Column(name = "clientHost")
     @ApiModelProperty(
             value = "The hostname of the client submitting the job. Set automatically by system",
             readOnly = true
@@ -354,6 +374,7 @@ public class Job extends CommonEntityFields {
      * The genie host name on which the job is being run.
      */
     @Basic
+    @Column(name = "hostName")
     @ApiModelProperty(
             value = "The genie host where the job is being run or was run. Set automatically by system",
             readOnly = true
@@ -365,6 +386,7 @@ public class Job extends CommonEntityFields {
      * instance.
      */
     @Basic
+    @Column(name = "killURI")
     @ApiModelProperty(
             value = "The URI to use to kill the job. Set automatically by system",
             readOnly = true
@@ -375,6 +397,7 @@ public class Job extends CommonEntityFields {
      * URI to fetch the stdout/err and logs.
      */
     @Basic
+    @Column(name = "outputURI")
     @ApiModelProperty(
             value = "The URI where to find job output. Set automatically by system",
             readOnly = true
@@ -385,6 +408,7 @@ public class Job extends CommonEntityFields {
      * Job exit code.
      */
     @Basic
+    @Column(name = "exitCode")
     @ApiModelProperty(
             value = "The exit code of the job. Set automatically by system",
             readOnly = true
@@ -395,6 +419,7 @@ public class Job extends CommonEntityFields {
      * Whether this job was forwarded to new instance or not.
      */
     @Basic
+    @Column(name = "forwarded")
     @ApiModelProperty(
             value = "Whether this job was forwarded or not. Set automatically by system",
             readOnly = true
@@ -405,6 +430,7 @@ public class Job extends CommonEntityFields {
      * Location of logs being archived to s3.
      */
     @Lob
+    @Column(name = "archiveLocation")
     @ApiModelProperty(
             value = "Where the logs were archived. Set automatically by system",
             readOnly = true
@@ -480,24 +506,6 @@ public class Job extends CommonEntityFields {
     protected void onLoadJob() throws GeniePreconditionException {
         this.clusterCriterias = this.stringToClusterCriterias(this.clusterCriteriasString);
         this.commandCriteria = this.stringToCommandCriteria(this.commandCriteriaString);
-    }
-
-    /**
-     * Gets the description of this job.
-     *
-     * @return description
-     */
-    public String getDescription() {
-        return this.description;
-    }
-
-    /**
-     * Sets the description for this job.
-     *
-     * @param description description for the job
-     */
-    public void setDescription(final String description) {
-        this.description = description;
     }
 
     /**
@@ -1062,8 +1070,8 @@ public class Job extends CommonEntityFields {
      *
      * @return envPropFile - file name containing environment variables.
      */
-    public String getEnvPropFile() {
-        return this.envPropFile;
+    public String getSetupFile() {
+        return this.setupFile;
     }
 
     /**
@@ -1072,8 +1080,8 @@ public class Job extends CommonEntityFields {
      * @param envPropFile contains the list of env variables to set while
      *                    running this job.
      */
-    public void setEnvPropFile(final String envPropFile) {
-        this.envPropFile = envPropFile;
+    public void setSetupFile(final String envPropFile) {
+        this.setupFile = envPropFile;
     }
 
     /**
@@ -1081,6 +1089,7 @@ public class Job extends CommonEntityFields {
      *
      * @return the tags
      */
+    @JsonIgnore
     public Set<String> getTags() {
         return this.tags;
     }
@@ -1090,6 +1099,7 @@ public class Job extends CommonEntityFields {
      *
      * @param tags the tags to set. Not Null.
      */
+    @JsonProperty
     public void setTags(final Set<String> tags) {
         this.tags = tags;
     }

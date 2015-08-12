@@ -255,7 +255,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals("2.4", job1.getVersion());
         Assert.assertEquals("-f -j", job1.getCommandArgs());
         Assert.assertEquals(JobStatus.INIT, job1.getStatus());
-        Assert.assertEquals(3, job1.getTags().size());
+        Assert.assertNull(job1.getTags());
         Assert.assertEquals(2, job1.getCommandCriteria().size());
         Assert.assertEquals(3, job1.getClusterCriterias().size());
 
@@ -266,7 +266,7 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals("2.4.3", job2.getVersion());
         Assert.assertEquals("-f -j -a", job2.getCommandArgs());
         Assert.assertEquals(JobStatus.FAILED, job2.getStatus());
-        Assert.assertEquals(4, job2.getTags().size());
+        Assert.assertNull(job2.getTags());
         Assert.assertEquals(2, job2.getCommandCriteria().size());
         Assert.assertEquals(2, job2.getClusterCriterias().size());
     }

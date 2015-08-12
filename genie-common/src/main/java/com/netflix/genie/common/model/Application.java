@@ -22,19 +22,23 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Representation of the state of Application Configuration object.
@@ -43,14 +47,16 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  */
 @Entity
+@Table(name = "applications")
 @Cacheable(false)
 @ApiModel(description = "An entity for managing an application in the Genie system.")
-public class Application extends CommonEntityFields {
+public class Application extends CommonFields {
 
     /**
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
     @Basic(optional = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The current status of this application",
@@ -63,34 +69,50 @@ public class Application extends CommonEntityFields {
      * Users can specify a property file location with environment variables.
      */
     @Basic
+    @Column(name = "setupFile")
     @ApiModelProperty(
             value = "A file location with environment variables or "
                     + "other settings which will be downloaded and sourced before application used"
     )
-    private String envPropFile;
+    private String setupFile;
 
     /**
      * Reference to all the configurations needed for this application.
      */
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "application_configs",
+            joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
+    )
+    @Column(name = "config", nullable = false)
     @ApiModelProperty(
             value = "All the configuration files needed for this application which will be downloaded pre-use"
     )
     private Set<String> configs;
 
     /**
-     * Set of jars required for this application.
+     * Set of dependencies required for this application.
      */
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "application_dependencies",
+            joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
+    )
+    @Column(name = "dependency", nullable = false)
     @ApiModelProperty(
             value = "Any jars needed to run this application which will be downloaded pre use"
     )
-    private Set<String> jars;
+    private Set<String> dependencies;
 
     /**
      * Set of tags for a application.
      */
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "application_tags",
+            joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
+    )
+    @Column(name = "tag", nullable = false)
     @ApiModelProperty(
             value = "The tags associated with this application",
             required = true
@@ -162,22 +184,21 @@ public class Application extends CommonEntityFields {
     }
 
     /**
-     * Gets the envPropFile name.
+     * Gets the setupFile name.
      *
-     * @return envPropFile - file name containing environment variables.
+     * @return setupFile - file name containing environment variables.
      */
-    public String getEnvPropFile() {
-        return envPropFile;
+    public String getSetupFile() {
+        return setupFile;
     }
 
     /**
      * Sets the env property file name in string form.
      *
-     * @param envPropFile contains the list of env variables to set while
-     *                    running a command using this application.
+     * @param setupFile location of a script to run while installing this application.
      */
-    public void setEnvPropFile(final String envPropFile) {
-        this.envPropFile = envPropFile;
+    public void setSetupFile(final String setupFile) {
+        this.setupFile = setupFile;
     }
 
     /**
@@ -199,21 +220,21 @@ public class Application extends CommonEntityFields {
     }
 
     /**
-     * Gets the jars for this application.
+     * Gets the dependencies for this application.
      *
      * @return list of jars this application relies on for execution
      */
-    public Set<String> getJars() {
-        return this.jars;
+    public Set<String> getDependencies() {
+        return this.dependencies;
     }
 
     /**
-     * Sets the jars needed for this application.
+     * Sets the dependencies needed for this application.
      *
-     * @param jars All jars needed for execution of this application
+     * @param dependencies All dependencies needed for execution of this application
      */
-    public void setJars(final Set<String> jars) {
-        this.jars = jars;
+    public void setDependencies(final Set<String> dependencies) {
+        this.dependencies = dependencies;
     }
 
     /**

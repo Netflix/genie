@@ -29,23 +29,23 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Test the CommonEntityFields class and methods.
+ * Test the CommonFields class and methods.
  *
  * @author tgianos
  */
-public class TestCommonEntityFields extends TestEntityBase {
+public class TestCommonFields extends TestEntityBase {
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final String VERSION = "1.0";
 
-    private CommonEntityFields c;
+    private CommonFields c;
 
     /**
      * Setup the tests.
      */
     @Before
     public void setup() {
-        this.c = new CommonEntityFields(NAME, USER, VERSION);
+        this.c = new CommonFields(NAME, USER, VERSION);
     }
 
     /**
@@ -53,7 +53,7 @@ public class TestCommonEntityFields extends TestEntityBase {
      */
     @Test
     public void testDefaultConstructor() {
-        final CommonEntityFields local = new CommonEntityFields();
+        final CommonFields local = new CommonFields();
         Assert.assertNull(local.getName());
         Assert.assertNull(local.getUser());
         Assert.assertNull(local.getVersion());
@@ -84,7 +84,7 @@ public class TestCommonEntityFields extends TestEntityBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateWithNothing() throws GenieException {
-        this.validate(new CommonEntityFields());
+        this.validate(new CommonFields());
     }
 
     /**
@@ -92,7 +92,7 @@ public class TestCommonEntityFields extends TestEntityBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.validate(new CommonEntityFields(null, USER, VERSION));
+        this.validate(new CommonFields(null, USER, VERSION));
     }
 
     /**
@@ -100,7 +100,7 @@ public class TestCommonEntityFields extends TestEntityBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoUser() {
-        this.validate(new CommonEntityFields(NAME, "     ", VERSION));
+        this.validate(new CommonFields(NAME, "     ", VERSION));
     }
 
     /**
@@ -108,7 +108,7 @@ public class TestCommonEntityFields extends TestEntityBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
-        this.validate(new CommonEntityFields(NAME, USER, ""));
+        this.validate(new CommonFields(NAME, USER, ""));
     }
 
     /**
@@ -116,7 +116,7 @@ public class TestCommonEntityFields extends TestEntityBase {
      */
     @Test
     public void testSetName() {
-        final CommonEntityFields local = new CommonEntityFields();
+        final CommonFields local = new CommonFields();
         Assert.assertNull(local.getName());
         local.setName(NAME);
         Assert.assertEquals(NAME, local.getName());
@@ -127,7 +127,7 @@ public class TestCommonEntityFields extends TestEntityBase {
      */
     @Test
     public void testSetUser() {
-        final CommonEntityFields local = new CommonEntityFields();
+        final CommonFields local = new CommonFields();
         Assert.assertNull(local.getUser());
         local.setUser(USER);
         Assert.assertEquals(USER, local.getUser());
@@ -138,10 +138,21 @@ public class TestCommonEntityFields extends TestEntityBase {
      */
     @Test
     public void testSetVersion() {
-        final CommonEntityFields local = new CommonEntityFields();
+        final CommonFields local = new CommonFields();
         Assert.assertNull(local.getVersion());
         local.setVersion(VERSION);
         Assert.assertEquals(VERSION, local.getVersion());
+    }
+
+    /**
+     * Test the description get/set.
+     */
+    @Test
+    public void testSetDescription() {
+        Assert.assertNull(this.c.getDescription());
+        final String description = "Test description";
+        this.c.setDescription(description);
+        Assert.assertEquals(description, this.c.getDescription());
     }
 
     /**
@@ -167,8 +178,8 @@ public class TestCommonEntityFields extends TestEntityBase {
         Assert.assertTrue(tags.contains(tag1));
         Assert.assertTrue(tags.contains(tag2));
         Assert.assertTrue(tags.contains(tag3));
-        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + id));
-        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + NAME));
+        Assert.assertTrue(tags.contains(CommonFields.GENIE_ID_TAG_NAMESPACE + id));
+        Assert.assertTrue(tags.contains(CommonFields.GENIE_NAME_TAG_NAMESPACE + NAME));
     }
 
     /**
@@ -194,8 +205,8 @@ public class TestCommonEntityFields extends TestEntityBase {
         Assert.assertTrue(tags.contains(tag1));
         Assert.assertTrue(tags.contains(tag2));
         Assert.assertTrue(tags.contains(tag3));
-        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + id));
-        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + NAME));
+        Assert.assertTrue(tags.contains(CommonFields.GENIE_ID_TAG_NAMESPACE + id));
+        Assert.assertTrue(tags.contains(CommonFields.GENIE_NAME_TAG_NAMESPACE + NAME));
 
         final String newName = UUID.randomUUID().toString();
         this.c.setName(newName);
@@ -205,8 +216,8 @@ public class TestCommonEntityFields extends TestEntityBase {
         Assert.assertTrue(tags.contains(tag1));
         Assert.assertTrue(tags.contains(tag2));
         Assert.assertTrue(tags.contains(tag3));
-        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + id));
-        Assert.assertTrue(tags.contains(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + newName));
+        Assert.assertTrue(tags.contains(CommonFields.GENIE_ID_TAG_NAMESPACE + id));
+        Assert.assertTrue(tags.contains(CommonFields.GENIE_NAME_TAG_NAMESPACE + newName));
     }
 
     /**
@@ -236,7 +247,7 @@ public class TestCommonEntityFields extends TestEntityBase {
 
         final String id = UUID.randomUUID().toString();
         this.c.setId(id);
-        tags.add(CommonEntityFields.GENIE_ID_TAG_NAMESPACE + UUID.randomUUID().toString());
+        tags.add(CommonFields.GENIE_ID_TAG_NAMESPACE + UUID.randomUUID().toString());
 
         this.c.addAndValidateSystemTags(tags);
     }
@@ -255,8 +266,8 @@ public class TestCommonEntityFields extends TestEntityBase {
         tags.add(tag1);
         tags.add(tag2);
         tags.add(tag3);
-        tags.add(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + UUID.randomUUID().toString());
-        tags.add(CommonEntityFields.GENIE_NAME_TAG_NAMESPACE + UUID.randomUUID().toString());
+        tags.add(CommonFields.GENIE_NAME_TAG_NAMESPACE + UUID.randomUUID().toString());
+        tags.add(CommonFields.GENIE_NAME_TAG_NAMESPACE + UUID.randomUUID().toString());
 
         final String id = UUID.randomUUID().toString();
         this.c.setId(id);
@@ -278,7 +289,7 @@ public class TestCommonEntityFields extends TestEntityBase {
         tags.add(tag1);
         tags.add(tag2);
         tags.add(tag3);
-        tags.add(CommonEntityFields.GENIE_TAG_NAMESPACE + UUID.randomUUID().toString());
+        tags.add(CommonFields.GENIE_TAG_NAMESPACE + UUID.randomUUID().toString());
 
         final String id = UUID.randomUUID().toString();
         this.c.setId(id);
