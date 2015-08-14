@@ -33,6 +33,7 @@ dependencies {
     // Spring Libs
     compile("org.springframework:spring-aspects:${springframework_version}")
     compile("org.springframework:spring-web:${springframework_version}")
+    compile("org.springframework.data:spring-data-elasticsearch:${spring_data_elasticsearch_version}")
     compile("org.springframework.data:spring-data-jpa:${spring_data_jpa_version}")
     compile("org.springframework.retry:spring-retry:${spring_retry_version}")
     compile("com.google.inject.extensions:guice-spring:${guice_version}")

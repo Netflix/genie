@@ -267,6 +267,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 if (clusters != null) {
                     clusters.remove(cluster);
                 }
+                this.em.merge(command);
             }
         }
         this.clusterRepo.delete(cluster);
