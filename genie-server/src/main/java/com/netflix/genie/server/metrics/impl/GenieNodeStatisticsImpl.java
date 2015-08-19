@@ -18,17 +18,14 @@
 package com.netflix.genie.server.metrics.impl;
 
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import com.netflix.servo.annotations.DataSourceType;
-import com.netflix.servo.annotations.Monitor;
-import com.netflix.servo.monitor.Monitors;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Named;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Singleton class that implements all servo monitoring for Genie.
@@ -36,56 +33,57 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
+@Named
 public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenieNodeStatisticsImpl.class);
 
-    @Monitor(name = "2xx_Count", type = DataSourceType.COUNTER)
+//    @Monitor(name = "2xx_Count", type = DataSourceType.COUNTER)
     private AtomicLong genie2xxCount = new AtomicLong(0);
 
-    @Monitor(name = "4xx_Count", type = DataSourceType.COUNTER)
+//    @Monitor(name = "4xx_Count", type = DataSourceType.COUNTER)
     private AtomicLong genie4xxCount = new AtomicLong(0);
 
-    @Monitor(name = "5xx_Count", type = DataSourceType.COUNTER)
+//    @Monitor(name = "5xx_Count", type = DataSourceType.COUNTER)
     private AtomicLong genie5xxCount = new AtomicLong(0);
 
-    @Monitor(name = "Submit_Jobs", type = DataSourceType.COUNTER)
+//    @Monitor(name = "Submit_Jobs", type = DataSourceType.COUNTER)
     private AtomicLong genieJobSubmissions = new AtomicLong(0);
 
-    @Monitor(name = "Successful_Jobs", type = DataSourceType.COUNTER)
+//    @Monitor(name = "Successful_Jobs", type = DataSourceType.COUNTER)
     private AtomicLong genieSuccessfulJobs = new AtomicLong(0);
 
-    @Monitor(name = "Forwarded_Jobs", type = DataSourceType.COUNTER)
+//    @Monitor(name = "Forwarded_Jobs", type = DataSourceType.COUNTER)
     private AtomicLong genieForwardedJobs = new AtomicLong(0);
 
-    @Monitor(name = "Failed_Jobs", type = DataSourceType.COUNTER)
+//    @Monitor(name = "Failed_Jobs", type = DataSourceType.COUNTER)
     private AtomicLong genieFailedJobs = new AtomicLong(0);
 
-    @Monitor(name = "Killed_Jobs", type = DataSourceType.COUNTER)
+//    @Monitor(name = "Killed_Jobs", type = DataSourceType.COUNTER)
     private AtomicLong genieKilledJobs = new AtomicLong(0);
 
-    @Monitor(name = "Running_Jobs", type = DataSourceType.GAUGE)
+//    @Monitor(name = "Running_Jobs", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs = new AtomicInteger(0);
 
-    @Monitor(name = "Running_Jobs_0_15m", type = DataSourceType.GAUGE)
+//    @Monitor(name = "Running_Jobs_0_15m", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs0To15m = new AtomicInteger(0);
 
-    @Monitor(name = "Running_Jobs_15m_2h", type = DataSourceType.GAUGE)
+//    @Monitor(name = "Running_Jobs_15m_2h", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs15mTo2h = new AtomicInteger(0);
 
-    @Monitor(name = "Running_Jobs_2h_8h", type = DataSourceType.GAUGE)
+//    @Monitor(name = "Running_Jobs_2h_8h", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs2hTo8h = new AtomicInteger(0);
 
-    @Monitor(name = "Running_Jobs_8h_plus", type = DataSourceType.GAUGE)
+//    @Monitor(name = "Running_Jobs_8h_plus", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs8hPlus = new AtomicInteger(0);
 
-    @Monitor(name = "Successful_Email_Count", type = DataSourceType.COUNTER)
+//    @Monitor(name = "Successful_Email_Count", type = DataSourceType.COUNTER)
     private final AtomicLong successEmailCount = new AtomicLong(0);
 
-    @Monitor(name = "Job_Submission_Retry_Count", type = DataSourceType.COUNTER)
+//    @Monitor(name = "Job_Submission_Retry_Count", type = DataSourceType.COUNTER)
     private final AtomicLong jobSubmissionRetryCount = new AtomicLong(0);
 
-    @Monitor(name = "Failed_Email_Count", type = DataSourceType.COUNTER)
+//    @Monitor(name = "Failed_Email_Count", type = DataSourceType.COUNTER)
     private final AtomicLong failedEmailCount = new AtomicLong(0);
 
     /**
@@ -95,7 +93,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
     public void initialize() {
         LOG.info("Registering Servo Monitor");
         //TODO: Too static no way to decouple
-        Monitors.registerObject(this);
+//        Monitors.registerObject(this);
     }
 
     /**
@@ -105,7 +103,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
     public void shutdown() {
         LOG.info("Shutting down Servo monitor");
         //TODO: Too static no way to decouple
-        Monitors.unregisterObject(this);
+//        Monitors.unregisterObject(this);
     }
 
     /**

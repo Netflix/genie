@@ -17,30 +17,29 @@
  */
 package com.netflix.genie.server.util;
 
-import com.netflix.config.ConfigurationManager;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.inject.Named;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Utility class to return appropriate host names and S3 locations.
  *
  * @author skrishnan
  */
+@Named
 public final class NetUtil {
-
-    private static String cloudHostName;
-    private static String dcHostName;
 
     private static final Logger LOG = LoggerFactory.getLogger(NetUtil.class);
 
@@ -52,9 +51,15 @@ public final class NetUtil {
     private static final String LOCAL_IPV4_URI
             = "http://169.254.169.254/latest/meta-data/local-ipv4";
 
-    private NetUtil() {
-        // never called
-    }
+    @Value("${com.netflix.genie.server.s3.archive.location:null}")
+    private String s3ArchiveLocation;
+    @Value("${com.netflix.genie.server.host:null}")
+    private String hostNameProperty;
+    @Value("${netflix.datacenter:null}")
+    private String dataCenter;
+
+    private  String cloudHostName;
+    private String dcHostName;
 
     /**
      * Returns the s3 location where job logs will be archived.
@@ -62,12 +67,10 @@ public final class NetUtil {
      * @param jobID to build archive location for
      * @return s3 location
      */
-    public static String getArchiveURI(final String jobID) {
+    public String getArchiveURI(final String jobID) {
         LOG.debug("called for jobID: " + jobID);
-        final String s3ArchiveLocation = ConfigurationManager.getConfigInstance()
-                .getString("com.netflix.genie.server.s3.archive.location");
-        if (s3ArchiveLocation != null && !s3ArchiveLocation.isEmpty()) {
-            return s3ArchiveLocation + "/" + jobID;
+        if (StringUtils.isNotBlank(this.s3ArchiveLocation)) {
+            return this.s3ArchiveLocation + "/" + jobID;
         } else {
             return null;
         }
@@ -82,19 +85,17 @@ public final class NetUtil {
      * @return host name
      * @throws GenieException For any error.
      */
-    public static String getHostName() throws GenieException {
+    public String getHostName() throws GenieException {
         LOG.debug("called");
 
         // check the fast property first
-        String hostName = ConfigurationManager.getConfigInstance().getString(
-                "com.netflix.genie.server.host");
-        if (hostName != null && !hostName.isEmpty()) {
-            return hostName;
+        if (StringUtils.isNotBlank(this.hostNameProperty)) {
+            return hostNameProperty;
         }
 
         // if hostName is not set by property, figure it out based on the datacenter
-        final String dc = ConfigurationManager.getConfigInstance().getString("netflix.datacenter");
-        if (dc != null && dc.equals("cloud")) {
+        String hostName;
+        if (this.dataCenter != null && this.dataCenter.equals("cloud")) {
             hostName = getCloudHostName();
         } else {
             hostName = getDCHostName();
@@ -109,33 +110,33 @@ public final class NetUtil {
         return hostName;
     }
 
-    private static String getCloudHostName() throws GenieException {
+    private String getCloudHostName() throws GenieException {
         LOG.debug("called");
 
-        if (cloudHostName != null && !cloudHostName.isEmpty()) {
+        if (StringUtils.isNotBlank(this.cloudHostName)) {
             return cloudHostName;
         }
 
         // gets the ec2 public hostname, if available
         try {
             cloudHostName = httpGet(PUBLIC_HOSTNAME_URI);
-        } catch (IOException ioe) {
+        } catch (final IOException ioe) {
             final String msg = "Unable to get public hostname from instance metadata";
             LOG.error(msg, ioe);
             throw new GenieServerException(msg, ioe);
         }
-        if (cloudHostName == null || cloudHostName.isEmpty()) {
+        if (StringUtils.isBlank(this.cloudHostName)) {
             try {
-                cloudHostName = httpGet(LOCAL_IPV4_URI);
+                this.cloudHostName = httpGet(LOCAL_IPV4_URI);
             } catch (final IOException ioe) {
                 final String msg = "Unable to get local IP from instance metadata";
                 LOG.error(msg, ioe);
                 throw new GenieServerException(msg, ioe);
             }
         }
-        LOG.info("cloudHostName=" + cloudHostName);
+        LOG.info("cloudHostName=" + this.cloudHostName);
 
-        return cloudHostName;
+        return this.cloudHostName;
     }
 
     /**
@@ -146,7 +147,7 @@ public final class NetUtil {
      * @return response from an HTTP GET call if it succeeds, null otherwise
      * @throws IOException if there was an error with the HTTP request
      */
-    private static String httpGet(final String uri) throws IOException {
+    private String httpGet(final String uri) throws IOException {
         String response = null;
         //TODO: Use one of other http clients to remove dependency
         final HttpClient client = new HttpClient();
@@ -159,23 +160,22 @@ public final class NetUtil {
         return response;
     }
 
-    private static String getDCHostName() throws GenieException {
+    private String getDCHostName() throws GenieException {
         LOG.debug("called");
 
-        if (dcHostName != null && !dcHostName.isEmpty()) {
-            return dcHostName;
+        if (StringUtils.isNotBlank(this.dcHostName)) {
+            return this.dcHostName;
         }
 
         try {
             // gets the local instance hostname
             final InetAddress addr = InetAddress.getLocalHost();
-            dcHostName = addr.getCanonicalHostName();
+            this.dcHostName = addr.getCanonicalHostName();
+            return this.dcHostName;
         } catch (final UnknownHostException e) {
             final String msg = "Unable to get the hostname";
             LOG.error(msg, e);
             throw new GenieServerException(msg, e);
         }
-
-        return dcHostName;
     }
 }

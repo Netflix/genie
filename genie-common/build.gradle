@@ -1,44 +1,38 @@
-def metaModelIgnorePattern = '**/com/netflix/genie/common/model/*_.java'
-def generatedSources = 'src/generated'
-def generatedSourcesJava = generatedSources + '/java'
+ext {
+    metaModelIgnorePattern = "**/com/netflix/genie/common/model/*_.java"
+    generatedSourcesDir = new File("${projectDir}/src/generated")
+    generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
+}
 
 sourceSets {
     main {
         java {
-            srcDir generatedSourcesJava
+            srcDir generatedSourcesJavaDir
         }
     }
 }
+
+//configurations {
+//    hibernateAnnotationProcessor
+//}
 
 dependencies {
     /*******************************
      * Compile Dependencies
      *******************************/
 
+    // Hibernate Metamodel Generator Libraries
+    compile("org.hibernate:hibernate-jpamodelgen")
+
     // Hibernate Validator Libs
-    compile("org.hibernate:hibernate-validator:${hibernate_validator_version}")
+    compile("org.hibernate:hibernate-validator")
 
-    // Jackson Libs
-    compile("com.fasterxml.jackson.core:jackson-annotations:${jackson_version}")
-    compile("com.fasterxml.jackson.core:jackson-core:${jackson_version}")
-    compile("com.fasterxml.jackson.core:jackson-databind:${jackson_version}")
-    compile("com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${jackson_version}")
-
-    // Jersey Libs
-    compile("com.sun.jersey:jersey-client:${jersey_version}")
-    compile("com.sun.jersey.contribs:jersey-apache-client4:${jersey_version}")
-
-    // Netflix Libs
-    compile("com.netflix.eureka:eureka-client:${eureka_version}")
-    compile("com.netflix.ribbon:ribbon-core:${ribbon_version}")
-    compile("com.netflix.ribbon:ribbon-eureka:${ribbon_version}")
-    compile("com.netflix.ribbon:ribbon-httpclient:${ribbon_version}")
-
-    // OpenJPA Libs
-    compile("org.apache.openjpa:openjpa:${openjpa_version}")
+    // Spring Libs
+    compile("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // Swagger Libs
-    compile("com.wordnik:swagger-core:${swagger_version}")
+    compile("io.swagger:swagger-core:${swagger_version}")
 
     /*******************************
      * Provided Dependencies
@@ -51,46 +45,19 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
-
-    testRuntime("javax.el:javax.el-api:${expression_language_version}")
-    testRuntime("org.glassfish.web:javax.el:${expression_language_version}")
-}
-
-task genJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA metamodels') {
-    def outputDir = file(generatedSourcesJava)
-    outputs.dir outputDir
-    source = sourceSets.main.java
-    classpath = configurations.compile
-    options.compilerArgs = [
-            "-proc:only",
-            "-Aopenjpa.metamodel=true"
-    ]
-    destinationDir = outputDir
-    dependencyCacheDir = compileJava.dependencyCacheDir
-}
-
-task enhance(description: "Enhance model classes for use with JPA") << {
-    ant.taskdef(
-            name: 'openJPAEnhancer',
-            classpath: project.runtimeClasspath.asPath,
-            classname: 'org.apache.openjpa.ant.PCEnhancerTask'
-    )
-
-    ant.openJPAEnhancer(
-            classpath: project.runtimeClasspath.asPath
-    )
-}
-
-compileJava {
-    dependsOn genJPAMetaModel
-}
-
-jar {
-    dependsOn enhance
 }
 
 clean {
-    delete generatedSources
+    delete generatedSourcesDir
+}
+
+//compileJava.compileClasspath += configurations.hibernateAnnotationProcessor
+compileJava {
+    doFirst {
+        // Java compiler won't create the directory if it doesn't already exist
+        generatedSourcesJavaDir.mkdirs()
+    }
+    options.compilerArgs += ['-s', generatedSourcesJavaDir]
 }
 
 //Ignore the generated classes from all our style/coverage/bug finding tools

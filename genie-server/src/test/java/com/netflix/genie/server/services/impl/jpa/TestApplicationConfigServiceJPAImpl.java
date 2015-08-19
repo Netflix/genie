@@ -25,19 +25,20 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
+import org.junit.Assert;
+import org.junit.Test;
+
+import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.junit.Assert;
-import org.junit.Test;
-
-import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
 
 /**
  * Tests for the ApplicationConfigServiceJPAImpl. Really these are integration tests.
@@ -45,7 +46,7 @@ import javax.validation.ConstraintViolationException;
  * @author tgianos
  */
 @DatabaseSetup("application/init.xml")
-public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
+public class TestApplicationConfigServiceJPAImpl extends SpringIntegrationTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String APP_1_NAME = "tez";

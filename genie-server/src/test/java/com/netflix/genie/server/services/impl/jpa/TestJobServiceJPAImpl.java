@@ -25,11 +25,13 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.services.JobService;
+import com.netflix.genie.server.util.NetUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -51,7 +53,7 @@ import java.util.UUID;
  * @author tgianos
  */
 @DatabaseSetup("job/init.xml")
-public class TestJobServiceJPAImpl extends DBUnitTestBase {
+public class TestJobServiceJPAImpl extends SpringIntegrationTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";
@@ -223,7 +225,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
         final JobRepository jobRepo = Mockito.mock(JobRepository.class);
         final GenieNodeStatistics stats = Mockito.mock(GenieNodeStatistics.class);
         final JobManagerFactory jobManagerFactory = Mockito.mock(JobManagerFactory.class);
-        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory);
+        final NetUtil netUtil = Mockito.mock(NetUtil.class);
+        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, netUtil);
 
         final Job job = Mockito.mock(Job.class);
         Mockito.when(job.getId()).thenReturn(JOB_1_ID);
@@ -1135,7 +1138,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
         final JobRepository jobRepo = Mockito.mock(JobRepository.class);
         final GenieNodeStatistics stats = Mockito.mock(GenieNodeStatistics.class);
         final JobManagerFactory jobManagerFactory = Mockito.mock(JobManagerFactory.class);
-        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory);
+        final NetUtil netUtil = Mockito.mock(NetUtil.class);
+        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, netUtil);
 
         final Job job = Mockito.mock(Job.class);
         Mockito.when(job.getId()).thenReturn(JOB_1_ID);
@@ -1162,7 +1166,8 @@ public class TestJobServiceJPAImpl extends DBUnitTestBase {
         final JobRepository jobRepo = Mockito.mock(JobRepository.class);
         final GenieNodeStatistics stats = Mockito.mock(GenieNodeStatistics.class);
         final JobManagerFactory jobManagerFactory = Mockito.mock(JobManagerFactory.class);
-        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory);
+        final NetUtil netUtil = Mockito.mock(NetUtil.class);
+        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, netUtil);
 
         final Job job = Mockito.mock(Job.class);
         Mockito.when(job.getId()).thenReturn(JOB_1_ID);

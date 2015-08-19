@@ -21,18 +21,20 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.jobmanager.JobJanitor;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.metrics.JobCountMonitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class bootstraps some common Genie spring stuff.
  *
  * @author tgianos
  */
+@Named
 public class GenieSpringBootstrap {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenieSpringBootstrap.class);
@@ -51,10 +53,12 @@ public class GenieSpringBootstrap {
      * @param jobCountManager The job count manager to use
      * @param jobCountMonitor The job count monitor to use
      */
+    @Inject
     public GenieSpringBootstrap(
             final JobJanitor janitor,
             final JobCountManager jobCountManager,
-            final JobCountMonitor jobCountMonitor) {
+            final JobCountMonitor jobCountMonitor
+    ) {
         this.jobJanitor = janitor;
         this.jobCountManager = jobCountManager;
         this.jobCountMonitor = jobCountMonitor;

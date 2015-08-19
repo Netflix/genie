@@ -23,17 +23,16 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
+import com.netflix.genie.server.services.JobSearchService;
 import com.netflix.genie.server.services.JobService;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-
-import java.net.HttpURLConnection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -52,10 +51,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.net.HttpURLConnection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Resource class for executing and monitoring jobs via Genie.
@@ -76,25 +75,15 @@ public final class JobResource {
     private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-    /**
-     * The execution service.
-     */
     private final ExecutionService executionService;
 
-    /**
-     * The job service.
-     */
     private final JobService jobService;
 
-    /**
-     * To get URI information for return codes.
-     */
+    private final JobSearchService jobSearchService;
+
     @Context
     private UriInfo uriInfo;
 
-    /**
-     * To get Header information for the request.
-     */
     @Context
     private HttpServletRequest httpServletRequest;
 
@@ -103,11 +92,17 @@ public final class JobResource {
      *
      * @param executionService The execution service to use.
      * @param jobService       The job service to use.
+     * @param jobSearchService The job search service to use.
      */
     @Inject
-    public JobResource(final ExecutionService executionService, final JobService jobService) {
+    public JobResource(
+            final ExecutionService executionService,
+            final JobService jobService,
+            final JobSearchService jobSearchService
+    ) {
         this.executionService = executionService;
         this.jobService = jobService;
+        this.jobSearchService = jobSearchService;
     }
 
     /**
@@ -223,7 +218,7 @@ public final class JobResource {
             final String id
     ) throws GenieException {
         LOG.info("called for job with id: " + id);
-        return this.jobService.getJob(id);
+        return this.jobSearchService.getJob(id);
     }
 
     /**
@@ -428,7 +423,7 @@ public final class JobResource {
             }
         }
 
-        return this.jobService.getJobs(
+        return this.jobSearchService.getJobs(
                 id,
                 name,
                 userName,
@@ -441,7 +436,8 @@ public final class JobResource {
                 page,
                 limit,
                 descending,
-                orderBys);
+                orderBys
+        );
     }
 
     /**

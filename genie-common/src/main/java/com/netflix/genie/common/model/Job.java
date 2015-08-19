@@ -18,18 +18,18 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -66,6 +66,7 @@ import java.util.Set;
 @Table(name = "jobs")
 @Cacheable(false)
 @ApiModel(description = "An entity for submitting and monitoring a job in Genie.")
+@Document(indexName = "genie", type = "job")
 public class Job extends CommonFields {
     /**
      * Used to split between cluster criteria sets.
@@ -88,7 +89,7 @@ public class Job extends CommonFields {
      */
     @Lob
     @Basic(optional = false)
-    @Column(name = "commandArgs", nullable = false)
+    @Column(name = "command_args", nullable = false)
     @ApiModelProperty(
             value = "Command line arguments for the job.",
             example = "-f hive.q",
@@ -101,17 +102,19 @@ public class Job extends CommonFields {
      * The group user belongs.
      */
     @Basic
-    @Column(name = "groupName")
+    @Column(name = "group_name", length = 255)
     @ApiModelProperty(
             value = "Group name of the user who submitted this job"
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String group;
 
     /**
      * Users can specify a property file location with environment variables.
      */
+    @Lob
     @Basic
-    @Column(name = "setupFile")
+    @Column(name = "setup_file")
     @ApiModelProperty(
             value = "Location of a file which is sourced before job is run where properties can be set"
     )
@@ -143,7 +146,7 @@ public class Job extends CommonFields {
      * File dependencies.
      */
     @Lob
-    @Column(name = "fileDependencies")
+    @Column(name = "file_dependencies")
     @ApiModelProperty(
             value = "Dependent files for this job to run. Will be downloaded before job starts"
     )
@@ -163,7 +166,7 @@ public class Job extends CommonFields {
      * Whether to disable archive logs or not - default is false.
      */
     @Basic
-    @Column(name = "disableLogArchival")
+    @Column(name = "disable_log_archival")
     @ApiModelProperty(
             value = "Boolean variable to decide whether job should be archived after it finishes defaults to true"
     )
@@ -174,10 +177,11 @@ public class Job extends CommonFields {
      * the Genie job completes.
      */
     @Basic
-    @Column(name = "email")
+    @Column(name = "email", length = 255)
     @ApiModelProperty(
             value = "Email address to send notifications to on job completion"
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String email;
 
     /**
@@ -188,7 +192,7 @@ public class Job extends CommonFields {
             name = "job_tags",
             joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "id")
     )
-    @Column(name = "tag", nullable = false)
+    @Column(name = "tag", nullable = false, length = 255)
     @ApiModelProperty(
             value = "Any tags a user wants to add to the job to help with discovery of job later"
     )
@@ -206,7 +210,7 @@ public class Job extends CommonFields {
     @JsonIgnore
     @Lob
     @Basic(optional = false)
-    @Column(name = "clusterCriteriasString", nullable = false)
+    @Column(name = "cluster_criterias_string", nullable = false)
     private String clusterCriteriasString;
 
     /**
@@ -215,7 +219,7 @@ public class Job extends CommonFields {
     @JsonIgnore
     @Lob
     @Basic(optional = false)
-    @Column(name = "commandCriteriaString", nullable = false)
+    @Column(name = "command_criteria_string", nullable = false)
     private String commandCriteriaString;
 
     /**
@@ -225,62 +229,67 @@ public class Job extends CommonFields {
     @JsonIgnore
     @Lob
     @Basic
-    @Column(name = "chosenClusterCriteriaString")
+    @Column(name = "chosen_cluster_criteria_string")
     private String chosenClusterCriteriaString;
 
     /**
      * Cluster Name of the cluster selected to run the job.
      */
     @Basic
-    @Column(name = "executionClusterName")
+    @Column(name = "execution_cluster_name", length = 255)
     @ApiModelProperty(
             value = "Name of the cluster where the job is running or was run. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String executionClusterName;
 
     /**
      * ID for the cluster that was selected to run the job .
      */
     @Basic
-    @Column(name = "executionClusterId")
+    @Column(name = "execution_cluster_id", length = 255)
     @ApiModelProperty(
             value = "Id of the cluster where the job is running or was run. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String executionClusterId;
 
     /**
      * Application name - e.g. mapreduce, tez
      */
     @Basic
-    @Column(name = "applicationName")
+    @Column(name = "application_name", length = 255)
     @ApiModelProperty(
             value = "Name of the application that this job is using to run or ran with. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String applicationName;
 
     /**
      * Application Id to pin to specific application id e.g. mr1
      */
     @Basic
-    @Column(name = "applicationId")
+    @Column(name = "application_id", length = 255)
     @ApiModelProperty(
             value = "Id of the application that this job is using to run or ran with. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String applicationId;
 
     /**
      * Command name to run - e.g. prodhive, testhive, prodpig, testpig.
      */
     @Basic
-    @Column(name = "commandName")
+    @Column(name = "command_name", length = 255)
     @ApiModelProperty(
             value = "Name of the command that this job is using to run or ran with. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String commandName;
 
     /**
@@ -288,18 +297,19 @@ public class Job extends CommonFields {
      * prodhive11_mr1
      */
     @Basic
-    @Column(name = "commandId")
+    @Column(name = "command_id", length = 255)
     @ApiModelProperty(
             value = "Id of the command that this job is using to run or ran with. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String commandId;
 
     /**
      * PID for job - updated by the server.
      */
     @Basic
-    @Column(name = "processHandle")
+    @Column(name = "process_handle")
     @ApiModelProperty(
             value = "The process handle. Set by system",
             readOnly = true
@@ -310,7 +320,7 @@ public class Job extends CommonFields {
      * Job status - INIT, RUNNING, SUCCEEDED, KILLED, FAILED (upper case in DB).
      */
     @Basic(optional = false)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The current status of the job. Set automatically by system",
@@ -322,11 +332,12 @@ public class Job extends CommonFields {
      * More verbose status message.
      */
     @Basic
-    @Column(name = "statusMsg")
+    @Column(name = "status_msg", length = 255)
     @ApiModelProperty(
             value = "A status message about the job. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String statusMsg;
 
     /**
@@ -363,30 +374,33 @@ public class Job extends CommonFields {
      * The host/IP address of the client submitting job.
      */
     @Basic
-    @Column(name = "clientHost")
+    @Column(name = "client_host", length = 255)
     @ApiModelProperty(
             value = "The hostname of the client submitting the job. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String clientHost;
 
     /**
      * The genie host name on which the job is being run.
      */
     @Basic
-    @Column(name = "hostName")
+    @Column(name = "host_name", length = 255)
     @ApiModelProperty(
             value = "The genie host where the job is being run or was run. Set automatically by system",
             readOnly = true
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String hostName;
 
     /**
      * REST URI to do a HTTP DEL on to kill this job - points to running
      * instance.
      */
+    @Lob
     @Basic
-    @Column(name = "killURI")
+    @Column(name = "kill_uri")
     @ApiModelProperty(
             value = "The URI to use to kill the job. Set automatically by system",
             readOnly = true
@@ -396,8 +410,9 @@ public class Job extends CommonFields {
     /**
      * URI to fetch the stdout/err and logs.
      */
+    @Lob
     @Basic
-    @Column(name = "outputURI")
+    @Column(name = "output_uri")
     @ApiModelProperty(
             value = "The URI where to find job output. Set automatically by system",
             readOnly = true
@@ -408,7 +423,7 @@ public class Job extends CommonFields {
      * Job exit code.
      */
     @Basic
-    @Column(name = "exitCode")
+    @Column(name = "exit_code")
     @ApiModelProperty(
             value = "The exit code of the job. Set automatically by system",
             readOnly = true
@@ -430,7 +445,7 @@ public class Job extends CommonFields {
      * Location of logs being archived to s3.
      */
     @Lob
-    @Column(name = "archiveLocation")
+    @Column(name = "archive_location")
     @ApiModelProperty(
             value = "Where the logs were archived. Set automatically by system",
             readOnly = true
@@ -491,9 +506,6 @@ public class Job extends CommonFields {
         // Add the id to the tags
         if (this.tags == null) {
             this.tags = new HashSet<>();
-        }
-        if (ConfigurationManager.getConfigInstance().getBoolean("com.netflix.genie.server.jobs.tags.default", false)) {
-            this.addAndValidateSystemTags(this.tags);
         }
     }
 
@@ -829,7 +841,7 @@ public class Job extends CommonFields {
      * @param started epoch time in ms
      */
     public void setStarted(final Date started) {
-        this.started = started;
+        this.started = new Date(started.getTime());
     }
 
     /**
@@ -847,7 +859,7 @@ public class Job extends CommonFields {
      * @param finished The finished time.
      */
     public void setFinished(final Date finished) {
-        this.finished = finished;
+        this.finished = new Date(finished.getTime());
     }
 
     /**
@@ -1089,7 +1101,6 @@ public class Job extends CommonFields {
      *
      * @return the tags
      */
-    @JsonIgnore
     public Set<String> getTags() {
         return this.tags;
     }
@@ -1099,7 +1110,6 @@ public class Job extends CommonFields {
      *
      * @param tags the tags to set. Not Null.
      */
-    @JsonProperty
     public void setTags(final Set<String> tags) {
         this.tags = tags;
     }

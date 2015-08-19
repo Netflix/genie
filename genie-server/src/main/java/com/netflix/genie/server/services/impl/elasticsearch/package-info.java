@@ -15,25 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.startup;
-
-import org.junit.Test;
 
 /**
- * Test the GenieModule.
+ * Classes implementing service interfaces to use Elasticsearch.
  *
  * @author tgianos
  */
-public class TestGenieModule {
-
-    /**
-     * Test configure servlets.
-     */
-    @Test
-    public void testConfigureServlets() {
-//        final GenieModule module = new GenieModule();
-//        module.configureServlets();
-//
-//        //TODO: Figure out how to test this method with so much static content.
-    }
-}
+package com.netflix.genie.server.services.impl.elasticsearch;

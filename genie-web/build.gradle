@@ -1,17 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.2'
-    }
-}
-
+apply plugin: 'spring-boot'
 apply plugin: 'war'
-apply plugin: 'com.bmuschko.tomcat'
 
 processResources {
     filter ReplaceTokens, tokens: [
@@ -25,15 +15,13 @@ dependencies {
      *******************************/
 
     compile(project(":genie-server"))
-    compile("com.netflix.karyon:karyon2-admin-web:${karyon_version}") {
-        exclude group: "commons-collections", module: "commons-collections"
-        exclude group: "org.eclipse.jetty.orbit", module: "javax.servlet"
-        exclude group: "org.mortbay.jetty", module: "servlet-api"
-    }
+    compile("org.springframework.boot:spring-boot-starter-actuator")
 
     /*******************************
      * Provided Dependencies
      *******************************/
+
+    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 
     /*******************************
      * Runtime Dependencies
@@ -42,30 +30,11 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
-
-    /*******************************
-     * Tomcat Plugin Dependencies
-     *******************************/
-    def tomcat_version = "7.0.62"
-    tomcat("org.apache.tomcat.embed:tomcat-embed-core:${tomcat_version}")
-    tomcat("org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcat_version}")
-    tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcat_version}")
-}
-
-tomcat {
-    contextPath = "/"
 }
 
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
 
-[tomcatRun, tomcatRunWar].each { task ->
-    task.doFirst {
-        System.setProperty("archaius.deployment.applicationId", "genie")
-        System.setProperty("archaius.deployment.environment", env)
-    }
-
-    task.doLast {
-        System.clearProperty("archaius.deployment.applicationId")
-        System.clearProperty("archaius.deployment.environment")
-    }
+bootRun {
+    addResources = false
+    systemProperty 'spring.profiles.active', env
 }

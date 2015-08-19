@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
-import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -28,7 +27,12 @@ import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +42,8 @@ import java.util.Map;
  *
  * @author tgianos
  */
+@Named
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class PrestoJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(PrestoJobManagerImpl.class);
@@ -46,6 +52,19 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
     private static final String COPY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.cp";
     private static final String MK_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.presto.command.mkdir";
 
+    @Value("${com.netflix.genie.server.job.manager.presto.protocol:null}")
+    private String prestoProtocol;
+    @Value("${com.netflix.genie.server.job.manager.presto.master.domain:null}")
+    private String prestoMasterDomain;
+    @Value("${com.netflix.genie.server.job.manager.presto.sleeptime:5000}")
+    private int prestoSleepTime;
+    @Value("${com.netflix.genie.server.hadoop.s3cp.timeout:1800}")
+    private String copyTimeout;
+    @Value("${com.netflix.genie.server.job.manager.presto.command.cp:null}")
+    private String copyCommand;
+    @Value("${com.netflix.genie.server.job.manager.presto.command.mkdir:null}")
+    private String mkdirCommand;
+
     /**
      * Constructor.
      *
@@ -53,6 +72,7 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
      * @param jobService     The job service to use.
      * @param commandService The command service to use.
      */
+    @Inject
     public PrestoJobManagerImpl(final JobMonitor jobMonitor,
                                 final JobService jobService,
                                 final CommandConfigService commandService) {
@@ -69,15 +89,10 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
             throw new GeniePreconditionException("Init wasn't called. Unable to continue.");
         }
 
-        // Check the parameters
-        final String prestoProtocol = ConfigurationManager
-                .getConfigInstance().getString(PRESTO_PROTOCOL_KEY, null);
-        if (prestoProtocol == null) {
+        if (StringUtils.isBlank(this.prestoProtocol)) {
             throw new GeniePreconditionException("Presto protocol not set. Please configure " + PRESTO_PROTOCOL_KEY);
         }
-        final String prestoMasterDomain = ConfigurationManager
-                .getConfigInstance().getString(PRESTO_MASTER_DOMAIN, null);
-        if (prestoMasterDomain == null) {
+        if (StringUtils.isBlank(this.prestoMasterDomain)) {
             throw new GeniePreconditionException("Presto protocol not set. Please configure " + PRESTO_MASTER_DOMAIN);
         }
 
@@ -85,7 +100,7 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
         // create the ProcessBuilder for this process
         final List<String> processArgs = this.createBaseProcessArguments();
         processArgs.add("--server");
-        processArgs.add(prestoProtocol + this.getCluster().getName() + prestoMasterDomain);
+        processArgs.add(this.prestoProtocol + this.getCluster().getName() + this.prestoMasterDomain);
         processArgs.add("--catalog");
         processArgs.add("hive");
         processArgs.add("--user");
@@ -100,12 +115,7 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
         this.setupPrestoProcess(processBuilder);
 
         // Launch the actual process
-        this.launchProcess(
-                processBuilder,
-                ConfigurationManager
-                        .getConfigInstance()
-                        .getInt("com.netflix.genie.server.job.manager.presto.sleeptime", 5000)
-        );
+        this.launchProcess(processBuilder, this.prestoSleepTime);
     }
 
     /**
@@ -117,28 +127,16 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
     private void setupPrestoProcess(final ProcessBuilder processBuilder) throws GenieException {
         final Map<String, String> processEnv = processBuilder.environment();
 
-        processEnv.put("CP_TIMEOUT",
-                ConfigurationManager.getConfigInstance()
-                        .getString("com.netflix.genie.server.hadoop.s3cp.timeout", "1800"));
+        processEnv.put("CP_TIMEOUT", this.copyTimeout);
 
-        final String copyCommand =
-                ConfigurationManager.getConfigInstance()
-                        .getString(COPY_COMMAND_KEY);
-        if (StringUtils.isBlank(copyCommand)) {
-            final String msg = "Required property " + COPY_COMMAND_KEY + " isn't set";
-            LOG.error(msg);
-            throw new GenieServerException(msg);
+        if (StringUtils.isBlank(this.copyCommand)) {
+            throw new GenieServerException("Required property " + COPY_COMMAND_KEY + " isn't set");
         }
         processEnv.put("COPY_COMMAND", copyCommand);
 
-        final String makeDirCommand =
-                ConfigurationManager.getConfigInstance()
-                        .getString(MK_DIRECTORY_COMMAND_KEY);
-        if (StringUtils.isBlank(makeDirCommand)) {
-            final String msg = "Required property " + MK_DIRECTORY_COMMAND_KEY + " isn't set";
-            LOG.error(msg);
-            throw new GenieServerException(msg);
+        if (StringUtils.isBlank(mkdirCommand)) {
+            throw new GenieServerException("Required property " + MK_DIRECTORY_COMMAND_KEY + " isn't set");
         }
-        processEnv.put("MKDIR_COMMAND", makeDirCommand);
+        processEnv.put("MKDIR_COMMAND", mkdirCommand);
     }
 }

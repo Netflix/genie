@@ -15,25 +15,26 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.startup;
+package com.netflix.genie.server.repository.elasticsearch;
 
-import org.junit.Test;
+import com.netflix.genie.common.model.Job;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+
+import java.util.List;
 
 /**
- * Test the GenieModule.
+ * CRUD repository for Job entities within Elasticsearch.
  *
  * @author tgianos
  */
-public class TestGenieModule {
-
+public interface ESJobRepository extends ElasticsearchRepository<Job, String> {
     /**
-     * Test configure servlets.
+     * Find jobs by tags.
+     *
+     * @param tag The tag to search for
+     * @param pageRequest The page of jobs to get
+     * @return the jobs that were found
      */
-    @Test
-    public void testConfigureServlets() {
-//        final GenieModule module = new GenieModule();
-//        module.configureServlets();
-//
-//        //TODO: Figure out how to test this method with so much static content.
-    }
+    List<Job> findByTagsContains(final String tag, final PageRequest pageRequest);
 }

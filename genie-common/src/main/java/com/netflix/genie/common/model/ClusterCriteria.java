@@ -18,15 +18,15 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Cluster Criteria.

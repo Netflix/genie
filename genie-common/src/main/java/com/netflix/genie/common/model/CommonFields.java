@@ -18,7 +18,8 @@
 package com.netflix.genie.common.model;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
@@ -56,30 +57,33 @@ public class CommonFields extends Auditable {
     private static final int MAX_TAG_GENIE_NAMESPACE = 2;
 
     @Basic(optional = false)
-    @Column(name = "version", nullable = false)
+    @Column(name = "version", nullable = false, length = 255)
     @ApiModelProperty(
             value = "The version number",
             required = true
     )
     @NotBlank(message = "Version is missing and is required.")
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String version;
 
     @Basic(optional = false)
-    @Column(name = "user", nullable = false)
+    @Column(name = "user", nullable = false, length = 255)
     @ApiModelProperty(
             value = "User who created/owns this object",
             required = true
     )
     @NotBlank(message = "User name is missing and is required.")
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String user;
 
     @Basic(optional = false)
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 255)
     @ApiModelProperty(
             value = "The name to use",
             required = true
     )
     @NotBlank(message = "Name is missing and is required.")
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String name;
 
     @Lob

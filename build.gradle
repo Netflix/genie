@@ -1,3 +1,17 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url 'http://repo.spring.io/milestone'
+        }
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE")
+        classpath("io.spring.gradle:dependency-management-plugin:0.5.2.RELEASE")
+    }
+}
+
 plugins {
     id 'nebula.netflixoss' version '2.2.10'
     id 'nebula.provided-base' version '2.2.2'
@@ -32,6 +46,7 @@ subprojects {
     apply plugin: 'pmd'
     apply plugin: 'jacoco'
     apply plugin: 'nebula.provided-base'
+    apply plugin: 'io.spring.dependency-management'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -41,10 +56,19 @@ subprojects {
     repositories {
         jcenter()
         mavenLocal()
+        maven {
+            url 'http://repo.spring.io/milestone'
+        }
     }
 
     configurations {
         all*.exclude group: "javax.servlet", module: "servlet-api"
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom 'io.spring.platform:platform-bom:1.1.3.RELEASE'
+        }
     }
 
     dependencies {
@@ -52,8 +76,8 @@ subprojects {
          * Compile Dependencies
          *******************************/
 
-        compile("org.apache.commons:commons-lang3:${commons_lang3_version}")
-        compile("org.slf4j:slf4j-log4j12:${slf4j_log4j12_version}")
+        compile("org.apache.commons:commons-lang3")
+        compile("org.springframework.boot:spring-boot-starter-logging")
 
         /*******************************
          * Provided Dependencies
@@ -67,11 +91,10 @@ subprojects {
          * Test Dependencies
          *******************************/
 
-        // JUnit
-        testCompile("junit:junit:${junit_version}")
+        testCompile("org.springframework.boot:spring-boot-starter-test")
 
-        // Mockito
-        testCompile("org.mockito:mockito-core:${mockito_version}")
+        testRuntime("javax.el:javax.el-api")
+        testRuntime("org.glassfish:javax.el")
     }
 
     checkstyle {

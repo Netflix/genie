@@ -15,12 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 -->
-<%@ page import="com.netflix.config.ConfigurationManager" %>
+<%--<%@ page import="com.netflix.config.ConfigurationManager" %>--%>
 <%@ page language="java" pageEncoding="UTF-8" session="false" %>
 <!DOCTYPE html>
 <html lang="en">
 <%
-    final String env = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment");
+    //final String env = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment");
+    final String env = "prod";
 %>
 <head>
     <meta charset="UTF-8">

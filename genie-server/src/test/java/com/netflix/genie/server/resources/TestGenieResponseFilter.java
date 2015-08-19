@@ -18,12 +18,12 @@
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
 import java.net.HttpURLConnection;
 
 /**
@@ -33,10 +33,10 @@ import java.net.HttpURLConnection;
  */
 public class TestGenieResponseFilter {
 
-    private static final ContainerRequest REQUEST = Mockito.mock(ContainerRequest.class);
+    private static final ContainerRequestContext REQUEST = Mockito.mock(ContainerRequestContext.class);
     private GenieNodeStatistics statistics;
     private GenieResponseFilter genieResponseFilter;
-    private ContainerResponse response;
+    private ContainerResponseContext response;
 
     /**
      * Setup for tests.
@@ -44,7 +44,7 @@ public class TestGenieResponseFilter {
     @Before
     public void setup() {
         this.statistics = Mockito.mock(GenieNodeStatistics.class);
-        this.response = Mockito.mock(ContainerResponse.class);
+        this.response = Mockito.mock(ContainerResponseContext.class);
         this.genieResponseFilter = new GenieResponseFilter(this.statistics);
     }
 

@@ -41,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.ConstraintViolationException;
@@ -65,6 +67,7 @@ import java.util.stream.Collectors;
                 ConstraintViolationException.class
         }
 )
+@Named
 public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceJPAImpl.class);
@@ -82,6 +85,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @param commandRepo The command repository to use.
      * @param jobRepo     The job repository to use.
      */
+    @Inject
     public ClusterConfigServiceJPAImpl(
             final ClusterRepository clusterRepo,
             final CommandRepository commandRepo,

@@ -15,12 +15,14 @@
     limitations under the License.
 
 -->
-<%@ page import="com.netflix.config.ConfigurationManager" %>
+<%--<%@ page import="com.netflix.config.ConfigurationManager" %>--%>
 <%@ page language="java" pageEncoding="UTF-8" session="false"%>
 <!DOCTYPE html>
 <%
-    final String env = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment");
-    final String version = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.version");
+//    final String env = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.environment");
+//    final String version = ConfigurationManager.getConfigInstance().getString("com.netflix.genie.version");
+    final String env = "prod";
+    final String version = "3.0.0-SNAPSHOT";
 %>
 <footer class="site-footer site-footer-<%=env%>">
     <div class="container">

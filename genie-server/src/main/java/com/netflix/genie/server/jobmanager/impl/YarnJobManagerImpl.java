@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
-import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -28,7 +27,13 @@ import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +45,8 @@ import java.util.Map;
  * @author amsharma
  * @author tgianos
  */
+@Named
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class YarnJobManagerImpl extends JobManagerImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(YarnJobManagerImpl.class);
@@ -47,17 +54,29 @@ public class YarnJobManagerImpl extends JobManagerImpl {
     private static final String MAKE_DIRECTORY_COMMAND_KEY = "com.netflix.genie.server.job.manager.yarn.command.mkdir";
 
     //TODO: Move to a property file
-    /**
-     * The name of the Genie job id property to be passed to all jobs.
-     */
     private static final String GENIE_JOB_ID = "genie.job.id";
 
     //TODO: Move to a property file
-    /**
-     * The name of the Environment (test/prod) property to be passed to all
-     * jobs.
-     */
     private static final String EXECUTION_ENVIRONMENT = "netflix.environment";
+
+    private final Environment environment;
+
+    @Value("${com.netflix.genie.server.job.manager.yarn.sleeptime:5000}")
+    private int yarnSleepTime;
+    @Value("${netflix.environment:null}")
+    private String netflixEnv;
+    @Value("${com.netflix.genie.server.lipstick.uuid.prop.name:lipstick.uuid.prop.name}")
+    private String lipstickUUIDPropName;
+    @Value("${com.netflix.genie.server.lipstick.enable:false")
+    private boolean enableLipstick;
+    @Value("${com.netflix.genie.server.hadoop.home:null}")
+    private String defaultHadoopHome;
+    @Value("${com.netflix.genie.server.hadoop.s3cp.timeout:1800}")
+    private String copyTimeout;
+    @Value("${com.netflix.genie.server.job.manager.yarn.command.cp:null}")
+    private String copyCommand;
+    @Value("${com.netflix.genie.server.job.manager.yarn.command.mkdir:null}")
+    private String makeDirCommand;
 
     /**
      * Default constructor - initializes cluster configuration and load
@@ -66,11 +85,17 @@ public class YarnJobManagerImpl extends JobManagerImpl {
      * @param jobMonitor     The job monitor object to use.
      * @param jobService     The job service to use.
      * @param commandService The command service to use.
+     * @param environment    The application environment
      */
-    public YarnJobManagerImpl(final JobMonitor jobMonitor,
-                              final JobService jobService,
-                              final CommandConfigService commandService) {
+    @Inject
+    public YarnJobManagerImpl(
+            final JobMonitor jobMonitor,
+            final JobService jobService,
+            final CommandConfigService commandService,
+            final Environment environment
+    ) {
         super(jobMonitor, jobService, commandService);
+        this.environment = environment;
     }
 
     /**
@@ -94,12 +119,7 @@ public class YarnJobManagerImpl extends JobManagerImpl {
         this.setupYarnProcess(processBuilder);
 
         // Launch the actual process
-        this.launchProcess(
-                processBuilder,
-                ConfigurationManager
-                        .getConfigInstance()
-                        .getInt("com.netflix.genie.server.job.manager.yarn.sleeptime", 5000)
-        );
+        this.launchProcess(processBuilder, this.yarnSleepTime);
     }
 
     /**
@@ -118,16 +138,11 @@ public class YarnJobManagerImpl extends JobManagerImpl {
         // set the variables to be added to the core-site xml. Format of this variable is:
         // key1=value1;key2=value2;key3=value3
         final String genieJobIDProp = GENIE_JOB_ID + "=" + this.getJob().getId();
-        final String netflixEnvProp = EXECUTION_ENVIRONMENT
-                + "="
-                + ConfigurationManager.getConfigInstance().getString("netflix.environment");
-
-        final String lipstickUuidPropName = ConfigurationManager.getConfigInstance()
-                .getString("com.netflix.genie.server.lipstick.uuid.prop.name", "lipstick.uuid.prop.name");
+        final String netflixEnvProp = EXECUTION_ENVIRONMENT + "=" + this.netflixEnv;
 
         final String lipstickUuidProp;
-        if (ConfigurationManager.getConfigInstance().getBoolean("com.netflix.genie.server.lipstick.enable", false)) {
-            lipstickUuidProp = lipstickUuidPropName + "=" + GENIE_JOB_ID;
+        if (this.enableLipstick) {
+            lipstickUuidProp = this.lipstickUUIDPropName + "=" + GENIE_JOB_ID;
         } else {
             lipstickUuidProp = "";
         }
@@ -144,69 +159,45 @@ public class YarnJobManagerImpl extends JobManagerImpl {
 
         // if the cluster version is provided, overwrite the HADOOP_HOME
         // environment variable
-        String hadoopHome;
         if (this.getCluster().getVersion() != null) {
             String hadoopVersion = this.getCluster().getVersion();
             LOG.debug("Hadoop Version of the cluster: " + hadoopVersion);
 
             // try extract version first
-            hadoopHome = ConfigurationManager
-                    .getConfigInstance()
-                    .getString("com.netflix.genie.server.hadoop." + hadoopVersion + ".home");
+            String hadoopHome =
+                    this.environment.getProperty("com.netflix.genie.server.hadoop." + hadoopVersion + ".home");
             // if not, trim to 3 most significant digits
             if (hadoopHome == null) {
                 hadoopVersion = StringUtil.trimVersion(hadoopVersion);
-                hadoopHome = ConfigurationManager.getConfigInstance()
-                        .getString("com.netflix.genie.server.hadoop." + hadoopVersion + ".home");
+                hadoopHome = this.environment.getProperty("com.netflix.genie.server.hadoop." + hadoopVersion + ".home");
             }
 
             if (hadoopHome == null || !new File(hadoopHome).exists()) {
-                final String msg = "This genie instance doesn't support Hadoop version: "
-                        + hadoopVersion;
-                LOG.error(msg);
-                throw new GenieServerException(msg);
+                throw new GenieServerException("This genie instance doesn't support Hadoop version: " + hadoopVersion);
             }
 
-            LOG.info("Overriding HADOOP_HOME from cluster config to: "
-                    + hadoopHome);
+            LOG.info("Overriding HADOOP_HOME from cluster config to: " + hadoopHome);
             processEnv.put("HADOOP_HOME", hadoopHome);
         } else {
             // set the default hadoop home
-            hadoopHome = ConfigurationManager
-                    .getConfigInstance()
-                    .getString("com.netflix.genie.server.hadoop.home");
-            if (hadoopHome == null || !new File(hadoopHome).exists()) {
-                final String msg = "Property com.netflix.genie.server.hadoop.home is not set correctly";
-                LOG.error(msg);
-                throw new GenieServerException(msg);
+            if (this.defaultHadoopHome == null || !new File(this.defaultHadoopHome).exists()) {
+                throw new GenieServerException("Property com.netflix.genie.server.hadoop.home is not set correctly");
             }
-            processEnv.put("HADOOP_HOME", hadoopHome);
+            processEnv.put("HADOOP_HOME", this.defaultHadoopHome);
         }
 
-        processEnv.put("CP_TIMEOUT",
-                ConfigurationManager.getConfigInstance()
-                        .getString("com.netflix.genie.server.hadoop.s3cp.timeout", "1800"));
+        processEnv.put("CP_TIMEOUT", this.copyTimeout);
 
-        final String copyCommand =
-                ConfigurationManager.getConfigInstance()
-                        .getString(COPY_COMMAND_KEY);
-        if (StringUtils.isBlank(copyCommand)) {
-            final String msg = "Required property " + COPY_COMMAND_KEY + " isn't set";
-            LOG.error(msg);
-            throw new GenieServerException(msg);
+        if (StringUtils.isBlank(this.copyCommand)) {
+            throw new GenieServerException("Required property " + COPY_COMMAND_KEY + " isn't set");
         }
-        processEnv.put("COPY_COMMAND", copyCommand);
+        processEnv.put("COPY_COMMAND", this.copyCommand);
 
         // Force flag to overwrite required in Hadoop2
         processEnv.put("FORCE_COPY_FLAG", "-f");
 
-        final String makeDirCommand =
-                ConfigurationManager.getConfigInstance()
-                        .getString(MAKE_DIRECTORY_COMMAND_KEY);
-        if (StringUtils.isBlank(makeDirCommand)) {
-            final String msg = "Required property " + MAKE_DIRECTORY_COMMAND_KEY + " isn't set";
-            LOG.error(msg);
-            throw new GenieServerException(msg);
+        if (StringUtils.isBlank(this.makeDirCommand)) {
+            throw new GenieServerException("Required property " + MAKE_DIRECTORY_COMMAND_KEY + " isn't set");
         }
         processEnv.put("MKDIR_COMMAND", makeDirCommand);
     }

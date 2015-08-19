@@ -24,25 +24,13 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Application_;
-import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.server.repository.jpa.ApplicationRepository;
 import com.netflix.genie.server.repository.jpa.ApplicationSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.ApplicationConfigService;
-
-import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.HashSet;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -50,6 +38,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * OpenJPA based implementation of the ApplicationConfigService.
@@ -63,6 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
                 ConstraintViolationException.class
         }
 )
+@Named
 public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigServiceJPAImpl.class);
@@ -77,6 +78,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @param applicationRepo The application repository to use
      * @param commandRepo     The command repository to use
      */
+    @Inject
     public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo,
                                            final CommandRepository commandRepo) {
         this.applicationRepo = applicationRepo;

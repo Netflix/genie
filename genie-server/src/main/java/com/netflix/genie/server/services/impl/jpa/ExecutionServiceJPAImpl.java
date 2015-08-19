@@ -17,15 +17,10 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.netflix.client.http.HttpRequest;
-import com.netflix.client.http.HttpRequest.Verb;
-import com.netflix.config.ConfigurationManager;
-import com.netflix.genie.common.client.BaseGenieClient;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
@@ -38,17 +33,18 @@ import com.netflix.genie.server.repository.jpa.JobSpecs;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.NetUtil;
-import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -57,30 +53,13 @@ import java.util.List;
  * launcher (via the job manager implementation), and uses OpenJPA for
  * persistence.
  *
- * @author skrishnan
- * @author bmundlapudi
- * @author amsharma
  * @author tgianos
+ * @author amsharma
  */
+@Named
 public class ExecutionServiceJPAImpl implements ExecutionService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceJPAImpl.class);
-
-    // instance of the netflix configuration object
-    private static final AbstractConfiguration CONF;
-
-    // these can be over-ridden in the properties file
-    private static final int SERVER_PORT;
-    private static final String JOB_RESOURCE_PREFIX;
-
-    // initialize static variables
-    static {
-        //TODO: Seem to remember something about injecting configuration using governator
-        CONF = ConfigurationManager.getConfigInstance();
-        SERVER_PORT = CONF.getInt("netflix.appinfo.port", 7001);
-        JOB_RESOURCE_PREFIX = CONF.getString(
-                "com.netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
-    }
 
     // per-instance variables
     private final GenieNodeStatistics stats;
@@ -88,6 +67,22 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     private final JobCountManager jobCountManager;
     private final JobManagerFactory jobManagerFactory;
     private final JobService jobService;
+    private final NetUtil netUtil;
+
+    @Value("${netflix.appinfo.port:8080}")
+    private int serverPort;
+    @Value("${com.netflix.genie.server.job.resource.prefix:genie/v2/jobs}")
+    private String jobResourcePrefix;
+    @Value("${com.netflix.genie.server.max.running.jobs:0}")
+    private int maxRunningJobs;
+    @Value("${com.netflix.genie.server.forward.jobs.threshold:0}")
+    private int jobForwardThreshold;
+    @Value("${com.netflix.genie.server.max.idle.host.threshold:0}")
+    private int maxIdleHostThreshold;
+    @Value("${com.netflix.genie.server.idle.host.threshold.delta:0}")
+    private int idleHostThresholdDelta;
+    @Value("${com.netflix.genie.server.janitor.zombie.delta.ms:1800000}")
+    private long zombieTime;
 
     /**
      * Default constructor - initializes persistence manager, and other utility
@@ -98,18 +93,23 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @param jobCountManager   the job count manager to use
      * @param jobManagerFactory The the job manager factory to use
      * @param jobService        The job service to use.
+     * @param netUtil           The network utility to use
      */
+    @Inject
     public ExecutionServiceJPAImpl(
             final JobRepository jobRepo,
             final GenieNodeStatistics stats,
             final JobCountManager jobCountManager,
             final JobManagerFactory jobManagerFactory,
-            final JobService jobService) {
+            final JobService jobService,
+            final NetUtil netUtil
+    ) {
         this.jobRepo = jobRepo;
         this.stats = stats;
         this.jobCountManager = jobCountManager;
         this.jobManagerFactory = jobManagerFactory;
         this.jobService = jobService;
+        this.netUtil = netUtil;
     }
 
     /**
@@ -186,7 +186,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         if (StringUtils.isBlank(killURI)) {
             throw new GeniePreconditionException("Failed to get killURI for jobID: " + id);
         }
-        final String localURI = getEndPoint() + "/" + JOB_RESOURCE_PREFIX + "/" + id;
+        final String localURI = getEndPoint() + "/" + this.jobResourcePrefix + "/" + id;
 
         if (!killURI.equals(localURI)) {
             LOG.debug("forwarding kill request to: " + killURI);
@@ -205,7 +205,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         LOG.debug("updating job status to KILLED for: " + id);
         if (!job.isDisableLogArchival()) {
-            job.setArchiveLocation(NetUtil.getArchiveURI(id));
+            job.setArchiveLocation(this.netUtil.getArchiveURI(id));
         }
 
         // all good - return results
@@ -221,12 +221,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         LOG.debug("called");
         final ProcessStatus zombie = ProcessStatus.ZOMBIE_JOB;
         final long currentTime = new Date().getTime();
-        final long zombieTime = CONF.getLong("com.netflix.genie.server.janitor.zombie.delta.ms", 1800000);
 
         @SuppressWarnings("unchecked")
-        final List<Job> jobs = this.jobRepo.findAll(
-                JobSpecs.findZombies(currentTime, zombieTime)
-        );
+        final List<Job> jobs = this.jobRepo.findAll(JobSpecs.findZombies(currentTime, this.zombieTime));
         for (final Job job : jobs) {
             job.setStatus(JobStatus.FAILED);
             job.setFinished(new Date());
@@ -289,7 +286,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
             // set the archive location - if needed
             if (!job.isDisableLogArchival()) {
-                job.setArchiveLocation(NetUtil.getArchiveURI(job.getId()));
+                job.setArchiveLocation(this.netUtil.getArchiveURI(job.getId()));
             }
 
             // set the updated time
@@ -299,29 +296,29 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     }
 
     private String getEndPoint() throws GenieException {
-        return "http://" + NetUtil.getHostName() + ":" + SERVER_PORT;
+        return "http://" + this.netUtil.getHostName() + ":" + this.serverPort;
     }
 
     private Job forwardJobKill(final String killURI) throws GenieException {
-        try {
-            final BaseGenieClient client = new BaseGenieClient(null);
-            final HttpRequest request = BaseGenieClient.buildRequest(Verb.DELETE, killURI, null, null);
-            return (Job) client.executeRequest(request, null, Job.class);
-        } catch (final IOException ioe) {
-            throw new GenieServerException(ioe.getMessage(), ioe);
-        }
+        throw new UnsupportedOperationException("Not yet implemented");
+//        try {
+//            final BaseGenieClient client = new BaseGenieClient(null);
+//            final HttpRequest request = BaseGenieClient.buildRequest(Verb.DELETE, killURI, null, null);
+//            return (Job) client.executeRequest(request, null, Job.class);
+//        } catch (final IOException ioe) {
+//            throw new GenieServerException(ioe.getMessage(), ioe);
+//        }
     }
 
-    private Job forwardJobRequest(
-            final String hostURI,
-            final Job job) throws GenieException {
-        try {
-            final BaseGenieClient client = new BaseGenieClient(null);
-            final HttpRequest request = BaseGenieClient.buildRequest(Verb.POST, hostURI, null, job);
-            return (Job) client.executeRequest(request, null, Job.class);
-        } catch (final IOException ioe) {
-            throw new GenieServerException(ioe.getMessage(), ioe);
-        }
+    private Job forwardJobRequest(final String hostURI, final Job job) throws GenieException {
+        throw new UnsupportedOperationException("Not yet implemented");
+//        try {
+//            final BaseGenieClient client = new BaseGenieClient(null);
+//            final HttpRequest request = BaseGenieClient.buildRequest(Verb.POST, hostURI, null, job);
+//            return (Job) client.executeRequest(request, null, Job.class);
+//        } catch (final IOException ioe) {
+//            throw new GenieServerException(ioe.getMessage(), ioe);
+//        }
     }
 
     /**
@@ -329,45 +326,33 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      *
      * @throws GenieException
      */
-    private synchronized Job checkAbilityToRunOrForward(
-            final Job job) throws GenieException {
-        // ensure that job won't overload system
-        // synchronize until an entry is created and INIT-ed in DB
-        // throttling related parameters
-        final int maxRunningJobs = CONF.getInt(
-                "com.netflix.genie.server.max.running.jobs", 0);
-        final int jobForwardThreshold = CONF.getInt(
-                "com.netflix.genie.server.forward.jobs.threshold", 0);
-        final int maxIdleHostThreshold = CONF.getInt(
-                "com.netflix.genie.server.max.idle.host.threshold", 0);
-        final int idleHostThresholdDelta = CONF.getInt(
-                "com.netflix.genie.server.idle.host.threshold.delta", 0);
+    private synchronized Job checkAbilityToRunOrForward(final Job job) throws GenieException {
 
         final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
         LOG.info("Number of running jobs: " + numRunningJobs);
 
         // find an instance with fewer than (numRunningJobs -
         // idleHostThresholdDelta)
-        int idleHostThreshold = numRunningJobs - idleHostThresholdDelta;
+        int idleHostThreshold = numRunningJobs - this.idleHostThresholdDelta;
         // if numRunningJobs is already >= maxRunningJobs, forward
         // aggressively
         // but cap it at the max
-        if (idleHostThreshold > maxIdleHostThreshold
-                || numRunningJobs >= maxRunningJobs) {
-            idleHostThreshold = maxIdleHostThreshold;
+        if (idleHostThreshold > this.maxIdleHostThreshold || numRunningJobs >= this.maxRunningJobs) {
+            idleHostThreshold = this.maxIdleHostThreshold;
         }
 
         // check to see if job should be forwarded - only forward it
         // once. the assumption is that jobForwardThreshold < maxRunningJobs
         // (set in properties file)
-        if (numRunningJobs >= jobForwardThreshold && !job.isForwarded()) {
+        if (numRunningJobs >= this.jobForwardThreshold && !job.isForwarded()) {
             LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
             final String idleHost = this.jobCountManager.getIdleInstance(idleHostThreshold);
-            if (!idleHost.equals(NetUtil.getHostName())) {
+            if (!idleHost.equals(this.netUtil.getHostName())) {
                 job.setForwarded(true);
                 this.stats.incrGenieForwardedJobs();
-                return forwardJobRequest("http://" + idleHost + ":"
-                        + SERVER_PORT + "/" + JOB_RESOURCE_PREFIX, job);
+                return forwardJobRequest(
+                        "http://" + idleHost + ":" + this.serverPort + "/" + this.jobResourcePrefix, job
+                );
             } // else, no idle hosts found - run here if capacity exists
         }
 

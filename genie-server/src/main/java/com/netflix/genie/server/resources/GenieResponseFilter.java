@@ -18,12 +18,12 @@
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 import java.net.HttpURLConnection;
 
@@ -52,7 +52,7 @@ public class GenieResponseFilter implements ContainerResponseFilter {
      * {@inheritDoc}
      */
     @Override
-    public ContainerResponse filter(final ContainerRequest request, final ContainerResponse response) {
+    public void filter(final ContainerRequestContext request, final ContainerResponseContext response) {
         final int status = response.getStatus();
         if (status >= HttpURLConnection.HTTP_OK && status < HttpURLConnection.HTTP_MULT_CHOICE) {
             this.statistics.incrGenie2xxCount();
@@ -61,6 +61,5 @@ public class GenieResponseFilter implements ContainerResponseFilter {
         } else if (status >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             this.statistics.incrGenie5xxCount();
         }
-        return response;
     }
 }

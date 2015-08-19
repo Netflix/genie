@@ -17,19 +17,23 @@
  */
 package com.netflix.genie.server.metrics.impl;
 
-import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.metrics.JobCountMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Monitor thread that routinely updates the statistics object.
  *
  * @author skrishnan
  */
+@Named
 public class JobCountMonitorImpl implements JobCountMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobCountMonitorImpl.class);
@@ -38,12 +42,16 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     private final JobCountManager jobCountManager;
     private final GenieNodeStatistics stats;
 
+    @Value("${com.netflix.genie.server.metrics.sleep.ms:30000}")
+    private long metricsSleepTime;
+
     /**
      * Constructor.
      *
      * @param stats reference to the statistics object that must be updated
      * @param jobCountManager The job count manager
      */
+    @Inject
     public JobCountMonitorImpl(final GenieNodeStatistics stats, final JobCountManager jobCountManager) {
         this.jobCountManager = jobCountManager;
         this.stats = stats;
@@ -139,10 +147,8 @@ public class JobCountMonitorImpl implements JobCountMonitor {
 
                 // sleep for the configured timeout
                 if (!this.stop) {
-                    final long sleepTime = ConfigurationManager.
-                            getConfigInstance().getLong("com.netflix.genie.server.metrics.sleep.ms", 30000);
                     LOG.info("JobCountMonitor daemon going to sleep");
-                    Thread.sleep(sleepTime);
+                    Thread.sleep(this.metricsSleepTime);
                 }
             } catch (final InterruptedException e) {
                 // log error and move on

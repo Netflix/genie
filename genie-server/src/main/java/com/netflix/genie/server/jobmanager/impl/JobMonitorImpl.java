@@ -19,30 +19,23 @@ package com.netflix.genie.server.jobmanager.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.server.jobmanager.JobMonitor;
-import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
+import com.netflix.genie.server.jobmanager.JobMonitor;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.services.ExecutionService;
-
-import java.io.File;
-import java.util.Properties;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
 import com.netflix.genie.server.services.JobService;
-import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.File;
 
 /**
  * The monitor thread that gets launched for each job.
@@ -51,6 +44,8 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @author tgianos
  */
+@Named
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class JobMonitorImpl implements JobMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobMonitorImpl.class);
@@ -64,11 +59,11 @@ public class JobMonitorImpl implements JobMonitor {
     private final ExecutionService xs;
     private final JobService jobService;
     // max specified stdout size
-    private final Long maxStdoutSize;
+    @Value("${com.netflix.genie.job.max.stdout.size:null}")
+    private Long maxStdoutSize;
     // max specified stdout size
-    private final Long maxStderrSize;
-    // Config Instance to get all properties
-    private final AbstractConfiguration config;
+    @Value("${com.netflix.genie.job.max.stderr.size:null}")
+    private Long maxStderrSize;
     private String jobId;
     private JobManager jobManager;
     // last updated time in DB
@@ -92,6 +87,7 @@ public class JobMonitorImpl implements JobMonitor {
      * @param jobService          The job service API's to use.
      * @param genieNodeStatistics The statistics object to use
      */
+    @Inject
     public JobMonitorImpl(
             final ExecutionService xs,
             final JobService jobService,
@@ -100,9 +96,6 @@ public class JobMonitorImpl implements JobMonitor {
         this.xs = xs;
         this.jobService = jobService;
         this.genieNodeStatistics = genieNodeStatistics;
-        this.config = ConfigurationManager.getConfigInstance();
-        this.maxStdoutSize = this.config.getLong("com.netflix.genie.job.max.stdout.size", null);
-        this.maxStderrSize = this.config.getLong("com.netflix.genie.job.max.stderr.size", null);
 
         this.workingDir = null;
         this.process = null;
@@ -294,137 +287,139 @@ public class JobMonitorImpl implements JobMonitor {
      * @return 0 for success, -1 for failure
      * @throws GenieException on issue
      */
+    //TODO: Re-write this using Spring Mail
     private boolean sendEmail(final String emailTo, final boolean killed) throws GenieException {
-        LOG.debug("called");
-        final Job job = this.jobService.getJob(this.jobId);
-
-        if (!this.config.getBoolean("com.netflix.genie.server.mail.enable", false)) {
-            LOG.warn("Email is disabled but user has specified an email address.");
-            return false;
-        }
-
-        // Sender's email ID
-        final String fromEmail = this.config.getString(
-                "com.netflix.genie.server.mail.smpt.from",
-                "no-reply-genie@geniehost.com"
-        );
-        LOG.info("From email address to use to send email: "
-                + fromEmail);
-
-        // Set the smtp server hostname. Use localhost as default
-        final String smtpHost = this.config.getString("com.netflix.genie.server.mail.smtp.host", "localhost");
-        LOG.debug("Email smtp server: "
-                + smtpHost);
-
-        // Get system properties
-        final Properties properties = new Properties();
-
-        // Setup mail server
-        properties.setProperty("mail.smtp.host", smtpHost);
-
-        // check whether authentication should be turned on
-        Authenticator auth = null;
-
-        if (this.config.getBoolean("com.netflix.genie.server.mail.smtp.auth", false)) {
-            LOG.debug("Email Authentication Enabled");
-
-            properties.put("mail.smtp.starttls.enable", "true");
-            properties.put("mail.smtp.auth", "true");
-
-            final String userName = config.getString("com.netflix.genie.server.mail.smtp.user");
-            final String password = config.getString("com.netflix.genie.server.mail.smtp.password");
-
-            if (userName == null || password == null) {
-                LOG.error("Authentication is enabled and username/password for smtp server is null");
-                return false;
-            }
-            LOG.debug("Constructing authenticator object with username"
-                    + userName
-                    + " and password "
-                    + password);
-            auth = new SMTPAuthenticator(userName,
-                    password);
-        } else {
-            LOG.debug("Email authentication not enabled.");
-        }
-
-        // Get the default Session object.
-        final Session session = Session.getInstance(properties, auth);
-
-        try {
-            // Create a default MimeMessage object.
-            final MimeMessage message = new MimeMessage(session);
-
-            // Set From: header field of the header.
-            message.setFrom(new InternetAddress(fromEmail));
-
-            // Set To: header field of the header.
-            message.addRecipient(Message.RecipientType.TO,
-                    new InternetAddress(emailTo));
-
-            JobStatus jobStatus;
-
-            if (killed) {
-                jobStatus = JobStatus.KILLED;
-            } else {
-                jobStatus = job.getStatus();
-            }
-
-            // Set Subject: header field
-            message.setSubject("Genie Job "
-                    + job.getName()
-                    + " completed with Status: "
-                    + jobStatus);
-
-            // Now set the actual message
-            final String body = "Your Genie Job is complete\n\n"
-                    + "Job ID: "
-                    + job.getId()
-                    + "\n"
-                    + "Job Name: "
-                    + job.getName()
-                    + "\n"
-                    + "Status: "
-                    + job.getStatus()
-                    + "\n"
-                    + "Status Message: "
-                    + job.getStatusMsg()
-                    + "\n"
-                    + "Output Base URL: "
-                    + job.getOutputURI()
-                    + "\n";
-
-            message.setText(body);
-
-            // Send message
-            Transport.send(message);
-            LOG.info("Sent email message successfully....");
-            return true;
-        } catch (final MessagingException mex) {
-            LOG.error("Got exception while sending email", mex);
-            return false;
-        }
+//        LOG.debug("called");
+//        final Job job = this.jobService.getJob(this.jobId);
+//
+//        if (!this.config.getBoolean("com.netflix.genie.server.mail.enable", false)) {
+//            LOG.warn("Email is disabled but user has specified an email address.");
+//            return false;
+//        }
+//
+//        // Sender's email ID
+//        final String fromEmail = this.config.getString(
+//                "com.netflix.genie.server.mail.smpt.from",
+//                "no-reply-genie@geniehost.com"
+//        );
+//        LOG.info("From email address to use to send email: "
+//                + fromEmail);
+//
+//        // Set the smtp server hostname. Use localhost as default
+//        final String smtpHost = this.config.getString("com.netflix.genie.server.mail.smtp.host", "localhost");
+//        LOG.debug("Email smtp server: "
+//                + smtpHost);
+//
+//        // Get system properties
+//        final Properties properties = new Properties();
+//
+//        // Setup mail server
+//        properties.setProperty("mail.smtp.host", smtpHost);
+//
+//        // check whether authentication should be turned on
+//        Authenticator auth = null;
+//
+//        if (this.config.getBoolean("com.netflix.genie.server.mail.smtp.auth", false)) {
+//            LOG.debug("Email Authentication Enabled");
+//
+//            properties.put("mail.smtp.starttls.enable", "true");
+//            properties.put("mail.smtp.auth", "true");
+//
+//            final String userName = config.getString("com.netflix.genie.server.mail.smtp.user");
+//            final String password = config.getString("com.netflix.genie.server.mail.smtp.password");
+//
+//            if (userName == null || password == null) {
+//                LOG.error("Authentication is enabled and username/password for smtp server is null");
+//                return false;
+//            }
+//            LOG.debug("Constructing authenticator object with username"
+//                    + userName
+//                    + " and password "
+//                    + password);
+//            auth = new SMTPAuthenticator(userName,
+//                    password);
+//        } else {
+//            LOG.debug("Email authentication not enabled.");
+//        }
+//
+//        // Get the default Session object.
+//        final Session session = Session.getInstance(properties, auth);
+//
+//        try {
+//            // Create a default MimeMessage object.
+//            final MimeMessage message = new MimeMessage(session);
+//
+//            // Set From: header field of the header.
+//            message.setFrom(new InternetAddress(fromEmail));
+//
+//            // Set To: header field of the header.
+//            message.addRecipient(Message.RecipientType.TO,
+//                    new InternetAddress(emailTo));
+//
+//            JobStatus jobStatus;
+//
+//            if (killed) {
+//                jobStatus = JobStatus.KILLED;
+//            } else {
+//                jobStatus = job.getStatus();
+//            }
+//
+//            // Set Subject: header field
+//            message.setSubject("Genie Job "
+//                    + job.getName()
+//                    + " completed with Status: "
+//                    + jobStatus);
+//
+//            // Now set the actual message
+//            final String body = "Your Genie Job is complete\n\n"
+//                    + "Job ID: "
+//                    + job.getId()
+//                    + "\n"
+//                    + "Job Name: "
+//                    + job.getName()
+//                    + "\n"
+//                    + "Status: "
+//                    + job.getStatus()
+//                    + "\n"
+//                    + "Status Message: "
+//                    + job.getStatusMsg()
+//                    + "\n"
+//                    + "Output Base URL: "
+//                    + job.getOutputURI()
+//                    + "\n";
+//
+//            message.setText(body);
+//
+//            // Send message
+//            Transport.send(message);
+//            LOG.info("Sent email message successfully....");
+//            return true;
+//        } catch (final MessagingException mex) {
+//            LOG.error("Got exception while sending email", mex);
+//            return false;
+//        }
+        return true;
     }
 
-    private static class SMTPAuthenticator extends Authenticator {
-
-        private final String username;
-        private final String password;
-
-        /**
-         * Default constructor.
-         */
-        SMTPAuthenticator(final String username, final String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        /**
-         * Return a PasswordAuthentication object based on username/password.
-         */
-        @Override
-        public PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication(this.username, this.password);
-        }
-    }
+//    private static class SMTPAuthenticator extends Authenticator {
+//
+//        private final String username;
+//        private final String password;
+//
+//        /**
+//         * Default constructor.
+//         */
+//        SMTPAuthenticator(final String username, final String password) {
+//            this.username = username;
+//            this.password = password;
+//        }
+//
+//        /**
+//         * Return a PasswordAuthentication object based on username/password.
+//         */
+//        @Override
+//        public PasswordAuthentication getPasswordAuthentication() {
+//            return new PasswordAuthentication(this.username, this.password);
+//        }
+//    }
 }

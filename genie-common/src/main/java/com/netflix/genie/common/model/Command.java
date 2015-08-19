@@ -19,8 +19,9 @@ package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
@@ -33,6 +34,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
@@ -58,7 +60,7 @@ public class Command extends CommonFields {
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
     @Basic(optional = false)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The status of the command",
@@ -71,19 +73,21 @@ public class Command extends CommonFields {
      * Location of the executable for this command.
      */
     @Basic(optional = false)
-    @Column(name = "executable", nullable = false)
+    @Column(name = "executable", nullable = false, length = 255)
     @ApiModelProperty(
             value = "Location of the executable for this command",
             required = true
     )
     @NotBlank(message = "No executable entered for command and is required.")
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String executable;
 
     /**
      * Users can specify a property file location with environment variables.
      */
     @Basic
-    @Column(name = "setupFile")
+    @Lob
+    @Column(name = "setup_file")
     @ApiModelProperty(
             value = "Location of a setup file which will be downloaded and run before command execution"
     )
@@ -93,10 +97,11 @@ public class Command extends CommonFields {
      * Job type of the command. eg: hive, pig , hadoop etc.
      */
     @Basic
-    @Column(name = "jobType")
+    @Column(name = "job_type", length = 255)
     @ApiModelProperty(
             value = "Job type of the command. eg: hive, pig , hadoop etc"
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String jobType;
 
     /**
@@ -107,7 +112,7 @@ public class Command extends CommonFields {
             name = "command_configs",
             joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
     )
-    @Column(name = "config", nullable = false)
+    @Column(name = "config", nullable = false, length = 255)
     @ApiModelProperty(
             value = "Locations of all the configuration files needed for this command which will be downloaded"
     )
@@ -121,7 +126,7 @@ public class Command extends CommonFields {
             name = "command_tags",
             joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
     )
-    @Column(name = "tag", nullable = false)
+    @Column(name = "tag", nullable = false, length = 255)
     @ApiModelProperty(
             value = "All the tags associated with this command",
             required = true

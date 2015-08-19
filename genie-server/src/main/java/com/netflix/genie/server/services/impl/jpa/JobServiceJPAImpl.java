@@ -17,31 +17,33 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.netflix.config.ConfigurationManager;
-
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.repository.jpa.JobSpecs;
 import com.netflix.genie.server.services.JobService;
 import com.netflix.genie.server.util.NetUtil;
-import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.orm.jpa.JpaOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Transactional;
-import com.netflix.genie.common.model.Job_;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -54,49 +56,42 @@ import java.util.Set;
  *
  * @author tgianos
  */
+@Named
 public class JobServiceJPAImpl implements JobService {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(JobServiceJPAImpl.class);
-
-    // instance of the netflix configuration object
-    private static final AbstractConfiguration CONF;
-
-    // these can be over-ridden in the properties file
-    private static final int SERVER_PORT;
-    private static final String JOB_DIR_PREFIX;
-    private static final String JOB_RESOURCE_PREFIX;
-
-    // initialize static variables
-    static {
-        //TODO: Seem to remember something about injecting configuration using governator
-        CONF = ConfigurationManager.getConfigInstance();
-        SERVER_PORT = CONF.getInt("netflix.appinfo.port", 8080);
-        JOB_DIR_PREFIX = CONF.getString("com.netflix.genie.server.job.dir.prefix",
-                "genie-jobs");
-        JOB_RESOURCE_PREFIX = CONF.getString(
-                "com.netflix.genie.server.job.resource.prefix", "genie/v2/jobs");
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(JobServiceJPAImpl.class);
 
     private final GenieNodeStatistics stats;
     private final JobRepository jobRepo;
     private final JobManagerFactory jobManagerFactory;
+    private final NetUtil netUtil;
+
+    @Value("${netflix.appinfo.port:8080}")
+    private int serverPort;
+    @Value("${com.netflix.genie.server.job.resource.prefix:genie/v2/jobs}")
+    private String jobResourcePrefix;
+    @Value("${com.netflix.genie.server.job.dir.prefix:genie-jobs}")
+    private String jobDirPrefix;
 
     /**
      * Constructor.
      *
      * @param jobRepo           The job repository to use.
-     * @param stats             the GenieNodeStatistics object
+     * @param stats             The GenieNodeStatistics object
      * @param jobManagerFactory The the job manager factory to use
+     * @param netUtil           The network utility code to use
      */
+    @Inject
     public JobServiceJPAImpl(
             final JobRepository jobRepo,
             final GenieNodeStatistics stats,
-            final JobManagerFactory jobManagerFactory
+            final JobManagerFactory jobManagerFactory,
+            final NetUtil netUtil
     ) {
         this.jobRepo = jobRepo;
         this.stats = stats;
         this.jobManagerFactory = jobManagerFactory;
+        this.netUtil = netUtil;
     }
 
     /**
@@ -119,16 +114,16 @@ public class JobServiceJPAImpl implements JobService {
         try {
             final Job persistedJob = this.jobRepo.save(job);
             // if job can be launched, update the URIs
-            final String hostName = NetUtil.getHostName();
+            final String hostName = this.netUtil.getHostName();
             persistedJob.setHostName(hostName);
             persistedJob.setOutputURI(
                     getEndPoint(hostName)
-                            + "/" + JOB_DIR_PREFIX
+                            + "/" + this.jobDirPrefix
                             + "/" + persistedJob.getId()
             );
             persistedJob.setKillURI(
                     getEndPoint(hostName)
-                            + "/" + JOB_RESOURCE_PREFIX
+                            + "/" + this.jobResourcePrefix
                             + "/" + persistedJob.getId()
             );
 
@@ -374,6 +369,7 @@ public class JobServiceJPAImpl implements JobService {
                     ConstraintViolationException.class
             }
     )
+    @Retryable(JpaOptimisticLockingFailureException.class)
     public long setUpdateTime(
             @NotBlank(message = "No job id entered. Unable to set update time.")
             final String id
@@ -532,6 +528,6 @@ public class JobServiceJPAImpl implements JobService {
     }
 
     private String getEndPoint(final String hostName) throws GenieException {
-        return "http://" + hostName + ":" + SERVER_PORT;
+        return "http://" + hostName + ":" + this.serverPort;
     }
 }

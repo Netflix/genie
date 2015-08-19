@@ -25,8 +25,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.Length;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,10 +59,11 @@ public class Auditable implements Serializable {
      * Unique ID.
      */
     @Id
-    @Column(name = "id", updatable = false)
+    @Column(name = "id", updatable = false, length = 255)
     @ApiModelProperty(
             value = "The unique id of this resource. If one is not provided it is created internally"
     )
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String id;
 
     /**

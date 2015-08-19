@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.server.jobmanager;
 
-import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -25,38 +24,47 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Factory class to instantiate individual job managers.
  *
- * @author skrishnan
  * @author tgianos
  * @author amsharma
  */
+@Named
 public class JobManagerFactory implements ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobManagerFactory.class);
     private final ClusterConfigService ccs;
     private final ClusterLoadBalancer clb;
+    private final Environment environment;
     private ApplicationContext context;
 
     /**
      * Default constructor.
      *
-     * @param ccs The cluster config service to use
-     * @param clb The clb to use
+     * @param ccs         The cluster config service to use
+     * @param clb         The clb to use
+     * @param environment The application environment
      */
+    @Inject
     public JobManagerFactory(
             final ClusterConfigService ccs,
-            final ClusterLoadBalancer clb) {
+            final ClusterLoadBalancer clb,
+            final Environment environment
+    ) {
         this.ccs = ccs;
         this.clb = clb;
+        this.environment = environment;
     }
 
     /**
@@ -78,8 +86,8 @@ public class JobManagerFactory implements ApplicationContextAware {
         // Figure out a cluster to run this job. Cluster selection is done based on
         // ClusterCriteria tags and Command tags specified in the job.
         final Cluster cluster = this.clb.selectCluster(this.ccs.chooseClusterForJob(job.getId()));
-        final String className = ConfigurationManager.getConfigInstance()
-                .getString("com.netflix.genie.server.job.manager." + cluster.getClusterType() + ".impl");
+        final String className = this.environment
+                .getProperty("com.netflix.genie.server.job.manager." + cluster.getClusterType() + ".impl");
 
         try {
             final Class jobManagerClass = Class.forName(className);

@@ -17,14 +17,15 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
-import java.util.Random;
-
-import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.server.jobmanager.JobJanitor;
 import com.netflix.genie.server.services.ExecutionService;
-import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.Random;
 
 /**
  * Janitor thread that marks jobs as zombies if status hasn't been updated for
@@ -33,23 +34,25 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
+@Named
 public class JobJanitorImpl implements JobJanitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobJanitorImpl.class);
-
-    private final AbstractConfiguration conf;
-    private boolean stop;
-
     private final ExecutionService xs;
+    @Value("${com.netflix.genie.server.janitor.min.sleep.ms:300000}")
+    private long minSleepTime;
+    @Value("${com.netflix.genie.server.janitor.max.sleep.ms:600000}")
+    private long maxSleepTime;
+    private boolean stop;
 
     /**
      * Default constructor - initializes members correctly in order.
      *
      * @param xs The execution service to use.
      */
+    @Inject
     public JobJanitorImpl(final ExecutionService xs) {
         this.xs = xs;
-        this.conf = ConfigurationManager.getConfigInstance();
         this.stop = false;
     }
 
@@ -82,19 +85,12 @@ public class JobJanitorImpl implements JobJanitor {
                 LOG.error(e.getMessage(), e);
             }
 
-            // get min sleep time
-            final long minSleepTime = conf.getLong(
-                    "com.netflix.genie.server.janitor.min.sleep.ms", 300000);
-
-            // get max sleep time
-            final long maxSleepTime = conf.getLong(
-                    "com.netflix.genie.server.janitor.max.sleep.ms", 600000);
-
             // calculate a random number of seconds between min and max to sleep.
             // This is done to stagger the janitor threads across multiple instances
             final Random randomGenerator = new Random();
             // Since its a few seconds the long to int cast is fine
-            final long randomSleepTime = randomGenerator.nextInt((int) (maxSleepTime - minSleepTime)) + minSleepTime;
+            final long randomSleepTime =
+                    randomGenerator.nextInt((int) (this.maxSleepTime - this.minSleepTime)) + this.minSleepTime;
 
             LOG.info("Job janitor daemon going to sleep for " + randomSleepTime / 1000 + " seconds.");
             try {

@@ -27,10 +27,15 @@ import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.JobService;
+import org.junit.Assert;
+import org.junit.Test;
 
+import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,19 +46,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
-
 /**
  * Tests for the CommandConfigServiceJPAImpl. Basically integration tests.
  *
  * @author tgianos
  */
 @DatabaseSetup("cluster/init.xml")
-public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
+public class TestClusterConfigServiceJPAImpl extends SpringIntegrationTestBase {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";

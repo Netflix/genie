@@ -16,49 +16,34 @@
  */
 package com.netflix.genie.server.metrics.impl;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.repository.jpa.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
-
-import java.util.Calendar;
-import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
-import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.Calendar;
 
 /**
  * Basic tests for the JobCountManager.
  *
- * @author skrishnan
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class,
-    DbUnitTestExecutionListener.class
-})
-@Transactional
-public class TestJobCountManagerImpl {
+public class TestJobCountManagerImpl extends SpringIntegrationTestBase {
 
     @Inject
     private JobRepository jobRepo;
 
     @Inject
     private JobCountManager manager;
+
+    @Inject
+    private NetUtil netUtil;
 
     /**
      * Test getting number of running jobs on one instance.
@@ -69,7 +54,7 @@ public class TestJobCountManagerImpl {
     @DatabaseSetup("testNumInstanceJobs.xml")
     public void testNumInstanceJobs() throws GenieException {
         //Force the hostname of the jobs to be the machine running the build
-        final String hostName = NetUtil.getHostName();
+        final String hostName = this.netUtil.getHostName();
         for (final Job job : this.jobRepo.findAll()) {
             job.setHostName(hostName);
         }

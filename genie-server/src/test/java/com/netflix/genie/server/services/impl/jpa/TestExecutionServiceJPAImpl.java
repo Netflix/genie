@@ -24,16 +24,16 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.services.ExecutionService;
-
-import java.util.Calendar;
-import java.util.UUID;
-import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
-
 import com.netflix.genie.server.services.JobService;
 import org.junit.Assert;
 import org.junit.Test;
+
+import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
+import java.util.Calendar;
+import java.util.UUID;
 
 /**
  * Test for the Genie execution service class.
@@ -42,7 +42,7 @@ import org.junit.Test;
  * @author tgianos
  */
 @DatabaseSetup("execution/init.xml")
-public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
+public class TestExecutionServiceJPAImpl extends SpringIntegrationTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";

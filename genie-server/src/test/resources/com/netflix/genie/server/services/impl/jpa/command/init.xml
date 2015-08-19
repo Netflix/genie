@@ -22,7 +22,8 @@
             user="tgianos"
             name="tez"
             version="1.2.3"
-            status="ACTIVE"/>
+            status="ACTIVE"
+            entity_version="0"/>
     <application_tags
             application_id="app1"
             tag="genie.id:app1"/>
@@ -56,9 +57,10 @@
             name="pig_13_prod"
             version="1.2.3"
             executable="pig"
-            jobType="yarn"
+            job_type="yarn"
             status="ACTIVE"
-            application_id="app1"/>
+            application_id="app1"
+            entity_version="0"/>
     <command_configs
             command_id="command1"
             config="s3://some/config/file"/>
@@ -89,8 +91,9 @@
             name="hive_11_prod"
             version="4.5.6"
             executable="hive"
-            jobType="yarn"
-            status="INACTIVE"/>
+            job_type="yarn"
+            status="INACTIVE"
+            entity_version="0"/>
     <command_configs
             command_id="command2"
             config="s3://some/config/file"/>
@@ -115,8 +118,9 @@
             name="pig_11_prod"
             version="7.8.9"
             executable="pig"
-            jobType="yarn"
-            status="DEPRECATED"/>
+            job_type="yarn"
+            status="DEPRECATED"
+            entity_version="0"/>
     <command_configs
             command_id="command3"
             config="s3://some/config/file"/>
@@ -143,8 +147,9 @@
             user="tgianos"
             name="h2prod"
             version="2.4.0"
-            clusterType="yarn"
-            status="UP"/>
+            cluster_type="yarn"
+            status="UP"
+            entity_version="0"/>
     <cluster_configs
             cluster_id="cluster1"
             config="s3://some/config/file"/>

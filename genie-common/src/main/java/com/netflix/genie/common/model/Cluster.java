@@ -19,8 +19,9 @@ package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
@@ -62,7 +63,7 @@ public class Cluster extends CommonFields {
      * Status of cluster - UP, OUT_OF_SERVICE or TERMINATED.
      */
     @Basic(optional = false)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The status of the cluster",
@@ -78,7 +79,7 @@ public class Cluster extends CommonFields {
      * netflix.genie.server.{clusterType}.JobManagerImpl
      */
     @Basic(optional = false)
-    @Column(name = "clusterType", nullable = false)
+    @Column(name = "cluster_type", nullable = false, length = 255)
     @ApiModelProperty(
             value = "The type of the cluster to use to figure out the job manager for this"
                     + " cluster. e.g.: yarn, presto, mesos etc. The mapping to a JobManager will be"
@@ -86,6 +87,7 @@ public class Cluster extends CommonFields {
             required = true
     )
     @NotBlank(message = "No cluster type entered and is required.")
+    @Length(max = 255, message = "Max length in database is 255 characters")
     private String clusterType;
 
     /**
@@ -96,7 +98,7 @@ public class Cluster extends CommonFields {
             name = "cluster_configs",
             joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
     )
-    @Column(name = "config", nullable = false)
+    @Column(name = "config", nullable = false, length = 255)
     @ApiModelProperty(
             value = "All the configuration files needed for this cluster which will be downloaded pre-use"
     )
@@ -110,7 +112,7 @@ public class Cluster extends CommonFields {
             name = "cluster_tags",
             joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
     )
-    @Column(name = "tag", nullable = false)
+    @Column(name = "tag", nullable = false, length = 255)
     @ApiModelProperty(
             value = "The tags associated with this cluster",
             required = true

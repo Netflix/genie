@@ -17,20 +17,13 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.jobmanager.JobJanitor;
-import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
-import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
 
 /**
  * Test code for the job janitor class, which marks un-updated jobs as zombies.
@@ -38,16 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author skrishnan
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class,
-    DbUnitTestExecutionListener.class
-})
-@Transactional
-public class TestJobJanitorImpl {
+public class TestJobJanitorImpl extends SpringIntegrationTestBase {
 
     @Inject
     private JobJanitor janitor;

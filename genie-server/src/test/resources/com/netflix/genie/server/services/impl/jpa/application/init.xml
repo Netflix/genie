@@ -22,7 +22,8 @@
             user="tgianos"
             name="tez"
             version="1.2.3"
-            status="INACTIVE"/>
+            status="INACTIVE"
+            entity_version="0"/>
     <application_tags
             application_id="app1"
             tag="genie.id:app1"/>
@@ -53,9 +54,10 @@
             name="pig_13_prod"
             version="1.2.3"
             executable="pig"
-            jobType="yarn"
+            job_type="yarn"
             status="INACTIVE"
-            application_id="app1"/>
+            application_id="app1"
+            entity_version="0"/>
 
     <applications
             id="app2"
@@ -94,7 +96,8 @@
             user="tgianos"
             name="storm"
             version="7.8.9"
-            status="DEPRECATED"/>
+            status="DEPRECATED"
+            entity_version="0"/>
     <application_tags
             application_id="app3"
             tag="genie.id:app3"/>

@@ -15,12 +15,10 @@
  */
 package com.netflix.genie.web.health;
 
-import netflix.karyon.health.HealthCheckHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import java.net.HttpURLConnection;
 
 /**
  * Custom health check for Genie goes here - although it is quite non-custom
@@ -28,7 +26,8 @@ import java.net.HttpURLConnection;
  *
  * @author skrishnan
  */
-public class HealthCheck implements HealthCheckHandler {
+//public class HealthCheck implements HealthCheckHandler {
+public class HealthCheck {
 
     private static final Logger LOG = LoggerFactory.getLogger(HealthCheck.class);
 
@@ -40,16 +39,16 @@ public class HealthCheck implements HealthCheckHandler {
         LOG.info("Health check initialized.");
     }
 
-    /**
-     * Should return custom status based on actual health - currently it always
-     * returns 200 (HTTP_OK).
-     *
-     * @return HTTP health status
-     */
-    @Override
-    public int getStatus() {
-        //TODO: Custom health check logic goes here
-        LOG.debug("Health check invoked.");
-        return HttpURLConnection.HTTP_OK;
-    }
+//    /**
+//     * Should return custom status based on actual health - currently it always
+//     * returns 200 (HTTP_OK).
+//     *
+//     * @return HTTP health status
+//     */
+//    @Override
+//    public int getStatus() {
+//        //TODO: Custom health check logic goes here
+//        LOG.debug("Health check invoked.");
+//        return HttpURLConnection.HTTP_OK;
+//    }
 }

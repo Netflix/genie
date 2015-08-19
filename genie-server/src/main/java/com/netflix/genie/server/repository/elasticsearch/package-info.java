@@ -15,34 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.startup;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
- * Tests for GenieApplication.
+ * Classes used as repositories for entities stores in Elastic Search.
  *
  * @author tgianos
  */
-public class TestGenieApplication {
-
-    private GenieApplication app;
-
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
-        this.app = new GenieApplication();
-    }
-
-    /**
-     * Just a random test to assert the constructor ran.
-     */
-    @Test
-    public void test() {
-        Assert.assertNotNull(this.app);
-    }
-}
+package com.netflix.genie.server.repository.elasticsearch;

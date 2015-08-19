@@ -6,10 +6,7 @@ dependencies {
      *******************************/
 
     compile project(":genie-common")
-    compile("com.netflix.feign:feign-core:${feign_version}")
-    compile("com.netflix.feign:feign-jackson:${feign_version}")
-    compile("com.netflix.feign:feign-ribbon:${feign_version}")
-    compile("org.codehaus.groovy:groovy:${groovy_lang_version}")
+    compile("org.codehaus.groovy:groovy")
 
     /*******************************
      * Provided Dependencies

@@ -42,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.ConstraintViolationException;
@@ -64,6 +66,7 @@ import java.util.UUID;
                 ConstraintViolationException.class
         }
 )
+@Named
 public class CommandConfigServiceJPAImpl implements CommandConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandConfigServiceJPAImpl.class);
@@ -80,6 +83,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * @param appRepo     the application repository to use
      * @param clusterRepo the cluster repository to use
      */
+    @Inject
     public CommandConfigServiceJPAImpl(
             final CommandRepository commandRepo,
             final ApplicationRepository appRepo,

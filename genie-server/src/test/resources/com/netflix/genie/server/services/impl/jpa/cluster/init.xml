@@ -23,8 +23,9 @@
             name="pig_13_prod"
             version="1.2.3"
             executable="pig"
-            jobType="yarn"
-            status="ACTIVE"/>
+            job_type="yarn"
+            status="ACTIVE"
+            entity_version="0"/>
     <command_configs
             command_id="command1"
             config="s3://some/config/file"/>
@@ -55,8 +56,9 @@
             name="hive_11_prod"
             version="4.5.6"
             executable="hive"
-            jobType="yarn"
-            status="INACTIVE"/>
+            job_type="yarn"
+            status="INACTIVE"
+            entity_version="0"/>
     <command_configs
             command_id="command2"
             config="s3://some/config/file"/>
@@ -81,8 +83,9 @@
             name="pig_11_prod"
             version="7.8.9"
             executable="pig"
-            jobType="yarn"
-            status="DEPRECATED"/>
+            job_type="yarn"
+            status="DEPRECATED"
+            entity_version="0"/>
     <command_configs
             command_id="command3"
             config="s3://some/config/file"/>
@@ -109,8 +112,9 @@
             user="tgianos"
             name="h2prod"
             version="2.4.0"
-            clusterType="yarn"
-            status="UP"/>
+            cluster_type="yarn"
+            status="UP"
+            entity_version="0"/>
     <cluster_configs
             cluster_id="cluster1"
             config="s3://some/config/file"/>
@@ -150,8 +154,9 @@
             user="amsharma"
             name="h2query"
             version="2.4.0"
-            clusterType="yarn"
-            status="UP"/>
+            cluster_type="yarn"
+            status="UP"
+            entity_version="0"/>
     <cluster_configs
             cluster_id="cluster2"
             config="s3://some/config/file"/>
@@ -195,9 +200,14 @@
             name="testPigJob"
             status="SUCCEEDED"
             version="2.4"
-            commandArgs="-f -j"
-            commandCriteriaString="prod,pig"
-            clusterCriteriasString="prod,pig|h2prod|h2query"/>
+            command_args="-f -j"
+            command_criteria_string="prod,pig"
+            cluster_criterias_string="prod,pig|h2prod|h2query"
+            disable_log_archival="true"
+            exit_code="0"
+            forwarded="false"
+            process_handle="3426"
+            entity_version="0"/>
 
     <jobs
             id="job2"
@@ -207,7 +217,12 @@
             name="testSparkJob"
             status="RUNNING"
             version="2.4"
-            commandArgs="-f -j"
-            commandCriteriaString="spark,prod"
-            clusterCriteriasString="spark,prod|spark"/>
+            command_args="-f -j"
+            command_criteria_string="spark,prod"
+            cluster_criterias_string="spark,prod|spark"
+            disable_log_archival="true"
+            exit_code="-1"
+            forwarded="false"
+            process_handle="3427"
+            entity_version="0"/>
 </dataset>

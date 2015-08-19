@@ -19,8 +19,8 @@ package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -32,6 +32,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -56,7 +57,7 @@ public class Application extends CommonFields {
      * If it is in use - ACTIVE, DEPRECATED, INACTIVE.
      */
     @Basic(optional = false)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(
             value = "The current status of this application",
@@ -68,8 +69,9 @@ public class Application extends CommonFields {
     /**
      * Users can specify a property file location with environment variables.
      */
+    @Lob
     @Basic
-    @Column(name = "setupFile")
+    @Column(name = "setup_file")
     @ApiModelProperty(
             value = "A file location with environment variables or "
                     + "other settings which will be downloaded and sourced before application used"
@@ -84,7 +86,7 @@ public class Application extends CommonFields {
             name = "application_configs",
             joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
     )
-    @Column(name = "config", nullable = false)
+    @Column(name = "config", nullable = false, length = 255)
     @ApiModelProperty(
             value = "All the configuration files needed for this application which will be downloaded pre-use"
     )
@@ -98,7 +100,7 @@ public class Application extends CommonFields {
             name = "application_dependencies",
             joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
     )
-    @Column(name = "dependency", nullable = false)
+    @Column(name = "dependency", nullable = false, length = 255)
     @ApiModelProperty(
             value = "Any jars needed to run this application which will be downloaded pre use"
     )
@@ -112,7 +114,7 @@ public class Application extends CommonFields {
             name = "application_tags",
             joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
     )
-    @Column(name = "tag", nullable = false)
+    @Column(name = "tag", nullable = false, length = 255)
     @ApiModelProperty(
             value = "The tags associated with this application",
             required = true

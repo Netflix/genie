@@ -15,13 +15,14 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server.services.impl.jpa;
+package com.netflix.genie.server;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -34,14 +35,15 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
  * @author tgianos
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:genie-application-test.xml")
+@ActiveProfiles("dev")
+@SpringApplicationConfiguration(classes = GenieServerTestSpringApplication.class)
 @TestExecutionListeners({
     DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class,
     TransactionalTestExecutionListener.class,
     TransactionDbUnitTestExecutionListener.class
 })
-public class DBUnitTestBase {
+public class SpringIntegrationTestBase {
     /**
      * Just some junk test to allow this to be inherited.
      */

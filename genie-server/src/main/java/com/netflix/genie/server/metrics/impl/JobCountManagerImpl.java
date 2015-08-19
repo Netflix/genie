@@ -17,22 +17,19 @@
  */
 package com.netflix.genie.server.metrics.impl;
 
-import com.netflix.appinfo.InstanceInfo;
-import com.netflix.appinfo.InstanceInfo.InstanceStatus;
-import com.netflix.config.ConfigurationManager;
-import com.netflix.discovery.DiscoveryClient;
-import com.netflix.discovery.DiscoveryManager;
-import com.netflix.discovery.shared.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.util.NetUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -40,12 +37,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
-import org.apache.commons.configuration.AbstractConfiguration;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Utility class to get number of jobs running on this instance.
@@ -53,21 +47,22 @@ import org.springframework.transaction.annotation.Transactional;
  * @author skrishnan
  * @author tgianos
  */
+@Named
 public class JobCountManagerImpl implements JobCountManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobCountManagerImpl.class);
-
+    private final NetUtil netUtil;
     @PersistenceContext
     private EntityManager em;
 
-    // Config Instance to get all properties
-    private final AbstractConfiguration config;
-
     /**
-     * Default Constructor.
+     * Constructor.
+     *
+     * @param netUtil The net utility code to use.
      */
-    public JobCountManagerImpl() {
-        this.config = ConfigurationManager.getConfigInstance();
+    @Inject
+    public JobCountManagerImpl(final NetUtil netUtil) {
+        this.netUtil = netUtil;
     }
 
     /**
@@ -99,16 +94,14 @@ public class JobCountManagerImpl implements JobCountManager {
     @Override
     @Transactional(readOnly = true)
     //TODO: Move to specification
-    public int getNumInstanceJobs(
-            final String hostName,
-            final Long minStartTime,
-            final Long maxStartTime) throws GenieException {
+    public int getNumInstanceJobs(final String hostName, final Long minStartTime, final Long maxStartTime)
+            throws GenieException {
         LOG.debug("called");
 
         final String finalHostName;
         // initialize host name
         if (StringUtils.isBlank(hostName)) {
-            finalHostName = NetUtil.getHostName();
+            finalHostName = this.netUtil.getHostName();
         } else {
             finalHostName = hostName;
         }
@@ -140,53 +133,51 @@ public class JobCountManagerImpl implements JobCountManager {
      * {@inheritDoc}
      */
     @Override
-    public String getIdleInstance(
-            final long minJobThreshold)
-            throws GenieException {
+    public String getIdleInstance(final long minJobThreshold) throws GenieException {
         LOG.debug("called");
-        final String localhost = NetUtil.getHostName();
+        final String localhost = this.netUtil.getHostName();
 
-        // Get the App Name from Configuration
-        final String appName = this.config.getString("APPNAME", "genie2");
-        LOG.info("Using App Name" + appName);
-
-        // naive implementation where we loop through all instances in discovery
-        // no need to raise any exceptions here, just return localhost if there
-        // is any error
-        //TODO: use injection instead of getInstance
-        final DiscoveryClient discoveryClient = DiscoveryManager.getInstance()
-                .getDiscoveryClient();
-        if (discoveryClient == null) {
-            LOG.warn("Can't instantiate DiscoveryClient - returning localhost");
-            return localhost;
-        }
-        final Application app = discoveryClient.getApplication(appName);
-        if (app == null) {
-            LOG.warn("Discovery client can't find genie - returning localhost");
-            return localhost;
-        }
-
-        for (InstanceInfo instance : app.getInstances()) {
-            // only pick instances that are UP
-            if (instance.getStatus() == null
-                    || instance.getStatus() != InstanceStatus.UP) {
-                continue;
-            }
-
-            // if instance is UP, check if job can be forwarded to it
-            final String hostName = instance.getHostName();
-            LOG.debug("Trying host name: " + hostName);
-            final int numInstanceJobs = getNumInstanceJobs(hostName, null, null);
-            if (numInstanceJobs <= minJobThreshold) {
-                LOG.info("Returning idle host: " + hostName + ", who has "
-                        + numInstanceJobs + " jobs running");
-                return hostName;
-            } else {
-                LOG.debug("Host: " + hostName + " skipped since it has "
-                        + numInstanceJobs + " running jobs, threshold is: "
-                        + minJobThreshold);
-            }
-        }
+//        // Get the App Name from Configuration
+//        final String appName = this.config.getString("APPNAME", "genie2");
+//        LOG.info("Using App Name" + appName);
+//
+//        // naive implementation where we loop through all instances in discovery
+//        // no need to raise any exceptions here, just return localhost if there
+//        // is any error
+//        //TODO: use injection instead of getInstance
+//        final DiscoveryClient discoveryClient = DiscoveryManager.getInstance()
+//                .getDiscoveryClient();
+//        if (discoveryClient == null) {
+//            LOG.warn("Can't instantiate DiscoveryClient - returning localhost");
+//            return localhost;
+//        }
+//        final Application app = discoveryClient.getApplication(appName);
+//        if (app == null) {
+//            LOG.warn("Discovery client can't find genie - returning localhost");
+//            return localhost;
+//        }
+//
+//        for (InstanceInfo instance : app.getInstances()) {
+//            // only pick instances that are UP
+//            if (instance.getStatus() == null
+//                    || instance.getStatus() != InstanceStatus.UP) {
+//                continue;
+//            }
+//
+//            // if instance is UP, check if job can be forwarded to it
+//            final String hostName = instance.getHostName();
+//            LOG.debug("Trying host name: " + hostName);
+//            final int numInstanceJobs = getNumInstanceJobs(hostName, null, null);
+//            if (numInstanceJobs <= minJobThreshold) {
+//                LOG.info("Returning idle host: " + hostName + ", who has "
+//                        + numInstanceJobs + " jobs running");
+//                return hostName;
+//            } else {
+//                LOG.debug("Host: " + hostName + " skipped since it has "
+//                        + numInstanceJobs + " running jobs, threshold is: "
+//                        + minJobThreshold);
+//            }
+//        }
 
         // no hosts found with numInstanceJobs < minJobThreshold, return current
         // instance

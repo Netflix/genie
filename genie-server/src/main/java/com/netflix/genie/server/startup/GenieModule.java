@@ -17,50 +17,41 @@
  */
 package com.netflix.genie.server.startup;
 
-import com.google.inject.servlet.ServletModule;
-import com.google.inject.spring.SpringIntegration;
-import com.netflix.genie.server.jobmanager.JobJanitor;
-import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import com.netflix.genie.server.metrics.JobCountManager;
-import com.netflix.genie.server.metrics.JobCountMonitor;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
 /**
  * A Guice module which binds spring beans to the Guice binder for integration.
  *
  * @author tgianos
  */
-public class GenieModule extends ServletModule {
-
-    /**
-     * Configure the Guice bindings.
-     */
-    @Override
-    protected void configureServlets() {
-        final ApplicationContext springApplicationContext
-                = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        bind(BeanFactory.class).toInstance(springApplicationContext);
-        bind(JobJanitor.class).toProvider(
-                SpringIntegration.fromSpring(
-                        JobJanitor.class,
-                        "JobJanitorImpl")
-        );
-        bind(GenieNodeStatistics.class).toProvider(
-                SpringIntegration.fromSpring(
-                        GenieNodeStatistics.class,
-                        "GenieNodeStatisticsImpl")
-        );
-        bind(JobCountManager.class).toProvider(
-                SpringIntegration.fromSpring(
-                        JobCountManager.class,
-                        "JobCountManagerImpl")
-        );
-        bind(JobCountMonitor.class).toProvider(
-                SpringIntegration.fromSpring(
-                        JobCountMonitor.class,
-                        "JobCountMonitorImpl")
-        );
-    }
+//public class GenieModule extends ServletModule {
+public class GenieModule {
+//
+//    /**
+//     * Configure the Guice bindings.
+//     */
+//    @Override
+//    protected void configureServlets() {
+//        final ApplicationContext springApplicationContext
+//                = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+//        bind(BeanFactory.class).toInstance(springApplicationContext);
+//        bind(JobJanitor.class).toProvider(
+//                SpringIntegration.fromSpring(
+//                        JobJanitor.class,
+//                        "JobJanitorImpl")
+//        );
+//        bind(GenieNodeStatistics.class).toProvider(
+//                SpringIntegration.fromSpring(
+//                        GenieNodeStatistics.class,
+//                        "GenieNodeStatisticsImpl")
+//        );
+//        bind(JobCountManager.class).toProvider(
+//                SpringIntegration.fromSpring(
+//                        JobCountManager.class,
+//                        "JobCountManagerImpl")
+//        );
+//        bind(JobCountMonitor.class).toProvider(
+//                SpringIntegration.fromSpring(
+//                        JobCountMonitor.class,
+//                        "JobCountMonitorImpl")
+//        );
+//    }
 }
