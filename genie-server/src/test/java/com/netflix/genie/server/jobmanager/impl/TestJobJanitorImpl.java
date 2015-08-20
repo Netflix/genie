@@ -17,11 +17,20 @@
  */
 package com.netflix.genie.server.jobmanager.impl;
 
+import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.netflix.genie.server.SpringIntegrationTestBase;
+import com.netflix.genie.server.GenieServerTestSpringApplication;
 import com.netflix.genie.server.jobmanager.JobJanitor;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
@@ -31,7 +40,16 @@ import javax.inject.Inject;
  * @author skrishnan
  * @author tgianos
  */
-public class TestJobJanitorImpl extends SpringIntegrationTestBase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = GenieServerTestSpringApplication.class)
+@TestExecutionListeners({
+        DependencyInjectionTestExecutionListener.class,
+        DirtiesContextTestExecutionListener.class,
+        TransactionalTestExecutionListener.class,
+        DbUnitTestExecutionListener.class
+})
+@Transactional
+public class TestJobJanitorImpl {
 
     @Inject
     private JobJanitor janitor;

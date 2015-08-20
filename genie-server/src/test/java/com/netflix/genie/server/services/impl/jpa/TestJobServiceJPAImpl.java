@@ -25,7 +25,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.ClusterCriteria;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
-import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
@@ -53,7 +52,7 @@ import java.util.UUID;
  * @author tgianos
  */
 @DatabaseSetup("job/init.xml")
-public class TestJobServiceJPAImpl extends SpringIntegrationTestBase {
+public class TestJobServiceJPAImpl extends DBUnitTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";
@@ -62,6 +61,9 @@ public class TestJobServiceJPAImpl extends SpringIntegrationTestBase {
 
     @Inject
     private JobService service;
+
+    @Inject
+    private NetUtil netUtil;
 
     /**
      * Test the get job function.
@@ -225,8 +227,7 @@ public class TestJobServiceJPAImpl extends SpringIntegrationTestBase {
         final JobRepository jobRepo = Mockito.mock(JobRepository.class);
         final GenieNodeStatistics stats = Mockito.mock(GenieNodeStatistics.class);
         final JobManagerFactory jobManagerFactory = Mockito.mock(JobManagerFactory.class);
-        final NetUtil netUtil = Mockito.mock(NetUtil.class);
-        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, netUtil);
+        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, this.netUtil);
 
         final Job job = Mockito.mock(Job.class);
         Mockito.when(job.getId()).thenReturn(JOB_1_ID);
@@ -258,7 +259,8 @@ public class TestJobServiceJPAImpl extends SpringIntegrationTestBase {
         Assert.assertEquals("2.4", job1.getVersion());
         Assert.assertEquals("-f -j", job1.getCommandArgs());
         Assert.assertEquals(JobStatus.INIT, job1.getStatus());
-        Assert.assertNull(job1.getTags());
+        Assert.assertNotNull(job1.getTags());
+        Assert.assertEquals(3, job1.getTags().size());
         Assert.assertEquals(2, job1.getCommandCriteria().size());
         Assert.assertEquals(3, job1.getClusterCriterias().size());
 
@@ -269,7 +271,8 @@ public class TestJobServiceJPAImpl extends SpringIntegrationTestBase {
         Assert.assertEquals("2.4.3", job2.getVersion());
         Assert.assertEquals("-f -j -a", job2.getCommandArgs());
         Assert.assertEquals(JobStatus.FAILED, job2.getStatus());
-        Assert.assertNull(job2.getTags());
+        Assert.assertNotNull(job2.getTags());
+        Assert.assertEquals(4, job2.getTags().size());
         Assert.assertEquals(2, job2.getCommandCriteria().size());
         Assert.assertEquals(2, job2.getClusterCriterias().size());
     }
@@ -1138,8 +1141,7 @@ public class TestJobServiceJPAImpl extends SpringIntegrationTestBase {
         final JobRepository jobRepo = Mockito.mock(JobRepository.class);
         final GenieNodeStatistics stats = Mockito.mock(GenieNodeStatistics.class);
         final JobManagerFactory jobManagerFactory = Mockito.mock(JobManagerFactory.class);
-        final NetUtil netUtil = Mockito.mock(NetUtil.class);
-        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, netUtil);
+        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, this.netUtil);
 
         final Job job = Mockito.mock(Job.class);
         Mockito.when(job.getId()).thenReturn(JOB_1_ID);
@@ -1166,8 +1168,7 @@ public class TestJobServiceJPAImpl extends SpringIntegrationTestBase {
         final JobRepository jobRepo = Mockito.mock(JobRepository.class);
         final GenieNodeStatistics stats = Mockito.mock(GenieNodeStatistics.class);
         final JobManagerFactory jobManagerFactory = Mockito.mock(JobManagerFactory.class);
-        final NetUtil netUtil = Mockito.mock(NetUtil.class);
-        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, netUtil);
+        final JobServiceJPAImpl impl = new JobServiceJPAImpl(jobRepo, stats, jobManagerFactory, this.netUtil);
 
         final Job job = Mockito.mock(Job.class);
         Mockito.when(job.getId()).thenReturn(JOB_1_ID);

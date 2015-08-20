@@ -25,7 +25,6 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import org.junit.Assert;
@@ -46,7 +45,7 @@ import java.util.UUID;
  * @author tgianos
  */
 @DatabaseSetup("application/init.xml")
-public class TestApplicationConfigServiceJPAImpl extends SpringIntegrationTestBase {
+public class TestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String APP_1_NAME = "tez";

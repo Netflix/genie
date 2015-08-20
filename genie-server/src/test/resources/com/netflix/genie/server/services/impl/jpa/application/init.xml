@@ -46,19 +46,6 @@
             application_id="app1"
             dependency="yarn.jar"/>
 
-    <commands
-            id="command1"
-            created="2014-08-08 01:47:00"
-            updated="2014-08-08 01:59:00"
-            user="tgianos"
-            name="pig_13_prod"
-            version="1.2.3"
-            executable="pig"
-            job_type="yarn"
-            status="INACTIVE"
-            application_id="app1"
-            entity_version="0"/>
-
     <applications
             id="app2"
             created="2014-08-09 01:45:00"
@@ -116,4 +103,23 @@
     <application_dependencies
             application_id="app3"
             dependency="yarn.jar"/>
+
+    <commands
+            id="command1"
+            created="2014-08-08 01:47:00"
+            updated="2014-08-08 01:59:00"
+            user="tgianos"
+            name="pig_13_prod"
+            version="1.2.3"
+            executable="pig"
+            job_type="yarn"
+            status="INACTIVE"
+            application_id="app1"
+            entity_version="0"/>
+    <command_tags
+            command_id="command1"
+            tag="genie.id:command1"/>
+    <command_tags
+            command_id="command1"
+            tag="genie.name:pig_13_prod"/>
 </dataset>

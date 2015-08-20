@@ -187,7 +187,7 @@ public class Job extends CommonFields {
     /**
      * Set of tags for a job.
      */
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "job_tags",
             joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "id")

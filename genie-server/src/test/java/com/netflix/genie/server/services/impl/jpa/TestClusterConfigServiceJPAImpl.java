@@ -27,7 +27,6 @@ import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.JobService;
@@ -52,7 +51,7 @@ import java.util.UUID;
  * @author tgianos
  */
 @DatabaseSetup("cluster/init.xml")
-public class TestClusterConfigServiceJPAImpl extends SpringIntegrationTestBase {
+public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";

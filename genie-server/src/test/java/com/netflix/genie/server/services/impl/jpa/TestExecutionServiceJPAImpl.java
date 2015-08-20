@@ -24,7 +24,6 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
-import com.netflix.genie.server.SpringIntegrationTestBase;
 import com.netflix.genie.server.services.ExecutionService;
 import com.netflix.genie.server.services.JobService;
 import org.junit.Assert;
@@ -42,7 +41,7 @@ import java.util.UUID;
  * @author tgianos
  */
 @DatabaseSetup("execution/init.xml")
-public class TestExecutionServiceJPAImpl extends SpringIntegrationTestBase {
+public class TestExecutionServiceJPAImpl extends DBUnitTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";

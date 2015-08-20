@@ -34,8 +34,6 @@ dependencies {
 
     // Database Libs
     runtime("mysql:mysql-connector-java")
-    runtime("org.apache.commons:commons-dbcp2")
-    runtime("org.apache.derby:derby")
     runtime("org.hsqldb:hsqldb")
 
     /*******************************

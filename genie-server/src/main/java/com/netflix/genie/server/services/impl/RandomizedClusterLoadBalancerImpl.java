@@ -43,9 +43,7 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
      * {@inheritDoc}
      */
     @Override
-    public Cluster selectCluster(
-            final List<Cluster> clusters
-    ) throws GenieException {
+    public Cluster selectCluster(final List<Cluster> clusters) throws GenieException {
         LOG.info("called");
 
         if (clusters == null || clusters.isEmpty()) {

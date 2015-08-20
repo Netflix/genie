@@ -30,7 +30,9 @@
           command_args="-tez"
           kill_uri="http://DOES/NOT/EXIST"
           disable_log_archival="true"
-          entity_version="0"/>
+          entity_version="0"
+          exit_code="0"
+            process_handle="1000"/>
     <jobs id="job2"
           created="2014-01-03 01:45:00"
           updated="2014-01-03 01:50:00"
@@ -46,7 +48,9 @@
           kill_uri="http://DOES/NOT/EXIST"
           disable_log_archival="true"
           forwarded="false"
-          entity_version="0"/>
+          entity_version="0"
+          exit_code="1"
+          process_handle="1001"/>
     <jobs id="job3"
           created="2014-01-04 01:45:00"
           updated="2014-01-04 01:50:00"
@@ -62,7 +66,9 @@
           kill_uri="http://DOES/NOT/EXIST"
           disable_log_archival="true"
           forwarded="false"
-          entity_version="0"/>
+          entity_version="0"
+          exit_code="1"
+          process_handle="1002"/>
     <jobs id="job4"
           created="2014-01-04 01:45:00"
           updated="2014-01-04 01:50:00"
@@ -78,7 +84,9 @@
           kill_uri="http://DOES/NOT/EXIST"
           disable_log_archival="true"
           forwarded="false"
-          entity_version="0"/>
+          entity_version="0"
+          exit_code="-1"
+          process_handle="1003"/>
     <jobs id="job5"
           created="2014-01-04 01:45:00"
           updated="2014-01-04 01:50:00"
@@ -95,7 +103,8 @@
           kill_uri="http://DOES/NOT/EXIST"
           disable_log_archival="true"
           forwarded="false"
-          entity_version="0"/>
+          entity_version="0"
+          exit_code="-1"/>
     <jobs id="job6"
           created="2014-01-04 01:45:00"
           updated="2014-01-04 01:50:00"
@@ -111,5 +120,6 @@
           command_args="-tez"
           disable_log_archival="true"
           forwarded="false"
-          entity_version="0"/>
+          entity_version="0"
+          exit_code="0"/>
 </dataset>

@@ -124,7 +124,7 @@ public class JobCountManagerImpl implements JobCountManager {
         cq.where(predicates.toArray(new Predicate[predicates.size()]));
         final TypedQuery<Long> query = this.em.createQuery(cq);
         //Downgrading to an int since all the code seems to want ints
-        //Don't feel like changing everthing right now can figure out later
+        //Don't feel like changing everything right now can figure out later
         //if need be
         return query.getSingleResult().intValue();
     }

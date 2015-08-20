@@ -19,12 +19,17 @@ package com.netflix.genie.server;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+
+import javax.validation.Validator;
 
 /**
  * Spring configuration class for integration tests.
@@ -32,12 +37,41 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author tgianos
  */
 @Configuration
-@ComponentScan("com.netflix.genie")
 @EnableAutoConfiguration
-@EnableElasticsearchRepositories("com.netflix.genie.server.repository.elasticsearch")
+@ComponentScan("com.netflix.genie")
+//@ComponentScan(
+//        {
+//                "com.netflix.genie.server.jobmanager",
+//                "com.netflix.genie.server.metrics",
+//                "com.netflix.genie.server.services",
+//                "com.netflix.genie.server.startup",
+//                "com.netflix.genie.server.util"
+//        }
+//)
 @EnableJpaRepositories("com.netflix.genie.server.repository.jpa")
+@EnableElasticsearchRepositories("com.netflix.genie.server.repository.elasticsearch")
 @EntityScan("com.netflix.genie.common.model")
 @EnableTransactionManagement
 @EnableRetry
 public class GenieServerTestSpringApplication {
+
+    /**
+     * Setup bean validation.
+     *
+     * @return The bean validator
+     */
+    @Bean
+    public Validator localValidatorFactoryBean() {
+        return new LocalValidatorFactoryBean();
+    }
+
+    /**
+     * Setup method parameter bean validation.
+     *
+     * @return The method validation processor
+     */
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
+    }
 }

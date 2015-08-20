@@ -21,10 +21,13 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
-import com.netflix.genie.server.SpringIntegrationTestBase;
+import com.netflix.genie.server.GenieServerTestSpringApplication;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -37,7 +40,9 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class TestRandomizedClusterLoadBalancerImpl extends SpringIntegrationTestBase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = GenieServerTestSpringApplication.class)
+public class TestRandomizedClusterLoadBalancerImpl {
 
     @Inject
     private ClusterLoadBalancer clb;
