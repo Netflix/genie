@@ -90,7 +90,7 @@ public class Application extends CommonFields {
     @ApiModelProperty(
             value = "All the configuration files needed for this application which will be downloaded pre-use"
     )
-    private Set<String> configs;
+    private Set<String> configs = new HashSet<>();
 
     /**
      * Set of dependencies required for this application.
@@ -104,7 +104,7 @@ public class Application extends CommonFields {
     @ApiModelProperty(
             value = "Any jars needed to run this application which will be downloaded pre use"
     )
-    private Set<String> dependencies;
+    private Set<String> dependencies = new HashSet<>();
 
     /**
      * Set of tags for a application.
@@ -119,14 +119,14 @@ public class Application extends CommonFields {
             value = "The tags associated with this application",
             required = true
     )
-    private Set<String> tags;
+    private Set<String> tags = new HashSet<>();
 
     /**
      * The commands this application is associated with.
      */
     @JsonIgnore
     @OneToMany(mappedBy = "application", fetch = FetchType.LAZY)
-    private Set<Command> commands;
+    private Set<Command> commands = new HashSet<>();
 
     /**
      * Default constructor.
@@ -160,9 +160,6 @@ public class Application extends CommonFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateApplication() throws GeniePreconditionException {
-        if (this.tags == null) {
-            this.tags = new HashSet<>();
-        }
         this.addAndValidateSystemTags(this.tags);
     }
 
@@ -218,7 +215,10 @@ public class Application extends CommonFields {
      * @param configs The configuration files that this application needs
      */
     public void setConfigs(final Set<String> configs) {
-        this.configs = configs;
+        this.configs.clear();
+        if (configs != null) {
+            this.configs.addAll(configs);
+        }
     }
 
     /**
@@ -236,7 +236,10 @@ public class Application extends CommonFields {
      * @param dependencies All dependencies needed for execution of this application
      */
     public void setDependencies(final Set<String> dependencies) {
-        this.dependencies = dependencies;
+        this.dependencies.clear();
+        if (dependencies != null) {
+            this.dependencies.addAll(dependencies);
+        }
     }
 
     /**
@@ -253,8 +256,12 @@ public class Application extends CommonFields {
      *
      * @param commands The commands to set.
      */
+    //TODO: Add @Valid?
     protected void setCommands(final Set<Command> commands) {
-        this.commands = commands;
+        this.commands.clear();
+        if (commands != null) {
+            this.commands.addAll(commands);
+        }
     }
 
     /**
@@ -272,6 +279,9 @@ public class Application extends CommonFields {
      * @param tags the tags to set. No tag can start with genie. as this is system reserved.
      */
     public void setTags(final Set<String> tags) {
-        this.tags = tags;
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
     }
 }

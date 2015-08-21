@@ -50,6 +50,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementation of the Job Service API's.
@@ -110,22 +111,19 @@ public class JobServiceJPAImpl implements JobService {
         // validate parameters
         job.setJobStatus(JobStatus.INIT, "Initializing job");
 
+        if (StringUtils.isEmpty(job.getId())) {
+            job.setId(UUID.randomUUID().toString());
+        }
+
         // Validation successful. init state in DB - return if job already exists
         try {
-            final Job persistedJob = this.jobRepo.save(job);
             // if job can be launched, update the URIs
             final String hostName = this.netUtil.getHostName();
-            persistedJob.setHostName(hostName);
-            persistedJob.setOutputURI(
-                    getEndPoint(hostName)
-                            + "/" + this.jobDirPrefix
-                            + "/" + persistedJob.getId()
-            );
-            persistedJob.setKillURI(
-                    getEndPoint(hostName)
-                            + "/" + this.jobResourcePrefix
-                            + "/" + persistedJob.getId()
-            );
+            job.setHostName(hostName);
+            final String endpoint = getEndPoint(hostName);
+            job.setOutputURI(endpoint + "/" + this.jobDirPrefix + "/" + job.getId());
+            job.setKillURI(endpoint + "/" + this.jobResourcePrefix + "/" + job.getId());
+            final Job persistedJob = this.jobRepo.save(job);
 
             // increment number of submitted jobs as we have successfully
             // persisted it in the database.

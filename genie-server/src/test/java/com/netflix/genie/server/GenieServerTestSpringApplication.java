@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.server;
 
+import com.github.springtestdbunit.bean.DatabaseConfigBean;
+import com.github.springtestdbunit.bean.DatabaseDataSourceConnectionFactoryBean;
+import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +32,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
+import javax.sql.DataSource;
 import javax.validation.Validator;
 
 /**
@@ -39,15 +43,6 @@ import javax.validation.Validator;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan("com.netflix.genie")
-//@ComponentScan(
-//        {
-//                "com.netflix.genie.server.jobmanager",
-//                "com.netflix.genie.server.metrics",
-//                "com.netflix.genie.server.services",
-//                "com.netflix.genie.server.startup",
-//                "com.netflix.genie.server.util"
-//        }
-//)
 @EnableJpaRepositories("com.netflix.genie.server.repository.jpa")
 @EnableElasticsearchRepositories("com.netflix.genie.server.repository.elasticsearch")
 @EntityScan("com.netflix.genie.common.model")
@@ -73,5 +68,31 @@ public class GenieServerTestSpringApplication {
     @Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
+    }
+
+    /**
+     * Get the DBUnit configuration.
+     *
+     * @return The config bean
+     */
+    @Bean
+     public DatabaseConfigBean dbUnitDatabaseConfig() {
+        final DatabaseConfigBean dbConfig = new DatabaseConfigBean();
+        dbConfig.setDatatypeFactory(new HsqldbDataTypeFactory());
+        return dbConfig;
+    }
+
+    /**
+     * Get the database connection factory bean.
+     *
+     * @param dataSource The data source to use
+     * @return The database connection factory bean for dbunit.
+     */
+    @Bean
+    public DatabaseDataSourceConnectionFactoryBean dbUnitDatabaseConnection(final DataSource dataSource) {
+        final DatabaseDataSourceConnectionFactoryBean dbConnection
+                = new DatabaseDataSourceConnectionFactoryBean(dataSource);
+        dbConnection.setDatabaseConfig(dbUnitDatabaseConfig());
+        return dbConnection;
     }
 }

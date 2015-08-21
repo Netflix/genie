@@ -43,8 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -75,8 +73,6 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     private final ClusterRepository clusterRepo;
     private final CommandRepository commandRepo;
     private final JobRepository jobRepo;
-    @PersistenceContext
-    private EntityManager em;
 
     /**
      * Default constructor - initialize all required dependencies.
@@ -172,7 +168,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Cluster> chooseClusterForJob(
             @NotBlank(message = "No job id entered. Unable to continue.")
             final String jobId
@@ -220,22 +216,18 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @NotBlank(message = "No cluster id entered. Unable to update.")
             final String id,
             @NotNull(message = "No cluster information entered. Unable to update.")
+            @Valid
             final Cluster updateCluster
     ) throws GenieException {
         LOG.debug("Called with id " + id + " and cluster " + updateCluster);
         if (!this.clusterRepo.exists(id)) {
             throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
-        if (StringUtils.isNotBlank(updateCluster.getId())
-                && !id.equals(updateCluster.getId())) {
+        if (!id.equals(updateCluster.getId())) {
             throw new GenieBadRequestException("Cluster id inconsistent with id passed in.");
         }
 
-        //Set the id if it's not set so we can merge
-        if (StringUtils.isBlank(updateCluster.getId())) {
-            updateCluster.setId(id);
-        }
-        return this.em.merge(updateCluster);
+        return this.clusterRepo.save(updateCluster);
     }
 
     /**
@@ -271,7 +263,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
                 if (clusters != null) {
                     clusters.remove(cluster);
                 }
-                this.em.merge(command);
+                this.commandRepo.save(command);
             }
         }
         this.clusterRepo.delete(cluster);

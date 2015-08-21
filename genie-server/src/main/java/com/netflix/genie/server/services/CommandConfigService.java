@@ -106,6 +106,7 @@ public interface CommandConfigService {
             @NotBlank(message = "No id entered. Unable to update.")
             final String id,
             @NotNull(message = "No command information entered. Unable to update.")
+            @Valid
             final Command updateCommand
     ) throws GenieException;
 

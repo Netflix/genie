@@ -51,14 +51,19 @@ public class TestApplication extends TestEntityBase {
      */
     @Test
     public void testDefaultConstructor() {
-        Assert.assertNull(this.a.getCommands());
-        Assert.assertNull(this.a.getConfigs());
         Assert.assertNull(this.a.getSetupFile());
         Assert.assertNull(this.a.getStatus());
-        Assert.assertNull(this.a.getDependencies());
         Assert.assertNull(this.a.getName());
         Assert.assertNull(this.a.getUser());
         Assert.assertNull(this.a.getVersion());
+        Assert.assertNotNull(this.a.getDependencies());
+        Assert.assertTrue(this.a.getDependencies().isEmpty());
+        Assert.assertNotNull(this.a.getConfigs());
+        Assert.assertTrue(this.a.getConfigs().isEmpty());
+        Assert.assertNotNull(this.a.getTags());
+        Assert.assertTrue(this.a.getTags().isEmpty());
+        Assert.assertNotNull(this.a.getCommands());
+        Assert.assertTrue(this.a.getCommands().isEmpty());
     }
 
     /**
@@ -69,14 +74,19 @@ public class TestApplication extends TestEntityBase {
     @Test
     public void testConstructor() throws GeniePreconditionException {
         this.a = new Application(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
-        Assert.assertNull(this.a.getCommands());
-        Assert.assertNull(this.a.getConfigs());
         Assert.assertNull(this.a.getSetupFile());
         Assert.assertEquals(ApplicationStatus.ACTIVE, this.a.getStatus());
-        Assert.assertNull(this.a.getDependencies());
         Assert.assertEquals(NAME, this.a.getName());
         Assert.assertEquals(USER, this.a.getUser());
         Assert.assertEquals(VERSION, this.a.getVersion());
+        Assert.assertNotNull(this.a.getDependencies());
+        Assert.assertTrue(this.a.getDependencies().isEmpty());
+        Assert.assertNotNull(this.a.getConfigs());
+        Assert.assertTrue(this.a.getConfigs().isEmpty());
+        Assert.assertNotNull(this.a.getTags());
+        Assert.assertTrue(this.a.getTags().isEmpty());
+        Assert.assertNotNull(this.a.getCommands());
+        Assert.assertTrue(this.a.getCommands().isEmpty());
     }
 
     /**
@@ -87,7 +97,7 @@ public class TestApplication extends TestEntityBase {
     @Test
     public void testOnCreateOrUpdateApplication() throws GeniePreconditionException {
         this.a = new Application(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
-        Assert.assertNull(this.a.getTags());
+        Assert.assertNotNull(this.a.getTags());
         this.a.onCreateOrUpdateApplication();
         Assert.assertEquals(2, this.a.getTags().size());
     }
@@ -148,10 +158,10 @@ public class TestApplication extends TestEntityBase {
     }
 
     /**
-     * Test setting the property file.
+     * Test setting the setup file.
      */
     @Test
-    public void testSetEnvPropFile() {
+    public void testSetSetupFile() {
         Assert.assertNull(this.a.getSetupFile());
         final String propFile = "s3://netflix.propFile";
         this.a.setSetupFile(propFile);
@@ -163,7 +173,7 @@ public class TestApplication extends TestEntityBase {
      */
     @Test
     public void testSetConfigs() {
-        Assert.assertNull(this.a.getConfigs());
+        Assert.assertNotNull(this.a.getConfigs());
         final Set<String> configs = new HashSet<>();
         configs.add("s3://netflix.configFile");
         this.a.setConfigs(configs);
@@ -174,8 +184,8 @@ public class TestApplication extends TestEntityBase {
      * Test setting the jars.
      */
     @Test
-    public void testSetJars() {
-        Assert.assertNull(this.a.getDependencies());
+    public void testSetDependencies() {
+        Assert.assertNotNull(this.a.getDependencies());
         final Set<String> jars = new HashSet<>();
         jars.add("s3://netflix/jars/myJar.jar");
         this.a.setDependencies(jars);
@@ -187,7 +197,7 @@ public class TestApplication extends TestEntityBase {
      */
     @Test
     public void testSetTags() {
-        Assert.assertNull(this.a.getTags());
+        Assert.assertNotNull(this.a.getTags());
         final Set<String> tags = new HashSet<>();
         tags.add("tag1");
         tags.add("tag2");
@@ -200,7 +210,7 @@ public class TestApplication extends TestEntityBase {
      */
     @Test
     public void testSetCommands() {
-        Assert.assertNull(this.a.getCommands());
+        Assert.assertNotNull(this.a.getCommands());
         final Set<Command> commands = new HashSet<>();
         commands.add(new Command());
         this.a.setCommands(commands);

@@ -30,19 +30,17 @@ import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
+import org.junit.Assert;
+import org.junit.Test;
 
+import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
 
 /**
  * Tests for the CommandConfigServiceJPAImpl. Most of these are basically integration tests.
@@ -421,57 +419,23 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
-    public void testUpdateCommandNoId() throws GenieException {
-        final Command init = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_1_USER, init.getUser());
-        Assert.assertEquals(CommandStatus.ACTIVE, init.getStatus());
-        Assert.assertEquals(5, init.getTags().size());
+    public void testUpdateCommand() throws GenieException {
+        final Command updateCommand = this.service.getCommand(COMMAND_1_ID);
+        Assert.assertEquals(COMMAND_1_USER, updateCommand.getUser());
+        Assert.assertEquals(CommandStatus.ACTIVE, updateCommand.getStatus());
+        Assert.assertEquals(5, updateCommand.getTags().size());
 
-        final Command updateCommand = new Command();
         updateCommand.setStatus(CommandStatus.INACTIVE);
         updateCommand.setUser(COMMAND_2_USER);
-        final Set<String> tags = new HashSet<>();
-        tags.add("prod");
-        tags.add("tez");
+        final Set<String> tags = updateCommand.getTags();
         tags.add("yarn");
         tags.add("hadoop");
-        updateCommand.setTags(tags);
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
 
         final Command updated = this.service.getCommand(COMMAND_1_ID);
         Assert.assertEquals(COMMAND_2_USER, updated.getUser());
         Assert.assertEquals(CommandStatus.INACTIVE, updated.getStatus());
-        Assert.assertEquals(6, updated.getTags().size());
-    }
-
-    /**
-     * Test to update an command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    public void testUpdateCommandWithId() throws GenieException {
-        final Command init = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_1_USER, init.getUser());
-        Assert.assertEquals(CommandStatus.ACTIVE, init.getStatus());
-        Assert.assertEquals(5, init.getTags().size());
-
-        final Command updateApp = new Command();
-        updateApp.setId(COMMAND_1_ID);
-        updateApp.setStatus(CommandStatus.INACTIVE);
-        updateApp.setUser(COMMAND_2_USER);
-        final Set<String> tags = new HashSet<>();
-        tags.add("prod");
-        tags.add("tez");
-        tags.add("yarn");
-        tags.add("hadoop");
-        updateApp.setTags(tags);
-        this.service.updateCommand(COMMAND_1_ID, updateApp);
-
-        final Command updated = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_2_USER, updated.getUser());
-        Assert.assertEquals(CommandStatus.INACTIVE, updated.getStatus());
-        Assert.assertEquals(6, updated.getTags().size());
+        Assert.assertEquals(7, updated.getTags().size());
     }
 
     /**
@@ -481,22 +445,19 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandWithInvalidCommand() throws GenieException {
-        final Command init = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_1_USER, init.getUser());
-        Assert.assertEquals(CommandStatus.ACTIVE, init.getStatus());
-        Assert.assertEquals(5, init.getTags().size());
+        final Command updateCommand = this.service.getCommand(COMMAND_1_ID);
+        Assert.assertEquals(COMMAND_1_USER, updateCommand.getUser());
+        Assert.assertEquals(CommandStatus.ACTIVE, updateCommand.getStatus());
+        Assert.assertEquals(5, updateCommand.getTags().size());
 
-        final Command updateApp = new Command();
-        updateApp.setId(COMMAND_1_ID);
-        updateApp.setStatus(CommandStatus.INACTIVE);
-        updateApp.setVersion("");
-        final Set<String> tags = new HashSet<>();
+        updateCommand.setStatus(CommandStatus.INACTIVE);
+        updateCommand.setVersion("");
+        final Set<String> tags = updateCommand.getTags();
         tags.add("prod");
         tags.add("tez");
         tags.add("yarn");
         tags.add("hadoop");
-        updateApp.setTags(tags);
-        this.service.updateCommand(COMMAND_1_ID, updateApp);
+        this.service.updateCommand(COMMAND_1_ID, updateCommand);
     }
 
     /**
@@ -527,7 +488,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandNullId() throws GenieException {
-        this.service.updateCommand(null, new Command());
+        this.service.updateCommand(null, this.service.getCommand(COMMAND_1_ID));
     }
 
     /**
@@ -547,8 +508,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateCommandNoCommandExists() throws GenieException {
-        this.service.updateCommand(
-                UUID.randomUUID().toString(), new Command());
+        this.service.updateCommand(UUID.randomUUID().toString(), this.service.getCommand(COMMAND_1_ID));
     }
 
     /**
@@ -558,9 +518,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieBadRequestException.class)
     public void testUpdateCommandIdsDontMatch() throws GenieException {
-        final Command updateApp = new Command();
-        updateApp.setId(UUID.randomUUID().toString());
-        this.service.updateCommand(COMMAND_1_ID, updateApp);
+        this.service.updateCommand(COMMAND_2_ID, this.service.getCommand(COMMAND_1_ID));
     }
 
     /**
@@ -681,7 +639,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToCommandNoId() throws GenieException {
-        this.service.addConfigsForCommand(null, new HashSet<String>());
+        this.service.addConfigsForCommand(null, new HashSet<>());
     }
 
     /**
@@ -739,7 +697,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForCommandNoId() throws GenieException {
-        this.service.updateConfigsForCommand(null, new HashSet<String>());
+        this.service.updateConfigsForCommand(null, new HashSet<>());
     }
 
     /**
@@ -1068,7 +1026,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToCommandNoId() throws GenieException {
-        this.service.addTagsForCommand(null, new HashSet<String>());
+        this.service.addTagsForCommand(null, new HashSet<>());
     }
 
     /**
@@ -1126,7 +1084,7 @@ public class TestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForCommandNoId() throws GenieException {
-        this.service.updateTagsForCommand(null, new HashSet<String>());
+        this.service.updateTagsForCommand(null, new HashSet<>());
     }
 
     /**

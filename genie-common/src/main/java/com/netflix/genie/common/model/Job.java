@@ -43,6 +43,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -129,7 +131,7 @@ public class Job extends CommonFields {
             required = true
     )
     @NotEmpty(message = "No cluster criteria entered. At least one required.")
-    private List<ClusterCriteria> clusterCriterias;
+    private List<ClusterCriteria> clusterCriterias = new ArrayList<>();
 
     /**
      * Set of tags to use for selecting command (REQUIRED).
@@ -140,7 +142,7 @@ public class Job extends CommonFields {
             required = true
     )
     @NotEmpty(message = "No command criteria entered. At least one required.")
-    private Set<String> commandCriteria;
+    private Set<String> commandCriteria = new HashSet<>();
 
     /**
      * File dependencies.
@@ -160,7 +162,7 @@ public class Job extends CommonFields {
     @ApiModelProperty(
             value = "Attachments sent as a part of job request. Can be used as command line arguments"
     )
-    private Set<FileAttachment> attachments;
+    private Set<FileAttachment> attachments = new HashSet<>();
 
     /**
      * Whether to disable archive logs or not - default is false.
@@ -196,7 +198,7 @@ public class Job extends CommonFields {
     @ApiModelProperty(
             value = "Any tags a user wants to add to the job to help with discovery of job later"
     )
-    private Set<String> tags;
+    private Set<String> tags = new HashSet<>();
 
     // ------------------------------------------------------------------------
     // GENERAL COMMON STUFF FOR ALL JOBS
@@ -480,12 +482,20 @@ public class Job extends CommonFields {
             final String version,
             final String commandArgs,
             final Set<String> commandCriteria,
-            final List<ClusterCriteria> clusterCriterias) {
+            final List<ClusterCriteria> clusterCriterias
+    ) {
         super(name, user, version);
 
         this.commandArgs = commandArgs;
-        this.clusterCriterias = clusterCriterias;
-        this.commandCriteria = commandCriteria;
+        //TODO: Come back and implement bean validation on entity constructors
+        if (clusterCriterias != null) {
+            this.clusterCriterias.addAll(clusterCriterias);
+            this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
+        }
+        if (commandCriteria != null) {
+            this.commandCriteria.addAll(commandCriteria);
+            this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
+        }
 
         // Set version to default if not specified
         if (StringUtils.isBlank(this.getVersion())) {
@@ -501,12 +511,8 @@ public class Job extends CommonFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateJob() throws GeniePreconditionException {
-        this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
-        this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
-        // Add the id to the tags
-        if (this.tags == null) {
-            this.tags = new HashSet<>();
-        }
+//        this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
+//        this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
     }
 
     /**
@@ -515,6 +521,8 @@ public class Job extends CommonFields {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @PostLoad
+    @PostPersist
+    @PostUpdate
     protected void onLoadJob() throws GeniePreconditionException {
         this.clusterCriterias = this.stringToClusterCriterias(this.clusterCriteriasString);
         this.commandCriteria = this.stringToCommandCriteria(this.commandCriteriaString);
@@ -596,7 +604,8 @@ public class Job extends CommonFields {
         if (clusterCriterias == null || clusterCriterias.isEmpty()) {
             throw new GeniePreconditionException("No cluster criteria entered.");
         }
-        this.clusterCriterias = clusterCriterias;
+        this.clusterCriterias.clear();
+        this.clusterCriterias.addAll(clusterCriterias);
         this.clusterCriteriasString = clusterCriteriasToString(clusterCriterias);
     }
 
@@ -1021,11 +1030,15 @@ public class Job extends CommonFields {
     /**
      * Sets the set of command criteria specified to pick a command.
      *
-     * @param commandCriteria The criteria list
+     * @param commandCriteria The criteria list. Not null/empty
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     public void setCommandCriteria(final Set<String> commandCriteria) throws GeniePreconditionException {
-        this.commandCriteria = commandCriteria;
+        if (commandCriteria == null || commandCriteria.isEmpty()) {
+            throw new GeniePreconditionException("No command criteria entered. At least one is required");
+        }
+        this.commandCriteria.clear();
+        this.commandCriteria.addAll(commandCriteria);
         this.commandCriteriaString = commandCriteriaToString(commandCriteria);
     }
 

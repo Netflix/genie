@@ -53,8 +53,6 @@ public class TestCommand extends TestEntityBase {
     @Test
     public void testDefaultConstructor() {
         Assert.assertNull(this.c.getApplication());
-        Assert.assertNull(this.c.getClusters());
-        Assert.assertNull(this.c.getConfigs());
         Assert.assertNull(this.c.getSetupFile());
         Assert.assertNull(this.c.getExecutable());
         Assert.assertNull(this.c.getJobType());
@@ -62,6 +60,12 @@ public class TestCommand extends TestEntityBase {
         Assert.assertNull(this.c.getStatus());
         Assert.assertNull(this.c.getUser());
         Assert.assertNull(this.c.getVersion());
+        Assert.assertNotNull(this.c.getConfigs());
+        Assert.assertTrue(this.c.getConfigs().isEmpty());
+        Assert.assertNotNull(this.c.getTags());
+        Assert.assertTrue(this.c.getTags().isEmpty());
+        Assert.assertNotNull(this.c.getClusters());
+        Assert.assertTrue(this.c.getClusters().isEmpty());
     }
 
     /**
@@ -73,8 +77,6 @@ public class TestCommand extends TestEntityBase {
     public void testConstructor() throws GeniePreconditionException {
         c = new Command(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
         Assert.assertNull(this.c.getApplication());
-        Assert.assertNull(this.c.getClusters());
-        Assert.assertNull(this.c.getConfigs());
         Assert.assertNull(this.c.getSetupFile());
         Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
         Assert.assertNull(this.c.getJobType());
@@ -82,6 +84,12 @@ public class TestCommand extends TestEntityBase {
         Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
         Assert.assertEquals(USER, this.c.getUser());
         Assert.assertEquals(VERSION, this.c.getVersion());
+        Assert.assertNotNull(this.c.getConfigs());
+        Assert.assertTrue(this.c.getConfigs().isEmpty());
+        Assert.assertNotNull(this.c.getTags());
+        Assert.assertTrue(this.c.getTags().isEmpty());
+        Assert.assertNotNull(this.c.getClusters());
+        Assert.assertTrue(this.c.getClusters().isEmpty());
     }
 
     /**
@@ -92,7 +100,8 @@ public class TestCommand extends TestEntityBase {
     @Test
     public void testOnCreateOrUpdateCommand() throws GeniePreconditionException {
         this.c = new Command(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
-        Assert.assertNull(this.c.getTags());
+        Assert.assertNotNull(this.c.getTags());
+        Assert.assertTrue(this.c.getTags().isEmpty());
         this.c.onCreateOrUpdateCommand();
         Assert.assertEquals(2, this.c.getTags().size());
     }
@@ -198,7 +207,8 @@ public class TestCommand extends TestEntityBase {
      */
     @Test
     public void testSetConfigs() {
-        Assert.assertNull(this.c.getConfigs());
+        Assert.assertNotNull(this.c.getConfigs());
+        Assert.assertTrue(this.c.getConfigs().isEmpty());
         final Set<String> configs = new HashSet<>();
         configs.add("s3://netflix.configFile");
         this.c.setConfigs(configs);
@@ -210,7 +220,8 @@ public class TestCommand extends TestEntityBase {
      */
     @Test
     public void testSetTags() {
-        Assert.assertNull(this.c.getTags());
+        Assert.assertNotNull(this.c.getTags());
+        Assert.assertTrue(this.c.getTags().isEmpty());
         final Set<String> tags = new HashSet<>();
         tags.add("tag1");
         tags.add("tag2");
@@ -248,7 +259,8 @@ public class TestCommand extends TestEntityBase {
      */
     @Test
     public void testSetClusters() {
-        Assert.assertNull(this.c.getClusters());
+        Assert.assertNotNull(this.c.getClusters());
+        Assert.assertTrue(this.c.getClusters().isEmpty());
         final Set<Cluster> clusters = new HashSet<>();
         clusters.add(new Cluster());
         this.c.setClusters(clusters);

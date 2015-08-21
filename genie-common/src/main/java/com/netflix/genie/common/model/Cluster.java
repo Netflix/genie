@@ -102,7 +102,7 @@ public class Cluster extends CommonFields {
     @ApiModelProperty(
             value = "All the configuration files needed for this cluster which will be downloaded pre-use"
     )
-    private Set<String> configs;
+    private Set<String> configs = new HashSet();
 
     /**
      * Set of tags for a cluster.
@@ -117,7 +117,7 @@ public class Cluster extends CommonFields {
             value = "The tags associated with this cluster",
             required = true
     )
-    private Set<String> tags;
+    private Set<String> tags = new HashSet<>();
 
     /**
      * Commands supported on this cluster - e.g. prodhive, testhive, etc.
@@ -135,7 +135,7 @@ public class Cluster extends CommonFields {
     )
     @OrderColumn(name = "command_order", nullable = false)
     @JsonIgnore
-    private List<Command> commands;
+    private List<Command> commands = new ArrayList<Command>();
 
     /**
      * Default Constructor.
@@ -172,10 +172,6 @@ public class Cluster extends CommonFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateCluster() throws GeniePreconditionException {
-        // Add the id to the tags
-        if (this.tags == null) {
-            this.tags = new HashSet<>();
-        }
         this.addAndValidateSystemTags(this.tags);
     }
 
@@ -233,7 +229,10 @@ public class Cluster extends CommonFields {
      *                null/empty.
      */
     public void setConfigs(final Set<String> configs) {
-        this.configs = configs;
+        this.configs.clear();
+        if (configs != null) {
+            this.configs.addAll(configs);
+        }
     }
 
     /**
@@ -261,7 +260,10 @@ public class Cluster extends CommonFields {
      * @param tags the tags to set. Not Null.
      */
     public void setTags(final Set<String> tags) {
-        this.tags = tags;
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
     }
 
     /**

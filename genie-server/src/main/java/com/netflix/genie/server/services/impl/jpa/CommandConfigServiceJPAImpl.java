@@ -44,8 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -73,8 +71,6 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     private final CommandRepository commandRepo;
     private final ApplicationRepository appRepo;
     private final ClusterRepository clusterRepo;
-    @PersistenceContext
-    private EntityManager em;
 
     /**
      * Default constructor.
@@ -172,22 +168,18 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             @NotBlank(message = "No id entered. Unable to update.")
             final String id,
             @NotNull(message = "No command information entered. Unable to update.")
+            @Valid
             final Command updateCommand
     ) throws GenieException {
         if (!this.commandRepo.exists(id)) {
             throw new GenieNotFoundException("No command exists with the given id. Unable to update.");
         }
-        if (StringUtils.isNotBlank(updateCommand.getId())
-                && !id.equals(updateCommand.getId())) {
+        if (!id.equals(updateCommand.getId())) {
             throw new GenieBadRequestException("Command id inconsistent with id passed in.");
         }
 
-        //Set the id if it's not set so we can merge
-        if (StringUtils.isBlank(updateCommand.getId())) {
-            updateCommand.setId(id);
-        }
         LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
-        return this.em.merge(updateCommand);
+        return this.commandRepo.save(updateCommand);
     }
 
     /**
@@ -224,7 +216,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             if (commands != null) {
                 commands.remove(command);
             }
-            this.em.merge(app);
+            this.appRepo.save(app);
         }
         //Remove the command from the associated cluster references
         final Set<Cluster> clusters = command.getClusters();
@@ -233,7 +225,7 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             if (commands != null) {
                 commands.remove(command);
             }
-            this.em.merge(cluster);
+            this.clusterRepo.save(cluster);
         }
         this.commandRepo.delete(command);
         return command;

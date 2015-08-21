@@ -60,13 +60,16 @@ public class TestCluster extends TestEntityBase {
     @Test
     public void testDefaultConstructor() {
         Assert.assertNull(this.c.getClusterType());
-        Assert.assertNull(this.c.getCommands());
-        Assert.assertNull(this.c.getConfigs());
         Assert.assertNull(this.c.getName());
         Assert.assertNull(this.c.getStatus());
-        Assert.assertNull(this.c.getTags());
         Assert.assertNull(this.c.getUser());
         Assert.assertNull(this.c.getVersion());
+        Assert.assertNotNull(this.c.getConfigs());
+        Assert.assertTrue(this.c.getConfigs().isEmpty());
+        Assert.assertNotNull(this.c.getTags());
+        Assert.assertTrue(this.c.getTags().isEmpty());
+        Assert.assertNotNull(this.c.getCommands());
+        Assert.assertTrue(this.c.getCommands().isEmpty());
     }
 
     /**
@@ -78,12 +81,16 @@ public class TestCluster extends TestEntityBase {
     public void testConstructor() throws GeniePreconditionException {
         this.c = new Cluster(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         Assert.assertEquals(CLUSTER_TYPE, this.c.getClusterType());
-        Assert.assertNull(this.c.getCommands());
         Assert.assertEquals(NAME, this.c.getName());
         Assert.assertEquals(ClusterStatus.UP, this.c.getStatus());
-        Assert.assertNull(this.c.getTags());
         Assert.assertEquals(USER, this.c.getUser());
         Assert.assertEquals(VERSION, this.c.getVersion());
+        Assert.assertNotNull(this.c.getConfigs());
+        Assert.assertTrue(this.c.getConfigs().isEmpty());
+        Assert.assertNotNull(this.c.getTags());
+        Assert.assertTrue(this.c.getTags().isEmpty());
+        Assert.assertNotNull(this.c.getCommands());
+        Assert.assertTrue(this.c.getCommands().isEmpty());
     }
 
     /**
@@ -94,7 +101,8 @@ public class TestCluster extends TestEntityBase {
     @Test
     public void testOnCreateOrUpdateCluster() throws GeniePreconditionException {
         this.c = new Cluster(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
-        Assert.assertNull(this.c.getTags());
+        Assert.assertNotNull(this.c.getTags());
+        Assert.assertTrue(this.c.getTags().isEmpty());
         this.c.onCreateOrUpdateCluster();
         Assert.assertEquals(2, this.c.getTags().size());
     }
@@ -180,7 +188,7 @@ public class TestCluster extends TestEntityBase {
      */
     @Test
     public void testSetTags() throws GeniePreconditionException {
-        Assert.assertNull(this.c.getTags());
+        Assert.assertNotNull(this.c.getTags());
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
         tags.add("sla");
@@ -193,7 +201,7 @@ public class TestCluster extends TestEntityBase {
      */
     @Test
     public void testSetConfigs() {
-        Assert.assertNull(this.c.getConfigs());
+        Assert.assertNotNull(this.c.getConfigs());
         this.c.setConfigs(this.configs);
         Assert.assertEquals(this.configs, this.c.getConfigs());
     }
@@ -205,7 +213,8 @@ public class TestCluster extends TestEntityBase {
      */
     @Test
     public void testSetCommands() throws GeniePreconditionException {
-        Assert.assertNull(this.c.getCommands());
+        Assert.assertNotNull(this.c.getCommands());
+        Assert.assertTrue(this.c.getCommands().isEmpty());
         final Command one = new Command();
         one.setId("one");
         final Command two = new Command();
@@ -232,7 +241,8 @@ public class TestCluster extends TestEntityBase {
     public void testAddCommand() throws GeniePreconditionException {
         final Command command = new Command();
         command.setId("commandId");
-        Assert.assertNull(this.c.getCommands());
+        Assert.assertNotNull(this.c.getCommands());
+        Assert.assertTrue(this.c.getCommands().isEmpty());
         this.c.addCommand(command);
         Assert.assertTrue(this.c.getCommands().contains(command));
         Assert.assertTrue(command.getClusters().contains(this.c));
@@ -259,12 +269,14 @@ public class TestCluster extends TestEntityBase {
         one.setId("one");
         final Command two = new Command();
         two.setId("two");
-        Assert.assertNull(this.c.getCommands());
+        Assert.assertNotNull(this.c.getCommands());
+        Assert.assertTrue(this.c.getCommands().isEmpty());
         this.c.addCommand(one);
         Assert.assertTrue(this.c.getCommands().contains(one));
         Assert.assertFalse(this.c.getCommands().contains(two));
         Assert.assertTrue(one.getClusters().contains(this.c));
-        Assert.assertNull(two.getClusters());
+        Assert.assertNotNull(two.getClusters());
+        Assert.assertTrue(two.getClusters().isEmpty());
         this.c.addCommand(two);
         Assert.assertTrue(this.c.getCommands().contains(one));
         Assert.assertTrue(this.c.getCommands().contains(two));
@@ -295,7 +307,8 @@ public class TestCluster extends TestEntityBase {
      */
     @Test
     public void testRemoveAllCommands() throws GeniePreconditionException {
-        Assert.assertNull(this.c.getCommands());
+        Assert.assertNotNull(this.c.getCommands());
+        Assert.assertTrue(this.c.getCommands().isEmpty());
         final Command one = new Command();
         one.setId("one");
         final Command two = new Command();

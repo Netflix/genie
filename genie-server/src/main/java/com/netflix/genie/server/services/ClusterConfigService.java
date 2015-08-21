@@ -117,6 +117,7 @@ public interface ClusterConfigService {
             @NotBlank(message = "No cluster id entered. Unable to update.")
             final String id,
             @NotNull(message = "No cluster information entered. Unable to update.")
+            @Valid
             final Cluster updateCluster
     ) throws GenieException;
 

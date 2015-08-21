@@ -4,6 +4,10 @@ ext {
     generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
 }
 
+configurations {
+    jpaModelGen
+}
+
 sourceSets {
     main {
         java {
@@ -12,17 +16,10 @@ sourceSets {
     }
 }
 
-//configurations {
-//    hibernateAnnotationProcessor
-//}
-
 dependencies {
     /*******************************
      * Compile Dependencies
      *******************************/
-
-    // Hibernate Metamodel Generator Libraries
-    compile("org.hibernate:hibernate-jpamodelgen")
 
     // Hibernate Validator Libs
     compile("org.hibernate:hibernate-validator")
@@ -45,19 +42,32 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
+
+    /*******************************
+     * JPA Model Gen Dependencies
+     *******************************/
+
+    // Hibernate Metamodel Generator Libraries
+    jpaModelGen("org.hibernate:hibernate-jpamodelgen")
+}
+
+task generateJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA Meta Models') {
+    source = sourceSets.main.java
+    outputs.dir generatedSourcesJavaDir
+    destinationDir = generatedSourcesJavaDir
+    dependencyCacheDir = compileJava.dependencyCacheDir
+    classpath = configurations.compile + configurations.jpaModelGen
+    options.compilerArgs = [
+            "-proc:only"
+    ]
 }
 
 clean {
     delete generatedSourcesDir
 }
 
-//compileJava.compileClasspath += configurations.hibernateAnnotationProcessor
 compileJava {
-    doFirst {
-        // Java compiler won't create the directory if it doesn't already exist
-        generatedSourcesJavaDir.mkdirs()
-    }
-    options.compilerArgs += ['-s', generatedSourcesJavaDir]
+    dependsOn generateJPAMetaModel
 }
 
 //Ignore the generated classes from all our style/coverage/bug finding tools

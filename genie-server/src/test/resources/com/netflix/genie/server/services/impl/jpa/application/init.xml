@@ -53,7 +53,8 @@
             user="amsharma"
             name="spark"
             version="4.5.6"
-            status="ACTIVE"/>
+            status="ACTIVE"
+            entity_version="0"/>
     <application_tags
             application_id="app2"
             tag="genie.id:app2"/>

@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Application_;
@@ -31,7 +32,6 @@ import com.netflix.genie.server.repository.jpa.ApplicationSpecs;
 import com.netflix.genie.server.repository.jpa.CommandRepository;
 import com.netflix.genie.server.repository.jpa.CommandSpecs;
 import com.netflix.genie.server.services.ApplicationConfigService;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -41,13 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,8 +65,6 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigServiceJPAImpl.class);
     private final ApplicationRepository applicationRepo;
     private final CommandRepository commandRepo;
-    @PersistenceContext
-    private EntityManager em;
 
     /**
      * Default constructor.
@@ -153,22 +147,18 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             @NotBlank(message = "No application id entered. Unable to update.")
             final String id,
             @NotNull(message = "No application information entered. Unable to update.")
+            @Valid
             final Application updateApp
     ) throws GenieException {
         if (!this.applicationRepo.exists(id)) {
             throw new GenieNotFoundException("No application information entered. Unable to update.");
         }
-        if (StringUtils.isNotBlank(updateApp.getId())
-                && !id.equals(updateApp.getId())) {
-            throw new GenieBadRequestException("Application id either not entered or inconsistent with id passed in.");
+        if (!id.equals(updateApp.getId())) {
+            throw new GenieBadRequestException("Application id inconsistent with id passed in.");
         }
 
-        //Set the id if it's not set so we can merge
-        if (StringUtils.isBlank(updateApp.getId())) {
-            updateApp.setId(id);
-        }
         LOG.debug("Called with app " + updateApp.toString());
-        return this.em.merge(updateApp);
+        return this.applicationRepo.save(updateApp);
     }
 
     /**
@@ -177,11 +167,18 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     @Override
     public List<Application> deleteAllApplications() throws GenieException {
         LOG.debug("Called");
-        final Iterable<Application> apps = this.applicationRepo.findAll();
-        final List<Application> returnApps = new ArrayList<>();
-        for (final Application app : apps) {
-            returnApps.add(this.deleteApplication(app.getId()));
+        final List<Application> returnApps = this.applicationRepo.findAll();
+        // Check to make sure the application isn't tied to any existing commands
+        for (final Application app : returnApps) {
+            final Set<Command> commands = app.getCommands();
+            if (commands != null && !commands.isEmpty()) {
+                throw new GeniePreconditionException(
+                        "Unable to delete app " + app.getId() + " as it is attached to " + commands.size()
+                                + " commands still."
+                );
+            }
         }
+        this.applicationRepo.deleteAll();
         return returnApps;
     }
 
@@ -199,13 +196,13 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
 
-        if (app.getCommands() != null) {
-            final Set<Command> commands = new HashSet<>();
-            commands.addAll(app.getCommands());
-            for (final Command command : commands) {
-                command.setApplication(null);
-            }
+        final Set<Command> commands = app.getCommands();
+        if (commands != null && !commands.isEmpty()) {
+            throw new GeniePreconditionException(
+                    "Unable to delete app " + app.getId() + " as it is attached to " + commands.size() + " commands."
+            );
         }
+
         this.applicationRepo.delete(app);
         return app;
     }

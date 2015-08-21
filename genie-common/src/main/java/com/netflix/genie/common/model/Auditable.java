@@ -101,7 +101,7 @@ public class Auditable implements Serializable {
      */
     @JsonIgnore
     @Version
-    @Column(name = "entityVersion")
+    @Column(name = "entity_version", nullable = false)
     private Long entityVersion;
 
     /**

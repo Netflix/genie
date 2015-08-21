@@ -116,7 +116,7 @@ public class Command extends CommonFields {
     @ApiModelProperty(
             value = "Locations of all the configuration files needed for this command which will be downloaded"
     )
-    private Set<String> configs;
+    private Set<String> configs = new HashSet<>();
 
     /**
      * Set of tags for a command.
@@ -131,7 +131,7 @@ public class Command extends CommonFields {
             value = "All the tags associated with this command",
             required = true
     )
-    private Set<String> tags;
+    private Set<String> tags = new HashSet<>();
 
     /**
      * Set of applications that can run this command.
@@ -146,7 +146,7 @@ public class Command extends CommonFields {
      */
     @JsonIgnore
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
-    private Set<Cluster> clusters;
+    private Set<Cluster> clusters = new HashSet<>();
 
     /**
      * Default Constructor.
@@ -183,10 +183,6 @@ public class Command extends CommonFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateCommand() throws GeniePreconditionException {
-        // Add the id to the tags
-        if (this.tags == null) {
-           this.tags = new HashSet<>();
-        }
         this.addAndValidateSystemTags(this.tags);
     }
 
@@ -279,7 +275,10 @@ public class Command extends CommonFields {
      * @param configs The configuration files that this command needs
      */
     public void setConfigs(final Set<String> configs) {
-        this.configs = configs;
+        this.configs.clear();
+        if (configs != null) {
+            this.configs.addAll(configs);
+        }
     }
 
     /**
@@ -306,7 +305,10 @@ public class Command extends CommonFields {
      * @param tags the tags to set.
      */
     public void setTags(final Set<String> tags) {
-        this.tags = tags;
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
     }
 
     /**
@@ -351,6 +353,9 @@ public class Command extends CommonFields {
      * @param clusters the clusters
      */
     protected void setClusters(final Set<Cluster> clusters) {
-        this.clusters = clusters;
+        this.clusters.clear();
+        if (clusters != null) {
+            this.clusters.addAll(clusters);
+        }
     }
 }

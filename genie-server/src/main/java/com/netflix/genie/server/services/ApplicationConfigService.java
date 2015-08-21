@@ -101,6 +101,7 @@ public interface ApplicationConfigService {
             @NotBlank(message = "No application id entered. Unable to update.")
             final String id,
             @NotNull(message = "No application information entered. Unable to update.")
+            @Valid
             final Application updateApp
     ) throws GenieException;
 
