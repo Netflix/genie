@@ -34,13 +34,13 @@ import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -59,7 +59,7 @@ import java.util.Set;
  * @author bmundlapudi
  * @author tgianos
  */
-@Named
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class JobManagerImpl implements JobManager {
 
@@ -107,7 +107,7 @@ public class JobManagerImpl implements JobManager {
      * @param jobService     The job service to use.
      * @param commandService The command service to use.
      */
-    @Inject
+    @Autowired
     public JobManagerImpl(final JobMonitor jobMonitor,
                           final JobService jobService,
                           final CommandConfigService commandService) {

@@ -27,8 +27,8 @@ import com.netflix.genie.server.services.JobService;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,7 +51,7 @@ public class IntTestJobServiceJPAImpl extends DBUnitTestBase {
     private static final String TAG_1 = "tag1";
     private static final String TAG_2 = "tag2";
 
-    @Inject
+    @Autowired
     private JobService service;
 
     /**

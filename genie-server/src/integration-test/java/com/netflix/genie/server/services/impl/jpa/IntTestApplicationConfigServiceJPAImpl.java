@@ -27,8 +27,8 @@ import com.netflix.genie.server.services.ApplicationConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import java.net.HttpURLConnection;
 import java.util.Date;
@@ -66,10 +66,10 @@ public class IntTestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String APP_3_VERSION = "7.8.9";
     private static final ApplicationStatus APP_3_STATUS = ApplicationStatus.DEPRECATED;
 
-    @Inject
+    @Autowired
     private ApplicationConfigService appService;
 
-    @Inject
+    @Autowired
     private CommandConfigService commandService;
 
     /**

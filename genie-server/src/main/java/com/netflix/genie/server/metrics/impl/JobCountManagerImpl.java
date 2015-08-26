@@ -26,10 +26,10 @@ import com.netflix.genie.server.util.NetUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -47,7 +47,7 @@ import java.util.List;
  * @author skrishnan
  * @author tgianos
  */
-@Named
+@Component
 public class JobCountManagerImpl implements JobCountManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobCountManagerImpl.class);
@@ -60,7 +60,7 @@ public class JobCountManagerImpl implements JobCountManager {
      *
      * @param netUtil The net utility code to use.
      */
-    @Inject
+    @Autowired
     public JobCountManagerImpl(final NetUtil netUtil) {
         this.netUtil = netUtil;
     }

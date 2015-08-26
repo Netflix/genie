@@ -36,6 +36,7 @@ allprojects {
     clean {
         delete 'genie-db'
         delete 'derby.log'
+        delete 'data'
     }
 }
 

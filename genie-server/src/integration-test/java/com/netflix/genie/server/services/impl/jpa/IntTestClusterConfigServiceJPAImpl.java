@@ -30,8 +30,8 @@ import com.netflix.genie.server.services.CommandConfigService;
 import com.netflix.genie.server.services.JobService;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -72,13 +72,13 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String CLUSTER_2_TYPE = "yarn";
     private static final ClusterStatus CLUSTER_2_STATUS = ClusterStatus.UP;
 
-    @Inject
+    @Autowired
     private ClusterConfigService service;
 
-    @Inject
+    @Autowired
     private CommandConfigService commandService;
 
-    @Inject
+    @Autowired
     private JobService jobService;
 
     /**

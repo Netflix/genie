@@ -27,12 +27,11 @@ import com.netflix.genie.server.services.ClusterLoadBalancer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import org.springframework.stereotype.Component;
 
 /**
  * Factory class to instantiate individual job managers.
@@ -40,7 +39,7 @@ import javax.inject.Named;
  * @author tgianos
  * @author amsharma
  */
-@Named
+@Component
 public class JobManagerFactory implements ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobManagerFactory.class);
@@ -56,7 +55,7 @@ public class JobManagerFactory implements ApplicationContextAware {
      * @param clb         The clb to use
      * @param environment The application environment
      */
-    @Inject
+    @Autowired
     public JobManagerFactory(
             final ClusterConfigService ccs,
             final ClusterLoadBalancer clb,

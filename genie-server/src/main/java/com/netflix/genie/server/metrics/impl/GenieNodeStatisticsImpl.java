@@ -20,10 +20,10 @@ package com.netflix.genie.server.metrics.impl;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Named;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author skrishnan
  * @author tgianos
  */
-@Named
+@Component
 public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenieNodeStatisticsImpl.class);

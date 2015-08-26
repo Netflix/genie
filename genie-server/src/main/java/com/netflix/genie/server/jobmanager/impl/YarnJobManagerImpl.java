@@ -27,13 +27,13 @@ import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +45,7 @@ import java.util.Map;
  * @author amsharma
  * @author tgianos
  */
-@Named
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class YarnJobManagerImpl extends JobManagerImpl {
 
@@ -87,7 +87,7 @@ public class YarnJobManagerImpl extends JobManagerImpl {
      * @param commandService The command service to use.
      * @param environment    The application environment
      */
-    @Inject
+    @Autowired
     public YarnJobManagerImpl(
             final JobMonitor jobMonitor,
             final JobService jobService,

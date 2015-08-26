@@ -33,9 +33,9 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -62,7 +62,7 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
-@Named
+@Controller
 @Path("/v2/jobs")
 @Api(
         value = "/v2/jobs",
@@ -94,7 +94,7 @@ public final class JobResource {
      * @param jobService       The job service to use.
      * @param jobSearchService The job search service to use.
      */
-    @Inject
+    @Autowired
     public JobResource(
             final ExecutionService executionService,
             final JobService jobService,

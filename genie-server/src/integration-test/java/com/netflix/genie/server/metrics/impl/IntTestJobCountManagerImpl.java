@@ -28,6 +28,7 @@ import com.netflix.genie.server.util.NetUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -36,7 +37,6 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.util.Calendar;
 
 /**
@@ -54,13 +54,13 @@ import java.util.Calendar;
 })
 public class IntTestJobCountManagerImpl {
 
-    @Inject
+    @Autowired
     private JobRepository jobRepo;
 
-    @Inject
+    @Autowired
     private JobCountManager manager;
 
-    @Inject
+    @Autowired
     private NetUtil netUtil;
 
     /**

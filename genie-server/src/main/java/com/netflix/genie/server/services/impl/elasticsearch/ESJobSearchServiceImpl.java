@@ -24,13 +24,13 @@ import com.netflix.genie.server.repository.elasticsearch.ESJobRepository;
 import com.netflix.genie.server.services.JobSearchService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 import java.util.Set;
 
@@ -39,7 +39,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-@Named
+@Service
 public class ESJobSearchServiceImpl implements JobSearchService {
 
     private final ESJobRepository repository;
@@ -51,7 +51,7 @@ public class ESJobSearchServiceImpl implements JobSearchService {
      * @param repository The elastic search repository
      * @param template   The elastic search template
      */
-    @Inject
+    @Autowired
     public ESJobSearchServiceImpl(final ESJobRepository repository, final ElasticsearchTemplate template) {
         this.repository = repository;
         this.template = template;

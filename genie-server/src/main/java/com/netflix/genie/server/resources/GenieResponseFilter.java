@@ -18,9 +18,9 @@
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -32,7 +32,7 @@ import java.net.HttpURLConnection;
  *
  * @author tgianos
  */
-@Named
+@Component
 @Provider
 public class GenieResponseFilter implements ContainerResponseFilter {
 
@@ -43,7 +43,7 @@ public class GenieResponseFilter implements ContainerResponseFilter {
      *
      * @param statistics The genie node statistics to use to capture information.
      */
-    @Inject
+    @Autowired
     public GenieResponseFilter(final GenieNodeStatistics statistics) {
         this.statistics = statistics;
     }

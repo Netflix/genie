@@ -43,7 +43,3 @@ dependencies {
     integrationTestCompile("org.dbunit:dbunit:${dbunit_version}")
     integrationTestCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
 }
-
-clean {
-    delete 'data'
-}

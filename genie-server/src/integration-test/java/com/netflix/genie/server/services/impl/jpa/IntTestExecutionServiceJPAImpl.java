@@ -25,8 +25,8 @@ import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.services.ExecutionService;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import java.util.Calendar;
 
@@ -43,7 +43,7 @@ public class IntTestExecutionServiceJPAImpl extends DBUnitTestBase {
     private static final String JOB_2_ID = "job2";
     private static final String JOB_3_ID = "job3";
 
-    @Inject
+    @Autowired
     private ExecutionService xs;
 
     /**

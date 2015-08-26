@@ -36,11 +36,11 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -53,13 +53,13 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
+@Service
 @Transactional(
         rollbackFor = {
                 GenieException.class,
                 ConstraintViolationException.class
         }
 )
-@Named
 public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigServiceJPAImpl.class);
@@ -72,7 +72,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @param applicationRepo The application repository to use
      * @param commandRepo     The command repository to use
      */
-    @Inject
+    @Autowired
     public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo,
                                            final CommandRepository commandRepo) {
         this.applicationRepo = applicationRepo;

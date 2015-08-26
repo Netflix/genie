@@ -31,9 +31,9 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -60,7 +60,7 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
-@Named
+@Controller
 @Path("/v2/config/applications")
 @Api(
         value = "/v2/config/applications",
@@ -88,7 +88,7 @@ public final class ApplicationConfigResource {
      *
      * @param applicationConfigService The application configuration service to use.
      */
-    @Inject
+    @Autowired
     public ApplicationConfigResource(final ApplicationConfigService applicationConfigService) {
         this.applicationConfigService = applicationConfigService;
     }

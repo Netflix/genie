@@ -22,8 +22,8 @@ import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Named;
 import javax.ws.rs.ApplicationPath;
 
 /**
@@ -31,7 +31,7 @@ import javax.ws.rs.ApplicationPath;
  *
  * @author tgianos
  */
-@Named
+@Component
 @ApplicationPath("genie")
 public class JerseyConfig extends ResourceConfig {
 

@@ -23,17 +23,16 @@ import com.netflix.genie.server.metrics.JobCountManager;
 import com.netflix.genie.server.metrics.JobCountMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import org.springframework.stereotype.Component;
 
 /**
  * Monitor thread that routinely updates the statistics object.
  *
  * @author skrishnan
  */
-@Named
+@Component
 public class JobCountMonitorImpl implements JobCountMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobCountMonitorImpl.class);
@@ -51,7 +50,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
      * @param stats reference to the statistics object that must be updated
      * @param jobCountManager The job count manager
      */
-    @Inject
+    @Autowired
     public JobCountMonitorImpl(final GenieNodeStatistics stats, final JobCountManager jobCountManager) {
         this.jobCountManager = jobCountManager;
         this.stats = stats;

@@ -29,8 +29,8 @@ import com.netflix.genie.server.services.ClusterConfigService;
 import com.netflix.genie.server.services.CommandConfigService;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import java.net.HttpURLConnection;
 import java.util.Date;
@@ -75,13 +75,13 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     private static final String COMMAND_3_JOB_TYPE = "yarn";
     private static final CommandStatus COMMAND_3_STATUS = CommandStatus.DEPRECATED;
 
-    @Inject
+    @Autowired
     private CommandConfigService service;
 
-    @Inject
+    @Autowired
     private ClusterConfigService clusterService;
 
-    @Inject
+    @Autowired
     private ApplicationConfigService appService;
 
     /**

@@ -21,10 +21,10 @@ import com.netflix.genie.server.jobmanager.JobJanitor;
 import com.netflix.genie.server.services.ExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Random;
 
 /**
@@ -34,7 +34,7 @@ import java.util.Random;
  * @author skrishnan
  * @author tgianos
  */
-@Named
+@Component
 public class JobJanitorImpl implements JobJanitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobJanitorImpl.class);
@@ -50,7 +50,7 @@ public class JobJanitorImpl implements JobJanitor {
      *
      * @param xs The execution service to use.
      */
-    @Inject
+    @Autowired
     public JobJanitorImpl(final ExecutionService xs) {
         this.xs = xs;
         this.stop = false;

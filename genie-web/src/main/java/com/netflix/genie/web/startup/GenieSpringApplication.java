@@ -20,6 +20,7 @@ package com.netflix.genie.web.startup;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -42,11 +43,12 @@ import javax.validation.Validator;
 @Configuration
 @ComponentScan("com.netflix.genie")
 @EnableAutoConfiguration
+@EnableConfigurationProperties
 @EnableElasticsearchRepositories("com.netflix.genie.server.repository.elasticsearch")
 @EnableJpaRepositories("com.netflix.genie.server.repository.jpa")
-@EntityScan("com.netflix.genie.common.model")
-@EnableTransactionManagement
 @EnableRetry
+@EnableTransactionManagement
+@EntityScan("com.netflix.genie.common.model")
 public class GenieSpringApplication extends SpringBootServletInitializer {
 
     /**

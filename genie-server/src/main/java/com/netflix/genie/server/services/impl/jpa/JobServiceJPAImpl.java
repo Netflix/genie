@@ -36,14 +36,14 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.orm.jpa.JpaOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -57,7 +57,7 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-@Named
+@Service
 public class JobServiceJPAImpl implements JobService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobServiceJPAImpl.class);
@@ -82,7 +82,7 @@ public class JobServiceJPAImpl implements JobService {
      * @param jobManagerFactory The the job manager factory to use
      * @param netUtil           The network utility code to use
      */
-    @Inject
+    @Autowired
     public JobServiceJPAImpl(
             final JobRepository jobRepo,
             final GenieNodeStatistics stats,

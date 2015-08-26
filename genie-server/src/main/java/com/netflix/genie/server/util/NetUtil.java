@@ -26,8 +26,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Named;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
@@ -38,7 +38,7 @@ import java.net.UnknownHostException;
  *
  * @author skrishnan
  */
-@Named
+@Component
 public class NetUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetUtil.class);

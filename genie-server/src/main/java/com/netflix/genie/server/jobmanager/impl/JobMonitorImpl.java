@@ -29,12 +29,12 @@ import com.netflix.genie.server.services.JobService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
 
 /**
@@ -44,7 +44,7 @@ import java.io.File;
  * @author amsharma
  * @author tgianos
  */
-@Named
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class JobMonitorImpl implements JobMonitor {
 
@@ -87,7 +87,7 @@ public class JobMonitorImpl implements JobMonitor {
      * @param jobService          The job service API's to use.
      * @param genieNodeStatistics The statistics object to use
      */
-    @Inject
+    @Autowired
     public JobMonitorImpl(
             final ExecutionService xs,
             final JobService jobService,

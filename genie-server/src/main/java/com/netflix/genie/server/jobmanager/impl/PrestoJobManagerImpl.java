@@ -27,12 +27,12 @@ import com.netflix.genie.server.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,7 @@ import java.util.Map;
  *
  * @author tgianos
  */
-@Named
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class PrestoJobManagerImpl extends JobManagerImpl {
 
@@ -72,7 +72,7 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
      * @param jobService     The job service to use.
      * @param commandService The command service to use.
      */
-    @Inject
+    @Autowired
     public PrestoJobManagerImpl(final JobMonitor jobMonitor,
                                 final JobService jobService,
                                 final CommandConfigService commandService) {

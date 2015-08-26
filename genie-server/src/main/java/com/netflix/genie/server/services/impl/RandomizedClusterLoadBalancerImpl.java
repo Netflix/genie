@@ -23,8 +23,8 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.server.services.ClusterLoadBalancer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Named;
 import java.util.List;
 import java.util.Random;
 
@@ -34,7 +34,7 @@ import java.util.Random;
  * @author skrishnan
  * @author tgianos
  */
-@Named
+@Service
 public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
 
     private static final Logger LOG = LoggerFactory.getLogger(RandomizedClusterLoadBalancerImpl.class);
