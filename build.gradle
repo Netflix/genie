@@ -15,6 +15,7 @@ buildscript {
 plugins {
     id 'nebula.netflixoss' version '2.2.10'
     id 'nebula.provided-base' version '2.2.2'
+    id 'org.unbroken-dome.test-sets' version '1.2.0'
 }
 
 ext.githubProjectName = rootProject.name
@@ -41,12 +42,15 @@ allprojects {
 subprojects {
     apply plugin: 'nebula.netflixoss'
     apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'checkstyle'
     apply plugin: 'findbugs'
     apply plugin: 'pmd'
     apply plugin: 'jacoco'
     apply plugin: 'nebula.provided-base'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.unbroken-dome.test-sets'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -59,6 +63,25 @@ subprojects {
         maven {
             url 'http://repo.spring.io/milestone'
         }
+    }
+
+    testSets {
+        integrationTest {
+            dirName = 'integration-test'
+        }
+    }
+
+    project.integrationTest {
+        outputs.upToDateWhen {
+            false
+        }
+    }
+
+    check.dependsOn integrationTest
+    integrationTest.mustRunAfter test
+
+    tasks.withType(Test) {
+        reports.html.destination = file("${reporting.baseDir}/${name}s")
     }
 
     configurations {
@@ -120,8 +143,6 @@ subprojects {
         doFirst {
             classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(['com/netflix/genie/common/model/*_*'])
         }
-        reports {
-            xml.enabled = true
-        }
+        reports.html.enabled true
     }
 }

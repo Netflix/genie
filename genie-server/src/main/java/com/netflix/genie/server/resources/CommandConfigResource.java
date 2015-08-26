@@ -781,21 +781,22 @@ public final class CommandConfigResource {
     /**
      * Set the application for the given command.
      *
-     * @param id          The id of the command to add the applications to. Not
-     *                    null/empty/blank.
-     * @param application The application to set. Not null.
+     * @param id           The id of the command to add the applications to. Not
+     *                     null/empty/blank.
+     * @param applications The applications to set. Not null.
      * @return The active applications for this command.
      * @throws GenieException For any error
      */
     @POST
-    @Path("/{id}/application")
+    @Path("/{id}/applications")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(
-            value = "Set the application for a command",
-            notes = "Set the supplied application to the command "
+            value = "Set the applications for a command",
+            notes = "Set the supplied applications to the command "
                     + "with the supplied id. Applications should already "
                     + "have been created.",
-            response = Application.class
+            response = Application.class,
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -811,7 +812,7 @@ public final class CommandConfigResource {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Application setApplicationForCommand(
+    public Set<Application> setApplicationsForCommand(
             @ApiParam(
                     value = "Id of the command to set application for.",
                     required = true
@@ -819,29 +820,30 @@ public final class CommandConfigResource {
             @PathParam("id")
             final String id,
             @ApiParam(
-                    value = "The application to add.",
+                    value = "The applications to add.",
                     required = true
             )
-            final Application application
+            final Set<Application> applications
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and application " + application);
-        return this.commandConfigService.setApplicationForCommand(id, application);
+        LOG.info("Called with id " + id + " and application " + applications);
+        return this.commandConfigService.setApplicationsForCommand(id, applications);
     }
 
     /**
-     * Get the application configured for a given command.
+     * Get the applications configured for a given command.
      *
      * @param id The id of the command to get the application files for. Not
      *           NULL/empty/blank.
-     * @return The active application for the command.
+     * @return The active applications for the command.
      * @throws GenieException For any error
      */
     @GET
-    @Path("/{id}/application")
+    @Path("/{id}/applications")
     @ApiOperation(
-            value = "Get the application for a command",
-            notes = "Get the application for the command with the supplied id.",
-            response = Application.class
+            value = "Get the applications for a command",
+            notes = "Get the applications for the command with the supplied id.",
+            response = Application.class,
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -857,7 +859,7 @@ public final class CommandConfigResource {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Application getApplicationForCommand(
+    public Set<Application> getApplicationForCommand(
             @ApiParam(
                     value = "Id of the command to get the application for.",
                     required = true
@@ -866,7 +868,7 @@ public final class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
-        return this.commandConfigService.getApplicationForCommand(id);
+        return this.commandConfigService.getApplicationsForCommand(id);
     }
 
     /**
@@ -878,11 +880,12 @@ public final class CommandConfigResource {
      * @throws GenieException For any error
      */
     @DELETE
-    @Path("/{id}/application")
+    @Path("/{id}/applications")
     @ApiOperation(
-            value = "Remove an application from a command",
-            notes = "Remove the application from the command with given id.",
-            response = Application.class
+            value = "Remove an applications from a command",
+            notes = "Remove the applications from the command with given id.",
+            response = Application.class,
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -898,7 +901,7 @@ public final class CommandConfigResource {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Application removeApplicationForCommand(
+    public Set<Application> removeApplicationForCommand(
             @ApiParam(
                     value = "Id of the command to delete from.",
                     required = true
@@ -907,7 +910,7 @@ public final class CommandConfigResource {
             final String id
     ) throws GenieException {
         LOG.info("Called with id '" + id + "'.");
-        return this.commandConfigService.removeApplicationForCommand(id);
+        return this.commandConfigService.removeApplicationsForCommand(id);
     }
 
     /**
@@ -986,7 +989,7 @@ public final class CommandConfigResource {
             notes = "Remove the given tag from the command with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(

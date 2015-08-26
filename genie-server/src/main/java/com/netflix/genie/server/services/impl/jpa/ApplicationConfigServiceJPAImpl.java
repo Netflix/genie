@@ -87,7 +87,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             @NotNull(message = "No application entered to create.")
             @Valid
             final Application app) throws GenieException {
-        LOG.debug("Called with application: " + app.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with application: " + app.toString());
+        }
         if (app.getId() != null && this.applicationRepo.exists(app.getId())) {
             throw new GenieConflictException("An application with id " + app.getId() + " already exists");
         }
@@ -103,7 +105,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             @NotBlank(message = "No id entered. Unable to get")
             final String id
     ) throws GenieException {
-        LOG.debug("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         final Application app = this.applicationRepo.findOne(id);
         if (app == null) {
             throw new GenieNotFoundException("No application with id " + id);
@@ -126,7 +130,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             final int limit,
             final boolean descending,
             final Set<String> orderBys) {
-        LOG.debug("Called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
 
         final PageRequest pageRequest = JPAUtils.getPageRequest(
                 page, limit, descending, orderBys, Application_.class, Application_.updated.getName()
@@ -157,7 +163,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             throw new GenieBadRequestException("Application id inconsistent with id passed in.");
         }
 
-        LOG.debug("Called with app " + updateApp.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with app " + updateApp.toString());
+        }
         return this.applicationRepo.save(updateApp);
     }
 
@@ -166,7 +174,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      */
     @Override
     public List<Application> deleteAllApplications() throws GenieException {
-        LOG.debug("Called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
         final List<Application> returnApps = this.applicationRepo.findAll();
         // Check to make sure the application isn't tied to any existing commands
         for (final Application app : returnApps) {
@@ -190,7 +200,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             @NotBlank(message = "No application id entered. Unable to delete.")
             final String id
     ) throws GenieException {
-        LOG.debug("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         final Application app = this.applicationRepo.findOne(id);
         if (app == null) {
             throw new GenieNotFoundException("No application with id " + id + " exists.");

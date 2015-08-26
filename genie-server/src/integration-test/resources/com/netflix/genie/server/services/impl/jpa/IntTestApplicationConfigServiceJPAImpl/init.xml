@@ -115,7 +115,6 @@
             executable="pig"
             job_type="yarn"
             status="INACTIVE"
-            application_id="app1"
             entity_version="0"/>
     <command_tags
             command_id="command1"
@@ -123,4 +122,6 @@
     <command_tags
             command_id="command1"
             tag="genie.name:pig_13_prod"/>
+
+    <commands_applications command_id="command1" application_id="app1"/>
 </dataset>

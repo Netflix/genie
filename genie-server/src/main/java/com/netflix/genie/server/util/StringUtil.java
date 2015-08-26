@@ -54,9 +54,10 @@ public final class StringUtil {
      * possible
      * @throws GenieException If there is any error
      */
-    public static String[] splitCmdLine(final String input)
-            throws GenieException {
-        LOG.debug("Command line: " + input);
+    public static String[] splitCmdLine(final String input) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Command line: " + input);
+        }
         if (StringUtils.isBlank(input)) {
             return new String[0];
         }
@@ -78,7 +79,9 @@ public final class StringUtil {
             if (output[i].startsWith("\"") && output[i].endsWith("\"")) {
                 output[i] = output[i].replaceAll("(^\")|(\"$)", "");
             }
-            LOG.debug(i + ": " + output[i]);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(i + ": " + output[i]);
+            }
         }
         return output;
     }
@@ -92,7 +95,9 @@ public final class StringUtil {
      * @return trimmed version number as documented
      */
     public static String trimVersion(final String fullVersion) {
-        LOG.debug("Returning canonical version for " + fullVersion);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Returning canonical version for " + fullVersion);
+        }
         if (fullVersion == null) {
             return null;
         }
@@ -109,8 +114,9 @@ public final class StringUtil {
                 break;
             }
         }
-        LOG.debug("Canonical version for " + fullVersion + " is "
-                + trimmedVersion.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Canonical version for " + fullVersion + " is " + trimmedVersion.toString());
+        }
 
         return trimmedVersion.toString();
     }

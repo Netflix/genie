@@ -33,7 +33,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -125,7 +125,7 @@ public class Application extends CommonFields {
      * The commands this application is associated with.
      */
     @JsonIgnore
-    @OneToMany(mappedBy = "application", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
     private Set<Command> commands = new HashSet<>();
 
     /**

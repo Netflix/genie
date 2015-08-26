@@ -27,7 +27,6 @@ import java.util.List;
  * Interface for the cluster load-balancer, which returns the "best" cluster to
  * run job on from an array of candidates.
  *
- * @author skrishnan
  * @author tgianos
  */
 @Validated
@@ -40,7 +39,5 @@ public interface ClusterLoadBalancer {
      * @return the "best" cluster to run job on
      * @throws GenieException if there is any error
      */
-    Cluster selectCluster(
-            final List<Cluster> clusters
-    ) throws GenieException;
+    Cluster selectCluster(final List<Cluster> clusters) throws GenieException;
 }

@@ -18,13 +18,11 @@
 package com.netflix.genie.server.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
-//import com.netflix.genie.common.model.*;
-import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.ClusterStatus;
-
+import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +31,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
+
+//import com.netflix.genie.common.model.*;
 
 /**
  * Abstraction layer to encapsulate CommandConfig functionality.<br>
@@ -208,44 +208,44 @@ public interface CommandConfigService {
     ) throws GenieException;
 
     /**
-     * Set the application for the command.
+     * Set the applications for the command.
      *
-     * @param id          The id of the command to add the application file to. Not
-     *                    null/empty/blank.
-     * @param application The applications to set. Not null.
+     * @param id           The id of the command to add the application file to. Not
+     *                     null/empty/blank.
+     * @param applications The applicationss to set. Not null.
      * @return The application
      * @throws GenieException if there is an error
      */
-    Application setApplicationForCommand(
+    Set<Application> setApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to add applications.")
             final String id,
-            @NotNull(message = "No application entered. Unable to set application.")
-            final Application application
+            @NotNull(message = "No applications entered. Unable to set applications.")
+            final Set<Application> applications
     ) throws GenieException;
 
     /**
-     * Get the application for a given command.
+     * Get the applications for a given command.
      *
      * @param id The id of the command to get the application for. Not
      *           null/empty/blank.
-     * @return The application or exception if none exists.
+     * @return The applications or exception if none exist.
      * @throws GenieException if there is an error
      */
-    Application getApplicationForCommand(
+    Set<Application> getApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to get applications.")
             final String id
     ) throws GenieException;
 
     /**
-     * Remove the application from the command.
+     * Remove the applications from the command.
      *
      * @param id The id of the command to remove the application from. Not
      *           null/empty/blank.
-     * @return The removed application
+     * @return The removed applications
      * @throws GenieException if there is an error
      */
-    Application removeApplicationForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove application.")
+    Set<Application> removeApplicationsForCommand(
+            @NotBlank(message = "No command id entered. Unable to remove applications.")
             final String id
     ) throws GenieException;
 
@@ -329,7 +329,7 @@ public interface CommandConfigService {
     /**
      * Get all the clusters the command with given id is associated with.
      *
-     * @param id The id of the command to get the clusters for.
+     * @param id       The id of the command to get the clusters for.
      * @param statuses The status of the clusters returned
      * @return The clusters the command is available on.
      * @throws GenieException if there is an error

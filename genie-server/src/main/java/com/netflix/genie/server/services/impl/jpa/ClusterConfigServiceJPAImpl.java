@@ -101,7 +101,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @Valid
             final Cluster cluster
     ) throws GenieException {
-        LOG.debug("Called to create cluster " + cluster.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to create cluster " + cluster.toString());
+        }
         if (StringUtils.isEmpty(cluster.getId())) {
             cluster.setId(UUID.randomUUID().toString());
         }
@@ -121,7 +123,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @NotBlank(message = "No id entered. Unable to get.")
             final String id
     ) throws GenieException {
-        LOG.debug("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             return cluster;
@@ -146,7 +150,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             final boolean descending,
             final Set<String> orderBys
     ) {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         final PageRequest pageRequest = JPAUtils.getPageRequest(
                 page, limit, descending, orderBys, Cluster_.class, Cluster_.updated.getName()
@@ -173,7 +179,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @NotBlank(message = "No job id entered. Unable to continue.")
             final String jobId
     ) throws GenieException {
-        LOG.debug("Called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
         final Job job = this.jobRepo.findOne(jobId);
         if (job == null) {
             throw new GenieNotFoundException("No job with id " + jobId + " exists. Unable to continue."
@@ -219,7 +227,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @Valid
             final Cluster updateCluster
     ) throws GenieException {
-        LOG.debug("Called with id " + id + " and cluster " + updateCluster);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and cluster " + updateCluster);
+        }
         if (!this.clusterRepo.exists(id)) {
             throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
@@ -235,7 +245,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      */
     @Override
     public List<Cluster> deleteAllClusters() throws GenieException {
-        LOG.debug("Called to delete all clusters");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to delete all clusters");
+        }
         final List<Cluster> clusters = this.clusterRepo.findAll();
         for (final Cluster cluster : clusters) {
             this.deleteCluster(cluster.getId());
@@ -251,7 +263,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @NotBlank(message = "No id entered unable to delete.")
             final String id
     ) throws GenieException {
-        LOG.debug("Called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster == null) {
             throw new GenieNotFoundException("No cluster with id " + id + " exists to delete.");
@@ -280,7 +294,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @NotEmpty(message = "No configuration files entered. Unable to add.")
             final Set<String> configs
     ) throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getConfigs().addAll(configs);
@@ -299,7 +315,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @NotBlank(message = "No cluster id sent. Cannot retrieve configurations.")
             final String id
     ) throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             return cluster.getConfigs();
@@ -318,7 +336,9 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             @NotEmpty(message = "No configs entered. Unable to update.")
             final Set<String> configs
     ) throws GenieException {
-        LOG.debug("called with id " + id + " and configs " + configs);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called with id " + id + " and configs " + configs);
+        }
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.setConfigs(configs);

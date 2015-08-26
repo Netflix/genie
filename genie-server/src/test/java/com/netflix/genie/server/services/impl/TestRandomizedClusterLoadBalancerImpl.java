@@ -17,35 +17,33 @@
  */
 package com.netflix.genie.server.services.impl;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.ClusterStatus;
-import com.netflix.genie.server.GenieServerTestSpringApplication;
-import com.netflix.genie.server.services.ClusterLoadBalancer;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.Mockito;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Test for the cluster load balancer.
  *
  * @author tgianos
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GenieServerTestSpringApplication.class)
 public class TestRandomizedClusterLoadBalancerImpl {
 
-    @Inject
-    private ClusterLoadBalancer clb;
+    private RandomizedClusterLoadBalancerImpl clb;
+
+    /**
+     * Setup the tests.
+     */
+    @Before
+    public void setup() {
+        this.clb = new RandomizedClusterLoadBalancerImpl();
+    }
 
     /**
      * Test whether a cluster is returned from a set of candidates.
@@ -54,11 +52,10 @@ public class TestRandomizedClusterLoadBalancerImpl {
      */
     @Test
     public void testValidCluster() throws GenieException {
-        final Set<String> configs = new HashSet<>();
-        configs.add("SomeConfig");
-        final Cluster cce = new Cluster("name", "tgianos", "2.4.0", ClusterStatus.UP, "jobManager");
-        cce.setConfigs(configs);
-        Assert.assertNotNull(this.clb.selectCluster(Arrays.asList(cce, cce, cce)));
+        final Cluster cluster1 = Mockito.mock(Cluster.class);
+        final Cluster cluster2 = Mockito.mock(Cluster.class);
+        final Cluster cluster3 = Mockito.mock(Cluster.class);
+        Assert.assertNotNull(this.clb.selectCluster(Lists.newArrayList(cluster1, cluster2, cluster3)));
     }
 
     /**

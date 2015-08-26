@@ -173,9 +173,12 @@ public class JobManagerImpl implements JobManager {
         // save the command name, application id and application name
         this.jobService.setCommandInfoForJob(this.job.getId(), command.getId(), command.getName());
 
-        final Application application = command.getApplication();
-        if (application != null) {
-            this.jobService.setApplicationInfoForJob(this.job.getId(), application.getId(), application.getName());
+        final Set<Application> applications = command.getApplications();
+        if (applications != null && !applications.isEmpty()) {
+            throw new UnsupportedOperationException("Not yet implemented for Genie 3.0");
+            //TODO: Fix this after change to multiple applications per command. Change job execution model to have
+            //      multiple applications and a command linked to it
+            //this.jobService.setApplicationInfoForJob(this.job.getId(), application.getId(), application.getName());
         }
 
         // Refresh the job in memory to get the changes
@@ -514,21 +517,23 @@ public class JobManagerImpl implements JobManager {
             processBuilder.environment().put("COMMAND_ENV_FILE", command.getSetupFile());
         }
 
-        final Application application = command.getApplication();
-        if (application != null) {
-            if (application.getConfigs() != null && !application.getConfigs().isEmpty()) {
-                processBuilder.environment()
-                        .put("S3_APPLICATION_CONF_FILES", convertCollectionToString(application.getConfigs()));
-            }
-
-            if (application.getDependencies() != null && !application.getDependencies().isEmpty()) {
-                processBuilder.environment()
-                        .put("S3_APPLICATION_JAR_FILES", convertCollectionToString(application.getDependencies()));
-            }
-
-            if (StringUtils.isNotBlank(application.getSetupFile())) {
-                processBuilder.environment().put("APPLICATION_ENV_FILE", application.getSetupFile());
-            }
+        final Set<Application> applications = command.getApplications();
+        if (applications != null && !applications.isEmpty()) {
+            throw new UnsupportedOperationException("Not yet implemented for Genie 3.0");
+            //TODO: Fix this for a new execution model that has multiple applications per command
+//            if (application.getConfigs() != null && !application.getConfigs().isEmpty()) {
+//                processBuilder.environment()
+//                        .put("S3_APPLICATION_CONF_FILES", convertCollectionToString(application.getConfigs()));
+//            }
+//
+//            if (application.getDependencies() != null && !application.getDependencies().isEmpty()) {
+//                processBuilder.environment()
+//                        .put("S3_APPLICATION_JAR_FILES", convertCollectionToString(application.getDependencies()));
+//            }
+//
+//            if (StringUtils.isNotBlank(application.getSetupFile())) {
+//                processBuilder.environment().put("APPLICATION_ENV_FILE", application.getSetupFile());
+//            }
         }
     }
 
@@ -550,7 +555,9 @@ public class JobManagerImpl implements JobManager {
      * @throws GenieException if there is an error getting the process id
      */
     private int getProcessId(final Process proc) throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         try {
             final Field f = proc.getClass().getDeclaredField(PID);

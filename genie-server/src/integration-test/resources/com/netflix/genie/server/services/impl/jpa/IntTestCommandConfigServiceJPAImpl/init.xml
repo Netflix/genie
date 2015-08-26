@@ -59,7 +59,6 @@
             executable="pig"
             job_type="yarn"
             status="ACTIVE"
-            application_id="app1"
             entity_version="0"/>
     <command_configs
             command_id="command1"
@@ -168,6 +167,8 @@
     <cluster_tags
             cluster_id="cluster1"
             tag="hive"/>
+
+    <commands_applications command_id="command1" application_id="app1"/>
 
     <clusters_commands
             cluster_id="cluster1"

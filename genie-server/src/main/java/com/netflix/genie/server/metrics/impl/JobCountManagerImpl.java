@@ -70,7 +70,9 @@ public class JobCountManagerImpl implements JobCountManager {
      */
     @Override
     public int getNumInstanceJobs() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         return getNumInstanceJobs(null, null, null);
     }
@@ -81,9 +83,11 @@ public class JobCountManagerImpl implements JobCountManager {
     @Override
     public int getNumInstanceJobs(
             final Long minStartTime,
-            final Long maxStartTime)
-            throws GenieException {
-        LOG.debug("called");
+            final Long maxStartTime
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         return getNumInstanceJobs(null, minStartTime, maxStartTime);
     }
@@ -96,7 +100,9 @@ public class JobCountManagerImpl implements JobCountManager {
     //TODO: Move to specification
     public int getNumInstanceJobs(final String hostName, final Long minStartTime, final Long maxStartTime)
             throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         final String finalHostName;
         // initialize host name
@@ -134,7 +140,9 @@ public class JobCountManagerImpl implements JobCountManager {
      */
     @Override
     public String getIdleInstance(final long minJobThreshold) throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final String localhost = this.netUtil.getHostName();
 
 //        // Get the App Name from Configuration

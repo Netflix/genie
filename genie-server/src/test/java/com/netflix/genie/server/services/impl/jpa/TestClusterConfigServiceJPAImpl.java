@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.server.services.impl.jpa;
 
-import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -25,91 +24,51 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.common.model.Job;
-import com.netflix.genie.server.services.ClusterConfigService;
-import com.netflix.genie.server.services.CommandConfigService;
-import com.netflix.genie.server.services.JobService;
-import org.junit.Assert;
+import com.netflix.genie.server.repository.jpa.ClusterRepository;
+import com.netflix.genie.server.repository.jpa.CommandRepository;
+import com.netflix.genie.server.repository.jpa.JobRepository;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Tests for the CommandConfigServiceJPAImpl. Basically integration tests.
+ * Tests for the CommandConfigServiceJPAImpl.
  *
  * @author tgianos
  */
-@DatabaseSetup("cluster/init.xml")
-public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
-
-    private static final String COMMAND_1_ID = "command1";
-    private static final String COMMAND_2_ID = "command2";
-    private static final String COMMAND_3_ID = "command3";
-    private static final String JOB_1_ID = "job1";
-    private static final String JOB_2_ID = "job2";
+public class TestClusterConfigServiceJPAImpl {
 
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
     private static final String CLUSTER_1_NAME = "h2prod";
     private static final String CLUSTER_1_VERSION = "2.4.0";
     private static final String CLUSTER_1_TYPE = "yarn";
-    private static final ClusterStatus CLUSTER_1_STATUS = ClusterStatus.UP;
 
-    private static final String CLUSTER_2_ID = "cluster2";
-    private static final String CLUSTER_2_USER = "amsharma";
-    private static final String CLUSTER_2_NAME = "h2query";
-    private static final String CLUSTER_2_VERSION = "2.4.0";
-    private static final String CLUSTER_2_TYPE = "yarn";
-    private static final ClusterStatus CLUSTER_2_STATUS = ClusterStatus.UP;
-
-    @Inject
-    private ClusterConfigService service;
-
-    @Inject
-    private CommandConfigService commandService;
-
-    @Inject
-    private JobService jobService;
+    private ClusterConfigServiceJPAImpl service;
+    private ClusterRepository clusterRepository;
+    private JobRepository jobRepository;
+    private CommandRepository commandRepository;
 
     /**
-     * Test the get cluster method.
-     *
-     * @throws GenieException For any problem
+     * Setup for the tests.
      */
-    @Test
-    public void testGetCluster() throws GenieException {
-        final Cluster cluster1 = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_ID, cluster1.getId());
-        Assert.assertEquals(CLUSTER_1_NAME, cluster1.getName());
-        Assert.assertEquals(CLUSTER_1_USER, cluster1.getUser());
-        Assert.assertEquals(CLUSTER_1_VERSION, cluster1.getVersion());
-        Assert.assertEquals(CLUSTER_1_STATUS, cluster1.getStatus());
-        Assert.assertEquals(CLUSTER_1_TYPE, cluster1.getClusterType());
-        Assert.assertEquals(5, cluster1.getTags().size());
-        Assert.assertEquals(1, cluster1.getConfigs().size());
-        Assert.assertEquals(3, cluster1.getCommands().size());
-
-        final Cluster cluster2 = this.service.getCluster(CLUSTER_2_ID);
-        Assert.assertEquals(CLUSTER_2_ID, cluster2.getId());
-        Assert.assertEquals(CLUSTER_2_NAME, cluster2.getName());
-        Assert.assertEquals(CLUSTER_2_USER, cluster2.getUser());
-        Assert.assertEquals(CLUSTER_2_VERSION, cluster2.getVersion());
-        Assert.assertEquals(CLUSTER_2_STATUS, cluster2.getStatus());
-        Assert.assertEquals(CLUSTER_2_TYPE, cluster2.getClusterType());
-        Assert.assertEquals(5, cluster2.getTags().size());
-        Assert.assertEquals(2, cluster2.getConfigs().size());
-        Assert.assertEquals(3, cluster1.getCommands().size());
+    @Before
+    public void setup() {
+        this.clusterRepository = Mockito.mock(ClusterRepository.class);
+        this.jobRepository = Mockito.mock(JobRepository.class);
+        this.commandRepository = Mockito.mock(CommandRepository.class);
+        this.service = new ClusterConfigServiceJPAImpl(
+                this.clusterRepository,
+                this.commandRepository,
+                this.jobRepository
+        );
     }
 
     /**
@@ -117,9 +76,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      *
      * @throws GenieException For any problem
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetClusterNull() throws GenieException {
-        this.service.getCluster(null);
+    @Test
+    @Ignore
+    public void testGetCluster() throws GenieException {
     }
 
     /**
@@ -129,181 +88,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetClusterNotExists() throws GenieException {
-        this.service.getCluster(UUID.randomUUID().toString());
-    }
-
-    /**
-     * Test the get clusters method.
-     */
-    @Test
-    public void testGetClustersByName() {
-        final List<Cluster> clusters = this.service.getClusters(
-                CLUSTER_2_NAME, null, null, null, null, 0, 10, true, null);
-        Assert.assertEquals(1, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-    }
-
-    /**
-     * Test the get clusters method.
-     */
-    @Test
-    public void testGetClustersByStatuses() {
-        final Set<ClusterStatus> statuses = EnumSet.noneOf(ClusterStatus.class);
-        statuses.add(ClusterStatus.UP);
-        final List<Cluster> clusters = this.service.getClusters(
-                null, statuses, null, null, null, -1, -5000, true, null);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
-    }
-
-    /**
-     * Test the get clusters method.
-     */
-    @Test
-    public void testGetClustersByTags() {
-        final Set<String> tags = new HashSet<>();
-        tags.add("prod");
-        List<Cluster> clusters = this.service.getClusters(
-                null, null, tags, null, null, 0, 10, true, null);
-        Assert.assertEquals(1, clusters.size());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
-
-        tags.clear();
-        tags.add("hive");
-        clusters = this.service.getClusters(
-                null, null, tags, null, null, 0, 10, true, null);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
-
-        tags.add("somethingThatWouldNeverReallyExist");
-        clusters = this.service.getClusters(
-                null, null, tags, null, null, 0, 10, true, null);
-        Assert.assertTrue(clusters.isEmpty());
-
-        tags.clear();
-        clusters = this.service.getClusters(
-                null, null, tags, null, null, 0, 10, true, null);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
-    }
-
-    /**
-     * Test the get clusters method.
-     */
-    @Test
-    public void testGetClustersByMinUpdateTime() {
-        final Calendar time = Calendar.getInstance();
-        time.clear();
-        time.set(2014, Calendar.JULY, 9, 2, 58, 59);
-        final List<Cluster> clusters = this.service.getClusters(
-                null, null, null, time.getTimeInMillis(), null, 0, 10, true, null);
-        Assert.assertEquals(1, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-    }
-
-    /**
-     * Test the get clusters method.
-     */
-    @Test
-    public void testGetClustersByMaxUpdateTime() {
-        final Calendar time = Calendar.getInstance();
-        time.clear();
-        time.set(2014, Calendar.JULY, 8, 3, 0, 0);
-        final List<Cluster> clusters = this.service.getClusters(
-                null, null, null, null, time.getTimeInMillis(), 0, 10, true, null);
-        Assert.assertEquals(1, clusters.size());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
-    }
-
-    /**
-     * Test the get clusters method with descending sort.
-     */
-    @Test
-    public void testGetClustersDescending() {
-        //Default to order by Updated
-        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, null);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
-    }
-
-    /**
-     * Test the get clusters method with ascending sort.
-     */
-    @Test
-    public void testGetClustersAscending() {
-        //Default to order by Updated
-        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, false, null);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(1).getId());
-    }
-
-    /**
-     * Test the get clusters method default order by.
-     */
-    @Test
-    public void testGetClustersOrderBysDefault() {
-        //Default to order by Updated
-        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, null);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
-    }
-
-    /**
-     * Test the get clusters method order by updated.
-     */
-    @Test
-    public void testGetClustersOrderBysUpdated() {
-        final Set<String> orderBys = new HashSet<>();
-        orderBys.add("updated");
-        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, orderBys);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
-    }
-
-    /**
-     * Test the get clusters method order by name.
-     */
-    @Test
-    public void testGetClustersOrderBysUser() {
-        final Set<String> orderBys = new HashSet<>();
-        orderBys.add("user");
-        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, orderBys);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(1).getId());
-    }
-
-    /**
-     * Test the get clusters method order by an invalid field should return the order by default value (updated).
-     */
-    @Test
-    public void testGetClustersOrderBysInvalidField() {
-        final Set<String> orderBys = new HashSet<>();
-        orderBys.add("I'mNotAValidField");
-        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, orderBys);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
-    }
-
-    /**
-     * Test the get clusters method order by a collection field should return the order by default value (updated).
-     */
-    @Test
-    public void testGetClustersOrderBysCollectionField() {
-        final Set<String> orderBys = new HashSet<>();
-        orderBys.add("tags");
-        final List<Cluster> clusters = this.service.getClusters(null, null, null, null, null, 0, 10, true, orderBys);
-        Assert.assertEquals(2, clusters.size());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(1).getId());
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.getCluster(id);
     }
 
     /**
@@ -312,26 +99,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testChooseClusterForJob() throws GenieException {
-        final List<Cluster> clusters = this.service.chooseClusterForJob(JOB_1_ID);
-        Assert.assertEquals(1, clusters.size());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
-        final Job job = this.jobService.getJob(JOB_1_ID);
-        final String chosen = job.getChosenClusterCriteriaString();
-        Assert.assertEquals(8, chosen.length());
-        Assert.assertTrue(chosen.contains("prod"));
-        Assert.assertTrue(chosen.contains("pig"));
-        Assert.assertTrue(chosen.contains(","));
-    }
-
-    /**
-     * Test the choseClusterForJob function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testChooseClusterForJobNoId() throws GenieException {
-        this.service.chooseClusterForJob(null);
     }
 
     /**
@@ -341,17 +110,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testChooseClusterForJobNoJobExists() throws GenieException {
-        this.service.chooseClusterForJob(UUID.randomUUID().toString());
-    }
-
-    /**
-     * Test the choseClusterForJob function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    public void testChooseClusterForJobNonChosen() throws GenieException {
-        Assert.assertTrue(this.service.chooseClusterForJob(JOB_2_ID).isEmpty());
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        this.service.chooseClusterForJob(id);
     }
 
     /**
@@ -360,87 +121,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testCreateCluster() throws GenieException {
-        final Set<String> configs = new HashSet<>();
-        configs.add("a config");
-        configs.add("another config");
-        configs.add("yet another config");
-        final Cluster cluster = new Cluster(
-                CLUSTER_1_NAME,
-                CLUSTER_1_USER,
-                CLUSTER_1_VERSION,
-                ClusterStatus.OUT_OF_SERVICE,
-                CLUSTER_1_TYPE
-        );
-        cluster.setConfigs(configs);
-        final String id = UUID.randomUUID().toString();
-        cluster.setId(id);
-        final Cluster created = this.service.createCluster(cluster);
-        Assert.assertNotNull(this.service.getCluster(id));
-        Assert.assertEquals(id, created.getId());
-        Assert.assertEquals(CLUSTER_1_NAME, created.getName());
-        Assert.assertEquals(CLUSTER_1_USER, created.getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
-        Assert.assertEquals(CLUSTER_1_TYPE, created.getClusterType());
-        Assert.assertEquals(3, created.getConfigs().size());
-        this.service.deleteCluster(id);
-        try {
-            this.service.getCluster(id);
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
-            );
-        }
-    }
-
-    /**
-     * Test the create method when no id is entered.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    public void testCreateClusterNoId() throws GenieException {
-        final Set<String> configs = new HashSet<>();
-        configs.add("a config");
-        configs.add("another config");
-        configs.add("yet another config");
-        final Cluster cluster = new Cluster(
-                CLUSTER_1_NAME,
-                CLUSTER_1_USER,
-                CLUSTER_1_VERSION,
-                ClusterStatus.OUT_OF_SERVICE,
-                CLUSTER_1_TYPE
-        );
-        cluster.setConfigs(configs);
-        final Cluster created = this.service.createCluster(cluster);
-        Assert.assertNotNull(created.getId());
-        Assert.assertEquals(CLUSTER_1_NAME, created.getName());
-        Assert.assertEquals(CLUSTER_1_USER, created.getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
-        Assert.assertEquals(CLUSTER_1_TYPE, created.getClusterType());
-        Assert.assertEquals(3, created.getConfigs().size());
-        this.service.deleteCluster(created.getId());
-        try {
-            this.service.getCluster(created.getId());
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
-            );
-        }
-    }
-
-    /**
-     * Test to make sure an exception is thrown when null is entered.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testCreateClusterNull() throws GenieException {
-        this.service.createCluster(null);
     }
 
     /**
@@ -463,6 +145,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         );
         cluster.setConfigs(configs);
         cluster.setId(CLUSTER_1_ID);
+
+        Mockito.when(this.clusterRepository.exists(CLUSTER_1_ID)).thenReturn(true);
         this.service.createCluster(cluster);
     }
 
@@ -472,82 +156,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
-    public void testUpdateClusterNoId() throws GenieException {
-        final Cluster updateCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_USER, updateCluster.getUser());
-        Assert.assertEquals(ClusterStatus.UP, updateCluster.getStatus());
-        Assert.assertEquals(5, updateCluster.getTags().size());
-
-        updateCluster.setStatus(ClusterStatus.OUT_OF_SERVICE);
-        updateCluster.setUser(CLUSTER_2_USER);
-        final Set<String> tags = updateCluster.getTags();
-        tags.add("tez");
-        tags.add("yarn");
-        tags.add("hadoop");
-        this.service.updateCluster(CLUSTER_1_ID, updateCluster);
-
-        final Cluster updated = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_2_USER, updated.getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, updated.getStatus());
-        Assert.assertEquals(8, updated.getTags().size());
-    }
-
-    /**
-     * Test to update an cluster with invalid content. Should throw ConstraintViolationException from JPA layer.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateClusterWithInvalidCluster() throws GenieException {
-        final Cluster updateCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_USER, updateCluster.getUser());
-        Assert.assertEquals(ClusterStatus.UP, updateCluster.getStatus());
-        Assert.assertEquals(5, updateCluster.getTags().size());
-
-        updateCluster.setStatus(ClusterStatus.OUT_OF_SERVICE);
-        updateCluster.setName("");
-        this.service.updateCluster(CLUSTER_1_ID, updateCluster);
-    }
-
-    /**
-     * Test to make sure setting the created and updated outside the system control doesn't change record in database.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    public void testUpdateCreateAndUpdate() throws GenieException {
-        final Cluster init = this.service.getCluster(CLUSTER_1_ID);
-        final Date created = init.getCreated();
-        final Date updated = init.getUpdated();
-
-        init.setCreated(new Date());
-        final Date zero = new Date(0);
-        init.setUpdated(zero);
-
-        final Cluster updatedCluster = this.service.updateCluster(CLUSTER_1_ID, init);
-        Assert.assertEquals(created, updatedCluster.getCreated());
-        Assert.assertNotEquals(updated, updatedCluster.getUpdated());
-        Assert.assertNotEquals(zero, updatedCluster.getUpdated());
-    }
-
-    /**
-     * Test to update an cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateClusterNullId() throws GenieException {
-        this.service.updateCluster(null, this.service.getCluster(CLUSTER_1_ID));
-    }
-
-    /**
-     * Test to update an cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateClusterNullUpdateCluster() throws GenieException {
-        this.service.updateCluster(CLUSTER_1_ID, null);
+    @Ignore
+    public void testUpdateCluster() throws GenieException {
     }
 
     /**
@@ -557,7 +167,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateClusterNoClusterExists() throws GenieException {
-        this.service.updateCluster(UUID.randomUUID().toString(), this.service.getCluster(CLUSTER_1_ID));
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.updateCluster(id, new Cluster());
     }
 
     /**
@@ -567,7 +179,11 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieBadRequestException.class)
     public void testUpdateClusterIdsDontMatch() throws GenieException {
-        this.service.updateCluster(CLUSTER_2_ID, this.service.getCluster(CLUSTER_1_ID));
+        final String id = UUID.randomUUID().toString();
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        Mockito.when(this.clusterRepository.exists(id)).thenReturn(true);
+        Mockito.when(cluster.getId()).thenReturn(UUID.randomUUID().toString());
+        this.service.updateCluster(id, cluster);
     }
 
     /**
@@ -576,14 +192,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testDeleteAll() throws GenieException {
-        Assert.assertEquals(2,
-                this.service.getClusters(null, null, null, null, null, 0, 10, true, null)
-                        .size());
-        Assert.assertEquals(2, this.service.deleteAllClusters().size());
-        Assert.assertTrue(
-                this.service.getClusters(null, null, null, null, null, 0, 10, true, null)
-                        .isEmpty());
     }
 
     /**
@@ -592,42 +202,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testDelete() throws GenieException {
-        Assert.assertEquals(2,
-                this.commandService.getClustersForCommand(COMMAND_1_ID, null).size());
-        Assert.assertEquals(2,
-                this.commandService.getClustersForCommand(COMMAND_2_ID, null).size());
-        Assert.assertEquals(2,
-                this.commandService.getClustersForCommand(COMMAND_3_ID, null).size());
-
-        Assert.assertEquals(CLUSTER_1_ID,
-                this.service.deleteCluster(CLUSTER_1_ID).getId());
-
-        Assert.assertEquals(1,
-                this.commandService.getClustersForCommand(COMMAND_1_ID, null).size());
-        Assert.assertEquals(CLUSTER_2_ID,
-                this.commandService.getClustersForCommand(COMMAND_1_ID, null)
-                        .iterator().next().getId());
-        Assert.assertEquals(1,
-                this.commandService.getClustersForCommand(COMMAND_2_ID, null).size());
-        Assert.assertEquals(CLUSTER_2_ID,
-                this.commandService.getClustersForCommand(COMMAND_2_ID, null)
-                        .iterator().next().getId());
-        Assert.assertEquals(1,
-                this.commandService.getClustersForCommand(COMMAND_3_ID, null).size());
-        Assert.assertEquals(CLUSTER_2_ID,
-                this.commandService.getClustersForCommand(COMMAND_3_ID, null)
-                        .iterator().next().getId());
-    }
-
-    /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testDeleteNoId() throws GenieException {
-        this.service.deleteCluster(null);
     }
 
     /**
@@ -637,7 +213,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testDeleteNoClusterToDelete() throws GenieException {
-        this.service.deleteCluster(UUID.randomUUID().toString());
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.deleteCluster(id);
     }
 
     /**
@@ -646,44 +224,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testAddConfigsToCluster() throws GenieException {
-        final String newConfig1 = UUID.randomUUID().toString();
-        final String newConfig2 = UUID.randomUUID().toString();
-        final String newConfig3 = UUID.randomUUID().toString();
-
-        final Set<String> newConfigs = new HashSet<>();
-        newConfigs.add(newConfig1);
-        newConfigs.add(newConfig2);
-        newConfigs.add(newConfig3);
-
-        Assert.assertEquals(1,
-                this.service.getConfigsForCluster(CLUSTER_1_ID).size());
-        final Set<String> finalConfigs
-                = this.service.addConfigsForCluster(CLUSTER_1_ID, newConfigs);
-        Assert.assertEquals(4, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newConfig1));
-        Assert.assertTrue(finalConfigs.contains(newConfig2));
-        Assert.assertTrue(finalConfigs.contains(newConfig3));
-    }
-
-    /**
-     * Test add configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddConfigsToClusterNoId() throws GenieException {
-        this.service.addConfigsForCluster(null, new HashSet<>());
-    }
-
-    /**
-     * Test add configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddConfigsToClusterNoConfigs() throws GenieException {
-        this.service.addConfigsForCluster(CLUSTER_1_ID, null);
     }
 
     /**
@@ -693,9 +235,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToClusterNoCluster() throws GenieException {
-        final Set<String> configs = new HashSet<>();
-        configs.add(UUID.randomUUID().toString());
-        this.service.addConfigsForCluster(UUID.randomUUID().toString(), configs);
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.addConfigsForCluster(UUID.randomUUID().toString(), new HashSet<>());
     }
 
     /**
@@ -704,34 +246,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testUpdateConfigsForCluster() throws GenieException {
-        final String newConfig1 = UUID.randomUUID().toString();
-        final String newConfig2 = UUID.randomUUID().toString();
-        final String newConfig3 = UUID.randomUUID().toString();
-
-        final Set<String> newConfigs = new HashSet<>();
-        newConfigs.add(newConfig1);
-        newConfigs.add(newConfig2);
-        newConfigs.add(newConfig3);
-
-        Assert.assertEquals(1,
-                this.service.getConfigsForCluster(CLUSTER_1_ID).size());
-        final Set<String> finalConfigs
-                = this.service.updateConfigsForCluster(CLUSTER_1_ID, newConfigs);
-        Assert.assertEquals(3, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newConfig1));
-        Assert.assertTrue(finalConfigs.contains(newConfig2));
-        Assert.assertTrue(finalConfigs.contains(newConfig3));
-    }
-
-    /**
-     * Test update configurations for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateConfigsForClusterNoId() throws GenieException {
-        this.service.updateConfigsForCluster(null, new HashSet<>());
     }
 
     /**
@@ -741,9 +257,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForClusterNoCluster() throws GenieException {
-        final Set<String> configs = new HashSet<>();
-        configs.add(UUID.randomUUID().toString());
-        this.service.updateConfigsForCluster(UUID.randomUUID().toString(), configs);
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.updateConfigsForCluster(UUID.randomUUID().toString(), new HashSet<>());
     }
 
     /**
@@ -752,19 +268,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testGetConfigsForCluster() throws GenieException {
-        Assert.assertEquals(1,
-                this.service.getConfigsForCluster(CLUSTER_1_ID).size());
-    }
-
-    /**
-     * Test get configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetConfigsForClusterNoId() throws GenieException {
-        this.service.getConfigsForCluster(null);
     }
 
     /**
@@ -774,7 +279,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetConfigsForClusterNoCluster() throws GenieException {
-        this.service.getConfigsForCluster(UUID.randomUUID().toString());
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.getConfigsForCluster(id);
     }
 
     /**
@@ -783,58 +290,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testAddCommandsForCluster() throws GenieException {
-        final Command command1 = this.commandService.createCommand(
-                new Command(
-                        "name",
-                        "user",
-                        "23.1.0",
-                        CommandStatus.ACTIVE,
-                        "pig"
-                )
-        );
-        final Command command2 = this.commandService.createCommand(
-                new Command(
-                        "name2",
-                        "user2",
-                        "23.1.1",
-                        CommandStatus.INACTIVE,
-                        "pig2"
-                )
-        );
-        final List<Command> newCommands = new ArrayList<>();
-        newCommands.add(command1);
-        newCommands.add(command2);
-        Assert.assertEquals(
-                3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-        final List<Command> commands
-                = this.service.addCommandsForCluster(CLUSTER_1_ID, newCommands);
-        Assert.assertEquals(
-                5,
-                commands.size()
-        );
-    }
-
-    /**
-     * Test adding commands to the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddCommandsForClusterNoId() throws GenieException {
-        this.service.addCommandsForCluster(null, new ArrayList<>());
-    }
-
-    /**
-     * Test adding commands to the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddCommandsForClusterNoCommands() throws GenieException {
-        this.service.addCommandsForCluster(UUID.randomUUID().toString(), null);
     }
 
     /**
@@ -844,9 +301,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddCommandsForClusterClusterDoesntExist() throws GenieException {
-        final List<Command> commands = new ArrayList<>();
-        commands.add(new Command());
-        this.service.addCommandsForCluster(UUID.randomUUID().toString(), commands);
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.addCommandsForCluster(UUID.randomUUID().toString(), new ArrayList<>());
     }
 
     /**
@@ -855,14 +312,16 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testAddCommandsForClusterCommandDoesntExist()
-            throws GenieException {
+    public void testAddCommandsForClusterCommandDoesntExist() throws GenieException {
         final List<Command> commands = new ArrayList<>();
-        final Command command = new Command();
-        command.setId(UUID.randomUUID().toString());
+        final Command command = Mockito.mock(Command.class);
+        final String commandId = UUID.randomUUID().toString();
+        Mockito.when(command.getId()).thenReturn(commandId);
         commands.add(command);
-        this.service.addCommandsForCluster(
-                CLUSTER_1_ID, commands);
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        Mockito.when(this.clusterRepository.findOne(Mockito.anyString())).thenReturn(cluster);
+        Mockito.when(this.commandRepository.findOne(commandId)).thenReturn(null);
+        this.service.addCommandsForCluster(CLUSTER_1_ID, commands);
     }
 
     /**
@@ -871,23 +330,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testGetCommandsForCluster() throws GenieException {
-        final List<Command> commands
-                = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assert.assertEquals(3, commands.size());
-        Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
-        Assert.assertEquals(COMMAND_2_ID, commands.get(2).getId());
-    }
-
-    /**
-     * Test the Get clusters for cluster function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetCommandsForClusterNoId() throws GenieException {
-        this.service.getCommandsForCluster("", null);
     }
 
     /**
@@ -897,8 +341,11 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForClusterNoCluster() throws GenieException {
-        this.service.getCommandsForCluster(UUID.randomUUID().toString(), null);
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.getCommandsForCluster(id, null);
     }
+//TODO: Missing tests for statuses
 
     /**
      * Test updating commands for the cluster.
@@ -906,61 +353,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testUpdateCommandsForCluster() throws GenieException {
-        final Command command1 = this.commandService.createCommand(
-                new Command(
-                        "name",
-                        "user",
-                        "23.1.0",
-                        CommandStatus.ACTIVE,
-                        "pig"
-                )
-        );
-        final Command command2 = this.commandService.createCommand(
-                new Command(
-                        "name2",
-                        "user2",
-                        "23.1.1",
-                        CommandStatus.INACTIVE,
-                        "pig2"
-                )
-        );
-        final List<Command> newCommands = new ArrayList<>();
-        newCommands.add(command1);
-        newCommands.add(command2);
-        Assert.assertEquals(
-                3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-        final List<Command> commands
-                = this.service.updateCommandsForCluster(
-                CLUSTER_1_ID,
-                newCommands
-        );
-        Assert.assertEquals(
-                2,
-                commands.size()
-        );
-    }
-
-    /**
-     * Test updating commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateCommandsForClusterNoId() throws GenieException {
-        this.service.updateCommandsForCluster(null, new ArrayList<>());
-    }
-
-    /**
-     * Test updating commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateCommandsForClusterNoCommands() throws GenieException {
-        this.service.updateCommandsForCluster(UUID.randomUUID().toString(), null);
     }
 
     /**
@@ -970,9 +364,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateCommandsForClusterClusterDoesntExist() throws GenieException {
-        final List<Command> commands = new ArrayList<>();
-        commands.add(new Command());
-        this.service.updateCommandsForCluster(UUID.randomUUID().toString(), commands);
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.updateCommandsForCluster(id, new ArrayList<>());
     }
 
     /**
@@ -981,14 +375,16 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testUpdateCommandsForClusterCommandDoesntExist()
-            throws GenieException {
+    public void testUpdateCommandsForClusterCommandDoesntExist() throws GenieException {
         final List<Command> commands = new ArrayList<>();
-        final Command command = new Command();
-        command.setId(UUID.randomUUID().toString());
+        final Command command = Mockito.mock(Command.class);
+        final String commandId = UUID.randomUUID().toString();
+        Mockito.when(command.getId()).thenReturn(commandId);
         commands.add(command);
-        this.service.updateCommandsForCluster(
-                CLUSTER_1_ID, commands);
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        Mockito.when(this.clusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
+        Mockito.when(this.commandRepository.findOne(commandId)).thenReturn(null);
+        this.service.updateCommandsForCluster(CLUSTER_1_ID, commands);
     }
 
     /**
@@ -997,29 +393,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testRemoveAllCommandsForCluster() throws GenieException {
-        Assert.assertEquals(
-                3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-        Assert.assertEquals(
-                0,
-                this.service.removeAllCommandsForCluster(CLUSTER_1_ID).size()
-        );
-        Assert.assertEquals(
-                0,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-    }
-
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllCommandsForClusterNoId() throws GenieException {
-        this.service.removeAllCommandsForCluster(null);
     }
 
     /**
@@ -1028,9 +403,10 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testRemoveAllCommandsForClusterNoCluster()
-            throws GenieException {
-        this.service.removeAllCommandsForCluster(UUID.randomUUID().toString());
+    public void testRemoveAllCommandsForClusterNoCluster() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.removeAllCommandsForCluster(id);
     }
 
     /**
@@ -1039,38 +415,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testRemoveCommandForCluster() throws GenieException {
-        Assert.assertEquals(
-                3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-        Assert.assertEquals(
-                2,
-                this.service.removeCommandForCluster(
-                        CLUSTER_1_ID,
-                        COMMAND_1_ID
-                ).size()
-        );
-    }
-
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveCommandForClusterNoId() throws GenieException {
-        this.service.removeCommandForCluster(null, COMMAND_1_ID);
-    }
-
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveCommandForClusterNoCmdId() throws GenieException {
-        this.service.removeCommandForCluster(CLUSTER_1_ID, null);
     }
 
     /**
@@ -1080,19 +426,23 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveCommandForClusterNoCluster() throws GenieException {
-        this.service.removeCommandForCluster(
-                UUID.randomUUID().toString(), COMMAND_1_ID);
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.removeCommandForCluster(id, UUID.randomUUID().toString());
     }
 
     /**
-     * Test removing all commands for the cluster.
+     * Test removing command for the cluster.
      *
      * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveCommandForClusterNoCommand() throws GenieException {
-        this.service.removeCommandForCluster(
-                CLUSTER_1_ID, UUID.randomUUID().toString());
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        Mockito.when(this.clusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
+        final String commandId = UUID.randomUUID().toString();
+        Mockito.when(this.commandRepository.findOne(commandId)).thenReturn(null);
+        this.service.removeCommandForCluster(CLUSTER_1_ID, commandId);
     }
 
     /**
@@ -1101,44 +451,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testAddTagsToCluster() throws GenieException {
-        final String newTag1 = UUID.randomUUID().toString();
-        final String newTag2 = UUID.randomUUID().toString();
-        final String newTag3 = UUID.randomUUID().toString();
-
-        final Set<String> newTags = new HashSet<>();
-        newTags.add(newTag1);
-        newTags.add(newTag2);
-        newTags.add(newTag3);
-
-        Assert.assertEquals(5,
-                this.service.getTagsForCluster(CLUSTER_1_ID).size());
-        final Set<String> finalTags
-                = this.service.addTagsForCluster(CLUSTER_1_ID, newTags);
-        Assert.assertEquals(8, finalTags.size());
-        Assert.assertTrue(finalTags.contains(newTag1));
-        Assert.assertTrue(finalTags.contains(newTag2));
-        Assert.assertTrue(finalTags.contains(newTag3));
-    }
-
-    /**
-     * Test add tags to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddTagsToClusterNoId() throws GenieException {
-        this.service.addTagsForCluster(null, new HashSet<>());
-    }
-
-    /**
-     * Test add tags to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddTagsToClusterNoTags() throws GenieException {
-        this.service.addTagsForCluster(CLUSTER_1_ID, null);
     }
 
     /**
@@ -1148,9 +462,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForClusterNoCluster() throws GenieException {
-        final Set<String> tags = new HashSet<>();
-        tags.add(UUID.randomUUID().toString());
-        this.service.addTagsForCluster(UUID.randomUUID().toString(), tags);
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.addTagsForCluster(UUID.randomUUID().toString(), new HashSet<>());
     }
 
     /**
@@ -1159,34 +473,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testUpdateTagsForCluster() throws GenieException {
-        final String newTag1 = UUID.randomUUID().toString();
-        final String newTag2 = UUID.randomUUID().toString();
-        final String newTag3 = UUID.randomUUID().toString();
-
-        final Set<String> newTags = new HashSet<>();
-        newTags.add(newTag1);
-        newTags.add(newTag2);
-        newTags.add(newTag3);
-
-        Assert.assertEquals(5,
-                this.service.getTagsForCluster(CLUSTER_1_ID).size());
-        final Set<String> finalTags
-                = this.service.updateTagsForCluster(CLUSTER_1_ID, newTags);
-        Assert.assertEquals(5, finalTags.size());
-        Assert.assertTrue(finalTags.contains(newTag1));
-        Assert.assertTrue(finalTags.contains(newTag2));
-        Assert.assertTrue(finalTags.contains(newTag3));
-    }
-
-    /**
-     * Test update tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateTagsForClusterNoId() throws GenieException {
-        this.service.updateTagsForCluster(null, new HashSet<>());
     }
 
     /**
@@ -1195,10 +483,10 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testUpdateTagsForClusterNoApp() throws GenieException {
-        final Set<String> tags = new HashSet<>();
-        tags.add(UUID.randomUUID().toString());
-        this.service.updateTagsForCluster(UUID.randomUUID().toString(), tags);
+    public void testUpdateTagsForClusterNoCluster() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.updateTagsForCluster(UUID.randomUUID().toString(), new HashSet<>());
     }
 
     /**
@@ -1207,19 +495,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testGetTagsForCluster() throws GenieException {
-        Assert.assertEquals(5,
-                this.service.getTagsForCluster(CLUSTER_1_ID).size());
-    }
-
-    /**
-     * Test get tags to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetTagsForClusterNoId() throws GenieException {
-        this.service.getTagsForCluster(null);
     }
 
     /**
@@ -1229,7 +506,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForClusterNoCluster() throws GenieException {
-        this.service.getTagsForCluster(UUID.randomUUID().toString());
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.getTagsForCluster(id);
     }
 
     /**
@@ -1238,23 +517,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testRemoveAllTagsForCluster() throws GenieException {
-        Assert.assertEquals(5,
-                this.service.getTagsForCluster(CLUSTER_1_ID).size());
-        final Set<String> finalTags
-                = this.service.removeAllTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(2,
-                finalTags.size());
-    }
-
-    /**
-     * Test remove all tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllTagsForClusterNoId() throws GenieException {
-        this.service.removeAllTagsForCluster(null);
     }
 
     /**
@@ -1264,7 +528,9 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForClusterNoCluster() throws GenieException {
-        this.service.removeAllTagsForCluster(UUID.randomUUID().toString());
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.removeAllTagsForCluster(id);
     }
 
     /**
@@ -1273,35 +539,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @Ignore
     public void testRemoveTagForCluster() throws GenieException {
-        final Set<String> tags
-                = this.service.getTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(5, tags.size());
-        Assert.assertEquals(4,
-                this.service.removeTagForCluster(
-                        CLUSTER_1_ID,
-                        "prod").size()
-        );
-    }
-
-    /**
-     * Test remove tag for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveTagForClusterNullTag() throws GenieException {
-        this.service.removeTagForCluster(CLUSTER_1_ID, null);
-    }
-
-    /**
-     * Test remove configuration for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveTagForClusterNoId() throws GenieException {
-        this.service.removeTagForCluster(null, "something");
     }
 
     /**
@@ -1311,9 +550,8 @@ public class TestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForClusterNoCluster() throws GenieException {
-        this.service.removeTagForCluster(
-                UUID.randomUUID().toString(),
-                "something"
-        );
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        this.service.removeTagForCluster(id, "something");
     }
 }

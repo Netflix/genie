@@ -121,7 +121,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             @Valid
             final Job job
     ) throws GenieException {
-        LOG.debug("Called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
         if (StringUtils.isNotBlank(job.getId()) && this.jobRepo.exists(job.getId())) {
             throw new GenieConflictException("Job with ID specified already exists.");
         }
@@ -160,7 +162,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             @NotBlank(message = "No id entered unable to kill job.")
             final String id
     ) throws GenieException {
-        LOG.debug("called for id: " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called for id: " + id);
+        }
         final Job job = this.jobRepo.findOne(id);
 
         // do some basic error handling
@@ -189,12 +193,16 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         final String localURI = getEndPoint() + "/" + this.jobResourcePrefix + "/" + id;
 
         if (!killURI.equals(localURI)) {
-            LOG.debug("forwarding kill request to: " + killURI);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("forwarding kill request to: " + killURI);
+            }
             return forwardJobKill(killURI);
         }
 
         // if we get here, killURI == localURI, and job should be killed here
-        LOG.debug("killing job on same instance: " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("killing job on same instance: " + id);
+        }
         this.jobManagerFactory.getJobManager(job).kill();
 
         job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
@@ -203,7 +211,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         // increment counter for killed jobs
         this.stats.incrGenieKilledJobs();
 
-        LOG.debug("updating job status to KILLED for: " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("updating job status to KILLED for: " + id);
+        }
         if (!job.isDisableLogArchival()) {
             job.setArchiveLocation(this.netUtil.getArchiveURI(id));
         }
@@ -218,7 +228,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     @Override
     @Transactional
     public int markZombies() {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final ProcessStatus zombie = ProcessStatus.ZOMBIE_JOB;
         final long currentTime = new Date().getTime();
 
@@ -258,7 +270,9 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         // it here again to prevent a race condition problem. This just makes the status message as
         // killed and prevents some jobs that are killed being marked as failed
         if (exitCode == ProcessStatus.JOB_KILLED.getExitCode()) {
-            LOG.debug("Process has been killed, therefore setting the appropriate status message.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Process has been killed, therefore setting the appropriate status message.");
+            }
             job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
             return JobStatus.KILLED;
         } else {

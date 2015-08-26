@@ -125,7 +125,6 @@ public class Cluster extends CommonFields {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "clusters_commands",
-
             joinColumns = {
                     @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false)
             },

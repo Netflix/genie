@@ -17,7 +17,7 @@
  */
 
 /**
- * Base classes for unit and integration tests for Genie server classes.
+ * Base classes for unit tests for Genie server classes.
  *
  * @author tgianos
  */

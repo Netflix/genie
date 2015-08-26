@@ -71,18 +71,22 @@ public final class JPAUtils {
                     //The field exists but is it a singular attribute?
                     if (field.getType() == SingularAttribute.class) {
                         finalOrderBys.add(fieldName);
-                    } else {
+                    } else if (LOG.isDebugEnabled()) {
                         LOG.debug("Field " + fieldName + " is a collection and can't be used for order by.");
                     }
                 } catch (final NoSuchFieldException nsfe) {
                     //Swallow and ignore
-                    LOG.debug("No such field " + fieldName + ". " + nsfe.getMessage());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("No such field " + fieldName + ". " + nsfe.getMessage());
+                    }
                 }
             }
         }
 
         if (finalOrderBys.isEmpty()) {
-            LOG.debug("No valid order by parameters set. Using default field " + defaultField);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No valid order by parameters set. Using default field " + defaultField);
+            }
             finalOrderBys.add(defaultField);
         }
 

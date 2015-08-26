@@ -34,9 +34,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -137,9 +137,17 @@ public class Command extends CommonFields {
      * Set of applications that can run this command.
      */
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "application_id")
-    private Application application;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "commands_applications",
+            joinColumns = {
+                    @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false)
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
+            }
+    )
+    private Set<Application> applications = new HashSet<>();
 
     /**
      * The clusters this command is available on.
@@ -158,10 +166,10 @@ public class Command extends CommonFields {
     /**
      * Construct a new Command with all required parameters.
      *
-     * @param name The name of the command. Not null/empty/blank.
-     * @param user The user who created the command. Not null/empty/blank.
-     * @param version The version of this command. Not null/empty/blank.
-     * @param status The status of the command. Not null.
+     * @param name       The name of the command. Not null/empty/blank.
+     * @param user       The user who created the command. Not null/empty/blank.
+     * @param version    The version of this command. Not null/empty/blank.
+     * @param status     The status of the command. Not null.
      * @param executable The executable of the command. Not null/empty/blank.
      */
     public Command(
@@ -282,12 +290,45 @@ public class Command extends CommonFields {
     }
 
     /**
-     * Gets the application that this command uses.
+     * Gets the applications that this command uses.
      *
-     * @return application
+     * @return applications linked to this command
      */
-    public Application getApplication() {
-        return this.application;
+    public Set<Application> getApplications() {
+        return this.applications;
+    }
+
+    /**
+     * Sets the applications for this command.
+     *
+     * @param applications The application that this command uses
+     */
+    public void setApplications(final Set<Application> applications) {
+        //Clear references to this command in existing applications
+        if (this.applications != null) {
+            this.applications.stream()
+                    .filter(application -> application.getCommands() != null)
+                    .forEach(application -> application.getCommands().remove(this));
+        }
+        //set the application for this command
+        if (this.applications == null) {
+            this.applications = new HashSet<>();
+        }
+        this.applications.clear();
+        if (applications != null) {
+            this.applications.addAll(applications);
+        }
+
+        //Add the reverse reference in the new applications
+        this.applications.stream()
+                .forEach(
+                        application -> {
+                            if (application.getCommands() == null) {
+                                application.setCommands(new HashSet<>());
+                            }
+                            application.getCommands().add(this);
+                        }
+                );
     }
 
     /**
@@ -308,33 +349,6 @@ public class Command extends CommonFields {
         this.tags.clear();
         if (tags != null) {
             this.tags.addAll(tags);
-        }
-    }
-
-    /**
-     * Sets the application for this command.
-     *
-     * @param application The application that this command uses
-     */
-    public void setApplication(final Application application) {
-        //Clear references to this command in existing applications
-        if (this.application != null
-                && this.application.getCommands() != null) {
-            this.application.getCommands().remove(this);
-        }
-        //set the application for this command
-        this.application = application;
-
-        //Add the reverse reference in the new applications
-        if (this.application != null) {
-            Set<Command> commands = this.application.getCommands();
-            if (commands == null) {
-                commands = new HashSet<>();
-                this.application.setCommands(commands);
-            }
-            if (!commands.contains(this)) {
-                commands.add(this);
-            }
         }
     }
 

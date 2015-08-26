@@ -40,8 +40,8 @@ dependencies {
      * Test Dependencies
      *******************************/
 
-    testCompile("org.dbunit:dbunit:${dbunit_version}")
-    testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
+    integrationTestCompile("org.dbunit:dbunit:${dbunit_version}")
+    integrationTestCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
 }
 
 clean {

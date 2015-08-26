@@ -52,7 +52,6 @@ public class TestCommand extends TestEntityBase {
      */
     @Test
     public void testDefaultConstructor() {
-        Assert.assertNull(this.c.getApplication());
         Assert.assertNull(this.c.getSetupFile());
         Assert.assertNull(this.c.getExecutable());
         Assert.assertNull(this.c.getJobType());
@@ -66,6 +65,8 @@ public class TestCommand extends TestEntityBase {
         Assert.assertTrue(this.c.getTags().isEmpty());
         Assert.assertNotNull(this.c.getClusters());
         Assert.assertTrue(this.c.getClusters().isEmpty());
+        Assert.assertNotNull(this.c.getApplications());
+        Assert.assertTrue(this.c.getApplications().isEmpty());
     }
 
     /**
@@ -76,7 +77,6 @@ public class TestCommand extends TestEntityBase {
     @Test
     public void testConstructor() throws GeniePreconditionException {
         c = new Command(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
-        Assert.assertNull(this.c.getApplication());
         Assert.assertNull(this.c.getSetupFile());
         Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
         Assert.assertNull(this.c.getJobType());
@@ -90,6 +90,8 @@ public class TestCommand extends TestEntityBase {
         Assert.assertTrue(this.c.getTags().isEmpty());
         Assert.assertNotNull(this.c.getClusters());
         Assert.assertTrue(this.c.getClusters().isEmpty());
+        Assert.assertNotNull(this.c.getApplications());
+        Assert.assertTrue(this.c.getApplications().isEmpty());
     }
 
     /**
@@ -230,26 +232,37 @@ public class TestCommand extends TestEntityBase {
     }
 
     /**
-     * Test setting an application.
+     * Test setting applications.
      *
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetApplication() throws GeniePreconditionException {
-        Assert.assertNull(this.c.getApplication());
+    public void testSetApplications() throws GeniePreconditionException {
+        Assert.assertNotNull(this.c.getApplications());
+        Assert.assertTrue(this.c.getApplications().isEmpty());
+        final Set<Application> applications = new HashSet<>();
         final Application one = new Application();
         one.setId("one");
         final Application two = new Application();
         two.setId("two");
-        this.c.setApplication(one);
-        Assert.assertEquals(one, this.c.getApplication());
+        applications.add(one);
+        applications.add(two);
+        this.c.setApplications(applications);
+        Assert.assertEquals(2, this.c.getApplications().size());
+        Assert.assertTrue(this.c.getApplications().contains(one));
+        Assert.assertTrue(this.c.getApplications().contains(two));
         Assert.assertTrue(one.getCommands().contains(this.c));
-        this.c.setApplication(two);
-        Assert.assertEquals(two, this.c.getApplication());
+        Assert.assertTrue(two.getCommands().contains(this.c));
+
+        applications.clear();
+        applications.add(two);
+        this.c.setApplications(applications);
+        Assert.assertEquals(1, this.c.getApplications().size());
+        Assert.assertTrue(this.c.getApplications().contains(two));
         Assert.assertFalse(one.getCommands().contains(this.c));
         Assert.assertTrue(two.getCommands().contains(this.c));
-        this.c.setApplication(null);
-        Assert.assertNull(this.c.getApplication());
+        this.c.setApplications(null);
+        Assert.assertTrue(this.c.getApplications().isEmpty());
         Assert.assertTrue(one.getCommands().isEmpty());
         Assert.assertTrue(two.getCommands().isEmpty());
     }

@@ -92,10 +92,11 @@ public final class CommandSpecs {
      */
     public static Specification<Command> findCommandsForApplication(
             final String applicationId,
-            final Set<CommandStatus> statuses) {
+            final Set<CommandStatus> statuses
+    ) {
         return (final Root<Command> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            final Join<Command, Application> application = root.join(Command_.application);
+            final Join<Command, Application> application = root.join(Command_.applications);
 
             predicates.add(cb.equal(application.get(Application_.id), applicationId));
 

@@ -63,7 +63,9 @@ public class JobCountMonitorImpl implements JobCountMonitor {
      */
     @Override
     public int getNumInstanceJobs() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         return this.jobCountManager.getNumInstanceJobs();
     }
 
@@ -72,7 +74,9 @@ public class JobCountMonitorImpl implements JobCountMonitor {
      */
     @Override
     public int getNumInstanceJobs15Mins() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 15 * 60 * 1000, null);
     }
@@ -82,7 +86,9 @@ public class JobCountMonitorImpl implements JobCountMonitor {
      */
     @Override
     public int getNumInstanceJobs2Hrs() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 2 * 60 * 60 * 1000,
                 time - 15 * 60 * 1000);
@@ -93,7 +99,9 @@ public class JobCountMonitorImpl implements JobCountMonitor {
      */
     @Override
     public int getNumInstanceJobs8Hrs() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(time - 8 * 60 * 60 * 1000,
                 time - 2 * 60 * 60 * 1000);
@@ -104,7 +112,9 @@ public class JobCountMonitorImpl implements JobCountMonitor {
      */
     @Override
     public int getNumInstanceJobs8HrsPlus() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final long time = System.currentTimeMillis();
         return this.jobCountManager.getNumInstanceJobs(null, time - 8 * 60 * 60
                 * 1000);

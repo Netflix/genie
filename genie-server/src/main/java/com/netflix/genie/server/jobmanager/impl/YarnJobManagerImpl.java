@@ -161,7 +161,9 @@ public class YarnJobManagerImpl extends JobManagerImpl {
         // environment variable
         if (this.getCluster().getVersion() != null) {
             String hadoopVersion = this.getCluster().getVersion();
-            LOG.debug("Hadoop Version of the cluster: " + hadoopVersion);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Hadoop Version of the cluster: " + hadoopVersion);
+            }
 
             // try extract version first
             String hadoopHome =

@@ -145,7 +145,9 @@ public class JobServiceJPAImpl implements JobService {
             @NotBlank(message = "No id entered. Unable to get job.")
             final String id
     ) throws GenieException {
-        LOG.debug("called for id: " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called for id: " + id);
+        }
 
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
@@ -175,7 +177,9 @@ public class JobServiceJPAImpl implements JobService {
             final int limit,
             final boolean descending,
             final Set<String> orderBys) {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         final PageRequest pageRequest = JPAUtils.getPageRequest(
                 page, limit, descending, orderBys, Job_.class, Job_.updated.getName()
@@ -226,7 +230,9 @@ public class JobServiceJPAImpl implements JobService {
             final JobStatus status,
             final String msg
     ) throws GenieException {
-        LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
+        }
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setJobStatus(status, msg);
@@ -372,7 +378,9 @@ public class JobServiceJPAImpl implements JobService {
             @NotBlank(message = "No job id entered. Unable to set update time.")
             final String id
     ) throws GenieException {
-        LOG.debug("Updating db for job: " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating db for job: " + id);
+        }
         final Job job = this.jobRepo.findOne(id);
         if (job == null) {
             throw new GenieNotFoundException(
@@ -401,7 +409,9 @@ public class JobServiceJPAImpl implements JobService {
             final String id,
             final int pid
     ) throws GenieException {
-        LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
+        }
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setProcessHandle(pid);
@@ -428,7 +438,9 @@ public class JobServiceJPAImpl implements JobService {
             @NotBlank(message = "No command name entered. Unable to set command info for job.")
             final String commandName
     ) throws GenieException {
-        LOG.debug("Setting the command info for job with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting the command info for job with id " + id);
+        }
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             //TODO: Should we check if this is valid
@@ -457,7 +469,9 @@ public class JobServiceJPAImpl implements JobService {
             @NotBlank(message = "No app name entered. unable to update app info for job.")
             final String appName
     ) throws GenieException {
-        LOG.debug("Setting the application info for job with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting the application info for job with id " + id);
+        }
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setApplicationId(appId);
@@ -485,7 +499,9 @@ public class JobServiceJPAImpl implements JobService {
             @NotBlank(message = "No cluster name entered. Unable to update cluster info for job.")
             final String clusterName
     ) throws GenieException {
-        LOG.debug("Setting the application info for job with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting the application info for job with id " + id);
+        }
         final Job job = this.jobRepo.findOne(id);
         if (job != null) {
             job.setExecutionClusterId(clusterId);

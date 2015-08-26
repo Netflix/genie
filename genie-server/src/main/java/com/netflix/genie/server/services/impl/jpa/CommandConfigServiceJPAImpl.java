@@ -48,6 +48,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -99,7 +100,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             @Valid
             final Command command
     ) throws GenieException {
-        LOG.debug("Called to create command " + command.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to create command " + command.toString());
+        }
         if (StringUtils.isEmpty(command.getId())) {
             command.setId(UUID.randomUUID().toString());
         }
@@ -119,7 +122,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             @NotBlank(message = "No id entered unable to get.")
             final String id
     ) throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             return command;
@@ -142,7 +147,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             final int limit,
             final boolean descending,
             final Set<String> orderBys) {
-        LOG.debug("Called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
 
         final PageRequest pageRequest = JPAUtils.getPageRequest(
                 page, limit, descending, orderBys, Command_.class, Command_.updated.getName()
@@ -178,7 +185,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             throw new GenieBadRequestException("Command id inconsistent with id passed in.");
         }
 
-        LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
+        }
         return this.commandRepo.save(updateCommand);
     }
 
@@ -187,7 +196,9 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     public List<Command> deleteAllCommands() throws GenieException {
-        LOG.debug("Called to delete all commands");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to delete all commands");
+        }
         final Iterable<Command> commands = this.commandRepo.findAll();
         final List<Command> returnCommands = new ArrayList<>();
         for (final Command command : commands) {
@@ -204,19 +215,24 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
             @NotBlank(message = "No id entered. Unable to delete.")
             final String id
     ) throws GenieException {
-        LOG.debug("Called to delete command config with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to delete command config with id " + id);
+        }
         final Command command = this.commandRepo.findOne(id);
         if (command == null) {
             throw new GenieNotFoundException("No command with id " + id + " exists to delete.");
         }
         //Remove the command from the associated Application references
-        final Application app = command.getApplication();
-        if (app != null) {
-            final Set<Command> commands = app.getCommands();
-            if (commands != null) {
-                commands.remove(command);
-            }
-            this.appRepo.save(app);
+        final Set<Application> apps = command.getApplications();
+        if (apps != null) {
+            apps.stream()
+                    .filter(application -> application.getCommands() != null)
+                    .forEach(
+                            application -> {
+                                application.getCommands().remove(command);
+                                this.appRepo.save(application);
+                            }
+                    );
         }
         //Remove the command from the associated cluster references
         final Set<Cluster> clusters = command.getClusters();
@@ -328,24 +344,25 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
-    public Application setApplicationForCommand(
+    public Set<Application> setApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to add applications.")
             final String id,
-            @NotNull(message = "No application entered. Unable to set application.")
-            final Application application
+            @NotNull(message = "No applications entered. Unable to set applications.")
+            final Set<Application> applications
     ) throws GenieException {
-        if (StringUtils.isBlank(application.getId())) {
-            throw new GeniePreconditionException("No application id entered. Unable to set application.");
+        if (applications.size()
+                != applications.stream().filter(application -> this.appRepo.exists(application.getId())).count()) {
+            throw new GeniePreconditionException("All applications must have an id and exist to add to a command");
         }
+
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            final Application app = this.appRepo.findOne(application.getId());
-            if (app != null) {
-                command.setApplication(app);
-            } else {
-                throw new GenieNotFoundException("No application with id " + application.getId() + " exists.");
-            }
-            return command.getApplication();
+            final Set<Application> attachedApplications = new HashSet<>();
+            applications.stream().forEach(
+                    application -> attachedApplications.add(this.appRepo.findOne(application.getId()))
+            );
+            command.setApplications(attachedApplications);
+            return command.getApplications();
         } else {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
@@ -356,18 +373,13 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Application getApplicationForCommand(
+    public Set<Application> getApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to get applications.")
             final String id
     ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            final Application app = command.getApplication();
-            if (app != null) {
-                return app;
-            } else {
-                throw new GenieNotFoundException("No application set for command with id '" + id + "'.");
-            }
+            return command.getApplications();
         } else {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
@@ -377,19 +389,16 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
      * {@inheritDoc}
      */
     @Override
-    public Application removeApplicationForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove application.")
+    public Set<Application> removeApplicationsForCommand(
+            @NotBlank(message = "No command id entered. Unable to remove applications.")
             final String id
     ) throws GenieException {
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
-            final Application app = command.getApplication();
-            if (app != null) {
-                command.setApplication(null);
-                return app;
-            } else {
-                throw new GenieNotFoundException("No application set for command with id '" + id + "'.");
-            }
+            final Set<Application> applications = new HashSet<>();
+            applications.addAll(command.getApplications());
+            command.setApplications(null);
+            return applications;
         } else {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }

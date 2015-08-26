@@ -39,7 +39,7 @@ import java.net.UnknownHostException;
  * @author skrishnan
  */
 @Named
-public final class NetUtil {
+public class NetUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetUtil.class);
 
@@ -68,7 +68,9 @@ public final class NetUtil {
      * @return s3 location
      */
     public String getArchiveURI(final String jobID) {
-        LOG.debug("called for jobID: " + jobID);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called for jobID: " + jobID);
+        }
         if (StringUtils.isNotBlank(this.s3ArchiveLocation)) {
             return this.s3ArchiveLocation + "/" + jobID;
         } else {
@@ -86,7 +88,9 @@ public final class NetUtil {
      * @throws GenieException For any error.
      */
     public String getHostName() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         // check the fast property first
         if (StringUtils.isNotBlank(this.hostNameProperty)) {
@@ -111,7 +115,9 @@ public final class NetUtil {
     }
 
     private String getCloudHostName() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         if (StringUtils.isNotBlank(this.cloudHostName)) {
             return cloudHostName;
@@ -161,7 +167,9 @@ public final class NetUtil {
     }
 
     private String getDCHostName() throws GenieException {
-        LOG.debug("called");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
 
         if (StringUtils.isNotBlank(this.dcHostName)) {
             return this.dcHostName;
