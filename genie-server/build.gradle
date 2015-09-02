@@ -17,6 +17,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-jersey")
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_eureka_version}")
     compile("org.springframework.retry:spring-retry")
 
     // Swagger Libs

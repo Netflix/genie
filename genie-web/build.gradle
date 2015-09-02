@@ -22,6 +22,8 @@ dependencies {
      *******************************/
 
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+    providedRuntime("javax.servlet:jstl")
+    providedRuntime("org.apache.tomcat.embed:tomcat-embed-jasper")
 
     /*******************************
      * Runtime Dependencies

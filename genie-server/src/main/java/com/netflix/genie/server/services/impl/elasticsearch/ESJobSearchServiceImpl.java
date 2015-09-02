@@ -104,7 +104,7 @@ public class ESJobSearchServiceImpl implements JobSearchService {
         }
         if (statuses != null && !statuses.isEmpty()) {
             final Criteria statusCriteria = new Criteria("status");
-            statuses.stream().forEach(status -> statusCriteria.or(new Criteria("status").is(status)));
+            statuses.stream().forEach(status -> statusCriteria.or(new Criteria("status").is(status.toString())));
 
             if (criteria == null) {
                 criteria = statusCriteria;

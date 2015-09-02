@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
@@ -47,6 +48,7 @@ import javax.validation.Validator;
 @EnableElasticsearchRepositories("com.netflix.genie.server.repository.elasticsearch")
 @EnableJpaRepositories("com.netflix.genie.server.repository.jpa")
 @EnableRetry
+@EnableScheduling
 @EnableTransactionManagement
 @EntityScan("com.netflix.genie.common.model")
 public class GenieSpringApplication extends SpringBootServletInitializer {
