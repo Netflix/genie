@@ -51,7 +51,7 @@ import javax.validation.Validator;
 @EnableScheduling
 @EnableTransactionManagement
 @EntityScan("com.netflix.genie.common.model")
-public class GenieSpringApplication extends SpringBootServletInitializer {
+public class GenieConfig extends SpringBootServletInitializer {
 
     /**
      * Setup bean validation.
@@ -78,7 +78,7 @@ public class GenieSpringApplication extends SpringBootServletInitializer {
      */
     @Override
     protected SpringApplicationBuilder configure(final SpringApplicationBuilder applicationBuilder) {
-        return applicationBuilder.sources(GenieSpringApplication.class);
+        return applicationBuilder.sources(GenieConfig.class);
     }
 
     /**
@@ -88,6 +88,6 @@ public class GenieSpringApplication extends SpringBootServletInitializer {
      * @throws Exception For any failure during program execution
      */
     public static void main(final String[] args) throws Exception {
-        SpringApplication.run(GenieSpringApplication.class, args);
+        SpringApplication.run(GenieConfig.class, args);
     }
 }
