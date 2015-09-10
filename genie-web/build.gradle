@@ -1,7 +1,6 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'spring-boot'
-apply plugin: 'war'
 
 processResources {
     filter ReplaceTokens, tokens: [
@@ -16,18 +15,21 @@ dependencies {
 
     compile(project(":genie-server"))
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.webjars:bootstrap:${bootstrap_version}")
+    compile("org.webjars:jquery:${jquery_version}")
+    compile("org.webjars:knockout:${knockout_version}")
 
     /*******************************
      * Provided Dependencies
      *******************************/
 
-    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
-    providedRuntime("javax.servlet:jstl")
-    providedRuntime("org.apache.tomcat.embed:tomcat-embed-jasper")
-
     /*******************************
      * Runtime Dependencies
      *******************************/
+
+    runtime("org.springframework.boot:spring-boot-starter-tomcat")
+    runtime("javax.servlet:jstl")
+    runtime("org.apache.tomcat.embed:tomcat-embed-jasper")
 
     /*******************************
      * Test Dependencies

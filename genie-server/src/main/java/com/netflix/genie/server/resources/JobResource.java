@@ -34,23 +34,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.List;
@@ -62,30 +58,17 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
-@Controller
-@Path("/v2/jobs")
-@Api(
-        value = "/v2/jobs",
-        tags = "jobs",
-        description = "Manage Genie Jobs."
-)
-@Produces(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "/genie/v2/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(value = "/genie/v2/jobs", tags = "jobs", description = "Manage Genie Jobs.")
 public final class JobResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
     private final ExecutionService executionService;
-
     private final JobService jobService;
-
     private final JobSearchService jobSearchService;
-
-    @Context
-    private UriInfo uriInfo;
-
-    @Context
-    private HttpServletRequest httpServletRequest;
 
     /**
      * Constructor.
@@ -108,12 +91,13 @@ public final class JobResource {
     /**
      * Submit a new job.
      *
-     * @param job request object containing job info element for new job
+     * @param job                request object containing job info element for new job
+     * @param clientHost         The header value for X-Forwarded-For
+     * @param httpServletRequest The current request
      * @return The submitted job
      * @throws GenieException For any error
      */
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Submit a job",
             notes = "Submit a new job to run to genie",
@@ -121,8 +105,8 @@ public final class JobResource {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    code = HttpURLConnection.HTTP_CREATED,
-                    message = "Created",
+                    code = HttpURLConnection.HTTP_ACCEPTED,
+                    message = "Accepted for processing",
                     response = Job.class
             ),
             @ApiResponse(
@@ -142,12 +126,15 @@ public final class JobResource {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Response submitJob(
+    public ResponseEntity<Job> submitJob(
             @ApiParam(
                     value = "Job object to run.",
                     required = true
             )
-            final Job job
+            final Job job,
+            @RequestHeader(FORWARDED_FOR_HEADER)
+            final String clientHost,
+            final HttpServletRequest httpServletRequest
     ) throws GenieException {
         if (job == null) {
             throw new GenieException(
@@ -157,26 +144,31 @@ public final class JobResource {
         LOG.info("Called to submit job: " + job);
 
         // get client's host from the context
-        String clientHost = this.httpServletRequest.getHeader(FORWARDED_FOR_HEADER);
-        if (clientHost != null) {
-            clientHost = clientHost.split(",")[0];
+        String localClientHost;
+        if (StringUtils.isNotBlank(clientHost)) {
+            localClientHost = clientHost.split(",")[0];
         } else {
-            clientHost = this.httpServletRequest.getRemoteAddr();
+            localClientHost = httpServletRequest.getRemoteAddr();
         }
 
         // set the clientHost, if it is not overridden already
-        if (StringUtils.isNotBlank(clientHost)) {
+        if (StringUtils.isNotBlank(localClientHost)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("called from: " + clientHost);
+                LOG.debug("called from: " + localClientHost);
             }
-            job.setClientHost(clientHost);
+            job.setClientHost(localClientHost);
         }
 
         final Job createdJob = this.executionService.submitJob(job);
-        return Response.created(
-                this.uriInfo.getAbsolutePathBuilder().path(createdJob.getId()).build()).
-                entity(createdJob).
-                build();
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                ServletUriComponentsBuilder
+                        .fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(createdJob.getId())
+                        .toUri()
+        );
+        return new ResponseEntity<>(createdJob, httpHeaders, HttpStatus.ACCEPTED);
     }
 
     /**
@@ -186,8 +178,7 @@ public final class JobResource {
      * @return the Job
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ApiOperation(
             value = "Find a job by id",
             notes = "Get the job by id if it exists",
@@ -216,7 +207,7 @@ public final class JobResource {
                     value = "Id of the job to get.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("called for job with id: " + id);
@@ -230,8 +221,7 @@ public final class JobResource {
      * @return The status of the job
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/status")
+    @RequestMapping(value = "/{id}/status", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the status of the job ",
             notes = "Get the status of job whose id is sent",
@@ -260,7 +250,7 @@ public final class JobResource {
                     value = "Id of the job.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called for job id:" + id);
@@ -289,7 +279,7 @@ public final class JobResource {
      * @return successful response, or one with HTTP error code
      * @throws GenieException For any error
      */
-    @GET
+    @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(
             value = "Find jobs",
             notes = "Find jobs by the submitted criteria.",
@@ -318,71 +308,68 @@ public final class JobResource {
             @ApiParam(
                     value = "Id of the job."
             )
-            @QueryParam("id")
+            @RequestParam("id")
             final String id,
             @ApiParam(
                     value = "Name of the job."
             )
-            @QueryParam("name")
+            @RequestParam("name")
             final String name,
             @ApiParam(
                     value = "Name of the user who submitted the job."
             )
-            @QueryParam("userName")
+            @RequestParam("userName")
             final String userName,
             @ApiParam(
                     value = "Statuses of the jobs to fetch.",
                     allowableValues = "INIT, RUNNING, SUCCEEDED, KILLED, FAILED"
             )
-            @QueryParam("status")
+            @RequestParam("status")
             final Set<String> statuses,
             @ApiParam(
                     value = "Tags for the job."
             )
-            @QueryParam("tag")
+            @RequestParam("tag")
             final Set<String> tags,
             @ApiParam(
                     value = "Name of the cluster on which the job ran."
             )
-            @QueryParam("executionClusterName")
+            @RequestParam("executionClusterName")
             final String clusterName,
             @ApiParam(
                     value = "Id of the cluster on which the job ran."
             )
-            @QueryParam("executionClusterId")
+            @RequestParam("executionClusterId")
             final String clusterId,
             @ApiParam(
                     value = "The page to start on."
             )
-            @QueryParam("commandName")
+            @RequestParam("commandName")
             final String commandName,
             @ApiParam(
                     value = "Id of the cluster on which the job ran."
             )
-            @QueryParam("commandId")
+            @RequestParam("commandId")
             final String commandId,
             @ApiParam(
                     value = "The page to start on."
             )
-            @QueryParam("page")
-            @DefaultValue("0")
+            @RequestParam(value = "page", defaultValue = "0")
             final int page,
             @ApiParam(
                     value = "Max number of results per page."
             )
-            @QueryParam("limit")
-            @DefaultValue("1024")
+            @RequestParam(value = "limit", defaultValue = "1024")
             final int limit,
             @ApiParam(
                     value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
             )
-            @QueryParam("descending")
-            @DefaultValue("true")
+            @RequestParam(value = "descending", defaultValue = "true")
             final boolean descending,
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
-            @QueryParam("orderBy")
+            @RequestParam("orderBy")
             final Set<String> orderBys
     ) throws GenieException {
         LOG.info(
@@ -449,8 +436,7 @@ public final class JobResource {
      * @return The job that was killed
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Delete a job",
             notes = "Delete the job with the id specified.",
@@ -475,7 +461,7 @@ public final class JobResource {
                     value = "Id of the job.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called for job id: " + id);
@@ -491,14 +477,12 @@ public final class JobResource {
      * @return The active tags for this job.
      * @throws GenieException For any error
      */
-    @POST
-    @Path("/{id}/tags")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add new tags to a job",
             notes = "Add the supplied tags to the job with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -521,7 +505,7 @@ public final class JobResource {
                     value = "Id of the job to add configuration to.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The tags to add.",
@@ -541,13 +525,12 @@ public final class JobResource {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/tags")
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the tags for a job",
             notes = "Get the tags for the job with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -572,7 +555,7 @@ public final class JobResource {
                     value = "Id of the job to get tags for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -589,14 +572,12 @@ public final class JobResource {
      * @return The new set of job tags.
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}/tags")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update tags for a job",
             notes = "Replace the existing tags for job with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -621,7 +602,7 @@ public final class JobResource {
                     value = "Id of the job to update tags for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The tags to replace existing with.",
@@ -641,13 +622,12 @@ public final class JobResource {
      * @return Empty set if successful
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/tags")
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove all tags from a job",
             notes = "Remove all the tags from the job with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -672,7 +652,7 @@ public final class JobResource {
                     value = "Id of the job to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -688,13 +668,12 @@ public final class JobResource {
      * @return The active set of tags for the job.
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/tags/{tag}")
+    @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove a tag from a job",
             notes = "Remove the given tag from the job with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -719,13 +698,13 @@ public final class JobResource {
                     value = "Id of the job to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The tag to remove.",
                     required = true
             )
-            @PathParam("tag")
+            @PathVariable("tag")
             final String tag
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tag " + tag);

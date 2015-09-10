@@ -19,9 +19,7 @@ package com.netflix.genie.web.startup;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -51,7 +49,7 @@ import javax.validation.Validator;
 @EnableScheduling
 @EnableTransactionManagement
 @EntityScan("com.netflix.genie.common.model")
-public class GenieConfig extends SpringBootServletInitializer {
+public class GenieConfig {
 
     /**
      * Setup bean validation.
@@ -71,14 +69,6 @@ public class GenieConfig extends SpringBootServletInitializer {
     @Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected SpringApplicationBuilder configure(final SpringApplicationBuilder applicationBuilder) {
-        return applicationBuilder.sources(GenieConfig.class);
     }
 
     /**

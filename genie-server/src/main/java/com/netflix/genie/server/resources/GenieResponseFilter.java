@@ -17,49 +17,38 @@
  */
 package com.netflix.genie.server.resources;
 
-import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.ext.Provider;
-import java.net.HttpURLConnection;
-
 /**
  * Used to increment various counters based on response from Jersey.
  *
  * @author tgianos
  */
-@Component
-@Provider
-public class GenieResponseFilter implements ContainerResponseFilter {
-
-    private GenieNodeStatistics statistics;
-
-    /**
-     * Constructor.
-     *
-     * @param statistics The genie node statistics to use to capture information.
-     */
-    @Autowired
-    public GenieResponseFilter(final GenieNodeStatistics statistics) {
-        this.statistics = statistics;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void filter(final ContainerRequestContext request, final ContainerResponseContext response) {
-        final int status = response.getStatus();
-        if (status >= HttpURLConnection.HTTP_OK && status < HttpURLConnection.HTTP_MULT_CHOICE) {
-            this.statistics.incrGenie2xxCount();
-        } else if (status >= HttpURLConnection.HTTP_BAD_REQUEST && status < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            this.statistics.incrGenie4xxCount();
-        } else if (status >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            this.statistics.incrGenie5xxCount();
-        }
-    }
+//@Component
+public class GenieResponseFilter /* implements ContainerResponseFilter */ {
+//
+//    private GenieNodeStatistics statistics;
+//
+//    /**
+//     * Constructor.
+//     *
+//     * @param statistics The genie node statistics to use to capture information.
+//     */
+//    @Autowired
+//    public GenieResponseFilter(final GenieNodeStatistics statistics) {
+//        this.statistics = statistics;
+//    }
+//
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public void filter(final ContainerRequestContext request, final ContainerResponseContext response) {
+//        final int status = response.getStatus();
+//        if (status >= HttpURLConnection.HTTP_OK && status < HttpURLConnection.HTTP_MULT_CHOICE) {
+//            this.statistics.incrGenie2xxCount();
+//        } else if (status >= HttpURLConnection.HTTP_BAD_REQUEST && status < HttpURLConnection.HTTP_INTERNAL_ERROR) {
+//            this.statistics.incrGenie4xxCount();
+//        } else if (status >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
+//            this.statistics.incrGenie5xxCount();
+//        }
+//    }
 }

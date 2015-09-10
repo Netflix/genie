@@ -32,22 +32,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.List;
@@ -60,28 +55,14 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
-@Controller
-@Path("/v2/config/clusters")
-@Api(
-        value = "/v2/config/clusters",
-        tags = "clusters",
-        description = "Manage the available clusters"
-)
-@Produces(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "/genie/v2/config/clusters", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(value = "/genie/v2/config/clusters", tags = "clusters", description = "Manage the available clusters")
 public final class ClusterConfigResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigResource.class);
 
-    /**
-     * The Cluster Configuration Service.
-     */
     private final ClusterConfigService clusterConfigService;
-
-    /**
-     * To get URI information for return codes.
-     */
-    @Context
-    private UriInfo uriInfo;
 
     /**
      * Constructor.
@@ -100,8 +81,7 @@ public final class ClusterConfigResource {
      * @return The created cluster
      * @throws GenieException For any error
      */
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Create a cluster",
             notes = "Create a cluster from the supplied information.",
@@ -126,7 +106,7 @@ public final class ClusterConfigResource {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Response createCluster(
+    public ResponseEntity<Cluster> createCluster(
             @ApiParam(
                     value = "The cluster to create.",
                     required = true
@@ -135,10 +115,15 @@ public final class ClusterConfigResource {
     ) throws GenieException {
         LOG.info("Called to create new cluster " + cluster);
         final Cluster createdCluster = this.clusterConfigService.createCluster(cluster);
-        return Response.created(
-                this.uriInfo.getAbsolutePathBuilder().path(createdCluster.getId()).build()).
-                entity(createdCluster).
-                build();
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                ServletUriComponentsBuilder
+                        .fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(createdCluster.getId())
+                        .toUri()
+        );
+        return new ResponseEntity<>(createdCluster, httpHeaders, HttpStatus.CREATED);
     }
 
     /**
@@ -148,8 +133,7 @@ public final class ClusterConfigResource {
      * @return the cluster
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ApiOperation(
             value = "Find a cluster by id",
             notes = "Get the cluster by id if it exists",
@@ -174,7 +158,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to get.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id: " + id);
@@ -197,7 +181,7 @@ public final class ClusterConfigResource {
      * @return the Clusters found matching the criteria
      * @throws GenieException For any error
      */
-    @GET
+    @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(
             value = "Find clusters",
             notes = "Find clusters by the submitted criteria.",
@@ -218,51 +202,48 @@ public final class ClusterConfigResource {
             @ApiParam(
                     value = "Name of the cluster."
             )
-            @QueryParam("name")
+            @RequestParam("name")
             final String name,
             @ApiParam(
                     value = "Status of the cluster.",
                     allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
             )
-            @QueryParam("status")
+            @RequestParam("status")
             final Set<String> statuses,
             @ApiParam(
                     value = "Tags for the cluster."
             )
-            @QueryParam("tag")
+            @RequestParam("tag")
             final Set<String> tags,
             @ApiParam(
                     value = "Minimum time threshold for cluster update"
             )
-            @QueryParam("minUpdateTime")
+            @RequestParam("minUpdateTime")
             final Long minUpdateTime,
             @ApiParam(
                     value = "Maximum time threshold for cluster update"
             )
-            @QueryParam("maxUpdateTime")
+            @RequestParam("maxUpdateTime")
             final Long maxUpdateTime,
             @ApiParam(
                     value = "The page to start on."
             )
-            @QueryParam("page")
-            @DefaultValue("0")
+            @RequestParam(value = "page", defaultValue = "0")
             final int page,
             @ApiParam(
                     value = "Max number of results per page."
             )
-            @QueryParam("limit")
-            @DefaultValue("1024")
+            @RequestParam(value = "limit", defaultValue = "1024")
             final int limit,
             @ApiParam(
                     value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
             )
-            @QueryParam("descending")
-            @DefaultValue("true")
+            @RequestParam(value = "descending", defaultValue = "true")
             final boolean descending,
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
-            @QueryParam("orderBy")
+            @RequestParam("orderBy")
             final Set<String> orderBys
     ) throws GenieException {
         LOG.info(
@@ -310,9 +291,7 @@ public final class ClusterConfigResource {
      * @return the updated cluster
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update a cluster",
             notes = "Update a cluster from the supplied information.",
@@ -337,7 +316,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to update.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The cluster information to update with.",
@@ -356,8 +335,7 @@ public final class ClusterConfigResource {
      * @return the deleted cluster
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Delete a cluster",
             notes = "Delete a cluster with the supplied id.",
@@ -382,7 +360,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to delete.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Delete called for id: " + id);
@@ -395,7 +373,7 @@ public final class ClusterConfigResource {
      * @return All The deleted clusters
      * @throws GenieException For any error
      */
-    @DELETE
+    @RequestMapping(method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Delete all clusters",
             notes = "Delete all available clusters and get them back.",
@@ -430,14 +408,12 @@ public final class ClusterConfigResource {
      * @return The active configurations for this cluster.
      * @throws GenieException For any error
      */
-    @POST
-    @Path("/{id}/configs")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add new configuration files to a cluster",
             notes = "Add the supplied configuration files to the cluster with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -458,7 +434,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to add configuration to.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The configuration files to add.",
@@ -478,13 +454,12 @@ public final class ClusterConfigResource {
      * @return The active set of configuration files.
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/configs")
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the configuration files for a cluster",
             notes = "Get the configuration files for the cluster with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -505,7 +480,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to get configurations for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -522,14 +497,12 @@ public final class ClusterConfigResource {
      * @return The new set of cluster configurations.
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}/configs")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update configuration files for an cluster",
             notes = "Replace the existing configuration files for cluster with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -550,7 +523,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to update configurations for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The configuration files to replace existing with.",
@@ -571,9 +544,7 @@ public final class ClusterConfigResource {
      * @return The active commands for this cluster.
      * @throws GenieException For any error
      */
-    @POST
-    @Path("/{id}/commands")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add new commands to a cluster",
             notes = "Add the supplied commands to the cluster with the supplied id."
@@ -600,7 +571,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to add commands to.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The commands to add.",
@@ -621,8 +592,7 @@ public final class ClusterConfigResource {
      * @return The active set of commands for the cluster.
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/commands")
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the commands for a cluster",
             notes = "Get the commands for the cluster with the supplied id.",
@@ -648,13 +618,13 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to get commands for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The statuses of the commands to find.",
                     allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
-            @QueryParam("status")
+            @RequestParam("status")
             final Set<String> statuses
     ) throws GenieException {
         LOG.info("Called with id " + id + " status " + statuses);
@@ -682,9 +652,7 @@ public final class ClusterConfigResource {
      * @return The new set of commands for the cluster.
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}/commands")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update the commands for an cluster",
             notes = "Replace the existing commands for cluster with given id.",
@@ -710,7 +678,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to update commands for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The commands to replace existing with. Should already be created",
@@ -730,8 +698,7 @@ public final class ClusterConfigResource {
      * @return Empty set if successful
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/commands")
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove all commands from an cluster",
             notes = "Remove all the commands from the cluster with given id.",
@@ -757,7 +724,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -767,14 +734,13 @@ public final class ClusterConfigResource {
     /**
      * Remove an command from a given cluster.
      *
-     * @param id    The id of the cluster to delete the command from. Not
-     *              null/empty/blank.
-     * @param cmdId The id of the command to remove. Not null/empty/blank.
+     * @param id        The id of the cluster to delete the command from. Not
+     *                  null/empty/blank.
+     * @param commandId The id of the command to remove. Not null/empty/blank.
      * @return The active set of commands for the cluster.
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/commands/{cmdId}")
+    @RequestMapping(value = "/{id}/commands/{commandId}", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove a command from a cluster",
             notes = "Remove the given command from the cluster with given id.",
@@ -800,17 +766,17 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The id of the command to remove.",
                     required = true
             )
-            @PathParam("cmdId")
-            final String cmdId
+            @PathVariable("commandId")
+            final String commandId
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and command id " + cmdId);
-        return this.clusterConfigService.removeCommandForCluster(id, cmdId);
+        LOG.info("Called with id " + id + " and command id " + commandId);
+        return this.clusterConfigService.removeCommandForCluster(id, commandId);
     }
 
     /**
@@ -822,14 +788,12 @@ public final class ClusterConfigResource {
      * @return The active tags for this cluster.
      * @throws GenieException For any error
      */
-    @POST
-    @Path("/{id}/tags")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add new tags to a cluster",
             notes = "Add the supplied tags to the cluster with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -850,7 +814,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to add configuration to.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The tags to add.",
@@ -870,13 +834,12 @@ public final class ClusterConfigResource {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/tags")
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the tags for a cluster",
             notes = "Get the tags for the cluster with the supplied id.",
             response = String.class,
-            responseContainer = "List")
+            responseContainer = "Set")
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
@@ -896,7 +859,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to get tags for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -913,14 +876,12 @@ public final class ClusterConfigResource {
      * @return The new set of cluster tags.
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}/tags")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update tags for a cluster",
             notes = "Replace the existing tags for cluster with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -941,7 +902,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to update tags for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The tags to replace existing with.",
@@ -961,14 +922,13 @@ public final class ClusterConfigResource {
      * @return Empty set if successful
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/tags")
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove all tags from a cluster",
             notes = "Remove all the tags from the cluster with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -989,7 +949,7 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -1005,14 +965,13 @@ public final class ClusterConfigResource {
      * @return The active set of tags for the cluster.
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/tags/{tag}")
+    @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove a tag from a cluster",
             notes = "Remove the given tag from the cluster with given id. Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -1033,13 +992,13 @@ public final class ClusterConfigResource {
                     value = "Id of the cluster to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The tag to remove.",
                     required = true
             )
-            @PathParam("tag")
+            @PathVariable("tag")
             final String tag
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tag " + tag);

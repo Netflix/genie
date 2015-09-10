@@ -18,36 +18,60 @@
 package com.netflix.genie.server.resources;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.io.IOException;
 
 /**
- * Exception mapper for CloudServiceExceptions.
+ * Exception mapper for Genie Exceptions.
  *
  * @author tgianos
  */
-@Provider
-public class GenieExceptionMapper implements ExceptionMapper<GenieException> {
+//TODO: Log errors?
+@ControllerAdvice
+public class GenieExceptionMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GenieExceptionMapper.class);
+    private static final String NEW_LINE = "\n";
 
     /**
-     * Create a response object from the exception.
+     * Handle Genie Exceptions.
      *
-     * @param ge The exception to create the HTTP response from
-     * @return a Response object
+     * @param response The HTTP response
+     * @param e        The exception to handle
+     * @throws IOException on error in sending error
      */
-    @Override
-    public Response toResponse(final GenieException ge) {
-        final int code = ge.getErrorCode();
-        final String errorMessage = ge.getLocalizedMessage();
-        LOG.error("Error code: " + code + " Error Message: " + errorMessage, ge);
-        return Response.status(code).entity(errorMessage).type(MediaType.TEXT_PLAIN).build();
+    @ExceptionHandler(GenieException.class)
+    public void handleBadRequest(
+            final HttpServletResponse response,
+            final GenieException e
+    ) throws IOException {
+        response.sendError(e.getErrorCode(), e.getLocalizedMessage());
+    }
+
+    /**
+     * Handle constraint violation exceptions.
+     *
+     * @param response The HTTP response
+     * @param cve      The exception to handle
+     * @throws IOException on error in sending error
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public void handleServiceUnavailable(
+            final HttpServletResponse response,
+            final ConstraintViolationException cve
+    ) throws IOException {
+        final StringBuilder builder = new StringBuilder();
+        for (final ConstraintViolation<?> cv : cve.getConstraintViolations()) {
+            if (builder.length() != 0) {
+                builder.append(NEW_LINE);
+            }
+            builder.append(cv.getMessage());
+        }
+        response.sendError(HttpStatus.PRECONDITION_FAILED.value(), builder.toString());
     }
 }

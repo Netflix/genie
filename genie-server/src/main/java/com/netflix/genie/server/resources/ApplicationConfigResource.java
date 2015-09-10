@@ -32,22 +32,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.List;
@@ -60,28 +56,14 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
-@Controller
-@Path("/v2/config/applications")
-@Api(
-        value = "/v2/config/applications",
-        tags = "applications",
-        description = "Manage the available applications"
-)
-@Produces(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "/genie/v2/config/applications", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(value = "/genie/v2/config/applications", tags = "applications", description = "Manage the available applications")
 public final class ApplicationConfigResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigResource.class);
 
-    /**
-     * The application service.
-     */
     private final ApplicationConfigService applicationConfigService;
-
-    /**
-     * To get URI information for return codes.
-     */
-    @Context
-    private UriInfo uriInfo;
 
     /**
      * Constructor.
@@ -100,8 +82,7 @@ public final class ApplicationConfigResource {
      * @return The created application configuration
      * @throws GenieException For any error
      */
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Create an application",
             notes = "Create an application from the supplied information.",
@@ -126,19 +107,22 @@ public final class ApplicationConfigResource {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Response createApplication(
-            @ApiParam(
-                    value = "The application to create.",
-                    required = true
-            )
+    public ResponseEntity<Application> createApplication(
+            @ApiParam(value = "The application to create.", required = true)
+            @RequestBody
             final Application app
     ) throws GenieException {
         LOG.info("Called to create new application");
         final Application createdApp = this.applicationConfigService.createApplication(app);
-        return Response.created(
-                this.uriInfo.getAbsolutePathBuilder().path(createdApp.getId()).build()).
-                entity(createdApp).
-                build();
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                ServletUriComponentsBuilder
+                        .fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(createdApp.getId())
+                        .toUri()
+        );
+        return new ResponseEntity<>(createdApp, httpHeaders, HttpStatus.CREATED);
     }
 
     /**
@@ -148,8 +132,7 @@ public final class ApplicationConfigResource {
      * @return The application configuration
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ApiOperation(
             value = "Find an application by id",
             notes = "Get the application by id if it exists",
@@ -179,7 +162,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to get.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called to get Application for id " + id);
@@ -200,7 +183,7 @@ public final class ApplicationConfigResource {
      * @return All applications matching the criteria
      * @throws GenieException For any error
      */
-    @GET
+    @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(
             value = "Find applications",
             notes = "Find applications by the submitted criteria.",
@@ -221,46 +204,43 @@ public final class ApplicationConfigResource {
             @ApiParam(
                     value = "Name of the application."
             )
-            @QueryParam("name")
+            @RequestParam("name")
             final String name,
             @ApiParam(
                     value = "User who created the application."
             )
-            @QueryParam("userName")
+            @RequestParam("userName")
             final String userName,
             @ApiParam(
                     value = "The status of the applications to get.",
                     allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
-            @QueryParam("status")
+            @RequestParam("status")
             final Set<String> statuses,
             @ApiParam(
                     value = "Tags for the cluster."
             )
-            @QueryParam("tag")
+            @RequestParam("tag")
             final Set<String> tags,
             @ApiParam(
                     value = "The page to start on."
             )
-            @QueryParam("page")
-            @DefaultValue("0")
+            @RequestParam(value = "page", defaultValue = "0")
             final int page,
             @ApiParam(
                     value = "Max number of results per page."
             )
-            @QueryParam("limit")
-            @DefaultValue("1024")
+            @RequestParam(value = "limit", defaultValue = "1024")
             final int limit,
             @ApiParam(
                     value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
             )
-            @QueryParam("descending")
-            @DefaultValue("true")
+            @RequestParam(value = "descending", defaultValue = "true")
             final boolean descending,
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
-            @QueryParam("orderBy")
+            @RequestParam("orderBy")
             final Set<String> orderBys
     ) throws GenieException {
         LOG.info(
@@ -304,9 +284,7 @@ public final class ApplicationConfigResource {
      * @return successful response, or one with an HTTP error code
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update an application",
             notes = "Update an application from the supplied information.",
@@ -327,16 +305,11 @@ public final class ApplicationConfigResource {
             )
     })
     public Application updateApplication(
-            @ApiParam(
-                    value = "Id of the application to update.",
-                    required = true
-            )
-            @PathParam("id")
+            @ApiParam(value = "Id of the application to update.", required = true)
+            @PathVariable("id")
             final String id,
-            @ApiParam(
-                    value = "The application information to update.",
-                    required = true
-            )
+            @ApiParam(value = "The application information to update.", required = true)
+            @RequestBody
             final Application updateApp
     ) throws GenieException {
         LOG.info("called to update application config with info " + updateApp.toString());
@@ -349,7 +322,7 @@ public final class ApplicationConfigResource {
      * @return All The deleted applications
      * @throws GenieException For any error
      */
-    @DELETE
+    @RequestMapping(method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Delete all applications",
             notes = "Delete all available applications and get them back.",
@@ -374,8 +347,7 @@ public final class ApplicationConfigResource {
      * @return The deleted application configuration
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Delete an application",
             notes = "Delete an application with the supplied id.",
@@ -400,7 +372,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to delete.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Delete an application with id " + id);
@@ -416,14 +388,12 @@ public final class ApplicationConfigResource {
      * @return The active configurations for this application.
      * @throws GenieException For any error
      */
-    @POST
-    @Path("/{id}/configs")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add new configuration files to an application",
             notes = "Add the supplied configuration files to the application with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -444,7 +414,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to add configuration to.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The configuration files to add.",
@@ -464,13 +434,12 @@ public final class ApplicationConfigResource {
      * @return The active set of configuration files.
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/configs")
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the configuration files for an application",
             notes = "Get the configuration files for the application with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -491,7 +460,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to get configurations for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -508,14 +477,12 @@ public final class ApplicationConfigResource {
      * @return The new set of application configurations.
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}/configs")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update configuration files for an application",
             notes = "Replace the existing configuration files for application with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -536,7 +503,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to update configurations for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The configuration files to replace existing with.",
@@ -556,13 +523,12 @@ public final class ApplicationConfigResource {
      * @return Empty set if successful
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/configs")
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove all configuration files from an application",
             notes = "Remove all the configuration files from the application with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -583,7 +549,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -599,14 +565,12 @@ public final class ApplicationConfigResource {
      * @return The active set of application jars.
      * @throws GenieException For any error
      */
-    @POST
-    @Path("/{id}/jars")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/jars", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add new jar files to an application",
             notes = "Add the supplied jar files to the applicaiton with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -627,7 +591,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to add jar to.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The jar files to add.",
@@ -647,13 +611,12 @@ public final class ApplicationConfigResource {
      * @return The set of jar files.
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/jars")
+    @RequestMapping(value = "/{id}/jars", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the jars for an application",
             notes = "Get the jars for the application with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -674,7 +637,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to get the jars for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -691,14 +654,12 @@ public final class ApplicationConfigResource {
      * @return The active set of application jars
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}/jars")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/jars", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update jar files for an application",
             notes = "Replace the existing jar files for application with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -719,7 +680,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to update configurations for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The jar files to replace existing with.",
@@ -739,13 +700,12 @@ public final class ApplicationConfigResource {
      * @return Empty set if successful
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/jars")
+    @RequestMapping(value = "/{id}/jars", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove all jar files from an application",
             notes = "Remove all the jar files from the application with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -766,7 +726,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -782,14 +742,12 @@ public final class ApplicationConfigResource {
      * @return The active tags for this application.
      * @throws GenieException For any error
      */
-    @POST
-    @Path("/{id}/tags")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add new tags to a application",
             notes = "Add the supplied tags to the application with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -810,7 +768,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to add configuration to.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The tags to add.",
@@ -830,13 +788,12 @@ public final class ApplicationConfigResource {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/tags")
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the tags for a application",
             notes = "Get the tags for the application with the supplied id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -857,7 +814,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to get tags for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -874,14 +831,12 @@ public final class ApplicationConfigResource {
      * @return The new set of application tags.
      * @throws GenieException For any error
      */
-    @PUT
-    @Path("/{id}/tags")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update tags for a application",
             notes = "Replace the existing tags for application with given id.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -902,7 +857,7 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to update tags for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The tags to replace existing with.",
@@ -922,14 +877,13 @@ public final class ApplicationConfigResource {
      * @return Empty set if successful
      * @throws GenieException For any error
      */
-    @DELETE
-    @Path("/{id}/tags")
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
     @ApiOperation(
             value = "Remove all tags from a application",
             notes = "Remove all the tags from the application with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted.",
             response = String.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -950,11 +904,60 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to delete from.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id
     ) throws GenieException {
         LOG.info("Called with id " + id);
         return this.applicationConfigService.removeAllTagsForApplication(id);
+    }
+
+    /**
+     * Remove an tag from a given application.
+     *
+     * @param id  The id of the application to delete the tag from. Not
+     *            null/empty/blank.
+     * @param tag The tag to remove. Not null/empty/blank.
+     * @return The active set of tags for the application.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
+    @ApiOperation(
+            value = "Remove a tag from a application",
+            notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
+                    + "prefixed with genie.id and genie.name cannot be deleted.",
+            response = String.class,
+            responseContainer = "Set"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Application not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid ID supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public Set<String> removeTagForApplication(
+            @ApiParam(
+                    value = "Id of the application to delete from.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id,
+            @ApiParam(
+                    value = "The tag to remove.",
+                    required = true
+            )
+            @PathVariable("tag")
+            final String tag
+    ) throws GenieException {
+        LOG.info("Called with id " + id + " and tag " + tag);
+        return this.applicationConfigService.removeTagForApplication(id, tag);
     }
 
     /**
@@ -966,8 +969,7 @@ public final class ApplicationConfigResource {
      * @return The set of commands.
      * @throws GenieException For any error
      */
-    @GET
-    @Path("/{id}/commands")
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET)
     @ApiOperation(
             value = "Get the commands this application is associated with",
             notes = "Get the commands which this application supports.",
@@ -993,13 +995,13 @@ public final class ApplicationConfigResource {
                     value = "Id of the application to get the commands for.",
                     required = true
             )
-            @PathParam("id")
+            @PathVariable("id")
             final String id,
             @ApiParam(
                     value = "The statuses of the commands to find.",
                     allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
-            @QueryParam("status")
+            @RequestParam("status")
             final Set<String> statuses
     ) throws GenieException {
         LOG.info("Called with id " + id);
@@ -1014,55 +1016,5 @@ public final class ApplicationConfigResource {
             }
         }
         return this.applicationConfigService.getCommandsForApplication(id, enumStatuses);
-    }
-
-    /**
-     * Remove an tag from a given application.
-     *
-     * @param id  The id of the application to delete the tag from. Not
-     *            null/empty/blank.
-     * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags for the application.
-     * @throws GenieException For any error
-     */
-    @DELETE
-    @Path("/{id}/tags/{tag}")
-    @ApiOperation(
-            value = "Remove a tag from a application",
-            notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted.",
-            response = String.class,
-            responseContainer = "List"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> removeTagForApplication(
-            @ApiParam(
-                    value = "Id of the application to delete from.",
-                    required = true
-            )
-            @PathParam("id")
-            final String id,
-            @ApiParam(
-                    value = "The tag to remove.",
-                    required = true
-            )
-            @PathParam("tag")
-            final String tag
-    ) throws GenieException {
-        LOG.info("Called with id " + id + " and tag " + tag);
-        return this.applicationConfigService.removeTagForApplication(id, tag);
     }
 }
