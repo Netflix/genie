@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -115,6 +116,7 @@ public final class CommandConfigResource {
                     value = "The command to create.",
                     required = true
             )
+            @RequestBody
             final Command command
     ) throws GenieException {
         LOG.info("called to create new command configuration " + command.toString());
@@ -204,23 +206,23 @@ public final class CommandConfigResource {
             @ApiParam(
                     value = "Name of the command."
             )
-            @RequestParam("name")
+            @RequestParam(value = "name", required = false)
             final String name,
             @ApiParam(
                     value = "User who created the command."
             )
-            @RequestParam("userName")
+            @RequestParam(value = "userName", required = false)
             final String userName,
             @ApiParam(
                     value = "The statuses of the commands to find.",
                     allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
-            @RequestParam("status")
+            @RequestParam(value = "status", required = false)
             final Set<String> statuses,
             @ApiParam(
                     value = "Tags for the cluster."
             )
-            @RequestParam("tag")
+            @RequestParam(value = "tag", required = false)
             final Set<String> tags,
             @ApiParam(
                     value = "The page to start on."
@@ -240,7 +242,7 @@ public final class CommandConfigResource {
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
-            @RequestParam("orderBy")
+            @RequestParam(value = "orderBy", required = false)
             final Set<String> orderBys
     ) throws GenieException {
         LOG.info(
@@ -265,7 +267,7 @@ public final class CommandConfigResource {
         );
 
         Set<CommandStatus> enumStatuses = null;
-        if (!statuses.isEmpty()) {
+        if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
             for (final String status : statuses) {
                 if (StringUtils.isNotBlank(status)) {
@@ -316,6 +318,7 @@ public final class CommandConfigResource {
                     value = "The command information to update.",
                     required = true
             )
+            @RequestBody
             final Command updateCommand
     ) throws GenieException {
         LOG.info("Called to update command");
@@ -434,6 +437,7 @@ public final class CommandConfigResource {
                     value = "The configuration files to add.",
                     required = true
             )
+            @RequestBody
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + configs);
@@ -523,6 +527,7 @@ public final class CommandConfigResource {
                     value = "The configuration files to replace existing with.",
                     required = true
             )
+            @RequestBody
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and configs " + configs);
@@ -611,6 +616,7 @@ public final class CommandConfigResource {
                     value = "The tags to add.",
                     required = true
             )
+            @RequestBody
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
@@ -700,6 +706,7 @@ public final class CommandConfigResource {
                     value = "The tags to replace existing with.",
                     required = true
             )
+            @RequestBody
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
@@ -842,6 +849,7 @@ public final class CommandConfigResource {
                     value = "The applications to add.",
                     required = true
             )
+            @RequestBody
             final Set<Application> applications
     ) throws GenieException {
         LOG.info("Called with id " + id + " and application " + applications);
@@ -971,7 +979,7 @@ public final class CommandConfigResource {
                     value = "Status of the cluster.",
                     allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
             )
-            @RequestParam("status")
+            @RequestParam(value = "status", required = false)
             final Set<String> statuses
     ) throws GenieException {
         LOG.info("Called with id " + id + " and statuses " + statuses);

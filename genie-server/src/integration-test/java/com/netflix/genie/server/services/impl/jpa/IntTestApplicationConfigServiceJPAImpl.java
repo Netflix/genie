@@ -955,7 +955,7 @@ public class IntTestApplicationConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveTagForApplicationNullTag() throws GenieException {
-        this.appService.removeTagForApplication(APP_1_ID, null).size();
+        this.appService.removeTagForApplication(APP_1_ID, null);
     }
 
     /**

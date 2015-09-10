@@ -39,6 +39,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -131,6 +132,7 @@ public final class JobResource {
                     value = "Job object to run.",
                     required = true
             )
+            @RequestBody
             final Job job,
             @RequestHeader(FORWARDED_FOR_HEADER)
             final String clientHost,
@@ -308,48 +310,48 @@ public final class JobResource {
             @ApiParam(
                     value = "Id of the job."
             )
-            @RequestParam("id")
+            @RequestParam(value = "id", required = false)
             final String id,
             @ApiParam(
                     value = "Name of the job."
             )
-            @RequestParam("name")
+            @RequestParam(value = "name", required = false)
             final String name,
             @ApiParam(
                     value = "Name of the user who submitted the job."
             )
-            @RequestParam("userName")
+            @RequestParam(value = "userName", required = false)
             final String userName,
             @ApiParam(
                     value = "Statuses of the jobs to fetch.",
                     allowableValues = "INIT, RUNNING, SUCCEEDED, KILLED, FAILED"
             )
-            @RequestParam("status")
+            @RequestParam(value = "status", required = false)
             final Set<String> statuses,
             @ApiParam(
                     value = "Tags for the job."
             )
-            @RequestParam("tag")
+            @RequestParam(value = "tag", required = false)
             final Set<String> tags,
             @ApiParam(
                     value = "Name of the cluster on which the job ran."
             )
-            @RequestParam("executionClusterName")
+            @RequestParam(value = "executionClusterName", required = false)
             final String clusterName,
             @ApiParam(
                     value = "Id of the cluster on which the job ran."
             )
-            @RequestParam("executionClusterId")
+            @RequestParam(value = "executionClusterId", required = false)
             final String clusterId,
             @ApiParam(
                     value = "The page to start on."
             )
-            @RequestParam("commandName")
+            @RequestParam(value = "commandName", required = false)
             final String commandName,
             @ApiParam(
                     value = "Id of the cluster on which the job ran."
             )
-            @RequestParam("commandId")
+            @RequestParam(value = "commandId", required = false)
             final String commandId,
             @ApiParam(
                     value = "The page to start on."
@@ -369,7 +371,7 @@ public final class JobResource {
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
-            @RequestParam("orderBy")
+            @RequestParam(value = "orderBy", required = false)
             final Set<String> orderBys
     ) throws GenieException {
         LOG.info(
@@ -403,7 +405,7 @@ public final class JobResource {
                         + orderBys
         );
         Set<JobStatus> enumStatuses = null;
-        if (!statuses.isEmpty()) {
+        if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(JobStatus.class);
             for (final String status : statuses) {
                 if (StringUtils.isNotBlank(status)) {
@@ -511,6 +513,7 @@ public final class JobResource {
                     value = "The tags to add.",
                     required = true
             )
+            @RequestBody
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
@@ -608,6 +611,7 @@ public final class JobResource {
                     value = "The tags to replace existing with.",
                     required = true
             )
+            @RequestBody
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);

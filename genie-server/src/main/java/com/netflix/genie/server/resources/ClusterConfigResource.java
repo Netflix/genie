@@ -37,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -111,6 +112,7 @@ public final class ClusterConfigResource {
                     value = "The cluster to create.",
                     required = true
             )
+            @RequestBody
             final Cluster cluster
     ) throws GenieException {
         LOG.info("Called to create new cluster " + cluster);
@@ -202,28 +204,28 @@ public final class ClusterConfigResource {
             @ApiParam(
                     value = "Name of the cluster."
             )
-            @RequestParam("name")
+            @RequestParam(value = "name", required = false)
             final String name,
             @ApiParam(
                     value = "Status of the cluster.",
                     allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
             )
-            @RequestParam("status")
+            @RequestParam(value = "status", required = false)
             final Set<String> statuses,
             @ApiParam(
                     value = "Tags for the cluster."
             )
-            @RequestParam("tag")
+            @RequestParam(value = "tag", required = false)
             final Set<String> tags,
             @ApiParam(
                     value = "Minimum time threshold for cluster update"
             )
-            @RequestParam("minUpdateTime")
+            @RequestParam(value = "minUpdateTime", required = false)
             final Long minUpdateTime,
             @ApiParam(
                     value = "Maximum time threshold for cluster update"
             )
-            @RequestParam("maxUpdateTime")
+            @RequestParam(value = "maxUpdateTime", required = false)
             final Long maxUpdateTime,
             @ApiParam(
                     value = "The page to start on."
@@ -243,7 +245,7 @@ public final class ClusterConfigResource {
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
-            @RequestParam("orderBy")
+            @RequestParam(value = "orderBy", required = false)
             final Set<String> orderBys
     ) throws GenieException {
         LOG.info(
@@ -270,7 +272,7 @@ public final class ClusterConfigResource {
         );
         //Create this conversion internal in case someone uses lower case by accident?
         Set<ClusterStatus> enumStatuses = null;
-        if (!statuses.isEmpty()) {
+        if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(ClusterStatus.class);
             for (final String status : statuses) {
                 if (StringUtils.isNotBlank(status)) {
@@ -322,6 +324,7 @@ public final class ClusterConfigResource {
                     value = "The cluster information to update with.",
                     required = true
             )
+            @RequestBody
             final Cluster updateCluster
     ) throws GenieException {
         LOG.info("Called to update cluster with id " + id + " update fields " + updateCluster);
@@ -440,6 +443,7 @@ public final class ClusterConfigResource {
                     value = "The configuration files to add.",
                     required = true
             )
+            @RequestBody
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + configs);
@@ -529,6 +533,7 @@ public final class ClusterConfigResource {
                     value = "The configuration files to replace existing with.",
                     required = true
             )
+            @RequestBody
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and configs " + configs);
@@ -577,6 +582,7 @@ public final class ClusterConfigResource {
                     value = "The commands to add.",
                     required = true
             )
+            @RequestBody
             final List<Command> commands
     ) throws GenieException {
         LOG.info("Called with id " + id + " and commands " + commands);
@@ -624,7 +630,7 @@ public final class ClusterConfigResource {
                     value = "The statuses of the commands to find.",
                     allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
-            @RequestParam("status")
+            @RequestParam(value = "status", required = false)
             final Set<String> statuses
     ) throws GenieException {
         LOG.info("Called with id " + id + " status " + statuses);
@@ -684,6 +690,7 @@ public final class ClusterConfigResource {
                     value = "The commands to replace existing with. Should already be created",
                     required = true
             )
+            @RequestBody
             final List<Command> commands
     ) throws GenieException {
         LOG.info("Called with id " + id + " and commands " + commands);
@@ -820,6 +827,7 @@ public final class ClusterConfigResource {
                     value = "The tags to add.",
                     required = true
             )
+            @RequestBody
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
@@ -908,6 +916,7 @@ public final class ClusterConfigResource {
                     value = "The tags to replace existing with.",
                     required = true
             )
+            @RequestBody
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);

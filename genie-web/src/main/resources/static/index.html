@@ -22,29 +22,29 @@ limitations under the License.
     <title>Genie</title>
     <link rel="shortcut icon" href="images/nficon2014.4.ico">
     <link rel="icon" href="images/nficon2014.4.ico">
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="webjars/bootstrap/2.3.2/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/select2.css"/>
     <link rel="stylesheet" href="css/select2-bootstrap.css"/>
-    <link rel="stylesheet" href="css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="webjars/datatables/1.10.7/css/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="css/dataTables.bootstrap.css"/>
     <link rel="stylesheet" href="css/genie.css"/>
-    <script src="vendor/js/require.js"></script>
+    <script src="webjars/requirejs/2.1.20/require.min.js"></script>
     <script>
         requirejs.config({
             baseUrl: './js', paths: {
-                'bootstrap': '../bootstrap/js/bootstrap',
-                'underscore': '../vendor/js/lodash.min',
+                'bootstrap': '../webjars/bootstrap/2.3.2/js/bootstrap',
+                'underscore': '../webjars/lodash/1.3.1/lodash.min',
                 'pager': '../vendor/js/pager',
-                'knockout': '../vendor/js/knockout-2.2.1',
+                'knockout': '../webjars/knockout/2.2.1/knockout',
                 'knockout.mapping': '../vendor/js/knockout.mapping',
-                'jquery': '../vendor/js/jquery.min-2.0.2',
-                'text': '../vendor/js/text',
+                'jquery': '../webjars/jquery/2.0.2/jquery.min',
+                'text': '../webjars/requirejs-text/2.0.14/text',
                 'stringTemplateEngine': '../vendor/js/stringTemplateEngine',
                 'select2': '../vendor/js/select2',
                 'loadKoTemplate': '../vendor/js/loadKoTemplate',
-                'jqdatatables': '../vendor/js/jquery.dataTables.min',
+                'jqdatatables': '../webjars/datatables/1.10.7/js/jquery.dataTables.min',
                 'dtbootstrap': '../vendor/js/dataTables.bootstrap.min',
-                'moment': '../vendor/js/moment.min',
+                'moment': '../webjars/momentjs/2.10.3/min/moment.min',
                 'momentDurationFormat': '../vendor/js/moment-duration-format'
             },
             shim: {

@@ -17,8 +17,8 @@
  */
 
 /**
- * Classes that represent the Genie service health.
+ * Classes used to configure the Genie web application.
  *
  * @author tgianos
  */
-package com.netflix.genie.web.health;
+package com.netflix.genie.web.config;

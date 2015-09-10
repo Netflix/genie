@@ -53,8 +53,7 @@ public class TestClusterCriteria {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testNullTagsConstructor() throws GeniePreconditionException {
-        final ClusterCriteria cc = new ClusterCriteria(null);
-        cc.getTags();
+        new ClusterCriteria(null);
     }
 
     /**
@@ -65,8 +64,7 @@ public class TestClusterCriteria {
     @Test(expected = GeniePreconditionException.class)
     public void testEmptyTagsConstructor() throws GeniePreconditionException {
         final Set<String> tags = new HashSet<>();
-        final ClusterCriteria cc = new ClusterCriteria(tags);
-        cc.getTags();
+        new ClusterCriteria(tags);
     }
 
     /**

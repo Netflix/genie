@@ -204,23 +204,23 @@ public final class ApplicationConfigResource {
             @ApiParam(
                     value = "Name of the application."
             )
-            @RequestParam("name")
+            @RequestParam(value = "name", required = false)
             final String name,
             @ApiParam(
                     value = "User who created the application."
             )
-            @RequestParam("userName")
+            @RequestParam(value = "userName", required = false)
             final String userName,
             @ApiParam(
                     value = "The status of the applications to get.",
                     allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
-            @RequestParam("status")
+            @RequestParam(value = "status", required = false)
             final Set<String> statuses,
             @ApiParam(
                     value = "Tags for the cluster."
             )
-            @RequestParam("tag")
+            @RequestParam(value = "tag", required = false)
             final Set<String> tags,
             @ApiParam(
                     value = "The page to start on."
@@ -240,7 +240,7 @@ public final class ApplicationConfigResource {
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
-            @RequestParam("orderBy")
+            @RequestParam(value = "orderBy[]", required = false)
             final Set<String> orderBys
     ) throws GenieException {
         LOG.info(
@@ -264,7 +264,7 @@ public final class ApplicationConfigResource {
                         + orderBys
         );
         Set<ApplicationStatus> enumStatuses = null;
-        if (!statuses.isEmpty()) {
+        if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
             for (final String status : statuses) {
                 if (StringUtils.isNotBlank(status)) {
@@ -420,6 +420,7 @@ public final class ApplicationConfigResource {
                     value = "The configuration files to add.",
                     required = true
             )
+            @RequestBody
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + configs);
@@ -509,6 +510,7 @@ public final class ApplicationConfigResource {
                     value = "The configuration files to replace existing with.",
                     required = true
             )
+            @RequestBody
             final Set<String> configs
     ) throws GenieException {
         LOG.info("Called with id " + id + " and configs " + configs);
@@ -597,6 +599,7 @@ public final class ApplicationConfigResource {
                     value = "The jar files to add.",
                     required = true
             )
+            @RequestBody
             final Set<String> jars
     ) throws GenieException {
         LOG.info("Called with id " + id + " and jars " + jars);
@@ -686,6 +689,7 @@ public final class ApplicationConfigResource {
                     value = "The jar files to replace existing with.",
                     required = true
             )
+            @RequestBody
             final Set<String> jars
     ) throws GenieException {
         LOG.info("Called with id " + id + " and jars " + jars);
@@ -774,6 +778,7 @@ public final class ApplicationConfigResource {
                     value = "The tags to add.",
                     required = true
             )
+            @RequestBody
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and config " + tags);
@@ -863,6 +868,7 @@ public final class ApplicationConfigResource {
                     value = "The tags to replace existing with.",
                     required = true
             )
+            @RequestBody
             final Set<String> tags
     ) throws GenieException {
         LOG.info("Called with id " + id + " and tags " + tags);
@@ -1001,7 +1007,7 @@ public final class ApplicationConfigResource {
                     value = "The statuses of the commands to find.",
                     allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
-            @RequestParam("status")
+            @RequestParam(value = "status", required = false)
             final Set<String> statuses
     ) throws GenieException {
         LOG.info("Called with id " + id);

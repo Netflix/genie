@@ -15,9 +15,18 @@ dependencies {
 
     compile(project(":genie-server"))
     compile("org.springframework.boot:spring-boot-starter-actuator")
+
+    // Web Jars
     compile("org.webjars:bootstrap:${bootstrap_version}")
+    compile("org.webjars:datatables:${datatables_version}")
+//    compile("org.webjars:datatables-bootstrap:${datatables_bootstrap_version}")
     compile("org.webjars:jquery:${jquery_version}")
     compile("org.webjars:knockout:${knockout_version}")
+    compile("org.webjars:lodash:${lodash_version}")
+    compile("org.webjars:momentjs:${momentjs_version}")
+    compile("org.webjars:requirejs:${requirejs_version}")
+    compile("org.webjars:requirejs-text:${requirejs_text_version}")
+//    compile("org.webjars:select2:${select2_version}")
 
     /*******************************
      * Provided Dependencies
@@ -28,8 +37,6 @@ dependencies {
      *******************************/
 
     runtime("org.springframework.boot:spring-boot-starter-tomcat")
-    runtime("javax.servlet:jstl")
-    runtime("org.apache.tomcat.embed:tomcat-embed-jasper")
 
     /*******************************
      * Test Dependencies
