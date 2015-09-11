@@ -56,7 +56,7 @@ define([
             $.ajax({
                 type: 'PUT',
                 headers: {'content-type':'application/json', 'Accept':'application/json'},
-                url: 'genie/v2/config/clusters/'+self.id(),
+                url: 'api/v3/clusters/'+self.id(),
                 data: JSON.stringify({status: self.status()})
             }).done(function(data) {
                 self.objStatus('ready');
@@ -93,7 +93,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/clusters?status=UP&status=OUT_OF_SERVICE'
+                url:  'api/v3/clusters?status=UP&status=OUT_OF_SERVICE'
             }).done(function(data) {
             	if (data instanceof Array) {
                     _.each(data, function(clusterObj, index) {
@@ -152,7 +152,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/clusters',
+                url:  'api/v3/clusters',
                 traditional: true,
                 data: {limit: limit, name: name, status: status, tag: self.selectedTags(), orderBy: self.clusterOrderBySelectedFields(), descending: bDescending }
             }).done(function(data) {
@@ -168,7 +168,7 @@ define([
                         }).append($("<img/>", {src: '../images/folder.svg', class: 'open-icon'}))).html();
 
                         clusterObj.rawLink  = $("<div />").append($("<a />", {
-                            href : "genie/v2/config/clusters/" + clusterObj.id,
+                            href : "api/v3/clusters/" + clusterObj.id,
                             target: "_blank"
                         }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
@@ -231,7 +231,7 @@ define([
                 $.ajax({
                     type: 'GET',
                     headers: {'Accept':'application/json'},
-                    url:  'genie/v2/config/clusters/'+clusterId
+                    url:  'api/v3/clusters/'+clusterId
                 }).done(function(clusterObj) {
                 	console.log(clusterObj);
 
@@ -246,7 +246,7 @@ define([
                     $.ajax({
                         type: 'GET',
                         headers: {'Accept':'application/json'},
-                        url:  'genie/v2/config/clusters/'+clusterId+'/commands?status=ACTIVE'
+                        url:  'api/v3/clusters/'+clusterId+'/commands?status=ACTIVE'
                     }).done(function(commands) {
                         console.log(commands);
                         clusterObj.commands = commands;

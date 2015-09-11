@@ -53,7 +53,7 @@ define([
             $.ajax({
                 type: 'PUT',
                 headers: {'content-type':'application/json', 'Accept':'application/json'},
-                url: 'genie/v2/config/applications/'+self.id(),
+                url: 'api/v3/applications/'+self.id(),
                 data: JSON.stringify({status: self.status()})
             }).done(function(data) {
                 self.objStatus('ready');
@@ -91,7 +91,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/applications?status=ACTIVE'
+                url:  'api/v3/applications?status=ACTIVE'
             }).done(function(data) {
             	if (data instanceof Array) {
                     _.each(data, function(applicationObj, index) {
@@ -150,7 +150,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/applications',
+                url:  'api/v3/applications',
                 traditional: true,
                 data: {limit: limit, name: name, status: status, tag: self.selectedTags(), orderBy: self.applicationOrderBySelectedFields(), descending: bDescending}
             }).done(function(data) {
@@ -167,7 +167,7 @@ define([
                         }).append($("<img/>", {src: '../images/folder.svg', class: 'open-icon'}))).html();
 
                         applicationObj.rawLink  = $("<div />").append($("<a />", {
-                            href : "genie/v2/config/applications/" + applicationObj.id,
+                            href : "api/v3/applications/" + applicationObj.id,
                             target: "_blank"
                         }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
@@ -228,7 +228,7 @@ define([
                 $.ajax({
                     type: 'GET',
                     headers: {'Accept':'application/json'},
-                    url:  'genie/v2/config/applications/'+applicationId
+                    url:  'api/v3/applications/'+applicationId
                 }).done(function(applicationObj) {
                 	console.log(applicationObj);
 
@@ -245,7 +245,7 @@ define([
                     $.ajax({
                         type: 'GET',
                         headers: {'Accept':'application/json'},
-                        url:  'genie/v2/config/applications/'+applicationId+'/commands?status=ACTIVE'
+                        url:  'api/v3/applications/'+applicationId+'/commands?status=ACTIVE'
                     }).done(function(commands) {
                         console.log(commands);
                         self.current().commands(commands);

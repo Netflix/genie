@@ -26,7 +26,7 @@ import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.server.jobmanager.JobManager;
 import com.netflix.genie.server.jobmanager.JobManagerFactory;
 import com.netflix.genie.server.metrics.GenieNodeStatistics;
-import com.netflix.genie.server.repository.jpa.JobRepository;
+import com.netflix.genie.server.repositories.jpa.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
 import org.junit.Assert;
 import org.junit.Before;

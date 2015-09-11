@@ -91,7 +91,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/jobs',
+                url:  'api/v3/jobs',
                 data: {status: 'RUNNING'}
             }).done(function(data) {
                 // check to see if jobInfo is an array
@@ -146,7 +146,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/jobs',
+                url:  'api/v3/jobs',
                 traditional: true,
                 data: {limit: limit,
                         userName: user,
@@ -177,7 +177,7 @@ define([
                         }).append($("<img/>", {src: '../images/folder.svg', class: 'open-icon'}))).html();
 
                         jobObj.rawLink  = $("<div />").append($("<a />", {
-                            href : "genie/v2/jobs/" + jobObj.id,
+                            href : "api/v3/jobs/" + jobObj.id,
                             target: "_blank"
                         }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 

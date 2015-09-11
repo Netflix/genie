@@ -15,12 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.server;
+package com.netflix.genie.web.configs;
 
-import com.github.springtestdbunit.bean.DatabaseConfigBean;
-import com.github.springtestdbunit.bean.DatabaseDataSourceConnectionFactoryBean;
-import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,27 +27,29 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import javax.sql.DataSource;
 import javax.validation.Validator;
 
 /**
- * Spring configuration class for integration tests.
+ * Main Genie Spring Configuration class.
  *
  * @author tgianos
  */
 @Configuration
-@EnableAutoConfiguration
 @ComponentScan("com.netflix.genie")
-@EnableJpaRepositories("com.netflix.genie.server.repositories.jpa")
+@EnableAutoConfiguration
+@EnableConfigurationProperties
 @EnableElasticsearchRepositories("com.netflix.genie.server.repositories.elasticsearch")
-@EntityScan("com.netflix.genie.common.model")
-@EnableTransactionManagement
+@EnableJpaRepositories("com.netflix.genie.server.repositories.jpa")
 @EnableRetry
-public class GenieServerTestSpringApplication {
+@EnableScheduling
+@EnableTransactionManagement
+@EntityScan("com.netflix.genie.common.model")
+public class GenieConfig {
 
     /**
      * Setup bean validation.
@@ -71,28 +72,12 @@ public class GenieServerTestSpringApplication {
     }
 
     /**
-     * Get the DBUnit configuration.
+     * Spring Boot Main.
      *
-     * @return The config bean
+     * @param args Program arguments
+     * @throws Exception For any failure during program execution
      */
-    @Bean
-     public DatabaseConfigBean dbUnitDatabaseConfig() {
-        final DatabaseConfigBean dbConfig = new DatabaseConfigBean();
-        dbConfig.setDatatypeFactory(new HsqldbDataTypeFactory());
-        return dbConfig;
-    }
-
-    /**
-     * Get the database connection factory bean.
-     *
-     * @param dataSource The data source to use
-     * @return The database connection factory bean for dbunit.
-     */
-    @Bean
-    public DatabaseDataSourceConnectionFactoryBean dbUnitDatabaseConnection(final DataSource dataSource) {
-        final DatabaseDataSourceConnectionFactoryBean dbConnection
-                = new DatabaseDataSourceConnectionFactoryBean(dataSource);
-        dbConnection.setDatabaseConfig(dbUnitDatabaseConfig());
-        return dbConnection;
+    public static void main(final String[] args) throws Exception {
+        SpringApplication.run(GenieConfig.class, args);
     }
 }

@@ -23,7 +23,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.server.GenieServerTestSpringApplication;
 import com.netflix.genie.server.metrics.JobCountManager;
-import com.netflix.genie.server.repository.jpa.JobRepository;
+import com.netflix.genie.server.repositories.jpa.JobRepository;
 import com.netflix.genie.server.util.NetUtil;
 import org.junit.Assert;
 import org.junit.Test;

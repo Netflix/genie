@@ -68,7 +68,7 @@ define([
             $.ajax({
                 type: 'PUT',
                 headers: {'content-type':'application/json', 'Accept':'application/json'},
-                url: 'genie/v2/config/commands/'+self.id(),
+                url: 'api/v3/commands/'+self.id(),
                 data: JSON.stringify({status: self.status()})
             }).done(function(data) {
                 self.objStatus('ready');
@@ -106,7 +106,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/commands?status=ACTIVE'
+                url:  'api/v3/commands?status=ACTIVE'
             }).done(function(data) {
             	if (data instanceof Array) {
                     _.each(data, function(commandObj, index) {
@@ -165,7 +165,7 @@ define([
                 global: false,
                 type: 'GET',
                 headers: {'Accept':'application/json'},
-                url:  'genie/v2/config/commands',
+                url:  'api/v3/commands',
                 traditional: true,
                 data: {limit: limit, name: name, status: status, tag: self.selectedTags(), orderBy: self.commandOrderBySelectedFields(), descending: bDescending }
             }).done(function(data) {
@@ -181,7 +181,7 @@ define([
                         }).append($("<img/>", {src: '../images/folder.svg', class: 'open-icon'}))).html();
 
                         commandObj.rawLink  = $("<div />").append($("<a />", {
-                            href : "genie/v2/config/commands/" + commandObj.id,
+                            href : "api/v3/commands/" + commandObj.id,
                             target: "_blank"
                         }).append($("<img/>", {src: '../images/genie.gif', class: 'genie-icon'}))).html();
 
@@ -242,7 +242,7 @@ define([
                 $.ajax({
                     type: 'GET',
                     headers: {'Accept':'application/json'},
-                    url:  'genie/v2/config/commands/'+commandId
+                    url:  'api/v3/commands/'+commandId
                 }).done(function(commandObj) {
                 	//console.log(command);
 
@@ -258,7 +258,7 @@ define([
                     $.ajax({
                         type: 'GET',
                         headers: {'Accept':'application/json'},
-                        url:  'genie/v2/config/commands/'+commandId+'/clusters?status=UP'
+                        url:  'api/v3/commands/'+commandId+'/clusters?status=UP'
                     }).done(function(clusters) {
                         self.current().clusters(clusters);
                     });
@@ -266,7 +266,7 @@ define([
                     $.ajax({
                         type: 'GET',
                         headers: {'Accept':'application/json'},
-                        url:  'genie/v2/config/commands/'+commandId+'/application'
+                        url:  'api/v3/commands/'+commandId+'/application'
                     }).done(function(application) {
                         console.log("Application: " + application);
                         self.current().application(application);

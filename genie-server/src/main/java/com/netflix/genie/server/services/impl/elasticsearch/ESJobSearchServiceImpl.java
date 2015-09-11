@@ -20,7 +20,7 @@ package com.netflix.genie.server.services.impl.elasticsearch;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
-import com.netflix.genie.server.repository.elasticsearch.ESJobRepository;
+import com.netflix.genie.server.repositories.elasticsearch.ESJobRepository;
 import com.netflix.genie.server.services.JobSearchService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;

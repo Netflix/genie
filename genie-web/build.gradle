@@ -15,6 +15,12 @@ dependencies {
 
     compile(project(":genie-server"))
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-tomcat")
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_eureka_version}")
+
+    // Swagger Libs
+    compile("io.swagger:swagger-jersey2-jaxrs:${swagger_version}")
 
     // Web Jars
     compile("org.webjars:bootstrap:${bootstrap_version}")
@@ -35,8 +41,6 @@ dependencies {
     /*******************************
      * Runtime Dependencies
      *******************************/
-
-    runtime("org.springframework.boot:spring-boot-starter-tomcat")
 
     /*******************************
      * Test Dependencies
