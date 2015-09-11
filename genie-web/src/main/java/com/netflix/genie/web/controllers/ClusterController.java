@@ -22,7 +22,7 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.server.services.ClusterConfigService;
+import com.netflix.genie.core.services.ClusterConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

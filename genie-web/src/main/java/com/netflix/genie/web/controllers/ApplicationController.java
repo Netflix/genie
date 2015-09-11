@@ -22,7 +22,7 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.server.services.ApplicationConfigService;
+import com.netflix.genie.core.services.ApplicationConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

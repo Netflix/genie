@@ -18,8 +18,8 @@
 package com.netflix.genie.web.startup;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.server.jobmanager.JobJanitor;
-import com.netflix.genie.server.metrics.JobCountMonitor;
+import com.netflix.genie.core.jobmanager.JobJanitor;
+import com.netflix.genie.core.metrics.JobCountMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
