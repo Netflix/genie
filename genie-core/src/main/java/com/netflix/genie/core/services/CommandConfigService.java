@@ -210,17 +210,17 @@ public interface CommandConfigService {
     /**
      * Set the applications for the command.
      *
-     * @param id           The id of the command to add the application file to. Not
-     *                     null/empty/blank.
-     * @param applications The applicationss to set. Not null.
+     * @param id             The id of the command to add the application file to. Not
+     *                       null/empty/blank.
+     * @param applicationIds The ids of the applications to set. Not null.
      * @return The application
      * @throws GenieException if there is an error
      */
     Set<Application> setApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to add applications.")
             final String id,
-            @NotNull(message = "No applications entered. Unable to set applications.")
-            final Set<Application> applications
+            @NotNull(message = "No application ids entered. Unable to set applications.")
+            final Set<String> applicationIds
     ) throws GenieException;
 
     /**

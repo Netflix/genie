@@ -23,7 +23,6 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.core.repositories.jpa.ApplicationRepository;
@@ -316,7 +315,7 @@ public class TestCommandConfigServiceJPAImpl {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testSetApplicationsForCommandNoAppId() throws GenieException {
-        this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(new Application()));
+        this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(UUID.randomUUID().toString()));
     }
 
     /**
@@ -329,9 +328,7 @@ public class TestCommandConfigServiceJPAImpl {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
         Mockito.when(this.applicationRepository.exists(Mockito.anyString())).thenReturn(true);
-        final Application app = Mockito.mock(Application.class);
-        Mockito.when(app.getId()).thenReturn(UUID.randomUUID().toString());
-        this.service.setApplicationsForCommand(id, Sets.newHashSet(app));
+        this.service.setApplicationsForCommand(id, Sets.newHashSet(UUID.randomUUID().toString()));
     }
 
     /**
@@ -341,11 +338,9 @@ public class TestCommandConfigServiceJPAImpl {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testSetApplicationsForCommandNoAppExists() throws GenieException {
-        final Application app = new Application();
         final String appId = UUID.randomUUID().toString();
-        app.setId(appId);
         Mockito.when(this.applicationRepository.exists(appId)).thenReturn(false);
-        this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(app));
+        this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(appId));
     }
 
     /**

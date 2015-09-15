@@ -803,9 +803,9 @@ public final class CommandController {
     /**
      * Set the application for the given command.
      *
-     * @param id           The id of the command to add the applications to. Not
-     *                     null/empty/blank.
-     * @param applications The applications to set. Not null.
+     * @param id             The id of the command to add the applications to. Not
+     *                       null/empty/blank.
+     * @param applicationIds The ids of the applications to set. Not null.
      * @return The active applications for this command.
      * @throws GenieException For any error
      */
@@ -842,14 +842,16 @@ public final class CommandController {
             @PathVariable("id")
             final String id,
             @ApiParam(
-                    value = "The applications to add.",
+                    value = "The ids of the applications to set.",
                     required = true
             )
             @RequestBody
-            final Set<Application> applications
+            final Set<String> applicationIds
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and application " + applications);
-        return this.commandConfigService.setApplicationsForCommand(id, applications);
+        if (LOG.isDebugEnabled()) {
+            LOG.info("Called with id " + id + " and application " + applicationIds);
+        }
+        return this.commandConfigService.setApplicationsForCommand(id, applicationIds);
     }
 
     /**

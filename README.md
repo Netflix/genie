@@ -3,6 +3,12 @@
 [![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg)]
 (https://bintray.com/netflixoss/maven/genie/_latestVersion)
 
+## In Active Development
+
+This branch contains code in active development towards Genie 3.0. It is not yet ready for use. If you're looking for 
+a version that is ready for production please see the [master](https://github.com/Netflix/genie/tree/master) branch. 
+If you want to see what we're working on see the [3.0.0 Milestone](https://github.com/Netflix/genie/milestones/3.0.0).
+
 ## Introduction
 
 Genie is a federated job execution engine developed by Netflix. Genie provides REST-ful APIs to run a variety of big

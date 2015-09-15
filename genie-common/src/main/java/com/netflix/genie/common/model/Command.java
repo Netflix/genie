@@ -37,8 +37,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -188,8 +188,8 @@ public class Command extends CommonFields {
      *
      * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @PrePersist
-    @PreUpdate
+    @PostPersist
+    @PostUpdate
     protected void onCreateOrUpdateCommand() throws GeniePreconditionException {
         this.addAndValidateSystemTags(this.tags);
     }

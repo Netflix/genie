@@ -34,8 +34,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -157,8 +157,8 @@ public class Application extends CommonFields {
      *
      * @throws GeniePreconditionException If any preconditions aren't met.
      */
-    @PrePersist
-    @PreUpdate
+    @PostPersist
+    @PostUpdate
     protected void onCreateOrUpdateApplication() throws GeniePreconditionException {
         this.addAndValidateSystemTags(this.tags);
     }

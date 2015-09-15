@@ -112,7 +112,9 @@ public final class ApplicationController {
             @RequestBody
             final Application app
     ) throws GenieException {
-        LOG.info("Called to create new application");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to create new application");
+        }
         final Application createdApp = this.applicationConfigService.createApplication(app);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -165,7 +167,9 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called to get Application for id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to get Application for id " + id);
+        }
         return this.applicationConfigService.getApplication(id);
     }
 
@@ -218,7 +222,7 @@ public final class ApplicationController {
             @RequestParam(value = "status", required = false)
             final Set<String> statuses,
             @ApiParam(
-                    value = "Tags for the cluster."
+                    value = "Tags for the application."
             )
             @RequestParam(value = "tag", required = false)
             final Set<String> tags,
@@ -240,29 +244,31 @@ public final class ApplicationController {
             @ApiParam(
                     value = "The fields to order the results by. Must not be collection fields. Default is updated."
             )
-            @RequestParam(value = "orderBy[]", required = false)
+            @RequestParam(value = "orderBy", required = false)
             final Set<String> orderBys
     ) throws GenieException {
-        LOG.info(
-                "Called [name | userName | status | tags | page | limit | descending | orderBys]"
-        );
-        LOG.info(
-                name
-                        + " | "
-                        + userName
-                        + " | "
-                        + statuses
-                        + " | "
-                        + tags
-                        + " | "
-                        + page
-                        + " | "
-                        + limit
-                        + " | "
-                        + descending
-                        + " | "
-                        + orderBys
-        );
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                    "Called [name | userName | status | tags | page | limit | descending | orderBys]"
+            );
+            LOG.debug(
+                    name
+                            + " | "
+                            + userName
+                            + " | "
+                            + statuses
+                            + " | "
+                            + tags
+                            + " | "
+                            + page
+                            + " | "
+                            + limit
+                            + " | "
+                            + descending
+                            + " | "
+                            + orderBys
+            );
+        }
         Set<ApplicationStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
@@ -312,7 +318,9 @@ public final class ApplicationController {
             @RequestBody
             final Application updateApp
     ) throws GenieException {
-        LOG.info("called to update application config with info " + updateApp.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called to update application config with info " + updateApp.toString());
+        }
         return this.applicationConfigService.updateApplication(id, updateApp);
     }
 
@@ -336,7 +344,9 @@ public final class ApplicationController {
             )
     })
     public List<Application> deleteAllApplications() throws GenieException {
-        LOG.info("Delete all Applications");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Delete all Applications");
+        }
         return this.applicationConfigService.deleteAllApplications();
     }
 
@@ -375,7 +385,9 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Delete an application with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Delete an application with id " + id);
+        }
         return this.applicationConfigService.deleteApplication(id);
     }
 
@@ -388,7 +400,7 @@ public final class ApplicationController {
      * @return The active configurations for this application.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add new configuration files to an application",
             notes = "Add the supplied configuration files to the application with the supplied id.",
@@ -423,7 +435,9 @@ public final class ApplicationController {
             @RequestBody
             final Set<String> configs
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and config " + configs);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and config " + configs);
+        }
         return this.applicationConfigService.addConfigsToApplication(id, configs);
     }
 
@@ -464,7 +478,9 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         return this.applicationConfigService.getConfigsForApplication(id);
     }
 
@@ -513,7 +529,9 @@ public final class ApplicationController {
             @RequestBody
             final Set<String> configs
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and configs " + configs);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and configs " + configs);
+        }
         return this.applicationConfigService.updateConfigsForApplication(id, configs);
     }
 
@@ -554,7 +572,9 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         return this.applicationConfigService.removeAllConfigsForApplication(id);
     }
 
@@ -602,7 +622,9 @@ public final class ApplicationController {
             @RequestBody
             final Set<String> jars
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and jars " + jars);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and jars " + jars);
+        }
         return this.applicationConfigService.addJarsForApplication(id, jars);
     }
 
@@ -643,7 +665,9 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         return this.applicationConfigService.getJarsForApplication(id);
     }
 
@@ -692,7 +716,9 @@ public final class ApplicationController {
             @RequestBody
             final Set<String> jars
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and jars " + jars);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and jars " + jars);
+        }
         return this.applicationConfigService.updateJarsForApplication(id, jars);
     }
 
@@ -733,7 +759,9 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         return this.applicationConfigService.removeAllJarsForApplication(id);
     }
 
@@ -781,7 +809,9 @@ public final class ApplicationController {
             @RequestBody
             final Set<String> tags
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and config " + tags);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and config " + tags);
+        }
         return this.applicationConfigService.addTagsForApplication(id, tags);
     }
 
@@ -822,7 +852,9 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         return this.applicationConfigService.getTagsForApplication(id);
     }
 
@@ -871,7 +903,9 @@ public final class ApplicationController {
             @RequestBody
             final Set<String> tags
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tags " + tags);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tags " + tags);
+        }
         return this.applicationConfigService.updateTagsForApplication(id, tags);
     }
 
@@ -913,7 +947,9 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         return this.applicationConfigService.removeAllTagsForApplication(id);
     }
 
@@ -962,7 +998,9 @@ public final class ApplicationController {
             @PathVariable("tag")
             final String tag
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tag " + tag);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tag " + tag);
+        }
         return this.applicationConfigService.removeTagForApplication(id, tag);
     }
 
@@ -1010,10 +1048,12 @@ public final class ApplicationController {
             @RequestParam(value = "status", required = false)
             final Set<String> statuses
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
 
         Set<CommandStatus> enumStatuses = null;
-        if (!statuses.isEmpty()) {
+        if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
             for (final String status : statuses) {
                 if (StringUtils.isNotBlank(status)) {

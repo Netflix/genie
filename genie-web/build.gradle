@@ -8,6 +8,10 @@ apply plugin: 'spring-boot'
 //    ]
 //}
 
+license {
+    excludes(["static/*"])
+}
+
 dependencies {
     /*******************************
      * Compile Dependencies
@@ -43,6 +47,9 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
+
+    integrationTestCompile("org.dbunit:dbunit:${dbunit_version}")
+    integrationTestCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
 }
 
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"

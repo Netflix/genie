@@ -347,19 +347,18 @@ public class CommandConfigServiceJPAImpl implements CommandConfigService {
     public Set<Application> setApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to add applications.")
             final String id,
-            @NotNull(message = "No applications entered. Unable to set applications.")
-            final Set<Application> applications
+            @NotNull(message = "No application ids entered. Unable to set applications.")
+            final Set<String> applicationIds
     ) throws GenieException {
-        if (applications.size()
-                != applications.stream().filter(application -> this.appRepo.exists(application.getId())).count()) {
-            throw new GeniePreconditionException("All applications must have an id and exist to add to a command");
+        if (applicationIds.size() != applicationIds.stream().filter(this.appRepo::exists).count()) {
+            throw new GeniePreconditionException("All applications exist to add to a command");
         }
 
         final Command command = this.commandRepo.findOne(id);
         if (command != null) {
             final Set<Application> attachedApplications = new HashSet<>();
-            applications.stream().forEach(
-                    application -> attachedApplications.add(this.appRepo.findOne(application.getId()))
+            applicationIds.stream().forEach(
+                    applicationId -> attachedApplications.add(this.appRepo.findOne(applicationId))
             );
             command.setApplications(attachedApplications);
             return command.getApplications();

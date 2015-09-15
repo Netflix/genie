@@ -37,8 +37,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -168,8 +168,8 @@ public class Cluster extends CommonFields {
      *
      * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @PrePersist
-    @PreUpdate
+    @PostPersist
+    @PostUpdate
     protected void onCreateOrUpdateCluster() throws GeniePreconditionException {
         this.addAndValidateSystemTags(this.tags);
     }

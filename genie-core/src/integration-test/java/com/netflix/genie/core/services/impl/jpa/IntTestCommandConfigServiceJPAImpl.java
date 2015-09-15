@@ -20,7 +20,6 @@ package com.netflix.genie.core.services.impl.jpa;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
@@ -723,9 +722,8 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         final Command command2 = this.service.getCommand(COMMAND_2_ID);
         Assert.assertTrue(command2.getApplications().isEmpty());
 
-        final Application app = this.appService.getApplication(APP_1_ID);
-        final Set<Application> apps = new HashSet<>();
-        apps.add(app);
+        final Set<String> appIds = new HashSet<>();
+        appIds.add(APP_1_ID);
         final List<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(1, preCommands
@@ -734,7 +732,7 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
                         .count()
         );
 
-        this.service.setApplicationsForCommand(COMMAND_2_ID, apps);
+        this.service.setApplicationsForCommand(COMMAND_2_ID, appIds);
 
         final List<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(2, savedCommands.size());

@@ -86,7 +86,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
     public Application createApplication(
             @NotNull(message = "No application entered to create.")
             @Valid
-            final Application app) throws GenieException {
+            final Application app
+    ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with application: " + app.toString());
         }
@@ -166,7 +167,17 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with app " + updateApp.toString());
         }
-        return this.applicationRepo.save(updateApp);
+        final Application persistedApp = this.applicationRepo.findOne(id);
+        persistedApp.setName(updateApp.getName());
+        persistedApp.setUser(updateApp.getUser());
+        persistedApp.setVersion(updateApp.getVersion());
+        persistedApp.setDescription(updateApp.getDescription());
+        persistedApp.setStatus(updateApp.getStatus());
+        persistedApp.setSetupFile(updateApp.getSetupFile());
+        persistedApp.setConfigs(updateApp.getConfigs());
+        persistedApp.setDependencies(updateApp.getDependencies());
+        persistedApp.setTags(updateApp.getTags());
+        return this.applicationRepo.save(persistedApp);
     }
 
     /**
@@ -507,10 +518,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         if (app != null) {
             @SuppressWarnings("unchecked")
             final List<Command> commands = this.commandRepo.findAll(
-                    CommandSpecs.findCommandsForApplication(
-                            id,
-                            statuses
-                    ));
+                    CommandSpecs.findCommandsForApplication(id, statuses)
+            );
             return commands;
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
