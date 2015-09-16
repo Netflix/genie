@@ -30,7 +30,7 @@ import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.core.repositories.jpa.CommandRepository;
 import com.netflix.genie.core.repositories.jpa.JobRepository;
-import com.netflix.genie.core.services.ClusterConfigService;
+import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.repositories.jpa.ClusterRepository;
 import com.netflix.genie.core.repositories.jpa.ClusterSpecs;
 import org.apache.commons.lang3.StringUtils;
@@ -66,9 +66,9 @@ import java.util.stream.Collectors;
                 ConstraintViolationException.class
         }
 )
-public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
+public class ClusterServiceJPAImpl implements ClusterService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceJPAImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterServiceJPAImpl.class);
     private static final char CRITERIA_DELIMITER = ',';
     private final ClusterRepository clusterRepo;
     private final CommandRepository commandRepo;
@@ -82,7 +82,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * @param jobRepo     The job repository to use.
      */
     @Autowired
-    public ClusterConfigServiceJPAImpl(
+    public ClusterServiceJPAImpl(
             final ClusterRepository clusterRepo,
             final CommandRepository commandRepo,
             final JobRepository jobRepo
@@ -244,7 +244,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    public List<Cluster> deleteAllClusters() throws GenieException {
+    public void deleteAllClusters() throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to delete all clusters");
         }
@@ -252,14 +252,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
         for (final Cluster cluster : clusters) {
             this.deleteCluster(cluster.getId());
         }
-        return clusters;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cluster deleteCluster(
+    public void deleteCluster(
             @NotBlank(message = "No id entered unable to delete.")
             final String id
     ) throws GenieException {
@@ -281,7 +280,6 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             }
         }
         this.clusterRepo.delete(cluster);
-        return cluster;
     }
 
     /**
@@ -355,17 +353,17 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     public List<Command> addCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to add commands.")
             final String id,
-            @NotEmpty(message = "No commands entered. Unable to add commands.")
-            final List<Command> commands
+            @NotEmpty(message = "No command ids entered. Unable to add commands.")
+            final List<String> commandIds
     ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
-            for (final Command detached : commands) {
-                final Command cmd = this.commandRepo.findOne(detached.getId());
+            for (final String commandId : commandIds) {
+                final Command cmd = this.commandRepo.findOne(commandId);
                 if (cmd != null) {
                     cluster.addCommand(cmd);
                 } else {
-                    throw new GenieNotFoundException("No command with id " + detached.getId() + " exists.");
+                    throw new GenieNotFoundException("No command with id " + commandId + " exists.");
                 }
             }
             return cluster.getCommands();
@@ -408,18 +406,18 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
     public List<Command> updateCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to update commands.")
             final String id,
-            @NotEmpty(message = "No commands entered. Unable to add commands.")
-            final List<Command> commands
+            @NotEmpty(message = "No command ids entered. Unable to update commands.")
+            final List<String> commandIds
     ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             final List<Command> cmds = new ArrayList<>();
-            for (final Command detached : commands) {
-                final Command cmd = this.commandRepo.findOne(detached.getId());
+            for (final String commandId : commandIds) {
+                final Command cmd = this.commandRepo.findOne(commandId);
                 if (cmd != null) {
                     cmds.add(cmd);
                 } else {
-                    throw new GenieNotFoundException("No command with id " + detached.getId() + " exists.");
+                    throw new GenieNotFoundException("No command with id " + commandId + " exists.");
                 }
             }
             cluster.setCommands(cmds);
@@ -433,7 +431,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    public List<Command> removeAllCommandsForCluster(
+    public void removeAllCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to remove commands.")
             final String id
     ) throws GenieException {
@@ -444,7 +442,6 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             for (final Command cmd : cmdList) {
                 cluster.removeCommand(cmd);
             }
-            return cluster.getCommands();
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
@@ -454,7 +451,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    public List<Command> removeCommandForCluster(
+    public void removeCommandForCluster(
             @NotBlank(message = "No cluster id entered. Unable to remove command.")
             final String id,
             @NotBlank(message = "No command id entered. Unable to remove command.")
@@ -468,7 +465,6 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             } else {
                 throw new GenieNotFoundException("No command with id " + cmdId + " exists.");
             }
-            return cluster.getCommands();
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
@@ -533,14 +529,13 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeAllTagsForCluster(
+    public void removeAllTagsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to remove tags.")
             final String id
     ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
             cluster.getTags().clear();
-            return cluster.getTags();
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
@@ -550,7 +545,7 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeTagForCluster(
+    public void removeTagForCluster(
             @NotBlank(message = "No cluster id entered. Unable to remove tag.")
             final String id,
             @NotBlank(message = "No tag entered. Unable to remove.")
@@ -561,7 +556,6 @@ public class ClusterConfigServiceJPAImpl implements ClusterConfigService {
             if (StringUtils.isNotBlank(tag)) {
                 cluster.getTags().remove(tag);
             }
-            return cluster.getTags();
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }

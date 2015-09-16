@@ -19,8 +19,8 @@ package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.ClusterStatus;
+import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -40,7 +40,7 @@ import java.util.Set;
  * @author tgianos
  */
 @Validated
-public interface ClusterConfigService {
+public interface ClusterService {
 
     /**
      * Create new cluster configuration.
@@ -124,19 +124,17 @@ public interface ClusterConfigService {
     /**
      * Delete all clusters from database.
      *
-     * @return The deleted clusters
      * @throws GenieException if there is an error
      */
-    List<Cluster> deleteAllClusters() throws GenieException;
+    void deleteAllClusters() throws GenieException;
 
     /**
      * Delete a cluster configuration by id.
      *
      * @param id unique id for cluster to delete
-     * @return the deleted cluster
      * @throws GenieException if there is an error
      */
-    Cluster deleteCluster(
+    void deleteCluster(
             @NotBlank(message = "No id entered unable to delete.")
             final String id
     ) throws GenieException;
@@ -192,17 +190,17 @@ public interface ClusterConfigService {
     /**
      * Add commands to the cluster.
      *
-     * @param id       The id of the cluster to add the command file to. Not
-     *                 null/empty/blank.
-     * @param commands The commands to add. Not null/empty.
+     * @param id         The id of the cluster to add the command file to. Not
+     *                   null/empty/blank.
+     * @param commandIds The ids of the commands to add. Not null/empty.
      * @return The active list of commands
      * @throws GenieException if there is an error
      */
     List<Command> addCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to add commands.")
             final String id,
-            @NotEmpty(message = "No commands entered. Unable to add commands.")
-            final List<Command> commands
+            @NotEmpty(message = "No command ids entered. Unable to add commands.")
+            final List<String> commandIds
     ) throws GenieException;
 
     /**
@@ -224,18 +222,18 @@ public interface ClusterConfigService {
      * Update the set of command files associated with the cluster with
      * given id.
      *
-     * @param id       The id of the cluster to update the command files for. Not
-     *                 null/empty/blank.
-     * @param commands The command files to replace existing
-     *                 commands with. Not null/empty.
+     * @param id         The id of the cluster to update the command files for. Not
+     *                   null/empty/blank.
+     * @param commandIds The ids of the commands to replace existing
+     *                   commands with. Not null/empty.
      * @return The active list of commands
      * @throws GenieException if there is an error
      */
     List<Command> updateCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to update commands.")
             final String id,
-            @NotEmpty(message = "No commands entered. Unable to add commands.")
-            final List<Command> commands
+            @NotEmpty(message = "No command ids entered. Unable to update commands.")
+            final List<String> commandIds
     ) throws GenieException;
 
     /**
@@ -243,10 +241,9 @@ public interface ClusterConfigService {
      *
      * @param id The id of the cluster to remove the commands from. Not
      *           null/empty/blank.
-     * @return The active list of commands
      * @throws GenieException if there is an error
      */
-    List<Command> removeAllCommandsForCluster(
+    void removeAllCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to remove commands.")
             final String id
     ) throws GenieException;
@@ -257,10 +254,9 @@ public interface ClusterConfigService {
      * @param id    The id of the cluster to remove the command from. Not
      *              null/empty/blank.
      * @param cmdId The id of the command to remove. Not null/empty/blank.
-     * @return The active list of commands
      * @throws GenieException if there is an error
      */
-    List<Command> removeCommandForCluster(
+    void removeCommandForCluster(
             @NotBlank(message = "No cluster id entered. Unable to remove command.")
             final String id,
             @NotBlank(message = "No command id entered. Unable to remove command.")
@@ -320,10 +316,9 @@ public interface ClusterConfigService {
      *
      * @param id The id of the cluster to remove the tags from.
      *           Not null/empty/blank.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> removeAllTagsForCluster(
+    void removeAllTagsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to remove tags.")
             final String id
     ) throws GenieException;
@@ -334,10 +329,9 @@ public interface ClusterConfigService {
      * @param id  The id of the cluster to remove the tag from. Not
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> removeTagForCluster(
+    void removeTagForCluster(
             @NotBlank(message = "No cluster id entered. Unable to remove tag.")
             final String id,
             @NotBlank(message = "No tag entered. Unable to remove.")

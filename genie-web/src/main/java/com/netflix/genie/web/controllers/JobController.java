@@ -143,7 +143,9 @@ public final class JobController {
                     HttpURLConnection.HTTP_PRECON_FAILED,
                     "No job entered. Unable to submit.");
         }
-        LOG.info("Called to submit job: " + job);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to submit job: " + job);
+        }
 
         // get client's host from the context
         String localClientHost;
@@ -212,7 +214,9 @@ public final class JobController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("called for job with id: " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called for job with id: " + id);
+        }
         return this.jobSearchService.getJob(id);
     }
 
@@ -255,7 +259,9 @@ public final class JobController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called for job id:" + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called for job id:" + id);
+        }
         final ObjectMapper mapper = new ObjectMapper();
         final ObjectNode node = mapper.createObjectNode();
         node.put("status", this.jobService.getJobStatus(id).toString());
@@ -374,36 +380,38 @@ public final class JobController {
             @RequestParam(value = "orderBy", required = false)
             final Set<String> orderBys
     ) throws GenieException {
-        LOG.info(
-                "Called with [id | jobName | userName | statuses | executionClusterName "
-                        + "| executionClusterId | page | limit | descending | orderBys]"
-        );
-        LOG.info(id
-                        + " | "
-                        + name
-                        + " | "
-                        + userName
-                        + " | "
-                        + statuses
-                        + " | "
-                        + tags
-                        + " | "
-                        + clusterName
-                        + " | "
-                        + clusterId
-                        + " | "
-                        + commandName
-                        + " | "
-                        + commandId
-                        + " | "
-                        + page
-                        + " | "
-                        + limit
-                        + " | "
-                        + descending
-                        + " | "
-                        + orderBys
-        );
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                    "Called with [id | jobName | userName | statuses | executionClusterName "
+                            + "| executionClusterId | page | limit | descending | orderBys]"
+            );
+            LOG.debug(id
+                            + " | "
+                            + name
+                            + " | "
+                            + userName
+                            + " | "
+                            + statuses
+                            + " | "
+                            + tags
+                            + " | "
+                            + clusterName
+                            + " | "
+                            + clusterId
+                            + " | "
+                            + commandName
+                            + " | "
+                            + commandId
+                            + " | "
+                            + page
+                            + " | "
+                            + limit
+                            + " | "
+                            + descending
+                            + " | "
+                            + orderBys
+            );
+        }
         Set<JobStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(JobStatus.class);
@@ -466,7 +474,9 @@ public final class JobController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called for job id: " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called for job id: " + id);
+        }
         return this.executionService.killJob(id);
     }
 
@@ -516,7 +526,9 @@ public final class JobController {
             @RequestBody
             final Set<String> tags
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tags " + tags);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tags " + tags);
+        }
         return this.jobService.addTagsForJob(id, tags);
     }
 
@@ -561,7 +573,9 @@ public final class JobController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         return this.jobService.getTagsForJob(id);
     }
 
@@ -614,7 +628,9 @@ public final class JobController {
             @RequestBody
             final Set<String> tags
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tags " + tags);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tags " + tags);
+        }
         return this.jobService.updateTagsForJob(id, tags);
     }
 
@@ -659,7 +675,9 @@ public final class JobController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
         return this.jobService.removeAllTagsForJob(id);
     }
 
@@ -711,7 +729,9 @@ public final class JobController {
             @PathVariable("tag")
             final String tag
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tag " + tag);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tag " + tag);
+        }
         return this.jobService.removeTagForJob(id, tag);
     }
 }

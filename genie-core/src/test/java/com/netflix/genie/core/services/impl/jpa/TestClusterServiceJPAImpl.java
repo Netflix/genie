@@ -23,7 +23,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
-import com.netflix.genie.common.model.Command;
 import com.netflix.genie.core.repositories.jpa.ClusterRepository;
 import com.netflix.genie.core.repositories.jpa.CommandRepository;
 import com.netflix.genie.core.repositories.jpa.JobRepository;
@@ -39,11 +38,11 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Tests for the CommandConfigServiceJPAImpl.
+ * Tests for the CommandServiceJPAImpl.
  *
  * @author tgianos
  */
-public class TestClusterConfigServiceJPAImpl {
+public class TestClusterServiceJPAImpl {
 
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
@@ -51,7 +50,7 @@ public class TestClusterConfigServiceJPAImpl {
     private static final String CLUSTER_1_VERSION = "2.4.0";
     private static final String CLUSTER_1_TYPE = "yarn";
 
-    private ClusterConfigServiceJPAImpl service;
+    private ClusterServiceJPAImpl service;
     private ClusterRepository clusterRepository;
     private JobRepository jobRepository;
     private CommandRepository commandRepository;
@@ -64,7 +63,7 @@ public class TestClusterConfigServiceJPAImpl {
         this.clusterRepository = Mockito.mock(ClusterRepository.class);
         this.jobRepository = Mockito.mock(JobRepository.class);
         this.commandRepository = Mockito.mock(CommandRepository.class);
-        this.service = new ClusterConfigServiceJPAImpl(
+        this.service = new ClusterServiceJPAImpl(
                 this.clusterRepository,
                 this.commandRepository,
                 this.jobRepository
@@ -313,15 +312,13 @@ public class TestClusterConfigServiceJPAImpl {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testAddCommandsForClusterCommandDoesntExist() throws GenieException {
-        final List<Command> commands = new ArrayList<>();
-        final Command command = Mockito.mock(Command.class);
+        final List<String> commandIds = new ArrayList<>();
         final String commandId = UUID.randomUUID().toString();
-        Mockito.when(command.getId()).thenReturn(commandId);
-        commands.add(command);
+        commandIds.add(commandId);
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(this.clusterRepository.findOne(Mockito.anyString())).thenReturn(cluster);
         Mockito.when(this.commandRepository.findOne(commandId)).thenReturn(null);
-        this.service.addCommandsForCluster(CLUSTER_1_ID, commands);
+        this.service.addCommandsForCluster(CLUSTER_1_ID, commandIds);
     }
 
     /**
@@ -376,15 +373,13 @@ public class TestClusterConfigServiceJPAImpl {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateCommandsForClusterCommandDoesntExist() throws GenieException {
-        final List<Command> commands = new ArrayList<>();
-        final Command command = Mockito.mock(Command.class);
+        final List<String> commandIds = new ArrayList<>();
         final String commandId = UUID.randomUUID().toString();
-        Mockito.when(command.getId()).thenReturn(commandId);
-        commands.add(command);
+        commandIds.add(commandId);
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(this.clusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
         Mockito.when(this.commandRepository.findOne(commandId)).thenReturn(null);
-        this.service.updateCommandsForCluster(CLUSTER_1_ID, commands);
+        this.service.updateCommandsForCluster(CLUSTER_1_ID, commandIds);
     }
 
     /**

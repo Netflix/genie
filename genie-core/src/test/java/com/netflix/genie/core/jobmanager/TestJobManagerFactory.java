@@ -18,7 +18,7 @@
 package com.netflix.genie.core.jobmanager;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.core.services.ClusterConfigService;
+import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -39,7 +39,7 @@ public class TestJobManagerFactory {
     @Test(expected = GenieException.class)
     public void testInvalidClassName() throws GenieException {
         final JobManagerFactory factory = new JobManagerFactory(
-                Mockito.mock(ClusterConfigService.class),
+                Mockito.mock(ClusterService.class),
                 Mockito.mock(ClusterLoadBalancer.class),
                 Mockito.mock(Environment.class)
         );

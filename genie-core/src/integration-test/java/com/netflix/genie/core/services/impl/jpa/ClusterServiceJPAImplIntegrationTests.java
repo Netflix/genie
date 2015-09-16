@@ -25,6 +25,8 @@ import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Job;
+import com.netflix.genie.core.services.ClusterService;
+import com.netflix.genie.core.services.CommandService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,13 +43,13 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration tests for the CommandConfigServiceJPAImpl.
+ * Integration tests for the CommandServiceJPAImpl.
  *
  * @author tgianos
  */
-@DatabaseSetup("IntTestClusterConfigServiceJPAImpl/init.xml")
+@DatabaseSetup("ClusterServiceJPAImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
+public class ClusterServiceJPAImplIntegrationTests extends DBUnitTestBase {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
@@ -70,10 +72,10 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
     private static final ClusterStatus CLUSTER_2_STATUS = ClusterStatus.UP;
 
     @Autowired
-    private com.netflix.genie.core.services.ClusterConfigService service;
+    private ClusterService service;
 
     @Autowired
-    private com.netflix.genie.core.services.CommandConfigService commandService;
+    private CommandService commandService;
 
     @Autowired
     private com.netflix.genie.core.services.JobService jobService;
@@ -510,13 +512,9 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testDeleteAll() throws GenieException {
-        Assert.assertEquals(2,
-                this.service.getClusters(null, null, null, null, null, 0, 10, true, null)
-                        .size());
-        Assert.assertEquals(2, this.service.deleteAllClusters().size());
-        Assert.assertTrue(
-                this.service.getClusters(null, null, null, null, null, 0, 10, true, null)
-                        .isEmpty());
+        Assert.assertEquals(2, this.service.getClusters(null, null, null, null, null, 0, 10, true, null).size());
+        this.service.deleteAllClusters();
+        Assert.assertTrue(this.service.getClusters(null, null, null, null, null, 0, 10, true, null).isEmpty());
     }
 
     /**
@@ -530,7 +528,7 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertEquals(2, this.commandService.getClustersForCommand(COMMAND_2_ID, null).size());
         Assert.assertEquals(2, this.commandService.getClustersForCommand(COMMAND_3_ID, null).size());
 
-        Assert.assertEquals(CLUSTER_1_ID, this.service.deleteCluster(CLUSTER_1_ID).getId());
+        this.service.deleteCluster(CLUSTER_1_ID);
 
         Assert.assertEquals(1, this.commandService.getClustersForCommand(COMMAND_1_ID, null).size());
         Assert.assertEquals(1,
@@ -693,19 +691,14 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
                         "pig2"
                 )
         );
-        final List<Command> newCommands = new ArrayList<>();
-        newCommands.add(command1);
-        newCommands.add(command2);
-        Assert.assertEquals(
-                3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-        final List<Command> commands
-                = this.service.addCommandsForCluster(CLUSTER_1_ID, newCommands);
-        Assert.assertEquals(
-                5,
-                commands.size()
-        );
+        final List<String> newCommandIds = new ArrayList<>();
+        newCommandIds.add(command1.getId());
+        newCommandIds.add(command2.getId());
+        Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+        final List<Command> commands = this.service.addCommandsForCluster(CLUSTER_1_ID, newCommandIds);
+        Assert.assertEquals(5, commands.size());
+        Assert.assertEquals(command1.getId(), commands.get(3).getId());
+        Assert.assertEquals(command2.getId(), commands.get(4).getId());
     }
 
     /**
@@ -778,22 +771,14 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
                         "pig2"
                 )
         );
-        final List<Command> newCommands = new ArrayList<>();
-        newCommands.add(command1);
-        newCommands.add(command2);
-        Assert.assertEquals(
-                3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-        final List<Command> commands
-                = this.service.updateCommandsForCluster(
-                CLUSTER_1_ID,
-                newCommands
-        );
-        Assert.assertEquals(
-                2,
-                commands.size()
-        );
+        final List<String> newCommandIds = new ArrayList<>();
+        newCommandIds.add(command1.getId());
+        newCommandIds.add(command2.getId());
+        Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+        final List<Command> commands = this.service.updateCommandsForCluster(CLUSTER_1_ID, newCommandIds);
+        Assert.assertEquals(2, commands.size());
+        Assert.assertEquals(command1.getId(), commands.get(0).getId());
+        Assert.assertEquals(command2.getId(), commands.get(1).getId());
     }
 
     /**
@@ -823,18 +808,9 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveAllCommandsForCluster() throws GenieException {
-        Assert.assertEquals(
-                3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-        Assert.assertEquals(
-                0,
-                this.service.removeAllCommandsForCluster(CLUSTER_1_ID).size()
-        );
-        Assert.assertEquals(
-                0,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
+        Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+        this.service.removeAllCommandsForCluster(CLUSTER_1_ID);
+        Assert.assertEquals(0, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
     }
 
     /**
@@ -854,17 +830,9 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveCommandForCluster() throws GenieException {
-        Assert.assertEquals(
-                3,
-                this.service.getCommandsForCluster(CLUSTER_1_ID, null).size()
-        );
-        Assert.assertEquals(
-                2,
-                this.service.removeCommandForCluster(
-                        CLUSTER_1_ID,
-                        COMMAND_1_ID
-                ).size()
-        );
+        Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+        this.service.removeCommandForCluster(CLUSTER_1_ID, COMMAND_1_ID);
+        Assert.assertEquals(2, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
     }
 
     /**
@@ -995,12 +963,9 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveAllTagsForCluster() throws GenieException {
-        Assert.assertEquals(5,
-                this.service.getTagsForCluster(CLUSTER_1_ID).size());
-        final Set<String> finalTags
-                = this.service.removeAllTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(2,
-                finalTags.size());
+        Assert.assertEquals(5, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        this.service.removeAllTagsForCluster(CLUSTER_1_ID);
+        Assert.assertEquals(2, this.service.getTagsForCluster(CLUSTER_1_ID).size());
     }
 
     /**
@@ -1020,14 +985,9 @@ public class IntTestClusterConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveTagForCluster() throws GenieException {
-        final Set<String> tags
-                = this.service.getTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(5, tags.size());
-        Assert.assertEquals(4,
-                this.service.removeTagForCluster(
-                        CLUSTER_1_ID,
-                        "prod").size()
-        );
+        Assert.assertTrue(this.service.getTagsForCluster(CLUSTER_1_ID).contains("prod"));
+        this.service.removeTagForCluster(CLUSTER_1_ID, "prod");
+        Assert.assertFalse(this.service.getTagsForCluster(CLUSTER_1_ID).contains("prod"));
     }
 
     /**

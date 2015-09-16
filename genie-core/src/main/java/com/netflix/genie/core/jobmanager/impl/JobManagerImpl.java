@@ -27,7 +27,7 @@ import com.netflix.genie.common.model.FileAttachment;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.core.jobmanager.JobMonitor;
-import com.netflix.genie.core.services.CommandConfigService;
+import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.core.jobmanager.JobManager;
 import com.netflix.genie.core.util.StringUtil;
@@ -79,7 +79,7 @@ public class JobManagerImpl implements JobManager {
     private final JobMonitor jobMonitor;
     private final Thread jobMonitorThread;
     private final JobService jobService;
-    private final CommandConfigService commandService;
+    private final CommandService commandService;
 
     private boolean initCalled;
     private String jobDir;
@@ -110,7 +110,7 @@ public class JobManagerImpl implements JobManager {
     @Autowired
     public JobManagerImpl(final JobMonitor jobMonitor,
                           final JobService jobService,
-                          final CommandConfigService commandService) {
+                          final CommandService commandService) {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
         this.jobService = jobService;

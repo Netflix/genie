@@ -31,7 +31,7 @@ import com.netflix.genie.core.repositories.jpa.ApplicationRepository;
 import com.netflix.genie.core.repositories.jpa.ApplicationSpecs;
 import com.netflix.genie.core.repositories.jpa.CommandRepository;
 import com.netflix.genie.core.repositories.jpa.CommandSpecs;
-import com.netflix.genie.core.services.ApplicationConfigService;
+import com.netflix.genie.core.services.ApplicationService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * OpenJPA based implementation of the ApplicationConfigService.
+ * OpenJPA based implementation of the ApplicationService.
  *
  * @author amsharma
  * @author tgianos
@@ -60,9 +60,9 @@ import java.util.Set;
                 ConstraintViolationException.class
         }
 )
-public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService {
+public class ApplicationServiceJPAImpl implements ApplicationService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfigServiceJPAImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationServiceJPAImpl.class);
     private final ApplicationRepository applicationRepo;
     private final CommandRepository commandRepo;
 
@@ -73,8 +73,8 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * @param commandRepo     The command repository to use
      */
     @Autowired
-    public ApplicationConfigServiceJPAImpl(final ApplicationRepository applicationRepo,
-                                           final CommandRepository commandRepo) {
+    public ApplicationServiceJPAImpl(final ApplicationRepository applicationRepo,
+                                     final CommandRepository commandRepo) {
         this.applicationRepo = applicationRepo;
         this.commandRepo = commandRepo;
     }
@@ -184,7 +184,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public List<Application> deleteAllApplications() throws GenieException {
+    public void deleteAllApplications() throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called");
         }
@@ -200,14 +200,13 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
             }
         }
         this.applicationRepo.deleteAll();
-        return returnApps;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Application deleteApplication(
+    public void deleteApplication(
             @NotBlank(message = "No application id entered. Unable to delete.")
             final String id
     ) throws GenieException {
@@ -227,7 +226,6 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         }
 
         this.applicationRepo.delete(app);
-        return app;
     }
 
     /**
@@ -289,14 +287,13 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeAllConfigsForApplication(
+    public void removeAllConfigsForApplication(
             @NotBlank(message = "No application id entered. Unable to remove configs.")
             final String id
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.getConfigs().clear();
-            return app.getConfigs();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -306,7 +303,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeConfigForApplication(
+    public void removeConfigForApplication(
             @NotBlank(message = "No application id entered. Unable to remove configuration.")
             final String id,
             @NotBlank(message = "No config entered. Unable to remove.")
@@ -315,7 +312,6 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.getConfigs().remove(config);
-            return app.getConfigs();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -325,15 +321,15 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public Set<String> addJarsForApplication(
-            @NotBlank(message = "No application id entered. Unable to add jars.")
+    public Set<String> addDependenciesForApplication(
+            @NotBlank(message = "No application id entered. Unable to add dependencies.")
             final String id,
-            @NotEmpty(message = "No jars entered. Unable to add jars.")
-            final Set<String> jars
+            @NotEmpty(message = "No dependencies entered. Unable to add dependencies.")
+            final Set<String> dependencies
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            app.getDependencies().addAll(jars);
+            app.getDependencies().addAll(dependencies);
             return app.getDependencies();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
@@ -345,9 +341,9 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      */
     @Override
     @Transactional(readOnly = true)
-    //TODO: Code is repetetive with configs. Refactor for reuse
-    public Set<String> getJarsForApplication(
-            @NotBlank(message = "No application id entered. Unable to get jars.")
+    //TODO: Code is repetitive with configs. Refactor for reuse
+    public Set<String> getDependenciesForApplication(
+            @NotBlank(message = "No application id entered. Unable to get dependencies.")
             final String id
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
@@ -362,15 +358,15 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public Set<String> updateJarsForApplication(
-            @NotBlank(message = "No application id entered. Unable to update jars.")
+    public Set<String> updateDependenciesForApplication(
+            @NotBlank(message = "No application id entered. Unable to update dependencies.")
             final String id,
-            @NotNull(message = "No jars entered. Unable to update.")
-            final Set<String> jars
+            @NotNull(message = "No dependencies entered. Unable to update.")
+            final Set<String> dependencies
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            app.setDependencies(jars);
+            app.setDependencies(dependencies);
             return app.getDependencies();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
@@ -381,14 +377,13 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeAllJarsForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove jars.")
+    public void removeAllDependenciesForApplication(
+            @NotBlank(message = "No application id entered. Unable to remove dependencies.")
             final String id
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
             app.getDependencies().clear();
-            return app.getDependencies();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -398,16 +393,15 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeJarForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove jar.")
+    public void removeDependencyForApplication(
+            @NotBlank(message = "No application id entered. Unable to remove dependency.")
             final String id,
-            @NotBlank(message = "No jar entiered. Unable to remove jar.")
-            final String jar
+            @NotBlank(message = "No dependency entered. Unable to remove dependency.")
+            final String dependency
     ) throws GenieException {
         final Application app = this.applicationRepo.findOne(id);
         if (app != null) {
-            app.getDependencies().remove(jar);
-            return app.getDependencies();
+            app.getDependencies().remove(dependency);
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -472,14 +466,13 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeAllTagsForApplication(
+    public void removeAllTagsForApplication(
             @NotBlank(message = "No application id entered. Unable to remove tags.")
             final String id
     ) throws GenieException {
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             application.getTags().clear();
-            return application.getTags();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -489,7 +482,7 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
      * {@inheritDoc}
      */
     @Override
-    public Set<String> removeTagForApplication(
+    public void removeTagForApplication(
             @NotBlank(message = "No application id entered. Unable to remove tag.")
             final String id,
             @NotBlank(message = "No tag entered. Unable to remove.")
@@ -498,7 +491,6 @@ public class ApplicationConfigServiceJPAImpl implements ApplicationConfigService
         final Application application = this.applicationRepo.findOne(id);
         if (application != null) {
             application.getTags().remove(tag);
-            return application.getTags();
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }

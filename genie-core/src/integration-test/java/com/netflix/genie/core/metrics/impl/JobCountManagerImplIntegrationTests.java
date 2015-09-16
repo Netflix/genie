@@ -52,7 +52,7 @@ import java.util.Calendar;
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class
 })
-public class IntTestJobCountManagerImpl {
+public class JobCountManagerImplIntegrationTests {
 
     @Autowired
     private JobRepository jobRepo;
@@ -70,8 +70,8 @@ public class IntTestJobCountManagerImpl {
      */
     @Test
     @Transactional
-    @DatabaseSetup("IntTestJobCountManagerImpl/init.xml")
-    @DatabaseTearDown("IntTestJobCountManagerImpl/cleanup.xml")
+    @DatabaseSetup("JobCountManagerImplIntegrationTests/init.xml")
+    @DatabaseTearDown("JobCountManagerImplIntegrationTests/cleanup.xml")
     public void testNumInstanceJobs() throws GenieException {
         //Force the hostname of the jobs to be the machine running the build
         //TODO: Can we do this via spring and injection of properties?

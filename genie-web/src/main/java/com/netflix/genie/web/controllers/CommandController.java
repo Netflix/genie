@@ -23,7 +23,7 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.core.services.CommandConfigService;
+import com.netflix.genie.core.services.CommandService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -51,7 +52,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Code for CommandConfigResource.
+ * Code for the Commands REST API implemented as a Spring REST controller.
  *
  * @author amsharma
  * @author tgianos
@@ -63,16 +64,16 @@ public final class CommandController {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);
 
-    private final CommandConfigService commandConfigService;
+    private final CommandService commandService;
 
     /**
      * Constructor.
      *
-     * @param commandConfigService The command configuration service to use.
+     * @param commandService The command configuration service to use.
      */
     @Autowired
-    public CommandController(final CommandConfigService commandConfigService) {
-        this.commandConfigService = commandConfigService;
+    public CommandController(final CommandService commandService) {
+        this.commandService = commandService;
     }
 
     /**
@@ -115,8 +116,10 @@ public final class CommandController {
             @RequestBody
             final Command command
     ) throws GenieException {
-        LOG.info("called to create new command configuration " + command.toString());
-        final Command createdCommand = this.commandConfigService.createCommand(command);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called to create new command configuration " + command.toString());
+        }
+        final Command createdCommand = this.commandService.createCommand(command);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
@@ -163,8 +166,10 @@ public final class CommandController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called to get command with id " + id);
-        return this.commandConfigService.getCommand(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to get command with id " + id);
+        }
+        return this.commandService.getCommand(id);
     }
 
     /**
@@ -241,26 +246,28 @@ public final class CommandController {
             @RequestParam(value = "orderBy", required = false)
             final Set<String> orderBys
     ) throws GenieException {
-        LOG.info(
-                "Called [name | userName | status | tags | page | limit | descending | orderBys]"
-        );
-        LOG.info(
-                name
-                        + " | "
-                        + userName
-                        + " | "
-                        + statuses
-                        + " | "
-                        + tags
-                        + " | "
-                        + page
-                        + " | "
-                        + limit
-                        + " | "
-                        + descending
-                        + " | "
-                        + orderBys
-        );
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                    "Called [name | userName | status | tags | page | limit | descending | orderBys]"
+            );
+            LOG.debug(
+                    name
+                            + " | "
+                            + userName
+                            + " | "
+                            + statuses
+                            + " | "
+                            + tags
+                            + " | "
+                            + page
+                            + " | "
+                            + limit
+                            + " | "
+                            + descending
+                            + " | "
+                            + orderBys
+            );
+        }
 
         Set<CommandStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
@@ -271,7 +278,7 @@ public final class CommandController {
                 }
             }
         }
-        return this.commandConfigService.getCommands(
+        return this.commandService.getCommands(
                 name, userName, enumStatuses, tags, page, limit, descending, orderBys);
     }
 
@@ -317,22 +324,22 @@ public final class CommandController {
             @RequestBody
             final Command updateCommand
     ) throws GenieException {
-        LOG.info("Called to update command");
-        return this.commandConfigService.updateCommand(id, updateCommand);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to update command");
+        }
+        return this.commandService.updateCommand(id, updateCommand);
     }
 
     /**
      * Delete all applications from database.
      *
-     * @return All The deleted comamnd
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Delete all commands",
-            notes = "Delete all available commands and get them back.",
-            response = Command.class,
-            responseContainer = "List"
+            notes = "Delete all available commands and get them back."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -348,23 +355,24 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Command> deleteAllCommands() throws GenieException {
-        LOG.info("called to delete all commands.");
-        return this.commandConfigService.deleteAllCommands();
+    public void deleteAllCommands() throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called to delete all commands.");
+        }
+        this.commandService.deleteAllCommands();
     }
 
     /**
      * Delete a command.
      *
      * @param id unique id for configuration to delete
-     * @return The deleted configuration
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-            value = "Delete an command",
-            notes = "Delete an command with the supplied id.",
-            response = Command.class
+            value = "Delete a command",
+            notes = "Delete a command with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -380,7 +388,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Command deleteCommand(
+    public void deleteCommand(
             @ApiParam(
                     value = "Id of the command to delete.",
                     required = true
@@ -388,8 +396,10 @@ public final class CommandController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called to delete command with id " + id);
-        return this.commandConfigService.deleteCommand(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to delete command with id " + id);
+        }
+        this.commandService.deleteCommand(id);
     }
 
     /**
@@ -436,8 +446,10 @@ public final class CommandController {
             @RequestBody
             final Set<String> configs
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and config " + configs);
-        return this.commandConfigService.addConfigsForCommand(id, configs);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and config " + configs);
+        }
+        return this.commandService.addConfigsForCommand(id, configs);
     }
 
     /**
@@ -477,8 +489,10 @@ public final class CommandController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.commandConfigService.getConfigsForCommand(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        return this.commandService.getConfigsForCommand(id);
     }
 
     /**
@@ -526,8 +540,10 @@ public final class CommandController {
             @RequestBody
             final Set<String> configs
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and configs " + configs);
-        return this.commandConfigService.updateConfigsForCommand(id, configs);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and configs " + configs);
+        }
+        return this.commandService.updateConfigsForCommand(id, configs);
     }
 
     /**
@@ -535,15 +551,13 @@ public final class CommandController {
      *
      * @param id The id of the command to delete the configuration files from.
      *           Not null/empty/blank.
-     * @return Empty set if successful
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove all configuration files from an command",
-            notes = "Remove all the configuration files from the command with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Remove all the configuration files from the command with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -559,7 +573,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeAllConfigsForCommand(
+    public void removeAllConfigsForCommand(
             @ApiParam(
                     value = "Id of the command to delete from.",
                     required = true
@@ -567,8 +581,10 @@ public final class CommandController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.commandConfigService.removeAllConfigsForCommand(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        this.commandService.removeAllConfigsForCommand(id);
     }
 
     /**
@@ -615,8 +631,10 @@ public final class CommandController {
             @RequestBody
             final Set<String> tags
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tags " + tags);
-        return this.commandConfigService.addTagsForCommand(id, tags);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tags " + tags);
+        }
+        return this.commandService.addTagsForCommand(id, tags);
     }
 
     /**
@@ -656,8 +674,10 @@ public final class CommandController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.commandConfigService.getTagsForCommand(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        return this.commandService.getTagsForCommand(id);
     }
 
     /**
@@ -673,9 +693,7 @@ public final class CommandController {
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update tags for a command",
-            notes = "Replace the existing tags for command with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Replace the existing tags for command with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -705,8 +723,10 @@ public final class CommandController {
             @RequestBody
             final Set<String> tags
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tags " + tags);
-        return this.commandConfigService.updateTagsForCommand(id, tags);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tags " + tags);
+        }
+        return this.commandService.updateTagsForCommand(id, tags);
     }
 
     /**
@@ -714,16 +734,14 @@ public final class CommandController {
      *
      * @param id The id of the command to delete the tags from.
      *           Not null/empty/blank.
-     * @return Empty set if successful
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove all tags from a command",
             notes = "Remove all the tags from the command with given id.  Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted.",
-            response = String.class,
-            responseContainer = "Set"
+                    + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -739,7 +757,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeAllTagsForCommand(
+    public void removeAllTagsForCommand(
             @ApiParam(
                     value = "Id of the command to delete from.",
                     required = true
@@ -747,8 +765,10 @@ public final class CommandController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.commandConfigService.removeAllTagsForCommand(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        this.commandService.removeAllTagsForCommand(id);
     }
 
     /**
@@ -757,16 +777,14 @@ public final class CommandController {
      * @param id  The id of the command to delete the tag from. Not
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags for the command.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove a tag from a command",
             notes = "Remove the given tag from the command with given id.  Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted.",
-            response = String.class,
-            responseContainer = "Set"
+                    + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -782,7 +800,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeTagForCommand(
+    public void removeTagForCommand(
             @ApiParam(
                     value = "Id of the command to delete from.",
                     required = true
@@ -796,12 +814,111 @@ public final class CommandController {
             @PathVariable("tag")
             final String tag
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tag " + tag);
-        return this.commandConfigService.removeTagForCommand(id, tag);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tag " + tag);
+        }
+        this.commandService.removeTagForCommand(id, tag);
     }
 
     /**
-     * Set the application for the given command.
+     * Add applications for the given command.
+     *
+     * @param id             The id of the command to add the applications to. Not
+     *                       null/empty/blank.
+     * @param applicationIds The ids of the applications to add. Not null.
+     * @return The active applications for this command.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(
+            value = "/{id}/applications", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ApiOperation(
+            value = "Add applications for a command",
+            notes = "Add the supplied applications to the command "
+                    + "with the supplied id. Applications should already "
+                    + "have been created.",
+            response = Application.class,
+            responseContainer = "Set"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public Set<Application> addApplicationsForCommand(
+            @ApiParam(
+                    value = "Id of the command to set application for.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id,
+            @ApiParam(
+                    value = "The ids of the applications to set.",
+                    required = true
+            )
+            @RequestBody
+            final Set<String> applicationIds
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.info("Called with id " + id + " and application " + applicationIds);
+        }
+        return this.commandService.addApplicationsForCommand(id, applicationIds);
+    }
+
+    /**
+     * Get the applications configured for a given command.
+     *
+     * @param id The id of the command to get the application files for. Not
+     *           NULL/empty/blank.
+     * @return The active applications for the command.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET)
+    @ApiOperation(
+            value = "Get the applications for a command",
+            notes = "Get the applications for the command with the supplied id.",
+            response = Application.class,
+            responseContainer = "Set"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public Set<Application> getApplicationsForCommand(
+            @ApiParam(
+                    value = "Id of the command to get the application for.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        return this.commandService.getApplicationsForCommand(id);
+    }
+
+    /**
+     * Set the applications for the given command.
      *
      * @param id             The id of the command to add the applications to. Not
      *                       null/empty/blank.
@@ -810,13 +927,13 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(
-            value = "/{id}/applications", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
+            value = "/{id}/applications", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiOperation(
-            value = "Set the applications for a command",
+            value = "Set applications for a command",
             notes = "Set the supplied applications to the command "
                     + "with the supplied id. Applications should already "
-                    + "have been created.",
+                    + "have been created. Replaces existing applications.",
             response = Application.class,
             responseContainer = "Set"
     )
@@ -851,64 +968,21 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.info("Called with id " + id + " and application " + applicationIds);
         }
-        return this.commandConfigService.setApplicationsForCommand(id, applicationIds);
+        return this.commandService.setApplicationsForCommand(id, applicationIds);
     }
 
     /**
-     * Get the applications configured for a given command.
+     * Remove the applications from a given command.
      *
-     * @param id The id of the command to get the application files for. Not
-     *           NULL/empty/blank.
-     * @return The active applications for the command.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET)
-    @ApiOperation(
-            value = "Get the applications for a command",
-            notes = "Get the applications for the command with the supplied id.",
-            response = Application.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<Application> getApplicationForCommand(
-            @ApiParam(
-                    value = "Id of the command to get the application for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.commandConfigService.getApplicationsForCommand(id);
-    }
-
-    /**
-     * Remove the application from a given command.
-     *
-     * @param id The id of the command to delete the application from. Not
+     * @param id The id of the command to delete the applications from. Not
      *           null/empty/blank.
-     * @return The active set of applications for the command.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/applications", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-            value = "Remove an applications from a command",
-            notes = "Remove the applications from the command with given id.",
-            response = Application.class,
-            responseContainer = "Set"
+            value = "Remove applications from a command",
+            notes = "Remove the applications from the command with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -924,7 +998,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<Application> removeApplicationForCommand(
+    public void removeAllApplicationsForCommand(
             @ApiParam(
                     value = "Id of the command to delete from.",
                     required = true
@@ -932,8 +1006,57 @@ public final class CommandController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id '" + id + "'.");
-        return this.commandConfigService.removeApplicationsForCommand(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id '" + id + "'.");
+        }
+        this.commandService.removeApplicationsForCommand(id);
+    }
+
+    /**
+     * Remove the application from a given command.
+     *
+     * @param id    The id of the command to delete the application from. Not
+     *              null/empty/blank.
+     * @param appId The id of the application to remove from the command. Not null/empty/blank.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}/applications/{appId}", method = RequestMethod.DELETE)
+    @ApiOperation(
+            value = "Remove applications from a command",
+            notes = "Remove the applications from the command with given id."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Command not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public void removeApplicationForCommand(
+            @ApiParam(
+                    value = "Id of the command to delete from.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id,
+            @ApiParam(
+                    value = "Id of the application to remove.",
+                    required = true
+            )
+            @PathVariable("appId")
+            final String appId
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id '" + id + "' and app id " + appId);
+        }
+        this.commandService.removeApplicationForCommand(id, appId);
     }
 
     /**
@@ -980,10 +1103,12 @@ public final class CommandController {
             @RequestParam(value = "status", required = false)
             final Set<String> statuses
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and statuses " + statuses);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and statuses " + statuses);
+        }
 
         Set<ClusterStatus> enumStatuses = null;
-        if (!statuses.isEmpty()) {
+        if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(ClusterStatus.class);
             for (final String status : statuses) {
                 if (StringUtils.isNotBlank(status)) {
@@ -992,6 +1117,6 @@ public final class CommandController {
             }
         }
 
-        return this.commandConfigService.getClustersForCommand(id, enumStatuses);
+        return this.commandService.getClustersForCommand(id, enumStatuses);
     }
 }

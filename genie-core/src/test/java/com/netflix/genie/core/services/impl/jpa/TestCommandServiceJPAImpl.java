@@ -37,11 +37,11 @@ import java.util.HashSet;
 import java.util.UUID;
 
 /**
- * Tests for the CommandConfigServiceJPAImpl.
+ * Tests for the CommandServiceJPAImpl.
  *
  * @author tgianos
  */
-public class TestCommandConfigServiceJPAImpl {
+public class TestCommandServiceJPAImpl {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_1_NAME = "pig_13_prod";
@@ -51,7 +51,7 @@ public class TestCommandConfigServiceJPAImpl {
 
     private static final String COMMAND_2_ID = "command2";
 
-    private CommandConfigServiceJPAImpl service;
+    private CommandServiceJPAImpl service;
     private CommandRepository commandRepository;
     private com.netflix.genie.core.repositories.jpa.ApplicationRepository applicationRepository;
 
@@ -63,7 +63,7 @@ public class TestCommandConfigServiceJPAImpl {
         this.commandRepository = Mockito.mock(CommandRepository.class);
         final ClusterRepository clusterRepository = Mockito.mock(ClusterRepository.class);
         this.applicationRepository = Mockito.mock(ApplicationRepository.class);
-        this.service = new CommandConfigServiceJPAImpl(
+        this.service = new CommandServiceJPAImpl(
                 this.commandRepository,
                 this.applicationRepository,
                 clusterRepository

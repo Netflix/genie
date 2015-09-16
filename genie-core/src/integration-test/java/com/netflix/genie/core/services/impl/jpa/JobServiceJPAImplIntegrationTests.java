@@ -41,9 +41,9 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-@DatabaseSetup("IntTestJobServiceJPAImpl/init.xml")
+@DatabaseSetup("JobServiceJPAImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class IntTestJobServiceJPAImpl extends DBUnitTestBase {
+public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";

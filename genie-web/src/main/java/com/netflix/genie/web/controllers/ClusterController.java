@@ -22,7 +22,7 @@ import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.ClusterStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.core.services.ClusterConfigService;
+import com.netflix.genie.core.services.ClusterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -63,16 +64,16 @@ public final class ClusterController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterController.class);
 
-    private final ClusterConfigService clusterConfigService;
+    private final ClusterService clusterService;
 
     /**
      * Constructor.
      *
-     * @param clusterConfigService The cluster configuration service to use.
+     * @param clusterService The cluster configuration service to use.
      */
     @Autowired
-    public ClusterController(final ClusterConfigService clusterConfigService) {
-        this.clusterConfigService = clusterConfigService;
+    public ClusterController(final ClusterService clusterService) {
+        this.clusterService = clusterService;
     }
 
     /**
@@ -115,8 +116,10 @@ public final class ClusterController {
             @RequestBody
             final Cluster cluster
     ) throws GenieException {
-        LOG.info("Called to create new cluster " + cluster);
-        final Cluster createdCluster = this.clusterConfigService.createCluster(cluster);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to create new cluster " + cluster);
+        }
+        final Cluster createdCluster = this.clusterService.createCluster(cluster);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
@@ -163,8 +166,10 @@ public final class ClusterController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id: " + id);
-        return this.clusterConfigService.getCluster(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id: " + id);
+        }
+        return this.clusterService.getCluster(id);
     }
 
     /**
@@ -248,28 +253,39 @@ public final class ClusterController {
             @RequestParam(value = "orderBy", required = false)
             final Set<String> orderBys
     ) throws GenieException {
-        LOG.info(
-                "Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page | limit | descending | orderBys]"
-        );
-        LOG.info(
-                name
-                        + " | "
-                        + statuses
-                        + " | "
-                        + tags
-                        + " | "
-                        + minUpdateTime
-                        + " | "
-                        + maxUpdateTime
-                        + " | "
-                        + page
-                        + " | "
-                        + limit
-                        + " | "
-                        + descending
-                        + " | "
-                        + orderBys
-        );
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                    "Called "
+                            + "[name "
+                            + "| statuses "
+                            + "| tags "
+                            + "| minUpdateTime "
+                            + "| maxUpdateTime "
+                            + "| page "
+                            + "| limit "
+                            + "| descending | "
+                            + "orderBys]"
+            );
+            LOG.debug(
+                    name
+                            + " | "
+                            + statuses
+                            + " | "
+                            + tags
+                            + " | "
+                            + minUpdateTime
+                            + " | "
+                            + maxUpdateTime
+                            + " | "
+                            + page
+                            + " | "
+                            + limit
+                            + " | "
+                            + descending
+                            + " | "
+                            + orderBys
+            );
+        }
         //Create this conversion internal in case someone uses lower case by accident?
         Set<ClusterStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
@@ -280,7 +296,7 @@ public final class ClusterController {
                 }
             }
         }
-        return this.clusterConfigService.getClusters(
+        return this.clusterService.getClusters(
                 name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page, limit, descending, orderBys
         );
     }
@@ -327,22 +343,23 @@ public final class ClusterController {
             @RequestBody
             final Cluster updateCluster
     ) throws GenieException {
-        LOG.info("Called to update cluster with id " + id + " update fields " + updateCluster);
-        return this.clusterConfigService.updateCluster(id, updateCluster);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to update cluster with id " + id + " update fields " + updateCluster);
+        }
+        return this.clusterService.updateCluster(id, updateCluster);
     }
 
     /**
      * Delete a cluster configuration.
      *
      * @param id unique id for cluster to delete
-     * @return the deleted cluster
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Delete a cluster",
-            notes = "Delete a cluster with the supplied id.",
-            response = Cluster.class
+            notes = "Delete a cluster with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -358,7 +375,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Cluster deleteCluster(
+    public void deleteCluster(
             @ApiParam(
                     value = "Id of the cluster to delete.",
                     required = true
@@ -366,22 +383,22 @@ public final class ClusterController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Delete called for id: " + id);
-        return this.clusterConfigService.deleteCluster(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Delete called for id: " + id);
+        }
+        this.clusterService.deleteCluster(id);
     }
 
     /**
      * Delete all clusters from database.
      *
-     * @return All The deleted clusters
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Delete all clusters",
-            notes = "Delete all available clusters and get them back.",
-            response = Cluster.class,
-            responseContainer = "List"
+            notes = "Delete all available clusters and get them back."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -397,9 +414,11 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Cluster> deleteAllClusters() throws GenieException {
-        LOG.info("called");
-        return this.clusterConfigService.deleteAllClusters();
+    public void deleteAllClusters() throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
+        this.clusterService.deleteAllClusters();
     }
 
     /**
@@ -446,8 +465,10 @@ public final class ClusterController {
             @RequestBody
             final Set<String> configs
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and config " + configs);
-        return this.clusterConfigService.addConfigsForCluster(id, configs);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and config " + configs);
+        }
+        return this.clusterService.addConfigsForCluster(id, configs);
     }
 
     /**
@@ -487,8 +508,10 @@ public final class ClusterController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.clusterConfigService.getConfigsForCluster(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        return this.clusterService.getConfigsForCluster(id);
     }
 
     /**
@@ -536,24 +559,26 @@ public final class ClusterController {
             @RequestBody
             final Set<String> configs
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and configs " + configs);
-        return this.clusterConfigService.updateConfigsForCluster(id, configs);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and configs " + configs);
+        }
+        return this.clusterService.updateConfigsForCluster(id, configs);
     }
 
     /**
-     * Add new commands to the given cluster.
+     * Add new commandIds to the given cluster.
      *
-     * @param id       The id of the cluster to add the commands to. Not
-     *                 null/empty/blank.
-     * @param commands The commands to add. Not null.
-     * @return The active commands for this cluster.
+     * @param id         The id of the cluster to add the commandIds to. Not
+     *                   null/empty/blank.
+     * @param commandIds The ids of the commandIds to add. Not null.
+     * @return The active commandIds for this cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
-            value = "Add new commands to a cluster",
-            notes = "Add the supplied commands to the cluster with the supplied id."
-                    + " commands should already have been created.",
+            value = "Add new commandIds to a cluster",
+            notes = "Add the supplied commandIds to the cluster with the supplied id."
+                    + " commandIds should already have been created.",
             response = Command.class,
             responseContainer = "List"
     )
@@ -573,35 +598,37 @@ public final class ClusterController {
     })
     public List<Command> addCommandsForCluster(
             @ApiParam(
-                    value = "Id of the cluster to add commands to.",
+                    value = "Id of the cluster to add commandIds to.",
                     required = true
             )
             @PathVariable("id")
             final String id,
             @ApiParam(
-                    value = "The commands to add.",
+                    value = "The ids of the commandIds to add.",
                     required = true
             )
             @RequestBody
-            final List<Command> commands
+            final List<String> commandIds
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and commands " + commands);
-        return this.clusterConfigService.addCommandsForCluster(id, commands);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and commandIds " + commandIds);
+        }
+        return this.clusterService.addCommandsForCluster(id, commandIds);
     }
 
     /**
-     * Get all the commands configured for a given cluster.
+     * Get all the commandIds configured for a given cluster.
      *
      * @param id       The id of the cluster to get the command files for. Not
      *                 NULL/empty/blank.
-     * @param statuses The various statuses to return commands for.
-     * @return The active set of commands for the cluster.
+     * @param statuses The various statuses to return commandIds for.
+     * @return The active set of commandIds for the cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET)
     @ApiOperation(
-            value = "Get the commands for a cluster",
-            notes = "Get the commands for the cluster with the supplied id.",
+            value = "Get the commandIds for a cluster",
+            notes = "Get the commandIds for the cluster with the supplied id.",
             response = Command.class,
             responseContainer = "List"
     )
@@ -621,19 +648,21 @@ public final class ClusterController {
     })
     public List<Command> getCommandsForCluster(
             @ApiParam(
-                    value = "Id of the cluster to get commands for.",
+                    value = "Id of the cluster to get commandIds for.",
                     required = true
             )
             @PathVariable("id")
             final String id,
             @ApiParam(
-                    value = "The statuses of the commands to find.",
+                    value = "The statuses of the commandIds to find.",
                     allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
             )
             @RequestParam(value = "status", required = false)
             final Set<String> statuses
     ) throws GenieException {
-        LOG.info("Called with id " + id + " status " + statuses);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " status " + statuses);
+        }
 
         Set<CommandStatus> enumStatuses = null;
         if (!statuses.isEmpty()) {
@@ -645,22 +674,22 @@ public final class ClusterController {
             }
         }
 
-        return this.clusterConfigService.getCommandsForCluster(id, enumStatuses);
+        return this.clusterService.getCommandsForCluster(id, enumStatuses);
     }
 
     /**
-     * Update the commands for a given cluster.
+     * Set the commandIds for a given cluster.
      *
-     * @param id       The id of the cluster to update the configuration files for.
-     *                 Not null/empty/blank.
-     * @param commands The commands to replace existing applications with. Not
-     *                 null/empty/blank.
-     * @return The new set of commands for the cluster.
+     * @param id         The id of the cluster to update the configuration files for.
+     *                   Not null/empty/blank.
+     * @param commandIds The ids of the commands to replace existing commands with. Not
+     *                   null/empty/blank.
+     * @return The new set of commandIds for the cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
-            value = "Update the commands for an cluster",
+            value = "Update the commands for a cluster",
             notes = "Replace the existing commands for cluster with given id.",
             response = Command.class,
             responseContainer = "List"
@@ -679,38 +708,38 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Command> updateCommandsForCluster(
+    public List<Command> setCommandsForCluster(
             @ApiParam(
-                    value = "Id of the cluster to update commands for.",
+                    value = "Id of the cluster to update commandIds for.",
                     required = true
             )
             @PathVariable("id")
             final String id,
             @ApiParam(
-                    value = "The commands to replace existing with. Should already be created",
+                    value = "The ids of the commands to replace existing commands with. Should already be created",
                     required = true
             )
             @RequestBody
-            final List<Command> commands
+            final List<String> commandIds
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and commands " + commands);
-        return this.clusterConfigService.updateCommandsForCluster(id, commands);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and commandIds " + commandIds);
+        }
+        return this.clusterService.updateCommandsForCluster(id, commandIds);
     }
 
     /**
-     * Remove the all commands from a given cluster.
+     * Remove the all commandIds from a given cluster.
      *
-     * @param id The id of the cluster to delete the commands from. Not
+     * @param id The id of the cluster to delete the commandIds from. Not
      *           null/empty/blank.
-     * @return Empty set if successful
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-            value = "Remove all commands from an cluster",
-            notes = "Remove all the commands from the cluster with given id.",
-            response = Command.class,
-            responseContainer = "List"
+            value = "Remove all commandIds from an cluster",
+            notes = "Remove all the commandIds from the cluster with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -726,7 +755,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Command> removeAllCommandsForCluster(
+    public void removeAllCommandsForCluster(
             @ApiParam(
                     value = "Id of the cluster to delete from.",
                     required = true
@@ -734,8 +763,10 @@ public final class ClusterController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.clusterConfigService.removeAllCommandsForCluster(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        this.clusterService.removeAllCommandsForCluster(id);
     }
 
     /**
@@ -744,15 +775,13 @@ public final class ClusterController {
      * @param id        The id of the cluster to delete the command from. Not
      *                  null/empty/blank.
      * @param commandId The id of the command to remove. Not null/empty/blank.
-     * @return The active set of commands for the cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/commands/{commandId}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove a command from a cluster",
-            notes = "Remove the given command from the cluster with given id.",
-            response = Command.class,
-            responseContainer = "List"
+            notes = "Remove the given command from the cluster with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -768,7 +797,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Command> removeCommandForCluster(
+    public void removeCommandForCluster(
             @ApiParam(
                     value = "Id of the cluster to delete from.",
                     required = true
@@ -782,8 +811,10 @@ public final class ClusterController {
             @PathVariable("commandId")
             final String commandId
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and command id " + commandId);
-        return this.clusterConfigService.removeCommandForCluster(id, commandId);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and command id " + commandId);
+        }
+        this.clusterService.removeCommandForCluster(id, commandId);
     }
 
     /**
@@ -830,8 +861,10 @@ public final class ClusterController {
             @RequestBody
             final Set<String> tags
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tags " + tags);
-        return this.clusterConfigService.addTagsForCluster(id, tags);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tags " + tags);
+        }
+        return this.clusterService.addTagsForCluster(id, tags);
     }
 
     /**
@@ -870,8 +903,10 @@ public final class ClusterController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.clusterConfigService.getTagsForCluster(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        return this.clusterService.getTagsForCluster(id);
     }
 
     /**
@@ -919,8 +954,10 @@ public final class ClusterController {
             @RequestBody
             final Set<String> tags
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tags " + tags);
-        return this.clusterConfigService.updateTagsForCluster(id, tags);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tags " + tags);
+        }
+        return this.clusterService.updateTagsForCluster(id, tags);
     }
 
     /**
@@ -928,16 +965,14 @@ public final class ClusterController {
      *
      * @param id The id of the cluster to delete the tags from.
      *           Not null/empty/blank.
-     * @return Empty set if successful
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove all tags from a cluster",
             notes = "Remove all the tags from the cluster with given id.  Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted.",
-            response = String.class,
-            responseContainer = "Set"
+                    + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -953,7 +988,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeAllTagsForCluster(
+    public void removeAllTagsForCluster(
             @ApiParam(
                     value = "Id of the cluster to delete from.",
                     required = true
@@ -961,8 +996,10 @@ public final class ClusterController {
             @PathVariable("id")
             final String id
     ) throws GenieException {
-        LOG.info("Called with id " + id);
-        return this.clusterConfigService.removeAllTagsForCluster(id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        this.clusterService.removeAllTagsForCluster(id);
     }
 
     /**
@@ -971,16 +1008,14 @@ public final class ClusterController {
      * @param id  The id of the cluster to delete the tag from. Not
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags for the cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove a tag from a cluster",
             notes = "Remove the given tag from the cluster with given id. Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted.",
-            response = String.class,
-            responseContainer = "Set"
+                    + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -996,7 +1031,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeTagForCluster(
+    public void removeTagForCluster(
             @ApiParam(
                     value = "Id of the cluster to delete from.",
                     required = true
@@ -1010,7 +1045,9 @@ public final class ClusterController {
             @PathVariable("tag")
             final String tag
     ) throws GenieException {
-        LOG.info("Called with id " + id + " and tag " + tag);
-        return this.clusterConfigService.removeTagForCluster(id, tag);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and tag " + tag);
+        }
+        this.clusterService.removeTagForCluster(id, tag);
     }
 }

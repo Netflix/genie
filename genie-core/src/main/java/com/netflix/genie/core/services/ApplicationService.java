@@ -20,8 +20,8 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
-import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.common.model.Command;
+import com.netflix.genie.common.model.CommandStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +39,7 @@ import java.util.Set;
  * @author tgianos
  */
 @Validated
-public interface ApplicationConfigService {
+public interface ApplicationService {
 
     /**
      * Create new application.
@@ -108,19 +108,17 @@ public interface ApplicationConfigService {
     /**
      * Delete all applications from database.
      *
-     * @return The deleted applications
      * @throws GenieException if there is an error
      */
-    List<Application> deleteAllApplications() throws GenieException;
+    void deleteAllApplications() throws GenieException;
 
     /**
      * Delete an application configuration from database.
      *
      * @param id unique id of application configuration to delete
-     * @return The deleted application
      * @throws GenieException if there is an error
      */
-    Application deleteApplication(
+    void deleteApplication(
             @NotBlank(message = "No application id entered. Unable to delete.")
             final String id
     ) throws GenieException;
@@ -178,10 +176,9 @@ public interface ApplicationConfigService {
      *
      * @param id The id of the application to remove the configuration file
      *           from. Not null/empty/blank.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> removeAllConfigsForApplication(
+    void removeAllConfigsForApplication(
             @NotBlank(message = "No application id entered. Unable to remove configs.")
             final String id
     ) throws GenieException;
@@ -192,10 +189,9 @@ public interface ApplicationConfigService {
      * @param id     The id of the application to remove the configuration file
      *               from. Not null/empty/blank.
      * @param config The configuration file to remove. Not null/empty/blank.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> removeConfigForApplication(
+    void removeConfigForApplication(
             @NotBlank(message = "No application id entered. Unable to remove configuration.")
             final String id,
             @NotBlank(message = "No config entered. Unable to remove.")
@@ -203,78 +199,76 @@ public interface ApplicationConfigService {
     ) throws GenieException;
 
     /**
-     * Add a jar file to the application.
+     * Add dependency files to the application.
      *
-     * @param id   The id of the application to add the jar file to. Not
-     *             null/empty/blank.
-     * @param jars The jar files to add. Not null.
+     * @param id           The id of the application to add the dependency file to. Not
+     *                     null/empty/blank.
+     * @param dependencies The dependency files to add. Not null.
      * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> addJarsForApplication(
-            @NotBlank(message = "No application id entered. Unable to add jars.")
+    Set<String> addDependenciesForApplication(
+            @NotBlank(message = "No application id entered. Unable to add dependencies.")
             final String id,
-            @NotEmpty(message = "No jars entered. Unable to add jars.")
-            final Set<String> jars
+            @NotEmpty(message = "No dependencies entered. Unable to add dependencies.")
+            final Set<String> dependencies
     ) throws GenieException;
 
     /**
-     * Get the set of jar files associated with the application with given id.
+     * Get the set of dependency files associated with the application with given id.
      *
-     * @param id The id of the application to get the jar files for. Not
+     * @param id The id of the application to get the dependency files for. Not
      *           null/empty/blank.
-     * @return The set of jar files as paths
+     * @return The set of dependency files as paths
      * @throws GenieException if there is an error
      */
-    Set<String> getJarsForApplication(
-            @NotBlank(message = "No application id entered. Unable to get jars.")
+    Set<String> getDependenciesForApplication(
+            @NotBlank(message = "No application id entered. Unable to get dependencies.")
             final String id
     ) throws GenieException;
 
     /**
-     * Update the set of jar files associated with the application with given
+     * Update the set of dependency files associated with the application with given
      * id.
      *
-     * @param id   The id of the application to update the jar files for. Not
+     * @param id   The id of the application to update the dependency files for. Not
      *             null/empty/blank.
-     * @param jars The jar files to replace existing jars with. Not null/empty.
+     * @param dependencies The dependency files to replace existing dependencies with. Not null/empty.
      * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> updateJarsForApplication(
-            @NotBlank(message = "No application id entered. Unable to update jars.")
+    Set<String> updateDependenciesForApplication(
+            @NotBlank(message = "No application id entered. Unable to update dependencies.")
             final String id,
-            @NotNull(message = "No jars entered. Unable to update.")
-            final Set<String> jars
+            @NotNull(message = "No dependencies entered. Unable to update.")
+            final Set<String> dependencies
     ) throws GenieException;
 
     /**
-     * Remove all jar files from the application.
+     * Remove all dependency files from the application.
      *
      * @param id The id of the application to remove the configuration file
      *           from. Not null/empty/blank.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> removeAllJarsForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove jars.")
+    void removeAllDependenciesForApplication(
+            @NotBlank(message = "No application id entered. Unable to remove dependencies.")
             final String id
     ) throws GenieException;
 
     /**
-     * Remove a jar file from the application.
+     * Remove a dependency file from the application.
      *
-     * @param id  The id of the application to remove the jar file from. Not
+     * @param id  The id of the application to remove the dependency file from. Not
      *            null/empty/blank.
-     * @param jar The jar file to remove. Not null/empty/blank.
-     * @return The active set of configurations
+     * @param dependency The dependency file to remove. Not null/empty/blank.
      * @throws GenieException if there is an error
      */
-    Set<String> removeJarForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove jar.")
+    void removeDependencyForApplication(
+            @NotBlank(message = "No application id entered. Unable to remove dependency.")
             final String id,
-            @NotBlank(message = "No jar entiered. Unable to remove jar.")
-            final String jar
+            @NotBlank(message = "No dependency entered. Unable to remove dependency.")
+            final String dependency
     ) throws GenieException;
 
     /**
@@ -330,10 +324,9 @@ public interface ApplicationConfigService {
      *
      * @param id The id of the application to remove the tags from.
      *           Not null/empty/blank.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> removeAllTagsForApplication(
+    void removeAllTagsForApplication(
             @NotBlank(message = "No application id entered. Unable to remove tags.")
             final String id
     ) throws GenieException;
@@ -344,10 +337,9 @@ public interface ApplicationConfigService {
      * @param id  The id of the application to remove the tag from. Not
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> removeTagForApplication(
+    void removeTagForApplication(
             @NotBlank(message = "No application id entered. Unable to remove tag.")
             final String id,
             @NotBlank(message = "No tag entered. Unable to remove.")

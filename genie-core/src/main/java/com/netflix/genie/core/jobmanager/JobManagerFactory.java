@@ -22,7 +22,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.core.services.ClusterConfigService;
+import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 public class JobManagerFactory implements ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobManagerFactory.class);
-    private final ClusterConfigService ccs;
+    private final ClusterService ccs;
     private final ClusterLoadBalancer clb;
     private final Environment environment;
     private ApplicationContext context;
@@ -57,7 +57,7 @@ public class JobManagerFactory implements ApplicationContextAware {
      */
     @Autowired
     public JobManagerFactory(
-            final ClusterConfigService ccs,
+            final ClusterService ccs,
             final ClusterLoadBalancer clb,
             final Environment environment
     ) {

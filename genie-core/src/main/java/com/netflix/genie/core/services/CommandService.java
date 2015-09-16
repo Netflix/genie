@@ -32,8 +32,6 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
-//import com.netflix.genie.common.model.*;
-
 /**
  * Abstraction layer to encapsulate CommandConfig functionality.<br>
  * Classes implementing this abstraction layer must be thread-safe.
@@ -42,7 +40,7 @@ import java.util.Set;
  * @author tgianos
  */
 @Validated
-public interface CommandConfigService {
+public interface CommandService {
 
     /**
      * Create new command configuration.
@@ -113,19 +111,17 @@ public interface CommandConfigService {
     /**
      * Delete all commands from database.
      *
-     * @return The deleted commands
      * @throws GenieException if there is an error
      */
-    List<Command> deleteAllCommands() throws GenieException;
+    void deleteAllCommands() throws GenieException;
 
     /**
      * Delete a command configuration from database.
      *
      * @param id unique if of the command configuration to delete
-     * @return The deleted command configuration
      * @throws GenieException if there is an error
      */
-    Command deleteCommand(
+    void deleteCommand(
             @NotBlank(message = "No id entered. Unable to delete.")
             final String id
     ) throws GenieException;
@@ -183,10 +179,9 @@ public interface CommandConfigService {
      *
      * @param id The id of the command to remove the configuration file from.
      *           Not null/empty/blank.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> removeAllConfigsForCommand(
+    void removeAllConfigsForCommand(
             @NotBlank(message = "No command id entered. Unable to remove configs.")
             final String id
     ) throws GenieException;
@@ -197,56 +192,13 @@ public interface CommandConfigService {
      * @param id     The id of the command to remove the configuration file from.
      *               Not null/empty/blank.
      * @param config The configuration file to remove. Not null/empty/blank.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> removeConfigForCommand(
+    void removeConfigForCommand(
             @NotBlank(message = "No command id entered. Unable to remove configuration.")
             final String id,
             @NotBlank(message = "No config entered. Unable to remove.")
             final String config
-    ) throws GenieException;
-
-    /**
-     * Set the applications for the command.
-     *
-     * @param id             The id of the command to add the application file to. Not
-     *                       null/empty/blank.
-     * @param applicationIds The ids of the applications to set. Not null.
-     * @return The application
-     * @throws GenieException if there is an error
-     */
-    Set<Application> setApplicationsForCommand(
-            @NotBlank(message = "No command id entered. Unable to add applications.")
-            final String id,
-            @NotNull(message = "No application ids entered. Unable to set applications.")
-            final Set<String> applicationIds
-    ) throws GenieException;
-
-    /**
-     * Get the applications for a given command.
-     *
-     * @param id The id of the command to get the application for. Not
-     *           null/empty/blank.
-     * @return The applications or exception if none exist.
-     * @throws GenieException if there is an error
-     */
-    Set<Application> getApplicationsForCommand(
-            @NotBlank(message = "No command id entered. Unable to get applications.")
-            final String id
-    ) throws GenieException;
-
-    /**
-     * Remove the applications from the command.
-     *
-     * @param id The id of the command to remove the application from. Not
-     *           null/empty/blank.
-     * @return The removed applications
-     * @throws GenieException if there is an error
-     */
-    Set<Application> removeApplicationsForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove applications.")
-            final String id
     ) throws GenieException;
 
     /**
@@ -302,10 +254,9 @@ public interface CommandConfigService {
      *
      * @param id The id of the command to remove the tags from.
      *           Not null/empty/blank.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> removeAllTagsForCommand(
+    void removeAllTagsForCommand(
             @NotBlank(message = "No command id entered. Unable to remove tags.")
             final String id
     ) throws GenieException;
@@ -316,14 +267,84 @@ public interface CommandConfigService {
      * @param id  The id of the command to remove the tag from. Not
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> removeTagForCommand(
+    void removeTagForCommand(
             @NotBlank(message = "No command id entered. Unable to remove tag.")
             final String id,
             @NotBlank(message = "No tag entered. Unable to remove.")
             final String tag
+    ) throws GenieException;
+
+    /**
+     * Add applications for the command.
+     *
+     * @param id             The id of the command to add the application file to. Not
+     *                       null/empty/blank.
+     * @param applicationIds The ids of the applications to add. Not null.
+     * @return The applications set for the command
+     * @throws GenieException if there is an error
+     */
+    Set<Application> addApplicationsForCommand(
+            @NotBlank(message = "No command id entered. Unable to add applications.")
+            final String id,
+            @NotNull(message = "No application ids entered. Unable to add applications.")
+            final Set<String> applicationIds
+    ) throws GenieException;
+
+    /**
+     * Set the applications for the command.
+     *
+     * @param id             The id of the command to add the application file to. Not
+     *                       null/empty/blank.
+     * @param applicationIds The ids of the applications to set. Not null.
+     * @return The applications set for the command
+     * @throws GenieException if there is an error
+     */
+    Set<Application> setApplicationsForCommand(
+            @NotBlank(message = "No command id entered. Unable to set applications.")
+            final String id,
+            @NotNull(message = "No application ids entered. Unable to set applications.")
+            final Set<String> applicationIds
+    ) throws GenieException;
+
+    /**
+     * Get the applications for a given command.
+     *
+     * @param id The id of the command to get the application for. Not
+     *           null/empty/blank.
+     * @return The applications or exception if none exist.
+     * @throws GenieException if there is an error
+     */
+    Set<Application> getApplicationsForCommand(
+            @NotBlank(message = "No command id entered. Unable to get applications.")
+            final String id
+    ) throws GenieException;
+
+    /**
+     * Remove the applications from the command.
+     *
+     * @param id The id of the command to remove the application from. Not
+     *           null/empty/blank.
+     * @throws GenieException if there is an error
+     */
+    void removeApplicationsForCommand(
+            @NotBlank(message = "No command id entered. Unable to remove applications.")
+            final String id
+    ) throws GenieException;
+
+    /**
+     * Remove the application from the command.
+     *
+     * @param id The id of the command to remove the application from. Not null/empty/blank.
+     * @param appId The id of the application to remove. Not null/empty/blank
+     * @throws GenieException if there is an error
+     */
+    void removeApplicationForCommand(
+            @NotBlank(message = "No command id entered. Unable to remove application.")
+            final String id,
+            @NotBlank(message = "No application id entered. Unable to remove application.")
+            final String appId
     ) throws GenieException;
 
     /**

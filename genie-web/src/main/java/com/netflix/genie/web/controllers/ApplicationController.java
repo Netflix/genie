@@ -22,7 +22,7 @@ import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.core.services.ApplicationConfigService;
+import com.netflix.genie.core.services.ApplicationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -50,8 +51,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Code for ApplicationConfigResource - REST end-point for supporting
- * Application.
+ * Code for ApplicationController - REST end-point for supporting Applications.
  *
  * @author amsharma
  * @author tgianos
@@ -63,16 +63,16 @@ public final class ApplicationController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationController.class);
 
-    private final ApplicationConfigService applicationConfigService;
+    private final ApplicationService applicationService;
 
     /**
      * Constructor.
      *
-     * @param applicationConfigService The application configuration service to use.
+     * @param applicationService The application configuration service to use.
      */
     @Autowired
-    public ApplicationController(final ApplicationConfigService applicationConfigService) {
-        this.applicationConfigService = applicationConfigService;
+    public ApplicationController(final ApplicationService applicationService) {
+        this.applicationService = applicationService;
     }
 
     /**
@@ -115,7 +115,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to create new application");
         }
-        final Application createdApp = this.applicationConfigService.createApplication(app);
+        final Application createdApp = this.applicationService.createApplication(app);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
@@ -170,7 +170,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to get Application for id " + id);
         }
-        return this.applicationConfigService.getApplication(id);
+        return this.applicationService.getApplication(id);
     }
 
     /**
@@ -278,7 +278,7 @@ public final class ApplicationController {
                 }
             }
         }
-        return this.applicationConfigService.getApplications(
+        return this.applicationService.getApplications(
                 name, userName, enumStatuses, tags, page, limit, descending, orderBys);
     }
 
@@ -321,21 +321,19 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called to update application config with info " + updateApp.toString());
         }
-        return this.applicationConfigService.updateApplication(id, updateApp);
+        return this.applicationService.updateApplication(id, updateApp);
     }
 
     /**
      * Delete all applications from database.
      *
-     * @return All The deleted applications
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Delete all applications",
-            notes = "Delete all available applications and get them back.",
-            response = Application.class,
-            responseContainer = "List"
+            notes = "Delete all available applications and get them back."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -343,21 +341,21 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Application> deleteAllApplications() throws GenieException {
+    public void deleteAllApplications() throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Delete all Applications");
         }
-        return this.applicationConfigService.deleteAllApplications();
+        this.applicationService.deleteAllApplications();
     }
 
     /**
      * Delete an application configuration from database.
      *
      * @param id unique id of configuration to delete
-     * @return The deleted application configuration
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Delete an application",
             notes = "Delete an application with the supplied id.",
@@ -377,7 +375,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Application deleteApplication(
+    public void deleteApplication(
             @ApiParam(
                     value = "Id of the application to delete.",
                     required = true
@@ -388,7 +386,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Delete an application with id " + id);
         }
-        return this.applicationConfigService.deleteApplication(id);
+        this.applicationService.deleteApplication(id);
     }
 
     /**
@@ -438,7 +436,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + configs);
         }
-        return this.applicationConfigService.addConfigsToApplication(id, configs);
+        return this.applicationService.addConfigsToApplication(id, configs);
     }
 
     /**
@@ -481,7 +479,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        return this.applicationConfigService.getConfigsForApplication(id);
+        return this.applicationService.getConfigsForApplication(id);
     }
 
     /**
@@ -532,7 +530,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and configs " + configs);
         }
-        return this.applicationConfigService.updateConfigsForApplication(id, configs);
+        return this.applicationService.updateConfigsForApplication(id, configs);
     }
 
     /**
@@ -540,10 +538,10 @@ public final class ApplicationController {
      *
      * @param id The id of the application to delete the configuration files
      *           from. Not null/empty/blank.
-     * @return Empty set if successful
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove all configuration files from an application",
             notes = "Remove all the configuration files from the application with given id.",
@@ -564,7 +562,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeAllConfigsForApplication(
+    public void removeAllConfigsForApplication(
             @ApiParam(
                     value = "Id of the application to delete from.",
                     required = true
@@ -575,22 +573,24 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        return this.applicationConfigService.removeAllConfigsForApplication(id);
+        this.applicationService.removeAllConfigsForApplication(id);
     }
 
     /**
-     * Add new jar files for a given application.
+     * Add new dependency files for a given application.
      *
-     * @param id   The id of the application to add the jar file to. Not
-     *             null/empty/blank.
-     * @param jars The jar files to add. Not null.
-     * @return The active set of application jars.
+     * @param id           The id of the application to add the dependency file to. Not
+     *                     null/empty/blank.
+     * @param dependencies The dependency files to add. Not null.
+     * @return The active set of application dependencies.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/jars", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            value = "/{id}/dependencies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     @ApiOperation(
-            value = "Add new jar files to an application",
-            notes = "Add the supplied jar files to the applicaiton with the supplied id.",
+            value = "Add new dependency files to an application",
+            notes = "Add the supplied dependency files to the application with the supplied id.",
             response = String.class,
             responseContainer = "Set"
     )
@@ -608,38 +608,38 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> addJarsForApplication(
+    public Set<String> addDependenciesForApplication(
             @ApiParam(
-                    value = "Id of the application to add jar to.",
+                    value = "Id of the application to add dependencies to.",
                     required = true
             )
             @PathVariable("id")
             final String id,
             @ApiParam(
-                    value = "The jar files to add.",
+                    value = "The dependencies files to add.",
                     required = true
             )
             @RequestBody
-            final Set<String> jars
+            final Set<String> dependencies
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and jars " + jars);
+            LOG.debug("Called with id " + id + " and dependencies " + dependencies);
         }
-        return this.applicationConfigService.addJarsForApplication(id, jars);
+        return this.applicationService.addDependenciesForApplication(id, dependencies);
     }
 
     /**
-     * Get all the jar files for a given application.
+     * Get all the dependency files for a given application.
      *
-     * @param id The id of the application to get the jar files for. Not
+     * @param id The id of the application to get the dependency files for. Not
      *           NULL/empty/blank.
-     * @return The set of jar files.
+     * @return The set of dependency files.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/jars", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/dependencies", method = RequestMethod.GET)
     @ApiOperation(
-            value = "Get the jars for an application",
-            notes = "Get the jars for the application with the supplied id.",
+            value = "Get the dependencies for an application",
+            notes = "Get the dependencies for the application with the supplied id.",
             response = String.class,
             responseContainer = "Set"
     )
@@ -657,9 +657,9 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> getJarsForApplication(
+    public Set<String> getDependenciesForApplication(
             @ApiParam(
-                    value = "Id of the application to get the jars for.",
+                    value = "Id of the application to get the dependencies for.",
                     required = true
             )
             @PathVariable("id")
@@ -668,23 +668,25 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        return this.applicationConfigService.getJarsForApplication(id);
+        return this.applicationService.getDependenciesForApplication(id);
     }
 
     /**
-     * Update the jar files for a given application.
+     * Update the dependency files for a given application.
      *
-     * @param id   The id of the application to update the jar files for. Not
+     * @param id   The id of the application to update the dependency files for. Not
      *             null/empty/blank.
-     * @param jars The jar files to replace existing jar files with. Not
+     * @param dependencies The dependency files to replace existing dependency files with. Not
      *             null/empty/blank.
-     * @return The active set of application jars
+     * @return The active set of application dependencies
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/jars", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            value = "/{id}/dependencies", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     @ApiOperation(
-            value = "Update jar files for an application",
-            notes = "Replace the existing jar files for application with given id.",
+            value = "Update dependency files for an application",
+            notes = "Replace the existing dependency files for application with given id.",
             response = String.class,
             responseContainer = "Set"
     )
@@ -702,7 +704,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> updateJarsForApplication(
+    public Set<String> updateDependenciesForApplication(
             @ApiParam(
                     value = "Id of the application to update configurations for.",
                     required = true
@@ -710,30 +712,30 @@ public final class ApplicationController {
             @PathVariable("id")
             final String id,
             @ApiParam(
-                    value = "The jar files to replace existing with.",
+                    value = "The dependency files to replace existing with.",
                     required = true
             )
             @RequestBody
-            final Set<String> jars
+            final Set<String> dependencies
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and jars " + jars);
+            LOG.debug("Called with id " + id + " and dependencies " + dependencies);
         }
-        return this.applicationConfigService.updateJarsForApplication(id, jars);
+        return this.applicationService.updateDependenciesForApplication(id, dependencies);
     }
 
     /**
-     * Delete the all jar files from a given application.
+     * Delete the all dependency files from a given application.
      *
-     * @param id The id of the application to delete the jar files from. Not
+     * @param id The id of the application to delete the dependency files from. Not
      *           null/empty/blank.
-     * @return Empty set if successful
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/jars", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}/dependencies", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-            value = "Remove all jar files from an application",
-            notes = "Remove all the jar files from the application with given id.",
+            value = "Remove all dependency files from an application",
+            notes = "Remove all the dependency files from the application with given id.",
             response = String.class,
             responseContainer = "Set"
     )
@@ -751,7 +753,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeAllJarsForApplication(
+    public void removeAllDependenciesForApplication(
             @ApiParam(
                     value = "Id of the application to delete from.",
                     required = true
@@ -762,7 +764,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        return this.applicationConfigService.removeAllJarsForApplication(id);
+        this.applicationService.removeAllDependenciesForApplication(id);
     }
 
     /**
@@ -812,7 +814,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + tags);
         }
-        return this.applicationConfigService.addTagsForApplication(id, tags);
+        return this.applicationService.addTagsForApplication(id, tags);
     }
 
     /**
@@ -855,7 +857,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        return this.applicationConfigService.getTagsForApplication(id);
+        return this.applicationService.getTagsForApplication(id);
     }
 
     /**
@@ -906,7 +908,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
         }
-        return this.applicationConfigService.updateTagsForApplication(id, tags);
+        return this.applicationService.updateTagsForApplication(id, tags);
     }
 
     /**
@@ -914,10 +916,10 @@ public final class ApplicationController {
      *
      * @param id The id of the application to delete the tags from.
      *           Not null/empty/blank.
-     * @return Empty set if successful
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove all tags from a application",
             notes = "Remove all the tags from the application with given id.  Note that the genie name space tags"
@@ -939,7 +941,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeAllTagsForApplication(
+    public void removeAllTagsForApplication(
             @ApiParam(
                     value = "Id of the application to delete from.",
                     required = true
@@ -950,7 +952,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        return this.applicationConfigService.removeAllTagsForApplication(id);
+        this.applicationService.removeAllTagsForApplication(id);
     }
 
     /**
@@ -959,10 +961,10 @@ public final class ApplicationController {
      * @param id  The id of the application to delete the tag from. Not
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags for the application.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove a tag from a application",
             notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
@@ -984,7 +986,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> removeTagForApplication(
+    public void removeTagForApplication(
             @ApiParam(
                     value = "Id of the application to delete from.",
                     required = true
@@ -1001,7 +1003,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tag " + tag);
         }
-        return this.applicationConfigService.removeTagForApplication(id, tag);
+        this.applicationService.removeTagForApplication(id, tag);
     }
 
     /**
@@ -1061,6 +1063,6 @@ public final class ApplicationController {
                 }
             }
         }
-        return this.applicationConfigService.getCommandsForApplication(id, enumStatuses);
+        return this.applicationService.getCommandsForApplication(id, enumStatuses);
     }
 }

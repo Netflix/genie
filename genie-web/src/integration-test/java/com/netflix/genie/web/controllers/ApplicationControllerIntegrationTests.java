@@ -67,7 +67,7 @@ import java.util.UUID;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = GenieConfig.class)
 @WebIntegrationTest(randomPort = true)
-public class ApplicationsControllerIntegrationTests {
+public class ApplicationControllerIntegrationTests {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = "spark";
@@ -490,27 +490,27 @@ public class ApplicationsControllerIntegrationTests {
     }
 
     /**
-     * Test to make sure we can add jars to the application after it is created.
+     * Test to make sure we can add dependencies to the application after it is created.
      *
      * @throws GenieException on configuration problems
      */
     @Test
-    public void canAddJarsToApplication() throws GenieException {
+    public void canAddDependenciesToApplication() throws GenieException {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         ResponseEntity<String[]> jarResponse = this.restTemplate.getForEntity(
-                this.appsBaseUrl + "/" + ID + "/jars",
+                this.appsBaseUrl + "/" + ID + "/dependencies",
                 String[].class
         );
         Assert.assertThat(jarResponse.getBody().length, Matchers.is(0));
 
         final String jar1 = UUID.randomUUID().toString();
         final String jar2 = UUID.randomUUID().toString();
-        final Set<String> jars = Sets.newHashSet(jar1, jar2);
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(jars, this.headers);
+        final Set<String> dependencies = Sets.newHashSet(jar1, jar2);
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(dependencies, this.headers);
         jarResponse = this.restTemplate.postForEntity(
-                this.appsBaseUrl + "/" + ID + "/jars",
+                this.appsBaseUrl + "/" + ID + "/dependencies",
                 entity,
                 String[].class
         );
@@ -521,12 +521,12 @@ public class ApplicationsControllerIntegrationTests {
     }
 
     /**
-     * Test to make sure we can update the jars for an application after it is created.
+     * Test to make sure we can update the dependencies for an application after it is created.
      *
      * @throws GenieException on configuration problems
      */
     @Test
-    public void canUpdateJarsForApplication() throws GenieException {
+    public void canUpdateDependenciesForApplication() throws GenieException {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
@@ -534,7 +534,7 @@ public class ApplicationsControllerIntegrationTests {
         final String jar2 = UUID.randomUUID().toString();
         HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(jar1, jar2), this.headers);
         this.restTemplate.postForEntity(
-                this.appsBaseUrl + "/" + ID + "/jars",
+                this.appsBaseUrl + "/" + ID + "/dependencies",
                 entity,
                 String[].class
         );
@@ -542,7 +542,7 @@ public class ApplicationsControllerIntegrationTests {
         final String jar3 = UUID.randomUUID().toString();
         entity = new HttpEntity<>(Sets.newHashSet(jar3), this.headers);
         final ResponseEntity<String[]> jarResponse = this.restTemplate.exchange(
-                this.appsBaseUrl + "/" + ID + "/jars",
+                this.appsBaseUrl + "/" + ID + "/dependencies",
                 HttpMethod.PUT,
                 entity,
                 String[].class
@@ -553,12 +553,12 @@ public class ApplicationsControllerIntegrationTests {
     }
 
     /**
-     * Test to make sure we can delete the jars for an application after it is created.
+     * Test to make sure we can delete the dependencies for an application after it is created.
      *
      * @throws GenieException on configuration problems
      */
     @Test
-    public void canDeleteJarsForApplication() throws GenieException {
+    public void canDeleteDependenciesForApplication() throws GenieException {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
@@ -566,20 +566,20 @@ public class ApplicationsControllerIntegrationTests {
         final String jar2 = UUID.randomUUID().toString();
         final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(jar1, jar2), this.headers);
         this.restTemplate.postForEntity(
-                this.appsBaseUrl + "/" + ID + "/jars",
+                this.appsBaseUrl + "/" + ID + "/dependencies",
                 entity,
                 String[].class
         );
 
         this.restTemplate.exchange(
-                this.appsBaseUrl + "/" + ID + "/jars",
+                this.appsBaseUrl + "/" + ID + "/dependencies",
                 HttpMethod.DELETE,
                 null,
                 String[].class
         );
 
         final ResponseEntity<String[]> jarResponse = this.restTemplate.getForEntity(
-                this.appsBaseUrl + "/" + ID + "/jars",
+                this.appsBaseUrl + "/" + ID + "/dependencies",
                 String[].class
         );
         Assert.assertThat(jarResponse.getBody().length, Matchers.is(0));

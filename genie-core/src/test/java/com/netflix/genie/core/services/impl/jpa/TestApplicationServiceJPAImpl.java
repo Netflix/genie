@@ -38,11 +38,11 @@ import java.util.HashSet;
 import java.util.UUID;
 
 /**
- * Tests for the ApplicationConfigServiceJPAImpl.
+ * Tests for the ApplicationServiceJPAImpl.
  *
  * @author tgianos
  */
-public class TestApplicationConfigServiceJPAImpl {
+public class TestApplicationServiceJPAImpl {
 
     private static final String APP_1_ID = "app1";
     private static final String APP_1_NAME = "tez";
@@ -50,7 +50,7 @@ public class TestApplicationConfigServiceJPAImpl {
     private static final String APP_1_VERSION = "1.2.3";
 
     private com.netflix.genie.core.repositories.jpa.ApplicationRepository applicationRepository;
-    private ApplicationConfigServiceJPAImpl appService;
+    private ApplicationServiceJPAImpl appService;
 
     /**
      * Setup the tests.
@@ -59,7 +59,7 @@ public class TestApplicationConfigServiceJPAImpl {
     public void setup() {
         this.applicationRepository = Mockito.mock(ApplicationRepository.class);
         final CommandRepository commandRepository = Mockito.mock(CommandRepository.class);
-        this.appService = new ApplicationConfigServiceJPAImpl(this.applicationRepository, commandRepository);
+        this.appService = new ApplicationServiceJPAImpl(this.applicationRepository, commandRepository);
     }
 
     /**
@@ -339,7 +339,7 @@ public class TestApplicationConfigServiceJPAImpl {
     public void testAddJarsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.applicationRepository.findOne(id)).thenReturn(null);
-        this.appService.addJarsForApplication(id, new HashSet<>());
+        this.appService.addDependenciesForApplication(id, new HashSet<>());
     }
 
     /**
@@ -361,7 +361,7 @@ public class TestApplicationConfigServiceJPAImpl {
     public void testUpdateJarsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.applicationRepository.findOne(id)).thenReturn(null);
-        this.appService.updateJarsForApplication(id, new HashSet<>());
+        this.appService.updateDependenciesForApplication(id, new HashSet<>());
     }
 
     /**
@@ -383,7 +383,7 @@ public class TestApplicationConfigServiceJPAImpl {
     public void testGetJarsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.applicationRepository.findOne(id)).thenReturn(null);
-        this.appService.getJarsForApplication(id);
+        this.appService.getDependenciesForApplication(id);
     }
 
     /**
@@ -405,7 +405,7 @@ public class TestApplicationConfigServiceJPAImpl {
     public void testRemoveAllJarsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.applicationRepository.findOne(id)).thenReturn(null);
-        this.appService.removeAllJarsForApplication(id);
+        this.appService.removeAllDependenciesForApplication(id);
     }
 
     /**
@@ -427,7 +427,7 @@ public class TestApplicationConfigServiceJPAImpl {
     public void testRemoveJarForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.applicationRepository.findOne(id)).thenReturn(null);
-        this.appService.removeJarForApplication(id, "something");
+        this.appService.removeDependencyForApplication(id, "something");
     }
 
     /**

@@ -23,9 +23,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.core.services.ApplicationConfigService;
-import com.netflix.genie.core.services.ClusterConfigService;
-import com.netflix.genie.core.services.CommandConfigService;
+import com.netflix.genie.core.services.ApplicationService;
+import com.netflix.genie.core.services.ClusterService;
+import com.netflix.genie.core.services.CommandService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +39,13 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration Tests for the CommandConfigServiceJPAImpl.
+ * Integration Tests for the CommandServiceJPAImpl.
  *
  * @author tgianos
  */
-@DatabaseSetup("IntTestCommandConfigServiceJPAImpl/init.xml")
+@DatabaseSetup("CommandServiceJPAImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
+public class CommandServiceJPAImplIntegrationTests extends DBUnitTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String CLUSTER_1_ID = "cluster1";
@@ -75,13 +75,13 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     private static final CommandStatus COMMAND_3_STATUS = CommandStatus.DEPRECATED;
 
     @Autowired
-    private CommandConfigService service;
+    private CommandService service;
 
     @Autowired
-    private ClusterConfigService clusterService;
+    private ClusterService clusterService;
 
     @Autowired
-    private ApplicationConfigService appService;
+    private ApplicationService appService;
 
     /**
      * Test the get command method.
@@ -483,7 +483,7 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(3, this.service.getCommands(null, null, null, null, 0, 10, true, null).size());
-        Assert.assertEquals(3, this.service.deleteAllCommands().size());
+        this.service.deleteAllCommands();
         Assert.assertTrue(this.service.getCommands(null, null, null, null, 0, 10, true, null).isEmpty());
     }
 
@@ -494,8 +494,7 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testDelete() throws GenieException {
-        List<Command> commands
-                = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
+        List<Command> commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(3, commands.size());
         boolean found = false;
         for (final Command command : commands) {
@@ -505,8 +504,7 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
             }
         }
         Assert.assertTrue(found);
-        List<Command> appCommands
-                = this.appService.getCommandsForApplication(APP_1_ID, null);
+        List<Command> appCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, appCommands.size());
         found = false;
         for (final Command command : appCommands) {
@@ -518,8 +516,7 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
         Assert.assertTrue(found);
 
         //Actually delete it
-        Assert.assertEquals(COMMAND_1_ID,
-                this.service.deleteCommand(COMMAND_1_ID).getId());
+        this.service.deleteCommand(COMMAND_1_ID);
 
         commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(2, commands.size());
@@ -536,8 +533,7 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
 
         //Test a case where the app has no commands to
         //make sure that also works.
-        Assert.assertEquals(COMMAND_3_ID,
-                this.service.deleteCommand(COMMAND_3_ID).getId());
+        this.service.deleteCommand(COMMAND_3_ID);
     }
 
     /**
@@ -660,10 +656,9 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveAllConfigsForCommand() throws GenieException {
-        Assert.assertEquals(2,
-                this.service.getConfigsForCommand(COMMAND_1_ID).size());
-        Assert.assertEquals(0,
-                this.service.removeAllConfigsForCommand(COMMAND_1_ID).size());
+        Assert.assertEquals(2, this.service.getConfigsForCommand(COMMAND_1_ID).size());
+        this.service.removeAllConfigsForCommand(COMMAND_1_ID);
+        Assert.assertEquals(0, this.service.getConfigsForCommand(COMMAND_1_ID).size());
     }
 
     /**
@@ -683,13 +678,11 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveConfigForCommand() throws GenieException {
-        final Set<String> configs
-                = this.service.getConfigsForCommand(COMMAND_1_ID);
+        final Set<String> configs = this.service.getConfigsForCommand(COMMAND_1_ID);
         Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(1,
-                this.service.removeConfigForCommand(
-                        COMMAND_1_ID,
-                        configs.iterator().next()).size());
+        final String removedConfig = configs.iterator().next();
+        this.service.removeConfigForCommand(COMMAND_1_ID, removedConfig);
+        Assert.assertFalse(this.service.getConfigsForCommand(COMMAND_1_ID).contains(removedConfig));
     }
 
     /**
@@ -710,6 +703,39 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveConfigForCommandNoId() throws GenieException {
         this.service.removeConfigForCommand(null, "something");
+    }
+
+    /**
+     * Test setting the applications for a given command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testAddApplicationsForCommand() throws GenieException {
+        final Command command2 = this.service.getCommand(COMMAND_2_ID);
+        Assert.assertTrue(command2.getApplications().isEmpty());
+
+        final Set<String> appIds = new HashSet<>();
+        appIds.add(APP_1_ID);
+        final List<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        Assert.assertEquals(1, preCommands.size());
+        Assert.assertEquals(1, preCommands
+                        .stream()
+                        .filter(command -> COMMAND_1_ID.equals(command.getId()))
+                        .count()
+        );
+
+        this.service.addApplicationsForCommand(COMMAND_2_ID, appIds);
+
+        final List<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        Assert.assertEquals(2, savedCommands.size());
+        Assert.assertEquals(
+                1,
+                this.service.getApplicationsForCommand(COMMAND_2_ID)
+                        .stream()
+                        .filter(application -> APP_1_ID.equals(application.getId()))
+                        .count()
+        );
     }
 
     /**
@@ -797,7 +823,7 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test
     public void testRemoveApplicationsForCommand() throws GenieException {
         Assert.assertEquals(1, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
-        Assert.assertEquals(1, this.service.removeApplicationsForCommand(COMMAND_1_ID).size());
+        this.service.removeApplicationsForCommand(COMMAND_1_ID);
         Assert.assertEquals(0, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
     }
 
@@ -809,6 +835,18 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveApplicationsForCommandNoId() throws GenieException {
         this.service.removeApplicationsForCommand(null);
+    }
+
+    /**
+     * Test remove application for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testRemoveApplicationForCommand() throws GenieException {
+        Assert.assertEquals(1, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
+        this.service.removeApplicationForCommand(COMMAND_1_ID, APP_1_ID);
+        Assert.assertEquals(0, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
     }
 
     /**
@@ -921,12 +959,9 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveAllTagsForCommand() throws GenieException {
-        Assert.assertEquals(5,
-                this.service.getTagsForCommand(COMMAND_1_ID).size());
-        final Set<String> finalTags
-                = this.service.removeAllTagsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(2,
-                finalTags.size());
+        Assert.assertEquals(5, this.service.getTagsForCommand(COMMAND_1_ID).size());
+        this.service.removeAllTagsForCommand(COMMAND_1_ID);
+        Assert.assertEquals(2, this.service.getTagsForCommand(COMMAND_1_ID).size());
     }
 
     /**
@@ -946,14 +981,9 @@ public class IntTestCommandConfigServiceJPAImpl extends DBUnitTestBase {
      */
     @Test
     public void testRemoveTagForCommand() throws GenieException {
-        final Set<String> tags
-                = this.service.getTagsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(5, tags.size());
-        Assert.assertEquals(4,
-                this.service.removeTagForCommand(
-                        COMMAND_1_ID,
-                        "tez").size()
-        );
+        Assert.assertTrue(this.service.getTagsForCommand(COMMAND_1_ID).contains("tez"));
+        this.service.removeTagForCommand(COMMAND_1_ID, "tez");
+        Assert.assertFalse(this.service.getTagsForCommand(COMMAND_1_ID).contains("tez"));
     }
 
     /**

@@ -21,7 +21,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobmanager.JobMonitor;
-import com.netflix.genie.core.services.CommandConfigService;
+import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.core.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -91,7 +91,7 @@ public class YarnJobManagerImpl extends JobManagerImpl {
     public YarnJobManagerImpl(
             final JobMonitor jobMonitor,
             final JobService jobService,
-            final CommandConfigService commandService,
+            final CommandService commandService,
             final Environment environment
     ) {
         super(jobMonitor, jobService, commandService);

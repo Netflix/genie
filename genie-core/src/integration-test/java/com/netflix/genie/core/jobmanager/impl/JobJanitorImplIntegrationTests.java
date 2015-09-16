@@ -46,7 +46,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class
 })
-public class IntTestJobJanitorImpl {
+public class JobJanitorImplIntegrationTests {
 
     @Autowired
     private JobJanitor janitor;
@@ -57,8 +57,8 @@ public class IntTestJobJanitorImpl {
      * @throws Exception For any issue
      */
     @Test
-    @DatabaseSetup("IntTestJobJanitorImpl/testMarkZombies/init.xml")
-    @DatabaseTearDown("IntTestJobJanitorImpl/testMarkZombies/cleanup.xml")
+    @DatabaseSetup("JobJanitorImplIntegrationTests/testMarkZombies/init.xml")
+    @DatabaseTearDown("JobJanitorImplIntegrationTests/testMarkZombies/cleanup.xml")
     public void testMarkZombies() throws Exception {
         Assert.assertEquals(2, this.janitor.markZombies());
     }
