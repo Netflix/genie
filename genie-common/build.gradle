@@ -1,23 +1,9 @@
 ext {
     metaModelIgnorePattern = "**/com/netflix/genie/common/model/*_.java"
-    generatedSourcesDir = new File("${projectDir}/src/generated")
-    generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
 }
 
 configurations {
     jpaModelGen
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir generatedSourcesJavaDir
-        }
-    }
-}
-
-license {
-    excludes(["${projectDir}/src/generated"])
 }
 
 dependencies {
@@ -64,10 +50,6 @@ task generateJPAMetaModel(type: JavaCompile, group: 'build', description: 'Gener
     options.compilerArgs = [
             "-proc:only"
     ]
-}
-
-clean {
-    delete generatedSourcesDir
 }
 
 compileJava {

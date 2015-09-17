@@ -37,9 +37,8 @@ nebulaRelease {
 
 allprojects {
     clean {
-        delete 'genie-db'
-        delete 'derby.log'
-        delete 'data'
+        delete "${projectDir}/genie-db"
+        delete "${projectDir}/data"
     }
 }
 
@@ -56,6 +55,15 @@ subprojects {
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'org.unbroken-dome.test-sets'
 
+    ext {
+        generatedSourcesDir = new File("${projectDir}/src/generated")
+        generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
+    }
+
+    clean {
+        delete generatedSourcesDir
+    }
+
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -68,6 +76,14 @@ subprojects {
         }
         maven {
             url 'http://repo.spring.io/snapshot'
+        }
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDir generatedSourcesJavaDir
+            }
         }
     }
 
@@ -128,6 +144,10 @@ subprojects {
 
         testRuntime("javax.el:javax.el-api")
         testRuntime("org.glassfish:javax.el")
+    }
+
+    license {
+        excludes(["${projectDir}/src/generated"])
     }
 
     checkstyle {

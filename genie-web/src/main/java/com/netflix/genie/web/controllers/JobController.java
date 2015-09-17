@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.web.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.model.JobStatus;
@@ -221,53 +219,53 @@ public final class JobController {
         return this.jobSearchService.getJob(id);
     }
 
-    /**
-     * Get job status for give job id.
-     *
-     * @param id id for job to look up
-     * @return The status of the job
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/status", method = RequestMethod.GET)
-    @ApiOperation(
-            value = "Get the status of the job ",
-            notes = "Get the status of job whose id is sent",
-            response = String.class
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_BAD_REQUEST,
-                    message = "Bad Request"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Job not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid id supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public ObjectNode getJobStatus(
-            @ApiParam(
-                    value = "Id of the job.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called for job id:" + id);
-        }
-        final ObjectMapper mapper = new ObjectMapper();
-        final ObjectNode node = mapper.createObjectNode();
-        node.put("status", this.jobService.getJobStatus(id).toString());
-        return node;
-    }
+//    /**
+//     * Get job status for give job id.
+//     *
+//     * @param id id for job to look up
+//     * @return The status of the job
+//     * @throws GenieException For any error
+//     */
+//    @RequestMapping(value = "/{id}/status", method = RequestMethod.GET)
+//    @ApiOperation(
+//            value = "Get the status of the job ",
+//            notes = "Get the status of job whose id is sent",
+//            response = String.class
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    code = HttpURLConnection.HTTP_BAD_REQUEST,
+//                    message = "Bad Request"
+//            ),
+//            @ApiResponse(
+//                    code = HttpURLConnection.HTTP_NOT_FOUND,
+//                    message = "Job not found"
+//            ),
+//            @ApiResponse(
+//                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+//                    message = "Invalid id supplied"
+//            ),
+//            @ApiResponse(
+//                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+//                    message = "Genie Server Error due to Unknown Exception"
+//            )
+//    })
+//    public ObjectNode getJobStatus(
+//            @ApiParam(
+//                    value = "Id of the job.",
+//                    required = true
+//            )
+//            @PathVariable("id")
+//            final String id
+//    ) throws GenieException {
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug("Called for job id:" + id);
+//        }
+//        final ObjectMapper mapper = new ObjectMapper();
+//        final ObjectNode node = mapper.createObjectNode();
+//        node.put("status", this.jobService.getJobStatus(id).toString());
+//        return node;
+//    }
 
     /**
      * Get jobs for given filter criteria.

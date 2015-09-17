@@ -79,6 +79,10 @@ public class GenieConfig {
                 .apiInfo(
                         new ApiInfo(
                                 "Genie REST API",
+//                                "See our &lt;a href=&quot;http://netflix.github.io/genie&quot;&gt;GitHub Page"
+//                                        + "&lt;/a&gt; for more documentation.&lt;br/&gt;Post any issues found &lt;"
+//                                        + "a href=&quot;https://github.com/Netflix/genie/issues&quot;>here"
+//                                        + "&lt;/a&gt;.&lt;br/&gt;",
                                 "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more "
                                         + "documentation.<br/>Post any issues found "
                                         + "<a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
@@ -96,16 +100,6 @@ public class GenieConfig {
                 .pathMapping("/")
                 .useDefaultResponseMessages(false);
     }
-
-//    /**
-//     * Configure the Swagger UI.
-//     *
-//     * @return The swagger UI configuration.
-//     */
-//    @Bean
-//    public UiConfiguration uiConfig() {
-//        return new UiConfiguration("validatorUrl");
-//    }
 
     /**
      * Setup bean validation.
