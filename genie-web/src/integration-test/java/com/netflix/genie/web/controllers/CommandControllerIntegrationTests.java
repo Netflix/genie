@@ -298,8 +298,8 @@ public class CommandControllerIntegrationTests {
         commands = getResponse.getBody();
         Assert.assertThat(commands.length, Matchers.is(2));
         Arrays.asList(commands).stream().forEach(
-                application -> {
-                    if (!application.getId().equals(id1) && !application.getId().equals(id3)) {
+                command -> {
+                    if (!command.getId().equals(id1) && !command.getId().equals(id3)) {
                         Assert.fail();
                     }
                 }
@@ -695,11 +695,12 @@ public class CommandControllerIntegrationTests {
 
         //Shouldn't add anything
         appIds.clear();
-        this.restTemplate.postForEntity(
+        final ResponseEntity<String> errorResponse = this.restTemplate.postForEntity(
                 this.commandsBaseUrl + "/" + ID + "/applications",
                 entity,
-                Application[].class
+                String.class
         );
+        Assert.assertThat(errorResponse.getStatusCode(), Matchers.is(HttpStatus.PRECONDITION_FAILED));
         responseEntity = this.restTemplate.getForEntity(
                 this.commandsBaseUrl + "/" + ID + "/applications",
                 Application[].class

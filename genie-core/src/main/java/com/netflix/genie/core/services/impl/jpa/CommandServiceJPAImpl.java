@@ -441,7 +441,7 @@ public class CommandServiceJPAImpl implements CommandService {
     public Set<Application> addApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to add applications.")
             final String id,
-            @NotNull(message = "No application ids entered. Unable to add applications.")
+            @NotEmpty(message = "No application ids entered. Unable to add applications.")
             final Set<String> applicationIds
     ) throws GenieException {
         if (applicationIds.size() != applicationIds.stream().filter(this.appRepo::exists).count()) {

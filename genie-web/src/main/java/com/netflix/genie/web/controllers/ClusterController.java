@@ -566,180 +566,17 @@ public final class ClusterController {
     }
 
     /**
-     * Add new commandIds to the given cluster.
+     * Delete the all configuration files from a given cluster.
      *
-     * @param id         The id of the cluster to add the commandIds to. Not
-     *                   null/empty/blank.
-     * @param commandIds The ids of the commandIds to add. Not null.
-     * @return The active commandIds for this cluster.
+     * @param id The id of the cluster to delete the configuration files from.
+     *           Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(
-            value = "Add new commandIds to a cluster",
-            notes = "Add the supplied commandIds to the cluster with the supplied id."
-                    + " commandIds should already have been created.",
-            response = Command.class,
-            responseContainer = "List"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public List<Command> addCommandsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to add commandIds to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The ids of the commandIds to add.",
-                    required = true
-            )
-            @RequestBody
-            final List<String> commandIds
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and commandIds " + commandIds);
-        }
-        return this.clusterService.addCommandsForCluster(id, commandIds);
-    }
-
-    /**
-     * Get all the commandIds configured for a given cluster.
-     *
-     * @param id       The id of the cluster to get the command files for. Not
-     *                 NULL/empty/blank.
-     * @param statuses The various statuses to return commandIds for.
-     * @return The active set of commandIds for the cluster.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET)
-    @ApiOperation(
-            value = "Get the commandIds for a cluster",
-            notes = "Get the commandIds for the cluster with the supplied id.",
-            response = Command.class,
-            responseContainer = "List"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public List<Command> getCommandsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to get commandIds for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The statuses of the commandIds to find.",
-                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
-            )
-            @RequestParam(value = "status", required = false)
-            final Set<String> statuses
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " status " + statuses);
-        }
-
-        Set<CommandStatus> enumStatuses = null;
-        if (!statuses.isEmpty()) {
-            enumStatuses = EnumSet.noneOf(CommandStatus.class);
-            for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(CommandStatus.parse(status));
-                }
-            }
-        }
-
-        return this.clusterService.getCommandsForCluster(id, enumStatuses);
-    }
-
-    /**
-     * Set the commandIds for a given cluster.
-     *
-     * @param id         The id of the cluster to update the configuration files for.
-     *                   Not null/empty/blank.
-     * @param commandIds The ids of the commands to replace existing commands with. Not
-     *                   null/empty/blank.
-     * @return The new set of commandIds for the cluster.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(
-            value = "Update the commands for a cluster",
-            notes = "Replace the existing commands for cluster with given id.",
-            response = Command.class,
-            responseContainer = "List"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public List<Command> setCommandsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to update commandIds for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The ids of the commands to replace existing commands with. Should already be created",
-                    required = true
-            )
-            @RequestBody
-            final List<String> commandIds
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and commandIds " + commandIds);
-        }
-        return this.clusterService.updateCommandsForCluster(id, commandIds);
-    }
-
-    /**
-     * Remove the all commandIds from a given cluster.
-     *
-     * @param id The id of the cluster to delete the commandIds from. Not
-     *           null/empty/blank.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-            value = "Remove all commandIds from an cluster",
-            notes = "Remove all the commandIds from the cluster with given id."
+            value = "Remove all configuration files from a cluster",
+            notes = "Remove all the configuration files from the cluster with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -755,7 +592,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public void removeAllCommandsForCluster(
+    public void removeAllConfigsForCluster(
             @ApiParam(
                     value = "Id of the cluster to delete from.",
                     required = true
@@ -766,55 +603,7 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        this.clusterService.removeAllCommandsForCluster(id);
-    }
-
-    /**
-     * Remove an command from a given cluster.
-     *
-     * @param id        The id of the cluster to delete the command from. Not
-     *                  null/empty/blank.
-     * @param commandId The id of the command to remove. Not null/empty/blank.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/commands/{commandId}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Remove a command from a cluster",
-            notes = "Remove the given command from the cluster with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeCommandForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The id of the command to remove.",
-                    required = true
-            )
-            @PathVariable("commandId")
-            final String commandId
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and command id " + commandId);
-        }
-        this.clusterService.removeCommandForCluster(id, commandId);
+        this.clusterService.removeAllConfigsForCluster(id);
     }
 
     /**
@@ -1049,5 +838,257 @@ public final class ClusterController {
             LOG.debug("Called with id " + id + " and tag " + tag);
         }
         this.clusterService.removeTagForCluster(id, tag);
+    }
+
+    /**
+     * Add new commandIds to the given cluster.
+     *
+     * @param id         The id of the cluster to add the commandIds to. Not
+     *                   null/empty/blank.
+     * @param commandIds The ids of the commandIds to add. Not null.
+     * @return The active commandIds for this cluster.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(
+            value = "Add new commandIds to a cluster",
+            notes = "Add the supplied commandIds to the cluster with the supplied id."
+                    + " commandIds should already have been created.",
+            response = Command.class,
+            responseContainer = "List"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "cluster not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public List<Command> addCommandsForCluster(
+            @ApiParam(
+                    value = "Id of the cluster to add commandIds to.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id,
+            @ApiParam(
+                    value = "The ids of the commandIds to add.",
+                    required = true
+            )
+            @RequestBody
+            final List<String> commandIds
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and commandIds " + commandIds);
+        }
+        return this.clusterService.addCommandsForCluster(id, commandIds);
+    }
+
+    /**
+     * Get all the commandIds configured for a given cluster.
+     *
+     * @param id       The id of the cluster to get the command files for. Not
+     *                 NULL/empty/blank.
+     * @param statuses The various statuses to return commandIds for.
+     * @return The active set of commandIds for the cluster.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET)
+    @ApiOperation(
+            value = "Get the commandIds for a cluster",
+            notes = "Get the commandIds for the cluster with the supplied id.",
+            response = Command.class,
+            responseContainer = "List"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Cluster not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public List<Command> getCommandsForCluster(
+            @ApiParam(
+                    value = "Id of the cluster to get commandIds for.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id,
+            @ApiParam(
+                    value = "The statuses of the commandIds to find.",
+                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
+            )
+            @RequestParam(value = "status", required = false)
+            final Set<String> statuses
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " status " + statuses);
+        }
+
+        Set<CommandStatus> enumStatuses = null;
+        if (statuses != null && !statuses.isEmpty()) {
+            enumStatuses = EnumSet.noneOf(CommandStatus.class);
+            for (final String status : statuses) {
+                if (StringUtils.isNotBlank(status)) {
+                    enumStatuses.add(CommandStatus.parse(status));
+                }
+            }
+        }
+
+        return this.clusterService.getCommandsForCluster(id, enumStatuses);
+    }
+
+    /**
+     * Set the commandIds for a given cluster.
+     *
+     * @param id         The id of the cluster to update the configuration files for.
+     *                   Not null/empty/blank.
+     * @param commandIds The ids of the commands to replace existing commands with. Not
+     *                   null/empty/blank.
+     * @return The new set of commandIds for the cluster.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(
+            value = "Update the commands for a cluster",
+            notes = "Replace the existing commands for cluster with given id.",
+            response = Command.class,
+            responseContainer = "List"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Cluster not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public List<Command> setCommandsForCluster(
+            @ApiParam(
+                    value = "Id of the cluster to update commandIds for.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id,
+            @ApiParam(
+                    value = "The ids of the commands to replace existing commands with. Should already be created",
+                    required = true
+            )
+            @RequestBody
+            final List<String> commandIds
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and commandIds " + commandIds);
+        }
+        return this.clusterService.updateCommandsForCluster(id, commandIds);
+    }
+
+    /**
+     * Remove the all commandIds from a given cluster.
+     *
+     * @param id The id of the cluster to delete the commandIds from. Not
+     *           null/empty/blank.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(
+            value = "Remove all commandIds from an cluster",
+            notes = "Remove all the commandIds from the cluster with given id."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Cluster not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public void removeAllCommandsForCluster(
+            @ApiParam(
+                    value = "Id of the cluster to delete from.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        this.clusterService.removeAllCommandsForCluster(id);
+    }
+
+    /**
+     * Remove an command from a given cluster.
+     *
+     * @param id        The id of the cluster to delete the command from. Not
+     *                  null/empty/blank.
+     * @param commandId The id of the command to remove. Not null/empty/blank.
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}/commands/{commandId}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(
+            value = "Remove a command from a cluster",
+            notes = "Remove the given command from the cluster with given id."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NOT_FOUND,
+                    message = "Cluster not found"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Invalid required parameter supplied"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public void removeCommandForCluster(
+            @ApiParam(
+                    value = "Id of the cluster to delete from.",
+                    required = true
+            )
+            @PathVariable("id")
+            final String id,
+            @ApiParam(
+                    value = "The id of the command to remove.",
+                    required = true
+            )
+            @PathVariable("commandId")
+            final String commandId
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id + " and command id " + commandId);
+        }
+        this.clusterService.removeCommandForCluster(id, commandId);
     }
 }

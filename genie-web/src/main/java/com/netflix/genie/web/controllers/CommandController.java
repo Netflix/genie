@@ -556,7 +556,7 @@ public final class CommandController {
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-            value = "Remove all configuration files from an command",
+            value = "Remove all configuration files from a command",
             notes = "Remove all the configuration files from the command with given id."
     )
     @ApiResponses(value = {

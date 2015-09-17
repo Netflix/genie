@@ -188,79 +188,15 @@ public interface ClusterService {
     ) throws GenieException;
 
     /**
-     * Add commands to the cluster.
+     * Remove all configuration files from the cluster.
      *
-     * @param id         The id of the cluster to add the command file to. Not
-     *                   null/empty/blank.
-     * @param commandIds The ids of the commands to add. Not null/empty.
-     * @return The active list of commands
+     * @param id The id of the cluster to remove the configuration file from.
+     *           Not null/empty/blank.
      * @throws GenieException if there is an error
      */
-    List<Command> addCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to add commands.")
-            final String id,
-            @NotEmpty(message = "No command ids entered. Unable to add commands.")
-            final List<String> commandIds
-    ) throws GenieException;
-
-    /**
-     * Get the set of commands associated with the cluster with given id.
-     *
-     * @param id       The id of the cluster to get the commands for. Not
-     *                 null/empty/blank.
-     * @param statuses The statuses to get commands for
-     * @return The list of commands
-     * @throws GenieException if there is an error
-     */
-    List<Command> getCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to get commands.")
-            final String id,
-            final Set<CommandStatus> statuses
-    ) throws GenieException;
-
-    /**
-     * Update the set of command files associated with the cluster with
-     * given id.
-     *
-     * @param id         The id of the cluster to update the command files for. Not
-     *                   null/empty/blank.
-     * @param commandIds The ids of the commands to replace existing
-     *                   commands with. Not null/empty.
-     * @return The active list of commands
-     * @throws GenieException if there is an error
-     */
-    List<Command> updateCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update commands.")
-            final String id,
-            @NotEmpty(message = "No command ids entered. Unable to update commands.")
-            final List<String> commandIds
-    ) throws GenieException;
-
-    /**
-     * Remove all commands from the cluster.
-     *
-     * @param id The id of the cluster to remove the commands from. Not
-     *           null/empty/blank.
-     * @throws GenieException if there is an error
-     */
-    void removeAllCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove commands.")
+    void removeAllConfigsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to remove configs.")
             final String id
-    ) throws GenieException;
-
-    /**
-     * Remove a command from the cluster.
-     *
-     * @param id    The id of the cluster to remove the command from. Not
-     *              null/empty/blank.
-     * @param cmdId The id of the command to remove. Not null/empty/blank.
-     * @throws GenieException if there is an error
-     */
-    void removeCommandForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove command.")
-            final String id,
-            @NotBlank(message = "No command id entered. Unable to remove command.")
-            final String cmdId
     ) throws GenieException;
 
     /**
@@ -336,5 +272,81 @@ public interface ClusterService {
             final String id,
             @NotBlank(message = "No tag entered. Unable to remove.")
             final String tag
+    ) throws GenieException;
+
+    /**
+     * Add commands to the cluster.
+     *
+     * @param id         The id of the cluster to add the command file to. Not
+     *                   null/empty/blank.
+     * @param commandIds The ids of the commands to add. Not null/empty.
+     * @return The active list of commands
+     * @throws GenieException if there is an error
+     */
+    List<Command> addCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to add commands.")
+            final String id,
+            @NotEmpty(message = "No command ids entered. Unable to add commands.")
+            final List<String> commandIds
+    ) throws GenieException;
+
+    /**
+     * Get the set of commands associated with the cluster with given id.
+     *
+     * @param id       The id of the cluster to get the commands for. Not
+     *                 null/empty/blank.
+     * @param statuses The statuses to get commands for
+     * @return The list of commands
+     * @throws GenieException if there is an error
+     */
+    List<Command> getCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to get commands.")
+            final String id,
+            final Set<CommandStatus> statuses
+    ) throws GenieException;
+
+    /**
+     * Update the set of command files associated with the cluster with
+     * given id.
+     *
+     * @param id         The id of the cluster to update the command files for. Not
+     *                   null/empty/blank.
+     * @param commandIds The ids of the commands to replace existing
+     *                   commands with. Not null/empty.
+     * @return The active list of commands
+     * @throws GenieException if there is an error
+     */
+    List<Command> updateCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to update commands.")
+            final String id,
+            @NotNull(message = "No command ids entered. Unable to update commands.")
+            final List<String> commandIds
+    ) throws GenieException;
+
+    /**
+     * Remove all commands from the cluster.
+     *
+     * @param id The id of the cluster to remove the commands from. Not
+     *           null/empty/blank.
+     * @throws GenieException if there is an error
+     */
+    void removeAllCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to remove commands.")
+            final String id
+    ) throws GenieException;
+
+    /**
+     * Remove a command from the cluster.
+     *
+     * @param id    The id of the cluster to remove the command from. Not
+     *              null/empty/blank.
+     * @param cmdId The id of the command to remove. Not null/empty/blank.
+     * @throws GenieException if there is an error
+     */
+    void removeCommandForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to remove command.")
+            final String id,
+            @NotBlank(message = "No command id entered. Unable to remove command.")
+            final String cmdId
     ) throws GenieException;
 }

@@ -237,7 +237,18 @@ public class ClusterServiceJPAImpl implements ClusterService {
             throw new GenieBadRequestException("Cluster id inconsistent with id passed in.");
         }
 
-        return this.clusterRepo.save(updateCluster);
+        //TODO: Move update of common fields to super classes
+        final Cluster savedCluster = this.clusterRepo.findOne(id);
+        savedCluster.setName(updateCluster.getName());
+        savedCluster.setUser(updateCluster.getUser());
+        savedCluster.setVersion(updateCluster.getVersion());
+        savedCluster.setDescription(updateCluster.getDescription());
+        savedCluster.setClusterType(updateCluster.getClusterType());
+        savedCluster.setStatus(updateCluster.getStatus());
+        savedCluster.setConfigs(updateCluster.getConfigs());
+        savedCluster.setTags(updateCluster.getTags());
+
+        return this.clusterRepo.save(savedCluster);
     }
 
     /**
@@ -350,121 +361,13 @@ public class ClusterServiceJPAImpl implements ClusterService {
      * {@inheritDoc}
      */
     @Override
-    public List<Command> addCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to add commands.")
-            final String id,
-            @NotEmpty(message = "No command ids entered. Unable to add commands.")
-            final List<String> commandIds
-    ) throws GenieException {
-        final Cluster cluster = this.clusterRepo.findOne(id);
-        if (cluster != null) {
-            for (final String commandId : commandIds) {
-                final Command cmd = this.commandRepo.findOne(commandId);
-                if (cmd != null) {
-                    cluster.addCommand(cmd);
-                } else {
-                    throw new GenieNotFoundException("No command with id " + commandId + " exists.");
-                }
-            }
-            return cluster.getCommands();
-        } else {
-            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<Command> getCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to get commands.")
-            final String id,
-            final Set<CommandStatus> statuses
-    ) throws GenieException {
-        final Cluster cluster = this.clusterRepo.findOne(id);
-        if (cluster != null) {
-            final List<Command> commands = cluster.getCommands();
-            if (statuses != null) {
-                return commands.stream()
-                        .filter(command -> statuses.contains(command.getStatus()))
-                        .collect(Collectors.toList());
-            } else {
-                return commands;
-            }
-
-        } else {
-            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    //TODO: Shares a lot of code with the add, should be able to refactor
-    public List<Command> updateCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update commands.")
-            final String id,
-            @NotEmpty(message = "No command ids entered. Unable to update commands.")
-            final List<String> commandIds
-    ) throws GenieException {
-        final Cluster cluster = this.clusterRepo.findOne(id);
-        if (cluster != null) {
-            final List<Command> cmds = new ArrayList<>();
-            for (final String commandId : commandIds) {
-                final Command cmd = this.commandRepo.findOne(commandId);
-                if (cmd != null) {
-                    cmds.add(cmd);
-                } else {
-                    throw new GenieNotFoundException("No command with id " + commandId + " exists.");
-                }
-            }
-            cluster.setCommands(cmds);
-            return cluster.getCommands();
-        } else {
-            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeAllCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove commands.")
+    public void removeAllConfigsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to remove configs.")
             final String id
     ) throws GenieException {
         final Cluster cluster = this.clusterRepo.findOne(id);
         if (cluster != null) {
-            final List<Command> cmdList = new ArrayList<>();
-            cmdList.addAll(cluster.getCommands());
-            for (final Command cmd : cmdList) {
-                cluster.removeCommand(cmd);
-            }
-        } else {
-            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeCommandForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove command.")
-            final String id,
-            @NotBlank(message = "No command id entered. Unable to remove command.")
-            final String cmdId
-    ) throws GenieException {
-        final Cluster cluster = this.clusterRepo.findOne(id);
-        if (cluster != null) {
-            final Command cmd = this.commandRepo.findOne(cmdId);
-            if (cmd != null) {
-                cluster.removeCommand(cmd);
-            } else {
-                throw new GenieNotFoundException("No command with id " + cmdId + " exists.");
-            }
+            cluster.getConfigs().clear();
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
@@ -555,6 +458,130 @@ public class ClusterServiceJPAImpl implements ClusterService {
         if (cluster != null) {
             if (StringUtils.isNotBlank(tag)) {
                 cluster.getTags().remove(tag);
+            }
+        } else {
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Command> addCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to add commands.")
+            final String id,
+            @NotEmpty(message = "No command ids entered. Unable to add commands.")
+            final List<String> commandIds
+    ) throws GenieException {
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            for (final String commandId : commandIds) {
+                final Command cmd = this.commandRepo.findOne(commandId);
+                if (cmd != null) {
+                    cluster.addCommand(cmd);
+                } else {
+                    throw new GenieNotFoundException("No command with id " + commandId + " exists.");
+                }
+            }
+            return cluster.getCommands();
+        } else {
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Command> getCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to get commands.")
+            final String id,
+            final Set<CommandStatus> statuses
+    ) throws GenieException {
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            final List<Command> commands = cluster.getCommands();
+            if (statuses != null) {
+                return commands.stream()
+                        .filter(command -> statuses.contains(command.getStatus()))
+                        .collect(Collectors.toList());
+            } else {
+                return commands;
+            }
+
+        } else {
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    //TODO: Shares a lot of code with the add, should be able to refactor
+    public List<Command> updateCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to update commands.")
+            final String id,
+            @NotNull(message = "No command ids entered. Unable to update commands.")
+            final List<String> commandIds
+    ) throws GenieException {
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            final List<Command> cmds = new ArrayList<>();
+            for (final String commandId : commandIds) {
+                final Command cmd = this.commandRepo.findOne(commandId);
+                if (cmd != null) {
+                    cmds.add(cmd);
+                } else {
+                    throw new GenieNotFoundException("No command with id " + commandId + " exists.");
+                }
+            }
+            cluster.setCommands(cmds);
+            return cluster.getCommands();
+        } else {
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllCommandsForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to remove commands.")
+            final String id
+    ) throws GenieException {
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            final List<Command> cmdList = new ArrayList<>();
+            cmdList.addAll(cluster.getCommands());
+            for (final Command cmd : cmdList) {
+                cluster.removeCommand(cmd);
+            }
+        } else {
+            throw new GenieNotFoundException("No cluster with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeCommandForCluster(
+            @NotBlank(message = "No cluster id entered. Unable to remove command.")
+            final String id,
+            @NotBlank(message = "No command id entered. Unable to remove command.")
+            final String cmdId
+    ) throws GenieException {
+        final Cluster cluster = this.clusterRepo.findOne(id);
+        if (cluster != null) {
+            final Command cmd = this.commandRepo.findOne(cmdId);
+            if (cmd != null) {
+                cluster.removeCommand(cmd);
+            } else {
+                throw new GenieNotFoundException("No command with id " + cmdId + " exists.");
             }
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
