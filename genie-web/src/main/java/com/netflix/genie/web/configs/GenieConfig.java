@@ -31,6 +31,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.validation.Validator;
 
@@ -49,7 +55,57 @@ import javax.validation.Validator;
 @EnableScheduling
 @EnableTransactionManagement
 @EntityScan("com.netflix.genie.common.model")
+@EnableSwagger2
 public class GenieConfig {
+
+    /**
+     * Spring Boot Main.
+     *
+     * @param args Program arguments
+     * @throws Exception For any failure during program execution
+     */
+    public static void main(final String[] args) throws Exception {
+        SpringApplication.run(GenieConfig.class, args);
+    }
+
+    /**
+     * Configure Spring Fox.
+     *
+     * @return The spring fox docket.
+     */
+    @Bean
+    public Docket genieApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(
+                        new ApiInfo(
+                                "Genie REST API",
+                                "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more "
+                                        + "documentation.<br/>Post any issues found "
+                                        + "<a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
+                                "3.0.0",
+                                null,
+                                "Netflix, Inc.",
+                                "Apache 2.0",
+                                "http://www.apache.org/licenses/LICENSE-2.0"
+                        )
+                )
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.netflix.genie.web.controllers"))
+                .paths(PathSelectors.any())
+                .build()
+                .pathMapping("/")
+                .useDefaultResponseMessages(false);
+    }
+
+//    /**
+//     * Configure the Swagger UI.
+//     *
+//     * @return The swagger UI configuration.
+//     */
+//    @Bean
+//    public UiConfiguration uiConfig() {
+//        return new UiConfiguration("validatorUrl");
+//    }
 
     /**
      * Setup bean validation.
@@ -69,15 +125,5 @@ public class GenieConfig {
     @Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
-    }
-
-    /**
-     * Spring Boot Main.
-     *
-     * @param args Program arguments
-     * @throws Exception For any failure during program execution
-     */
-    public static void main(final String[] args) throws Exception {
-        SpringApplication.run(GenieConfig.class, args);
     }
 }

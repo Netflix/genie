@@ -16,6 +16,10 @@ sourceSets {
     }
 }
 
+license {
+    excludes(["${projectDir}/src/generated"])
+}
+
 dependencies {
     /*******************************
      * Compile Dependencies

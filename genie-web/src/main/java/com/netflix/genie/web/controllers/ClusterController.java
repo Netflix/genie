@@ -51,15 +51,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Code for ClusterConfigResource - REST end-point for supporting cluster
- * configurations.
+ * REST end-point for supporting clusters.
  *
  * @author amsharma
  * @author tgianos
+ * @since 3.0.0
  */
 @RestController
 @RequestMapping(value = "/api/v3/clusters", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/api/v3/clusters", tags = "clusters", description = "Manage the available clusters")
+@Api(value = "clusters", tags = "clusters", description = "Manage the available clusters")
 public final class ClusterController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterController.class);

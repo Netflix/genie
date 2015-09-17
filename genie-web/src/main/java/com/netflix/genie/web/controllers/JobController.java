@@ -54,14 +54,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Resource class for executing and monitoring jobs via Genie.
+ * REST end-point for supporting jobs.
  *
  * @author amsharma
  * @author tgianos
+ * @since 3.0.0
  */
 @RestController
 @RequestMapping(value = "/api/v3/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/api/v3/jobs", tags = "jobs", description = "Manage Genie Jobs.")
+@Api(value = "jobs", tags = "jobs", description = "Manage Genie Jobs.")
 public final class JobController {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobController.class);

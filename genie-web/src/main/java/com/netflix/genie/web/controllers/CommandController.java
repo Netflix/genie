@@ -52,14 +52,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Code for the Commands REST API implemented as a Spring REST controller.
+ * REST end-point for supporting commands.
  *
  * @author amsharma
  * @author tgianos
+ * @since 3.0.0
  */
 @RestController
 @RequestMapping(value = "/api/v3/commands", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/api/v3/commands", tags = "commands", description = "Manage the available commands")
+@Api(value = "commands", tags = "commands", description = "Manage the available commands")
 public final class CommandController {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);

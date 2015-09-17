@@ -51,14 +51,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Code for ApplicationController - REST end-point for supporting Applications.
+ * REST end-point for supporting Applications.
  *
  * @author amsharma
  * @author tgianos
+ * @since 3.0.0
  */
 @RestController
 @RequestMapping(value = "/api/v3/applications", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/api/v3/applications", tags = "applications", description = "Manage the available applications")
+@Api(value = "applications", tags = "applications", description = "Manage the available applications")
 public final class ApplicationController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationController.class);
