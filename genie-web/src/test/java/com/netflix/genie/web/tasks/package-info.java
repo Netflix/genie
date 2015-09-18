@@ -15,29 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.jobmanager;
 
 /**
- * Janitor thread that marks jobs as zombies if status hasn't been updated for
- * the configured timeout.
+ * Tests for any task classes.
  *
- * @author skrishnan
  * @author tgianos
+ * @since 3.0.0
  */
-public interface JobJanitor extends Runnable {
-
-    /**
-     * Mark jobs as zombies if status hasn't been updated for
-     * com.netflix.genie.server.janitor.zombie.delta.ms.
-     *
-     * @return Number of jobs marked as zombies
-     */
-    int markZombies();
-
-    /**
-     * Tell the janitor thread to stop running at next iteration.
-     *
-     * @param stop true if the thread should stop running
-     */
-    void setStop(final boolean stop);
-}
+package com.netflix.genie.web.tasks;

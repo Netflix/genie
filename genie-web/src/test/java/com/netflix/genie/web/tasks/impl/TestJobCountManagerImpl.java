@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.netflix.genie.core.metrics.impl;
+package com.netflix.genie.web.tasks.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import org.junit.Ignore;

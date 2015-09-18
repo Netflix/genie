@@ -15,25 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.startup;
-
-import org.junit.Test;
 
 /**
- * Test the GenieModule.
+ * Integration tests for the tasks implementations.
  *
  * @author tgianos
  */
-public class TestGenieModule {
-
-    /**
-     * Test configure servlets.
-     */
-    @Test
-    public void testConfigureServlets() {
-//        final GenieModule module = new GenieModule();
-//        module.configureServlets();
-//
-//        //TODO: Figure out how to test this method with so much static content.
-    }
-}
+package com.netflix.genie.web.tasks.impl;

@@ -17,8 +17,9 @@
  */
 
 /**
- * Classes that provide the initial startup of Genie services.
+ * Implementations of the task interfaces.
  *
  * @author tgianos
+ * @since 3.0.0
  */
-package com.netflix.genie.web.startup;
+package com.netflix.genie.web.tasks.impl;

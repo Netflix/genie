@@ -46,7 +46,8 @@ dependencies {
      * Test Dependencies
      *******************************/
 
-    integrationTestCompile("io.springfox:springfox-staticdocs:${springfox_version}")
+    integrationTestCompile("org.dbunit:dbunit:${dbunit_version}")
+    integrationTestCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
 }
 
 license {

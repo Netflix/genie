@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.jobmanager.impl;
+package com.netflix.genie.web.tasks.impl;
 
 import org.junit.Ignore;
 import org.junit.Test;

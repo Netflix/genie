@@ -17,8 +17,9 @@
  */
 
 /**
- * Classes to test the startup classes.
+ * Classes which Genie will run basically as cron jobs to do various tasks.
  *
  * @author tgianos
+ * @since 3.0.0
  */
-package com.netflix.genie.web.startup;
+package com.netflix.genie.web.tasks;

@@ -15,10 +15,20 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.tasks;
 
 /**
- * Integration tests for the job manager implementations.
+ * Janitor thread that marks jobs as zombies if status hasn't been updated for
+ * the configured timeout.
  *
+ * @author skrishnan
  * @author tgianos
  */
-package com.netflix.genie.core.jobmanager.impl;
+public interface JobJanitor {
+
+    /**
+     * Mark jobs as zombies if status hasn't been updated for
+     * com.netflix.genie.server.janitor.zombie.delta.ms.
+     */
+    void markZombies();
+}

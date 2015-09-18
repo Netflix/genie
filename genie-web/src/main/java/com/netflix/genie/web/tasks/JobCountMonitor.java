@@ -15,10 +15,22 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.tasks;
+
+import com.netflix.genie.common.exceptions.GenieException;
 
 /**
- * Classes to test the job manager implementation classes.
+ * Monitor thread that routinely updates the statistics object.
  *
+ * @author skrishnan
  * @author tgianos
  */
-package com.netflix.genie.core.jobmanager.impl;
+public interface JobCountMonitor {
+
+    /**
+     * Update all the job counts.
+     *
+     * @throws GenieException for any issue during execution
+     */
+    void updateJobCounts() throws GenieException;
+}
