@@ -12,6 +12,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.0.M5")
         classpath("io.spring.gradle:dependency-management-plugin:0.5.3.RELEASE")
+        classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.2")
     }
 }
 

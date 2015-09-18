@@ -1,16 +1,13 @@
 //import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'spring-boot'
+apply plugin: 'org.asciidoctor.convert'
 
 //processResources {
 //    filter ReplaceTokens, tokens: [
 //            "project.version": project.getVersion().toString()
 //    ]
 //}
-
-license {
-    excludes(["static/*"])
-}
 
 dependencies {
     /*******************************
@@ -50,6 +47,10 @@ dependencies {
      *******************************/
 
     integrationTestCompile("io.springfox:springfox-staticdocs:${springfox_version}")
+}
+
+license {
+    excludes(["static/*"])
 }
 
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"

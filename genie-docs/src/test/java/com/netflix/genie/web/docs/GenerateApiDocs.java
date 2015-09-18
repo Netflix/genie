@@ -18,7 +18,6 @@
 package com.netflix.genie.web.docs;
 
 import com.netflix.genie.web.configs.GenieConfig;
-import io.github.robwin.markup.builder.MarkupLanguage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +40,7 @@ import springfox.documentation.staticdocs.Swagger2MarkupResultHandler;
  * @author tgianos
  * @since 3.0.0
  */
-@ActiveProfiles({"integration"})
+@ActiveProfiles({"docs"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = GenieConfig.class)
 @WebIntegrationTest(randomPort = true)
@@ -69,21 +68,7 @@ public class GenerateApiDocs {
     public void convertSwaggerToAsciiDoc() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/v2/api-docs")
                 .accept(MediaType.APPLICATION_JSON))
-                .andDo(Swagger2MarkupResultHandler.outputDirectory("src/generated/docs/asciidoc").build())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-
-    /**
-     * Generate the markdown documentation for the REST APIs.
-     *
-     * @throws Exception on any problem
-     */
-    @Test
-    public void convertSwaggerToMarkdown() throws Exception {
-        this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/v2/api-docs").accept(MediaType.APPLICATION_JSON))
-                .andDo(Swagger2MarkupResultHandler.outputDirectory("src/generated/docs/markdown")
-                        .withMarkupLanguage(MarkupLanguage.MARKDOWN).build())
+                .andDo(Swagger2MarkupResultHandler.outputDirectory("src/docs/asciidoc/generated").build())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
