@@ -26,7 +26,7 @@ import com.netflix.genie.client.CommandServiceClient;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.ClusterStatus;
+import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.model.Command;
 
 import java.util.ArrayList;

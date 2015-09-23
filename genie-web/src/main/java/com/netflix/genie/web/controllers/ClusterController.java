@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.ClusterStatus;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.core.services.ClusterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,7 +53,6 @@ import java.util.Set;
 /**
  * REST end-point for supporting clusters.
  *
- * @author amsharma
  * @author tgianos
  * @since 3.0.0
  */
@@ -86,14 +85,12 @@ public final class ClusterController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Create a cluster",
-            notes = "Create a cluster from the supplied information.",
-            response = Cluster.class
+            notes = "Create a cluster from the supplied information."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CREATED,
-                    message = "Created",
-                    response = Cluster.class
+                    message = "Cluster created successfully."
             ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CONFLICT,
@@ -108,7 +105,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public ResponseEntity<Cluster> createCluster(
+    public ResponseEntity<?> createCluster(
             @ApiParam(
                     value = "The cluster to create.",
                     required = true
@@ -119,16 +116,16 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to create new cluster " + cluster);
         }
-        final Cluster createdCluster = this.clusterService.createCluster(cluster);
+        final String id = this.clusterService.createCluster(cluster);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
                         .fromCurrentRequest()
                         .path("/{id}")
-                        .buildAndExpand(createdCluster.getId())
+                        .buildAndExpand(id)
                         .toUri()
         );
-        return new ResponseEntity<>(createdCluster, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
     /**
@@ -306,14 +303,13 @@ public final class ClusterController {
      *
      * @param id            unique if for cluster to update
      * @param updateCluster contains the cluster information to update
-     * @return the updated cluster
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update a cluster",
-            notes = "Update a cluster from the supplied information.",
-            response = Cluster.class
+            notes = "Update a cluster from the supplied information."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -329,7 +325,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Cluster updateCluster(
+    public void updateCluster(
             @ApiParam(
                     value = "Id of the cluster to update.",
                     required = true
@@ -346,7 +342,7 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to update cluster with id " + id + " update fields " + updateCluster);
         }
-        return this.clusterService.updateCluster(id, updateCluster);
+        this.clusterService.updateCluster(id, updateCluster);
     }
 
     /**
@@ -427,15 +423,13 @@ public final class ClusterController {
      * @param id      The id of the cluster to add the configuration file to. Not
      *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
-     * @return The active configurations for this cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add new configuration files to a cluster",
-            notes = "Add the supplied configuration files to the cluster with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Add the supplied configuration files to the cluster with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -451,7 +445,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> addConfigsForCluster(
+    public void addConfigsForCluster(
             @ApiParam(
                     value = "Id of the cluster to add configuration to.",
                     required = true
@@ -468,7 +462,7 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + configs);
         }
-        return this.clusterService.addConfigsForCluster(id, configs);
+        this.clusterService.addConfigsForCluster(id, configs);
     }
 
     /**
@@ -521,15 +515,13 @@ public final class ClusterController {
      *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
      *                files with. Not null/empty/blank.
-     * @return The new set of cluster configurations.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update configuration files for an cluster",
-            notes = "Replace the existing configuration files for cluster with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Replace the existing configuration files for cluster with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -545,7 +537,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> updateConfigsForCluster(
+    public void updateConfigsForCluster(
             @ApiParam(
                     value = "Id of the cluster to update configurations for.",
                     required = true
@@ -562,7 +554,7 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and configs " + configs);
         }
-        return this.clusterService.updateConfigsForCluster(id, configs);
+        this.clusterService.updateConfigsForCluster(id, configs);
     }
 
     /**
@@ -612,15 +604,13 @@ public final class ClusterController {
      * @param id   The id of the cluster to add the tags to. Not
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
-     * @return The active tags for this cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add new tags to a cluster",
-            notes = "Add the supplied tags to the cluster with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Add the supplied tags to the cluster with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -636,7 +626,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> addTagsForCluster(
+    public void addTagsForCluster(
             @ApiParam(
                     value = "Id of the cluster to add configuration to.",
                     required = true
@@ -653,7 +643,7 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
         }
-        return this.clusterService.addTagsForCluster(id, tags);
+        this.clusterService.addTagsForCluster(id, tags);
     }
 
     /**
@@ -705,15 +695,13 @@ public final class ClusterController {
      *             Not null/empty/blank.
      * @param tags The tags to replace existing configuration
      *             files with. Not null/empty/blank.
-     * @return The new set of cluster tags.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update tags for a cluster",
-            notes = "Replace the existing tags for cluster with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Replace the existing tags for cluster with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -729,7 +717,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> updateTagsForCluster(
+    public void updateTagsForCluster(
             @ApiParam(
                     value = "Id of the cluster to update tags for.",
                     required = true
@@ -746,7 +734,7 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
         }
-        return this.clusterService.updateTagsForCluster(id, tags);
+        this.clusterService.updateTagsForCluster(id, tags);
     }
 
     /**
@@ -846,16 +834,14 @@ public final class ClusterController {
      * @param id         The id of the cluster to add the commandIds to. Not
      *                   null/empty/blank.
      * @param commandIds The ids of the commandIds to add. Not null.
-     * @return The active commandIds for this cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add new commandIds to a cluster",
             notes = "Add the supplied commandIds to the cluster with the supplied id."
-                    + " commandIds should already have been created.",
-            response = Command.class,
-            responseContainer = "List"
+                    + " commandIds should already have been created."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -871,7 +857,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Command> addCommandsForCluster(
+    public void addCommandsForCluster(
             @ApiParam(
                     value = "Id of the cluster to add commandIds to.",
                     required = true
@@ -888,7 +874,7 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and commandIds " + commandIds);
         }
-        return this.clusterService.addCommandsForCluster(id, commandIds);
+        this.clusterService.addCommandsForCluster(id, commandIds);
     }
 
     /**
@@ -959,15 +945,12 @@ public final class ClusterController {
      *                   Not null/empty/blank.
      * @param commandIds The ids of the commands to replace existing commands with. Not
      *                   null/empty/blank.
-     * @return The new set of commandIds for the cluster.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update the commands for a cluster",
-            notes = "Replace the existing commands for cluster with given id.",
-            response = Command.class,
-            responseContainer = "List"
+            notes = "Replace the existing commands for cluster with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -983,7 +966,7 @@ public final class ClusterController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Command> setCommandsForCluster(
+    public void setCommandsForCluster(
             @ApiParam(
                     value = "Id of the cluster to update commandIds for.",
                     required = true
@@ -1000,7 +983,7 @@ public final class ClusterController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and commandIds " + commandIds);
         }
-        return this.clusterService.updateCommandsForCluster(id, commandIds);
+        this.clusterService.updateCommandsForCluster(id, commandIds);
     }
 
     /**

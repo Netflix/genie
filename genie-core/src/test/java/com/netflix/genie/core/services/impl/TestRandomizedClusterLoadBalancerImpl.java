@@ -18,9 +18,9 @@
 package com.netflix.genie.core.services.impl;
 
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.Cluster;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

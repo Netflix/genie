@@ -17,12 +17,11 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.JobStatus;
 import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.core.services.JobSearchService;
-import com.netflix.genie.core.services.JobService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -67,24 +66,20 @@ public final class JobController {
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
     private final ExecutionService executionService;
-    private final JobService jobService;
     private final JobSearchService jobSearchService;
 
     /**
      * Constructor.
      *
      * @param executionService The execution service to use.
-     * @param jobService       The job service to use.
      * @param jobSearchService The job search service to use.
      */
     @Autowired
     public JobController(
             final ExecutionService executionService,
-            final JobService jobService,
             final JobSearchService jobSearchService
     ) {
         this.executionService = executionService;
-        this.jobService = jobService;
         this.jobSearchService = jobSearchService;
     }
 
@@ -477,260 +472,5 @@ public final class JobController {
             LOG.debug("Called for job id: " + id);
         }
         return this.executionService.killJob(id);
-    }
-
-    /**
-     * Add new tags to a given job.
-     *
-     * @param id   The id of the job to add the tags to. Not
-     *             null/empty/blank.
-     * @param tags The tags to add. Not null/empty/blank.
-     * @return The active tags for this job.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(
-            value = "Add new tags to a job",
-            notes = "Add the supplied tags to the job with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_BAD_REQUEST,
-                    message = "Bad Request"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Job for id does not exist."
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid id supplied"
-            ),
-            @ApiResponse(code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception")
-    })
-    public Set<String> addTagsForJob(
-            @ApiParam(
-                    value = "Id of the job to add configuration to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tags to add.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> tags
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and tags " + tags);
-        }
-        return this.jobService.addTagsForJob(id, tags);
-    }
-
-    /**
-     * Get all the tags for a given job.
-     *
-     * @param id The id of the job to get the tags for. Not
-     *           NULL/empty/blank.
-     * @return The active set of tags.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET)
-    @ApiOperation(
-            value = "Get the tags for a job",
-            notes = "Get the tags for the job with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_BAD_REQUEST,
-                    message = "Bad Request"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Job for id does not exist."
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid id supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> getTagsForJob(
-            @ApiParam(
-                    value = "Id of the job to get tags for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
-        return this.jobService.getTagsForJob(id);
-    }
-
-    /**
-     * Update the tags for a given job.
-     *
-     * @param id   The id of the job to update the tags for.
-     *             Not null/empty/blank.
-     * @param tags The tags to replace existing configuration
-     *             files with. Not null/empty/blank.
-     * @return The new set of job tags.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(
-            value = "Update tags for a job",
-            notes = "Replace the existing tags for job with given id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_BAD_REQUEST,
-                    message = "Bad Request"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Job for id does not exist."
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid id supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> updateTagsForJob(
-            @ApiParam(
-                    value = "Id of the job to update tags for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tags to replace existing with.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> tags
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and tags " + tags);
-        }
-        return this.jobService.updateTagsForJob(id, tags);
-    }
-
-    /**
-     * Delete the all tags from a given job.
-     *
-     * @param id The id of the job to delete the tags from.
-     *           Not null/empty/blank.
-     * @return Empty set if successful
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
-    @ApiOperation(
-            value = "Remove all tags from a job",
-            notes = "Remove all the tags from the job with given id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_BAD_REQUEST,
-                    message = "Bad Request"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Job for id does not exist."
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid id supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> removeAllTagsForJob(
-            @ApiParam(
-                    value = "Id of the job to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
-        return this.jobService.removeAllTagsForJob(id);
-    }
-
-    /**
-     * Remove an tag from a given job.
-     *
-     * @param id  The id of the job to delete the tag from. Not
-     *            null/empty/blank.
-     * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags for the job.
-     * @throws GenieException For any error
-     */
-    @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
-    @ApiOperation(
-            value = "Remove a tag from a job",
-            notes = "Remove the given tag from the job with given id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_BAD_REQUEST,
-                    message = "Bad Request"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Job for id does not exist."
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid id supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> removeTagForJob(
-            @ApiParam(
-                    value = "Id of the job to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tag to remove.",
-                    required = true
-            )
-            @PathVariable("tag")
-            final String tag
-    ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and tag " + tag);
-        }
-        return this.jobService.removeTagForJob(id, tag);
     }
 }

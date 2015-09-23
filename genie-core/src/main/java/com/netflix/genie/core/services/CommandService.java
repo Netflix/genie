@@ -17,12 +17,12 @@
  */
 package com.netflix.genie.core.services;
 
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.ClusterStatus;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
@@ -47,10 +47,10 @@ public interface CommandService {
      *
      * @param command encapsulates the command configuration information to
      *                create. Not null. Valid.
-     * @return The command created
+     * @return The id of the command created
      * @throws GenieException if there is an error
      */
-    Command createCommand(
+    String createCommand(
             @NotNull(message = "No command entered. Unable to create.")
             @Valid
             final Command command
@@ -97,10 +97,9 @@ public interface CommandService {
      * @param id            The id of the command configuration to update. Not null or
      *                      empty.
      * @param updateCommand contains the information to update the command with
-     * @return The updated command
      * @throws GenieException if there is an error
      */
-    Command updateCommand(
+    void updateCommand(
             @NotBlank(message = "No id entered. Unable to update.")
             final String id,
             @NotNull(message = "No command information entered. Unable to update.")
@@ -132,10 +131,9 @@ public interface CommandService {
      * @param id      The id of the command to add the configuration file to. Not
      *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> addConfigsForCommand(
+    void addConfigsForCommand(
             @NotBlank(message = "No command id entered. Unable to add configurations.")
             final String id,
             @NotEmpty(message = "No configuration files entered. Unable to add.")
@@ -164,10 +162,9 @@ public interface CommandService {
      *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configurations
      *                with. Not null/empty.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> updateConfigsForCommand(
+    void updateConfigsForCommand(
             @NotBlank(message = "No command id entered. Unable to update configurations.")
             final String id,
             @NotEmpty(message = "No configs entered. Unable to update.")
@@ -207,10 +204,9 @@ public interface CommandService {
      * @param id   The id of the command to add the tags to. Not
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> addTagsForCommand(
+    void addTagsForCommand(
             @NotBlank(message = "No command id entered. Unable to add tags.")
             final String id,
             @NotEmpty(message = "No tags entered. Unable to add.")
@@ -239,10 +235,9 @@ public interface CommandService {
      *             Not null/empty/blank.
      * @param tags The tags to replace existing tags
      *             with. Not null/empty.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> updateTagsForCommand(
+    void updateTagsForCommand(
             @NotBlank(message = "No command id entered. Unable to update tags.")
             final String id,
             @NotEmpty(message = "No tags entered. Unable to update.")
@@ -282,10 +277,9 @@ public interface CommandService {
      * @param id             The id of the command to add the application file to. Not
      *                       null/empty/blank.
      * @param applicationIds The ids of the applications to add. Not null.
-     * @return The applications set for the command
      * @throws GenieException if there is an error
      */
-    Set<Application> addApplicationsForCommand(
+    void addApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to add applications.")
             final String id,
             @NotEmpty(message = "No application ids entered. Unable to add applications.")
@@ -298,10 +292,9 @@ public interface CommandService {
      * @param id             The id of the command to add the application file to. Not
      *                       null/empty/blank.
      * @param applicationIds The ids of the applications to set. Not null.
-     * @return The applications set for the command
      * @throws GenieException if there is an error
      */
-    Set<Application> setApplicationsForCommand(
+    void setApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to set applications.")
             final String id,
             @NotNull(message = "No application ids entered. Unable to set applications.")
@@ -355,7 +348,7 @@ public interface CommandService {
      * @return The clusters the command is available on.
      * @throws GenieException if there is an error
      */
-    List<Cluster> getClustersForCommand(
+    Set<Cluster> getClustersForCommand(
             @NotBlank(message = "No command id entered. Unable to get clusters.")
             final String id,
             final Set<ClusterStatus> statuses

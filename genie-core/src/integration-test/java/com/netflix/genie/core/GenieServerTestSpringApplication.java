@@ -43,8 +43,8 @@ import javax.validation.Validator;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan("com.netflix.genie")
-@EnableJpaRepositories("com.netflix.genie.core.repositories.jpa")
-@EnableElasticsearchRepositories("com.netflix.genie.core.repositories.elasticsearch")
+@EnableJpaRepositories("com.netflix.genie.core.jpa.repositories")
+@EnableElasticsearchRepositories("com.netflix.genie.core.elasticsearch.repositories")
 @EntityScan("com.netflix.genie.common.model")
 @EnableTransactionManagement
 @EnableRetry

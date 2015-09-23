@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.core.services;
 
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.ClusterStatus;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
@@ -35,7 +35,6 @@ import java.util.Set;
  * Abstraction layer to encapsulate data ClusterConfig functionality.<br>
  * Classes implementing this abstraction layer must be thread-safe
  *
- * @author skrishnan
  * @author amsharma
  * @author tgianos
  */
@@ -46,10 +45,10 @@ public interface ClusterService {
      * Create new cluster configuration.
      *
      * @param cluster The cluster to create
-     * @return The created cluster
+     * @return The created clusters id
      * @throws GenieException if there is an error
      */
-    Cluster createCluster(
+    String createCluster(
             @NotNull(message = "No cluster entered. Unable to create.")
             @Valid
             final Cluster cluster
@@ -106,14 +105,13 @@ public interface ClusterService {
     ) throws GenieException;
 
     /**
-     * Update a cluster configuration.
+     * Update a cluster.
      *
      * @param id            The id of the cluster to update
-     * @param updateCluster the information to update the cluster with
-     * @return the updated cluster
+     * @param updateCluster The information to update the cluster with
      * @throws GenieException if there is an error
      */
-    Cluster updateCluster(
+    void updateCluster(
             @NotBlank(message = "No cluster id entered. Unable to update.")
             final String id,
             @NotNull(message = "No cluster information entered. Unable to update.")
@@ -145,10 +143,9 @@ public interface ClusterService {
      * @param id      The id of the cluster to add the configuration file to. Not
      *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> addConfigsForCluster(
+    void addConfigsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to add configurations.")
             final String id,
             @NotEmpty(message = "No configuration files entered. Unable to add.")
@@ -177,10 +174,9 @@ public interface ClusterService {
      *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configurations
      *                with. Not null/empty.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> updateConfigsForCluster(
+    void updateConfigsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to update configurations.")
             final String id,
             @NotEmpty(message = "No configs entered. Unable to update.")
@@ -205,10 +201,9 @@ public interface ClusterService {
      * @param id   The id of the cluster to add the tags to. Not
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> addTagsForCluster(
+    void addTagsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to add tags.")
             final String id,
             @NotEmpty(message = "No tags entered. Unable to add to tags.")
@@ -237,10 +232,9 @@ public interface ClusterService {
      *             Not null/empty/blank.
      * @param tags The tags to replace existing tags
      *             with. Not null/empty.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> updateTagsForCluster(
+    void updateTagsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to update tags.")
             final String id,
             @NotEmpty(message = "No tags entered. Unable to update.")
@@ -280,10 +274,9 @@ public interface ClusterService {
      * @param id         The id of the cluster to add the command file to. Not
      *                   null/empty/blank.
      * @param commandIds The ids of the commands to add. Not null/empty.
-     * @return The active list of commands
      * @throws GenieException if there is an error
      */
-    List<Command> addCommandsForCluster(
+    void addCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to add commands.")
             final String id,
             @NotEmpty(message = "No command ids entered. Unable to add commands.")
@@ -313,10 +306,9 @@ public interface ClusterService {
      *                   null/empty/blank.
      * @param commandIds The ids of the commands to replace existing
      *                   commands with. Not null/empty.
-     * @return The active list of commands
      * @throws GenieException if there is an error
      */
-    List<Command> updateCommandsForCluster(
+    void updateCommandsForCluster(
             @NotBlank(message = "No cluster id entered. Unable to update commands.")
             final String id,
             @NotNull(message = "No command ids entered. Unable to update commands.")

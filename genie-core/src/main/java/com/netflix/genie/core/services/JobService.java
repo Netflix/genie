@@ -17,11 +17,10 @@
  */
 package com.netflix.genie.core.services;
 
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.JobStatus;
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -122,76 +121,6 @@ public interface JobService {
             @NotNull(message = "No status entered unable to update.")
             final JobStatus status,
             final String msg
-    ) throws GenieException;
-
-    /**
-     * Add tags to the job.
-     *
-     * @param id   The id of the job to add the tags to. Not null/empty/blank.
-     * @param tags The tags to add. Not null/empty.
-     * @return The active set of tags
-     * @throws GenieException if there is an error
-     */
-    Set<String> addTagsForJob(
-            @NotBlank(message = "No id entered. Unable to add tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered to add.")
-            final Set<String> tags
-    ) throws GenieException;
-
-    /**
-     * Get the set of tags associated with the job with given id.
-     *
-     * @param id The id of the job to get the tags for. Not null/empty/blank.
-     * @return The set of tags as paths
-     * @throws GenieException if there is an error
-     */
-    Set<String> getTagsForJob(
-            @NotBlank(message = "No job id entered. Unable to get tags.")
-            final String id
-    ) throws GenieException;
-
-    /**
-     * Update the set of tags associated with the job with given id.
-     *
-     * @param id   The id of the job to update the tags for. Not null/empty/blank.
-     * @param tags The tags to replace existing tags with. Not null/empty.
-     * @return The active set of tags
-     * @throws GenieException if there is an error
-     */
-    Set<String> updateTagsForJob(
-            @NotBlank(message = "No job id entered. Unable to update tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered. Unable to update tags.")
-            final Set<String> tags
-    ) throws GenieException;
-
-    /**
-     * Remove all tags from the job.
-     *
-     * @param id The id of the job to remove the tags from. Not
-     *           null/empty/blank.
-     * @return The active set of tags
-     * @throws GenieException if there is an error
-     */
-    Set<String> removeAllTagsForJob(
-            @NotBlank(message = "No job id entered. Unable to remove tags.")
-            final String id
-    ) throws GenieException;
-
-    /**
-     * Remove a tag from the job.
-     *
-     * @param id  The id of the job to remove the tag from. Not null/empty/blank.
-     * @param tag The tag to remove. Not null/empty/blank.
-     * @return The active set of tags
-     * @throws GenieException if there is an error
-     */
-    Set<String> removeTagForJob(
-            @NotBlank(message = "No id entered for job. Unable to remove tag.")
-            final String id,
-            @NotBlank(message = "No tag entered. Unable to remove")
-            final String tag
     ) throws GenieException;
 
     /**

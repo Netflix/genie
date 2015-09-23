@@ -18,6 +18,7 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -283,5 +284,38 @@ public class Application extends CommonFields {
         if (tags != null) {
             this.tags.addAll(tags);
         }
+    }
+
+    /**
+     * Get a DTO from this entity.
+     *
+     * @return DTO of this entity.
+     */
+    public com.netflix.genie.common.dto.Application getDTO() {
+        return new com.netflix.genie.common.dto.Application
+                .Builder(this.getName(), this.getUser(), this.getVersion(), this.status)
+                .withId(this.getId())
+                .withCreated(this.getCreated())
+                .withUpdated(this.getUpdated())
+                .withDescription(this.getDescription())
+                .withTags(this.tags)
+                .withConfigs(this.configs)
+                .withSetupFile(this.setupFile)
+                .withDependencies(this.dependencies)
+                .build();
+//        return new com.netflix.genie.common.dto.Application(
+//                this.getId(),
+//                this.getCreated(),
+//                this.getUpdated(),
+//                this.getName(),
+//                this.getUser(),
+//                this.getVersion(),
+//                this.getDescription(),
+//                this.tags,
+//                this.configs,
+//                this.status,
+//                this.setupFile,
+//                this.dependencies
+//        );
     }
 }

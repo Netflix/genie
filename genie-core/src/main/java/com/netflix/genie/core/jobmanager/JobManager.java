@@ -17,22 +17,23 @@
  */
 package com.netflix.genie.core.jobmanager;
 
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
 
 /**
  * The interface to be implemented by job manager implementations.
  *
- * @author skrishnan
  * @author amsharma
+ * @author tgianos
+ * @since 2.0.0
  */
 public interface JobManager {
 
     /**
      * Initialize the JobManager.
      *
-     * @param job The job this manager will be managing.
+     * @param job     The job this manager will be managing.
      * @param cluster The cluster this job will run on.
      * @throws GenieException On issue
      */

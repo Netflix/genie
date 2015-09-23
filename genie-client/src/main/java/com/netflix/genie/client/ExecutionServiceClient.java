@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.dto.JobStatus;
 import org.apache.commons.lang3.StringUtils;
 
 /**

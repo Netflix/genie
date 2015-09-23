@@ -19,7 +19,7 @@ package com.netflix.genie.core.metrics.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.core.metrics.JobCountManager;
 import com.netflix.genie.core.util.NetUtil;

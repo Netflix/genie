@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.ApplicationStatus;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.core.services.ApplicationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,7 +53,6 @@ import java.util.Set;
 /**
  * REST end-point for supporting Applications.
  *
- * @author amsharma
  * @author tgianos
  * @since 3.0.0
  */
@@ -83,17 +82,16 @@ public final class ApplicationController {
      * @return The created application configuration
      * @throws GenieException For any error
      */
+    @ResponseStatus
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Create an application",
-            notes = "Create an application from the supplied information.",
-            response = Application.class
+            notes = "Create an application from the supplied information."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CREATED,
-                    message = "Application created successfully.",
-                    response = Application.class
+                    message = "Application created successfully."
             ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CONFLICT,
@@ -108,7 +106,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public ResponseEntity<Application> createApplication(
+    public ResponseEntity<?> createApplication(
             @ApiParam(value = "The application to create.", required = true)
             @RequestBody
             final Application app
@@ -116,16 +114,16 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to create new application");
         }
-        final Application createdApp = this.applicationService.createApplication(app);
+        final String id = this.applicationService.createApplication(app);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
                         .fromCurrentRequest()
                         .path("/{id}")
-                        .buildAndExpand(createdApp.getId())
+                        .buildAndExpand(id)
                         .toUri()
         );
-        return new ResponseEntity<>(createdApp, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
     /**
@@ -288,14 +286,13 @@ public final class ApplicationController {
      *
      * @param id        unique id for configuration to update
      * @param updateApp contains the application information to update
-     * @return successful response, or one with an HTTP error code
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update an application",
-            notes = "Update an application from the supplied information.",
-            response = Application.class
+            notes = "Update an application from the supplied information."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -311,7 +308,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Application updateApplication(
+    public void updateApplication(
             @ApiParam(value = "Id of the application to update.", required = true)
             @PathVariable("id")
             final String id,
@@ -322,7 +319,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called to update application config with info " + updateApp.toString());
         }
-        return this.applicationService.updateApplication(id, updateApp);
+        this.applicationService.updateApplication(id, updateApp);
     }
 
     /**
@@ -396,15 +393,13 @@ public final class ApplicationController {
      * @param id      The id of the application to add the configuration file to. Not
      *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
-     * @return The active configurations for this application.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add new configuration files to an application",
-            notes = "Add the supplied configuration files to the application with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Add the supplied configuration files to the application with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -420,7 +415,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> addConfigsToApplication(
+    public void addConfigsToApplication(
             @ApiParam(
                     value = "Id of the application to add configuration to.",
                     required = true
@@ -437,7 +432,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + configs);
         }
-        return this.applicationService.addConfigsToApplication(id, configs);
+        this.applicationService.addConfigsToApplication(id, configs);
     }
 
     /**
@@ -490,15 +485,13 @@ public final class ApplicationController {
      *                for. Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
      *                files with. Not null/empty/blank.
-     * @return The new set of application configurations.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update configuration files for an application",
-            notes = "Replace the existing configuration files for application with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Replace the existing configuration files for application with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -514,7 +507,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> updateConfigsForApplication(
+    public void updateConfigsForApplication(
             @ApiParam(
                     value = "Id of the application to update configurations for.",
                     required = true
@@ -531,7 +524,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and configs " + configs);
         }
-        return this.applicationService.updateConfigsForApplication(id, configs);
+        this.applicationService.updateConfigsForApplication(id, configs);
     }
 
     /**
@@ -545,9 +538,7 @@ public final class ApplicationController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove all configuration files from an application",
-            notes = "Remove all the configuration files from the application with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Remove all the configuration files from the application with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -583,17 +574,15 @@ public final class ApplicationController {
      * @param id           The id of the application to add the dependency file to. Not
      *                     null/empty/blank.
      * @param dependencies The dependency files to add. Not null.
-     * @return The active set of application dependencies.
      * @throws GenieException For any error
      */
     @RequestMapping(
             value = "/{id}/dependencies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
     )
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add new dependency files to an application",
-            notes = "Add the supplied dependency files to the application with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Add the supplied dependency files to the application with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -609,7 +598,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> addDependenciesForApplication(
+    public void addDependenciesForApplication(
             @ApiParam(
                     value = "Id of the application to add dependencies to.",
                     required = true
@@ -626,7 +615,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and dependencies " + dependencies);
         }
-        return this.applicationService.addDependenciesForApplication(id, dependencies);
+        this.applicationService.addDependenciesForApplication(id, dependencies);
     }
 
     /**
@@ -675,21 +664,19 @@ public final class ApplicationController {
     /**
      * Update the dependency files for a given application.
      *
-     * @param id   The id of the application to update the dependency files for. Not
-     *             null/empty/blank.
+     * @param id           The id of the application to update the dependency files for. Not
+     *                     null/empty/blank.
      * @param dependencies The dependency files to replace existing dependency files with. Not
-     *             null/empty/blank.
-     * @return The active set of application dependencies
+     *                     null/empty/blank.
      * @throws GenieException For any error
      */
     @RequestMapping(
             value = "/{id}/dependencies", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
     )
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update dependency files for an application",
-            notes = "Replace the existing dependency files for application with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Replace the existing dependency files for application with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -705,7 +692,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> updateDependenciesForApplication(
+    public void updateDependenciesForApplication(
             @ApiParam(
                     value = "Id of the application to update configurations for.",
                     required = true
@@ -722,7 +709,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and dependencies " + dependencies);
         }
-        return this.applicationService.updateDependenciesForApplication(id, dependencies);
+        this.applicationService.updateDependenciesForApplication(id, dependencies);
     }
 
     /**
@@ -736,9 +723,7 @@ public final class ApplicationController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Remove all dependency files from an application",
-            notes = "Remove all the dependency files from the application with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Remove all the dependency files from the application with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -774,15 +759,13 @@ public final class ApplicationController {
      * @param id   The id of the application to add the tags to. Not
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
-     * @return The active tags for this application.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add new tags to a application",
-            notes = "Add the supplied tags to the application with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Add the supplied tags to the application with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -798,7 +781,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> addTagsForApplication(
+    public void addTagsForApplication(
             @ApiParam(
                     value = "Id of the application to add configuration to.",
                     required = true
@@ -815,7 +798,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + tags);
         }
-        return this.applicationService.addTagsForApplication(id, tags);
+        this.applicationService.addTagsForApplication(id, tags);
     }
 
     /**
@@ -868,15 +851,13 @@ public final class ApplicationController {
      *             Not null/empty/blank.
      * @param tags The tags to replace existing configuration
      *             files with. Not null/empty/blank.
-     * @return The new set of application tags.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update tags for a application",
-            notes = "Replace the existing tags for application with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Replace the existing tags for application with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -892,7 +873,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> updateTagsForApplication(
+    public void updateTagsForApplication(
             @ApiParam(
                     value = "Id of the application to update tags for.",
                     required = true
@@ -909,7 +890,7 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
         }
-        return this.applicationService.updateTagsForApplication(id, tags);
+        this.applicationService.updateTagsForApplication(id, tags);
     }
 
     /**
@@ -924,9 +905,7 @@ public final class ApplicationController {
     @ApiOperation(
             value = "Remove all tags from a application",
             notes = "Remove all the tags from the application with given id.  Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted.",
-            response = String.class,
-            responseContainer = "Set"
+                    + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -969,9 +948,7 @@ public final class ApplicationController {
     @ApiOperation(
             value = "Remove a tag from a application",
             notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted.",
-            response = String.class,
-            responseContainer = "Set"
+                    + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -1021,7 +998,7 @@ public final class ApplicationController {
             value = "Get the commands this application is associated with",
             notes = "Get the commands which this application supports.",
             response = Command.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -1037,7 +1014,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Command> getCommandsForApplication(
+    public Set<Command> getCommandsForApplication(
             @ApiParam(
                     value = "Id of the application to get the commands for.",
                     required = true

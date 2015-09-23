@@ -20,7 +20,7 @@ package com.netflix.genie.core.jobmanager.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jobmanager.JobManager;
 import com.netflix.genie.core.jobmanager.JobMonitor;
 import com.netflix.genie.core.services.ExecutionService;

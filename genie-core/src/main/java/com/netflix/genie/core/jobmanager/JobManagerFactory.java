@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.core.jobmanager;
 
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
+import com.netflix.genie.core.services.ClusterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;

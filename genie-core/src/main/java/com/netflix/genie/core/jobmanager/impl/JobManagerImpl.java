@@ -17,19 +17,22 @@
  */
 package com.netflix.genie.core.jobmanager.impl;
 
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.FileAttachment;
+import com.netflix.genie.common.dto.FileAttachment;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.core.jobmanager.JobManager;
 import com.netflix.genie.core.jobmanager.JobMonitor;
+import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobService;
-import com.netflix.genie.core.jobmanager.JobManager;
 import com.netflix.genie.core.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -80,6 +83,7 @@ public class JobManagerImpl implements JobManager {
     private final Thread jobMonitorThread;
     private final JobService jobService;
     private final CommandService commandService;
+    private final ClusterService clusterService;
 
     private boolean initCalled;
     private String jobDir;
@@ -105,16 +109,21 @@ public class JobManagerImpl implements JobManager {
      *
      * @param jobMonitor     The job monitor object to use.
      * @param jobService     The job service to use.
+     * @param clusterService The cluster service to use.
      * @param commandService The command service to use.
      */
     @Autowired
-    public JobManagerImpl(final JobMonitor jobMonitor,
-                          final JobService jobService,
-                          final CommandService commandService) {
+    public JobManagerImpl(
+            final JobMonitor jobMonitor,
+            final JobService jobService,
+            final ClusterService clusterService,
+            final CommandService commandService
+    ) {
         this.jobMonitor = jobMonitor;
         this.jobMonitorThread = new Thread(this.jobMonitor);
         this.jobService = jobService;
         this.commandService = commandService;
+        this.clusterService = clusterService;
         this.initCalled = false;
     }
 
@@ -156,7 +165,8 @@ public class JobManagerImpl implements JobManager {
 
         // Find the command for the job
         Command command = null;
-        for (final Command cmd : this.cluster.getCommands()) {
+        final Set<CommandStatus> activeStatus = Sets.newHashSet(CommandStatus.ACTIVE);
+        for (final Command cmd : this.clusterService.getCommandsForCluster(this.cluster.getId(), activeStatus)) {
             if (cmd.getTags().containsAll(this.job.getCommandCriteria())) {
                 command = cmd;
                 break;
@@ -173,7 +183,7 @@ public class JobManagerImpl implements JobManager {
         // save the command name, application id and application name
         this.jobService.setCommandInfoForJob(this.job.getId(), command.getId(), command.getName());
 
-        final Set<Application> applications = command.getApplications();
+        final Set<Application> applications = this.commandService.getApplicationsForCommand(command.getId());
         if (applications != null && !applications.isEmpty()) {
             throw new UnsupportedOperationException("Not yet implemented for Genie 3.0");
             //TODO: Fix this after change to multiple applications per command. Change job execution model to have
@@ -517,7 +527,7 @@ public class JobManagerImpl implements JobManager {
             processBuilder.environment().put("COMMAND_ENV_FILE", command.getSetupFile());
         }
 
-        final Set<Application> applications = command.getApplications();
+        final Set<Application> applications = this.commandService.getApplicationsForCommand(command.getId());
         if (applications != null && !applications.isEmpty()) {
             throw new UnsupportedOperationException("Not yet implemented for Genie 3.0");
             //TODO: Fix this for a new execution model that has multiple applications per command

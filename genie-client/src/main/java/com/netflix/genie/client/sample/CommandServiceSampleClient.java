@@ -26,7 +26,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
 import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
+import com.netflix.genie.common.dto.CommandStatus;
 
 import java.util.HashSet;
 import java.util.List;

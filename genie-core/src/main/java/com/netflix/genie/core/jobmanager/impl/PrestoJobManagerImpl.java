@@ -20,9 +20,10 @@ package com.netflix.genie.core.jobmanager.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.jobmanager.JobMonitor;
+import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobService;
-import com.netflix.genie.core.jobmanager.JobMonitor;
 import com.netflix.genie.core.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -70,13 +71,17 @@ public class PrestoJobManagerImpl extends JobManagerImpl {
      *
      * @param jobMonitor     The job monitor object to use.
      * @param jobService     The job service to use.
+     * @param clusterService The cluster service to use.
      * @param commandService The command service to use.
      */
     @Autowired
-    public PrestoJobManagerImpl(final JobMonitor jobMonitor,
-                                final JobService jobService,
-                                final CommandService commandService) {
-        super(jobMonitor, jobService, commandService);
+    public PrestoJobManagerImpl(
+            final JobMonitor jobMonitor,
+            final JobService jobService,
+            final ClusterService clusterService,
+            final CommandService commandService
+    ) {
+        super(jobMonitor, jobService, clusterService, commandService);
     }
 
     /**

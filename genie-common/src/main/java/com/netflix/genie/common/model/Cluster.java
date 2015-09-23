@@ -18,6 +18,7 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -102,7 +103,7 @@ public class Cluster extends CommonFields {
     @ApiModelProperty(
             value = "All the configuration files needed for this cluster which will be downloaded pre-use"
     )
-    private Set<String> configs = new HashSet();
+    private Set<String> configs = new HashSet<>();
 
     /**
      * Set of tags for a cluster.
@@ -134,7 +135,7 @@ public class Cluster extends CommonFields {
     )
     @OrderColumn(name = "command_order", nullable = false)
     @JsonIgnore
-    private List<Command> commands = new ArrayList<Command>();
+    private List<Command> commands = new ArrayList<>();
 
     /**
      * Default Constructor.
@@ -354,5 +355,27 @@ public class Cluster extends CommonFields {
                 this.removeCommand(command);
             }
         }
+    }
+
+    /**
+     * Get a DTO from the contents of this entity.
+     *
+     * @return The DTO
+     */
+    public com.netflix.genie.common.dto.Cluster getDTO() {
+        return new com.netflix.genie.common.dto.Cluster.Builder(
+                this.getName(),
+                this.getUser(),
+                this.getVersion(),
+                this.status,
+                this.clusterType
+        )
+                .withId(this.getId())
+                .withCreated(this.getCreated())
+                .withUpdated(this.getUpdated())
+                .withDescription(this.getDescription())
+                .withTags(this.tags)
+                .withConfigs(this.configs)
+                .build();
     }
 }

@@ -18,6 +18,7 @@
 package com.netflix.genie.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -371,5 +372,29 @@ public class Command extends CommonFields {
         if (clusters != null) {
             this.clusters.addAll(clusters);
         }
+    }
+
+    /**
+     * Get a dto based on the information in this entity.
+     *
+     * @return The dto
+     */
+    public com.netflix.genie.common.dto.Command getDTO() {
+        return new com.netflix.genie.common.dto.Command.Builder(
+                this.getName(),
+                this.getUser(),
+                this.getVersion(),
+                this.status,
+                this.executable
+        )
+                .withId(this.getId())
+                .withCreated(this.getCreated())
+                .withUpdated(this.getUpdated())
+                .withDescription(this.getDescription())
+                .withTags(this.tags)
+                .withConfigs(this.configs)
+                .withSetupFile(this.setupFile)
+                .withJobType(this.jobType)
+                .build();
     }
 }

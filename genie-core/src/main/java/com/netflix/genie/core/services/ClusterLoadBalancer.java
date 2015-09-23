@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.core.services;
 
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Cluster;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;

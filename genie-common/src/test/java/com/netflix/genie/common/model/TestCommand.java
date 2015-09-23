@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;

@@ -23,7 +23,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ApplicationServiceClient;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.ApplicationStatus;
+import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.model.Command;
 
 import java.util.HashSet;

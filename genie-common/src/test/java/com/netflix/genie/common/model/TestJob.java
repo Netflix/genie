@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.common.model;
 
+import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.dto.FileAttachment;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
@@ -69,7 +72,7 @@ public class TestJob extends TestEntityBase {
 
     private static final Set<String> COMMAND_CRITERIA
             = new HashSet<>();
-    private static final List<ClusterCriteria> CLUSTER_CRITERIAS
+    private static final List<com.netflix.genie.common.dto.ClusterCriteria> CLUSTER_CRITERIAS
             = new ArrayList<>();
 
     private Job job;
@@ -353,7 +356,7 @@ public class TestJob extends TestEntityBase {
         final FileAttachment attachment = new FileAttachment();
         attachment.setName("/some/query.q");
         attachment.setData("select * from mytable;".getBytes(UTF8_CHARSET));
-        final Set<FileAttachment> attachments = new HashSet<>();
+        final Set<com.netflix.genie.common.dto.FileAttachment> attachments = new HashSet<>();
         attachments.add(attachment);
         this.job.setAttachments(attachments);
         Assert.assertEquals(attachments, this.job.getAttachments());
@@ -635,7 +638,7 @@ public class TestJob extends TestEntityBase {
 
         // finish time is non-zero on completion
         final String successMessage = "Job Succeeded";
-        job2.setJobStatus(JobStatus.SUCCEEDED, successMessage);
+        job2.setJobStatus(com.netflix.genie.common.dto.JobStatus.SUCCEEDED, successMessage);
         Assert.assertEquals(successMessage, job2.getStatusMsg());
         Assert.assertFalse(dt.compareTo(job2.getFinished()) == 0);
     }
@@ -876,7 +879,7 @@ public class TestJob extends TestEntityBase {
      */
     @Test
     public void testStringToClusterCriterias() throws GeniePreconditionException {
-        final List<ClusterCriteria> criterias =
+        final List<com.netflix.genie.common.dto.ClusterCriteria> criterias =
                 this.job.stringToClusterCriterias(EXPECTED_CLUSTER_CRITERIAS_STRING);
         Assert.assertEquals(CLUSTER_CRITERIAS.size(), criterias.size());
         for (int i = 0; i < criterias.size(); i++) {
@@ -892,7 +895,7 @@ public class TestJob extends TestEntityBase {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testStringToClusterCriteriasNull() throws GeniePreconditionException {
-        final List<ClusterCriteria> criterias =
+        final List<com.netflix.genie.common.dto.ClusterCriteria> criterias =
                 this.job.stringToClusterCriterias(null);
         Assert.assertEquals(CLUSTER_CRITERIAS.size(), criterias.size());
         for (int i = 0; i < criterias.size(); i++) {

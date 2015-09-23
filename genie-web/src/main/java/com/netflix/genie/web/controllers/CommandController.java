@@ -17,12 +17,12 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.ClusterStatus;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
 import com.netflix.genie.core.services.CommandService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -87,14 +87,12 @@ public final class CommandController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Create a command",
-            notes = "Create a command from the supplied information.",
-            response = Command.class
+            notes = "Create a command from the supplied information."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CREATED,
-                    message = "Created",
-                    response = Command.class
+                    message = "Successfully created the command"
             ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CONFLICT,
@@ -109,7 +107,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public ResponseEntity<Command> createCommand(
+    public ResponseEntity<?> createCommand(
             @ApiParam(
                     value = "The command to create.",
                     required = true
@@ -120,16 +118,16 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called to create new command configuration " + command.toString());
         }
-        final Command createdCommand = this.commandService.createCommand(command);
+        final String id = this.commandService.createCommand(command);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
                         .fromCurrentRequest()
                         .path("/{id}")
-                        .buildAndExpand(createdCommand.getId())
+                        .buildAndExpand(id)
                         .toUri()
         );
-        return new ResponseEntity<>(createdCommand, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
     /**
@@ -288,14 +286,13 @@ public final class CommandController {
      *
      * @param id            unique id for the configuration to update.
      * @param updateCommand the information to update the command with
-     * @return The updated command
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update a command",
-            notes = "Update a command from the supplied information.",
-            response = Command.class
+            notes = "Update a command from the supplied information."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -311,7 +308,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Command updateCommand(
+    public void updateCommand(
             @ApiParam(
                     value = "Id of the command to update.",
                     required = true
@@ -328,7 +325,7 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to update command");
         }
-        return this.commandService.updateCommand(id, updateCommand);
+        this.commandService.updateCommand(id, updateCommand);
     }
 
     /**
@@ -409,15 +406,13 @@ public final class CommandController {
      * @param id      The id of the command to add the configuration file to. Not
      *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
-     * @return The active configurations for this command.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add new configuration files to a command",
-            notes = "Add the supplied configuration files to the command with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Add the supplied configuration files to the command with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -433,7 +428,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> addConfigsForCommand(
+    public void addConfigsForCommand(
             @ApiParam(
                     value = "Id of the command to add configuration to.",
                     required = true
@@ -450,7 +445,7 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + configs);
         }
-        return this.commandService.addConfigsForCommand(id, configs);
+        this.commandService.addConfigsForCommand(id, configs);
     }
 
     /**
@@ -503,15 +498,13 @@ public final class CommandController {
      *                Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
      *                files with. Not null/empty/blank.
-     * @return The new set of command configurations.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update configuration files for an command",
-            notes = "Replace the existing configuration files for command with given id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Replace the existing configuration files for command with given id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -527,7 +520,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> updateConfigsForCommand(
+    public void updateConfigsForCommand(
             @ApiParam(
                     value = "Id of the command to update configurations for.",
                     required = true
@@ -544,7 +537,7 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and configs " + configs);
         }
-        return this.commandService.updateConfigsForCommand(id, configs);
+        this.commandService.updateConfigsForCommand(id, configs);
     }
 
     /**
@@ -594,15 +587,13 @@ public final class CommandController {
      * @param id   The id of the command to add the tags to. Not
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
-     * @return The active tags for this command.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add new tags to a command",
-            notes = "Add the supplied tags to the command with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
+            notes = "Add the supplied tags to the command with the supplied id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -618,7 +609,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> addTagsForCommand(
+    public void addTagsForCommand(
             @ApiParam(
                     value = "Id of the command to add configuration to.",
                     required = true
@@ -635,7 +626,7 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
         }
-        return this.commandService.addTagsForCommand(id, tags);
+        this.commandService.addTagsForCommand(id, tags);
     }
 
     /**
@@ -688,10 +679,10 @@ public final class CommandController {
      *             Not null/empty/blank.
      * @param tags The tags to replace existing configuration
      *             files with. Not null/empty/blank.
-     * @return The new set of command tags.
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Update tags for a command",
             notes = "Replace the existing tags for command with given id."
@@ -710,7 +701,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<String> updateTagsForCommand(
+    public void updateTagsForCommand(
             @ApiParam(
                     value = "Id of the command to update tags for.",
                     required = true
@@ -727,7 +718,7 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
         }
-        return this.commandService.updateTagsForCommand(id, tags);
+        this.commandService.updateTagsForCommand(id, tags);
     }
 
     /**
@@ -827,19 +818,17 @@ public final class CommandController {
      * @param id             The id of the command to add the applications to. Not
      *                       null/empty/blank.
      * @param applicationIds The ids of the applications to add. Not null.
-     * @return The active applications for this command.
      * @throws GenieException For any error
      */
     @RequestMapping(
             value = "/{id}/applications", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
     )
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Add applications for a command",
             notes = "Add the supplied applications to the command "
                     + "with the supplied id. Applications should already "
-                    + "have been created.",
-            response = Application.class,
-            responseContainer = "Set"
+                    + "have been created."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -855,7 +844,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<Application> addApplicationsForCommand(
+    public void addApplicationsForCommand(
             @ApiParam(
                     value = "Id of the command to set application for.",
                     required = true
@@ -872,7 +861,7 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.info("Called with id " + id + " and application " + applicationIds);
         }
-        return this.commandService.addApplicationsForCommand(id, applicationIds);
+        this.commandService.addApplicationsForCommand(id, applicationIds);
     }
 
     /**
@@ -924,19 +913,17 @@ public final class CommandController {
      * @param id             The id of the command to add the applications to. Not
      *                       null/empty/blank.
      * @param applicationIds The ids of the applications to set. Not null.
-     * @return The active applications for this command.
      * @throws GenieException For any error
      */
     @RequestMapping(
             value = "/{id}/applications", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
     )
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Set applications for a command",
             notes = "Set the supplied applications to the command "
                     + "with the supplied id. Applications should already "
-                    + "have been created. Replaces existing applications.",
-            response = Application.class,
-            responseContainer = "Set"
+                    + "have been created. Replaces existing applications."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -952,7 +939,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<Application> setApplicationsForCommand(
+    public void setApplicationsForCommand(
             @ApiParam(
                     value = "Id of the command to set application for.",
                     required = true
@@ -969,7 +956,7 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.info("Called with id " + id + " and application " + applicationIds);
         }
-        return this.commandService.setApplicationsForCommand(id, applicationIds);
+        this.commandService.setApplicationsForCommand(id, applicationIds);
     }
 
     /**
@@ -1074,7 +1061,7 @@ public final class CommandController {
             value = "Get the clusters this command is associated with",
             notes = "Get the clusters which this command exists on supports.",
             response = Cluster.class,
-            responseContainer = "List"
+            responseContainer = "Set"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -1090,7 +1077,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Cluster> getClustersForCommand(
+    public Set<Cluster> getClustersForCommand(
             @ApiParam(
                     value = "Id of the command to get the clusters for.",
                     required = true

@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.core.services;
 
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.ApplicationStatus;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Abstraction layer to encapsulate ApplicationConfig functionality.<br>
- * Classes implementing this abstraction layer must be thread-safe.
+ * Application service interface.
  *
  * @author amsharma
  * @author tgianos
@@ -45,10 +44,10 @@ public interface ApplicationService {
      * Create new application.
      *
      * @param app The application configuration to create
-     * @return The application that was created
+     * @return The id of the application that was created
      * @throws GenieException if there is an error
      */
-    Application createApplication(
+    String createApplication(
             @NotNull(message = "No application entered to create.")
             @Valid
             final Application app
@@ -77,16 +76,18 @@ public interface ApplicationService {
      * @param limit      Max number of results per page
      * @param descending Whether to sort the results by descending or ascending order
      * @param orderBys   How to order the results
-     * @return successful response, or one with HTTP error code
+     * @return The found applications
      */
-    List<Application> getApplications(final String name,
-                                      final String userName,
-                                      final Set<ApplicationStatus> statuses,
-                                      final Set<String> tags,
-                                      final int page,
-                                      final int limit,
-                                      final boolean descending,
-                                      final Set<String> orderBys);
+    List<Application> getApplications(
+            final String name,
+            final String userName,
+            final Set<ApplicationStatus> statuses,
+            final Set<String> tags,
+            final int page,
+            final int limit,
+            final boolean descending,
+            final Set<String> orderBys
+    );
 
     /**
      * Update an application.
@@ -94,10 +95,9 @@ public interface ApplicationService {
      * @param id        The id of the application configuration to update
      * @param updateApp Information to update for the application configuration
      *                  with
-     * @return The updated application
      * @throws GenieException if there is an error
      */
-    Application updateApplication(
+    void updateApplication(
             @NotBlank(message = "No application id entered. Unable to update.")
             final String id,
             @NotNull(message = "No application information entered. Unable to update.")
@@ -129,10 +129,9 @@ public interface ApplicationService {
      * @param id      The id of the application to add the configuration file to. Not
      *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> addConfigsToApplication(
+    void addConfigsToApplication(
             @NotBlank(message = "No application id entered. Unable to add configurations.")
             final String id,
             @NotEmpty(message = "No configuration files entered.")
@@ -161,10 +160,9 @@ public interface ApplicationService {
      *                for. Not null/empty/blank.
      * @param configs The configuration files to replace existing configurations
      *                with. Not null/empty.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> updateConfigsForApplication(
+    void updateConfigsForApplication(
             @NotBlank(message = "No application id entered. Unable to update configurations.")
             final String id,
             @NotNull(message = "No configs entered. Unable to update. If you want, use delete API.")
@@ -204,10 +202,9 @@ public interface ApplicationService {
      * @param id           The id of the application to add the dependency file to. Not
      *                     null/empty/blank.
      * @param dependencies The dependency files to add. Not null.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> addDependenciesForApplication(
+    void addDependenciesForApplication(
             @NotBlank(message = "No application id entered. Unable to add dependencies.")
             final String id,
             @NotEmpty(message = "No dependencies entered. Unable to add dependencies.")
@@ -231,13 +228,12 @@ public interface ApplicationService {
      * Update the set of dependency files associated with the application with given
      * id.
      *
-     * @param id   The id of the application to update the dependency files for. Not
-     *             null/empty/blank.
+     * @param id           The id of the application to update the dependency files for. Not
+     *                     null/empty/blank.
      * @param dependencies The dependency files to replace existing dependencies with. Not null/empty.
-     * @return The active set of configurations
      * @throws GenieException if there is an error
      */
-    Set<String> updateDependenciesForApplication(
+    void updateDependenciesForApplication(
             @NotBlank(message = "No application id entered. Unable to update dependencies.")
             final String id,
             @NotNull(message = "No dependencies entered. Unable to update.")
@@ -259,8 +255,8 @@ public interface ApplicationService {
     /**
      * Remove a dependency file from the application.
      *
-     * @param id  The id of the application to remove the dependency file from. Not
-     *            null/empty/blank.
+     * @param id         The id of the application to remove the dependency file from. Not
+     *                   null/empty/blank.
      * @param dependency The dependency file to remove. Not null/empty/blank.
      * @throws GenieException if there is an error
      */
@@ -277,10 +273,9 @@ public interface ApplicationService {
      * @param id   The id of the application to add the tags to. Not
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> addTagsForApplication(
+    void addTagsForApplication(
             @NotBlank(message = "No application id entered. Unable to add tags.")
             final String id,
             @NotEmpty(message = "No tags entered. Unable to add.")
@@ -309,10 +304,9 @@ public interface ApplicationService {
      *             Not null/empty/blank.
      * @param tags The tags to replace existing tags
      *             with. Not null/empty.
-     * @return The active set of tags
      * @throws GenieException if there is an error
      */
-    Set<String> updateTagsForApplication(
+    void updateTagsForApplication(
             @NotBlank(message = "No application id entered. Unable to update tags.")
             final String id,
             @NotNull(message = "No tags entered unable to update tags.")
@@ -354,7 +348,7 @@ public interface ApplicationService {
      * @return The commands the application is a part of.
      * @throws GenieException if there is an error
      */
-    List<Command> getCommandsForApplication(
+    Set<Command> getCommandsForApplication(
             @NotBlank(message = "No application id entered. Unable to get commands.")
             final String id,
             final Set<CommandStatus> statuses

@@ -20,10 +20,10 @@ package com.netflix.genie.client.sample
 import com.google.common.collect.Multimap;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
-import com.netflix.genie.common.model.ClusterCriteria;
-import com.netflix.genie.common.model.FileAttachment;
+import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.dto.FileAttachment;
 import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.JobStatus;
+import com.netflix.genie.common.dto.JobStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

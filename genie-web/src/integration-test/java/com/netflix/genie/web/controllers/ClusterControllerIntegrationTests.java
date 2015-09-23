@@ -19,15 +19,14 @@ package com.netflix.genie.web.controllers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Cluster;
-import com.netflix.genie.common.model.ClusterStatus;
-import com.netflix.genie.common.model.Command;
-import com.netflix.genie.common.model.CommandStatus;
-import com.netflix.genie.core.repositories.jpa.ClusterRepository;
-import com.netflix.genie.core.repositories.jpa.CommandRepository;
+import com.netflix.genie.core.jpa.repositories.ClusterRepository;
+import com.netflix.genie.core.jpa.repositories.CommandRepository;
 import com.netflix.genie.web.configs.GenieConfig;
-import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -120,11 +119,9 @@ public class ClusterControllerIntegrationTests {
     @Test
     public void canCreateClusterWithoutId() throws GenieException {
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
-        final ResponseEntity<Cluster> responseEntity
-                = createCluster(null, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        final URI location = createCluster(null, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
-        Assert.assertThat(responseEntity.getStatusCode(), Matchers.is(HttpStatus.CREATED));
-        final Cluster cluster = responseEntity.getBody();
+        final Cluster cluster = this.restTemplate.getForEntity(location, Cluster.class).getBody();
         Assert.assertThat(cluster.getId(), Matchers.is(Matchers.notNullValue()));
         Assert.assertThat(cluster.getName(), Matchers.is(NAME));
         Assert.assertThat(cluster.getUser(), Matchers.is(USER));
@@ -144,11 +141,9 @@ public class ClusterControllerIntegrationTests {
     @Test
     public void canCreateClusterWithId() throws GenieException {
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
-        final ResponseEntity<Cluster> responseEntity
-                = createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        final URI location = createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
-        Assert.assertThat(responseEntity.getStatusCode(), Matchers.is(HttpStatus.CREATED));
-        final Cluster cluster = responseEntity.getBody();
+        final Cluster cluster = this.restTemplate.getForEntity(location, Cluster.class).getBody();
         Assert.assertThat(cluster.getId(), Matchers.is(ID));
         Assert.assertThat(cluster.getName(), Matchers.is(NAME));
         Assert.assertThat(cluster.getUser(), Matchers.is(USER));
@@ -167,44 +162,15 @@ public class ClusterControllerIntegrationTests {
     @Test
     public void canHandleBadInputToCreateCluster() {
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
-        final HttpEntity<Cluster> entity = new HttpEntity<>(new Cluster(), this.headers);
+        final HttpEntity<Cluster> entity = new HttpEntity<>(
+                new Cluster.Builder(null, null, null, null, null).build(),
+                this.headers
+        );
         final ResponseEntity<String> responseEntity
                 = this.restTemplate.postForEntity(this.clustersBaseUrl, entity, String.class);
 
         Assert.assertThat(responseEntity.getStatusCode(), Matchers.is(HttpStatus.PRECONDITION_FAILED));
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
-    }
-
-    /**
-     * Test to make sure that you can retrieve a created cluster based on the location header.
-     *
-     * @throws GenieException on configuration error
-     */
-    @Test
-    public void canGetCreatedCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
-        final ResponseEntity<Cluster> responseEntity
-                = createCluster(null, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
-
-        Assert.assertThat(responseEntity.getStatusCode(), Matchers.is(HttpStatus.CREATED));
-        final Cluster createdCluster = responseEntity.getBody();
-        final String resourceURI = responseEntity.getHeaders().getLocation().toString();
-        final ResponseEntity<Cluster> getResponse = this.restTemplate.getForEntity(resourceURI, Cluster.class);
-
-        Assert.assertThat(getResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
-        final Cluster cluster = getResponse.getBody();
-        Assert.assertThat(cluster.getId(), Matchers.is(createdCluster.getId()));
-        Assert.assertThat(cluster.getName(), Matchers.is(createdCluster.getName()));
-        Assert.assertThat(cluster.getVersion(), Matchers.is(createdCluster.getVersion()));
-        Assert.assertThat(cluster.getUser(), Matchers.is(createdCluster.getUser()));
-        Assert.assertThat(cluster.getDescription(), Matchers.is(createdCluster.getDescription()));
-        Assert.assertThat(cluster.getStatus(), Matchers.is(createdCluster.getStatus()));
-        Assert.assertThat(cluster.getClusterType(), Matchers.is(createdCluster.getClusterType()));
-        Assert.assertThat(cluster.getConfigs(), Matchers.is(createdCluster.getConfigs()));
-        Assert.assertThat(cluster.getTags(), Matchers.is(createdCluster.getTags()));
-        Assert.assertThat(cluster.getUpdated(), Matchers.is(createdCluster.getUpdated()));
-        Assert.assertThat(cluster.getCreated(), Matchers.is(createdCluster.getCreated()));
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -307,26 +273,33 @@ public class ClusterControllerIntegrationTests {
     @Test
     public void canUpdateCluster() throws GenieException {
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
-        final ResponseEntity<Cluster> createResponse
-                = createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        final URI location = createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
-        Assert.assertThat(createResponse.getStatusCode(), Matchers.is(HttpStatus.CREATED));
-        final Cluster createdCluster = createResponse.getBody();
+        final Cluster createdCluster = this.restTemplate.getForEntity(location, Cluster.class).getBody();
         Assert.assertThat(createdCluster.getStatus(), Matchers.is(ClusterStatus.UP));
 
-        createdCluster.setStatus(ClusterStatus.OUT_OF_SERVICE);
-        final HttpEntity<Cluster> entity = new HttpEntity<>(createdCluster, this.headers);
-        final ResponseEntity<Cluster> updateResponse = this.restTemplate
-                .exchange(
-                        this.clustersBaseUrl + "/" + ID,
-                        HttpMethod.PUT,
-                        entity,
-                        Cluster.class
-                );
+        final Cluster updateCluster = new Cluster.Builder(
+                createdCluster.getName(),
+                createdCluster.getUser(),
+                createdCluster.getVersion(),
+                ClusterStatus.OUT_OF_SERVICE,
+                createdCluster.getClusterType()
+        )
+                .withId(createdCluster.getId())
+                .withCreated(createdCluster.getCreated())
+                .withUpdated(createdCluster.getUpdated())
+                .withDescription(createdCluster.getDescription())
+                .withTags(createdCluster.getTags())
+                .withConfigs(createdCluster.getConfigs())
+                .build();
 
+        final HttpEntity<Cluster> entity = new HttpEntity<>(updateCluster, this.headers);
+        this.restTemplate.put(location, entity);
+
+        final ResponseEntity<Cluster> updateResponse = this.restTemplate.getForEntity(location, Cluster.class);
         Assert.assertThat(updateResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
-        final Cluster updateCluster = updateResponse.getBody();
-        Assert.assertThat(updateCluster.getStatus(), Matchers.is(ClusterStatus.OUT_OF_SERVICE));
+        final Cluster updatedCluster = updateResponse.getBody();
+        Assert.assertThat(updatedCluster.getStatus(), Matchers.is(ClusterStatus.OUT_OF_SERVICE));
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
@@ -414,11 +387,12 @@ public class ClusterControllerIntegrationTests {
         final String config2 = UUID.randomUUID().toString();
         final Set<String> configs = Sets.newHashSet(config1, config2);
         final HttpEntity<Set<String>> entity = new HttpEntity<>(configs, this.headers);
-        configResponse = this.restTemplate.postForEntity(
+        this.restTemplate.postForEntity(
                 this.clustersBaseUrl + "/" + ID + "/configs",
                 entity,
-                String[].class
+                void.class
         );
+        configResponse = this.restTemplate.getForEntity(this.clustersBaseUrl + "/" + ID + "/configs", String[].class);
 
         Assert.assertThat(configResponse.getBody().length, Matchers.is(2));
         Assert.assertTrue(Arrays.asList(configResponse.getBody()).contains(config1));
@@ -441,17 +415,18 @@ public class ClusterControllerIntegrationTests {
         this.restTemplate.postForEntity(
                 this.clustersBaseUrl + "/" + ID + "/configs",
                 entity,
-                String[].class
+                void.class
         );
 
         final String config3 = UUID.randomUUID().toString();
         entity = new HttpEntity<>(Sets.newHashSet(config3), this.headers);
-        final ResponseEntity<String[]> configResponse = this.restTemplate.exchange(
+        this.restTemplate.put(
                 this.clustersBaseUrl + "/" + ID + "/configs",
-                HttpMethod.PUT,
-                entity,
-                String[].class
+                entity
         );
+
+        final ResponseEntity<String[]> configResponse
+                = this.restTemplate.getForEntity(this.clustersBaseUrl + "/" + ID + "/configs", String[].class);
 
         Assert.assertThat(configResponse.getBody().length, Matchers.is(1));
         Assert.assertThat(configResponse.getBody()[0], Matchers.is(config3));
@@ -476,12 +451,7 @@ public class ClusterControllerIntegrationTests {
                 String[].class
         );
 
-        this.restTemplate.exchange(
-                this.clustersBaseUrl + "/" + ID + "/configs",
-                HttpMethod.DELETE,
-                null,
-                String[].class
-        );
+        this.restTemplate.delete(this.clustersBaseUrl + "/" + ID + "/configs");
 
         final ResponseEntity<String[]> configResponse = this.restTemplate.getForEntity(
                 this.clustersBaseUrl + "/" + ID + "/configs",
@@ -510,12 +480,13 @@ public class ClusterControllerIntegrationTests {
         final String tag2 = UUID.randomUUID().toString();
         final Set<String> tags = Sets.newHashSet(tag1, tag2);
         final HttpEntity<Set<String>> entity = new HttpEntity<>(tags, this.headers);
-        tagResponse = this.restTemplate.postForEntity(
+        this.restTemplate.postForEntity(
                 this.clustersBaseUrl + "/" + ID + "/tags",
                 entity,
-                String[].class
+                void.class
         );
 
+        tagResponse = this.restTemplate.getForEntity(this.clustersBaseUrl + "/" + ID + "/tags", String[].class);
         Assert.assertThat(tagResponse.getBody().length, Matchers.is(4));
         Assert.assertTrue(Arrays.asList(tagResponse.getBody()).contains("genie.id:" + ID));
         Assert.assertTrue(Arrays.asList(tagResponse.getBody()).contains("genie.name:" + NAME));
@@ -544,12 +515,13 @@ public class ClusterControllerIntegrationTests {
 
         final String tag3 = UUID.randomUUID().toString();
         entity = new HttpEntity<>(Sets.newHashSet(tag3), this.headers);
-        final ResponseEntity<String[]> tagResponse = this.restTemplate.exchange(
+        this.restTemplate.put(
                 this.clustersBaseUrl + "/" + ID + "/tags",
-                HttpMethod.PUT,
-                entity,
-                String[].class
+                entity
         );
+
+        final ResponseEntity<String[]> tagResponse
+                = this.restTemplate.getForEntity(this.clustersBaseUrl + "/" + ID + "/tags", String[].class);
 
         Assert.assertThat(tagResponse.getBody().length, Matchers.is(3));
         Assert.assertTrue(Arrays.asList(tagResponse.getBody()).contains("genie.id:" + ID));
@@ -576,12 +548,7 @@ public class ClusterControllerIntegrationTests {
                 String[].class
         );
 
-        this.restTemplate.exchange(
-                this.clustersBaseUrl + "/" + ID + "/tags",
-                HttpMethod.DELETE,
-                null,
-                String[].class
-        );
+        this.restTemplate.delete(this.clustersBaseUrl + "/" + ID + "/tags");
 
         final ResponseEntity<String[]> tagResponse = this.restTemplate.getForEntity(
                 this.clustersBaseUrl + "/" + ID + "/tags",
@@ -611,12 +578,7 @@ public class ClusterControllerIntegrationTests {
                 String[].class
         );
 
-        this.restTemplate.exchange(
-                this.clustersBaseUrl + "/" + ID + "/tags/" + tag1,
-                HttpMethod.DELETE,
-                null,
-                String[].class
-        );
+        this.restTemplate.delete(this.clustersBaseUrl + "/" + ID + "/tags/" + tag1);
 
         final ResponseEntity<String[]> tagResponse = this.restTemplate.getForEntity(
                 this.clustersBaseUrl + "/" + ID + "/tags",
@@ -895,7 +857,7 @@ public class ClusterControllerIntegrationTests {
      * @param executable The executable to use for the command
      * @throws GenieException for any misconfiguration
      */
-    private ResponseEntity<Command> createCommand(
+    private URI createCommand(
             final String id,
             final String name,
             final String user,
@@ -903,12 +865,9 @@ public class ClusterControllerIntegrationTests {
             final CommandStatus status,
             final String executable
     ) throws GenieException {
-        final Command command = new Command(name, user, version, status, executable);
-        if (StringUtils.isNotBlank(id)) {
-            command.setId(id);
-        }
+        final Command command = new Command.Builder(name, user, version, status, executable).withId(id).build();
         final HttpEntity<Command> entity = new HttpEntity<>(command, this.headers);
-        return this.restTemplate.postForEntity(this.commandsBaseUrl, entity, Command.class);
+        return this.restTemplate.postForLocation(this.commandsBaseUrl, entity);
     }
 
     /**
@@ -922,7 +881,7 @@ public class ClusterControllerIntegrationTests {
      * @param clusterType The type of the cluster e.g. yarn or presto
      * @throws GenieException for any misconfiguration
      */
-    private ResponseEntity<Cluster> createCluster(
+    private URI createCluster(
             final String id,
             final String name,
             final String user,
@@ -930,11 +889,8 @@ public class ClusterControllerIntegrationTests {
             final ClusterStatus status,
             final String clusterType
     ) throws GenieException {
-        final Cluster cluster = new Cluster(name, user, version, status, clusterType);
-        if (StringUtils.isNotBlank(id)) {
-            cluster.setId(id);
-        }
+        final Cluster cluster = new Cluster.Builder(name, user, version, status, clusterType).withId(id).build();
         final HttpEntity<Cluster> entity = new HttpEntity<>(cluster, this.headers);
-        return this.restTemplate.postForEntity(this.clustersBaseUrl, entity, Cluster.class);
+        return this.restTemplate.postForLocation(this.clustersBaseUrl, entity);
     }
 }
