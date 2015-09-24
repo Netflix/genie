@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.common.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import io.swagger.annotations.ApiModelProperty;
@@ -232,6 +234,21 @@ public abstract class BaseDTO {
      */
     public Set<String> getTags() {
         return Collections.unmodifiableSet(this.tags);
+    }
+
+    /**
+     * Convert this object to a string representation.
+     *
+     * @return This application data represented as a JSON structure
+     */
+    @Override
+    public String toString() {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(this);
+        } catch (final JsonProcessingException ioe) {
+            return ioe.getLocalizedMessage();
+        }
     }
 
     /**

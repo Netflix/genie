@@ -17,10 +17,12 @@
  */
 package com.netflix.genie.core.elasticsearch.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.elasticsearch.repositories.ESJobRepository;
+import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.services.JobSearchService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Elasticsearch based job search service implementation.
@@ -62,7 +65,12 @@ public class ESJobSearchServiceImpl implements JobSearchService {
      */
     @Override
     public Job getJob(@NotBlank(message = "No id entered. Unable to get job.") final String id) throws GenieException {
-        return this.repository.findOne(id);
+        final JobEntity job = this.repository.findOne(id);
+        if (job != null) {
+            return job.getDTO();
+        } else {
+            throw new GenieNotFoundException("No job with id " + id + " exists.");
+        }
     }
 
     /**
@@ -154,9 +162,18 @@ public class ESJobSearchServiceImpl implements JobSearchService {
 
         if (criteria != null) {
             final CriteriaQuery query = new CriteriaQuery(criteria, new PageRequest(page, limit));
-            return this.template.queryForList(query, Job.class);
+            return this.template
+                    .queryForList(query, JobEntity.class)
+                    .stream()
+                    .map(JobEntity::getDTO)
+                    .collect(Collectors.toList());
         } else {
-            return this.repository.findAll(new PageRequest(page, limit)).getContent();
+            return this.repository
+                    .findAll(new PageRequest(page, limit))
+                    .getContent()
+                    .stream()
+                    .map(JobEntity::getDTO)
+                    .collect(Collectors.toList());
         }
     }
 }

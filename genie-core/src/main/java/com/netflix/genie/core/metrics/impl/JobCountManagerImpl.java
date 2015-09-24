@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.core.metrics.impl;
 
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.model.Job_;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.metrics.JobCountManager;
 import com.netflix.genie.core.util.NetUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -113,18 +113,18 @@ public class JobCountManagerImpl implements JobCountManager {
         }
         final CriteriaBuilder cb = this.em.getCriteriaBuilder();
         final CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-        final Root<Job> j = cq.from(Job.class);
+        final Root<JobEntity> j = cq.from(JobEntity.class);
         cq.select(cb.count(j));
-        final Predicate runningStatus = cb.equal(j.get(Job_.status), JobStatus.RUNNING);
-        final Predicate initStatus = cb.equal(j.get(Job_.status), JobStatus.INIT);
+        final Predicate runningStatus = cb.equal(j.get(JobEntity_.status), JobStatus.RUNNING);
+        final Predicate initStatus = cb.equal(j.get(JobEntity_.status), JobStatus.INIT);
         final List<Predicate> predicates = new ArrayList<>();
-        predicates.add(cb.equal(j.get(Job_.hostName), finalHostName));
+        predicates.add(cb.equal(j.get(JobEntity_.hostName), finalHostName));
         predicates.add(cb.or(runningStatus, initStatus));
         if (minStartTime != null) {
-            predicates.add(cb.greaterThanOrEqualTo(j.get(Job_.started), new Date(minStartTime)));
+            predicates.add(cb.greaterThanOrEqualTo(j.get(JobEntity_.started), new Date(minStartTime)));
         }
         if (maxStartTime != null) {
-            predicates.add(cb.lessThan(j.get(Job_.started), new Date(maxStartTime)));
+            predicates.add(cb.lessThan(j.get(JobEntity_.started), new Date(maxStartTime)));
         }
         //documentation says that by default predicate array is conjuncted together
         cq.where(predicates.toArray(new Predicate[predicates.size()]));

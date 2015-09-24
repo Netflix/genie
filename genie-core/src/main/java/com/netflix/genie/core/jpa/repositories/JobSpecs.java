@@ -15,9 +15,9 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.common.model.Job;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.model.Job_;
+import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.entities.JobEntity_;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -59,7 +59,7 @@ public final class JobSpecs {
      * @param commandId   The command id
      * @return The specification
      */
-    public static Specification<Job> find(
+    public static Specification<JobEntity> find(
             final String id,
             final String jobName,
             final String userName,
@@ -69,41 +69,41 @@ public final class JobSpecs {
             final String clusterId,
             final String commandName,
             final String commandId) {
-        return (final Root<Job> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+        return (final Root<JobEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(id)) {
-                predicates.add(cb.like(root.get(Job_.id), id));
+                predicates.add(cb.like(root.get(JobEntity_.id), id));
             }
             if (StringUtils.isNotBlank(jobName)) {
-                predicates.add(cb.like(root.get(Job_.name), jobName));
+                predicates.add(cb.like(root.get(JobEntity_.name), jobName));
             }
             if (StringUtils.isNotBlank(userName)) {
-                predicates.add(cb.equal(root.get(Job_.user), userName));
+                predicates.add(cb.equal(root.get(JobEntity_.user), userName));
             }
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =
                         statuses
                                 .stream()
-                                .map(status -> cb.equal(root.get(Job_.status), status))
+                                .map(status -> cb.equal(root.get(JobEntity_.status), status))
                                 .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null) {
                 tags.stream()
                         .filter(StringUtils::isNotBlank)
-                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(Job_.tags))));
+                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(JobEntity_.tags))));
             }
             if (StringUtils.isNotBlank(clusterName)) {
-                predicates.add(cb.equal(root.get(Job_.executionClusterName), clusterName));
+                predicates.add(cb.equal(root.get(JobEntity_.executionClusterName), clusterName));
             }
             if (StringUtils.isNotBlank(clusterId)) {
-                predicates.add(cb.equal(root.get(Job_.executionClusterId), clusterId));
+                predicates.add(cb.equal(root.get(JobEntity_.executionClusterId), clusterId));
             }
             if (StringUtils.isNotBlank(commandName)) {
-                predicates.add(cb.equal(root.get(Job_.commandName), commandName));
+                predicates.add(cb.equal(root.get(JobEntity_.commandName), commandName));
             }
             if (StringUtils.isNotBlank(commandId)) {
-                predicates.add(cb.equal(root.get(Job_.commandId), commandId));
+                predicates.add(cb.equal(root.get(JobEntity_.commandId), commandId));
             }
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
@@ -116,16 +116,16 @@ public final class JobSpecs {
      * @param zombieTime  The time that zombies should be marked by
      * @return The specification for this query
      */
-    public static Specification<Job> findZombies(final long currentTime, final long zombieTime) {
-        return (final Root<Job> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+    public static Specification<JobEntity> findZombies(final long currentTime, final long zombieTime) {
+        return (final Root<JobEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             // the equivalent query is as follows:
             // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
             // statusMsg='Job has been marked as a zombie'
             // where updateTime < $min and (status='RUNNING' or status='INIT')"
             final List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.lessThan(root.get(Job_.updated), new Date(currentTime - zombieTime)));
-            final Predicate orPredicate1 = cb.equal(root.get(Job_.status), JobStatus.RUNNING);
-            final Predicate orPredicate2 = cb.equal(root.get(Job_.status), JobStatus.INIT);
+            predicates.add(cb.lessThan(root.get(JobEntity_.updated), new Date(currentTime - zombieTime)));
+            final Predicate orPredicate1 = cb.equal(root.get(JobEntity_.status), JobStatus.RUNNING);
+            final Predicate orPredicate2 = cb.equal(root.get(JobEntity_.status), JobStatus.INIT);
             predicates.add(cb.or(orPredicate1, orPredicate2));
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };

@@ -26,7 +26,9 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.Application_;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.ApplicationSpecs;
 import com.netflix.genie.core.jpa.repositories.CommandRepository;
@@ -76,8 +78,7 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
      * @param commandRepo     The command repository to use
      */
     @Autowired
-    public ApplicationServiceJPAImpl(final ApplicationRepository applicationRepo,
-                                     final CommandRepository commandRepo) {
+    public ApplicationServiceJPAImpl(final ApplicationRepository applicationRepo, final CommandRepository commandRepo) {
         this.applicationRepo = applicationRepo;
         this.commandRepo = commandRepo;
     }
@@ -98,24 +99,25 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
             throw new GenieConflictException("An application with id " + app.getId() + " already exists");
         }
 
-        final com.netflix.genie.common.model.Application application = new com.netflix.genie.common.model.Application();
-        application.setId(app.getId());
-        application.setName(app.getName());
-        application.setUser(app.getUser());
-        application.setVersion(app.getVersion());
-        application.setDescription(app.getDescription());
-        application.setStatus(app.getStatus());
-        application.setSetupFile(app.getSetupFile());
-        application.setTags(app.getTags());
-        application.setConfigs(app.getConfigs());
-        application.setDependencies(app.getDependencies());
+        final ApplicationEntity applicationEntity
+                = new ApplicationEntity();
+        applicationEntity.setId(app.getId());
+        applicationEntity.setName(app.getName());
+        applicationEntity.setUser(app.getUser());
+        applicationEntity.setVersion(app.getVersion());
+        applicationEntity.setDescription(app.getDescription());
+        applicationEntity.setStatus(app.getStatus());
+        applicationEntity.setSetupFile(app.getSetupFile());
+        applicationEntity.setTags(app.getTags());
+        applicationEntity.setConfigs(app.getConfigs());
+        applicationEntity.setDependencies(app.getDependencies());
 
-        if (StringUtils.isBlank(application.getId())) {
-            application.setId(UUID.randomUUID().toString());
+        if (StringUtils.isBlank(applicationEntity.getId())) {
+            applicationEntity.setId(UUID.randomUUID().toString());
         }
 
-        final String id = application.getId();
-        this.applicationRepo.save(application);
+        final String id = applicationEntity.getId();
+        this.applicationRepo.save(applicationEntity);
         return id;
     }
 
@@ -153,15 +155,17 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
         }
 
         final PageRequest pageRequest = JPAUtils.getPageRequest(
-                page, limit, descending, orderBys, Application_.class, Application_.updated.getName()
+                page, limit, descending, orderBys, ApplicationEntity_.class, ApplicationEntity_.updated.getName()
         );
 
         @SuppressWarnings("unchecked")
-        final List<com.netflix.genie.common.model.Application> apps = this.applicationRepo.findAll(
-                ApplicationSpecs.find(name, userName, statuses, tags),
-                pageRequest
-        ).getContent();
-        return apps.stream().map(com.netflix.genie.common.model.Application::getDTO).collect(Collectors.toList());
+        final List<ApplicationEntity> applicationEntities
+                = this.applicationRepo.findAll(ApplicationSpecs.find(name, userName, statuses, tags), pageRequest)
+                .getContent();
+        return applicationEntities
+                .stream()
+                .map(ApplicationEntity::getDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -185,18 +189,18 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with app " + updateApp.toString());
         }
-        final com.netflix.genie.common.model.Application persistedApp = this.findApplication(id);
-        persistedApp.setName(updateApp.getName());
-        persistedApp.setUser(updateApp.getUser());
-        persistedApp.setVersion(updateApp.getVersion());
-        persistedApp.setDescription(updateApp.getDescription());
-        persistedApp.setStatus(updateApp.getStatus());
-        persistedApp.setSetupFile(updateApp.getSetupFile());
-        persistedApp.setConfigs(updateApp.getConfigs());
-        persistedApp.setDependencies(updateApp.getDependencies());
-        persistedApp.setTags(updateApp.getTags());
+        final ApplicationEntity applicationEntity = this.findApplication(id);
+        applicationEntity.setName(updateApp.getName());
+        applicationEntity.setUser(updateApp.getUser());
+        applicationEntity.setVersion(updateApp.getVersion());
+        applicationEntity.setDescription(updateApp.getDescription());
+        applicationEntity.setStatus(updateApp.getStatus());
+        applicationEntity.setSetupFile(updateApp.getSetupFile());
+        applicationEntity.setConfigs(updateApp.getConfigs());
+        applicationEntity.setDependencies(updateApp.getDependencies());
+        applicationEntity.setTags(updateApp.getTags());
 
-        this.applicationRepo.save(persistedApp);
+        this.applicationRepo.save(applicationEntity);
     }
 
     /**
@@ -207,14 +211,13 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called");
         }
-        final List<com.netflix.genie.common.model.Application> returnApps = this.applicationRepo.findAll();
         // Check to make sure the application isn't tied to any existing commands
-        for (final com.netflix.genie.common.model.Application app : returnApps) {
-            final Set<com.netflix.genie.common.model.Command> commands = app.getCommands();
-            if (commands != null && !commands.isEmpty()) {
+        for (final ApplicationEntity applicationEntity : this.applicationRepo.findAll()) {
+            final Set<CommandEntity> commandEntities = applicationEntity.getCommands();
+            if (commandEntities != null && !commandEntities.isEmpty()) {
                 throw new GeniePreconditionException(
-                        "Unable to delete app " + app.getId() + " as it is attached to " + commands.size()
-                                + " commands still."
+                        "Unable to delete app " + applicationEntity.getId() + " as it is attached to "
+                                + commandEntities.size() + " commands still."
                 );
             }
         }
@@ -232,15 +235,16 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        final com.netflix.genie.common.model.Application app = this.findApplication(id);
-        final Set<com.netflix.genie.common.model.Command> commands = app.getCommands();
-        if (commands != null && !commands.isEmpty()) {
+        final ApplicationEntity applicationEntity = this.findApplication(id);
+        final Set<CommandEntity> commandEntities = applicationEntity.getCommands();
+        if (commandEntities != null && !commandEntities.isEmpty()) {
             throw new GeniePreconditionException(
-                    "Unable to delete app " + app.getId() + " as it is attached to " + commands.size() + " commands."
+                    "Unable to delete app " + applicationEntity.getId() + " as it is attached to "
+                            + commandEntities.size() + " commands."
             );
         }
 
-        this.applicationRepo.delete(app);
+        this.applicationRepo.delete(applicationEntity);
     }
 
     /**
@@ -443,23 +447,27 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
         @SuppressWarnings("unchecked")
-        final List<com.netflix.genie.common.model.Command> commands = this.commandRepo.findAll(
+        final List<CommandEntity> commandEntities = this.commandRepo.findAll(
                 CommandSpecs.findCommandsForApplication(id, statuses)
         );
-        return commands.stream().map(com.netflix.genie.common.model.Command::getDTO).collect(Collectors.toSet());
+        return commandEntities
+                .stream()
+                .map(CommandEntity::getDTO)
+                .collect(Collectors.toSet());
     }
 
     /**
-     * Helper to find an application based on ID.
+     * Helper to find an application entity based on ID.
      *
      * @param id The id of the application to find
-     * @return The application if one is found
+     * @return The application entity if one is found
      * @throws GenieNotFoundException If no application is found
      */
-    private com.netflix.genie.common.model.Application findApplication(final String id) throws GenieNotFoundException {
-        final com.netflix.genie.common.model.Application application = this.applicationRepo.findOne(id);
-        if (application != null) {
-            return application;
+    private ApplicationEntity findApplication(final String id)
+            throws GenieNotFoundException {
+        final ApplicationEntity applicationEntity = this.applicationRepo.findOne(id);
+        if (applicationEntity != null) {
+            return applicationEntity;
         } else {
             throw new GenieNotFoundException("No application with id " + id);
         }

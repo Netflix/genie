@@ -22,12 +22,12 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.FileAttachment;
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.dto.FileAttachment;
-import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jobmanager.JobManager;
 import com.netflix.genie.core.jobmanager.JobMonitor;
 import com.netflix.genie.core.services.ClusterService;
@@ -59,7 +59,6 @@ import java.util.Set;
  *
  * @author amsharma
  * @author skrishnan
- * @author bmundlapudi
  * @author tgianos
  */
 @Component
@@ -231,7 +230,7 @@ public class JobManagerImpl implements JobManager {
 
         // check to ensure that the process id is actually set (which means job
         // was launched)
-        final int processId = this.job.getProcessHandle();
+        final int processId = this.job.getProcessId();
         if (processId > 0) {
             LOG.info("Attempting to kill the process " + processId);
             try {
@@ -240,8 +239,9 @@ public class JobManagerImpl implements JobManager {
                     LOG.error(msg);
                     throw new GenieServerException(msg);
                 }
-                final Process killProcessId = Runtime.getRuntime().exec(
-                        this.genieHome + File.separator + "jobkill.sh " + processId);
+                final Process killProcessId = Runtime
+                        .getRuntime()
+                        .exec(this.genieHome + File.separator + "jobkill.sh " + processId);
 
                 int returnCode = 1;
                 int counter = 0;
@@ -400,7 +400,7 @@ public class JobManagerImpl implements JobManager {
                 && !this.job.getFileDependencies().isEmpty()) {
             processBuilder.environment().put(
                     "CURRENT_JOB_FILE_DEPENDENCIES",
-                    StringUtils.replaceChars(this.job.getFileDependencies(), ',', ' ')
+                    StringUtils.join(this.job.getFileDependencies(), " ")
             );
         }
 
@@ -440,7 +440,7 @@ public class JobManagerImpl implements JobManager {
 
         // set the archive location
         // unless user has explicitly requested for it to be disabled
-        if (!this.job.isDisableLogArchival() && StringUtils.isNotBlank(this.s3ArchiveLocation)) {
+        if (!this.job.getDisableLogArchival() && StringUtils.isNotBlank(this.s3ArchiveLocation)) {
             processBuilder.environment().put("S3_ARCHIVE_LOCATION", this.s3ArchiveLocation);
         }
     }

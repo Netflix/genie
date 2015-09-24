@@ -19,10 +19,13 @@ package com.netflix.genie.core.jpa.services;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
+import com.netflix.genie.core.jpa.repositories.JobRepository;
+import com.netflix.genie.core.services.JobService;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,7 +54,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
     private static final String TAG_2 = "tag2";
 
     @Autowired
-    private com.netflix.genie.core.services.JobService service;
+    private JobService service;
+
+    @Autowired
+    private JobRepository jobRepository;
 
     /**
      * Test the get job function.
@@ -66,17 +72,11 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         final String version = UUID.randomUUID().toString();
         final String commandArgs = UUID.randomUUID().toString();
         final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
-        final ClusterCriteria criteria1 = new ClusterCriteria();
-        final Set<String> tags1 = new HashSet<>();
-        tags1.add(UUID.randomUUID().toString());
-        tags1.add(UUID.randomUUID().toString());
-        criteria1.setTags(tags1);
+        final ClusterCriteria criteria1
+                = new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         clusterCriterias.add(criteria1);
-        final ClusterCriteria criteria2 = new ClusterCriteria();
-        final Set<String> tags2 = new HashSet<>();
-        tags2.add(UUID.randomUUID().toString());
-        tags2.add(UUID.randomUUID().toString());
-        criteria2.setTags(tags2);
+        final ClusterCriteria criteria2
+                = new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         clusterCriterias.add(criteria2);
 
         final Set<String> commandCriteria = new HashSet<>();
@@ -84,14 +84,14 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         commandCriteria.add(UUID.randomUUID().toString());
 
         final Job created = this.service.createJob(
-                new Job(
+                new Job.Builder(
                         user,
                         name,
                         version,
                         commandArgs,
-                        commandCriteria,
-                        clusterCriterias
-                )
+                        clusterCriterias,
+                        commandCriteria
+                ).build()
         );
 
         final Job job = this.service.getJob(created.getId());
@@ -102,7 +102,6 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(commandArgs, job.getCommandArgs());
         Assert.assertEquals(clusterCriterias.size(), job.getClusterCriterias().size());
         Assert.assertEquals(commandCriteria.size(), job.getCommandCriteria().size());
-        Assert.assertEquals(commandCriteria.size(), job.getCommandCriteriaString().split(",").length);
         Assert.assertEquals(JobStatus.INIT, job.getStatus());
         Assert.assertNotNull(job.getHostName());
         Assert.assertNotNull(job.getOutputURI());
@@ -123,32 +122,25 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         final String version = UUID.randomUUID().toString();
         final String commandArgs = UUID.randomUUID().toString();
         final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
-        final ClusterCriteria criteria1 = new ClusterCriteria();
-        final Set<String> tags1 = new HashSet<>();
-        tags1.add(UUID.randomUUID().toString());
-        tags1.add(UUID.randomUUID().toString());
-        criteria1.setTags(tags1);
+        final ClusterCriteria criteria1
+                = new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         clusterCriterias.add(criteria1);
-        final ClusterCriteria criteria2 = new ClusterCriteria();
-        final Set<String> tags2 = new HashSet<>();
-        tags2.add(UUID.randomUUID().toString());
-        tags2.add(UUID.randomUUID().toString());
-        criteria2.setTags(tags2);
+        final ClusterCriteria criteria2
+                = new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         clusterCriterias.add(criteria2);
 
         final Set<String> commandCriteria = new HashSet<>();
         commandCriteria.add(UUID.randomUUID().toString());
         commandCriteria.add(UUID.randomUUID().toString());
 
-        final Job jobToCreate = new Job(
+        final Job jobToCreate = new Job.Builder(
                 user,
                 name,
                 version,
                 commandArgs,
-                commandCriteria,
-                clusterCriterias
-        );
-        jobToCreate.setId(id);
+                clusterCriterias,
+                commandCriteria
+        ).withId(id).build();
 
         final Job created = this.service.createJob(jobToCreate);
 
@@ -161,7 +153,6 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(commandArgs, job.getCommandArgs());
         Assert.assertEquals(clusterCriterias.size(), job.getClusterCriterias().size());
         Assert.assertEquals(commandCriteria.size(), job.getCommandCriteria().size());
-        Assert.assertEquals(commandCriteria.size(), job.getCommandCriteriaString().split(",").length);
         Assert.assertEquals(JobStatus.INIT, job.getStatus());
         Assert.assertNotNull(job.getHostName());
         Assert.assertNotNull(job.getOutputURI());
@@ -638,14 +629,14 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testSetProcessIdForJob() throws GenieException {
-        Assert.assertEquals(-1, this.service.getJob(JOB_1_ID).getProcessHandle());
+        Assert.assertEquals(-1, this.service.getJob(JOB_1_ID).getProcessId());
         final Random random = new Random();
         int pid = -1;
         while (pid < 0) {
             pid = random.nextInt();
         }
         this.service.setProcessIdForJob(JOB_1_ID, pid);
-        Assert.assertEquals(pid, this.service.getJob(JOB_1_ID).getProcessHandle());
+        Assert.assertEquals(pid, this.service.getJob(JOB_1_ID).getProcessId());
     }
 
     /**
@@ -670,7 +661,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         this.service.setCommandInfoForJob(JOB_1_ID, id, name);
         final Job job = this.service.getJob(JOB_1_ID);
         Assert.assertEquals(id, job.getCommandId());
-        Assert.assertEquals(name, job.getCommandName());
+        Assert.assertEquals(name, this.jobRepository.findOne(JOB_1_ID).getCommandName());
     }
 
     /**
@@ -693,9 +684,8 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
         this.service.setApplicationInfoForJob(JOB_1_ID, id, name);
-        final Job job = this.service.getJob(JOB_1_ID);
-        Assert.assertEquals(id, job.getApplicationId());
-        Assert.assertEquals(name, job.getApplicationName());
+        Assert.assertEquals(id, this.jobRepository.findOne(JOB_1_ID).getApplicationId());
+        Assert.assertEquals(name, this.jobRepository.findOne(JOB_1_ID).getApplicationName());
     }
 
     /**
@@ -720,7 +710,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         this.service.setClusterInfoForJob(JOB_1_ID, id, name);
         final Job job = this.service.getJob(JOB_1_ID);
         Assert.assertEquals(id, job.getExecutionClusterId());
-        Assert.assertEquals(name, job.getExecutionClusterName());
+        Assert.assertEquals(name, this.jobRepository.findOne(JOB_1_ID).getExecutionClusterName());
     }
 
     /**

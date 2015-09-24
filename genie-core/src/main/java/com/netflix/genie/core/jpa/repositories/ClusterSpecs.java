@@ -15,13 +15,13 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.common.model.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.model.Cluster_;
-import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import com.netflix.genie.core.jpa.entities.ClusterEntity_;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity_;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -60,34 +60,34 @@ public final class ClusterSpecs {
      * @param maxUpdateTime The maximum updated time of the clusters to find
      * @return The specification
      */
-    public static Specification<Cluster> find(
+    public static Specification<ClusterEntity> find(
             final String name,
             final Set<ClusterStatus> statuses,
             final Set<String> tags,
             final Long minUpdateTime,
             final Long maxUpdateTime) {
-        return (final Root<Cluster> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+        return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
-                predicates.add(cb.like(root.get(Cluster_.name), name));
+                predicates.add(cb.like(root.get(ClusterEntity_.name), name));
             }
             if (minUpdateTime != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get(Cluster_.updated), new Date(minUpdateTime)));
+                predicates.add(cb.greaterThanOrEqualTo(root.get(ClusterEntity_.updated), new Date(minUpdateTime)));
             }
             if (maxUpdateTime != null) {
-                predicates.add(cb.lessThan(root.get(Cluster_.updated), new Date(maxUpdateTime)));
+                predicates.add(cb.lessThan(root.get(ClusterEntity_.updated), new Date(maxUpdateTime)));
             }
             if (tags != null) {
                 tags.stream()
                         .filter(StringUtils::isNotBlank)
-                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(Cluster_.tags))));
+                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(ClusterEntity_.tags))));
             }
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
                 final List<Predicate> orPredicates =
                         statuses
                                 .stream()
-                                .map(status -> cb.equal(root.get(Cluster_.status), status))
+                                .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
                                 .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
@@ -103,28 +103,28 @@ public final class ClusterSpecs {
      * @param commandCriteria The command Criteria
      * @return The specification
      */
-    public static Specification<Cluster> findByClusterAndCommandCriteria(
+    public static Specification<ClusterEntity> findByClusterAndCommandCriteria(
             final ClusterCriteria clusterCriteria,
             final Set<String> commandCriteria) {
-        return (final Root<Cluster> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+        return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            final Join<Cluster, Command> commands = root.join(Cluster_.commands);
+            final Join<ClusterEntity, CommandEntity> commands = root.join(ClusterEntity_.commands);
 
             cq.distinct(true);
 
-            predicates.add(cb.equal(commands.get(Command_.status), CommandStatus.ACTIVE));
-            predicates.add(cb.equal(root.get(Cluster_.status), ClusterStatus.UP));
+            predicates.add(cb.equal(commands.get(CommandEntity_.status), CommandStatus.ACTIVE));
+            predicates.add(cb.equal(root.get(ClusterEntity_.status), ClusterStatus.UP));
 
             if (commandCriteria != null) {
                 for (final String tag : commandCriteria) {
-                    predicates.add(cb.isMember(tag, commands.get(Command_.tags)));
+                    predicates.add(cb.isMember(tag, commands.get(CommandEntity_.tags)));
 
                 }
             }
 
             if (clusterCriteria != null) {
                 for (final String tag : clusterCriteria.getTags()) {
-                    predicates.add(cb.isMember(tag, root.get(Cluster_.tags)));
+                    predicates.add(cb.isMember(tag, root.get(ClusterEntity_.tags)));
                 }
             }
 
@@ -139,20 +139,20 @@ public final class ClusterSpecs {
      * @param statuses  The status of the cluster
      * @return The specification
      */
-    public static Specification<Cluster> findClustersForCommand(
+    public static Specification<ClusterEntity> findClustersForCommand(
             final String commandId,
             final Set<ClusterStatus> statuses) {
-        return (final Root<Cluster> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+        return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            final Join<Cluster, Command> commands = root.join(Cluster_.commands);
+            final Join<ClusterEntity, CommandEntity> commands = root.join(ClusterEntity_.commands);
 
-            predicates.add(cb.equal(commands.get(Command_.id), commandId));
+            predicates.add(cb.equal(commands.get(CommandEntity_.id), commandId));
 
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
                 final List<Predicate> orPredicates =
                         statuses.stream()
-                                .map(status -> cb.equal(root.get(Cluster_.status), status))
+                                .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
                                 .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }

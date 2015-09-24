@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.core.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 
 import java.util.List;
@@ -29,6 +29,7 @@ import java.util.Set;
  * Interfaces for services to find jobs.
  *
  * @author tgianos
+ * @since 3.0.0
  */
 public interface JobSearchService {
 

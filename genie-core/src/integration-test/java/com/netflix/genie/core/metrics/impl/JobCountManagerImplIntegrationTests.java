@@ -20,7 +20,7 @@ import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
+import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.GenieServerTestSpringApplication;
 import com.netflix.genie.core.metrics.JobCountManager;
 import com.netflix.genie.core.jpa.repositories.JobRepository;
@@ -76,8 +76,8 @@ public class JobCountManagerImplIntegrationTests {
         //Force the hostname of the jobs to be the machine running the build
         //TODO: Can we do this via spring and injection of properties?
         final String hostName = this.netUtil.getHostName();
-        for (final Job job : this.jobRepo.findAll()) {
-            job.setHostName(hostName);
+        for (final JobEntity jobEntity : this.jobRepo.findAll()) {
+            jobEntity.setHostName(hostName);
         }
         this.jobRepo.flush();
 

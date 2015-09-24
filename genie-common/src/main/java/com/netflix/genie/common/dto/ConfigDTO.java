@@ -30,7 +30,7 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-public class ConfigDTO extends BaseDTO {
+public abstract class ConfigDTO extends BaseDTO {
 
     @ApiModelProperty(
             value = "Locations of all the configuration files needed for this resource"

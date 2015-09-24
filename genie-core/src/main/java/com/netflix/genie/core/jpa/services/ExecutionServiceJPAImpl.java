@@ -17,21 +17,21 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.ProcessStatus;
+import com.netflix.genie.core.jobmanager.JobManagerFactory;
+import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.repositories.JobRepository;
 import com.netflix.genie.core.jpa.repositories.JobSpecs;
+import com.netflix.genie.core.metrics.GenieNodeStatistics;
 import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.core.services.JobService;
-import com.netflix.genie.core.jobmanager.JobManagerFactory;
-import com.netflix.genie.core.metrics.GenieNodeStatistics;
-import com.netflix.genie.core.metrics.JobCountManager;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
 import com.netflix.genie.core.util.NetUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
@@ -64,7 +64,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     // per-instance variables
     private final GenieNodeStatistics stats;
     private final JobRepository jobRepo;
-    private final JobCountManager jobCountManager;
     private final JobManagerFactory jobManagerFactory;
     private final JobService jobService;
     private final NetUtil netUtil;
@@ -90,7 +89,6 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      *
      * @param jobRepo           The job repository to use.
      * @param stats             the GenieNodeStatistics object
-     * @param jobCountManager   the job count manager to use
      * @param jobManagerFactory The the job manager factory to use
      * @param jobService        The job service to use.
      * @param netUtil           The network utility to use
@@ -99,14 +97,12 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
     public ExecutionServiceJPAImpl(
             final JobRepository jobRepo,
             final GenieNodeStatistics stats,
-            final JobCountManager jobCountManager,
             final JobManagerFactory jobManagerFactory,
             final JobService jobService,
             final NetUtil netUtil
     ) {
         this.jobRepo = jobRepo;
         this.stats = stats;
-        this.jobCountManager = jobCountManager;
         this.jobManagerFactory = jobManagerFactory;
         this.jobService = jobService;
         this.netUtil = netUtil;
@@ -116,36 +112,36 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * {@inheritDoc}
      */
     @Override
-    public Job submitJob(
-            @NotNull(message = "No job entered to run")
+    public String submitJob(
+            @NotNull(message = "No job request entered to run")
             @Valid
-            final Job job
+            final JobRequest jobRequest
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called");
         }
-        if (StringUtils.isNotBlank(job.getId()) && this.jobRepo.exists(job.getId())) {
+        if (StringUtils.isNotBlank(jobRequest.getId()) && this.jobRepo.exists(jobRequest.getId())) {
             throw new GenieConflictException("Job with ID specified already exists.");
         }
 
         // Check if the job is forwarded. If not this is the first node that got the request.
         // So we log it, to track all requests.
-        if (!job.isForwarded()) {
-            LOG.info("Received job request:" + job);
-        }
-
-        final Job forwardedJob = checkAbilityToRunOrForward(job);
-
-        if (forwardedJob != null) {
-            return forwardedJob;
-        }
+//        if (!job.isForwarded()) {
+//            LOG.debug("Received job request:" + jobRequest);
+//        }
+//
+//        final Job forwardedJob = checkAbilityToRunOrForward(job);
+//
+//        if (forwardedJob != null) {
+//            return forwardedJob;
+//        }
 
         // At this point we have established that the job can be run on this node.
         // Before running we validate the job and save it in the db if it passes validation.
-        final Job savedJob = this.jobService.createJob(job);
+        final Job savedJob = this.jobService.createJob(jobRequest);
 
         // try to run the job - return success or error
-        return this.jobService.runJob(savedJob);
+        return this.jobService.runJob(savedJob).getId();
     }
 
     /**
@@ -165,48 +161,43 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called for id: " + id);
         }
-        final Job job = this.jobRepo.findOne(id);
-
-        // do some basic error handling
-        if (job == null) {
-            throw new GenieNotFoundException("No job exists for id " + id + ". Unable to kill.");
-        }
+        final JobEntity jobEntity = this.findJob(id);
 
         // check if it is done already
-        if (job.getStatus() == JobStatus.SUCCEEDED
-                || job.getStatus() == JobStatus.KILLED
-                || job.getStatus() == JobStatus.FAILED) {
+        if (jobEntity.getStatus() == JobStatus.SUCCEEDED
+                || jobEntity.getStatus() == JobStatus.KILLED
+                || jobEntity.getStatus() == JobStatus.FAILED) {
             // job already exited, return status to user
-            return job;
-        } else if (job.getStatus() == JobStatus.INIT
-                || job.getProcessHandle() == -1) {
+            return jobEntity.getDTO();
+        } else if (jobEntity.getStatus() == JobStatus.INIT
+                || jobEntity.getProcessHandle() == -1) {
             // can't kill a job if it is still initializing
             throw new GeniePreconditionException("Unable to kill job as it is still initializing");
         }
 
         // if we get here, job is still running - and can be killed
         // redirect to the right node if killURI points to a different node
-        final String killURI = job.getKillURI();
+        final String killURI = jobEntity.getKillURI();
         if (StringUtils.isBlank(killURI)) {
             throw new GeniePreconditionException("Failed to get killURI for jobID: " + id);
         }
-        final String localURI = getEndPoint() + "/" + this.jobResourcePrefix + "/" + id;
-
-        if (!killURI.equals(localURI)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("forwarding kill request to: " + killURI);
-            }
-            return forwardJobKill(killURI);
-        }
+//        final String localURI = getEndPoint() + "/" + this.jobResourcePrefix + "/" + id;
+//
+//        if (!killURI.equals(localURI)) {
+//            if (LOG.isDebugEnabled()) {
+//                LOG.debug("forwarding kill request to: " + killURI);
+//            }
+//            return forwardJobKill(killURI);
+//        }
 
         // if we get here, killURI == localURI, and job should be killed here
         if (LOG.isDebugEnabled()) {
             LOG.debug("killing job on same instance: " + id);
         }
-        this.jobManagerFactory.getJobManager(job).kill();
+        this.jobManagerFactory.getJobManager(jobEntity.getDTO()).kill();
 
-        job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
-        job.setExitCode(ProcessStatus.JOB_KILLED.getExitCode());
+        jobEntity.setJobStatus(JobStatus.KILLED, "Job killed on user request");
+        jobEntity.setExitCode(ProcessStatus.JOB_KILLED.getExitCode());
 
         // increment counter for killed jobs
         this.stats.incrGenieKilledJobs();
@@ -214,12 +205,12 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("updating job status to KILLED for: " + id);
         }
-        if (!job.isDisableLogArchival()) {
-            job.setArchiveLocation(this.netUtil.getArchiveURI(id));
+        if (!jobEntity.isDisableLogArchival()) {
+            jobEntity.setArchiveLocation(this.netUtil.getArchiveURI(id));
         }
 
         // all good - return results
-        return job;
+        return jobEntity.getDTO();
     }
 
     /**
@@ -235,14 +226,15 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
         final long currentTime = new Date().getTime();
 
         @SuppressWarnings("unchecked")
-        final List<Job> jobs = this.jobRepo.findAll(JobSpecs.findZombies(currentTime, this.zombieTime));
-        for (final Job job : jobs) {
-            job.setStatus(JobStatus.FAILED);
-            job.setFinished(new Date());
-            job.setExitCode(zombie.getExitCode());
-            job.setStatusMsg(zombie.getMessage());
+        final List<JobEntity> jobEntities
+                = this.jobRepo.findAll(JobSpecs.findZombies(currentTime, this.zombieTime));
+        for (final JobEntity jobEntity : jobEntities) {
+            jobEntity.setStatus(JobStatus.FAILED);
+            jobEntity.setFinished(new Date());
+            jobEntity.setExitCode(zombie.getExitCode());
+            jobEntity.setStatusMsg(zombie.getMessage());
         }
-        return jobs.size();
+        return jobEntities.size();
     }
 
     /**
@@ -260,11 +252,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             final String id,
             final int exitCode
     ) throws GenieException {
-        final Job job = this.jobRepo.findOne(id);
-        if (job == null) {
-            throw new GenieNotFoundException("No job with id " + id + " exists");
-        }
-        job.setExitCode(exitCode);
+        final JobEntity jobEntity = this.findJob(id);
+        jobEntity.setExitCode(exitCode);
 
         // We check if status code is killed. The kill thread sets this, but just to make sure we set
         // it here again to prevent a race condition problem. This just makes the status message as
@@ -273,7 +262,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Process has been killed, therefore setting the appropriate status message.");
             }
-            job.setJobStatus(JobStatus.KILLED, "Job killed on user request");
+            jobEntity.setJobStatus(JobStatus.KILLED, "Job killed on user request");
             return JobStatus.KILLED;
         } else {
             if (exitCode != ProcessStatus.SUCCESS.getExitCode()) {
@@ -286,35 +275,35 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
                 } catch (final GenieException ge) {
                     errMsg = "Please look at job's stderr for more details";
                 }
-                job.setJobStatus(JobStatus.FAILED,
+                jobEntity.setJobStatus(JobStatus.FAILED,
                         "Failed to execute job, Error Message: " + errMsg);
                 // incr counter for failed jobs
                 this.stats.incrGenieFailedJobs();
             } else {
                 // success
-                job.setJobStatus(JobStatus.SUCCEEDED,
+                jobEntity.setJobStatus(JobStatus.SUCCEEDED,
                         "Job finished successfully");
                 // incr counter for successful jobs
                 this.stats.incrGenieSuccessfulJobs();
             }
 
             // set the archive location - if needed
-            if (!job.isDisableLogArchival()) {
-                job.setArchiveLocation(this.netUtil.getArchiveURI(job.getId()));
+            if (!jobEntity.isDisableLogArchival()) {
+                jobEntity.setArchiveLocation(this.netUtil.getArchiveURI(jobEntity.getId()));
             }
 
             // set the updated time
-            job.setUpdated(new Date());
-            return job.getStatus();
+            jobEntity.setUpdated(new Date());
+            return jobEntity.getStatus();
         }
     }
 
-    private String getEndPoint() throws GenieException {
-        return "http://" + this.netUtil.getHostName() + ":" + this.serverPort;
-    }
-
-    private Job forwardJobKill(final String killURI) throws GenieException {
-        throw new UnsupportedOperationException("Not yet implemented");
+//    private String getEndPoint() throws GenieException {
+//        return "http://" + this.netUtil.getHostName() + ":" + this.serverPort;
+//    }
+//
+//    private Job forwardJobKill(final String killURI) throws GenieException {
+//        throw new UnsupportedOperationException("Not yet implemented");
 //        try {
 //            final BaseGenieClient client = new BaseGenieClient(null);
 //            final HttpRequest request = BaseGenieClient.buildRequest(Verb.DELETE, killURI, null, null);
@@ -322,10 +311,10 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 //        } catch (final IOException ioe) {
 //            throw new GenieServerException(ioe.getMessage(), ioe);
 //        }
-    }
-
-    private Job forwardJobRequest(final String hostURI, final Job job) throws GenieException {
-        throw new UnsupportedOperationException("Not yet implemented");
+//    }
+//
+//    private Job forwardJobRequest(final String hostURI, final Job job) throws GenieException {
+//        throw new UnsupportedOperationException("Not yet implemented");
 //        try {
 //            final BaseGenieClient client = new BaseGenieClient(null);
 //            final HttpRequest request = BaseGenieClient.buildRequest(Verb.POST, hostURI, null, job);
@@ -333,54 +322,63 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 //        } catch (final IOException ioe) {
 //            throw new GenieServerException(ioe.getMessage(), ioe);
 //        }
-    }
+//    }
+//
+//    /**
+//     * Check if we can run the job on this host or not.
+//     *
+//     * @throws GenieException
+//     */
+//    private synchronized Job checkAbilityToRunOrForward(final Job job) throws GenieException {
+//
+//        final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
+//        LOG.info("Number of running jobs: " + numRunningJobs);
+//
+//        // find an instance with fewer than (numRunningJobs -
+//        // idleHostThresholdDelta)
+//        int idleHostThreshold = numRunningJobs - this.idleHostThresholdDelta;
+//        // if numRunningJobs is already >= maxRunningJobs, forward
+//        // aggressively
+//        // but cap it at the max
+//        if (idleHostThreshold > this.maxIdleHostThreshold || numRunningJobs >= this.maxRunningJobs) {
+//            idleHostThreshold = this.maxIdleHostThreshold;
+//        }
+//
+//        // check to see if job should be forwarded - only forward it
+//        // once. the assumption is that jobForwardThreshold < maxRunningJobs
+//        // (set in properties file)
+//        if (numRunningJobs >= this.jobForwardThreshold && !job.isForwarded()) {
+//            LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
+//            final String idleHost = this.jobCountManager.getIdleInstance(idleHostThreshold);
+//            if (!idleHost.equals(this.netUtil.getHostName())) {
+//                job.setForwarded(true);
+//                this.stats.incrGenieForwardedJobs();
+//                return forwardJobRequest(
+//                        "http://" + idleHost + ":" + this.serverPort + "/" + this.jobResourcePrefix, job
+//                );
+//            } // else, no idle hosts found - run here if capacity exists
+//        }
+//
+//        // TODO: Gotta be something better we can do than this
+//        if (numRunningJobs >= maxRunningJobs) {
+//            // if we get here, job can't be forwarded to an idle
+//            // instance anymore and current node is overloaded
+//            throw new GenieServerUnavailableException(
+//                    "Number of running jobs greater than system limit ("
+//                            + maxRunningJobs
+//                            + ") - try another instance or try again later");
+//        }
+//
+//        //We didn't forward the job so return null to signal to run the job locally
+//        return null;
+//    }
 
-    /**
-     * Check if we can run the job on this host or not.
-     *
-     * @throws GenieException
-     */
-    private synchronized Job checkAbilityToRunOrForward(final Job job) throws GenieException {
-
-        final int numRunningJobs = this.jobCountManager.getNumInstanceJobs();
-        LOG.info("Number of running jobs: " + numRunningJobs);
-
-        // find an instance with fewer than (numRunningJobs -
-        // idleHostThresholdDelta)
-        int idleHostThreshold = numRunningJobs - this.idleHostThresholdDelta;
-        // if numRunningJobs is already >= maxRunningJobs, forward
-        // aggressively
-        // but cap it at the max
-        if (idleHostThreshold > this.maxIdleHostThreshold || numRunningJobs >= this.maxRunningJobs) {
-            idleHostThreshold = this.maxIdleHostThreshold;
+    private JobEntity findJob(final String id) throws GenieNotFoundException {
+        final JobEntity jobEntity = this.jobRepo.findOne(id);
+        if (jobEntity != null) {
+            return jobEntity;
+        } else {
+            throw new GenieNotFoundException("No job with id " + id + " exists.");
         }
-
-        // check to see if job should be forwarded - only forward it
-        // once. the assumption is that jobForwardThreshold < maxRunningJobs
-        // (set in properties file)
-        if (numRunningJobs >= this.jobForwardThreshold && !job.isForwarded()) {
-            LOG.info("Number of running jobs greater than forwarding threshold - trying to auto-forward");
-            final String idleHost = this.jobCountManager.getIdleInstance(idleHostThreshold);
-            if (!idleHost.equals(this.netUtil.getHostName())) {
-                job.setForwarded(true);
-                this.stats.incrGenieForwardedJobs();
-                return forwardJobRequest(
-                        "http://" + idleHost + ":" + this.serverPort + "/" + this.jobResourcePrefix, job
-                );
-            } // else, no idle hosts found - run here if capacity exists
-        }
-
-        // TODO: Gotta be something better we can do than this
-        if (numRunningJobs >= maxRunningJobs) {
-            // if we get here, job can't be forwarded to an idle
-            // instance anymore and current node is overloaded
-            throw new GenieServerUnavailableException(
-                    "Number of running jobs greater than system limit ("
-                            + maxRunningJobs
-                            + ") - try another instance or try again later");
-        }
-
-        //We didn't forward the job so return null to signal to run the job locally
-        return null;
     }
 }

@@ -1,11 +1,3 @@
-ext {
-    metaModelIgnorePattern = "**/com/netflix/genie/common/model/*_.java"
-}
-
-configurations {
-    jpaModelGen
-}
-
 dependencies {
     /*******************************
      * Compile Dependencies
@@ -15,8 +7,7 @@ dependencies {
     compile("org.hibernate:hibernate-validator")
 
     // Spring Libs
-    compile("org.springframework.boot:spring-boot-starter-data-elasticsearch")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework.boot:spring-boot-starter")
 
     // Swagger Libs
     compile("io.swagger:swagger-core:${swagger_version}")
@@ -32,41 +23,4 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
-
-    /*******************************
-     * JPA Model Gen Dependencies
-     *******************************/
-
-    // Hibernate Metamodel Generator Libraries
-    jpaModelGen("org.hibernate:hibernate-jpamodelgen")
-}
-
-task generateJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA Meta Models') {
-    source = sourceSets.main.java
-    outputs.dir generatedSourcesJavaDir
-    destinationDir = generatedSourcesJavaDir
-    dependencyCacheDir = compileJava.dependencyCacheDir
-    classpath = configurations.compile + configurations.jpaModelGen
-    options.compilerArgs = [
-            "-proc:only"
-    ]
-}
-
-compileJava {
-    dependsOn generateJPAMetaModel
-}
-
-//Ignore the generated classes from all our style/coverage/bug finding tools
-tasks.withType(Checkstyle) {
-    exclude metaModelIgnorePattern
-}
-
-tasks.withType(FindBugs) {
-    classes = classes.filter {
-        !it.path.contains('_')
-    }
-}
-
-tasks.withType(Pmd) {
-    exclude metaModelIgnorePattern
 }

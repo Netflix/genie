@@ -17,14 +17,16 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.model.Job_;
 import com.netflix.genie.core.jobmanager.JobManagerFactory;
+import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.jpa.repositories.JobRepository;
 import com.netflix.genie.core.jpa.repositories.JobSpecs;
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
@@ -49,6 +51,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the Job Service APIs.
@@ -101,32 +104,39 @@ public class JobServiceJPAImpl implements JobService {
     public Job createJob(
             @NotNull(message = "No job entered. Unable to create.")
             @Valid
-            final Job job
+            final JobRequest jobRequest
     ) throws GenieException {
-        if (StringUtils.isNotEmpty(job.getId()) && this.jobRepo.exists(job.getId())) {
-            throw new GenieConflictException("A job with id " + job.getId() + " already exists. Unable to save.");
+        final String requestId = jobRequest.getId();
+        if (StringUtils.isNotBlank(requestId) && this.jobRepo.exists(requestId)) {
+            throw new GenieConflictException("A job with id " + requestId + " already exists. Unable to save.");
         }
-        // validate parameters
-        job.setJobStatus(JobStatus.INIT, "Initializing job");
 
-        if (StringUtils.isEmpty(job.getId())) {
-            job.setId(UUID.randomUUID().toString());
-        }
+        final JobEntity jobEntity = new JobEntity(
+                jobRequest.getUser(),
+                jobRequest.getName(),
+                jobRequest.getVersion(),
+                jobRequest.getCommandArgs(),
+                jobRequest.getCommandCriteria(),
+                jobRequest.getClusterCriterias()
+        );
+
+        jobEntity.setId(StringUtils.isBlank(requestId) ? UUID.randomUUID().toString() : requestId);
+        jobEntity.setJobStatus(JobStatus.INIT, "Initializing job");
 
         // Validation successful. init state in DB - return if job already exists
         try {
             // if job can be launched, update the URIs
             final String hostName = this.netUtil.getHostName();
-            job.setHostName(hostName);
+            jobEntity.setHostName(hostName);
             final String endpoint = getEndPoint(hostName);
-            job.setOutputURI(endpoint + "/" + this.jobDirPrefix + "/" + job.getId());
-            job.setKillURI(endpoint + "/" + this.jobResourcePrefix + "/" + job.getId());
-            final Job persistedJob = this.jobRepo.save(job);
+            jobEntity.setOutputURI(endpoint + "/" + this.jobDirPrefix + "/" + jobEntity.getId());
+            jobEntity.setKillURI(endpoint + "/" + this.jobResourcePrefix + "/" + jobEntity.getId());
+            final JobEntity attachedJobEntity = this.jobRepo.save(jobEntity);
 
             // increment number of submitted jobs as we have successfully
             // persisted it in the database.
             this.stats.incrGenieJobSubmissions();
-            return persistedJob;
+            return attachedJobEntity.getDTO();
         } catch (final RuntimeException e) {
             //This will catch runtime as well
             LOG.error("Can't create entity in the database", e);
@@ -147,13 +157,7 @@ public class JobServiceJPAImpl implements JobService {
             LOG.debug("called for id: " + id);
         }
 
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            return job;
-        } else {
-            throw new GenieNotFoundException(
-                    "No job exists for id " + id + ". Unable to retrieve.");
-        }
+        return this.findJob(id).getDTO();
     }
 
     /**
@@ -180,11 +184,11 @@ public class JobServiceJPAImpl implements JobService {
         }
 
         final PageRequest pageRequest = JPAUtils.getPageRequest(
-                page, limit, descending, orderBys, Job_.class, Job_.updated.getName()
+                page, limit, descending, orderBys, JobEntity_.class, JobEntity_.updated.getName()
         );
 
         @SuppressWarnings("unchecked")
-        final List<Job> jobs = this.jobRepo.findAll(
+        final List<JobEntity> jobEntities = this.jobRepo.findAll(
                 JobSpecs.find(
                         id,
                         jobName,
@@ -196,7 +200,7 @@ public class JobServiceJPAImpl implements JobService {
                         commandName,
                         commandId),
                 pageRequest).getContent();
-        return jobs;
+        return jobEntities.stream().map(JobEntity::getDTO).collect(Collectors.toList());
     }
 
     /**
@@ -231,12 +235,7 @@ public class JobServiceJPAImpl implements JobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
         }
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setJobStatus(status, msg);
-        } else {
-            throw new GenieNotFoundException("No job with id " + id + " exists");
-        }
+        this.findJob(id).setJobStatus(status, msg);
     }
 
     /**
@@ -257,16 +256,11 @@ public class JobServiceJPAImpl implements JobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating db for job: " + id);
         }
-        final Job job = this.jobRepo.findOne(id);
-        if (job == null) {
-            throw new GenieNotFoundException(
-                    "No job with id " + id + " exists"
-            );
-        }
+        final JobEntity jobEntity = this.findJob(id);
 
         final long lastUpdatedTimeMS = System.currentTimeMillis();
-        job.setJobStatus(JobStatus.RUNNING, "Job is running");
-        job.setUpdated(new Date(lastUpdatedTimeMS));
+        jobEntity.setJobStatus(JobStatus.RUNNING, "Job is running");
+        jobEntity.setUpdated(new Date(lastUpdatedTimeMS));
         return lastUpdatedTimeMS;
     }
 
@@ -288,12 +282,7 @@ public class JobServiceJPAImpl implements JobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
         }
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setProcessHandle(pid);
-        } else {
-            throw new GenieNotFoundException("No job with id " + id + " exists");
-        }
+        this.findJob(id).setProcessHandle(pid);
     }
 
     /**
@@ -317,14 +306,10 @@ public class JobServiceJPAImpl implements JobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting the command info for job with id " + id);
         }
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            //TODO: Should we check if this is valid
-            job.setCommandId(commandId);
-            job.setCommandName(commandName);
-        } else {
-            throw new GenieNotFoundException("No job with id " + id + " exists");
-        }
+        final JobEntity jobEntity = this.findJob(id);
+        //TODO: Should we check if this is valid
+        jobEntity.setCommandId(commandId);
+        jobEntity.setCommandName(commandName);
     }
 
     /**
@@ -348,13 +333,9 @@ public class JobServiceJPAImpl implements JobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting the application info for job with id " + id);
         }
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setApplicationId(appId);
-            job.setApplicationName(appName);
-        } else {
-            throw new GenieNotFoundException("No job with id " + id + " exists");
-        }
+        final JobEntity jobEntity = this.findJob(id);
+        jobEntity.setApplicationId(appId);
+        jobEntity.setApplicationName(appName);
     }
 
     /**
@@ -378,13 +359,9 @@ public class JobServiceJPAImpl implements JobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting the application info for job with id " + id);
         }
-        final Job job = this.jobRepo.findOne(id);
-        if (job != null) {
-            job.setExecutionClusterId(clusterId);
-            job.setExecutionClusterName(clusterName);
-        } else {
-            throw new GenieNotFoundException("No job with id " + id + " exists");
-        }
+        final JobEntity jobEntity = this.findJob(id);
+        jobEntity.setExecutionClusterId(clusterId);
+        jobEntity.setExecutionClusterName(clusterName);
     }
 
     /**
@@ -403,14 +380,14 @@ public class JobServiceJPAImpl implements JobService {
             // update entity in DB
             // TODO This update runs into deadlock issue, either add manual retries
             // or Spring retries.
-            final Job runningJob = this.jobRepo.findOne(job.getId());
-            runningJob.setUpdated(new Date());
-            return runningJob;
+            final JobEntity runningJobEntity = this.findJob(job.getId());
+            runningJobEntity.setUpdated(new Date());
+            return runningJobEntity.getDTO();
         } catch (final GenieException e) {
             LOG.error("Failed to run job: ", e);
-            final Job failedJob = this.jobRepo.findOne(job.getId());
+            final JobEntity failedJobEntity = this.findJob(job.getId());
             // update db
-            failedJob.setJobStatus(JobStatus.FAILED, e.getMessage());
+            failedJobEntity.setJobStatus(JobStatus.FAILED, e.getMessage());
             // increment counter for failed jobs
             this.stats.incrGenieFailedJobs();
             throw e;
@@ -419,5 +396,14 @@ public class JobServiceJPAImpl implements JobService {
 
     private String getEndPoint(final String hostName) throws GenieException {
         return "http://" + hostName + ":" + this.serverPort;
+    }
+
+    private JobEntity findJob(final String id) throws GenieNotFoundException {
+        final JobEntity jobEntity = this.jobRepo.findOne(id);
+        if (jobEntity != null) {
+            return jobEntity;
+        } else {
+            throw new GenieNotFoundException("No job exists with id: " + id + ". Unable to find.");
+        }
     }
 }

@@ -20,7 +20,7 @@ package com.netflix.genie.web.tasks.impl;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
-import com.netflix.genie.common.model.Job;
+import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.ProcessStatus;
 import com.netflix.genie.core.jpa.repositories.JobRepository;
@@ -76,16 +76,16 @@ public class JobJanitorImplIntegrationTests {
         Assert.assertThat(this.jobRepository.findOne("job2").getStatus(), Matchers.is(JobStatus.INIT));
         Assert.assertThat(this.jobRepository.findOne("job3").getStatus(), Matchers.is(JobStatus.SUCCEEDED));
         this.janitor.markZombies();
-        final Job job1 = this.jobRepository.findOne("job1");
-        Assert.assertThat(job1.getStatus(), Matchers.is(JobStatus.FAILED));
-        Assert.assertThat(job1.getExitCode(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getExitCode()));
-        Assert.assertThat(job1.getStatusMsg(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getMessage()));
-        final Job job2 = this.jobRepository.findOne("job2");
-        Assert.assertThat(job2.getStatus(), Matchers.is(JobStatus.FAILED));
-        Assert.assertThat(job2.getExitCode(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getExitCode()));
-        Assert.assertThat(job2.getStatusMsg(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getMessage()));
-        final Job job3 = this.jobRepository.findOne("job3");
-        Assert.assertThat(job3.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(job3.getExitCode(), Matchers.is(ProcessStatus.SUCCESS.getExitCode()));
+        final JobEntity jobEntity1 = this.jobRepository.findOne("job1");
+        Assert.assertThat(jobEntity1.getStatus(), Matchers.is(JobStatus.FAILED));
+        Assert.assertThat(jobEntity1.getExitCode(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getExitCode()));
+        Assert.assertThat(jobEntity1.getStatusMsg(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getMessage()));
+        final JobEntity jobEntity2 = this.jobRepository.findOne("job2");
+        Assert.assertThat(jobEntity2.getStatus(), Matchers.is(JobStatus.FAILED));
+        Assert.assertThat(jobEntity2.getExitCode(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getExitCode()));
+        Assert.assertThat(jobEntity2.getStatusMsg(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getMessage()));
+        final JobEntity jobEntity3 = this.jobRepository.findOne("job3");
+        Assert.assertThat(jobEntity3.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
+        Assert.assertThat(jobEntity3.getExitCode(), Matchers.is(ProcessStatus.SUCCESS.getExitCode()));
     }
 }

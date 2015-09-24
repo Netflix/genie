@@ -45,7 +45,7 @@ import javax.validation.Validator;
 @ComponentScan("com.netflix.genie")
 @EnableJpaRepositories("com.netflix.genie.core.jpa.repositories")
 @EnableElasticsearchRepositories("com.netflix.genie.core.elasticsearch.repositories")
-@EntityScan("com.netflix.genie.common.model")
+@EntityScan("com.netflix.genie.core.jpa.entities")
 @EnableTransactionManagement
 @EnableRetry
 public class GenieServerTestSpringApplication {

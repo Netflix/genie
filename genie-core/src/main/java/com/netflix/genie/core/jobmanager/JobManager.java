@@ -18,8 +18,8 @@
 package com.netflix.genie.core.jobmanager;
 
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
 
 /**
  * The interface to be implemented by job manager implementations.

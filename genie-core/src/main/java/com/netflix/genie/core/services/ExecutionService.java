@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.core.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
@@ -27,12 +28,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
- * Interface for the Execution Service.<br>
- * Implementations must be thread-safe.
+ * Interface for the execution service used to run, kill and monitor jobs.
  *
- * @author skrishnan
  * @author amsharma
  * @author tgianos
+ * @since 2.0.0
  */
 @Validated
 public interface ExecutionService {
@@ -40,14 +40,14 @@ public interface ExecutionService {
     /**
      * Submit a new job.
      *
-     * @param job the job to submit
-     * @return The job that was submitted
+     * @param jobRequest The job to submit
+     * @return The id of the job that was submitted
      * @throws GenieException if there is an error
      */
-    Job submitJob(
-            @NotNull(message = "No job entered to run")
+    String submitJob(
+            @NotNull(message = "No job request entered to run")
             @Valid
-            final Job job
+            final JobRequest jobRequest
     ) throws GenieException;
 
     /**

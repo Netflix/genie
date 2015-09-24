@@ -17,15 +17,15 @@
  */
 package com.netflix.genie.core.jobmanager.impl;
 
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.Job;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jobmanager.JobManager;
 import com.netflix.genie.core.jobmanager.JobMonitor;
+import com.netflix.genie.core.metrics.GenieNodeStatistics;
 import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.core.services.JobService;
-import com.netflix.genie.core.metrics.GenieNodeStatistics;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

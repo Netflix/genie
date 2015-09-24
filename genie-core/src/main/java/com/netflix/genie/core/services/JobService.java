@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.core.services;
 
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
@@ -29,9 +30,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Helper API's for working with Jobs.
+ * Helper APIs for working with Jobs.
  *
  * @author tgianos
+ * @since 2.0.0
  */
 @Validated
 public interface JobService {
@@ -39,14 +41,14 @@ public interface JobService {
     /**
      * Validate the job and persist it if it passes validation.
      *
-     * @param job The job to validate and maybe save
+     * @param jobRequest The job request
      * @return The validated/saved job object
      * @throws GenieException if there is an error
      */
     Job createJob(
             @NotNull(message = "No job entered. Unable to create.")
             @Valid
-            final Job job
+            final JobRequest jobRequest
     ) throws GenieException;
 
     /**

@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -31,6 +32,7 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
+@ApiModel(description = "A resource for a command in Genie.")
 @JsonDeserialize(builder = Command.Builder.class)
 public class Command extends ConfigDTO {
 
@@ -111,7 +113,7 @@ public class Command extends ConfigDTO {
     }
 
     /**
-     * A builder to help making creating Commands easier.
+     * A builder to create commands.
      *
      * @author tgianos
      * @since 3.0.0

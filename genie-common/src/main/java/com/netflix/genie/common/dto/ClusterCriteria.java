@@ -17,14 +17,14 @@
  */
 package com.netflix.genie.common.dto;
 
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,12 +33,12 @@ import java.util.Set;
  *
  * @author amsharma
  * @author tgianos
+ * @since 2.0.0
  */
 @ApiModel(description = "A set of cluster criteria for a job.")
 public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterCriteria.class);
 
     @ApiModelProperty(
             value = "The tags which are ANDed together to select a viable cluster for the job",
@@ -48,53 +48,26 @@ public class ClusterCriteria implements Serializable {
     private Set<String> tags = new HashSet<>();
 
     /**
-     * Default Constructor.
-     */
-    public ClusterCriteria() {
-    }
-
-    /**
      * Create a cluster criteria object with the included tags.
      *
      * @param tags The tags to add. Not null or empty.
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public ClusterCriteria(final Set<String> tags) throws GeniePreconditionException {
-        this.checkTags(tags);
-        this.tags = tags;
+    @JsonCreator
+    public ClusterCriteria(
+            @JsonProperty("tags")
+            final Set<String> tags
+    )  {
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
     }
 
     /**
      * Get the tags for this cluster criteria.
      *
-     * @return The tags for this criteria as unmodifiable list
+     * @return The tags for this criteria as a read-only set. Any attempt to modify will throw exception.
      */
     public Set<String> getTags() {
-        return this.tags;
-    }
-
-    /**
-     * Set the tags for the cluster criteria.
-     *
-     * @param tags The tags to set. Not null or empty.
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    public void setTags(final Set<String> tags) throws GeniePreconditionException {
-        this.checkTags(tags);
-        this.tags = tags;
-    }
-
-    /**
-     * Helper method for checking the tags.
-     *
-     * @param tagsToCheck The tags to check
-     * @throws GeniePreconditionException If the tags are null or empty.
-     */
-    private void checkTags(final Set<String> tagsToCheck) throws GeniePreconditionException {
-        if (tagsToCheck == null || tagsToCheck.isEmpty()) {
-            final String msg = "No tags passed in to set. Unable to continue.";
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
-        }
+        return Collections.unmodifiableSet(this.tags);
     }
 }

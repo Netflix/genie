@@ -44,6 +44,7 @@ import javax.validation.Validator;
  * Main Genie Spring Configuration class.
  *
  * @author tgianos
+ * @since 3.0.0
  */
 @Configuration
 @ComponentScan("com.netflix.genie")
@@ -54,7 +55,7 @@ import javax.validation.Validator;
 @EnableRetry
 @EnableScheduling
 @EnableTransactionManagement
-@EntityScan("com.netflix.genie.common.model")
+@EntityScan("com.netflix.genie.core.jpa.entities")
 @EnableSwagger2
 public class GenieConfig {
 

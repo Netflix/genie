@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
 import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.core.services.JobSearchService;
 import io.swagger.annotations.Api;
@@ -37,14 +38,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.List;
@@ -63,7 +63,7 @@ import java.util.Set;
 public final class JobController {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobController.class);
-    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
+//    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
     private final ExecutionService executionService;
     private final JobSearchService jobSearchService;
@@ -86,23 +86,19 @@ public final class JobController {
     /**
      * Submit a new job.
      *
-     * @param job                request object containing job info element for new job
-     * @param clientHost         The header value for X-Forwarded-For
-     * @param httpServletRequest The current request
+     * @param jobRequest         The job request information
      * @return The submitted job
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Submit a job",
-            notes = "Submit a new job to run to genie",
-            response = Job.class
+            notes = "Submit a new job to run to genie"
     )
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_ACCEPTED,
-                    message = "Accepted for processing",
-                    response = Job.class
+                    message = "Accepted for processing"
             ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_BAD_REQUEST,
@@ -121,52 +117,51 @@ public final class JobController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public ResponseEntity<Job> submitJob(
+    public ResponseEntity<?> submitJob(
             @ApiParam(
                     value = "Job object to run.",
                     required = true
             )
             @RequestBody
-            final Job job,
-            @RequestHeader(FORWARDED_FOR_HEADER)
-            final String clientHost,
-            final HttpServletRequest httpServletRequest
+            final JobRequest jobRequest    //,
+//            @RequestHeader(FORWARDED_FOR_HEADER)
+//            final String clientHost,
+//            final HttpServletRequest httpServletRequest
     ) throws GenieException {
-        if (job == null) {
-            throw new GenieException(
-                    HttpURLConnection.HTTP_PRECON_FAILED,
-                    "No job entered. Unable to submit.");
+        if (jobRequest == null) {
+            throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Called to submit job: " + job);
+            LOG.debug("Called to submit job: " + jobRequest);
         }
 
-        // get client's host from the context
-        String localClientHost;
-        if (StringUtils.isNotBlank(clientHost)) {
-            localClientHost = clientHost.split(",")[0];
-        } else {
-            localClientHost = httpServletRequest.getRemoteAddr();
-        }
+        //TODO: Re-implement with new API type call that passes info along
+//        // get client's host from the context
+//        String localClientHost;
+//        if (StringUtils.isNotBlank(clientHost)) {
+//            localClientHost = clientHost.split(",")[0];
+//        } else {
+//            localClientHost = httpServletRequest.getRemoteAddr();
+//        }
+//
+//        // set the clientHost, if it is not overridden already
+//        if (StringUtils.isNotBlank(localClientHost)) {
+//            if (LOG.isDebugEnabled()) {
+//                LOG.debug("called from: " + localClientHost);
+//            }
+//            job.setClientHost(localClientHost);
+//        }
 
-        // set the clientHost, if it is not overridden already
-        if (StringUtils.isNotBlank(localClientHost)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("called from: " + localClientHost);
-            }
-            job.setClientHost(localClientHost);
-        }
-
-        final Job createdJob = this.executionService.submitJob(job);
+        final String id = this.executionService.submitJob(jobRequest);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
                         .fromCurrentRequest()
                         .path("/{id}")
-                        .buildAndExpand(createdJob.getId())
+                        .buildAndExpand(id)
                         .toUri()
         );
-        return new ResponseEntity<>(createdJob, httpHeaders, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(null, httpHeaders, HttpStatus.ACCEPTED);
     }
 
     /**
@@ -437,14 +432,13 @@ public final class JobController {
      * Kill job based on given job ID.
      *
      * @param id id for job to kill
-     * @return The job that was killed
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-            value = "Delete a job",
-            notes = "Delete the job with the id specified.",
-            response = Job.class
+            value = "Kill a job",
+            notes = "Kill the job with the id specified."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -460,7 +454,7 @@ public final class JobController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Job killJob(
+    public void killJob(
             @ApiParam(
                     value = "Id of the job.",
                     required = true
@@ -471,6 +465,6 @@ public final class JobController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called for job id: " + id);
         }
-        return this.executionService.killJob(id);
+        this.executionService.killJob(id);
     }
 }

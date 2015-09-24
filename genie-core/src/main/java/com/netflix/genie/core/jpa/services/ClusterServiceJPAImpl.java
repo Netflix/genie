@@ -25,8 +25,10 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.model.Cluster_;
-import com.netflix.genie.common.model.Job;
+import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import com.netflix.genie.core.jpa.entities.ClusterEntity_;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.repositories.ClusterRepository;
 import com.netflix.genie.core.jpa.repositories.ClusterSpecs;
 import com.netflix.genie.core.jpa.repositories.CommandRepository;
@@ -106,7 +108,8 @@ public class ClusterServiceJPAImpl implements ClusterService {
             throw new GenieConflictException("A cluster with id " + cluster.getId() + " already exists");
         }
 
-        final com.netflix.genie.common.model.Cluster clusterEntity = new com.netflix.genie.common.model.Cluster();
+        final ClusterEntity clusterEntity
+                = new ClusterEntity();
         clusterEntity.setId(StringUtils.isBlank(cluster.getId()) ? UUID.randomUUID().toString() : cluster.getId());
         clusterEntity.setName(cluster.getName());
         clusterEntity.setUser(cluster.getUser());
@@ -156,11 +159,11 @@ public class ClusterServiceJPAImpl implements ClusterService {
         }
 
         final PageRequest pageRequest = JPAUtils.getPageRequest(
-                page, limit, descending, orderBys, Cluster_.class, Cluster_.updated.getName()
+                page, limit, descending, orderBys, ClusterEntity_.class, ClusterEntity_.updated.getName()
         );
 
         @SuppressWarnings("unchecked")
-        final List<com.netflix.genie.common.model.Cluster> clusters = this.clusterRepo.findAll(
+        final List<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
                 ClusterSpecs.find(
                         name,
                         statuses,
@@ -168,7 +171,10 @@ public class ClusterServiceJPAImpl implements ClusterService {
                         minUpdateTime,
                         maxUpdateTime),
                 pageRequest).getContent();
-        return clusters.stream().map(com.netflix.genie.common.model.Cluster::getDTO).collect(Collectors.toList());
+        return clusterEntities
+                .stream()
+                .map(ClusterEntity::getDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -183,35 +189,35 @@ public class ClusterServiceJPAImpl implements ClusterService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called");
         }
-        final Job job = this.jobRepo.findOne(jobId);
-        if (job == null) {
+        final JobEntity jobEntity = this.jobRepo.findOne(jobId);
+        if (jobEntity == null) {
             throw new GenieNotFoundException("No job with id " + jobId + " exists. Unable to continue."
             );
         }
 
-        final List<ClusterCriteria> clusterCriterias = job.getClusterCriterias();
-        final Set<String> commandCriteria = job.getCommandCriteria();
+        final List<ClusterCriteria> clusterCriterias = jobEntity.getClusterCriterias();
+        final Set<String> commandCriteria = jobEntity.getCommandCriteria();
 
         for (final ClusterCriteria clusterCriteria : clusterCriterias) {
             @SuppressWarnings("unchecked")
-            final List<com.netflix.genie.common.model.Cluster> clusters = this.clusterRepo.findAll(
+            final List<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
                     ClusterSpecs.findByClusterAndCommandCriteria(
                             clusterCriteria,
                             commandCriteria
                     )
             );
 
-            if (!clusters.isEmpty()) {
+            if (!clusterEntities.isEmpty()) {
                 // Add the successfully criteria to the job object in string form.
-                job.setChosenClusterCriteriaString(
+                jobEntity.setChosenClusterCriteriaString(
                         StringUtils.join(
                                 clusterCriteria.getTags(),
                                 CRITERIA_DELIMITER
                         )
                 );
-                return clusters
+                return clusterEntities
                         .stream()
-                        .map(com.netflix.genie.common.model.Cluster::getDTO)
+                        .map(ClusterEntity::getDTO)
                         .collect(Collectors.toList());
             }
         }
@@ -242,17 +248,17 @@ public class ClusterServiceJPAImpl implements ClusterService {
         }
 
         //TODO: Move update of common fields to super classes
-        final com.netflix.genie.common.model.Cluster savedCluster = this.clusterRepo.findOne(id);
-        savedCluster.setName(updateCluster.getName());
-        savedCluster.setUser(updateCluster.getUser());
-        savedCluster.setVersion(updateCluster.getVersion());
-        savedCluster.setDescription(updateCluster.getDescription());
-        savedCluster.setClusterType(updateCluster.getClusterType());
-        savedCluster.setStatus(updateCluster.getStatus());
-        savedCluster.setConfigs(updateCluster.getConfigs());
-        savedCluster.setTags(updateCluster.getTags());
+        final ClusterEntity clusterEntity = this.clusterRepo.findOne(id);
+        clusterEntity.setName(updateCluster.getName());
+        clusterEntity.setUser(updateCluster.getUser());
+        clusterEntity.setVersion(updateCluster.getVersion());
+        clusterEntity.setDescription(updateCluster.getDescription());
+        clusterEntity.setClusterType(updateCluster.getClusterType());
+        clusterEntity.setStatus(updateCluster.getStatus());
+        clusterEntity.setConfigs(updateCluster.getConfigs());
+        clusterEntity.setTags(updateCluster.getTags());
 
-        this.clusterRepo.save(savedCluster);
+        this.clusterRepo.save(clusterEntity);
     }
 
     /**
@@ -263,9 +269,8 @@ public class ClusterServiceJPAImpl implements ClusterService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to delete all clusters");
         }
-        final List<com.netflix.genie.common.model.Cluster> clusters = this.clusterRepo.findAll();
-        for (final com.netflix.genie.common.model.Cluster cluster : clusters) {
-            this.deleteCluster(cluster.getId());
+        for (final ClusterEntity clusterEntity : this.clusterRepo.findAll()) {
+            this.deleteCluster(clusterEntity.getId());
         }
     }
 
@@ -280,18 +285,18 @@ public class ClusterServiceJPAImpl implements ClusterService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called");
         }
-        final com.netflix.genie.common.model.Cluster cluster = this.findCluster(id);
-        final List<com.netflix.genie.common.model.Command> commands = cluster.getCommands();
-        if (commands != null) {
-            for (final com.netflix.genie.common.model.Command command : commands) {
-                final Set<com.netflix.genie.common.model.Cluster> clusters = command.getClusters();
-                if (clusters != null) {
-                    clusters.remove(cluster);
+        final ClusterEntity clusterEntity = this.findCluster(id);
+        final List<CommandEntity> commandEntities = clusterEntity.getCommands();
+        if (commandEntities != null) {
+            for (final CommandEntity commandEntity : commandEntities) {
+                final Set<ClusterEntity> clusterEntities = commandEntity.getClusters();
+                if (clusterEntities != null) {
+                    clusterEntities.remove(clusterEntity);
                 }
-                this.commandRepo.save(command);
+                this.commandRepo.save(commandEntity);
             }
         }
-        this.clusterRepo.delete(cluster);
+        this.clusterRepo.delete(clusterEntity);
     }
 
     /**
@@ -424,11 +429,11 @@ public class ClusterServiceJPAImpl implements ClusterService {
             @NotEmpty(message = "No command ids entered. Unable to add commands.")
             final List<String> commandIds
     ) throws GenieException {
-        final com.netflix.genie.common.model.Cluster cluster = this.findCluster(id);
+        final ClusterEntity clusterEntity = this.findCluster(id);
         for (final String commandId : commandIds) {
-            final com.netflix.genie.common.model.Command cmd = this.commandRepo.findOne(commandId);
+            final CommandEntity cmd = this.commandRepo.findOne(commandId);
             if (cmd != null) {
-                cluster.addCommand(cmd);
+                clusterEntity.addCommand(cmd);
             } else {
                 throw new GenieNotFoundException("No command with id " + commandId + " exists.");
             }
@@ -445,15 +450,15 @@ public class ClusterServiceJPAImpl implements ClusterService {
             final String id,
             final Set<CommandStatus> statuses
     ) throws GenieException {
-        final com.netflix.genie.common.model.Cluster cluster = this.findCluster(id);
-        final List<com.netflix.genie.common.model.Command> commands = cluster.getCommands();
+        final ClusterEntity clusterEntity = this.findCluster(id);
+        final List<CommandEntity> commandEntities = clusterEntity.getCommands();
         if (statuses != null) {
-            return commands.stream()
+            return commandEntities.stream()
                     .filter(command -> statuses.contains(command.getStatus()))
-                    .map(com.netflix.genie.common.model.Command::getDTO)
+                    .map(CommandEntity::getDTO)
                     .collect(Collectors.toList());
         } else {
-            return commands.stream().map(com.netflix.genie.common.model.Command::getDTO).collect(Collectors.toList());
+            return commandEntities.stream().map(CommandEntity::getDTO).collect(Collectors.toList());
         }
     }
 
@@ -467,17 +472,17 @@ public class ClusterServiceJPAImpl implements ClusterService {
             @NotNull(message = "No command ids entered. Unable to update commands.")
             final List<String> commandIds
     ) throws GenieException {
-        final com.netflix.genie.common.model.Cluster cluster = this.findCluster(id);
-        final List<com.netflix.genie.common.model.Command> cmds = new ArrayList<>();
+        final ClusterEntity clusterEntity = this.findCluster(id);
+        final List<CommandEntity> commandEntities = new ArrayList<>();
         for (final String commandId : commandIds) {
-            final com.netflix.genie.common.model.Command cmd = this.commandRepo.findOne(commandId);
+            final CommandEntity cmd = this.commandRepo.findOne(commandId);
             if (cmd != null) {
-                cmds.add(cmd);
+                commandEntities.add(cmd);
             } else {
                 throw new GenieNotFoundException("No command with id " + commandId + " exists.");
             }
         }
-        cluster.setCommands(cmds);
+        clusterEntity.setCommands(commandEntities);
     }
 
     /**
@@ -488,11 +493,11 @@ public class ClusterServiceJPAImpl implements ClusterService {
             @NotBlank(message = "No cluster id entered. Unable to remove commands.")
             final String id
     ) throws GenieException {
-        final com.netflix.genie.common.model.Cluster cluster = this.findCluster(id);
-        final List<com.netflix.genie.common.model.Command> cmdList = new ArrayList<>();
-        cmdList.addAll(cluster.getCommands());
-        for (final com.netflix.genie.common.model.Command cmd : cmdList) {
-            cluster.removeCommand(cmd);
+        final ClusterEntity clusterEntity = this.findCluster(id);
+        final List<CommandEntity> commandEntities = new ArrayList<>();
+        commandEntities.addAll(clusterEntity.getCommands());
+        for (final CommandEntity commandEntity : commandEntities) {
+            clusterEntity.removeCommand(commandEntity);
         }
     }
 
@@ -506,26 +511,26 @@ public class ClusterServiceJPAImpl implements ClusterService {
             @NotBlank(message = "No command id entered. Unable to remove command.")
             final String cmdId
     ) throws GenieException {
-        final com.netflix.genie.common.model.Cluster cluster = this.findCluster(id);
-        final com.netflix.genie.common.model.Command cmd = this.commandRepo.findOne(cmdId);
-        if (cmd != null) {
-            cluster.removeCommand(cmd);
+        final ClusterEntity clusterEntity = this.findCluster(id);
+        final CommandEntity commandEntity = this.commandRepo.findOne(cmdId);
+        if (commandEntity != null) {
+            clusterEntity.removeCommand(commandEntity);
         } else {
             throw new GenieNotFoundException("No command with id " + cmdId + " exists.");
         }
     }
 
     /**
-     * Helper method to find a cluster to save code.
+     * Helper method to find a cluster entity to save code.
      *
      * @param id The id of the cluster to find
      * @return The cluster entity if one exists
      * @throws GenieNotFoundException If the cluster doesn't exist
      */
-    private com.netflix.genie.common.model.Cluster findCluster(final String id) throws GenieNotFoundException {
-        final com.netflix.genie.common.model.Cluster cluster = this.clusterRepo.findOne(id);
-        if (cluster != null) {
-            return cluster;
+    private ClusterEntity findCluster(final String id) throws GenieNotFoundException {
+        final ClusterEntity clusterEntity = this.clusterRepo.findOne(id);
+        if (clusterEntity != null) {
+            return clusterEntity;
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }

@@ -15,11 +15,11 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.common.model.Application;
-import com.netflix.genie.common.model.Application_;
-import com.netflix.genie.common.model.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity_;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -56,28 +56,28 @@ public final class CommandSpecs {
      * @param tags     The set of tags to search the command for
      * @return A specification object used for querying
      */
-    public static Specification<Command> find(
+    public static Specification<CommandEntity> find(
             final String name, final String userName, final Set<CommandStatus> statuses, final Set<String> tags) {
-        return (final Root<Command> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+        return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
-                predicates.add(cb.equal(root.get(Command_.name), name));
+                predicates.add(cb.equal(root.get(CommandEntity_.name), name));
             }
             if (StringUtils.isNotBlank(userName)) {
-                predicates.add(cb.equal(root.get(Command_.user), userName));
+                predicates.add(cb.equal(root.get(CommandEntity_.user), userName));
             }
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =
                         statuses
                                 .stream()
-                                .map(status -> cb.equal(root.get(Command_.status), status))
+                                .map(status -> cb.equal(root.get(CommandEntity_.status), status))
                                 .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null) {
                 tags.stream()
                         .filter(StringUtils::isNotBlank)
-                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(Command_.tags))));
+                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(CommandEntity_.tags))));
             }
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
@@ -90,21 +90,21 @@ public final class CommandSpecs {
      * @param statuses      The status of the commands
      * @return The specification
      */
-    public static Specification<Command> findCommandsForApplication(
+    public static Specification<CommandEntity> findCommandsForApplication(
             final String applicationId,
             final Set<CommandStatus> statuses
     ) {
-        return (final Root<Command> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+        return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            final Join<Command, Application> application = root.join(Command_.applications);
+            final Join<CommandEntity, ApplicationEntity> application = root.join(CommandEntity_.applications);
 
-            predicates.add(cb.equal(application.get(Application_.id), applicationId));
+            predicates.add(cb.equal(application.get(ApplicationEntity_.id), applicationId));
 
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =
                         statuses
                                 .stream()
-                                .map(status -> cb.equal(root.get(Command_.status), status))
+                                .map(status -> cb.equal(root.get(CommandEntity_.status), status))
                                 .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }

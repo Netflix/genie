@@ -24,7 +24,8 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.model.Job;
+import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.repositories.JobRepository;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import org.junit.Assert;
@@ -78,7 +79,7 @@ public class ClusterServiceJPAImplIntegrationTests extends DBUnitTestBase {
     private CommandService commandService;
 
     @Autowired
-    private com.netflix.genie.core.services.JobService jobService;
+    private JobRepository jobRepository;
 
     /**
      * Test the get cluster method.
@@ -302,8 +303,8 @@ public class ClusterServiceJPAImplIntegrationTests extends DBUnitTestBase {
         final List<Cluster> clusters = this.service.chooseClusterForJob(JOB_1_ID);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
-        final Job job = this.jobService.getJob(JOB_1_ID);
-        final String chosen = job.getChosenClusterCriteriaString();
+        final JobEntity jobEntity = this.jobRepository.findOne(JOB_1_ID);
+        final String chosen = jobEntity.getChosenClusterCriteriaString();
         Assert.assertEquals(8, chosen.length());
         Assert.assertTrue(chosen.contains("prod"));
         Assert.assertTrue(chosen.contains("pig"));

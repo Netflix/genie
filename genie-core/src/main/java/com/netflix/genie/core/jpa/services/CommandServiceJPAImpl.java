@@ -27,7 +27,10 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.model.Command_;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity_;
 import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.ClusterRepository;
 import com.netflix.genie.core.jpa.repositories.ClusterSpecs;
@@ -106,7 +109,8 @@ public class CommandServiceJPAImpl implements CommandService {
             throw new GenieConflictException("A command with id " + command.getId() + " already exists");
         }
 
-        final com.netflix.genie.common.model.Command commandEntity = new com.netflix.genie.common.model.Command();
+        final CommandEntity commandEntity
+                = new CommandEntity();
         commandEntity.setId(StringUtils.isBlank(command.getId()) ? UUID.randomUUID().toString() : command.getId());
         commandEntity.setName(command.getName());
         commandEntity.setUser(command.getUser());
@@ -156,11 +160,11 @@ public class CommandServiceJPAImpl implements CommandService {
         }
 
         final PageRequest pageRequest = JPAUtils.getPageRequest(
-                page, limit, descending, orderBys, Command_.class, Command_.updated.getName()
+                page, limit, descending, orderBys, CommandEntity_.class, CommandEntity_.updated.getName()
         );
 
         @SuppressWarnings("unchecked")
-        final List<com.netflix.genie.common.model.Command> commands = this.commandRepo.findAll(
+        final List<CommandEntity> commandEntities = this.commandRepo.findAll(
                 CommandSpecs.find(
                         name,
                         userName,
@@ -169,7 +173,10 @@ public class CommandServiceJPAImpl implements CommandService {
                 ),
                 pageRequest).getContent();
 
-        return commands.stream().map(com.netflix.genie.common.model.Command::getDTO).collect(Collectors.toList());
+        return commandEntities
+                .stream()
+                .map(CommandEntity::getDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -194,18 +201,18 @@ public class CommandServiceJPAImpl implements CommandService {
             LOG.debug("Called to update command with id " + id + " " + updateCommand.toString());
         }
 
-        final com.netflix.genie.common.model.Command savedCommand = this.findCommand(id);
-        savedCommand.setName(updateCommand.getName());
-        savedCommand.setUser(updateCommand.getUser());
-        savedCommand.setVersion(updateCommand.getVersion());
-        savedCommand.setStatus(updateCommand.getStatus());
-        savedCommand.setDescription(updateCommand.getDescription());
-        savedCommand.setExecutable(updateCommand.getExecutable());
-        savedCommand.setSetupFile(updateCommand.getSetupFile());
-        savedCommand.setJobType(updateCommand.getJobType());
-        savedCommand.setConfigs(updateCommand.getConfigs());
-        savedCommand.setTags(updateCommand.getTags());
-        this.commandRepo.save(savedCommand);
+        final CommandEntity commandEntity = this.findCommand(id);
+        commandEntity.setName(updateCommand.getName());
+        commandEntity.setUser(updateCommand.getUser());
+        commandEntity.setVersion(updateCommand.getVersion());
+        commandEntity.setStatus(updateCommand.getStatus());
+        commandEntity.setDescription(updateCommand.getDescription());
+        commandEntity.setExecutable(updateCommand.getExecutable());
+        commandEntity.setSetupFile(updateCommand.getSetupFile());
+        commandEntity.setJobType(updateCommand.getJobType());
+        commandEntity.setConfigs(updateCommand.getConfigs());
+        commandEntity.setTags(updateCommand.getTags());
+        this.commandRepo.save(commandEntity);
     }
 
     /**
@@ -216,8 +223,8 @@ public class CommandServiceJPAImpl implements CommandService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to delete all commands");
         }
-        for (final com.netflix.genie.common.model.Command command : this.commandRepo.findAll()) {
-            this.deleteCommand(command.getId());
+        for (final CommandEntity commandEntity : this.commandRepo.findAll()) {
+            this.deleteCommand(commandEntity.getId());
         }
     }
 
@@ -232,30 +239,31 @@ public class CommandServiceJPAImpl implements CommandService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to delete command config with id " + id);
         }
-        final com.netflix.genie.common.model.Command command = this.findCommand(id);
+        final CommandEntity commandEntity = this.findCommand(id);
 
         //Remove the command from the associated Application references
-        final Set<com.netflix.genie.common.model.Application> apps = command.getApplications();
-        if (apps != null) {
-            apps.stream()
+        final Set<ApplicationEntity> applicationEntities
+                = commandEntity.getApplications();
+        if (applicationEntities != null) {
+            applicationEntities.stream()
                     .filter(application -> application.getCommands() != null)
                     .forEach(
                             application -> {
-                                application.getCommands().remove(command);
+                                application.getCommands().remove(commandEntity);
                                 this.appRepo.save(application);
                             }
                     );
         }
         //Remove the command from the associated cluster references
-        final Set<com.netflix.genie.common.model.Cluster> clusters = command.getClusters();
-        for (final com.netflix.genie.common.model.Cluster cluster : clusters) {
-            final List<com.netflix.genie.common.model.Command> commands = cluster.getCommands();
-            if (commands != null) {
-                commands.remove(command);
+        final Set<ClusterEntity> clusterEntities = commandEntity.getClusters();
+        for (final ClusterEntity clusterEntity : clusterEntities) {
+            final List<CommandEntity> commandEntities = clusterEntity.getCommands();
+            if (commandEntities != null) {
+                commandEntities.remove(commandEntity);
             }
-            this.clusterRepo.save(cluster);
+            this.clusterRepo.save(clusterEntity);
         }
-        this.commandRepo.delete(command);
+        this.commandRepo.delete(commandEntity);
     }
 
     /**
@@ -396,9 +404,9 @@ public class CommandServiceJPAImpl implements CommandService {
             throw new GeniePreconditionException("All applications need to exist to add to a command");
         }
 
-        final com.netflix.genie.common.model.Command command = this.findCommand(id);
+        final CommandEntity commandEntity = this.findCommand(id);
         applicationIds.stream().forEach(
-                applicationId -> command.getApplications().add(this.appRepo.findOne(applicationId))
+                applicationId -> commandEntity.getApplications().add(this.appRepo.findOne(applicationId))
         );
     }
 
@@ -416,11 +424,11 @@ public class CommandServiceJPAImpl implements CommandService {
             throw new GeniePreconditionException("All applications need to exist to add to a command");
         }
 
-        final com.netflix.genie.common.model.Command command = this.findCommand(id);
-        command.getApplications().clear();
+        final CommandEntity commandEntity = this.findCommand(id);
+        commandEntity.getApplications().clear();
         applicationIds
                 .stream()
-                .forEach(applicationId -> command.getApplications().add(this.appRepo.findOne(applicationId)));
+                .forEach(applicationId -> commandEntity.getApplications().add(this.appRepo.findOne(applicationId)));
     }
 
     /**
@@ -432,11 +440,11 @@ public class CommandServiceJPAImpl implements CommandService {
             @NotBlank(message = "No command id entered. Unable to get applications.")
             final String id
     ) throws GenieException {
-        final com.netflix.genie.common.model.Command command = this.findCommand(id);
-        return command
+        final CommandEntity commandEntity = this.findCommand(id);
+        return commandEntity
                 .getApplications()
                 .stream()
-                .map(com.netflix.genie.common.model.Application::getDTO)
+                .map(ApplicationEntity::getDTO)
                 .collect(Collectors.toSet());
     }
 
@@ -461,10 +469,10 @@ public class CommandServiceJPAImpl implements CommandService {
             @NotBlank(message = "No application id entered. Unable to remove application.")
             final String appId
     ) throws GenieException {
-        final com.netflix.genie.common.model.Command command = this.findCommand(id);
-        final com.netflix.genie.common.model.Application application = this.appRepo.findOne(appId);
-        if (application != null) {
-            command.getApplications().remove(application);
+        final CommandEntity commandEntity = this.findCommand(id);
+        final ApplicationEntity applicationEntity = this.appRepo.findOne(appId);
+        if (applicationEntity != null) {
+            commandEntity.getApplications().remove(applicationEntity);
         } else {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
@@ -484,27 +492,30 @@ public class CommandServiceJPAImpl implements CommandService {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
         @SuppressWarnings("unchecked")
-        final List<com.netflix.genie.common.model.Cluster> clusters = this.clusterRepo.findAll(
+        final List<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
                 ClusterSpecs.findClustersForCommand(
                         id,
                         statuses
                 )
         );
 
-        return clusters.stream().map(com.netflix.genie.common.model.Cluster::getDTO).collect(Collectors.toSet());
+        return clusterEntities
+                .stream()
+                .map(ClusterEntity::getDTO)
+                .collect(Collectors.toSet());
     }
 
     /**
-     * Helper method to find a command.
+     * Helper method to find a command entity.
      *
      * @param id The id of the command to find
-     * @return The command if one is found
+     * @return The command entity if one is found
      * @throws GenieNotFoundException When the command doesn't exist
      */
-    private com.netflix.genie.common.model.Command findCommand(final String id) throws GenieNotFoundException {
-        final com.netflix.genie.common.model.Command command = this.commandRepo.findOne(id);
-        if (command != null) {
-            return command;
+    private CommandEntity findCommand(final String id) throws GenieNotFoundException {
+        final CommandEntity commandEntity = this.commandRepo.findOne(id);
+        if (commandEntity != null) {
+            return commandEntity;
         } else {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }

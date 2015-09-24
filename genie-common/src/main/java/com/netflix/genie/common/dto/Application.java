@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
@@ -32,6 +33,7 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
+@ApiModel(description = "A resource for an application in Genie.")
 @JsonDeserialize(builder = Application.Builder.class)
 public class Application extends ConfigDTO {
 
@@ -90,7 +92,7 @@ public class Application extends ConfigDTO {
     }
 
     /**
-     * A builder to help create Applications easier.
+     * A builder to create applications.
      *
      * @author tgianos
      * @since 3.0.0

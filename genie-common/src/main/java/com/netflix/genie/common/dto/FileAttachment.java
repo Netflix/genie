@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.common.dto;
 
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -32,31 +31,35 @@ import java.util.Arrays;
  *
  * @author skrishnan
  * @author tgianos
+ * @since 1.0.0
  */
+//TODO: There's gotta be a better way to deal with memory for this. Remove serializable once not used in Entities
 @ApiModel(description = "An attachment for use with a job.")
 public class FileAttachment implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Name of the file.
-     */
-    @ApiModelProperty(
-            value = "The name of the file",
-            required = true
-    )
+    @ApiModelProperty(value = "The name of the file", required = true)
     @NotBlank(message = "No name entered for the attachment and is required.")
     private String name;
 
-    /**
-     * The data for the attachment.
-     */
-    @ApiModelProperty(
-            value = "The bytes of the attachment",
-            required = true
-    )
+    @ApiModelProperty(value = "The date for the attachment as bytes", required = true)
     @NotEmpty(message = "No data entered for the attachment and is required")
     private byte[] data;
+
+    /**
+     * Create a new attachment.
+     *
+     * @param name The name of the attachment file.
+     * @param data The data of the attachment as a byte array
+     */
+    @JsonCreator
+    public FileAttachment(final String name, final byte[] data) {
+        this.name = name;
+        if (data != null) {
+            this.data = Arrays.copyOf(data, data.length);
+        }
+    }
 
     /**
      * Get the name of the file for this attachment.
@@ -65,19 +68,6 @@ public class FileAttachment implements Serializable {
      */
     public String getName() {
         return this.name;
-    }
-
-    /**
-     * Set the name of the file for this attachment.
-     *
-     * @param name name of the file for this attachment. Not null/empty/blank.
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    public void setName(final String name) throws GeniePreconditionException {
-        if (StringUtils.isBlank(name)) {
-            throw new GeniePreconditionException("No name entered for attachment. Unable to continue.");
-        }
-        this.name = name;
     }
 
     /**
@@ -91,18 +81,5 @@ public class FileAttachment implements Serializable {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Set the data for the attachment.
-     *
-     * @param data the data for the attachment. Not null or empty.
-     * @throws GeniePreconditionException If preconditions aren't met.
-     */
-    public void setData(final byte[] data) throws GeniePreconditionException {
-        if (data == null || data.length == 0) {
-            throw new GeniePreconditionException("No data entered for attachment. Unable to continue.");
-        }
-        this.data = Arrays.copyOf(data, data.length);
     }
 }

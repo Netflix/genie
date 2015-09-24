@@ -22,7 +22,7 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.genie.client.ExecutionServiceClient;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.FileAttachment;
-import com.netflix.genie.common.model.Job;
+import Job;
 import com.netflix.genie.common.dto.JobStatus;
 
 import org.slf4j.Logger;
