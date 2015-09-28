@@ -18,6 +18,7 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
@@ -54,7 +55,7 @@ public class FileAttachment implements Serializable {
      * @param data The data of the attachment as a byte array
      */
     @JsonCreator
-    public FileAttachment(final String name, final byte[] data) {
+    public FileAttachment(@JsonProperty("name") final String name, @JsonProperty("data") final byte[] data) {
         this.name = name;
         if (data != null) {
             this.data = Arrays.copyOf(data, data.length);

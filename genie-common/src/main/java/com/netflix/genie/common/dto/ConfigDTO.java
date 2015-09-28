@@ -20,7 +20,6 @@ package com.netflix.genie.common.dto;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,37 +45,6 @@ public abstract class ConfigDTO extends BaseDTO {
         super(builder);
         if (builder.bConfigs != null) {
             this.configs.addAll(builder.bConfigs);
-        }
-    }
-
-    /**
-     * Construct a new Config DTO.
-     *
-     * @param id          The id for the config resource
-     * @param created     The creation time for the config resource
-     * @param updated     The update time for the config resource
-     * @param name        The name for the config resource
-     * @param user        The user who created the config resource
-     * @param version     The version of the config resource
-     * @param description The description of the config resource
-     * @param tags        The tags of the config resource
-     * @param configs     The config files for the config resource
-     */
-    protected ConfigDTO(
-            final String id,
-            final Date created,
-            final Date updated,
-            final String name,
-            final String user,
-            final String version,
-            final String description,
-            final Set<String> tags,
-            final Set<String> configs
-    ) {
-        super(id, created, updated, name, user, version, description, tags);
-
-        if (configs != null) {
-            this.configs.addAll(configs);
         }
     }
 
