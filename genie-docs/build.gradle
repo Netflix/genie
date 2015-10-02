@@ -1,7 +1,8 @@
 apply plugin: 'org.asciidoctor.convert'
 
 ext {
-    generatedDocumentation = file("src/docs/asciidoc/generated")
+    generatedDocumentation = file('src/docs/asciidoc/generated')
+    snippetsDir = file('build/generated-snippets')
 }
 
 dependencies {
@@ -22,6 +23,8 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-web"))
+    testCompile("com.jayway.jsonpath:json-path")
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:1.0.0.RC1")
     testCompile("io.springfox:springfox-staticdocs:${springfox_version}")
 }
 
@@ -31,6 +34,7 @@ clean {
 
 test {
     outputs.dir generatedDocumentation
+    outputs.dir snippetsDir
 }
 
 asciidoctor {

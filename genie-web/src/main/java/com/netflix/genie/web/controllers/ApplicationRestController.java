@@ -19,19 +19,29 @@ package com.netflix.genie.web.controllers;
 
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.ApplicationService;
+import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
+import com.netflix.genie.web.hateoas.resources.ApplicationResource;
+import com.netflix.genie.web.hateoas.resources.CommandResource;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ResponseHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,8 +57,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.HttpURLConnection;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * REST end-point for supporting Applications.
@@ -57,22 +67,32 @@ import java.util.Set;
  * @since 3.0.0
  */
 @RestController
-@RequestMapping(value = "/api/v3/applications", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v3/applications")
 @Api(value = "applications", tags = "applications", description = "Manage the available applications")
-public final class ApplicationController {
+public class ApplicationRestController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationRestController.class);
 
     private final ApplicationService applicationService;
+    private final ApplicationResourceAssembler applicationResourceAssembler;
+    private final CommandResourceAssembler commandResourceAssembler;
 
     /**
      * Constructor.
      *
-     * @param applicationService The application configuration service to use.
+     * @param applicationService           The application configuration service to use.
+     * @param applicationResourceAssembler The assembler used to create Application resources.
+     * @param commandResourceAssembler     The assembler used to create Command resources.
      */
     @Autowired
-    public ApplicationController(final ApplicationService applicationService) {
+    public ApplicationRestController(
+            final ApplicationService applicationService,
+            final ApplicationResourceAssembler applicationResourceAssembler,
+            final CommandResourceAssembler commandResourceAssembler
+    ) {
         this.applicationService = applicationService;
+        this.applicationResourceAssembler = applicationResourceAssembler;
+        this.commandResourceAssembler = commandResourceAssembler;
     }
 
     /**
@@ -82,8 +102,8 @@ public final class ApplicationController {
      * @return The created application configuration
      * @throws GenieException For any error
      */
-    @ResponseStatus
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
             value = "Create an application",
             notes = "Create an application from the supplied information."
@@ -91,7 +111,8 @@ public final class ApplicationController {
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CREATED,
-                    message = "Application created successfully."
+                    message = "Application created successfully.",
+                    responseHeaders = {@ResponseHeader(name = HttpHeaders.LOCATION, response = String.class)}
             ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CONFLICT,
@@ -106,7 +127,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public ResponseEntity<?> createApplication(
+    public ResponseEntity<Void> createApplication(
             @ApiParam(value = "The application to create.", required = true)
             @RequestBody
             final Application app
@@ -123,7 +144,7 @@ public final class ApplicationController {
                         .buildAndExpand(id)
                         .toUri()
         );
-        return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
     /**
@@ -133,18 +154,14 @@ public final class ApplicationController {
      * @return The application configuration
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Find an application by id",
             notes = "Get the application by id if it exists",
-            response = Application.class
+            response = ApplicationResource.class
     )
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_OK,
-                    message = "OK",
-                    response = Application.class
-            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -158,7 +175,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Application getApplication(
+    public ApplicationResource getApplication(
             @ApiParam(
                     value = "Id of the application to get.",
                     required = true
@@ -169,28 +186,27 @@ public final class ApplicationController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to get Application for id " + id);
         }
-        return this.applicationService.getApplication(id);
+        return this.applicationResourceAssembler.toResource(this.applicationService.getApplication(id));
     }
 
     /**
      * Get Applications based on user parameters.
      *
-     * @param name       name for configuration (optional)
-     * @param userName   The user who created the application (optional)
-     * @param statuses   The statuses of the applications (optional)
-     * @param tags       The set of tags you want the command for.
-     * @param page       The page to start one (optional)
-     * @param limit      the max number of results to return per page (optional)
-     * @param descending Whether results returned in descending or ascending order (optional)
-     * @param orderBys   The fields to order the results by (optional)
+     * @param name      name for configuration (optional)
+     * @param userName  The user who created the application (optional)
+     * @param statuses  The statuses of the applications (optional)
+     * @param tags      The set of tags you want the command for.
+     * @param page      The page to get
+     * @param assembler The paged resources assembler to use
      * @return All applications matching the criteria
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Find applications",
             notes = "Find applications by the submitted criteria.",
-            response = Application.class,
+            response = PagedResources.class,
             responseContainer = "List"
     )
     @ApiResponses(value = {
@@ -203,7 +219,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Application> getApplications(
+    public PagedResources<ApplicationResource> getApplications(
             @ApiParam(
                     value = "Name of the application."
             )
@@ -225,30 +241,13 @@ public final class ApplicationController {
             )
             @RequestParam(value = "tag", required = false)
             final Set<String> tags,
-            @ApiParam(
-                    value = "The page to start on."
-            )
-            @RequestParam(value = "page", defaultValue = "0")
-            final int page,
-            @ApiParam(
-                    value = "Max number of results per page."
-            )
-            @RequestParam(value = "limit", defaultValue = "1024")
-            final int limit,
-            @ApiParam(
-                    value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
-            )
-            @RequestParam(value = "descending", defaultValue = "true")
-            final boolean descending,
-            @ApiParam(
-                    value = "The fields to order the results by. Must not be collection fields. Default is updated."
-            )
-            @RequestParam(value = "orderBy", required = false)
-            final Set<String> orderBys
+            @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
+            final Pageable page,
+            final PagedResourcesAssembler<Application> assembler
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug(
-                    "Called [name | userName | status | tags | page | limit | descending | orderBys]"
+                    "Called [name | userName | status | tags | pageable]"
             );
             LOG.debug(
                     name
@@ -260,14 +259,9 @@ public final class ApplicationController {
                             + tags
                             + " | "
                             + page
-                            + " | "
-                            + limit
-                            + " | "
-                            + descending
-                            + " | "
-                            + orderBys
             );
         }
+
         Set<ApplicationStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
@@ -277,8 +271,11 @@ public final class ApplicationController {
                 }
             }
         }
-        return this.applicationService.getApplications(
-                name, userName, enumStatuses, tags, page, limit, descending, orderBys);
+
+        return assembler.toResource(
+                this.applicationService.getApplications(name, userName, enumStatuses, tags, page),
+                this.applicationResourceAssembler
+        );
     }
 
     /**
@@ -289,12 +286,16 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Update an application",
             notes = "Update an application from the supplied information."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful update"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application to update not found"
@@ -328,12 +329,16 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Delete all applications",
             notes = "Delete all available applications and get them back."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful delete"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_INTERNAL_ERROR,
                     message = "Genie Server Error due to Unknown Exception"
@@ -353,13 +358,16 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Delete an application",
-            notes = "Delete an application with the supplied id.",
-            response = Application.class
+            notes = "Delete an application with the supplied id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful delete"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -396,7 +404,7 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Add new configuration files to an application",
             notes = "Add the supplied configuration files to the application with the supplied id."
@@ -443,7 +451,8 @@ public final class ApplicationController {
      * @return The active set of configuration files.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Get the configuration files for an application",
             notes = "Get the configuration files for the application with the supplied id.",
@@ -488,12 +497,16 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Update configuration files for an application",
             notes = "Replace the existing configuration files for application with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful update"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -535,12 +548,16 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove all configuration files from an application",
             notes = "Remove all the configuration files from the application with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful delete"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -579,12 +596,16 @@ public final class ApplicationController {
     @RequestMapping(
             value = "/{id}/dependencies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Add new dependency files to an application",
             notes = "Add the supplied dependency files to the application with the supplied id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful addition"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -626,7 +647,10 @@ public final class ApplicationController {
      * @return The set of dependency files.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/dependencies", method = RequestMethod.GET)
+    @RequestMapping(
+            value = "/{id}/dependencies", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Get the dependencies for an application",
             notes = "Get the dependencies for the application with the supplied id.",
@@ -673,12 +697,16 @@ public final class ApplicationController {
     @RequestMapping(
             value = "/{id}/dependencies", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Update dependency files for an application",
             notes = "Replace the existing dependency files for application with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful update"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -720,12 +748,16 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/dependencies", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove all dependency files from an application",
             notes = "Remove all the dependency files from the application with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful delete"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -762,12 +794,16 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Add new tags to a application",
             notes = "Add the supplied tags to the application with the supplied id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful addition"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -809,7 +845,8 @@ public final class ApplicationController {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Get the tags for a application",
             notes = "Get the tags for the application with the supplied id.",
@@ -854,12 +891,16 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Update tags for a application",
             notes = "Replace the existing tags for application with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful update"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -901,13 +942,17 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove all tags from a application",
             notes = "Remove all the tags from the application with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful delete"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -944,13 +989,17 @@ public final class ApplicationController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove a tag from a application",
             notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successful delete"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Application not found"
@@ -993,11 +1042,11 @@ public final class ApplicationController {
      * @return The set of commands.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(
             value = "Get the commands this application is associated with",
             notes = "Get the commands which this application supports.",
-            response = Command.class,
+            response = CommandResource.class,
             responseContainer = "Set"
     )
     @ApiResponses(value = {
@@ -1014,7 +1063,7 @@ public final class ApplicationController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<Command> getCommandsForApplication(
+    public Set<CommandResource> getCommandsForApplication(
             @ApiParam(
                     value = "Id of the application to get the commands for.",
                     required = true
@@ -1041,6 +1090,10 @@ public final class ApplicationController {
                 }
             }
         }
-        return this.applicationService.getCommandsForApplication(id, enumStatuses);
+
+        return this.applicationService.getCommandsForApplication(id, enumStatuses)
+                .stream()
+                .map(this.commandResourceAssembler::toResource)
+                .collect(Collectors.toSet());
     }
 }

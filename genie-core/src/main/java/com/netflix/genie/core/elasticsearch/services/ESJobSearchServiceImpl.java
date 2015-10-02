@@ -27,15 +27,14 @@ import com.netflix.genie.core.services.JobSearchService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Elasticsearch based job search service implementation.
@@ -77,7 +76,7 @@ public class ESJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    public List<Job> getJobs(
+    public Page<Job> getJobs(
             final String id,
             final String jobName,
             final String userName,
@@ -87,10 +86,7 @@ public class ESJobSearchServiceImpl implements JobSearchService {
             final String clusterId,
             final String commandName,
             final String commandId,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys
+            final Pageable page
     ) {
         Criteria criteria = null;
         if (StringUtils.isNotBlank(id)) {
@@ -161,19 +157,12 @@ public class ESJobSearchServiceImpl implements JobSearchService {
         }
 
         if (criteria != null) {
-            final CriteriaQuery query = new CriteriaQuery(criteria, new PageRequest(page, limit));
+            final CriteriaQuery query = new CriteriaQuery(criteria, page);
             return this.template
-                    .queryForList(query, JobEntity.class)
-                    .stream()
-                    .map(JobEntity::getDTO)
-                    .collect(Collectors.toList());
+                    .queryForPage(query, JobEntity.class)
+                    .map(JobEntity::getDTO);
         } else {
-            return this.repository
-                    .findAll(new PageRequest(page, limit))
-                    .getContent()
-                    .stream()
-                    .map(JobEntity::getDTO)
-                    .collect(Collectors.toList());
+            return this.repository.findAll(page).map(JobEntity::getDTO);
         }
     }
 }

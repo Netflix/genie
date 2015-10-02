@@ -24,15 +24,28 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.CommandService;
+import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
+import com.netflix.genie.web.hateoas.resources.ApplicationResource;
+import com.netflix.genie.web.hateoas.resources.ClusterResource;
+import com.netflix.genie.web.hateoas.resources.CommandResource;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ResponseHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,8 +61,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.HttpURLConnection;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * REST end-point for supporting commands.
@@ -59,22 +72,36 @@ import java.util.Set;
  * @since 3.0.0
  */
 @RestController
-@RequestMapping(value = "/api/v3/commands", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v3/commands")
 @Api(value = "commands", tags = "commands", description = "Manage the available commands")
-public final class CommandController {
+public class CommandController {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);
 
     private final CommandService commandService;
+    private final CommandResourceAssembler commandResourceAssembler;
+    private final ApplicationResourceAssembler applicationResourceAssembler;
+    private final ClusterResourceAssembler clusterResourceAssembler;
 
     /**
      * Constructor.
      *
-     * @param commandService The command configuration service to use.
+     * @param commandService               The command configuration service to use.
+     * @param commandResourceAssembler     The assembler to use to convert commands to command HAL resources
+     * @param applicationResourceAssembler The assembler to use to convert applicaitons to application HAL resources
+     * @param clusterResourceAssembler     The assembler to use to convert clusters to cluster HAL resources
      */
     @Autowired
-    public CommandController(final CommandService commandService) {
+    public CommandController(
+            final CommandService commandService,
+            final CommandResourceAssembler commandResourceAssembler,
+            final ApplicationResourceAssembler applicationResourceAssembler,
+            final ClusterResourceAssembler clusterResourceAssembler
+    ) {
         this.commandService = commandService;
+        this.commandResourceAssembler = commandResourceAssembler;
+        this.applicationResourceAssembler = applicationResourceAssembler;
+        this.clusterResourceAssembler = clusterResourceAssembler;
     }
 
     /**
@@ -85,6 +112,7 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
             value = "Create a command",
             notes = "Create a command from the supplied information."
@@ -92,7 +120,8 @@ public final class CommandController {
     @ApiResponses(value = {
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CREATED,
-                    message = "Successfully created the command"
+                    message = "Successfully created the command",
+                    responseHeaders = {@ResponseHeader(name = HttpHeaders.LOCATION, response = String.class)}
             ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_CONFLICT,
@@ -107,7 +136,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public ResponseEntity<?> createCommand(
+    public ResponseEntity<Void> createCommand(
             @ApiParam(
                     value = "The command to create.",
                     required = true
@@ -127,7 +156,7 @@ public final class CommandController {
                         .buildAndExpand(id)
                         .toUri()
         );
-        return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
     /**
@@ -137,11 +166,12 @@ public final class CommandController {
      * @return The command configuration
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Find a command by id",
             notes = "Get the command by id if it exists",
-            response = Command.class
+            response = CommandResource.class
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -157,7 +187,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Command getCommand(
+    public CommandResource getCommand(
             @ApiParam(
                     value = "Id of the command to get.",
                     required = true
@@ -168,28 +198,27 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to get command with id " + id);
         }
-        return this.commandService.getCommand(id);
+        return this.commandResourceAssembler.toResource(this.commandService.getCommand(id));
     }
 
     /**
      * Get Command configuration based on user parameters.
      *
-     * @param name       Name for command (optional)
-     * @param userName   The user who created the configuration (optional)
-     * @param statuses   The statuses of the commands to get (optional)
-     * @param tags       The set of tags you want the command for.
-     * @param page       The page to start one (optional)
-     * @param limit      The max number of results to return per page (optional)
-     * @param descending Whether results returned in descending or ascending order (optional)
-     * @param orderBys   The fields to order the results by (optional)
+     * @param name      Name for command (optional)
+     * @param userName  The user who created the configuration (optional)
+     * @param statuses  The statuses of the commands to get (optional)
+     * @param tags      The set of tags you want the command for.
+     * @param page      The page to get
+     * @param assembler The paged resources assembler to use
      * @return All the Commands matching the criteria or all if no criteria
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Find commands",
             notes = "Find commands by the submitted criteria.",
-            response = Command.class,
+            response = CommandResource.class,
             responseContainer = "List"
     )
     @ApiResponses(value = {
@@ -202,7 +231,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Command> getCommands(
+    public PagedResources<CommandResource> getCommands(
             @ApiParam(
                     value = "Name of the command."
             )
@@ -224,30 +253,13 @@ public final class CommandController {
             )
             @RequestParam(value = "tag", required = false)
             final Set<String> tags,
-            @ApiParam(
-                    value = "The page to start on."
-            )
-            @RequestParam(value = "page", defaultValue = "0")
-            final int page,
-            @ApiParam(
-                    value = "Max number of results per page."
-            )
-            @RequestParam(value = "limit", defaultValue = "1024")
-            final int limit,
-            @ApiParam(
-                    value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
-            )
-            @RequestParam(value = "descending", defaultValue = "true")
-            final boolean descending,
-            @ApiParam(
-                    value = "The fields to order the results by. Must not be collection fields. Default is updated."
-            )
-            @RequestParam(value = "orderBy", required = false)
-            final Set<String> orderBys
+            @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
+            final Pageable page,
+            final PagedResourcesAssembler<Command> assembler
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug(
-                    "Called [name | userName | status | tags | page | limit | descending | orderBys]"
+                    "Called [name | userName | status | tags | page]"
             );
             LOG.debug(
                     name
@@ -259,12 +271,6 @@ public final class CommandController {
                             + tags
                             + " | "
                             + page
-                            + " | "
-                            + limit
-                            + " | "
-                            + descending
-                            + " | "
-                            + orderBys
             );
         }
 
@@ -277,8 +283,10 @@ public final class CommandController {
                 }
             }
         }
-        return this.commandService.getCommands(
-                name, userName, enumStatuses, tags, page, limit, descending, orderBys);
+        return assembler.toResource(
+                this.commandService.getCommands(name, userName, enumStatuses, tags, page),
+                this.commandResourceAssembler
+        );
     }
 
     /**
@@ -289,12 +297,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Update a command",
             notes = "Update a command from the supplied information."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully updated"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command to update not found"
@@ -334,12 +346,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Delete all commands",
             notes = "Delete all available commands and get them back."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully deleted"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -367,12 +383,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Delete a command",
             notes = "Delete a command with the supplied id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully deleted"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -409,12 +429,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Add new configuration files to a command",
             notes = "Add the supplied configuration files to the command with the supplied id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully added"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -456,7 +480,8 @@ public final class CommandController {
      * @return The active set of configuration files.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Get the configuration files for a command",
             notes = "Get the configuration files for the command with the supplied id.",
@@ -501,12 +526,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Update configuration files for an command",
             notes = "Replace the existing configuration files for command with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully updated"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -548,12 +577,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove all configuration files from a command",
             notes = "Remove all the configuration files from the command with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully deleted"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -590,12 +623,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Add new tags to a command",
             notes = "Add the supplied tags to the command with the supplied id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully added"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -637,7 +674,8 @@ public final class CommandController {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Get the tags for a command",
             notes = "Get the tags for the command with the supplied id.",
@@ -682,12 +720,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Update tags for a command",
             notes = "Replace the existing tags for command with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully updated"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -729,13 +771,17 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove all tags from a command",
             notes = "Remove all the tags from the command with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully deleted"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -772,13 +818,17 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove a tag from a command",
             notes = "Remove the given tag from the command with given id.  Note that the genie name space tags"
                     + "prefixed with genie.id and genie.name cannot be deleted."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully deleted"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -823,7 +873,7 @@ public final class CommandController {
     @RequestMapping(
             value = "/{id}/applications", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Add applications for a command",
             notes = "Add the supplied applications to the command "
@@ -831,6 +881,10 @@ public final class CommandController {
                     + "have been created."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully added"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -872,7 +926,8 @@ public final class CommandController {
      * @return The active applications for the command.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Get the applications for a command",
             notes = "Get the applications for the command with the supplied id.",
@@ -893,7 +948,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<Application> getApplicationsForCommand(
+    public Set<ApplicationResource> getApplicationsForCommand(
             @ApiParam(
                     value = "Id of the command to get the application for.",
                     required = true
@@ -904,7 +959,10 @@ public final class CommandController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
-        return this.commandService.getApplicationsForCommand(id);
+        return this.commandService.getApplicationsForCommand(id)
+                .stream()
+                .map(this.applicationResourceAssembler::toResource)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -918,7 +976,7 @@ public final class CommandController {
     @RequestMapping(
             value = "/{id}/applications", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Set applications for a command",
             notes = "Set the supplied applications to the command "
@@ -926,6 +984,10 @@ public final class CommandController {
                     + "have been created. Replaces existing applications."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully updated"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -967,12 +1029,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/applications", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove applications from a command",
             notes = "Remove the applications from the command with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully deleted"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -1009,11 +1075,16 @@ public final class CommandController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/applications/{appId}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(
             value = "Remove applications from a command",
             notes = "Remove the applications from the command with given id."
     )
     @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_NO_CONTENT,
+                    message = "Successfully deleted"
+            ),
             @ApiResponse(
                     code = HttpURLConnection.HTTP_NOT_FOUND,
                     message = "Command not found"
@@ -1056,7 +1127,8 @@ public final class CommandController {
      * @return The list of clusters.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/clusters", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/clusters", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Get the clusters this command is associated with",
             notes = "Get the clusters which this command exists on supports.",
@@ -1077,7 +1149,7 @@ public final class CommandController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Set<Cluster> getClustersForCommand(
+    public Set<ClusterResource> getClustersForCommand(
             @ApiParam(
                     value = "Id of the command to get the clusters for.",
                     required = true
@@ -1105,6 +1177,9 @@ public final class CommandController {
             }
         }
 
-        return this.commandService.getClustersForCommand(id, enumStatuses);
+        return this.commandService.getClustersForCommand(id, enumStatuses)
+                .stream()
+                .map(this.clusterResourceAssembler::toResource)
+                .collect(Collectors.toSet());
     }
 }

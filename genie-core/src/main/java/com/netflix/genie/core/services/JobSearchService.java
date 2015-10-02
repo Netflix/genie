@@ -21,8 +21,9 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -57,13 +58,10 @@ public interface JobSearchService {
      * @param clusterId   id of cluster for job
      * @param commandName name of the command run in the job
      * @param commandId   id of the command run in the job
-     * @param page        page number for job
-     * @param limit       max number of jobs to return
-     * @param descending  Whether the results should be returned in descending or ascending order
-     * @param orderBys    The fields to order the results by
+     * @param page        Page information of job to get
      * @return All jobs which match the criteria
      */
-    List<Job> getJobs(
+    Page<Job> getJobs(
             final String id,
             final String jobName,
             final String userName,
@@ -73,9 +71,6 @@ public interface JobSearchService {
             final String clusterId,
             final String commandName,
             final String commandId,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys
+            final Pageable page
     );
 }

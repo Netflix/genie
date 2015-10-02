@@ -24,7 +24,7 @@ import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.ProcessStatus;
 import com.netflix.genie.core.jpa.repositories.JobRepository;
-import com.netflix.genie.web.configs.GenieConfig;
+import com.netflix.genie.web.GenieWeb;
 import com.netflix.genie.web.tasks.JobJanitor;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -47,7 +47,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
  */
 @ActiveProfiles({"integration"})
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GenieConfig.class)
+@SpringApplicationConfiguration(classes = GenieWeb.class)
 @TestExecutionListeners({
         DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,

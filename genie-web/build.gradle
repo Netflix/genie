@@ -1,7 +1,6 @@
 //import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'spring-boot'
-apply plugin: 'org.asciidoctor.convert'
 
 //processResources {
 //    filter ReplaceTokens, tokens: [
@@ -16,6 +15,7 @@ dependencies {
 
     compile(project(":genie-core"))
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_eureka_version}")

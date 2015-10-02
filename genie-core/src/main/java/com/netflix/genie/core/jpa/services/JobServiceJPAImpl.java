@@ -26,7 +26,6 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobmanager.JobManagerFactory;
 import com.netflix.genie.core.jpa.entities.JobEntity;
-import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.jpa.repositories.JobRepository;
 import com.netflix.genie.core.jpa.repositories.JobSpecs;
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
@@ -38,7 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.orm.jpa.JpaOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -48,10 +48,8 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the Job Service APIs.
@@ -165,7 +163,7 @@ public class JobServiceJPAImpl implements JobService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Job> getJobs(
+    public Page<Job> getJobs(
             final String id,
             final String jobName,
             final String userName,
@@ -175,20 +173,14 @@ public class JobServiceJPAImpl implements JobService {
             final String clusterId,
             final String commandName,
             final String commandId,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys) {
+            final Pageable page
+    ) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called");
         }
 
-        final PageRequest pageRequest = JPAUtils.getPageRequest(
-                page, limit, descending, orderBys, JobEntity_.class, JobEntity_.updated.getName()
-        );
-
         @SuppressWarnings("unchecked")
-        final List<JobEntity> jobEntities = this.jobRepo.findAll(
+        final Page<JobEntity> jobEntities = this.jobRepo.findAll(
                 JobSpecs.find(
                         id,
                         jobName,
@@ -199,8 +191,9 @@ public class JobServiceJPAImpl implements JobService {
                         clusterId,
                         commandName,
                         commandId),
-                pageRequest).getContent();
-        return jobEntities.stream().map(JobEntity::getDTO).collect(Collectors.toList());
+                page
+        );
+        return jobEntities.map(JobEntity::getDTO);
     }
 
     /**

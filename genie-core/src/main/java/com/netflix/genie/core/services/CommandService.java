@@ -25,11 +25,12 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -75,21 +76,16 @@ public interface CommandService {
      * @param userName   The name of the user who created the configuration
      * @param statuses   The status of the applications to get. Can be null.
      * @param tags       tags allocated to this command
-     * @param page       Page number to start results on
-     * @param limit      Max number of results per page
-     * @param descending Whether the results should be returned in descending or ascending order
-     * @param orderBys   The fields to order the results by
+     * @param page       The page of results to get
      * @return All the commands matching the specified criteria
      */
-    List<Command> getCommands(
+    Page<Command> getCommands(
             final String name,
             final String userName,
             final Set<CommandStatus> statuses,
             final Set<String> tags,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys);
+            final Pageable page
+    );
 
     /**
      * Update command configuration.
