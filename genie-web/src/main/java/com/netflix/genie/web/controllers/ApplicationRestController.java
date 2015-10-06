@@ -277,8 +277,8 @@ public class ApplicationRestController {
         final Link self = ControllerLinkBuilder.linkTo(
                 ControllerLinkBuilder
                         .methodOn(ApplicationRestController.class)
-                        .getApplications(name, userName, statuses, tags, page, null))
-                .withSelfRel();
+                        .getApplications(name, userName, statuses, tags, page, assembler)
+        ).withSelfRel();
 
         return assembler.toResource(
                 this.applicationService.getApplications(name, userName, enumStatuses, tags, page),

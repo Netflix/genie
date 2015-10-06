@@ -72,13 +72,12 @@ import java.util.List;
 @WebIntegrationTest(randomPort = true)
 public class ApplicationRestDocs {
 
+    private static final String APPLICATION_API_PATH = "/api/v3/applications";
     /**
      * Where to put the generated documentation.
      */
     @Rule
     public final RestDocumentation restDocumentation = new RestDocumentation("build/generated-snippets");
-    
-    private static final String APPLICATION_API_PATH = "/api/v3/applications";
 
     @Autowired
     private WebApplicationContext context;
@@ -416,10 +415,10 @@ public class ApplicationRestDocs {
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders
-                        .get(APPLICATION_API_PATH
-                                + "?name=spark&userName=genieUser&status=ACTIVE"
-                                + "&tag=type:spark&page=1&size=2&sort=updated,desc")
-                        .accept(MediaTypes.HAL_JSON)
+                                .get(APPLICATION_API_PATH
+                                        + "?name=spark&userName=genieUser&status=ACTIVE"
+                                        + "&tag=type:spark&page=1&size=2&sort=updated,desc")
+                                .accept(MediaTypes.HAL_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(this.document);
