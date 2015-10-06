@@ -72,7 +72,7 @@ executeWithRetry "kill -CONT -$parent_pid"
 waitWithTimeout "$parent_pid"
 
 # Follow with a sigkill to the entire group if there are still processes
-if pgrep -g "$parent_pid"; then
+if pgrep -g "$parent_pid" > /dev/null; then
     executeWithRetry "kill -9 -$parent_pid"
 fi
 
