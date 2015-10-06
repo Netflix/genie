@@ -40,8 +40,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -272,9 +274,16 @@ public class ApplicationRestController {
             }
         }
 
+        final Link self = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder
+                        .methodOn(ApplicationRestController.class)
+                        .getApplications(name, userName, statuses, tags, page, null))
+                .withSelfRel();
+
         return assembler.toResource(
                 this.applicationService.getApplications(name, userName, enumStatuses, tags, page),
-                this.applicationResourceAssembler
+                this.applicationResourceAssembler,
+                self
         );
     }
 
