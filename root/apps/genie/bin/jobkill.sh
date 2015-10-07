@@ -34,27 +34,47 @@ function executeWithRetry()
     fi
 }
 
+function waitWithTimeout()
+{
+    local pid=$1
+    local timeout=$((`date +%s` + 60))
+    while true; do
+        if ! $(kill -0 $pid > /dev/null 2>&1); then
+            return
+        elif [[ $(date +%s) -gt $timeout ]]; then
+            echo "Timeout reached waiting for pid $pid"
+            return
+        fi
+        echo "Waiting for pid $pid to exit gracefully..."
+        sleep 3
+    done
+}
+
 # basic error checking
 if [[ $# != 1 ]]; then
-	echo "Incorrect number of arguments"
-	echo "Usage: jobkill.sh PARENT_PID"
-	exit 1
+    echo "Incorrect number of arguments"
+    echo "Usage: jobkill.sh PARENT_PID"
+    exit 1
 fi
 
 # the process id of the launcher
 parent_pid=$1
 
-# pause the parent so it doesn't trigger any retries
-executeWithRetry "kill -STOP $parent_pid"
+# pause the process group so it doesn't trigger any retries
+executeWithRetry "kill -STOP -$parent_pid"
 
-# kill all the children
-executeWithRetry "pkill -P $parent_pid"
-
-# now kill the parent - but it won't be killed yet since it is paused
-executeWithRetry "kill $parent_pid"
+# send a sigterm to all untrapped procs in the group
+executeWithRetry "kill -- -$parent_pid"
 
 # continue parent, this will kill it - and the trap will ensure that files are archived to S3
-executeWithRetry "kill -CONT $parent_pid"
+executeWithRetry "kill -CONT -$parent_pid"
+
+waitWithTimeout "$parent_pid"
+
+# Follow with a sigkill to the entire group if there are still processes
+if pgrep -g "$parent_pid" > /dev/null; then
+    executeWithRetry "kill -9 -$parent_pid"
+fi
 
 echo "Done"
 exit 0
