@@ -57,7 +57,7 @@ public class JobJanitorImpl implements JobJanitor {
      * {@inheritDoc}
      */
     @Override
-    @Scheduled(fixedRate = 450000) // TODO: Randomize? Do we need this to be a property?
+    @Scheduled(fixedRate = 450000, initialDelay = 60000) // TODO: Randomize? Do we need this to be a property?
     public void markZombies() {
         LOG.info("Checking for zombies...");
         final int zombies = this.xs.markZombies();

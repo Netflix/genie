@@ -67,7 +67,7 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/api/v3/jobs")
 @Api(value = "jobs", tags = "jobs", description = "Manage Genie Jobs.")
-public final class JobController {
+public class JobController {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobController.class);
 //    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
