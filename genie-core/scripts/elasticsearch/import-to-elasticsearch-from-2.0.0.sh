@@ -11,7 +11,7 @@ function print_help() {
     printf "%-40s %-80s %s\n" "mysql_user" "The user of MySQL." "root"
     printf "%-40s %-80s %s\n" "mysql_password" "The password for the MySQL user." ""
     printf "%-40s %-80s %s\n" "mysql_database" "The name of the mysql database to use." "genie"
-    printf "%-40s %-80s %s\n" "elasticsearch_version" "The version of elasticsearch to index into. OPTIONS: [1.7.0|1.6.0|1.5.2]" "1.7.0"
+    printf "%-40s %-80s %s\n" "elasticsearch_version" "The version of elasticsearch to index into. OPTIONS: [1.7.2|1.7.0|1.6.0|1.5.2]" "1.7.2"
     printf "%-40s %-80s %s\n" "elasticsearch_protocol" "Whether https should be enabled. OPTIONS: [http|https]" "http"
     printf "%-40s %-80s %s\n" "elasticsearch_host" "The hostname of the elasticsearch node to index into." "localhost"
     printf "%-40s %-80s %s\n" "elasticsearch_http_port" "The http port the elasticsearch cluster is listening on." "9200"
@@ -27,7 +27,7 @@ MYSQL_PORT="3306"
 MYSQL_USER="root"
 MYSQL_PASSWORD=""
 MYSQL_DATABASE="genie"
-ELASTICSEARCH_VERSION="1.7.0"
+ELASTICSEARCH_VERSION="1.7.2"
 ELASTICSEARCH_PROTOCOL="http"
 ELASTICSEARCH_HOST="localhost"
 ELASTICSEARCH_HTTP_PORT="9200"
@@ -108,7 +108,9 @@ done
 pushd "/tmp" > /dev/null
 
 # Based on https://github.com/jprante/elasticsearch-jdbc#recent-versions
-if [ "${ELASTICSEARCH_VERSION}" == "1.7.0" ]; then
+if [ "${ELASTICSEARCH_VERSION}" == "1.7.2" ]; then
+    ELASTICSEARCH_JDBC_VERSION="1.7.2.1"
+elif [ "${ELASTICSEARCH_VERSION}" == "1.7.0" ]; then
     ELASTICSEARCH_JDBC_VERSION="1.7.0.1"
 elif [ "${ELASTICSEARCH_VERSION}" == "1.6.0" ]; then
     ELASTICSEARCH_JDBC_VERSION="1.6.0.1"
@@ -169,21 +171,66 @@ if [ "$(curl -X HEAD -i -s -o /dev/null -w "%{http_code}" "${ELASTICSEARCH_PROTO
     fi
 fi
 
+# "sql" : "SELECT Job.id, Job.created, Job.updated, Job.name, Job.user, Job.version, Job.description, Job.archiveLocation, Job.chosenClusterCriteriaString, Job.clusterCriteriasString, Job.commandCriteriaString, Job.commandId, Job.email, Job.envPropFile as 'setupFile', Job.executionClusterId, Job.exitCode, Job.fileDependencies, Job.finished, Job.groupName as 'group', Job.hostName, Job.killURI, Job.outputURI, Job.started, Job.status, Job.statusMsg, Job_tags.element as 'tags', '${ELASTICSEARCH_INDEX_NAME}' as _index, 'job' as _type, Job.id as _id, Job.entityVersion as _version FROM Job LEFT JOIN Job_tags ON Job.id = Job_tags.JOB_ID ORDER BY _id",
+# "sql" : "select *, '${ELASTICSEARCH_INDEX_NAME}' as _index, 'job' as _type, id as _id from Job",
 echo "
 {
-    \"type\" : \"jdbc\",
-    \"jdbc\" : {
-        \"url\" : \"jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}\",
-        \"user\" : \"${MYSQL_USER}\",
-        \"password\" : \"${MYSQL_PASSWORD}\",
-        \"sql\" : \"select *, \\\"${ELASTICSEARCH_INDEX_NAME}\\\" as _index, \\\"job\\\" as _type, id as _id from Job limit 1\",
-        \"elasticsearch\" : {
-             \"cluster\" : \"${ELASTICSEARCH_CLUSTER_NAME}\",
-             \"host\" : \"${ELASTICSEARCH_HOST}\",
-             \"port\" : ${ELASTICSEARCH_TRANSPORT_PORT}
+    \"type\": \"jdbc\",
+    \"jdbc\": {
+        \"url\": \"jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}\",
+        \"user\": \"${MYSQL_USER}\",
+        \"password\": \"${MYSQL_PASSWORD}\",
+        \"sql\": [
+            {
+                \"statement\": \"SELECT Job.id, Job.created, Job.updated, Job.name, Job.user, Job.version, Job.description, Job.archiveLocation, Job.chosenClusterCriteriaString, Job.clusterCriteriasString, Job.commandCriteriaString, Job.commandId, Job.email, Job.envPropFile AS 'setupFile', Job.executionClusterId, Job.exitCode, Job.fileDependencies, Job.finished, Job.groupName AS 'group', Job.hostName, Job.killURI, Job.outputURI, Job.started, Job.status, Job.statusMsg, Job_tags.element AS 'tags', Job.id as _id, Job.entityVersion AS _version FROM Job LEFT JOIN Job_tags ON Job.id = Job_tags.JOB_ID ORDER BY _id\"
+            }
+        ],
+        \"elasticsearch\": {
+             \"cluster\": \"${ELASTICSEARCH_CLUSTER_NAME}\",
+             \"host\": \"${ELASTICSEARCH_HOST}\",
+             \"port\": ${ELASTICSEARCH_TRANSPORT_PORT}
         },
-        \"index\" : \"${ELASTICSEARCH_INDEX_NAME}\",
-        \"type\" : \"job\"
+        \"index\": \"${ELASTICSEARCH_INDEX_NAME}\",
+        \"type\": \"job\",
+        \"detect_json\": false,
+        \"type_mapping\": {
+            \"job\": {
+                \"properties\": {
+                    \"id\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"name\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"user\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"version\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"archiveLocation\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"commandId\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"executionClusterId\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"tags\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    }
+                }
+            }
+        }
     }
 }
 " | java -cp "lib/*" -Dlog4j.configurationFile=bin/log4j2.xml org.xbib.tools.Runner org.xbib.tools.JDBCImporter

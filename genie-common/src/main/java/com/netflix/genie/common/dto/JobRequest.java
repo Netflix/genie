@@ -191,6 +191,7 @@ public class JobRequest extends BaseDTO {
     /**
      * A builder to create job requests.
      *
+     * @param <T> The type of builder that extends this builder for final implementation
      * @author tgianos
      * @since 3.0.0
      */

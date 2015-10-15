@@ -23,6 +23,8 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
+import com.netflix.genie.web.hateoas.resources.JobResource;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,6 +34,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,7 +58,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -61,29 +68,33 @@ import java.util.Set;
  * @since 3.0.0
  */
 @RestController
-@RequestMapping(value = "/api/v3/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v3/jobs")
 @Api(value = "jobs", tags = "jobs", description = "Manage Genie Jobs.")
-public final class JobController {
+public class JobController {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobController.class);
 //    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
     private final ExecutionService executionService;
     private final JobSearchService jobSearchService;
+    private final JobResourceAssembler jobResourceAssembler;
 
     /**
      * Constructor.
      *
-     * @param executionService The execution service to use.
-     * @param jobSearchService The job search service to use.
+     * @param executionService     The execution service to use.
+     * @param jobSearchService     The job search service to use.
+     * @param jobResourceAssembler Assemble job resources out of jobs
      */
     @Autowired
     public JobController(
             final ExecutionService executionService,
-            final JobSearchService jobSearchService
+            final JobSearchService jobSearchService,
+            final JobResourceAssembler jobResourceAssembler
     ) {
         this.executionService = executionService;
         this.jobSearchService = jobSearchService;
+        this.jobResourceAssembler = jobResourceAssembler;
     }
 
     /**
@@ -94,6 +105,7 @@ public final class JobController {
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @ApiOperation(
             value = "Submit a job",
             notes = "Submit a new job to run to genie"
@@ -120,7 +132,7 @@ public final class JobController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public ResponseEntity<?> submitJob(
+    public ResponseEntity<Void> submitJob(
             @ApiParam(
                     value = "Job information to run.",
                     required = true
@@ -164,7 +176,7 @@ public final class JobController {
                         .buildAndExpand(id)
                         .toUri()
         );
-        return new ResponseEntity<>(null, httpHeaders, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
     }
 
     /**
@@ -253,7 +265,7 @@ public final class JobController {
      * @return the Job
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(
             value = "Find a job by id",
             notes = "Get the job by id if it exists",
@@ -277,7 +289,7 @@ public final class JobController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public Job getJob(
+    public JobResource getJob(
             @ApiParam(
                     value = "Id of the job to get.",
                     required = true
@@ -288,7 +300,7 @@ public final class JobController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called for job with id: " + id);
         }
-        return this.jobSearchService.getJob(id);
+        return this.jobResourceAssembler.toResource(this.jobSearchService.getJob(id));
     }
 
 //    /**
@@ -351,14 +363,13 @@ public final class JobController {
      * @param clusterId   the id of the cluster
      * @param commandName the name of the command run by the job
      * @param commandId   the id of the command run by the job
-     * @param page        page number for job
-     * @param limit       max number of jobs to return
-     * @param descending  Whether the order of the results should be descending or ascending
-     * @param orderBys    Fields to order the results by
+     * @param page        page information for job
+     * @param assembler   The paged resources assembler to use
      * @return successful response, or one with HTTP error code
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Find jobs",
             notes = "Find jobs by the submitted criteria.",
@@ -383,7 +394,7 @@ public final class JobController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public List<Job> getJobs(
+    public PagedResources<JobResource> getJobs(
             @ApiParam(
                     value = "Id of the job."
             )
@@ -430,33 +441,17 @@ public final class JobController {
             )
             @RequestParam(value = "commandId", required = false)
             final String commandId,
-            @ApiParam(
-                    value = "The page to start on."
-            )
-            @RequestParam(value = "page", defaultValue = "0")
-            final int page,
-            @ApiParam(
-                    value = "Max number of results per page."
-            )
-            @RequestParam(value = "limit", defaultValue = "1024")
-            final int limit,
-            @ApiParam(
-                    value = "Whether results should be sorted in descending or ascending order. Defaults to descending"
-            )
-            @RequestParam(value = "descending", defaultValue = "true")
-            final boolean descending,
-            @ApiParam(
-                    value = "The fields to order the results by. Must not be collection fields. Default is updated."
-            )
-            @RequestParam(value = "orderBy", required = false)
-            final Set<String> orderBys
+            @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
+            final Pageable page,
+            final PagedResourcesAssembler<Job> assembler
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug(
-                    "Called with [id | jobName | userName | statuses | executionClusterName "
-                            + "| executionClusterId | page | limit | descending | orderBys]"
+                    "Called with "
+                            + "[id | jobName | userName | statuses | executionClusterName | executionClusterId | page]"
             );
-            LOG.debug(id
+            LOG.debug(
+                    id
                             + " | "
                             + name
                             + " | "
@@ -475,12 +470,6 @@ public final class JobController {
                             + commandId
                             + " | "
                             + page
-                            + " | "
-                            + limit
-                            + " | "
-                            + descending
-                            + " | "
-                            + orderBys
             );
         }
         Set<JobStatus> enumStatuses = null;
@@ -493,20 +482,20 @@ public final class JobController {
             }
         }
 
-        return this.jobSearchService.getJobs(
-                id,
-                name,
-                userName,
-                enumStatuses,
-                tags,
-                clusterName,
-                clusterId,
-                commandName,
-                commandId,
-                page,
-                limit,
-                descending,
-                orderBys
+        return assembler.toResource(
+                this.jobSearchService.getJobs(
+                        id,
+                        name,
+                        userName,
+                        enumStatuses,
+                        tags,
+                        clusterName,
+                        clusterId,
+                        commandName,
+                        commandId,
+                        page
+                ),
+                this.jobResourceAssembler
         );
     }
 

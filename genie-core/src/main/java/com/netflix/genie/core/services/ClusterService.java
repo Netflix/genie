@@ -24,6 +24,8 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -75,22 +77,17 @@ public interface ClusterService {
      * @param tags          tags allocated to this cluster
      * @param minUpdateTime min time when cluster configuration was updated
      * @param maxUpdateTime max time when cluster configuration was updated
-     * @param page          page number
-     * @param limit         number of entries to return
-     * @param descending    Whether the results should be returned in descending or ascending order
-     * @param orderBys      The fields to order the results by
+     * @param page          The page to get
      * @return All the clusters matching the criteria
      */
-    List<Cluster> getClusters(
+    Page<Cluster> getClusters(
             final String name,
             final Set<ClusterStatus> statuses,
             final Set<String> tags,
             final Long minUpdateTime,
             final Long maxUpdateTime,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys);
+            final Pageable page
+    );
 
     /**
      * Get the clusters on which the job can be run.

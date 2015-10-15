@@ -26,7 +26,6 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
-import com.netflix.genie.core.jpa.entities.ClusterEntity_;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.repositories.ClusterRepository;
@@ -40,7 +39,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,38 +143,23 @@ public class ClusterServiceJPAImpl implements ClusterService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<com.netflix.genie.common.dto.Cluster> getClusters(
+    public Page<Cluster> getClusters(
             final String name,
             final Set<ClusterStatus> statuses,
             final Set<String> tags,
             final Long minUpdateTime,
             final Long maxUpdateTime,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys
+            final Pageable page
     ) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called");
         }
 
-        final PageRequest pageRequest = JPAUtils.getPageRequest(
-                page, limit, descending, orderBys, ClusterEntity_.class, ClusterEntity_.updated.getName()
-        );
-
         @SuppressWarnings("unchecked")
-        final List<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
-                ClusterSpecs.find(
-                        name,
-                        statuses,
-                        tags,
-                        minUpdateTime,
-                        maxUpdateTime),
-                pageRequest).getContent();
-        return clusterEntities
-                .stream()
-                .map(ClusterEntity::getDTO)
-                .collect(Collectors.toList());
+        final Page<ClusterEntity> clusterEntities
+                = this.clusterRepo.findAll(ClusterSpecs.find(name, statuses, tags, minUpdateTime, maxUpdateTime), page);
+
+        return clusterEntities.map(ClusterEntity::getDTO);
     }
 
     /**

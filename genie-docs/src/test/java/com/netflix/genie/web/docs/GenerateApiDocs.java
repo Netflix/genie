@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.docs;
 
-import com.netflix.genie.web.configs.GenieConfig;
+import com.netflix.genie.web.GenieWeb;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +42,7 @@ import springfox.documentation.staticdocs.Swagger2MarkupResultHandler;
  */
 @ActiveProfiles({"docs"})
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GenieConfig.class)
+@SpringApplicationConfiguration(classes = GenieWeb.class)
 @WebIntegrationTest(randomPort = true)
 public class GenerateApiDocs {
 

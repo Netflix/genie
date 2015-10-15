@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.configs;
+package com.netflix.genie.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -26,6 +26,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -51,13 +52,14 @@ import javax.validation.Validator;
 @EnableAutoConfiguration
 @EnableConfigurationProperties
 @EnableElasticsearchRepositories("com.netflix.genie.core.elasticsearch.repositories")
+@EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})
 @EnableJpaRepositories("com.netflix.genie.core.jpa.repositories")
 @EnableRetry
 @EnableScheduling
 @EnableTransactionManagement
 @EntityScan("com.netflix.genie.core.jpa.entities")
 @EnableSwagger2
-public class GenieConfig {
+public class GenieWeb {
 
     /**
      * Spring Boot Main.
@@ -66,7 +68,7 @@ public class GenieConfig {
      * @throws Exception For any failure during program execution
      */
     public static void main(final String[] args) throws Exception {
-        SpringApplication.run(GenieConfig.class, args);
+        SpringApplication.run(GenieWeb.class, args);
     }
 
     /**

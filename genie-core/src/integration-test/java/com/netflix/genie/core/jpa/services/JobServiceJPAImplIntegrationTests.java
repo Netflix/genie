@@ -30,6 +30,11 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
@@ -52,6 +57,8 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
     private static final String JOB_2_ID = "job2";
     private static final String TAG_1 = "tag1";
     private static final String TAG_2 = "tag2";
+
+    private static final Pageable PAGE = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
     private JobService service;
@@ -206,7 +213,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsById() {
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 JOB_1_ID,
                 null,
                 null,
@@ -216,13 +223,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
-                0,
-                10,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+        Assert.assertEquals(1, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(0).getId());
     }
 
     /**
@@ -230,7 +234,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsByName() {
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 "testSparkJob",
                 null,
@@ -240,13 +244,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
-                0,
-                10,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
+        Assert.assertEquals(1, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_2_ID, jobs.getContent().get(0).getId());
     }
 
     /**
@@ -254,7 +255,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsByUser() {
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 "tgianos",
@@ -264,13 +265,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
-                0,
-                10,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+        Assert.assertEquals(1, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(0).getId());
     }
 
     /**
@@ -282,7 +280,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         statuses.add(JobStatus.FAILED);
         statuses.add(JobStatus.INIT);
 
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 null,
@@ -292,14 +290,11 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
-                0,
-                10,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
-        Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
+        Assert.assertEquals(2, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(0).getId());
+        Assert.assertEquals(JOB_2_ID, jobs.getContent().get(1).getId());
     }
 
     /**
@@ -313,8 +308,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         tags.add(TAG_1);
         tags.add(TAG_2);
 
-        @SuppressWarnings("unchecked")
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 null,
@@ -324,13 +318,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
-                0,
-                10,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
+        Assert.assertEquals(1, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_2_ID, jobs.getContent().get(0).getId());
     }
 
     /**
@@ -343,7 +334,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         final Set<String> tags = new HashSet<>();
         tags.add("random");
 
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 null,
@@ -353,13 +344,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
-                0,
-                10,
-                true,
-                null
+                PAGE
         );
 
-        Assert.assertEquals(0, jobs.size());
+        Assert.assertEquals(0, jobs.getNumberOfElements());
     }
 
     /**
@@ -367,7 +355,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsByClusterName() {
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 null,
@@ -377,13 +365,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
-                -1,
-                0,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+        Assert.assertEquals(1, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(0).getId());
     }
 
     /**
@@ -391,7 +376,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsByCommandName() {
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 null,
@@ -401,13 +386,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 "pig_13_prod",
                 null,
-                -1,
-                0,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+        Assert.assertEquals(1, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(0).getId());
     }
 
     /**
@@ -415,7 +397,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsByCommandId() {
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 null,
@@ -425,13 +407,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 "command1",
-                -1,
-                0,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
+        Assert.assertEquals(1, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(0).getId());
     }
 
     /**
@@ -439,7 +418,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsByClusterId() {
-        final List<Job> jobs = this.service.getJobs(
+        final Page<Job> jobs = this.service.getJobs(
                 null,
                 null,
                 null,
@@ -449,26 +428,10 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
                 "cluster2",
                 null,
                 null,
-                0,
-                10,
-                true,
-                null
+                PAGE
         );
-        Assert.assertEquals(1, jobs.size());
-        Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
-    }
-
-    /**
-     * Test the get jobs method with descending sort.
-     */
-    @Test
-    public void testGetJobsDescending() {
-        //Default to order by Updated
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null,
-                0, 10, true, null);
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
-        Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
+        Assert.assertEquals(1, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_2_ID, jobs.getContent().get(0).getId());
     }
 
     /**
@@ -476,39 +439,13 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsAscending() {
+        final Pageable ascending = new PageRequest(0, 10, Sort.Direction.ASC, "updated");
         //Default to order by Updated
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null,
-                null, 0, 10, false, null);
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
-        Assert.assertEquals(JOB_1_ID, jobs.get(1).getId());
-    }
-
-    /**
-     * Test the get jobs method default order by.
-     */
-    @Test
-    public void testGetJobsOrderBysDefault() {
-        //Default to order by Updated
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null,
-                0, 10, true, null);
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
-        Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
-    }
-
-    /**
-     * Test the get jobs method order by updated.
-     */
-    @Test
-    public void testGetJobsOrderBysUpdated() {
-        final Set<String> orderBys = new HashSet<>();
-        orderBys.add("updated");
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null,
-                null, 0, 10, true, orderBys);
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
-        Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
+        final Page<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null,
+                null, ascending);
+        Assert.assertEquals(2, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_2_ID, jobs.getContent().get(0).getId());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(1).getId());
     }
 
     /**
@@ -516,41 +453,36 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetJobsOrderBysName() {
-        final Set<String> orderBys = new HashSet<>();
-        orderBys.add("name");
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null,
-                0, 10, true, orderBys);
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(JOB_2_ID, jobs.get(0).getId());
-        Assert.assertEquals(JOB_1_ID, jobs.get(1).getId());
+        final Pageable name = new PageRequest(0, 10, Sort.Direction.DESC, "name");
+        final Page<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, name);
+        Assert.assertEquals(2, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_2_ID, jobs.getContent().get(0).getId());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(1).getId());
     }
 
     /**
      * Test the get jobs method order by an invalid field should return the order by default value (updated).
      */
-    @Test
+    @Test(expected = PropertyReferenceException.class)
     public void testGetJobsOrderBysInvalidField() {
-        final Set<String> orderBys = new HashSet<>();
-        orderBys.add("I'mNotAValidField");
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null,
-                null, null, 0, 10, true, orderBys);
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
-        Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
+        final Pageable invalid = new PageRequest(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
+        final Page<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, invalid);
+        Assert.assertEquals(2, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(0).getId());
+        Assert.assertEquals(JOB_2_ID, jobs.getContent().get(1).getId());
     }
 
     /**
      * Test the get jobs method order by a collection field should return the order by default value (updated).
      */
+    @Ignore
     @Test
     public void testGetJobsOrderBysCollectionField() {
-        final Set<String> orderBys = new HashSet<>();
-        orderBys.add("tags");
-        final List<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null,
-                null, 0, 10, true, orderBys);
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(JOB_1_ID, jobs.get(0).getId());
-        Assert.assertEquals(JOB_2_ID, jobs.get(1).getId());
+        final Pageable tags = new PageRequest(0, 10, Sort.Direction.DESC, "tags");
+        final Page<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, tags);
+        Assert.assertEquals(2, jobs.getNumberOfElements());
+        Assert.assertEquals(JOB_1_ID, jobs.getContent().get(0).getId());
+        Assert.assertEquals(JOB_2_ID, jobs.getContent().get(1).getId());
     }
 
     /**

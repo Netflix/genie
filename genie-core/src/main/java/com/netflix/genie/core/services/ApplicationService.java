@@ -24,11 +24,12 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -68,25 +69,19 @@ public interface ApplicationService {
     /**
      * Get applications for given filter criteria.
      *
-     * @param name       name of application. Can be null or empty.
+     * @param name       Name of application. Can be null or empty.
      * @param userName   The user who created the application. Can be null/empty
      * @param statuses   The statuses of the applications to find. Can be null.
-     * @param tags       tags allocated to this application
-     * @param page       Page number to start results on
-     * @param limit      Max number of results per page
-     * @param descending Whether to sort the results by descending or ascending order
-     * @param orderBys   How to order the results
-     * @return The found applications
+     * @param tags       Tags allocated to this application
+     * @param pageable   The page requested from the search results
+     * @return The page of found applications
      */
-    List<Application> getApplications(
+    Page<Application> getApplications(
             final String name,
             final String userName,
             final Set<ApplicationStatus> statuses,
             final Set<String> tags,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys
+            final Pageable pageable
     );
 
     /**

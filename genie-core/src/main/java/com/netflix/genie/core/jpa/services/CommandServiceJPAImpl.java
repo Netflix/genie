@@ -30,7 +30,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
-import com.netflix.genie.core.jpa.entities.CommandEntity_;
 import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.ClusterRepository;
 import com.netflix.genie.core.jpa.repositories.ClusterSpecs;
@@ -43,7 +42,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,37 +146,29 @@ public class CommandServiceJPAImpl implements CommandService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Command> getCommands(
+    public Page<Command> getCommands(
             final String name,
             final String userName,
             final Set<CommandStatus> statuses,
             final Set<String> tags,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys) {
+            final Pageable page
+    ) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called");
         }
 
-        final PageRequest pageRequest = JPAUtils.getPageRequest(
-                page, limit, descending, orderBys, CommandEntity_.class, CommandEntity_.updated.getName()
-        );
-
         @SuppressWarnings("unchecked")
-        final List<CommandEntity> commandEntities = this.commandRepo.findAll(
+        final Page<CommandEntity> commandEntities = this.commandRepo.findAll(
                 CommandSpecs.find(
                         name,
                         userName,
                         statuses,
                         tags
                 ),
-                pageRequest).getContent();
+                page
+        );
 
-        return commandEntities
-                .stream()
-                .map(CommandEntity::getDTO)
-                .collect(Collectors.toList());
+        return commandEntities.map(CommandEntity::getDTO);
     }
 
     /**

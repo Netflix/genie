@@ -15,15 +15,27 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.elasticsearch.repositories;
+package com.netflix.genie.web.hateoas.resources;
 
-import com.netflix.genie.core.elasticsearch.documents.JobDocument;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.netflix.genie.common.dto.Job;
+import org.springframework.hateoas.Resource;
 
 /**
- * CRUD repository for Job documents within Elasticsearch.
+ * HATEOAS resource representation of a Job.
  *
  * @author tgianos
+ * @since 3.0.0
  */
-public interface ESJobRepository extends ElasticsearchRepository<JobDocument, String> {
+public class JobResource extends Resource<Job> {
+
+    /**
+     * Constructor.
+     *
+     * @param job The job this resource is wrapping
+     */
+    @JsonCreator
+    public JobResource(final Job job) {
+        super(job);
+    }
 }

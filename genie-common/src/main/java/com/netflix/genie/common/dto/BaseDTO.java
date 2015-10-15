@@ -22,9 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ public abstract class BaseDTO {
     @ApiModelProperty(
             value = "The unique id of this resource. If one is not provided it is created internally"
     )
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length is 255 characters")
     private String id;
 
     @ApiModelProperty(
@@ -65,7 +65,7 @@ public abstract class BaseDTO {
             required = true
     )
     @NotBlank(message = "Version is missing and is required.")
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length is 255 characters")
     private String version;
 
     @ApiModelProperty(
@@ -73,7 +73,7 @@ public abstract class BaseDTO {
             required = true
     )
     @NotBlank(message = "User name is missing and is required.")
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length is 255 characters")
     private String user;
 
     @ApiModelProperty(
@@ -81,7 +81,7 @@ public abstract class BaseDTO {
             required = true
     )
     @NotBlank(message = "Name is missing and is required.")
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length is 255 characters")
     private String name;
 
     @ApiModelProperty(

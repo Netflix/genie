@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
@@ -25,11 +27,13 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.CommandRepository;
-import com.netflix.genie.web.configs.GenieConfig;
+import com.netflix.genie.web.GenieWeb;
+import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +41,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -51,6 +60,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -64,18 +74,19 @@ import java.util.UUID;
 @ActiveProfiles({"integration"})
 @DirtiesContext
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GenieConfig.class)
+@SpringApplicationConfiguration(classes = GenieWeb.class)
 @WebIntegrationTest(randomPort = true)
-public class ApplicationControllerIntegrationTests {
+public class ApplicationRestControllerIntegrationTests {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = "spark";
     private static final String USER = "genie";
     private static final String VERSION = "0.15.0";
-
-    // The TestRestTemplate overrides error handler so that errors pass through to user so can validate
-    private final RestTemplate restTemplate = new TestRestTemplate();
-    private final HttpHeaders headers = new HttpHeaders();
+    private static final HttpHeaders HEADERS = new HttpHeaders();
+    private static final ParameterizedTypeReference<PagedResources<ApplicationResource>> PAGED_TYPE_REFERENCE
+            = new ParameterizedTypeReference<PagedResources<ApplicationResource>>() {
+    };
+    private static RestTemplate restTemplate;
 
     // Since we're bringing the service up on random port need to figure out what it is
     @Value("${local.server.port}")
@@ -90,13 +101,34 @@ public class ApplicationControllerIntegrationTests {
     private CommandRepository commandRepository;
 
     /**
+     * Any one time setup for all the tests.
+     */
+    @BeforeClass
+    public static void setupClass() {
+        HEADERS.setContentType(MediaType.APPLICATION_JSON);
+
+        // The TestRestTemplate overrides error handler so that errors pass through to user so can validate
+        restTemplate = new TestRestTemplate();
+
+        // Add the conversion handler for HAL
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.registerModule(new Jackson2HalModule());
+
+        final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setSupportedMediaTypes(MediaType.parseMediaTypes(MediaTypes.HAL_JSON_VALUE));
+        converter.setObjectMapper(mapper);
+
+        restTemplate.getMessageConverters().add(0, converter);
+    }
+
+    /**
      * Setup for tests.
      */
     @Before
     public void setup() {
         this.appsBaseUrl = "http://localhost:" + this.port + "/api/v3/applications";
         this.commandsBaseUrl = "http://localhost:" + this.port + "/api/v3/commands";
-        this.headers.setContentType(MediaType.APPLICATION_JSON);
     }
 
     /**
@@ -117,10 +149,11 @@ public class ApplicationControllerIntegrationTests {
     public void canCreateApplicationWithoutId() throws GenieException {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final URI location = createApplication(null, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
-        final ResponseEntity<Application> getResponse = this.restTemplate.getForEntity(location, Application.class);
+        final ResponseEntity<ApplicationResource> getResponse
+                = restTemplate.getForEntity(location, ApplicationResource.class);
 
         Assert.assertThat(getResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
-        final Application getApp = getResponse.getBody();
+        final Application getApp = getResponse.getBody().getContent();
         Assert.assertThat(getApp.getId(), Matchers.notNullValue());
         Assert.assertThat(getApp.getName(), Matchers.is(NAME));
         Assert.assertThat(getApp.getVersion(), Matchers.is(VERSION));
@@ -146,10 +179,11 @@ public class ApplicationControllerIntegrationTests {
     public void canCreateApplicationWithId() throws GenieException {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final URI location = createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
-        final ResponseEntity<Application> getResponse = this.restTemplate.getForEntity(location, Application.class);
+        final ResponseEntity<ApplicationResource> getResponse
+                = restTemplate.getForEntity(location, ApplicationResource.class);
 
         Assert.assertThat(getResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
-        final Application getApp = getResponse.getBody();
+        final Application getApp = getResponse.getBody().getContent();
         Assert.assertThat(getApp.getId(), Matchers.is(ID));
         Assert.assertThat(getApp.getName(), Matchers.is(NAME));
         Assert.assertThat(getApp.getVersion(), Matchers.is(VERSION));
@@ -173,9 +207,9 @@ public class ApplicationControllerIntegrationTests {
     public void canHandleBadInputToCreateApplication() {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final Application app = new Application.Builder(null, null, null, null).build();
-        final HttpEntity<Application> entity = new HttpEntity<>(app, this.headers);
+        final HttpEntity<Application> entity = new HttpEntity<>(app, HEADERS);
         final ResponseEntity<String> responseEntity
-                = this.restTemplate.postForEntity(this.appsBaseUrl, entity, String.class);
+                = new TestRestTemplate().postForEntity(this.appsBaseUrl, entity, String.class);
 
         Assert.assertThat(responseEntity.getStatusCode(), Matchers.is(HttpStatus.PRECONDITION_FAILED));
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
@@ -207,24 +241,32 @@ public class ApplicationControllerIntegrationTests {
         createApplication(id3, name3, user3, version3, ApplicationStatus.INACTIVE);
 
         // Test finding all applications
-        ResponseEntity<Application[]> getResponse
-                = this.restTemplate.getForEntity(this.appsBaseUrl, Application[].class);
+        ResponseEntity<PagedResources<ApplicationResource>> resources = restTemplate.exchange(
+                this.appsBaseUrl,
+                HttpMethod.GET,
+                null,
+                PAGED_TYPE_REFERENCE
+        );
 
-        Assert.assertThat(getResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
-        Application[] apps = getResponse.getBody();
-        Assert.assertThat(apps.length, Matchers.is(3));
+        Collection<ApplicationResource> apps = resources.getBody().getContent();
+        Assert.assertThat(apps.size(), Matchers.is(3));
 
         // Try to limit the number of results
         URI uri = UriComponentsBuilder.fromHttpUrl(this.appsBaseUrl)
-                .queryParam("limit", 2)
+                .queryParam("size", 2)
                 .build()
                 .encode()
                 .toUri();
-        getResponse = this.restTemplate.getForEntity(uri, Application[].class);
 
-        Assert.assertThat(getResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
-        apps = getResponse.getBody();
-        Assert.assertThat(apps.length, Matchers.is(2));
+        resources = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                null,
+                PAGED_TYPE_REFERENCE
+        );
+
+        apps = resources.getBody().getContent();
+        Assert.assertThat(apps.size(), Matchers.is(2));
 
         // Query by name
         uri = UriComponentsBuilder.fromHttpUrl(this.appsBaseUrl)
@@ -232,10 +274,15 @@ public class ApplicationControllerIntegrationTests {
                 .build()
                 .encode()
                 .toUri();
-        getResponse = this.restTemplate.getForEntity(uri, Application[].class);
-        apps = getResponse.getBody();
-        Assert.assertThat(apps.length, Matchers.is(1));
-        Assert.assertThat(apps[0].getId(), Matchers.is(id2));
+        resources = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                null,
+                PAGED_TYPE_REFERENCE
+        );
+        apps = resources.getBody().getContent();
+        Assert.assertThat(apps.size(), Matchers.is(1));
+        Assert.assertThat(apps.iterator().next().getContent().getId(), Matchers.is(id2));
 
         // Query by user
         uri = UriComponentsBuilder.fromHttpUrl(this.appsBaseUrl)
@@ -243,10 +290,15 @@ public class ApplicationControllerIntegrationTests {
                 .build()
                 .encode()
                 .toUri();
-        getResponse = this.restTemplate.getForEntity(uri, Application[].class);
-        apps = getResponse.getBody();
-        Assert.assertThat(apps.length, Matchers.is(1));
-        Assert.assertThat(apps[0].getId(), Matchers.is(id3));
+        resources = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                null,
+                PAGED_TYPE_REFERENCE
+        );
+        apps = resources.getBody().getContent();
+        Assert.assertThat(apps.size(), Matchers.is(1));
+        Assert.assertThat(apps.iterator().next().getContent().getId(), Matchers.is(id3));
 
         // Query by statuses
         uri = UriComponentsBuilder.fromHttpUrl(this.appsBaseUrl)
@@ -254,16 +306,23 @@ public class ApplicationControllerIntegrationTests {
                 .build()
                 .encode()
                 .toUri();
-        getResponse = this.restTemplate.getForEntity(uri, Application[].class);
-        apps = getResponse.getBody();
-        Assert.assertThat(apps.length, Matchers.is(2));
-        Arrays.asList(apps).stream().forEach(
-                application -> {
-                    if (!application.getId().equals(id1) && !application.getId().equals(id2)) {
-                        Assert.fail();
-                    }
-                }
+        resources = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                null,
+                PAGED_TYPE_REFERENCE
         );
+        apps = resources.getBody().getContent();
+        Assert.assertThat(apps.size(), Matchers.is(2));
+        apps.stream()
+                .map(ApplicationResource::getContent).
+                forEach(
+                        application -> {
+                            if (!application.getId().equals(id1) && !application.getId().equals(id2)) {
+                                Assert.fail();
+                            }
+                        }
+                );
 
         // Query by tags
         uri = UriComponentsBuilder.fromHttpUrl(this.appsBaseUrl)
@@ -271,10 +330,15 @@ public class ApplicationControllerIntegrationTests {
                 .build()
                 .encode()
                 .toUri();
-        getResponse = this.restTemplate.getForEntity(uri, Application[].class);
-        apps = getResponse.getBody();
-        Assert.assertThat(apps.length, Matchers.is(1));
-        Assert.assertThat(apps[0].getId(), Matchers.is(id1));
+        resources = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                null,
+                PAGED_TYPE_REFERENCE
+        );
+        apps = resources.getBody().getContent();
+        Assert.assertThat(apps.size(), Matchers.is(1));
+        Assert.assertThat(apps.iterator().next().getContent().getId(), Matchers.is(id1));
 
         //TODO: Add tests for sort, orderBy etc
 
@@ -290,7 +354,8 @@ public class ApplicationControllerIntegrationTests {
     public void canUpdateApplication() throws GenieException {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final URI location = createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
-        final Application createdApp = this.restTemplate.getForEntity(location, Application.class).getBody();
+        final Application createdApp
+                = restTemplate.getForEntity(location, ApplicationResource.class).getBody().getContent();
         Assert.assertThat(createdApp.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
 
         final Application newStatusApp = new Application.Builder(
@@ -309,18 +374,17 @@ public class ApplicationControllerIntegrationTests {
                 .withDependencies(createdApp.getDependencies())
                 .build();
 
-        final HttpEntity<Application> entity = new HttpEntity<>(newStatusApp, this.headers);
-        final ResponseEntity<?> updateResponse = this.restTemplate
-                .exchange(
-                        this.appsBaseUrl + "/" + ID,
-                        HttpMethod.PUT,
-                        entity,
-                        Void.class
-                );
+        final HttpEntity<Application> entity = new HttpEntity<>(newStatusApp, HEADERS);
+        final ResponseEntity<?> updateResponse = restTemplate.exchange(
+                this.appsBaseUrl + "/" + ID,
+                HttpMethod.PUT,
+                entity,
+                Void.class
+        );
 
-        Assert.assertThat(updateResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
+        Assert.assertThat(updateResponse.getStatusCode(), Matchers.is(HttpStatus.NO_CONTENT));
         final Application updateApp
-                = this.restTemplate.getForEntity(this.appsBaseUrl + "/" + ID, Application.class).getBody();
+                = restTemplate.getForEntity(this.appsBaseUrl + "/" + ID, Application.class).getBody();
         Assert.assertThat(updateApp.getStatus(), Matchers.is(ApplicationStatus.INACTIVE));
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
     }
@@ -338,7 +402,7 @@ public class ApplicationControllerIntegrationTests {
         createApplication(null, NAME, USER, VERSION, ApplicationStatus.INACTIVE);
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
 
-        this.restTemplate.delete(this.appsBaseUrl);
+        restTemplate.delete(this.appsBaseUrl);
 
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
     }
@@ -369,21 +433,26 @@ public class ApplicationControllerIntegrationTests {
         createApplication(id3, name3, user3, version3, ApplicationStatus.INACTIVE);
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
 
-        this.restTemplate.delete(this.appsBaseUrl + "/" + id2);
+        restTemplate.delete(this.appsBaseUrl + "/" + id2);
 
-        final ResponseEntity<Application[]> getResponse
-                = this.restTemplate.getForEntity(this.appsBaseUrl, Application[].class);
-
-        Assert.assertThat(getResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
-        final Application[] apps = getResponse.getBody();
-        Assert.assertThat(apps.length, Matchers.is(2));
-        Arrays.asList(apps).stream().forEach(
-                application -> {
-                    if (!application.getId().equals(id1) && !application.getId().equals(id3)) {
-                        Assert.fail();
-                    }
-                }
+        final ResponseEntity<PagedResources<ApplicationResource>> resources = restTemplate.exchange(
+                this.appsBaseUrl,
+                HttpMethod.GET,
+                null,
+                PAGED_TYPE_REFERENCE
         );
+
+        final Collection<ApplicationResource> apps = resources.getBody().getContent();
+        Assert.assertThat(apps.size(), Matchers.is(2));
+        apps.stream()
+                .map(ApplicationResource::getContent)
+                .forEach(
+                        application -> {
+                            if (!application.getId().equals(id1) && !application.getId().equals(id3)) {
+                                Assert.fail();
+                            }
+                        }
+                );
     }
 
     /**
@@ -396,7 +465,7 @@ public class ApplicationControllerIntegrationTests {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
-        ResponseEntity<String[]> configResponse = this.restTemplate.getForEntity(
+        ResponseEntity<String[]> configResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/configs",
                 String[].class
         );
@@ -405,14 +474,14 @@ public class ApplicationControllerIntegrationTests {
         final String config1 = UUID.randomUUID().toString();
         final String config2 = UUID.randomUUID().toString();
         final Set<String> configs = Sets.newHashSet(config1, config2);
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(configs, this.headers);
-        this.restTemplate.postForEntity(
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(configs, HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/configs",
                 entity,
                 Void.class
         );
 
-        configResponse = this.restTemplate.getForEntity(
+        configResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/configs",
                 String[].class
         );
@@ -434,18 +503,18 @@ public class ApplicationControllerIntegrationTests {
 
         final String config1 = UUID.randomUUID().toString();
         final String config2 = UUID.randomUUID().toString();
-        HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(config1, config2), this.headers);
-        this.restTemplate.postForEntity(
+        HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(config1, config2), HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/configs",
                 entity,
                 Void.class
         );
 
         final String config3 = UUID.randomUUID().toString();
-        entity = new HttpEntity<>(Sets.newHashSet(config3), this.headers);
-        this.restTemplate.put(this.appsBaseUrl + "/" + ID + "/configs", entity);
+        entity = new HttpEntity<>(Sets.newHashSet(config3), HEADERS);
+        restTemplate.put(this.appsBaseUrl + "/" + ID + "/configs", entity);
 
-        final ResponseEntity<String[]> configResponse = this.restTemplate.getForEntity(
+        final ResponseEntity<String[]> configResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/configs",
                 String[].class
         );
@@ -466,16 +535,16 @@ public class ApplicationControllerIntegrationTests {
 
         final String config1 = UUID.randomUUID().toString();
         final String config2 = UUID.randomUUID().toString();
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(config1, config2), this.headers);
-        this.restTemplate.postForEntity(
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(config1, config2), HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/configs",
                 entity,
                 String[].class
         );
 
-        this.restTemplate.delete(this.appsBaseUrl + "/" + ID + "/configs");
+        restTemplate.delete(this.appsBaseUrl + "/" + ID + "/configs");
 
-        final ResponseEntity<String[]> configResponse = this.restTemplate.getForEntity(
+        final ResponseEntity<String[]> configResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/configs",
                 String[].class
         );
@@ -492,7 +561,7 @@ public class ApplicationControllerIntegrationTests {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
-        ResponseEntity<String[]> dependencyResponse = this.restTemplate.getForEntity(
+        ResponseEntity<String[]> dependencyResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/dependencies",
                 String[].class
         );
@@ -501,14 +570,14 @@ public class ApplicationControllerIntegrationTests {
         final String jar1 = UUID.randomUUID().toString();
         final String jar2 = UUID.randomUUID().toString();
         final Set<String> dependencies = Sets.newHashSet(jar1, jar2);
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(dependencies, this.headers);
-        this.restTemplate.postForEntity(
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(dependencies, HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/dependencies",
                 entity,
                 Void.class
         );
 
-        dependencyResponse = this.restTemplate.getForEntity(
+        dependencyResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/dependencies",
                 String[].class
         );
@@ -530,17 +599,17 @@ public class ApplicationControllerIntegrationTests {
 
         final String dependency1 = UUID.randomUUID().toString();
         final String dependency2 = UUID.randomUUID().toString();
-        HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(dependency1, dependency2), this.headers);
-        this.restTemplate.postForEntity(
+        HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(dependency1, dependency2), HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/dependencies",
                 entity,
                 void.class
         );
 
         final String dependency3 = UUID.randomUUID().toString();
-        entity = new HttpEntity<>(Sets.newHashSet(dependency3), this.headers);
-        this.restTemplate.put(this.appsBaseUrl + "/" + ID + "/dependencies", entity);
-        final ResponseEntity<String[]> dependencyResponse = this.restTemplate.getForEntity(
+        entity = new HttpEntity<>(Sets.newHashSet(dependency3), HEADERS);
+        restTemplate.put(this.appsBaseUrl + "/" + ID + "/dependencies", entity);
+        final ResponseEntity<String[]> dependencyResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/dependencies",
                 String[].class
         );
@@ -561,16 +630,16 @@ public class ApplicationControllerIntegrationTests {
 
         final String jar1 = UUID.randomUUID().toString();
         final String jar2 = UUID.randomUUID().toString();
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(jar1, jar2), this.headers);
-        this.restTemplate.postForEntity(
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(jar1, jar2), HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/dependencies",
                 entity,
                 String[].class
         );
 
-        this.restTemplate.delete(this.appsBaseUrl + "/" + ID + "/dependencies");
+        restTemplate.delete(this.appsBaseUrl + "/" + ID + "/dependencies");
 
-        final ResponseEntity<String[]> jarResponse = this.restTemplate.getForEntity(
+        final ResponseEntity<String[]> jarResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/dependencies",
                 String[].class
         );
@@ -587,7 +656,7 @@ public class ApplicationControllerIntegrationTests {
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
-        ResponseEntity<String[]> tagResponse = this.restTemplate.getForEntity(
+        ResponseEntity<String[]> tagResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 String[].class
         );
@@ -596,14 +665,14 @@ public class ApplicationControllerIntegrationTests {
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
         final Set<String> tags = Sets.newHashSet(tag1, tag2);
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(tags, this.headers);
-        this.restTemplate.postForEntity(
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(tags, HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 entity,
                 void.class
         );
 
-        tagResponse = this.restTemplate.getForEntity(
+        tagResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 String[].class
         );
@@ -627,18 +696,18 @@ public class ApplicationControllerIntegrationTests {
 
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
-        HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(tag1, tag2), this.headers);
-        this.restTemplate.postForEntity(
+        HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(tag1, tag2), HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 entity,
                 String[].class
         );
 
         final String tag3 = UUID.randomUUID().toString();
-        entity = new HttpEntity<>(Sets.newHashSet(tag3), this.headers);
-        this.restTemplate.put(this.appsBaseUrl + "/" + ID + "/tags", entity);
+        entity = new HttpEntity<>(Sets.newHashSet(tag3), HEADERS);
+        restTemplate.put(this.appsBaseUrl + "/" + ID + "/tags", entity);
 
-        final ResponseEntity<String[]> tagResponse = this.restTemplate.getForEntity(
+        final ResponseEntity<String[]> tagResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 String[].class
         );
@@ -660,16 +729,16 @@ public class ApplicationControllerIntegrationTests {
 
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(tag1, tag2), this.headers);
-        this.restTemplate.postForEntity(
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(tag1, tag2), HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 entity,
                 String[].class
         );
 
-        this.restTemplate.delete(this.appsBaseUrl + "/" + ID + "/tags");
+        restTemplate.delete(this.appsBaseUrl + "/" + ID + "/tags");
 
-        final ResponseEntity<String[]> tagResponse = this.restTemplate.getForEntity(
+        final ResponseEntity<String[]> tagResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 String[].class
         );
@@ -690,16 +759,16 @@ public class ApplicationControllerIntegrationTests {
 
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(tag1, tag2), this.headers);
-        this.restTemplate.postForEntity(
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(Sets.newHashSet(tag1, tag2), HEADERS);
+        restTemplate.postForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 entity,
                 String[].class
         );
 
-        this.restTemplate.delete(this.appsBaseUrl + "/" + ID + "/tags/" + tag1);
+        restTemplate.delete(this.appsBaseUrl + "/" + ID + "/tags/" + tag1);
 
-        final ResponseEntity<String[]> tagResponse = this.restTemplate.getForEntity(
+        final ResponseEntity<String[]> tagResponse = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/tags",
                 String[].class
         );
@@ -726,19 +795,19 @@ public class ApplicationControllerIntegrationTests {
         createCommand(command3Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
 
         final Set<String> appIds = Sets.newHashSet(ID);
-        final HttpEntity<Set<String>> entity = new HttpEntity<>(appIds, this.headers);
-        this.restTemplate.postForEntity(
+        final HttpEntity<Set<String>> entity = new HttpEntity<>(appIds, HEADERS);
+        restTemplate.postForEntity(
                 this.commandsBaseUrl + "/" + command1Id + "/applications",
                 entity,
                 Application[].class
         );
-        this.restTemplate.postForEntity(
+        restTemplate.postForEntity(
                 this.commandsBaseUrl + "/" + command3Id + "/applications",
                 entity,
                 Application[].class
         );
 
-        final ResponseEntity<Command[]> responseEntity = this.restTemplate.getForEntity(
+        final ResponseEntity<Command[]> responseEntity = restTemplate.getForEntity(
                 this.appsBaseUrl + "/" + ID + "/commands",
                 Command[].class
         );
@@ -772,8 +841,8 @@ public class ApplicationControllerIntegrationTests {
             final ApplicationStatus status
     ) throws GenieException {
         final Application app = new Application.Builder(name, user, version, status).withId(id).build();
-        final HttpEntity<Application> entity = new HttpEntity<>(app, this.headers);
-        return this.restTemplate.postForLocation(this.appsBaseUrl, entity);
+        final HttpEntity<Application> entity = new HttpEntity<>(app, HEADERS);
+        return restTemplate.postForLocation(this.appsBaseUrl, entity);
     }
 
     /**
@@ -796,7 +865,7 @@ public class ApplicationControllerIntegrationTests {
             final String executable
     ) throws GenieException {
         final Command command = new Command.Builder(name, user, version, status, executable).withId(id).build();
-        final HttpEntity<Command> entity = new HttpEntity<>(command, this.headers);
-        return this.restTemplate.postForLocation(this.commandsBaseUrl, entity);
+        final HttpEntity<Command> entity = new HttpEntity<>(command, HEADERS);
+        return restTemplate.postForLocation(this.commandsBaseUrl, entity);
     }
 }

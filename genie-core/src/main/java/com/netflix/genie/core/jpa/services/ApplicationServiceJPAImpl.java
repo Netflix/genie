@@ -27,7 +27,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
-import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.ApplicationSpecs;
@@ -40,7 +39,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,7 +90,7 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
     public String createApplication(
             @NotNull(message = "No application entered to create.")
             @Valid
-            final com.netflix.genie.common.dto.Application app
+            final Application app
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with application: " + app.toString());
@@ -141,31 +141,21 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<com.netflix.genie.common.dto.Application> getApplications(
+    public Page<Application> getApplications(
             final String name,
             final String userName,
             final Set<ApplicationStatus> statuses,
             final Set<String> tags,
-            final int page,
-            final int limit,
-            final boolean descending,
-            final Set<String> orderBys) {
+            final Pageable page) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called");
         }
 
-        final PageRequest pageRequest = JPAUtils.getPageRequest(
-                page, limit, descending, orderBys, ApplicationEntity_.class, ApplicationEntity_.updated.getName()
-        );
-
         @SuppressWarnings("unchecked")
-        final List<ApplicationEntity> applicationEntities
-                = this.applicationRepo.findAll(ApplicationSpecs.find(name, userName, statuses, tags), pageRequest)
-                .getContent();
-        return applicationEntities
-                .stream()
-                .map(ApplicationEntity::getDTO)
-                .collect(Collectors.toList());
+        final Page<ApplicationEntity> applicationEntities
+                = this.applicationRepo.findAll(ApplicationSpecs.find(name, userName, statuses, tags), page);
+
+        return applicationEntities.map(ApplicationEntity::getDTO);
     }
 
     /**
