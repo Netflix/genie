@@ -188,6 +188,7 @@ public class JobController {
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @ApiOperation(
             value = "Submit a job with attachments",
             notes = "Submit a new job to run to genie with the associated attachments"
@@ -214,7 +215,7 @@ public class JobController {
                     message = "Genie Server Error due to Unknown Exception"
             )
     })
-    public ResponseEntity<?> submitJob(
+    public ResponseEntity<Void> submitJob(
             @ApiParam(
                     value = "Job information to run.",
                     required = true
@@ -234,7 +235,6 @@ public class JobController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to submit job: " + jobRequest);
         }
-        LOG.info("Called to submit job: " + jobRequest);
 
         if (attachments != null) {
             Arrays.asList(attachments)
@@ -255,7 +255,7 @@ public class JobController {
                         .buildAndExpand(jobRequest.getId())
                         .toUri()
         );
-        return new ResponseEntity<>(null, httpHeaders, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
     }
 
     /**
