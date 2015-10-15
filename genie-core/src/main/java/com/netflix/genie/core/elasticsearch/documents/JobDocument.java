@@ -15,38 +15,15 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.jpa.entities;
+package com.netflix.genie.core.elasticsearch.documents;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
-import com.netflix.genie.common.dto.FileAttachment;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.elasticsearch.annotations.Document;
 
-import javax.persistence.Basic;
-import javax.persistence.Cacheable;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.PostLoad;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -60,10 +37,8 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
-@Entity
-@Table(name = "jobs")
-@Cacheable(false)
-public class JobEntity extends CommonFields {
+@Document(indexName = "genie", type = "job")
+public class JobDocument extends CommonDocument {
     /**
      * Used to split between cluster criteria sets.
      */
@@ -72,245 +47,28 @@ public class JobEntity extends CommonFields {
      * Used to split between criteria.
      */
     protected static final char CRITERIA_DELIMITER = ',';
-    /**
-     * Used as default version when one not entered.
-     */
-    protected static final String DEFAULT_VERSION = "NA";
 
-    // ------------------------------------------------------------------------
-    // GENERAL COMMON PARAMS FOR ALL JOBS - TO BE SPECIFIED BY CLIENTS
-    // ------------------------------------------------------------------------
-
-    @Lob
-    @Basic(optional = false)
-    @Column(name = "command_args", nullable = false)
-    @NotBlank(message = "Command arguments are required.")
     private String commandArgs;
-
-    @Basic
-    @Column(name = "group_name", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
     private String group;
-
-    @Lob
-    @Basic
-    @Column(name = "setup_file")
     private String setupFile;
-
-    @Transient
-    @NotEmpty(message = "No cluster criteria entered. At least one required.")
-    private List<ClusterCriteria> clusterCriterias = new ArrayList<>();
-
-    /**
-     * Set of tags to use for selecting command (REQUIRED).
-     */
-    @Transient
-    @NotEmpty(message = "No command criteria entered. At least one required.")
-    private Set<String> commandCriteria = new HashSet<>();
-
-    @Lob
-    @Column(name = "file_dependencies")
     private String fileDependencies;
-
-    @Transient
-    private Set<FileAttachment> attachments = new HashSet<>();
-
-    @Basic
-    @Column(name = "disable_log_archival")
-    private boolean disableLogArchival;
-
-    @Basic
-    @Column(name = "email", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
     private String email;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "job_tags",
-            joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "id")
-    )
-    @Column(name = "tag", nullable = false, length = 255)
     private Set<String> tags = new HashSet<>();
-
-    // ------------------------------------------------------------------------
-    // GENERAL COMMON STUFF FOR ALL JOBS
-    // TO BE GENERATED/USED BY SERVER
-    // ------------------------------------------------------------------------
-
-    @Lob
-    @Basic(optional = false)
-    @Column(name = "cluster_criterias_string", nullable = false)
     private String clusterCriteriasString;
-
-    @Lob
-    @Basic(optional = false)
-    @Column(name = "command_criteria_string", nullable = false)
     private String commandCriteriaString;
-
-    @Lob
-    @Basic
-    @Column(name = "chosen_cluster_criteria_string")
     private String chosenClusterCriteriaString;
-
-    @Basic
-    @Column(name = "execution_cluster_name", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String executionClusterName;
-
-    @Basic
-    @Column(name = "execution_cluster_id", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
     private String executionClusterId;
-
-    @Basic
-    @Column(name = "application_name", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String applicationName;
-
-    @Basic
-    @Column(name = "application_id", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String applicationId;
-
-    @Basic
-    @Column(name = "command_name", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String commandName;
-
-    @Basic
-    @Column(name = "command_id", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
     private String commandId;
-
-    @Basic
-    @Column(name = "process_handle")
-    private int processHandle = -1;
-
-    @Basic(optional = false)
-    @Column(name = "status", nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
     private JobStatus status;
-
-    @Basic
-    @Column(name = "status_msg", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
     private String statusMsg;
-
-    @Basic
-    @Column(name = "started")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date started = new Date(0);
-
-    @Basic
-    @Column(name = "finished")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date finished = new Date(0);
-
-    @Basic
-    @Column(name = "client_host", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
     private String clientHost;
-
-    @Basic
-    @Column(name = "host_name", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
     private String hostName;
-
-    @Lob
-    @Basic
-    @Column(name = "kill_uri")
     private String killURI;
-
-    @Lob
-    @Basic
-    @Column(name = "output_uri")
     private String outputURI;
-
-    @Basic
-    @Column(name = "exit_code")
     private int exitCode = -1;
-
-    @Basic
-    @Column(name = "forwarded")
-    private boolean forwarded;
-
-    @Lob
-    @Column(name = "archive_location")
     private String archiveLocation;
-
-    /**
-     * Default Constructor.
-     */
-    public JobEntity() {
-        super();
-        // Set version to default if not specified
-        if (StringUtils.isBlank(this.getVersion())) {
-            this.setVersion(DEFAULT_VERSION);
-        }
-    }
-
-    /**
-     * Construct a new Job.
-     *
-     * @param user             The name of the user running the job. Not null/empty/blank.
-     * @param name             The name specified for the job. Not null/empty/blank.
-     * @param version          The version of this job. Not null/empty/blank.
-     * @param commandArgs      The command line arguments for the job. Not
-     *                         null/empty/blank.
-     * @param commandCriteria  The criteria for the command. Not null/empty.
-     * @param clusterCriterias The cluster criteria for the job. Not null/empty.
-     */
-    public JobEntity(
-            final String user,
-            final String name,
-            final String version,
-            final String commandArgs,
-            final Set<String> commandCriteria,
-            final List<ClusterCriteria> clusterCriterias
-    ) {
-        super(name, user, version);
-
-        this.commandArgs = commandArgs;
-        //TODO: Come back and implement bean validation on entity constructors
-        if (clusterCriterias != null) {
-            this.clusterCriterias.addAll(clusterCriterias);
-            this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
-        }
-        if (commandCriteria != null) {
-            this.commandCriteria.addAll(commandCriteria);
-            this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
-        }
-
-        // Set version to default if not specified
-        if (StringUtils.isBlank(this.getVersion())) {
-            this.setVersion(DEFAULT_VERSION);
-        }
-    }
-
-    /**
-     * Makes sure non-transient fields are set from transient fields.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @PrePersist
-    @PreUpdate
-    protected void onCreateOrUpdateJob() throws GeniePreconditionException {
-//        this.clusterCriteriasString = clusterCriteriasToString(this.clusterCriterias);
-//        this.commandCriteriaString = commandCriteriaToString(this.commandCriteria);
-    }
-
-    /**
-     * On any update to the entity will add id to tags.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @PostLoad
-    @PostPersist
-    @PostUpdate
-    protected void onLoadJob() throws GeniePreconditionException {
-        this.clusterCriterias = this.stringToClusterCriterias(this.clusterCriteriasString);
-        this.commandCriteria = this.stringToCommandCriteria(this.commandCriteriaString);
-    }
 
     /**
      * Gets the group name of the user who submitted the job.
@@ -328,25 +86,6 @@ public class JobEntity extends CommonFields {
      */
     public void setGroup(final String group) {
         this.group = group;
-    }
-
-    /**
-     * Gets the name of the cluster on which this job was run.
-     *
-     * @return executionClusterName
-     */
-    public String getExecutionClusterName() {
-        return this.executionClusterName;
-    }
-
-    /**
-     * Sets the name of the cluster on which this job is run.
-     *
-     * @param executionClusterName Name of the cluster on which job is executed.
-     *                             Populated by the server.
-     */
-    public void setExecutionClusterName(final String executionClusterName) {
-        this.executionClusterName = executionClusterName;
     }
 
     /**
@@ -375,7 +114,7 @@ public class JobEntity extends CommonFields {
      * @return clusterCriterias
      */
     public List<ClusterCriteria> getClusterCriterias() {
-        return this.clusterCriterias;
+        return this.stringToClusterCriterias(this.clusterCriteriasString);
     }
 
     /**
@@ -388,8 +127,6 @@ public class JobEntity extends CommonFields {
         if (clusterCriterias == null || clusterCriterias.isEmpty()) {
             throw new GeniePreconditionException("No cluster criteria entered.");
         }
-        this.clusterCriterias.clear();
-        this.clusterCriterias.addAll(clusterCriterias);
         this.clusterCriteriasString = clusterCriteriasToString(clusterCriterias);
     }
 
@@ -436,42 +173,6 @@ public class JobEntity extends CommonFields {
     }
 
     /**
-     * Get the attachments for this job.
-     *
-     * @return The attachments
-     */
-    public Set<FileAttachment> getAttachments() {
-        return this.attachments;
-    }
-
-    /**
-     * Set the attachments for this job.
-     *
-     * @param attachments The attachments to set
-     */
-    public void setAttachments(final Set<FileAttachment> attachments) {
-        this.attachments = attachments;
-    }
-
-    /**
-     * Is the log archival disabled.
-     *
-     * @return true if it's disabled
-     */
-    public boolean isDisableLogArchival() {
-        return this.disableLogArchival;
-    }
-
-    /**
-     * Set whether the log archival is disabled or not.
-     *
-     * @param disableLogArchival True if disabling is desired
-     */
-    public void setDisableLogArchival(final boolean disableLogArchival) {
-        this.disableLogArchival = disableLogArchival;
-    }
-
-    /**
      * Gets the commandArgs specified to run the job.
      *
      * @return commandArgs
@@ -490,63 +191,6 @@ public class JobEntity extends CommonFields {
     }
 
     /**
-     * Gets the application name specified to run the job.
-     *
-     * @return applicationName
-     */
-    public String getApplicationName() {
-        return this.applicationName;
-    }
-
-    /**
-     * Set application Name with which this job is run, if not null.
-     *
-     * @param applicationName Name of the application if specified on which the
-     *                        job is run
-     */
-    public void setApplicationName(final String applicationName) {
-        this.applicationName = applicationName;
-    }
-
-    /**
-     * Gets the application id specified to run the job.
-     *
-     * @return applicationId
-     */
-    public String getApplicationId() {
-        return this.applicationId;
-    }
-
-    /**
-     * Set application Id with which this job is run, if not null.
-     *
-     * @param applicationId Id of the application if specified on which the job
-     *                      is run
-     */
-    public void setApplicationId(final String applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    /**
-     * Gets the command name for this job.
-     *
-     * @return commandName
-     */
-    public String getCommandName() {
-        return this.commandName;
-    }
-
-    /**
-     * Set command Name with which this job is run.
-     *
-     * @param commandName Name of the command if specified on which the job is
-     *                    run
-     */
-    public void setCommandName(final String commandName) {
-        this.commandName = commandName;
-    }
-
-    /**
      * Gets the command id for this job.
      *
      * @return commandId
@@ -562,24 +206,6 @@ public class JobEntity extends CommonFields {
      */
     public void setCommandId(final String commandId) {
         this.commandId = commandId;
-    }
-
-    /**
-     * Get the process handle for the job.
-     *
-     * @return processHandle
-     */
-    public int getProcessHandle() {
-        return this.processHandle;
-    }
-
-    /**
-     * Set the process handle for the job.
-     *
-     * @param processHandle the process handle
-     */
-    public void setProcessHandle(final int processHandle) {
-        this.processHandle = processHandle;
     }
 
     /**
@@ -746,24 +372,6 @@ public class JobEntity extends CommonFields {
     }
 
     /**
-     * Has the job been forwarded to another instance.
-     *
-     * @return true, if forwarded
-     */
-    public boolean isForwarded() {
-        return this.forwarded;
-    }
-
-    /**
-     * Has the job been forwarded to another instance.
-     *
-     * @param forwarded true, if forwarded
-     */
-    public void setForwarded(final boolean forwarded) {
-        this.forwarded = forwarded;
-    }
-
-    /**
      * Get location where logs are archived.
      *
      * @return s3/hdfs location where logs are archived
@@ -798,7 +406,6 @@ public class JobEntity extends CommonFields {
      */
     protected void setClusterCriteriasString(final String clusterCriteriasString) throws GeniePreconditionException {
         this.clusterCriteriasString = clusterCriteriasString;
-        this.clusterCriterias = stringToClusterCriterias(clusterCriteriasString);
     }
 
     /**
@@ -808,7 +415,7 @@ public class JobEntity extends CommonFields {
      * @return commandCriteria
      */
     public Set<String> getCommandCriteria() {
-        return this.commandCriteria;
+        return this.stringToCommandCriteria(this.commandCriteriaString);
     }
 
     /**
@@ -821,8 +428,6 @@ public class JobEntity extends CommonFields {
         if (commandCriteria == null || commandCriteria.isEmpty()) {
             throw new GeniePreconditionException("No command criteria entered. At least one is required");
         }
-        this.commandCriteria.clear();
-        this.commandCriteria.addAll(commandCriteria);
         this.commandCriteriaString = commandCriteriaToString(commandCriteria);
     }
 
@@ -843,7 +448,6 @@ public class JobEntity extends CommonFields {
      */
     public void setCommandCriteriaString(final String commandCriteriaString) throws GeniePreconditionException {
         this.commandCriteriaString = commandCriteriaString;
-        this.commandCriteria = stringToCommandCriteria(commandCriteriaString);
     }
 
     /**
@@ -918,7 +522,7 @@ public class JobEntity extends CommonFields {
      * to run this job.
      */
     public String getChosenClusterCriteriaString() {
-        return chosenClusterCriteriaString;
+        return this.chosenClusterCriteriaString;
     }
 
     /**
@@ -948,7 +552,6 @@ public class JobEntity extends CommonFields {
                 .withId(this.getId())
                 .withCreated(this.getCreated())
                 .withDescription(this.getDescription())
-                .withDisableLogArchival(this.disableLogArchival)
                 .withEmail(this.email)
                 .withFileDependencies(
                         this.fileDependencies != null
@@ -967,7 +570,6 @@ public class JobEntity extends CommonFields {
                 .withHostName(this.hostName)
                 .withKillURI(this.killURI)
                 .withOutputURI(this.outputURI)
-                .withProcessId(this.processHandle)
                 .withStarted(this.started)
                 .withStatus(this.status)
                 .withStatusMsg(this.statusMsg)

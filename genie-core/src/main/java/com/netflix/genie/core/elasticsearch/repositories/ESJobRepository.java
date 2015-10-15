@@ -17,24 +17,13 @@
  */
 package com.netflix.genie.core.elasticsearch.repositories;
 
-import com.netflix.genie.core.jpa.entities.JobEntity;
-import org.springframework.data.domain.PageRequest;
+import com.netflix.genie.core.elasticsearch.documents.JobDocument;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
-import java.util.List;
-
 /**
- * CRUD repository for Job entities within Elasticsearch.
+ * CRUD repository for Job documents within Elasticsearch.
  *
  * @author tgianos
  */
-public interface ESJobRepository extends ElasticsearchRepository<JobEntity, String> {
-    /**
-     * Find jobs by tags.
-     *
-     * @param tag The tag to search for
-     * @param pageRequest The page of jobs to get
-     * @return the jobs that were found
-     */
-    List<JobEntity> findByTagsContains(final String tag, final PageRequest pageRequest);
+public interface ESJobRepository extends ElasticsearchRepository<JobDocument, String> {
 }

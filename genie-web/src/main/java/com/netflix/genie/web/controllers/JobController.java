@@ -286,7 +286,8 @@ public class JobController {
      * @return successful response, or one with HTTP error code
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
             value = "Find jobs",
             notes = "Find jobs by the submitted criteria.",

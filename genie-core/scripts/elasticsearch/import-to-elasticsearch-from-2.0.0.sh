@@ -171,22 +171,66 @@ if [ "$(curl -X HEAD -i -s -o /dev/null -w "%{http_code}" "${ELASTICSEARCH_PROTO
     fi
 fi
 
+# "sql" : "SELECT Job.id, Job.created, Job.updated, Job.name, Job.user, Job.version, Job.description, Job.archiveLocation, Job.chosenClusterCriteriaString, Job.clusterCriteriasString, Job.commandCriteriaString, Job.commandId, Job.email, Job.envPropFile as 'setupFile', Job.executionClusterId, Job.exitCode, Job.fileDependencies, Job.finished, Job.groupName as 'group', Job.hostName, Job.killURI, Job.outputURI, Job.started, Job.status, Job.statusMsg, Job_tags.element as 'tags', '${ELASTICSEARCH_INDEX_NAME}' as _index, 'job' as _type, Job.id as _id, Job.entityVersion as _version FROM Job LEFT JOIN Job_tags ON Job.id = Job_tags.JOB_ID ORDER BY _id",
+# "sql" : "select *, '${ELASTICSEARCH_INDEX_NAME}' as _index, 'job' as _type, id as _id from Job",
 echo "
 {
-    \"type\" : \"jdbc\",
-    \"jdbc\" : {
-        \"url\" : \"jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}\",
-        \"user\" : \"${MYSQL_USER}\",
-        \"password\" : \"${MYSQL_PASSWORD}\",
-        \"sql\" : \"select *, \\\"${ELASTICSEARCH_INDEX_NAME}\\\" as _index, \\\"job\\\" as _type, id as _id from Job\",
-        \"elasticsearch\" : {
-             \"cluster\" : \"${ELASTICSEARCH_CLUSTER_NAME}\",
-             \"host\" : \"${ELASTICSEARCH_HOST}\",
-             \"port\" : ${ELASTICSEARCH_TRANSPORT_PORT}
+    \"type\": \"jdbc\",
+    \"jdbc\": {
+        \"url\": \"jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}\",
+        \"user\": \"${MYSQL_USER}\",
+        \"password\": \"${MYSQL_PASSWORD}\",
+        \"sql\": [
+            {
+                \"statement\": \"SELECT Job.id, Job.created, Job.updated, Job.name, Job.user, Job.version, Job.description, Job.archiveLocation, Job.chosenClusterCriteriaString, Job.clusterCriteriasString, Job.commandCriteriaString, Job.commandId, Job.email, Job.envPropFile AS 'setupFile', Job.executionClusterId, Job.exitCode, Job.fileDependencies, Job.finished, Job.groupName AS 'group', Job.hostName, Job.killURI, Job.outputURI, Job.started, Job.status, Job.statusMsg, Job_tags.element AS 'tags', Job.id as _id, Job.entityVersion AS _version FROM Job LEFT JOIN Job_tags ON Job.id = Job_tags.JOB_ID ORDER BY _id\"
+            }
+        ],
+        \"elasticsearch\": {
+             \"cluster\": \"${ELASTICSEARCH_CLUSTER_NAME}\",
+             \"host\": \"${ELASTICSEARCH_HOST}\",
+             \"port\": ${ELASTICSEARCH_TRANSPORT_PORT}
         },
-        \"index\" : \"${ELASTICSEARCH_INDEX_NAME}\",
-        \"type\" : \"job\",
-        \"detect_json\" : false
+        \"index\": \"${ELASTICSEARCH_INDEX_NAME}\",
+        \"type\": \"job\",
+        \"detect_json\": false,
+        \"type_mapping\": {
+            \"job\": {
+                \"properties\": {
+                    \"id\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"name\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"user\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"version\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"archiveLocation\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"commandId\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"executionClusterId\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    },
+                    \"tags\": {
+                        \"type\": \"string\",
+                        \"index\": \"not_analyzed\"
+                    }
+                }
+            }
+        }
     }
 }
 " | java -cp "lib/*" -Dlog4j.configurationFile=bin/log4j2.xml org.xbib.tools.Runner org.xbib.tools.JDBCImporter
