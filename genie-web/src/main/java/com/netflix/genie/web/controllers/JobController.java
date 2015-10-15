@@ -49,11 +49,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -131,7 +134,7 @@ public class JobController {
     })
     public ResponseEntity<Void> submitJob(
             @ApiParam(
-                    value = "Job object to run.",
+                    value = "Job information to run.",
                     required = true
             )
             @RequestBody
@@ -171,6 +174,85 @@ public class JobController {
                         .fromCurrentRequest()
                         .path("/{id}")
                         .buildAndExpand(id)
+                        .toUri()
+        );
+        return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
+    }
+
+    /**
+     * Submit a new job with attachments.
+     *
+     * @param jobRequest  The job request information
+     * @param attachments The attachments for the job
+     * @return The submitted job
+     * @throws GenieException For any error
+     */
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ApiOperation(
+            value = "Submit a job with attachments",
+            notes = "Submit a new job to run to genie with the associated attachments"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_ACCEPTED,
+                    message = "Accepted for processing"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_BAD_REQUEST,
+                    message = "Bad Request"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_CONFLICT,
+                    message = "Job with ID already exists."
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_PRECON_FAILED,
+                    message = "Precondition Failed"
+            ),
+            @ApiResponse(
+                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
+                    message = "Genie Server Error due to Unknown Exception"
+            )
+    })
+    public ResponseEntity<Void> submitJob(
+            @ApiParam(
+                    value = "Job information to run.",
+                    required = true
+            )
+            @RequestPart("request")
+            final JobRequest jobRequest,
+            @ApiParam(
+                    value = "Attachments for the job.",
+                    required = false
+            )
+            @RequestPart(value = "attachment")
+            final MultipartFile[] attachments
+    ) throws GenieException {
+        if (jobRequest == null) {
+            throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called to submit job: " + jobRequest);
+        }
+
+        if (attachments != null) {
+            Arrays.asList(attachments)
+                    .stream()
+                    .forEach(
+                            attachment -> LOG.info("Attachment name: " + attachment.getOriginalFilename()
+                                            + " Size " + attachment.getSize()
+                            )
+                    );
+        }
+
+//        final String id = this.executionService.submitJob(jobRequest);
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                ServletUriComponentsBuilder
+                        .fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(jobRequest.getId())
                         .toUri()
         );
         return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);

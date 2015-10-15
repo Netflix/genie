@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload files to Genie</title>
+</head>
+<body>
+<h1> Multiple File Upload </h1>
+
+<form id="upload-form" name="upload-form" method="post" enctype="multipart/form-data">
+    <!--<input type="text" name="request" style="font-size:12pt;height:600px;width:600px"> <br/>-->
+    <label>Job Request: </label>
+    <textarea id="jobRequest" cols="100" rows="20" required></textarea> <br/>
+    <label>Upload File 1: </label>
+    <input type="file" name="attachment"> <br/>
+    <label>Upload File 2: </label>
+    <input type="file" name="attachment"> <br/>
+    <label>Upload File 3: </label>
+    <input type="file" name="attachment"> <br/>
+    <label>Upload File 4: </label>
+    <input type="file" name="attachment"> <br/>
+    <br/><br/><input type="submit" value="Upload">
+</form>
+<div></div>
+<script type="application/javascript">
+    var form = document.getElementById('upload-form');
+    form.addEventListener('submit', function (ev) {
+
+        var oOutput = document.querySelector("div"), oData = new FormData()
+        oData.append(
+                "request",
+                new Blob(
+                        [
+                            JSON.stringify(
+                                    JSON.parse(document.getElementById("jobRequest").value)
+//{
+//    "clusterCriterias": [
+//        {
+//            "tags": [
+//                "sched:adhoc", "type:yarn"
+//            ]
+//        }
+//    ],
+//    "commandArgs": "-q hive.q",
+//    "commandCriteria": [
+//        "type:hive", "data:prod"
+//    ],
+//    "name": "tom test job",
+//    "user": "tgianos",
+//    "version": "1.0.0"
+//}
+                            )
+                        ],
+                        {
+                            name: "jobRequest.json",
+                            type: "application/json"
+                        }
+                )
+        );
+        if (form[1].files.length != 0) {
+            oData.append("attachment", form[1].files[0]);
+        }
+        if (form[2].files.length != 0) {
+            oData.append("attachment", form[2].files[0]);
+        }
+        if (form[3].files.length != 0) {
+            oData.append("attachment", form[3].files[0]);
+        }
+        if (form[4].files.length != 0) {
+            oData.append("attachment", form[4].files[0]);
+        }
+
+        var oReq = new XMLHttpRequest();
+        oReq.open("POST", "api/v3/jobs", true);
+        oReq.onload = function (oEvent) {
+            if (oReq.status == 202) {
+                oOutput.innerHTML = "Uploaded!";
+            } else {
+                oOutput.innerHTML = "Error " + oReq.status + " occurred when trying to upload your file.<br \/>";
+            }
+        };
+
+        oReq.send(oData);
+        ev.preventDefault();
+    }, false);
+</script>
+</body>
+</html>
