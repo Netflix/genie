@@ -19,7 +19,7 @@ package com.netflix.genie.web.hateoas.assemblers;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.web.controllers.JobController;
+import com.netflix.genie.web.controllers.JobRestController;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -44,7 +44,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
         try {
             jobResource.add(
                     ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(JobController.class)
+                            ControllerLinkBuilder.methodOn(JobRestController.class)
                                     .getJob(job.getId()))
                             .withSelfRel()
             );

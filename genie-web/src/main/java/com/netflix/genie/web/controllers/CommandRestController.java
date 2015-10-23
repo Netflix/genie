@@ -74,9 +74,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api/v3/commands")
 @Api(value = "commands", tags = "commands", description = "Manage the available commands")
-public class CommandController {
+public class CommandRestController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CommandRestController.class);
 
     private final CommandService commandService;
     private final CommandResourceAssembler commandResourceAssembler;
@@ -92,7 +92,7 @@ public class CommandController {
      * @param clusterResourceAssembler     The assembler to use to convert clusters to cluster HAL resources
      */
     @Autowired
-    public CommandController(
+    public CommandRestController(
             final CommandService commandService,
             final CommandResourceAssembler commandResourceAssembler,
             final ApplicationResourceAssembler applicationResourceAssembler,

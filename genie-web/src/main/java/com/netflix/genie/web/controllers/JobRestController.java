@@ -21,6 +21,8 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
@@ -55,10 +57,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * REST end-point for supporting jobs.
@@ -70,13 +73,14 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/api/v3/jobs")
 @Api(value = "jobs", tags = "jobs", description = "Manage Genie Jobs.")
-public class JobController {
+public class JobRestController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobRestController.class);
 //    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
     private final ExecutionService executionService;
     private final JobSearchService jobSearchService;
+    private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
 
     /**
@@ -84,16 +88,19 @@ public class JobController {
      *
      * @param executionService     The execution service to use.
      * @param jobSearchService     The job search service to use.
+     * @param attachmentService    The attachment service to use to save attachments.
      * @param jobResourceAssembler Assemble job resources out of jobs
      */
     @Autowired
-    public JobController(
+    public JobRestController(
             final ExecutionService executionService,
             final JobSearchService jobSearchService,
+            final AttachmentService attachmentService,
             final JobResourceAssembler jobResourceAssembler
     ) {
         this.executionService = executionService;
         this.jobSearchService = jobSearchService;
+        this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
     }
 
@@ -236,14 +243,17 @@ public class JobController {
             LOG.debug("Called to submit job: " + jobRequest);
         }
 
+        final String jobId = UUID.randomUUID().toString();
         if (attachments != null) {
-            Arrays.asList(attachments)
-                    .stream()
-                    .forEach(
-                            attachment -> LOG.info("Attachment name: " + attachment.getOriginalFilename()
-                                            + " Size " + attachment.getSize()
-                            )
-                    );
+            for (final MultipartFile attachment : attachments) {
+                LOG.info("Attachment name: " + attachment.getOriginalFilename()
+                        + " Size " + attachment.getSize());
+                try {
+                    this.attachmentService.save(jobId, attachment.getOriginalFilename(), attachment.getInputStream());
+                } catch (final IOException ioe) {
+                    throw new GenieServerException(ioe);
+                }
+            }
         }
 
 //        final String id = this.executionService.submitJob(jobRequest);

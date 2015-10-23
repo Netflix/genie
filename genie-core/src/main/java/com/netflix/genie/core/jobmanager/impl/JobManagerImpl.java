@@ -22,7 +22,6 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.dto.FileAttachment;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -45,7 +44,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -88,7 +86,6 @@ public class JobManagerImpl implements JobManager {
     private String jobDir;
     private Cluster cluster;
     private Job job;
-    private Set<FileAttachment> attachments;
 
     // From property files
     @Value("${com.netflix.genie.server.sys.home:null}")
@@ -157,7 +154,6 @@ public class JobManagerImpl implements JobManager {
         this.jobMonitor.setJobManager(this);
         this.job = jobToManage;
         this.cluster = clusterToUse;
-        this.attachments = this.job.getAttachments();
 
         // save the cluster name and id
         this.jobService.setClusterInfoForJob(this.job.getId(), this.cluster.getId(), this.cluster.getName());
@@ -387,8 +383,8 @@ public class JobManagerImpl implements JobManager {
         //Set the process working directory
         processBuilder.directory(this.createWorkingDirectory(this.baseUserWorkingDir));
 
-        //Copy any attachments from the job.
-        this.copyAttachments();
+//        //Copy any attachments from the job.
+//        this.copyAttachments();
 
         LOG.info("Setting job working dir , conf dir and jar dir");
         // setup env for current job, conf and jar directories directories
@@ -445,39 +441,39 @@ public class JobManagerImpl implements JobManager {
         }
     }
 
-    /**
-     * Copy over any attachments for the job which exist.
-     *
-     * @throws GenieException
-     */
-    private void copyAttachments() throws GenieException {
-        // copy over the attachments if they exist
-        if (this.attachments != null) {
-            for (final FileAttachment attachment : this.attachments) {
-                // basic error checking
-                if (attachment.getName() == null || attachment.getName().isEmpty()) {
-                    final String msg = "File attachment is missing required parameter name";
-                    LOG.error(msg);
-                    throw new GeniePreconditionException(msg);
-                }
-                if (attachment.getData() == null) {
-                    final String msg = "File attachment is missing required parameter data";
-                    LOG.error(msg);
-                    throw new GeniePreconditionException(msg);
-                }
-                // good to go - copy attachments
-                // not checking for 0-byte attachments - assuming they are legitimate
-                try (final FileOutputStream output =
-                             new FileOutputStream(this.jobDir + File.separator + attachment.getName())) {
-                    output.write(attachment.getData());
-                } catch (final IOException e) {
-                    final String msg = "Unable to copy attachment correctly: " + attachment.getName();
-                    LOG.error(msg);
-                    throw new GenieServerException(msg, e);
-                }
-            }
-        }
-    }
+//    /**
+//     * Copy over any attachments for the job which exist.
+//     *
+//     * @throws GenieException
+//     */
+//    private void copyAttachments() throws GenieException {
+//        // copy over the attachments if they exist
+//        if (this.attachments != null) {
+//            for (final FileAttachment attachment : this.attachments) {
+//                // basic error checking
+//                if (attachment.getName() == null || attachment.getName().isEmpty()) {
+//                    final String msg = "File attachment is missing required parameter name";
+//                    LOG.error(msg);
+//                    throw new GeniePreconditionException(msg);
+//                }
+//                if (attachment.getData() == null) {
+//                    final String msg = "File attachment is missing required parameter data";
+//                    LOG.error(msg);
+//                    throw new GeniePreconditionException(msg);
+//                }
+//                // good to go - copy attachments
+//                // not checking for 0-byte attachments - assuming they are legitimate
+//                try (final FileOutputStream output =
+//                             new FileOutputStream(this.jobDir + File.separator + attachment.getName())) {
+//                    output.write(attachment.getData());
+//                } catch (final IOException e) {
+//                    final String msg = "Unable to copy attachment correctly: " + attachment.getName();
+//                    LOG.error(msg);
+//                    throw new GenieServerException(msg, e);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Get the working directory for the job. Will create folders on the system.

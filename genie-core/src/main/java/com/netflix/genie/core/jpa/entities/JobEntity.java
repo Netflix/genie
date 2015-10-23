@@ -19,7 +19,6 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
-import com.netflix.genie.common.dto.FileAttachment;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.apache.commons.lang3.StringUtils;
@@ -112,8 +111,8 @@ public class JobEntity extends CommonFields {
     @Column(name = "file_dependencies")
     private String fileDependencies;
 
-    @Transient
-    private Set<FileAttachment> attachments = new HashSet<>();
+//    @Transient
+//    private Set<AttachmentEntity> attachments = new HashSet<>();
 
     @Basic
     @Column(name = "disable_log_archival")
@@ -435,23 +434,23 @@ public class JobEntity extends CommonFields {
         this.fileDependencies = fileDependencies;
     }
 
-    /**
-     * Get the attachments for this job.
-     *
-     * @return The attachments
-     */
-    public Set<FileAttachment> getAttachments() {
-        return this.attachments;
-    }
-
-    /**
-     * Set the attachments for this job.
-     *
-     * @param attachments The attachments to set
-     */
-    public void setAttachments(final Set<FileAttachment> attachments) {
-        this.attachments = attachments;
-    }
+//    /**
+//     * Get the attachments for this job.
+//     *
+//     * @return The attachments
+//     */
+//    public Set<AttachmentEntity> getAttachments() {
+//        return this.attachments;
+//    }
+//
+//    /**
+//     * Set the attachments for this job.
+//     *
+//     * @param attachments The attachments to set
+//     */
+//    public void setAttachments(final Set<AttachmentEntity> attachments) {
+//        this.attachments = attachments;
+//    }
 
     /**
      * Is the log archival disabled.

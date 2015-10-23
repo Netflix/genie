@@ -68,9 +68,6 @@ public class JobRequest extends BaseDTO {
     @ApiModelProperty(value = "Dependent files for this job to run. Will be downloaded before job starts")
     private Set<String> fileDependencies = new HashSet<>();
 
-    @ApiModelProperty(value = "Attachments sent as a part of job request. Can be used as command line arguments")
-    private Set<FileAttachment> attachments = new HashSet<>();
-
     @ApiModelProperty(
             value = "Boolean variable to decide whether job should be archived after it finishes defaults to true"
     )
@@ -99,9 +96,6 @@ public class JobRequest extends BaseDTO {
         this.setupFile = builder.bSetupFile;
         if (builder.bFileDependencies != null) {
             this.fileDependencies.addAll(builder.bFileDependencies);
-        }
-        if (builder.bAttachments != null) {
-            this.attachments.addAll(builder.bAttachments);
         }
         this.disableLogArchival = builder.bDisableLogArchival;
         this.email = builder.bEmail;
@@ -162,15 +156,6 @@ public class JobRequest extends BaseDTO {
     }
 
     /**
-     * Get the attachments for the job.
-     *
-     * @return The attachments for the job as a read-only set. Attempts to modify will throw exception
-     */
-    public Set<FileAttachment> getAttachments() {
-        return Collections.unmodifiableSet(this.attachments);
-    }
-
-    /**
      * Get whether to disable log archival or not.
      *
      * @return true if it should be disabled
@@ -203,7 +188,6 @@ public class JobRequest extends BaseDTO {
         private String bGroup;
         private String bSetupFile;
         private Set<String> bFileDependencies = new HashSet<>();
-        private Set<FileAttachment> bAttachments = new HashSet<>();
         private boolean bDisableLogArchival;
         private String bEmail;
 
@@ -272,19 +256,6 @@ public class JobRequest extends BaseDTO {
         public T withFileDependencies(final Set<String> fileDependencies) {
             if (fileDependencies != null) {
                 this.bFileDependencies.addAll(fileDependencies);
-            }
-            return (T) this;
-        }
-
-        /**
-         * Set the attachments needed to run the job.
-         *
-         * @param attachments The attachments
-         * @return The builder
-         */
-        public T withAttachments(final Set<FileAttachment> attachments) {
-            if (attachments != null) {
-                this.bAttachments.addAll(attachments);
             }
             return (T) this;
         }

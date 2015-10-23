@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.web.controllers.CommandController;
+import com.netflix.genie.web.controllers.CommandRestController;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -46,14 +46,14 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
         try {
             commandResource.add(
                     ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(CommandController.class)
+                            ControllerLinkBuilder.methodOn(CommandRestController.class)
                                     .getCommand(command.getId()))
                             .withSelfRel()
             );
 
             commandResource.add(
                     ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(CommandController.class)
+                            ControllerLinkBuilder.methodOn(CommandRestController.class)
                                     .getClustersForCommand(
                                             command.getId(),
                                             Sets.newHashSet(

@@ -43,7 +43,7 @@ ALTER TABLE `Application`
   ADD INDEX `APPLICATIONS_NAME_INDEX` (`name`),
   ADD INDEX `APPLICATIONS_STATUS_INDEX` (`status`);
 
-ALTER TABLE `application_configs` DROP KEY `I_PPLCFGS_APPLICATION_ID`;
+ALTER TABLE `Application_configs` DROP KEY `I_PPLCFGS_APPLICATION_ID`;
 ALTER TABLE `Application_configs`
   CHANGE `APPLICATION_ID` `application_id` VARCHAR(255) NOT NULL,
   CHANGE `element` `config` VARCHAR(255) NOT NULL,
@@ -55,7 +55,7 @@ ALTER TABLE `Application_jars`
   CHANGE `element` `dependency` VARCHAR(255) NOT NULL,
   ADD FOREIGN KEY (`application_id`) REFERENCES `Application` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `application_tags` DROP KEY `I_PPLCTGS_APPLICATION_ID`;
+ALTER TABLE `Application_tags` DROP KEY `I_PPLCTGS_APPLICATION_ID`;
 ALTER TABLE `Application_tags`
   CHANGE `APPLICATION_ID` `application_id` VARCHAR(255) NOT NULL,
   CHANGE `element` `tag` VARCHAR(255) NOT NULL,
@@ -86,7 +86,7 @@ ALTER TABLE `Cluster_Command`
   ADD FOREIGN KEY (`cluster_id`) REFERENCES `Cluster` (`id`) ON DELETE CASCADE,
   ADD FOREIGN KEY (`command_id`) REFERENCES `Command` (`id`) ON DELETE RESTRICT;
 
-ALTER TABLE `cluster_configs` DROP KEY `I_CLSTFGS_CLUSTER_ID`;
+ALTER TABLE `Cluster_configs` DROP KEY `I_CLSTFGS_CLUSTER_ID`;
 ALTER TABLE `Cluster_configs`
   CHANGE `CLUSTER_ID` `cluster_id` VARCHAR(255) NOT NULL,
   CHANGE `element` `config` VARCHAR(255) NOT NULL,

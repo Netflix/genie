@@ -19,7 +19,6 @@ package com.netflix.genie.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,9 +26,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
-import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import springfox.documentation.builders.PathSelectors;
@@ -50,13 +46,13 @@ import javax.validation.Validator;
 @Configuration
 @ComponentScan("com.netflix.genie")
 @EnableAutoConfiguration
-@EnableConfigurationProperties
+//@EnableConfigurationProperties
 @EnableElasticsearchRepositories("com.netflix.genie.core.elasticsearch.repositories")
 @EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})
 @EnableJpaRepositories("com.netflix.genie.core.jpa.repositories")
-@EnableRetry
-@EnableScheduling
-@EnableTransactionManagement
+//@EnableRetry
+//@EnableScheduling
+//@EnableTransactionManagement
 @EntityScan("com.netflix.genie.core.jpa.entities")
 @EnableSwagger2
 public class GenieWeb {

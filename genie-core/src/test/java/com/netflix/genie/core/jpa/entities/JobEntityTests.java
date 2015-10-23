@@ -19,7 +19,6 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
-import com.netflix.genie.common.dto.FileAttachment;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -346,21 +345,21 @@ public class JobEntityTests extends EntityTestsBase {
         Assert.assertEquals(fileDependencies, this.jobEntity.getFileDependencies());
     }
 
-    /**
-     * Test the setter and getter for attachments.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    public void testSetGetAttachments() throws GeniePreconditionException {
-        Assert.assertNotNull(this.jobEntity.getAttachments());
-        final FileAttachment attachment
-                = new FileAttachment("/some/query.q", "select * from mytable;".getBytes(UTF8_CHARSET));
-        final Set<com.netflix.genie.common.dto.FileAttachment> attachments = new HashSet<>();
-        attachments.add(attachment);
-        this.jobEntity.setAttachments(attachments);
-        Assert.assertEquals(attachments, this.jobEntity.getAttachments());
-    }
+//    /**
+//     * Test the setter and getter for attachments.
+//     *
+//     * @throws GeniePreconditionException If any precondition isn't met.
+//     */
+//    @Test
+//    public void testSetGetAttachments() throws GeniePreconditionException {
+//        Assert.assertNotNull(this.jobEntity.getAttachments());
+//        final FileAttachment attachment
+//                = new FileAttachment("/some/query.q", "select * from mytable;".getBytes(UTF8_CHARSET));
+//        final Set<com.netflix.genie.common.dto.FileAttachment> attachments = new HashSet<>();
+//        attachments.add(attachment);
+//        this.jobEntity.setAttachments(attachments);
+//        Assert.assertEquals(attachments, this.jobEntity.getAttachments());
+//    }
 
     /**
      * Test setting and getting whether archival is disabled.
