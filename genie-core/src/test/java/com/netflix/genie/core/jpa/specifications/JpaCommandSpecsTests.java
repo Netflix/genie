@@ -18,7 +18,6 @@ package com.netflix.genie.core.jpa.specifications;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
-import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +39,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class CommandSpecsTests {
+public class JpaCommandSpecsTests {
 
     private static final String NAME = "hive";
     private static final String USER_NAME = "tgianos";

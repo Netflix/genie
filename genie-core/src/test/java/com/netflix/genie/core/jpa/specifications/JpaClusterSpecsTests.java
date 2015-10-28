@@ -23,7 +23,6 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity_;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
-import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,7 +48,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class ClusterSpecsTests {
+public class JpaClusterSpecsTests {
 
     private static final String NAME = "h2prod";
     private static final String TAG_1 = "prod";

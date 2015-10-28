@@ -18,7 +18,6 @@ package com.netflix.genie.core.jpa.specifications;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
-import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +40,7 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-public class JobSpecsTests {
+public class JpaJobSpecsTests {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String JOB_NAME = "jobName";

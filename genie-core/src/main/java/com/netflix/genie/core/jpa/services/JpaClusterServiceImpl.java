@@ -29,9 +29,9 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
-import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.core.services.ClusterService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
@@ -156,8 +156,10 @@ public class JpaClusterServiceImpl implements ClusterService {
         }
 
         @SuppressWarnings("unchecked")
-        final Page<ClusterEntity> clusterEntities
-                = this.clusterRepo.findAll(JpaClusterSpecs.find(name, statuses, tags, minUpdateTime, maxUpdateTime), page);
+        final Page<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
+                JpaClusterSpecs.find(name, statuses, tags, minUpdateTime, maxUpdateTime),
+                page
+        );
 
         return clusterEntities.map(ClusterEntity::getDTO);
     }

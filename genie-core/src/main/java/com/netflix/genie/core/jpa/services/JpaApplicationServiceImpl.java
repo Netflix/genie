@@ -78,7 +78,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      * @param commandRepo     The command repository to use
      */
     @Autowired
-    public JpaApplicationServiceImpl(final JpaApplicationRepository applicationRepo, final JpaCommandRepository commandRepo) {
+    public JpaApplicationServiceImpl(
+            final JpaApplicationRepository applicationRepo,
+            final JpaCommandRepository commandRepo
+    ) {
         this.applicationRepo = applicationRepo;
         this.commandRepo = commandRepo;
     }

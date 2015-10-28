@@ -18,7 +18,6 @@ package com.netflix.genie.core.jpa.specifications;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
-import com.netflix.genie.core.jpa.specifications.JpaApplicationSpecs;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +39,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class ApplicationSpecsTests {
+public class JpaApplicationSpecsTests {
 
     private static final String NAME = "tez";
     private static final String USER_NAME = "tgianos";
