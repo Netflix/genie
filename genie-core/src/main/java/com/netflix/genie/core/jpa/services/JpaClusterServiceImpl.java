@@ -28,10 +28,10 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
-import com.netflix.genie.core.jpa.repositories.ClusterRepository;
-import com.netflix.genie.core.jpa.repositories.ClusterSpecs;
-import com.netflix.genie.core.jpa.repositories.CommandRepository;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.services.ClusterService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
@@ -66,13 +66,13 @@ import java.util.stream.Collectors;
                 ConstraintViolationException.class
         }
 )
-public class ClusterServiceJPAImpl implements ClusterService {
+public class JpaClusterServiceImpl implements ClusterService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterServiceJPAImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JpaClusterServiceImpl.class);
     private static final char CRITERIA_DELIMITER = ',';
-    private final ClusterRepository clusterRepo;
-    private final CommandRepository commandRepo;
-    private final JobRepository jobRepo;
+    private final JpaClusterRepository clusterRepo;
+    private final JpaCommandRepository commandRepo;
+    private final JpaJobRepository jobRepo;
 
     /**
      * Default constructor - initialize all required dependencies.
@@ -82,10 +82,10 @@ public class ClusterServiceJPAImpl implements ClusterService {
      * @param jobRepo     The job repository to use.
      */
     @Autowired
-    public ClusterServiceJPAImpl(
-            final ClusterRepository clusterRepo,
-            final CommandRepository commandRepo,
-            final JobRepository jobRepo
+    public JpaClusterServiceImpl(
+            final JpaClusterRepository clusterRepo,
+            final JpaCommandRepository commandRepo,
+            final JpaJobRepository jobRepo
     ) {
         this.clusterRepo = clusterRepo;
         this.commandRepo = commandRepo;
@@ -157,7 +157,7 @@ public class ClusterServiceJPAImpl implements ClusterService {
 
         @SuppressWarnings("unchecked")
         final Page<ClusterEntity> clusterEntities
-                = this.clusterRepo.findAll(ClusterSpecs.find(name, statuses, tags, minUpdateTime, maxUpdateTime), page);
+                = this.clusterRepo.findAll(JpaClusterSpecs.find(name, statuses, tags, minUpdateTime, maxUpdateTime), page);
 
         return clusterEntities.map(ClusterEntity::getDTO);
     }
@@ -186,7 +186,7 @@ public class ClusterServiceJPAImpl implements ClusterService {
         for (final ClusterCriteria clusterCriteria : clusterCriterias) {
             @SuppressWarnings("unchecked")
             final List<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
-                    ClusterSpecs.findByClusterAndCommandCriteria(
+                    JpaClusterSpecs.findByClusterAndCommandCriteria(
                             clusterCriteria,
                             commandCriteria
                     )

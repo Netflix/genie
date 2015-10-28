@@ -27,8 +27,8 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.ProcessStatus;
 import com.netflix.genie.core.jobmanager.JobManagerFactory;
 import com.netflix.genie.core.jpa.entities.JobEntity;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
-import com.netflix.genie.core.jpa.repositories.JobSpecs;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
 import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.core.services.JobService;
@@ -57,13 +57,13 @@ import java.util.List;
  * @author amsharma
  */
 @Service
-public class ExecutionServiceJPAImpl implements ExecutionService {
+public class JpaExecutionServiceImpl implements ExecutionService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceJPAImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JpaExecutionServiceImpl.class);
 
     // per-instance variables
     private final GenieNodeStatistics stats;
-    private final JobRepository jobRepo;
+    private final JpaJobRepository jobRepo;
     private final JobManagerFactory jobManagerFactory;
     private final JobService jobService;
     private final NetUtil netUtil;
@@ -94,8 +94,8 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
      * @param netUtil           The network utility to use
      */
     @Autowired
-    public ExecutionServiceJPAImpl(
-            final JobRepository jobRepo,
+    public JpaExecutionServiceImpl(
+            final JpaJobRepository jobRepo,
             final GenieNodeStatistics stats,
             final JobManagerFactory jobManagerFactory,
             final JobService jobService,
@@ -227,7 +227,7 @@ public class ExecutionServiceJPAImpl implements ExecutionService {
 
         @SuppressWarnings("unchecked")
         final List<JobEntity> jobEntities
-                = this.jobRepo.findAll(JobSpecs.findZombies(currentTime, this.zombieTime));
+                = this.jobRepo.findAll(JpaJobSpecs.findZombies(currentTime, this.zombieTime));
         for (final JobEntity jobEntity : jobEntities) {
             jobEntity.setStatus(JobStatus.FAILED);
             jobEntity.setFinished(new Date());

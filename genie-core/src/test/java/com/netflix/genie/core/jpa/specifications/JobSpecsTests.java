@@ -13,11 +13,12 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
+import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -137,7 +138,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithAll() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -175,7 +176,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutId() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 null,
                 JOB_NAME,
                 USER_NAME,
@@ -214,7 +215,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutJobName() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 "",
                 USER_NAME,
@@ -253,7 +254,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutUserName() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 " ",
@@ -292,7 +293,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutStatus() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -331,7 +332,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithEmptyStatus() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -370,7 +371,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutClusterName() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -410,7 +411,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutClusterId() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -449,7 +450,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutCommandName() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -489,7 +490,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutCommandId() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -528,7 +529,7 @@ public class JobSpecsTests {
      */
     @Test
     public void testFindWithOutTags() {
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -568,7 +569,7 @@ public class JobSpecsTests {
     @Test
     public void testFindWithEmptyTag() {
         TAGS.add("");
-        final Specification<JobEntity> spec = JobSpecs.find(
+        final Specification<JobEntity> spec = JpaJobSpecs.find(
                 ID,
                 JOB_NAME,
                 USER_NAME,
@@ -630,7 +631,7 @@ public class JobSpecsTests {
         Mockito.when(this.cb.or(equalRunningPredicate, equalInitPredicate))
                 .thenReturn(orPredicate);
 
-        final Specification<JobEntity> findZombies = JobSpecs.findZombies(
+        final Specification<JobEntity> findZombies = JpaJobSpecs.findZombies(
                 now.getTime(),
                 before.getTime()
         );
@@ -650,6 +651,6 @@ public class JobSpecsTests {
      */
     @Test
     public void testProtectedConstructor() {
-        Assert.assertNotNull(new JobSpecs());
+        Assert.assertNotNull(new JpaJobSpecs());
     }
 }

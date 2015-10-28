@@ -17,8 +17,8 @@
  */
 
 /**
- * Classes to test jpa repository classes.
+ * Classes to test JPA specification classes.
  *
  * @author tgianos
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.specifications;

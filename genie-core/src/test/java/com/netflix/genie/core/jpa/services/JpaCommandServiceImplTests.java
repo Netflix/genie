@@ -25,9 +25,9 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
-import com.netflix.genie.core.jpa.repositories.ClusterRepository;
-import com.netflix.genie.core.jpa.repositories.CommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -41,7 +41,7 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-public class CommandServiceJPAImplTests {
+public class JpaCommandServiceImplTests {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_1_NAME = "pig_13_prod";
@@ -51,22 +51,22 @@ public class CommandServiceJPAImplTests {
 
     private static final String COMMAND_2_ID = "command2";
 
-    private CommandServiceJPAImpl service;
-    private CommandRepository commandRepository;
-    private ApplicationRepository applicationRepository;
+    private JpaCommandServiceImpl service;
+    private JpaCommandRepository jpaCommandRepository;
+    private JpaApplicationRepository jpaApplicationRepository;
 
     /**
      * Setup the tests.
      */
     @Before
     public void setup() {
-        this.commandRepository = Mockito.mock(CommandRepository.class);
-        final ClusterRepository clusterRepository = Mockito.mock(ClusterRepository.class);
-        this.applicationRepository = Mockito.mock(ApplicationRepository.class);
-        this.service = new CommandServiceJPAImpl(
-                this.commandRepository,
-                this.applicationRepository,
-                clusterRepository
+        this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
+        final JpaClusterRepository jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
+        this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
+        this.service = new JpaCommandServiceImpl(
+                this.jpaCommandRepository,
+                this.jpaApplicationRepository,
+                jpaClusterRepository
         );
     }
 
@@ -88,7 +88,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandNotExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.getCommand(id);
     }
 
@@ -118,7 +118,7 @@ public class CommandServiceJPAImplTests {
         )
                 .withId(COMMAND_1_ID)
                 .build();
-        Mockito.when(this.commandRepository.exists(COMMAND_1_ID)).thenReturn(true);
+        Mockito.when(this.jpaCommandRepository.exists(COMMAND_1_ID)).thenReturn(true);
         this.service.createCommand(command);
     }
 
@@ -140,7 +140,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateCommandNoCommandExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.updateCommand(
                 id,
                 new Command.Builder(null, null, null, null, null).build()
@@ -154,7 +154,7 @@ public class CommandServiceJPAImplTests {
      */
     @Test(expected = GenieBadRequestException.class)
     public void testUpdateCommandIdsDontMatch() throws GenieException {
-        Mockito.when(this.commandRepository.exists(COMMAND_2_ID)).thenReturn(true);
+        Mockito.when(this.jpaCommandRepository.exists(COMMAND_2_ID)).thenReturn(true);
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(UUID.randomUUID().toString());
         this.service.updateCommand(COMMAND_2_ID, command);
@@ -188,7 +188,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testDeleteNoCommandToDelete() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.deleteCommand(id);
     }
 
@@ -210,7 +210,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.addConfigsForCommand(id, new HashSet<>());
     }
 
@@ -232,7 +232,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.updateConfigsForCommand(UUID.randomUUID().toString(), new HashSet<>());
     }
 
@@ -254,7 +254,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetConfigsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.getConfigsForCommand(id);
     }
 
@@ -276,7 +276,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllConfigsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeAllConfigsForCommand(id);
     }
 
@@ -298,7 +298,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveConfigForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeConfigForCommand(id, "something");
     }
 
@@ -330,8 +330,8 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testSetApplicationsForCommandNoCommandExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
-        Mockito.when(this.applicationRepository.exists(Mockito.anyString())).thenReturn(true);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.exists(Mockito.anyString())).thenReturn(true);
         this.service.setApplicationsForCommand(id, Sets.newHashSet(UUID.randomUUID().toString()));
     }
 
@@ -343,7 +343,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GeniePreconditionException.class)
     public void testSetApplicationsForCommandNoAppExists() throws GenieException {
         final String appId = UUID.randomUUID().toString();
-        Mockito.when(this.applicationRepository.exists(appId)).thenReturn(false);
+        Mockito.when(this.jpaApplicationRepository.exists(appId)).thenReturn(false);
         this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(appId));
     }
 
@@ -365,7 +365,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetApplicationsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.getApplicationsForCommand(id);
     }
 
@@ -387,7 +387,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveApplicationsForCommandNoCommandExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeApplicationsForCommand(id);
     }
 
@@ -409,7 +409,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.addTagsForCommand(id, new HashSet<>());
     }
 
@@ -431,7 +431,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.updateTagsForCommand(UUID.randomUUID().toString(), new HashSet<>());
     }
 
@@ -453,7 +453,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.getTagsForCommand(id);
     }
 
@@ -475,7 +475,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeAllTagsForCommand(id);
     }
 
@@ -497,7 +497,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeTagForCommand(id, "something");
     }
 
@@ -519,7 +519,7 @@ public class CommandServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetClustersForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.getClustersForCommand(id, null);
     }
 }

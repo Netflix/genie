@@ -28,10 +28,10 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
-import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
-import com.netflix.genie.core.jpa.repositories.ApplicationSpecs;
-import com.netflix.genie.core.jpa.repositories.CommandRepository;
-import com.netflix.genie.core.jpa.repositories.CommandSpecs;
+import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.core.jpa.specifications.JpaApplicationSpecs;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.core.services.ApplicationService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
@@ -65,11 +65,11 @@ import java.util.stream.Collectors;
                 ConstraintViolationException.class
         }
 )
-public class ApplicationServiceJPAImpl implements ApplicationService {
+public class JpaApplicationServiceImpl implements ApplicationService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationServiceJPAImpl.class);
-    private final ApplicationRepository applicationRepo;
-    private final CommandRepository commandRepo;
+    private static final Logger LOG = LoggerFactory.getLogger(JpaApplicationServiceImpl.class);
+    private final JpaApplicationRepository applicationRepo;
+    private final JpaCommandRepository commandRepo;
 
     /**
      * Default constructor.
@@ -78,7 +78,7 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
      * @param commandRepo     The command repository to use
      */
     @Autowired
-    public ApplicationServiceJPAImpl(final ApplicationRepository applicationRepo, final CommandRepository commandRepo) {
+    public JpaApplicationServiceImpl(final JpaApplicationRepository applicationRepo, final JpaCommandRepository commandRepo) {
         this.applicationRepo = applicationRepo;
         this.commandRepo = commandRepo;
     }
@@ -153,7 +153,7 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
 
         @SuppressWarnings("unchecked")
         final Page<ApplicationEntity> applicationEntities
-                = this.applicationRepo.findAll(ApplicationSpecs.find(name, userName, statuses, tags), page);
+                = this.applicationRepo.findAll(JpaApplicationSpecs.find(name, userName, statuses, tags), page);
 
         return applicationEntities.map(ApplicationEntity::getDTO);
     }
@@ -438,7 +438,7 @@ public class ApplicationServiceJPAImpl implements ApplicationService {
         }
         @SuppressWarnings("unchecked")
         final List<CommandEntity> commandEntities = this.commandRepo.findAll(
-                CommandSpecs.findCommandsForApplication(id, statuses)
+                JpaCommandSpecs.findCommandsForApplication(id, statuses)
         );
         return commandEntities
                 .stream()

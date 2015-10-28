@@ -25,7 +25,7 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import org.junit.Assert;
@@ -56,7 +56,7 @@ import java.util.UUID;
  */
 @DatabaseSetup("ClusterServiceJPAImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class ClusterServiceJPAImplIntegrationTests extends DBUnitTestBase {
+public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
@@ -87,7 +87,7 @@ public class ClusterServiceJPAImplIntegrationTests extends DBUnitTestBase {
     private CommandService commandService;
 
     @Autowired
-    private JobRepository jobRepository;
+    private JpaJobRepository jpaJobRepository;
 
     /**
      * Test the get cluster method.
@@ -274,7 +274,7 @@ public class ClusterServiceJPAImplIntegrationTests extends DBUnitTestBase {
         final List<Cluster> clusters = this.service.chooseClusterForJob(JOB_1_ID);
         Assert.assertEquals(1, clusters.size());
         Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
-        final JobEntity jobEntity = this.jobRepository.findOne(JOB_1_ID);
+        final JobEntity jobEntity = this.jpaJobRepository.findOne(JOB_1_ID);
         final String chosen = jobEntity.getChosenClusterCriteriaString();
         Assert.assertEquals(8, chosen.length());
         Assert.assertTrue(chosen.contains("prod"));

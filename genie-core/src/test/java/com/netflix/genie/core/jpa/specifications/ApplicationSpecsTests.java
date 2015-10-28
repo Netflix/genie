@@ -13,11 +13,12 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
+import com.netflix.genie.core.jpa.specifications.JpaApplicationSpecs;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -102,7 +103,7 @@ public class ApplicationSpecsTests {
      */
     @Test
     public void testFindAll() {
-        final Specification<ApplicationEntity> spec = ApplicationSpecs
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
                 .find(NAME, USER_NAME, STATUSES, TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -125,7 +126,7 @@ public class ApplicationSpecsTests {
      */
     @Test
     public void testFindNoName() {
-        final Specification<ApplicationEntity> spec = ApplicationSpecs
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
                 .find(null, USER_NAME, STATUSES, TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -148,7 +149,7 @@ public class ApplicationSpecsTests {
      */
     @Test
     public void testFindNoUserName() {
-        final Specification<ApplicationEntity> spec = ApplicationSpecs
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
                 .find(NAME, null, STATUSES, TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -171,7 +172,7 @@ public class ApplicationSpecsTests {
      */
     @Test
     public void testFindNoStatuses() {
-        final Specification<ApplicationEntity> spec = ApplicationSpecs
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
                 .find(NAME, USER_NAME, null, TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -194,7 +195,7 @@ public class ApplicationSpecsTests {
      */
     @Test
     public void testFindEmptyStatuses() {
-        final Specification<ApplicationEntity> spec = ApplicationSpecs
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
                 .find(NAME, USER_NAME, new HashSet<>(), TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -217,7 +218,7 @@ public class ApplicationSpecsTests {
      */
     @Test
     public void testFindNoTags() {
-        final Specification<ApplicationEntity> spec = ApplicationSpecs
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
                 .find(NAME, USER_NAME, STATUSES, null);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -241,7 +242,7 @@ public class ApplicationSpecsTests {
     @Test
     public void testFindEmptyTag() {
         TAGS.add("");
-        final Specification<ApplicationEntity> spec = ApplicationSpecs
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
                 .find(NAME, USER_NAME, STATUSES, TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -269,6 +270,6 @@ public class ApplicationSpecsTests {
      */
     @Test
     public void testProtectedConstructor() {
-        Assert.assertNotNull(new ApplicationSpecs());
+        Assert.assertNotNull(new JpaApplicationSpecs());
     }
 }

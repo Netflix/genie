@@ -33,13 +33,13 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public final class JPAUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterServiceJPAImpl.class);
+public final class JpaUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(JpaClusterServiceImpl.class);
 
     /**
      * Private constructor for Utility class to prevent instantiation.
      */
-    private JPAUtils() {
+    private JpaUtils() {
     }
 
     /**

@@ -13,7 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -23,6 +23,7 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity_;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
+import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -141,7 +142,7 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testFindAll() {
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .find(
                         NAME,
                         STATUSES,
@@ -176,7 +177,7 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testFindNoName() {
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .find(
                         null,
                         STATUSES,
@@ -211,7 +212,7 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testFindNoStatuses() {
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .find(
                         NAME,
                         null,
@@ -246,7 +247,7 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testFindEmptyStatuses() {
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .find(
                         NAME,
                         EnumSet.noneOf(ClusterStatus.class),
@@ -281,7 +282,7 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testFindNoTags() {
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .find(
                         NAME,
                         STATUSES,
@@ -316,7 +317,7 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testFindNoMinTime() {
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .find(
                         NAME,
                         STATUSES,
@@ -351,7 +352,7 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testFindNoMax() {
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .find(
                         NAME,
                         STATUSES,
@@ -387,7 +388,7 @@ public class ClusterSpecsTests {
     @Test
     public void testFindEmptyTag() {
         TAGS.add("");
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .find(
                         NAME,
                         STATUSES,
@@ -427,7 +428,7 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testFindByClusterAndCommandCriteriaNoCriteria() {
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .findByClusterAndCommandCriteria(null, null);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -450,7 +451,7 @@ public class ClusterSpecsTests {
     @Test
     public void testFindByClusterAndCommandCriteria() throws GenieException {
         final ClusterCriteria criteria = new ClusterCriteria(CLUSTER_CRITERIA_TAGS);
-        final Specification<ClusterEntity> spec = ClusterSpecs
+        final Specification<ClusterEntity> spec = JpaClusterSpecs
                 .findByClusterAndCommandCriteria(criteria, COMMAND_CRITERIA);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -476,6 +477,6 @@ public class ClusterSpecsTests {
      */
     @Test
     public void testProtectedConstructor() {
-        Assert.assertNotNull(new ClusterSpecs());
+        Assert.assertNotNull(new JpaClusterSpecs());
     }
 }

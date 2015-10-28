@@ -13,11 +13,12 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
+import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -102,7 +103,7 @@ public class CommandSpecsTests {
      */
     @Test
     public void testFindAll() {
-        final Specification<CommandEntity> spec = CommandSpecs.find(
+        final Specification<CommandEntity> spec = JpaCommandSpecs.find(
                 NAME, USER_NAME, STATUSES, TAGS
         );
 
@@ -126,7 +127,7 @@ public class CommandSpecsTests {
      */
     @Test
     public void testFindNoName() {
-        final Specification<CommandEntity> spec = CommandSpecs.find(
+        final Specification<CommandEntity> spec = JpaCommandSpecs.find(
                 null, USER_NAME, STATUSES, TAGS
         );
 
@@ -150,7 +151,7 @@ public class CommandSpecsTests {
      */
     @Test
     public void testFindNoUserName() {
-        final Specification<CommandEntity> spec = CommandSpecs.find(
+        final Specification<CommandEntity> spec = JpaCommandSpecs.find(
                 NAME, null, STATUSES, TAGS
         );
 
@@ -174,7 +175,7 @@ public class CommandSpecsTests {
      */
     @Test
     public void testFindNoTags() {
-        final Specification<CommandEntity> spec = CommandSpecs.find(
+        final Specification<CommandEntity> spec = JpaCommandSpecs.find(
                 NAME, USER_NAME, STATUSES, null
         );
 
@@ -199,7 +200,7 @@ public class CommandSpecsTests {
     @Test
     public void testFindEmptyTag() {
         TAGS.add("");
-        final Specification<CommandEntity> spec = CommandSpecs.find(
+        final Specification<CommandEntity> spec = JpaCommandSpecs.find(
                 NAME, USER_NAME, STATUSES, TAGS
         );
 
@@ -228,7 +229,7 @@ public class CommandSpecsTests {
      */
     @Test
     public void testFindNoStatuses() {
-        final Specification<CommandEntity> spec = CommandSpecs
+        final Specification<CommandEntity> spec = JpaCommandSpecs
                 .find(NAME, USER_NAME, null, TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -251,7 +252,7 @@ public class CommandSpecsTests {
      */
     @Test
     public void testFindEmptyStatuses() {
-        final Specification<CommandEntity> spec = CommandSpecs
+        final Specification<CommandEntity> spec = JpaCommandSpecs
                 .find(NAME, USER_NAME, new HashSet<>(), TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -274,6 +275,6 @@ public class CommandSpecsTests {
      */
     @Test
     public void testProtectedConstructor() {
-        Assert.assertNotNull(new CommandSpecs());
+        Assert.assertNotNull(new JpaCommandSpecs());
     }
 }

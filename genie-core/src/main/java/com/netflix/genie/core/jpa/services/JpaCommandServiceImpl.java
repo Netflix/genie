@@ -30,11 +30,11 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
-import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
-import com.netflix.genie.core.jpa.repositories.ClusterRepository;
-import com.netflix.genie.core.jpa.repositories.ClusterSpecs;
-import com.netflix.genie.core.jpa.repositories.CommandRepository;
-import com.netflix.genie.core.jpa.repositories.CommandSpecs;
+import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.core.services.CommandService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
@@ -68,12 +68,12 @@ import java.util.stream.Collectors;
                 ConstraintViolationException.class
         }
 )
-public class CommandServiceJPAImpl implements CommandService {
+public class JpaCommandServiceImpl implements CommandService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CommandServiceJPAImpl.class);
-    private final CommandRepository commandRepo;
-    private final ApplicationRepository appRepo;
-    private final ClusterRepository clusterRepo;
+    private static final Logger LOG = LoggerFactory.getLogger(JpaCommandServiceImpl.class);
+    private final JpaCommandRepository commandRepo;
+    private final JpaApplicationRepository appRepo;
+    private final JpaClusterRepository clusterRepo;
 
     /**
      * Default constructor.
@@ -83,10 +83,10 @@ public class CommandServiceJPAImpl implements CommandService {
      * @param clusterRepo the cluster repository to use
      */
     @Autowired
-    public CommandServiceJPAImpl(
-            final CommandRepository commandRepo,
-            final ApplicationRepository appRepo,
-            final ClusterRepository clusterRepo
+    public JpaCommandServiceImpl(
+            final JpaCommandRepository commandRepo,
+            final JpaApplicationRepository appRepo,
+            final JpaClusterRepository clusterRepo
     ) {
         this.commandRepo = commandRepo;
         this.appRepo = appRepo;
@@ -159,7 +159,7 @@ public class CommandServiceJPAImpl implements CommandService {
 
         @SuppressWarnings("unchecked")
         final Page<CommandEntity> commandEntities = this.commandRepo.findAll(
-                CommandSpecs.find(
+                JpaCommandSpecs.find(
                         name,
                         userName,
                         statuses,
@@ -485,7 +485,7 @@ public class CommandServiceJPAImpl implements CommandService {
         }
         @SuppressWarnings("unchecked")
         final List<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
-                ClusterSpecs.findClustersForCommand(
+                JpaClusterSpecs.findClustersForCommand(
                         id,
                         statuses
                 )

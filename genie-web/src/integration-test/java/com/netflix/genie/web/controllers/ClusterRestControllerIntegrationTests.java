@@ -26,8 +26,8 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.core.jpa.repositories.ClusterRepository;
-import com.netflix.genie.core.jpa.repositories.CommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.GenieWeb;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
@@ -99,10 +99,10 @@ public class ClusterRestControllerIntegrationTests {
     private String clustersBaseUrl;
 
     @Autowired
-    private ClusterRepository clusterRepository;
+    private JpaClusterRepository jpaClusterRepository;
 
     @Autowired
-    private CommandRepository commandRepository;
+    private JpaCommandRepository jpaCommandRepository;
 
     /**
      * Setup for all tests.
@@ -140,8 +140,8 @@ public class ClusterRestControllerIntegrationTests {
      */
     @After
     public void cleanup() {
-        this.clusterRepository.deleteAll();
-        this.commandRepository.deleteAll();
+        this.jpaClusterRepository.deleteAll();
+        this.jpaCommandRepository.deleteAll();
     }
 
     /**
@@ -151,7 +151,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canCreateClusterWithoutId() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         final URI location = createCluster(null, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         final Cluster cluster = restTemplate.getForEntity(location, ClusterResource.class).getBody().getContent();
@@ -163,7 +163,7 @@ public class ClusterRestControllerIntegrationTests {
         Assert.assertThat(cluster.getClusterType(), Matchers.is(CLUSTER_TYPE));
         Assert.assertThat(cluster.getTags(), Matchers.hasItem(Matchers.startsWith("genie.id:")));
         Assert.assertThat(cluster.getTags(), Matchers.hasItem(Matchers.startsWith("genie.name:")));
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -173,7 +173,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canCreateClusterWithId() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         final URI location = createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         final Cluster cluster = restTemplate.getForEntity(location, ClusterResource.class).getBody().getContent();
@@ -186,7 +186,7 @@ public class ClusterRestControllerIntegrationTests {
         Assert.assertThat(cluster.getTags().size(), Matchers.is(2));
         Assert.assertThat(cluster.getTags(), Matchers.hasItem(Matchers.startsWith("genie.id:")));
         Assert.assertThat(cluster.getTags(), Matchers.hasItem(Matchers.startsWith("genie.name:")));
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -194,7 +194,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canHandleBadInputToCreateCluster() {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         final HttpEntity<Cluster> entity = new HttpEntity<>(
                 new Cluster.Builder(null, null, null, null, null).build(),
                 HEADERS
@@ -203,7 +203,7 @@ public class ClusterRestControllerIntegrationTests {
                 = new TestRestTemplate().postForEntity(this.clustersBaseUrl, entity, String.class);
 
         Assert.assertThat(responseEntity.getStatusCode(), Matchers.is(HttpStatus.PRECONDITION_FAILED));
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -213,7 +213,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canFindClusters() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -320,7 +320,7 @@ public class ClusterRestControllerIntegrationTests {
         //TODO: Add tests for searching by min and max update time as those are available parameters
         //TODO: Add tests for sort, orderBy etc
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
     }
 
     /**
@@ -330,7 +330,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canUpdateCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         final URI location = createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         final Cluster createdCluster
@@ -359,7 +359,7 @@ public class ClusterRestControllerIntegrationTests {
         Assert.assertThat(updateResponse.getStatusCode(), Matchers.is(HttpStatus.OK));
         final Cluster updatedCluster = updateResponse.getBody();
         Assert.assertThat(updatedCluster.getStatus(), Matchers.is(ClusterStatus.OUT_OF_SERVICE));
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -369,15 +369,15 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteAllClusters() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         createCluster(null, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         createCluster(null, NAME, USER, VERSION, ClusterStatus.OUT_OF_SERVICE, CLUSTER_TYPE);
         createCluster(null, NAME, USER, VERSION, ClusterStatus.TERMINATED, CLUSTER_TYPE);
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
 
         restTemplate.delete(this.clustersBaseUrl);
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -387,7 +387,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteACluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -407,7 +407,7 @@ public class ClusterRestControllerIntegrationTests {
         createCluster(id1, name1, user1, version1, ClusterStatus.UP, clusterType1);
         createCluster(id2, name2, user2, version2, ClusterStatus.OUT_OF_SERVICE, clusterType2);
         createCluster(id3, name3, user3, version3, ClusterStatus.TERMINATED, clusterType3);
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
 
         restTemplate.delete(this.clustersBaseUrl + "/" + id2);
 
@@ -437,7 +437,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canAddConfigsToCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         ResponseEntity<String[]> configResponse = restTemplate.getForEntity(
@@ -469,7 +469,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canUpdateConfigsForCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         final String config1 = UUID.randomUUID().toString();
@@ -502,7 +502,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteConfigsForCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         final String config1 = UUID.randomUUID().toString();
@@ -530,7 +530,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canAddTagsToCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         ResponseEntity<String[]> tagResponse = restTemplate.getForEntity(
@@ -564,7 +564,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canUpdateTagsForCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         final String tag1 = UUID.randomUUID().toString();
@@ -599,7 +599,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteTagsForCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         final String tag1 = UUID.randomUUID().toString();
@@ -629,7 +629,7 @@ public class ClusterRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteTagForCluster() throws GenieException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
 
         final String tag1 = UUID.randomUUID().toString();
@@ -889,7 +889,7 @@ public class ClusterRestControllerIntegrationTests {
         Assert.assertThat(responseEntity.getBody().length, Matchers.is(2));
         Assert.assertThat(responseEntity.getBody()[0].getContent().getId(), Matchers.is(commandId1));
         Assert.assertThat(responseEntity.getBody()[1].getContent().getId(), Matchers.is(commandId3));
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(3L));
         final ResponseEntity<Cluster[]> command1Clusters = restTemplate.getForEntity(
                 this.commandsBaseUrl + "/" + commandId1 + "/clusters",
                 Cluster[].class

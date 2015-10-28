@@ -26,8 +26,8 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobmanager.JobManagerFactory;
 import com.netflix.genie.core.jpa.entities.JobEntity;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
-import com.netflix.genie.core.jpa.repositories.JobSpecs;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.core.util.NetUtil;
@@ -57,12 +57,12 @@ import java.util.UUID;
  * @author tgianos
  */
 @Service
-public class JobServiceJPAImpl implements JobService {
+public class JpaJobServiceImpl implements JobService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobServiceJPAImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JpaJobServiceImpl.class);
 
     private final GenieNodeStatistics stats;
-    private final JobRepository jobRepo;
+    private final JpaJobRepository jobRepo;
     private final JobManagerFactory jobManagerFactory;
     private final NetUtil netUtil;
 
@@ -82,8 +82,8 @@ public class JobServiceJPAImpl implements JobService {
      * @param netUtil           The network utility code to use
      */
     @Autowired
-    public JobServiceJPAImpl(
-            final JobRepository jobRepo,
+    public JpaJobServiceImpl(
+            final JpaJobRepository jobRepo,
             final GenieNodeStatistics stats,
             final JobManagerFactory jobManagerFactory,
             final NetUtil netUtil
@@ -181,7 +181,7 @@ public class JobServiceJPAImpl implements JobService {
 
         @SuppressWarnings("unchecked")
         final Page<JobEntity> jobEntities = this.jobRepo.findAll(
-                JobSpecs.find(
+                JpaJobSpecs.find(
                         id,
                         jobName,
                         userName,

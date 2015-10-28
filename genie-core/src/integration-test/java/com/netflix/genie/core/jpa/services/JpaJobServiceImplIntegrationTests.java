@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.services.JobService;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -51,7 +51,7 @@ import java.util.UUID;
  */
 @DatabaseSetup("JobServiceJPAImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
+public class JpaJobServiceImplIntegrationTests extends DBUnitTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";
@@ -64,7 +64,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
     private JobService service;
 
     @Autowired
-    private JobRepository jobRepository;
+    private JpaJobRepository jpaJobRepository;
 
     /**
      * Test the get job function.
@@ -593,7 +593,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         this.service.setCommandInfoForJob(JOB_1_ID, id, name);
         final Job job = this.service.getJob(JOB_1_ID);
         Assert.assertEquals(id, job.getCommandId());
-        Assert.assertEquals(name, this.jobRepository.findOne(JOB_1_ID).getCommandName());
+        Assert.assertEquals(name, this.jpaJobRepository.findOne(JOB_1_ID).getCommandName());
     }
 
     /**
@@ -616,8 +616,8 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
         this.service.setApplicationInfoForJob(JOB_1_ID, id, name);
-        Assert.assertEquals(id, this.jobRepository.findOne(JOB_1_ID).getApplicationId());
-        Assert.assertEquals(name, this.jobRepository.findOne(JOB_1_ID).getApplicationName());
+        Assert.assertEquals(id, this.jpaJobRepository.findOne(JOB_1_ID).getApplicationId());
+        Assert.assertEquals(name, this.jpaJobRepository.findOne(JOB_1_ID).getApplicationName());
     }
 
     /**
@@ -642,7 +642,7 @@ public class JobServiceJPAImplIntegrationTests extends DBUnitTestBase {
         this.service.setClusterInfoForJob(JOB_1_ID, id, name);
         final Job job = this.service.getJob(JOB_1_ID);
         Assert.assertEquals(id, job.getExecutionClusterId());
-        Assert.assertEquals(name, this.jobRepository.findOne(JOB_1_ID).getExecutionClusterName());
+        Assert.assertEquals(name, this.jpaJobRepository.findOne(JOB_1_ID).getExecutionClusterName());
     }
 
     /**

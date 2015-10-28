@@ -25,8 +25,8 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
-import com.netflix.genie.core.jpa.repositories.CommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.GenieWeb;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import org.hamcrest.Matchers;
@@ -95,10 +95,10 @@ public class ApplicationRestControllerIntegrationTests {
     private String commandsBaseUrl;
 
     @Autowired
-    private ApplicationRepository applicationRepository;
+    private JpaApplicationRepository jpaApplicationRepository;
 
     @Autowired
-    private CommandRepository commandRepository;
+    private JpaCommandRepository jpaCommandRepository;
 
     /**
      * Any one time setup for all the tests.
@@ -136,8 +136,8 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @After
     public void cleanup() {
-        this.commandRepository.deleteAll();
-        this.applicationRepository.deleteAll();
+        this.jpaCommandRepository.deleteAll();
+        this.jpaApplicationRepository.deleteAll();
     }
 
     /**
@@ -147,7 +147,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canCreateApplicationWithoutId() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         final URI location = createApplication(null, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         final ResponseEntity<ApplicationResource> getResponse
                 = restTemplate.getForEntity(location, ApplicationResource.class);
@@ -167,7 +167,7 @@ public class ApplicationRestControllerIntegrationTests {
         Assert.assertThat(getApp.getDependencies().size(), Matchers.is(0));
         Assert.assertThat(getApp.getUpdated(), Matchers.notNullValue());
         Assert.assertThat(getApp.getCreated(), Matchers.notNullValue());
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -177,7 +177,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canCreateApplicationWithId() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         final URI location = createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         final ResponseEntity<ApplicationResource> getResponse
                 = restTemplate.getForEntity(location, ApplicationResource.class);
@@ -197,7 +197,7 @@ public class ApplicationRestControllerIntegrationTests {
         Assert.assertThat(getApp.getDependencies().size(), Matchers.is(0));
         Assert.assertThat(getApp.getUpdated(), Matchers.notNullValue());
         Assert.assertThat(getApp.getCreated(), Matchers.notNullValue());
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -205,14 +205,14 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canHandleBadInputToCreateApplication() {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         final Application app = new Application.Builder(null, null, null, null).build();
         final HttpEntity<Application> entity = new HttpEntity<>(app, HEADERS);
         final ResponseEntity<String> responseEntity
                 = new TestRestTemplate().postForEntity(this.appsBaseUrl, entity, String.class);
 
         Assert.assertThat(responseEntity.getStatusCode(), Matchers.is(HttpStatus.PRECONDITION_FAILED));
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -222,7 +222,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canFindApplications() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -342,7 +342,7 @@ public class ApplicationRestControllerIntegrationTests {
 
         //TODO: Add tests for sort, orderBy etc
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
     }
 
     /**
@@ -352,7 +352,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canUpdateApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         final URI location = createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         final Application createdApp
                 = restTemplate.getForEntity(location, ApplicationResource.class).getBody().getContent();
@@ -386,7 +386,7 @@ public class ApplicationRestControllerIntegrationTests {
         final Application updateApp
                 = restTemplate.getForEntity(this.appsBaseUrl + "/" + ID, Application.class).getBody();
         Assert.assertThat(updateApp.getStatus(), Matchers.is(ApplicationStatus.INACTIVE));
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -396,15 +396,15 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteAllApplications() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(null, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         createApplication(null, NAME, USER, VERSION, ApplicationStatus.DEPRECATED);
         createApplication(null, NAME, USER, VERSION, ApplicationStatus.INACTIVE);
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
 
         restTemplate.delete(this.appsBaseUrl);
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -414,7 +414,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteAnApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -431,7 +431,7 @@ public class ApplicationRestControllerIntegrationTests {
         createApplication(id1, name1, user1, version1, ApplicationStatus.ACTIVE);
         createApplication(id2, name2, user2, version2, ApplicationStatus.DEPRECATED);
         createApplication(id3, name3, user3, version3, ApplicationStatus.INACTIVE);
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
 
         restTemplate.delete(this.appsBaseUrl + "/" + id2);
 
@@ -462,7 +462,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canAddConfigsToApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         ResponseEntity<String[]> configResponse = restTemplate.getForEntity(
@@ -498,7 +498,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canUpdateConfigsForApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final String config1 = UUID.randomUUID().toString();
@@ -530,7 +530,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteConfigsForApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final String config1 = UUID.randomUUID().toString();
@@ -558,7 +558,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canAddDependenciesToApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         ResponseEntity<String[]> dependencyResponse = restTemplate.getForEntity(
@@ -594,7 +594,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canUpdateDependenciesForApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final String dependency1 = UUID.randomUUID().toString();
@@ -625,7 +625,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteDependenciesForApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final String jar1 = UUID.randomUUID().toString();
@@ -653,7 +653,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canAddTagsToApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         ResponseEntity<String[]> tagResponse = restTemplate.getForEntity(
@@ -691,7 +691,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canUpdateTagsForApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final String tag1 = UUID.randomUUID().toString();
@@ -724,7 +724,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteTagsForApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final String tag1 = UUID.randomUUID().toString();
@@ -754,7 +754,7 @@ public class ApplicationRestControllerIntegrationTests {
      */
     @Test
     public void canDeleteTagForApplication() throws GenieException {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final String tag1 = UUID.randomUUID().toString();

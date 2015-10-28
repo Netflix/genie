@@ -37,7 +37,7 @@ import java.util.Calendar;
  */
 @DatabaseSetup("ExecutionServiceJPAImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class ExecutionServiceJPAImplIntegrationTests extends DBUnitTestBase {
+public class JpaExecutionServiceImplIntegrationTests extends DBUnitTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";

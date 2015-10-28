@@ -25,7 +25,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jobmanager.JobManager;
 import com.netflix.genie.core.jobmanager.JobManagerFactory;
 import com.netflix.genie.core.jpa.entities.JobEntity;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
 import com.netflix.genie.core.util.NetUtil;
 import org.junit.Assert;
@@ -43,10 +43,10 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-public class JobServiceJPAImplTests {
+public class JpaJobServiceImplTests {
 
-    private JobServiceJPAImpl service;
-    private JobRepository jobRepository;
+    private JpaJobServiceImpl service;
+    private JpaJobRepository jpaJobRepository;
     private GenieNodeStatistics genieNodeStatistics;
     private JobManagerFactory jobManagerFactory;
     private NetUtil netUtil;
@@ -56,12 +56,12 @@ public class JobServiceJPAImplTests {
      */
     @Before
     public void setup() {
-        this.jobRepository = Mockito.mock(JobRepository.class);
+        this.jpaJobRepository = Mockito.mock(JpaJobRepository.class);
         this.genieNodeStatistics = Mockito.mock(GenieNodeStatistics.class);
         this.jobManagerFactory = Mockito.mock(JobManagerFactory.class);
         this.netUtil = Mockito.mock(NetUtil.class);
-        this.service = new JobServiceJPAImpl(
-                this.jobRepository,
+        this.service = new JpaJobServiceImpl(
+                this.jpaJobRepository,
                 this.genieNodeStatistics,
                 this.jobManagerFactory,
                 this.netUtil
@@ -88,7 +88,7 @@ public class JobServiceJPAImplTests {
         final String id = UUID.randomUUID().toString();
         final Job job = Mockito.mock(Job.class);
         Mockito.when(job.getId()).thenReturn(id);
-        Mockito.when(this.jobRepository.exists(id)).thenReturn(true);
+        Mockito.when(this.jpaJobRepository.exists(id)).thenReturn(true);
         this.service.createJob(job);
     }
 
@@ -102,9 +102,9 @@ public class JobServiceJPAImplTests {
         final String id = UUID.randomUUID().toString();
         final Job job = Mockito.mock(Job.class);
         Mockito.when(job.getId()).thenReturn(id);
-        Mockito.when(this.jobRepository.exists(id)).thenReturn(false);
+        Mockito.when(this.jpaJobRepository.exists(id)).thenReturn(false);
         Mockito.when(this.netUtil.getHostName()).thenReturn(UUID.randomUUID().toString());
-        Mockito.when(this.jobRepository.save(Mockito.any(JobEntity.class)))
+        Mockito.when(this.jpaJobRepository.save(Mockito.any(JobEntity.class)))
                 .thenThrow(new RuntimeException("junk"));
 
         try {
@@ -133,7 +133,7 @@ public class JobServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetJobNoJobExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
         this.service.getJob(id);
     }
 
@@ -155,7 +155,7 @@ public class JobServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testSetUpdateTimeNoJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
         this.service.setUpdateTime(id);
     }
 
@@ -177,7 +177,7 @@ public class JobServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testSetJobStatusNoJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
         this.service.setJobStatus(id, JobStatus.SUCCEEDED, null);
     }
 
@@ -199,7 +199,7 @@ public class JobServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testSetProcessIdForJobNoJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
         this.service.setProcessIdForJob(id, 810);
     }
 
@@ -221,7 +221,7 @@ public class JobServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testSetCommandInfoForJobNoJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
         this.service.setCommandInfoForJob(id, "cmdId", "cmdName");
     }
 
@@ -243,7 +243,7 @@ public class JobServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testSetApplicationInfoForJobNoJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
         this.service.setApplicationInfoForJob(id, "appId", "appName");
     }
 
@@ -265,7 +265,7 @@ public class JobServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testSetClusterInfoForJobNoJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
         this.service.setClusterInfoForJob(id, "clusterId", "clusterName");
     }
 
@@ -291,13 +291,13 @@ public class JobServiceJPAImplTests {
         final JobEntity jobEntity
                 = Mockito.mock(JobEntity.class);
         Mockito.when(job.getId()).thenReturn(id);
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(jobEntity);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(jobEntity);
 
         final JobManager manager = Mockito.mock(JobManager.class);
         Mockito.when(this.jobManagerFactory.getJobManager(job)).thenReturn(manager);
 
         this.service.runJob(job);
-        Mockito.verify(this.jobRepository, Mockito.times(1)).findOne(id);
+        Mockito.verify(this.jpaJobRepository, Mockito.times(1)).findOne(id);
         Mockito.verify(this.jobManagerFactory, Mockito.times(1)).getJobManager(job);
         Mockito.verify(manager, Mockito.times(1)).launch();
         Mockito.verify(jobEntity, Mockito.times(1)).setUpdated(Mockito.any(Date.class));
@@ -316,13 +316,13 @@ public class JobServiceJPAImplTests {
         final JobEntity jobEntity
                 = Mockito.mock(JobEntity.class);
         Mockito.when(job.getId()).thenReturn(id);
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(jobEntity);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(jobEntity);
 
         final JobManager manager = Mockito.mock(JobManager.class);
         Mockito.when(this.jobManagerFactory.getJobManager(job)).thenThrow(new GenieNotFoundException("Some message"));
 
         this.service.runJob(job);
-        Mockito.verify(this.jobRepository, Mockito.never()).findOne(id);
+        Mockito.verify(this.jpaJobRepository, Mockito.never()).findOne(id);
         Mockito.verify(this.jobManagerFactory, Mockito.times(1)).getJobManager(job);
         Mockito.verify(manager, Mockito.never()).launch();
         Mockito.verify(jobEntity, Mockito.never()).setUpdated(Mockito.any(Date.class));
