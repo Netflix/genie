@@ -70,6 +70,7 @@ public class TestGenieException extends Exception {
     public void testTwoArgConstructorWithThrowable() throws GenieException {
         final GenieException ge = new GenieException(ERROR_CODE, IOE);
         Assert.assertEquals(ERROR_CODE, ge.getErrorCode());
+        Assert.assertEquals(String.valueOf(ERROR_CODE), ge.getMessage());
         Assert.assertEquals(IOE, ge.getCause());
         throw ge;
     }
