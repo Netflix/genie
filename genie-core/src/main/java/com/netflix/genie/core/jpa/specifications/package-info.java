@@ -15,15 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.elasticsearch.repositories;
-
-import com.netflix.genie.core.elasticsearch.documents.JobDocument;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 /**
- * CRUD repository for Job documents within Elasticsearch.
+ * Package containing specification classes for use with JPA queries through Spring.
  *
  * @author tgianos
+ * @since 3.0.0
  */
-public interface ESJobRepository extends ElasticsearchRepository<JobDocument, String> {
-}
+package com.netflix.genie.core.jpa.specifications;

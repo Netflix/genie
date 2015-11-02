@@ -15,15 +15,15 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
- * Job repository.
+ * Cluster repository.
  *
  * @author tgianos
  */
-public interface JobRepository extends JpaRepository<JobEntity, String>, JpaSpecificationExecutor {
+public interface JpaClusterRepository extends JpaRepository<ClusterEntity, String>, JpaSpecificationExecutor {
 
 }

@@ -15,23 +15,15 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.core.jpa.entities.CommandEntity;
-import java.util.List;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
- * Command repository.
+ * Application repository.
  *
  * @author tgianos
  */
-public interface CommandRepository extends JpaRepository<CommandEntity, String>, JpaSpecificationExecutor {
+public interface JpaApplicationRepository extends JpaRepository<ApplicationEntity, String>, JpaSpecificationExecutor {
 
-    /**
-     * Find commands by name.
-     *
-     * @param name The name of the command to find
-     * @return The commands matching the name.
-     */
-    List<CommandEntity> findByName(final String name);
 }

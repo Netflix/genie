@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.core.jpa.repositories.ApplicationRepository;
+import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.GenieWeb;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -83,7 +83,7 @@ public class ApplicationRestDocs {
     private WebApplicationContext context;
 
     @Autowired
-    private ApplicationRepository applicationRepository;
+    private JpaApplicationRepository jpaApplicationRepository;
 
     private RestDocumentationResultHandler document;
     private MockMvc mockMvc;
@@ -110,7 +110,7 @@ public class ApplicationRestDocs {
      */
     @After
     public void teardown() {
-        this.applicationRepository.deleteAll();
+        this.jpaApplicationRepository.deleteAll();
     }
 
     /**

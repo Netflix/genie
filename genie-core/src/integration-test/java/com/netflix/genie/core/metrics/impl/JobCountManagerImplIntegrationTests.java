@@ -23,7 +23,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.GenieServerTestSpringApplication;
 import com.netflix.genie.core.metrics.JobCountManager;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.util.NetUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,7 +55,7 @@ import java.util.Calendar;
 public class JobCountManagerImplIntegrationTests {
 
     @Autowired
-    private JobRepository jobRepo;
+    private JpaJobRepository jobRepo;
 
     @Autowired
     private JobCountManager manager;

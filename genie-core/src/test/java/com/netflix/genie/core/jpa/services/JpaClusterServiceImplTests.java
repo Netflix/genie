@@ -24,9 +24,9 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
-import com.netflix.genie.core.jpa.repositories.ClusterRepository;
-import com.netflix.genie.core.jpa.repositories.CommandRepository;
-import com.netflix.genie.core.jpa.repositories.JobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,7 +43,7 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-public class ClusterServiceJPAImplTests {
+public class JpaClusterServiceImplTests {
 
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
@@ -51,23 +51,23 @@ public class ClusterServiceJPAImplTests {
     private static final String CLUSTER_1_VERSION = "2.4.0";
     private static final String CLUSTER_1_TYPE = "yarn";
 
-    private ClusterServiceJPAImpl service;
-    private ClusterRepository clusterRepository;
-    private JobRepository jobRepository;
-    private CommandRepository commandRepository;
+    private JpaClusterServiceImpl service;
+    private JpaClusterRepository jpaClusterRepository;
+    private JpaJobRepository jpaJobRepository;
+    private JpaCommandRepository jpaCommandRepository;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.clusterRepository = Mockito.mock(ClusterRepository.class);
-        this.jobRepository = Mockito.mock(JobRepository.class);
-        this.commandRepository = Mockito.mock(CommandRepository.class);
-        this.service = new ClusterServiceJPAImpl(
-                this.clusterRepository,
-                this.commandRepository,
-                this.jobRepository
+        this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
+        this.jpaJobRepository = Mockito.mock(JpaJobRepository.class);
+        this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
+        this.service = new JpaClusterServiceImpl(
+                this.jpaClusterRepository,
+                this.jpaCommandRepository,
+                this.jpaJobRepository
         );
     }
 
@@ -89,7 +89,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetClusterNotExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.getCluster(id);
     }
 
@@ -111,7 +111,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testChooseClusterForJobNoJobExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
         this.service.chooseClusterForJob(id);
     }
 
@@ -147,7 +147,7 @@ public class ClusterServiceJPAImplTests {
                 .withConfigs(configs)
                 .build();
 
-        Mockito.when(this.clusterRepository.exists(CLUSTER_1_ID)).thenReturn(true);
+        Mockito.when(this.jpaClusterRepository.exists(CLUSTER_1_ID)).thenReturn(true);
         this.service.createCluster(cluster);
     }
 
@@ -169,7 +169,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateClusterNoClusterExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.updateCluster(id, new Cluster.Builder(null, null, null, null, null).build());
     }
 
@@ -182,7 +182,7 @@ public class ClusterServiceJPAImplTests {
     public void testUpdateClusterIdsDontMatch() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
-        Mockito.when(this.clusterRepository.exists(id)).thenReturn(true);
+        Mockito.when(this.jpaClusterRepository.exists(id)).thenReturn(true);
         Mockito.when(cluster.getId()).thenReturn(UUID.randomUUID().toString());
         this.service.updateCluster(id, cluster);
     }
@@ -215,7 +215,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testDeleteNoClusterToDelete() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.deleteCluster(id);
     }
 
@@ -237,7 +237,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.addConfigsForCluster(UUID.randomUUID().toString(), new HashSet<>());
     }
 
@@ -259,7 +259,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.updateConfigsForCluster(UUID.randomUUID().toString(), new HashSet<>());
     }
 
@@ -281,7 +281,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetConfigsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.getConfigsForCluster(id);
     }
 
@@ -303,7 +303,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testAddCommandsForClusterClusterDoesntExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.addCommandsForCluster(UUID.randomUUID().toString(), new ArrayList<>());
     }
 
@@ -319,8 +319,8 @@ public class ClusterServiceJPAImplTests {
         commandIds.add(commandId);
         final ClusterEntity clusterEntity
                 = Mockito.mock(ClusterEntity.class);
-        Mockito.when(this.clusterRepository.findOne(Mockito.anyString())).thenReturn(clusterEntity);
-        Mockito.when(this.commandRepository.findOne(commandId)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(Mockito.anyString())).thenReturn(clusterEntity);
+        Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
         this.service.addCommandsForCluster(CLUSTER_1_ID, commandIds);
     }
 
@@ -342,7 +342,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.getCommandsForCluster(id, null);
     }
 //TODO: Missing tests for statuses
@@ -365,7 +365,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateCommandsForClusterClusterDoesntExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.updateCommandsForCluster(id, new ArrayList<>());
     }
 
@@ -381,8 +381,8 @@ public class ClusterServiceJPAImplTests {
         commandIds.add(commandId);
         final ClusterEntity cluster
                 = Mockito.mock(ClusterEntity.class);
-        Mockito.when(this.clusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
-        Mockito.when(this.commandRepository.findOne(commandId)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
+        Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
         this.service.updateCommandsForCluster(CLUSTER_1_ID, commandIds);
     }
 
@@ -404,7 +404,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllCommandsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.removeAllCommandsForCluster(id);
     }
 
@@ -426,7 +426,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveCommandForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.removeCommandForCluster(id, UUID.randomUUID().toString());
     }
 
@@ -439,9 +439,9 @@ public class ClusterServiceJPAImplTests {
     public void testRemoveCommandForClusterNoCommand() throws GenieException {
         final ClusterEntity clusterEntity
                 = Mockito.mock(ClusterEntity.class);
-        Mockito.when(this.clusterRepository.findOne(CLUSTER_1_ID)).thenReturn(clusterEntity);
+        Mockito.when(this.jpaClusterRepository.findOne(CLUSTER_1_ID)).thenReturn(clusterEntity);
         final String commandId = UUID.randomUUID().toString();
-        Mockito.when(this.commandRepository.findOne(commandId)).thenReturn(null);
+        Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
         this.service.removeCommandForCluster(CLUSTER_1_ID, commandId);
     }
 
@@ -463,7 +463,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.addTagsForCluster(UUID.randomUUID().toString(), new HashSet<>());
     }
 
@@ -485,7 +485,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.updateTagsForCluster(UUID.randomUUID().toString(), new HashSet<>());
     }
 
@@ -507,7 +507,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.getTagsForCluster(id);
     }
 
@@ -529,7 +529,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.removeAllTagsForCluster(id);
     }
 
@@ -551,7 +551,7 @@ public class ClusterServiceJPAImplTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.clusterRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.removeTagForCluster(id, "something");
     }
 }

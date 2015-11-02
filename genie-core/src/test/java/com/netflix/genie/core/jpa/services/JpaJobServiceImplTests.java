@@ -37,17 +37,18 @@ package com.netflix.genie.core.jpa.services;
 //import java.util.Date;
 //import java.util.UUID;
 
+
 /**
  * Tests for the JobServiceJPAImpl class.
  *
  * @author tgianos
  */
-public class JobServiceJPAImplTests {
+public class JpaJobServiceImplTests {
 
     //private JobServiceJPAImpl service;
-//    private JobRepository jobRepository;
-//    private GenieNodeStatistics genieNodeStatistics;
-//    private NetUtil netUtil;
+    //    private JobRepository jobRepository;
+    //    private GenieNodeStatistics genieNodeStatistics;
+    //    private NetUtil netUtil;
 
     /**
      * Setup the tests.
@@ -64,6 +65,7 @@ public class JobServiceJPAImplTests {
 //                this.jobManagerFactory,
 //                this.netUtil
 //        );
+
     }
 //
 //    /**

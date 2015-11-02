@@ -53,7 +53,6 @@ Genie builds are hosted on CloudBees [here](https://netflixoss.ci.cloudbees.com/
 |        Build       |                                                                                                   Status                                                                                                  |
 |:------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 |      Snapshots     |      [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/)      |
-|    Pull Requests   | [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-pull-requests/) |
 |      Releases      |       [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/)       |
 
 ## Support

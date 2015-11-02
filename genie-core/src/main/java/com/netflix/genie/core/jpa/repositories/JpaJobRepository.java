@@ -15,15 +15,15 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.JobEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
- * Application repository.
+ * Job repository.
  *
  * @author tgianos
  */
-public interface ApplicationRepository extends JpaRepository<ApplicationEntity, String>, JpaSpecificationExecutor {
+public interface JpaJobRepository extends JpaRepository<JobEntity, String>, JpaSpecificationExecutor {
 
 }

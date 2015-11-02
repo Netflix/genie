@@ -13,7 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.JobEntity;
@@ -37,12 +37,12 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  */
-public final class JobSpecs {
+public final class JpaJobSpecs {
 
     /**
      * Protected constructor for utility class.
      */
-    protected JobSpecs() {
+    protected JpaJobSpecs() {
     }
 
     /**

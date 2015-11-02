@@ -13,7 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
@@ -36,12 +36,12 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  */
-public final class ApplicationSpecs {
+public final class JpaApplicationSpecs {
 
     /**
      * Private constructor for utility class.
      */
-    protected ApplicationSpecs() {
+    protected JpaApplicationSpecs() {
     }
 
     /**

@@ -13,7 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -42,12 +42,12 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  */
-public final class ClusterSpecs {
+public final class JpaClusterSpecs {
 
     /**
      * Private constructor for utility class.
      */
-    protected ClusterSpecs() {
+    protected JpaClusterSpecs() {
     }
 
     /**

@@ -52,7 +52,7 @@ import java.util.UUID;
  */
 @DatabaseSetup("CommandServiceJPAImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class CommandServiceJPAImplIntegrationTests extends DBUnitTestBase {
+public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String CLUSTER_1_ID = "cluster1";

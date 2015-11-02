@@ -22,7 +22,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.elasticsearch.documents.JobDocument;
-import com.netflix.genie.core.elasticsearch.repositories.ESJobRepository;
+import com.netflix.genie.core.elasticsearch.repositories.EsJobRepository;
 import com.netflix.genie.core.services.JobCRUDService;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -51,11 +51,11 @@ import java.util.stream.Collectors;
  * @author tgianos
  */
 @Service
-public class ESJobSearchServiceImpl implements JobCRUDService {
+public class EsJobSearchServiceImpl implements JobCRUDService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ESJobSearchServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EsJobSearchServiceImpl.class);
 
-    private final ESJobRepository repository;
+    private final EsJobRepository repository;
     private final ElasticsearchTemplate template;
 
     /**
@@ -65,7 +65,7 @@ public class ESJobSearchServiceImpl implements JobCRUDService {
      * @param template   The elastic search template
      */
     @Autowired
-    public ESJobSearchServiceImpl(final ESJobRepository repository, final ElasticsearchTemplate template) {
+    public EsJobSearchServiceImpl(final EsJobRepository repository, final ElasticsearchTemplate template) {
         this.repository = repository;
         this.template = template;
     }
