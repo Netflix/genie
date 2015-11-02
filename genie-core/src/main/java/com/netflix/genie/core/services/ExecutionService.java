@@ -17,11 +17,9 @@
  */
 package com.netflix.genie.core.services;
 
-import com.netflix.genie.common.dto.Job;
-import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobStatus;
+
+import com.netflix.genie.common.dto.JobExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieException;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -40,47 +38,13 @@ public interface ExecutionService {
     /**
      * Submit a new job.
      *
-     * @param jobRequest The job to submit
+     * @param jobExecutionEnvironment The job to submit
      * @return The id of the job that was submitted
      * @throws GenieException if there is an error
      */
     String submitJob(
             @NotNull(message = "No job request entered to run")
             @Valid
-            final JobRequest jobRequest
-    ) throws GenieException;
-
-    /**
-     * Kill job based on given job iD.
-     *
-     * @param id id for job to kill
-     * @return The killed job
-     * @throws GenieException if there is an error
-     */
-    Job killJob(
-            @NotBlank(message = "No id entered unable to kill job.")
-            final String id
-    ) throws GenieException;
-
-    /**
-     * Mark jobs as zombies if status hasn't been updated for
-     * com.netflix.genie.server.janitor.zombie.delta.ms.
-     *
-     * @return Number of jobs marked as zombies
-     */
-    int markZombies();
-
-    /**
-     * Finalize the status of a job.
-     *
-     * @param id       The id of the job to finalize.
-     * @param exitCode The exit code of the job process.
-     * @return The job status.
-     * @throws GenieException if there is an error
-     */
-    JobStatus finalizeJob(
-            @NotBlank(message = "No job id entered. Unable to finalize.")
-            final String id,
-            final int exitCode
+            final JobExecutionEnvironment jobExecutionEnvironment
     ) throws GenieException;
 }

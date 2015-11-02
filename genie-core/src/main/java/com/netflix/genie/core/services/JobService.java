@@ -41,14 +41,14 @@ public interface JobService {
      * @param jobRequest of job to kill
      * @throws GenieException if there is an error
      */
-    void processJob(
+    void runJob(
             @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
             @Valid
             final JobRequest jobRequest
     ) throws GenieException;
 
     /**
-     * Takes in a Job Request object and does necessary preparation for execution.
+     * Gets the Job object to return to user given the id.
      *
      * @param jobId of job to retrieve
      *
@@ -61,7 +61,7 @@ public interface JobService {
     ) throws GenieException;
 
     /**
-     * Get job info for given filter criteria.
+     * Get list of jobs for given filter criteria.
      *
      * @param id          id for job
      * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
