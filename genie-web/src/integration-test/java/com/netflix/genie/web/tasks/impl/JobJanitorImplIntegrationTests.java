@@ -28,6 +28,7 @@ import com.netflix.genie.web.GenieWeb;
 import com.netflix.genie.web.tasks.JobJanitor;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
         DbUnitTestExecutionListener.class
 })
 @WebIntegrationTest(randomPort = true)
+@Ignore
 public class JobJanitorImplIntegrationTests {
 
     @Autowired

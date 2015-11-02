@@ -23,8 +23,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.AttachmentService;
-import com.netflix.genie.core.services.ExecutionService;
-import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.core.services.JobCRUDService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import io.swagger.annotations.Api;
@@ -78,28 +77,24 @@ public class JobRestController {
     private static final Logger LOG = LoggerFactory.getLogger(JobRestController.class);
 //    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-    private final ExecutionService executionService;
-    private final JobSearchService jobSearchService;
+    private final JobCRUDService jobCRUDService;
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
 
     /**
      * Constructor.
      *
-     * @param executionService     The execution service to use.
-     * @param jobSearchService     The job search service to use.
+     * @param jobCRUDService     The job search service to use.
      * @param attachmentService    The attachment service to use to save attachments.
      * @param jobResourceAssembler Assemble job resources out of jobs
      */
     @Autowired
     public JobRestController(
-            final ExecutionService executionService,
-            final JobSearchService jobSearchService,
+            final JobCRUDService jobCRUDService,
             final AttachmentService attachmentService,
             final JobResourceAssembler jobResourceAssembler
     ) {
-        this.executionService = executionService;
-        this.jobSearchService = jobSearchService;
+        this.jobCRUDService = jobCRUDService;
         this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
     }
@@ -174,7 +169,8 @@ public class JobRestController {
 //            job.setClientHost(localClientHost);
 //        }
 
-        final String id = this.executionService.submitJob(jobRequest);
+        //final String id = this.executionService.submitJob(jobRequest);
+        final String id = "blah";
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
@@ -310,7 +306,7 @@ public class JobRestController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called for job with id: " + id);
         }
-        return this.jobResourceAssembler.toResource(this.jobSearchService.getJob(id));
+        return this.jobResourceAssembler.toResource(this.jobCRUDService.getJob(id));
     }
 
 //    /**
@@ -493,7 +489,7 @@ public class JobRestController {
         }
 
         return assembler.toResource(
-                this.jobSearchService.getJobs(
+                this.jobCRUDService.getJobs(
                         id,
                         name,
                         userName,
@@ -546,6 +542,6 @@ public class JobRestController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called for job id: " + id);
         }
-        this.executionService.killJob(id);
+        //this.executionService.killJob(id);
     }
 }

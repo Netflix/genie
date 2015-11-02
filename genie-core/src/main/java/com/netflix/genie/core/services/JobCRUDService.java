@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Set;
+import javax.validation.constraints.NotNull;
 
 /**
  * Interfaces for services to find jobs.
@@ -32,7 +33,7 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-public interface JobSearchService {
+public interface JobCRUDService {
 
     /**
      * Get job information for given job id.
@@ -73,4 +74,15 @@ public interface JobSearchService {
             final String commandId,
             final Pageable page
     );
+
+    /**
+     * Save the job object in the data store.
+     *
+     * @param job the Job object to save
+     * @throws GenieException if there is an error
+     */
+    void saveJob(
+            @NotNull(message = "Job is null so cannot be saved")
+            final Job job
+    ) throws GenieException;
 }

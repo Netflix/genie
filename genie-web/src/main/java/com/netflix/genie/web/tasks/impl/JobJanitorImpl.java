@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.tasks.impl;
 
-import com.netflix.genie.core.services.ExecutionService;
+//import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.web.tasks.JobJanitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 public class JobJanitorImpl implements JobJanitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobJanitorImpl.class);
-    private final ExecutionService xs;
+    //private final ExecutionService xs;
     @Value("${com.netflix.genie.server.janitor.min.sleep.ms:300000}")
     private long minSleepTime;
     @Value("${com.netflix.genie.server.janitor.max.sleep.ms:600000}")
@@ -46,11 +46,9 @@ public class JobJanitorImpl implements JobJanitor {
     /**
      * Default constructor - initializes members correctly in order.
      *
-     * @param xs The execution service to use.
      */
-    @Autowired
-    public JobJanitorImpl(final ExecutionService xs) {
-        this.xs = xs;
+    public JobJanitorImpl() {
+        //this.xs = xs;
     }
 
     /**
@@ -60,7 +58,8 @@ public class JobJanitorImpl implements JobJanitor {
     @Scheduled(fixedRate = 450000, initialDelay = 60000) // TODO: Randomize? Do we need this to be a property?
     public void markZombies() {
         LOG.info("Checking for zombies...");
-        final int zombies = this.xs.markZombies();
+        //final int zombies = this.xs.markZombies();
+        final int zombies = 0;
         LOG.info("Marked " + zombies + " jobs as zombies");
     }
 }

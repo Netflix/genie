@@ -15,41 +15,32 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.jobmanager;
 
-import com.netflix.genie.common.dto.Cluster;
+package com.netflix.genie.core.services;
+
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.exceptions.GenieException;
+import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 
 /**
- * The interface to be implemented by job manager implementations.
+ * Interface to handoff job execution based on different environments.
  *
  * @author amsharma
- * @author tgianos
- * @since 2.0.0
+ * @since 3.0.0
  */
-public interface JobManager {
+public interface JobSubmitterService {
 
     /**
-     * Initialize the JobManager.
+     * Submit the job for appropriate execution based on environment.
      *
-     * @param job     The job this manager will be managing.
-     * @param cluster The cluster this job will run on.
-     * @throws GenieException On issue
+     * @param job of job to kill
+     * @throws GenieException if there is an error
      */
-    void init(final Job job, final Cluster cluster) throws GenieException;
+    void submitJob(
+            @NotNull(message = "No job provided. Unable to submit job for execution.")
+            @Valid
+            final Job job
+    ) throws GenieException;
 
-    /**
-     * Launch the job.
-     *
-     * @throws GenieException On issue
-     */
-    void launch() throws GenieException;
-
-    /**
-     * Kill a job using the job information - no need to initialize this job.
-     *
-     * @throws GenieException On issue
-     */
-    void kill() throws GenieException;
 }

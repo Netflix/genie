@@ -23,7 +23,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.elasticsearch.documents.JobDocument;
 import com.netflix.genie.core.elasticsearch.repositories.ESJobRepository;
-import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.core.services.JobCRUDService;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * @author tgianos
  */
 @Service
-public class ESJobSearchServiceImpl implements JobSearchService {
+public class ESJobSearchServiceImpl implements JobCRUDService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESJobSearchServiceImpl.class);
 
@@ -154,5 +154,15 @@ public class ESJobSearchServiceImpl implements JobSearchService {
         return this.template
                 .queryForPage(query, JobDocument.class)
                 .map(JobDocument::getDTO);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveJob(
+            final Job job
+    ) {
+
     }
 }

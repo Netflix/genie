@@ -24,44 +24,40 @@ import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.validation.annotation.Validated;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
- * Helper APIs for working with Jobs.
+ * Interface that handles all job related tasks.
  *
- * @author tgianos
- * @since 2.0.0
+ * @author amsharma
+ * @since 3.0.0
  */
-@Validated
 public interface JobService {
-
     /**
-     * Validate the job and persist it if it passes validation.
+     * Takes in a Job Request object and does necessary preparation for execution.
      *
-     * @param jobRequest The job request
-     * @return The validated/saved job object
+     * @param jobRequest of job to kill
      * @throws GenieException if there is an error
      */
-    Job createJob(
-            @NotNull(message = "No job entered. Unable to create.")
+    void processJob(
+            @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
             @Valid
             final JobRequest jobRequest
     ) throws GenieException;
 
     /**
-     * Get job information for given job id.
+     * Takes in a Job Request object and does necessary preparation for execution.
      *
-     * @param id id of job to look up
-     * @return the job
+     * @param jobId of job to retrieve
+     *
+     * @return job object
      * @throws GenieException if there is an error
      */
     Job getJob(
-            @NotBlank(message = "No id entered. Unable to get job.")
-            final String id
+            @NotBlank(message = "No job id provided. Unable to retrieve job.")
+            final String jobId
     ) throws GenieException;
 
     /**
@@ -93,119 +89,13 @@ public interface JobService {
     );
 
     /**
-     * Get job status for give job id.
+     * Takes in a id of the job to kill.
      *
-     * @param id id for job to look up
-     * @return successful response, or one with HTTP error code
+     * @param jobId id of the job to kill
      * @throws GenieException if there is an error
      */
-    JobStatus getJobStatus(
-            @NotBlank(message = "No id entered. Unable to get status.")
-            final String id
-    ) throws GenieException;
-
-    /**
-     * Set the status for a given job.
-     *
-     * @param id     The id of the job to fail.
-     * @param status The status to set.
-     * @param msg    The message of the failure.
-     * @throws GenieException if there is an error
-     */
-    void setJobStatus(
-            @NotBlank(message = "No id entered for the job. Unable to update the status.")
-            final String id,
-            @NotNull(message = "No status entered unable to update.")
-            final JobStatus status,
-            final String msg
-    ) throws GenieException;
-
-    /**
-     * Update a job with the last updated time.
-     *
-     * @param id The id of the job to update.
-     * @return The time in milliseconds when the job was updated.
-     * @throws GenieException if there is an error
-     */
-    long setUpdateTime(
-            @NotBlank(message = "No job id entered. Unable to set update time.")
-            final String id
-    ) throws GenieException;
-
-    /**
-     * Set the java process id that will run the given job.
-     *
-     * @param id  The id of the job to attach the process to.
-     * @param pid The id of the process that will run the job.
-     * @throws GenieException if there is an error
-     */
-    void setProcessIdForJob(
-            @NotBlank(message = "No job id entered. Unable to set process id")
-            final String id,
-            final int pid
-    ) throws GenieException;
-
-    /**
-     * Set the command information for a given job.
-     *
-     * @param id          The id of the job.
-     * @param commandId   The id of the command used to run the job.
-     * @param commandName The name of the command used to run the job.
-     * @throws GenieException if there is an error
-     */
-    void setCommandInfoForJob(
-            @NotBlank(message = "No job id entered. Unable to set command info for job.")
-            final String id,
-            @NotBlank(message = "No command id entered. Unable to set command info for job.")
-            final String commandId,
-            @NotBlank(message = "No command name entered. Unable to set command info for job.")
-            final String commandName
-    ) throws GenieException;
-
-    /**
-     * Set the application information for a given job.
-     *
-     * @param id      The id of the job.
-     * @param appId   The id of the application used to run the job.
-     * @param appName The name of the application used to run the job.
-     * @throws GenieException if there is an error
-     */
-    void setApplicationInfoForJob(
-            @NotBlank(message = "No job id entered. Unable to update app info for job.")
-            final String id,
-            @NotBlank(message = "No app id entered. Unable to update app info for job.")
-            final String appId,
-            @NotBlank(message = "No app name entered. unable to update app info for job.")
-            final String appName
-    ) throws GenieException;
-
-    /**
-     * Set the cluster information for a given job.
-     *
-     * @param id          The id of the job.
-     * @param clusterId   The id of the cluster used to run the job.
-     * @param clusterName The name of the cluster used to run the job.
-     * @throws GenieException if there is an error
-     */
-    void setClusterInfoForJob(
-            @NotBlank(message = "No job id entered. Unable to update cluster info for job.")
-            final String id,
-            @NotBlank(message = "No cluster id entered. Unable to update cluster info for job.")
-            final String clusterId,
-            @NotBlank(message = "No cluster name entered. Unable to update cluster info for job.")
-            final String clusterName
-    ) throws GenieException;
-
-    /**
-     * Run the job using a JobLauncher.
-     *
-     * @param job The job to run.
-     * @return The job object that's returned after launch
-     * @throws GenieException if there is an error
-     */
-    Job runJob(
-            @NotNull(message = "No job entered unable to run")
-            @Valid
-            final Job job
+    void killJob(
+            @NotBlank(message = "No job id provided. Unable to retrieve job.")
+            final String jobId
     ) throws GenieException;
 }
