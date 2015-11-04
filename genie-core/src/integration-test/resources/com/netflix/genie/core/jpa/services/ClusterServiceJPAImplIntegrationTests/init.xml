@@ -200,13 +200,7 @@
             name="testPigJob"
             status="SUCCEEDED"
             version="2.4"
-            command_args="-f -j"
-            command_criteria_string="prod,pig"
-            cluster_criterias_string="prod,pig|h2prod|h2query"
-            disable_log_archival="true"
             exit_code="0"
-            forwarded="false"
-            process_handle="3426"
             entity_version="0"/>
 
     <jobs
@@ -217,12 +211,6 @@
             name="testSparkJob"
             status="RUNNING"
             version="2.4"
-            command_args="-f -j"
-            command_criteria_string="spark,prod"
-            cluster_criterias_string="spark,prod|spark"
-            disable_log_archival="true"
             exit_code="-1"
-            forwarded="false"
-            process_handle="3427"
             entity_version="0"/>
 </dataset>

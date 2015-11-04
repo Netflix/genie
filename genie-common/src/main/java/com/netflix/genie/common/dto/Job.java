@@ -22,14 +22,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Read only data transfer object representing a Job in the Genie system.
@@ -37,53 +33,37 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-@ApiModel(description = "A resource for a job in Genie.")
 @JsonDeserialize(builder = Job.Builder.class)
-public class Job extends JobRequest {
+public class Job extends CommonDTO {
 
-    @ApiModelProperty(value = "Id of the cluster where the job is running or was run.", readOnly = true)
-    @Length(max = 255, message = "Max length is 255 characters")
-    private String executionClusterId;
+    @Size(max = 255, message = "Max length is 255 characters")
+    private String clusterId;
 
-    @ApiModelProperty(value = "Id of the command that this job is using to run or ran with.", readOnly = true)
-    @Length(max = 255, message = "Max length in database is 255 characters")
+    @Size(max = 255, message = "Max length in database is 255 characters")
     private String commandId;
 
-    @ApiModelProperty(value = "The current status of the job.", readOnly = true)
     @NotNull(message = "A job must have a status")
     private JobStatus status;
 
-    @ApiModelProperty(value = "A status message about the job.", readOnly = true)
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length is 255 characters")
     private String statusMsg;
 
-    @ApiModelProperty(value = "The start time of the job.", dataType = "dateTime", readOnly = true)
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date started;
 
-    @ApiModelProperty(value = "The end time of the job.", dataType = "dateTime", readOnly = true)
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date finished;
 
-    @ApiModelProperty(value = "The genie host where the job is being run or was run.", readOnly = true)
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String hostName;
-
-    @ApiModelProperty(value = "The URI to use to kill the job.", readOnly = true)
+    @Size(max = 1024, message = "Max character length is 1024 characters")
     private String killURI;
 
-    @ApiModelProperty(value = "The URI where to find job output.", readOnly = true)
+    @Size(max = 1024, message = "Max character length is 1024 characters")
     private String outputURI;
 
-    @ApiModelProperty(value = "The exit code of the job.", readOnly = true)
     private int exitCode = -1;
 
-    @ApiModelProperty(value = "Where the logs were archived.", readOnly = true)
+    @Size(max = 1024, message = "Max character length is 1024 characters")
     private String archiveLocation;
-
-    //TODO: Redesign should get rid of this and a lot of other fields
-    @ApiModelProperty(value = "The process id.", readOnly = true)
-    private int processId = -1;
 
     /**
      * Constructor used by the builder.
@@ -92,7 +72,7 @@ public class Job extends JobRequest {
      */
     protected Job(final Builder builder) {
         super(builder);
-        this.executionClusterId = builder.bExecutionClusterId;
+        this.clusterId = builder.bClusterId;
         this.commandId = builder.bCommandId;
         this.status = builder.bStatus;
         this.statusMsg = builder.bStatusMsg;
@@ -102,12 +82,10 @@ public class Job extends JobRequest {
         if (builder.bFinished != null) {
             this.finished = new Date(builder.bFinished.getTime());
         }
-        this.hostName = builder.bHostName;
         this.killURI = builder.bKillURI;
         this.outputURI = builder.bOutputURI;
         this.exitCode = builder.bExitCode;
         this.archiveLocation = builder.bArchiveLocation;
-        this.processId = builder.bProcessId;
     }
 
     /**
@@ -115,8 +93,8 @@ public class Job extends JobRequest {
      *
      * @return The id
      */
-    public String getExecutionClusterId() {
-        return this.executionClusterId;
+    public String getClusterId() {
+        return this.clusterId;
     }
 
     /**
@@ -165,15 +143,6 @@ public class Job extends JobRequest {
     }
 
     /**
-     * Get the host name of the Genie node the job ran on.
-     *
-     * @return The host name
-     */
-    public String getHostName() {
-        return hostName;
-    }
-
-    /**
      * Get the URI used to kill the job.
      *
      * @return The kill URI
@@ -210,44 +179,30 @@ public class Job extends JobRequest {
     }
 
     /**
-     * Get the id of the process that ran or is running the job.
-     *
-     * @return the process id
-     */
-    public int getProcessId() {
-        return this.processId;
-    }
-
-    /**
      * A builder to create jobs.
      *
      * @author tgianos
      * @since 3.0.0
      */
-    public static class Builder extends JobRequest.Builder<Builder> {
+    public static class Builder extends CommonDTO.Builder<Builder> {
 
-        private String bExecutionClusterId;
+        private String bClusterId;
         private String bCommandId;
         private JobStatus bStatus;
         private String bStatusMsg;
         private Date bStarted;
         private Date bFinished;
-        private String bHostName;
         private String bKillURI;
         private String bOutputURI;
         private int bExitCode;
         private String bArchiveLocation;
-        private int bProcessId;
 
         /**
          * Constructor which has required fields.
          *
-         * @param name             The name to use for the Job
-         * @param user             The user to use for the Job
-         * @param version          The version to use for the Job
-         * @param commandArgs      The command line arguments for the Job
-         * @param clusterCriterias The list of cluster criteria for the Job
-         * @param commandCriteria  The list of command criteria for the Job
+         * @param name    The name to use for the Job
+         * @param user    The user to use for the Job
+         * @param version The version to use for the Job
          */
         public Builder(
                 @JsonProperty("name")
@@ -255,25 +210,19 @@ public class Job extends JobRequest {
                 @JsonProperty("user")
                 final String user,
                 @JsonProperty("version")
-                final String version,
-                @JsonProperty("commandArgs")
-                final String commandArgs,
-                @JsonProperty("clusterCriterias")
-                final List<ClusterCriteria> clusterCriterias,
-                @JsonProperty("commandCriteria")
-                final Set<String> commandCriteria
+                final String version
         ) {
-            super(name, user, version, commandArgs, clusterCriterias, commandCriteria);
+            super(name, user, version);
         }
 
         /**
          * Set the execution cluster id for this job.
          *
-         * @param executionClusterId The execution cluster id
+         * @param clusterId The execution cluster id
          * @return The builder
          */
-        public Builder withExecutionClusterId(final String executionClusterId) {
-            this.bExecutionClusterId = executionClusterId;
+        public Builder withClusterId(final String clusterId) {
+            this.bClusterId = clusterId;
             return this;
         }
 
@@ -340,17 +289,6 @@ public class Job extends JobRequest {
         }
 
         /**
-         * Set the Genie host name the job ran on.
-         *
-         * @param hostName The host name
-         * @return The builder
-         */
-        public Builder withHostName(final String hostName) {
-            this.bHostName = hostName;
-            return this;
-        }
-
-        /**
          * Set the kill URI for the job.
          *
          * @param killURI The kill uri
@@ -391,17 +329,6 @@ public class Job extends JobRequest {
          */
         public Builder withArchiveLocation(final String archiveLocation) {
             this.bArchiveLocation = archiveLocation;
-            return this;
-        }
-
-        /**
-         * Set the process id of the job.
-         *
-         * @param processId The id of the process being used to run the job client
-         * @return The builder
-         */
-        public Builder withProcessId(final int processId) {
-            this.bProcessId = processId;
             return this;
         }
 

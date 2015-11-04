@@ -69,6 +69,7 @@ public final class JpaJobSpecs {
             final String clusterId,
             final String commandName,
             final String commandId) {
+        //TODO: fix cluster name and command name if we want to
         return (final Root<JobEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(id)) {
@@ -93,14 +94,8 @@ public final class JpaJobSpecs {
                         .filter(StringUtils::isNotBlank)
                         .forEach(tag -> predicates.add(cb.isMember(tag, root.get(JobEntity_.tags))));
             }
-            if (StringUtils.isNotBlank(clusterName)) {
-                predicates.add(cb.equal(root.get(JobEntity_.executionClusterName), clusterName));
-            }
             if (StringUtils.isNotBlank(clusterId)) {
-                predicates.add(cb.equal(root.get(JobEntity_.executionClusterId), clusterId));
-            }
-            if (StringUtils.isNotBlank(commandName)) {
-                predicates.add(cb.equal(root.get(JobEntity_.commandName), commandName));
+                predicates.add(cb.equal(root.get(JobEntity_.clusterId), clusterId));
             }
             if (StringUtils.isNotBlank(commandId)) {
                 predicates.add(cb.equal(root.get(JobEntity_.commandId), commandId));

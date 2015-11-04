@@ -21,14 +21,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateSerializer;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Size;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Base fields for multiple DTOs.
@@ -38,63 +33,14 @@ import java.util.Set;
  */
 public abstract class BaseDTO {
 
-    @ApiModelProperty(
-            value = "The unique id of this resource. If one is not provided it is created internally"
-    )
     @Size(max = 255, message = "Max length is 255 characters")
     private String id;
 
-    @ApiModelProperty(
-            value = "When this resource was created. Set automatically by system",
-            readOnly = true,
-            dataType = "dateTime"
-    )
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date created;
 
-    @ApiModelProperty(
-            value = "When this resource was last updated. Set automatically by system",
-            readOnly = true,
-            dataType = "dateTime"
-    )
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date updated;
-
-    @ApiModelProperty(
-            value = "The version number",
-            required = true
-    )
-    @NotBlank(message = "Version is missing and is required.")
-    @Size(max = 255, message = "Max length is 255 characters")
-    private String version;
-
-    @ApiModelProperty(
-            value = "User who created/owns this object",
-            required = true
-    )
-    @NotBlank(message = "User name is missing and is required.")
-    @Size(max = 255, message = "Max length is 255 characters")
-    private String user;
-
-    @ApiModelProperty(
-            value = "The name to use",
-            required = true
-    )
-    @NotBlank(message = "Name is missing and is required.")
-    @Size(max = 255, message = "Max length is 255 characters")
-    private String name;
-
-    @ApiModelProperty(
-            value = "The description of this entity",
-            required = true
-    )
-    private String description;
-
-    @ApiModelProperty(
-            value = "The tags associated with this entity",
-            required = true
-    )
-    private final Set<String> tags = new HashSet<>();
 
     /**
      * Constructor.
@@ -108,51 +54,6 @@ public abstract class BaseDTO {
         }
         if (builder.bUpdated != null) {
             this.updated = new Date(builder.bUpdated.getTime());
-        }
-        this.name = builder.bName;
-        this.user = builder.bUser;
-        this.version = builder.bVersion;
-        this.description = builder.bDescription;
-        if (builder.bTags != null) {
-            this.tags.addAll(builder.bTags);
-        }
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param id          The id for the dto
-     * @param created     The creation time
-     * @param updated     The update time
-     * @param name        The name
-     * @param user        The user
-     * @param version     The version
-     * @param description The description
-     * @param tags        The tags
-     */
-    protected BaseDTO(
-            final String id,
-            final Date created,
-            final Date updated,
-            final String name,
-            final String user,
-            final String version,
-            final String description,
-            final Set<String> tags
-    ) {
-        this.id = id;
-        if (created != null) {
-            this.created = new Date(created.getTime());
-        }
-        if (updated != null) {
-            this.updated = new Date(updated.getTime());
-        }
-        this.name = name;
-        this.user = user;
-        this.version = version;
-        this.description = description;
-        if (tags != null) {
-            this.tags.addAll(tags);
         }
     }
 
@@ -192,51 +93,6 @@ public abstract class BaseDTO {
     }
 
     /**
-     * Get the version.
-     *
-     * @return the version
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Get the user.
-     *
-     * @return The user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Get the name.
-     *
-     * @return The name
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Get the description.
-     *
-     * @return The desciption
-     */
-    public String getDescription() {
-        return this.description;
-    }
-
-    /**
-     * Get a readonly copy of the tags.
-     *
-     * @return The tags. Read only. Will throw exception if try to modify.
-     */
-    public Set<String> getTags() {
-        return Collections.unmodifiableSet(this.tags);
-    }
-
-    /**
      * Convert this object to a string representation.
      *
      * @return This application data represented as a JSON structure
@@ -263,16 +119,8 @@ public abstract class BaseDTO {
         private String bId;
         private Date bCreated;
         private Date bUpdated;
-        private final String bName;
-        private final String bUser;
-        private final String bVersion;
-        private String bDescription;
-        private Set<String> bTags = new HashSet<>();
 
-        protected Builder(final String name, final String user, final String version) {
-            this.bName = name;
-            this.bUser = user;
-            this.bVersion = version;
+        protected Builder() {
         }
 
         /**
@@ -308,30 +156,6 @@ public abstract class BaseDTO {
         public T withUpdated(final Date updated) {
             if (updated != null) {
                 this.bUpdated = new Date(updated.getTime());
-            }
-            return (T) this;
-        }
-
-        /**
-         * Set the description for the resource.
-         *
-         * @param description The description to use
-         * @return The builder
-         */
-        public T withDescription(final String description) {
-            this.bDescription = description;
-            return (T) this;
-        }
-
-        /**
-         * Set the tags to use for the resource.
-         *
-         * @param tags The tags to use
-         * @return The builder
-         */
-        public T withTags(final Set<String> tags) {
-            if (tags != null) {
-                this.bTags.addAll(tags);
             }
             return (T) this;
         }

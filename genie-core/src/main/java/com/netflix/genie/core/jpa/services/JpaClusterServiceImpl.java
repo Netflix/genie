@@ -182,8 +182,8 @@ public class JpaClusterServiceImpl implements ClusterService {
             );
         }
 
-        final List<ClusterCriteria> clusterCriterias = jobEntity.getClusterCriterias();
-        final Set<String> commandCriteria = jobEntity.getCommandCriteria();
+        final List<ClusterCriteria> clusterCriterias = jobEntity.getRequest().getClusterCriteriasAsList();
+        final Set<String> commandCriteria = jobEntity.getRequest().getCommandCriteriaAsSet();
 
         for (final ClusterCriteria clusterCriteria : clusterCriterias) {
             @SuppressWarnings("unchecked")
@@ -195,13 +195,6 @@ public class JpaClusterServiceImpl implements ClusterService {
             );
 
             if (!clusterEntities.isEmpty()) {
-                // Add the successfully criteria to the job object in string form.
-                jobEntity.setChosenClusterCriteriaString(
-                        StringUtils.join(
-                                clusterCriteria.getTags(),
-                                CRITERIA_DELIMITER
-                        )
-                );
                 return clusterEntities
                         .stream()
                         .map(ClusterEntity::getDTO)

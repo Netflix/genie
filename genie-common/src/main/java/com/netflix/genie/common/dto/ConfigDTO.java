@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.common.dto;
 
-import io.swagger.annotations.ApiModelProperty;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,11 +27,8 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-public abstract class ConfigDTO extends BaseDTO {
+public abstract class ConfigDTO extends CommonDTO {
 
-    @ApiModelProperty(
-            value = "Locations of all the configuration files needed for this resource"
-    )
     private final Set<String> configs = new HashSet<>();
 
     /**
@@ -64,7 +59,7 @@ public abstract class ConfigDTO extends BaseDTO {
      * @author tgianos
      * @since 3.0.0
      */
-    protected abstract static class Builder<T extends Builder> extends BaseDTO.Builder<T> {
+    protected abstract static class Builder<T extends Builder> extends CommonDTO.Builder<T> {
 
         private Set<String> bConfigs = new HashSet<>();
 

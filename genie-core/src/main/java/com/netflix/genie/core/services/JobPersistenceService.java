@@ -33,7 +33,7 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
-public interface JobCRUDService {
+public interface JobPersistenceService {
 
     /**
      * Get job information for given job id.

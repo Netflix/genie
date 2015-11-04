@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
-import javax.persistence.Cacheable;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -53,7 +53,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "clusters")
-@Cacheable(false)
 public class ClusterEntity extends CommonFields {
 
     @Basic(optional = false)
@@ -322,8 +321,8 @@ public class ClusterEntity extends CommonFields {
      *
      * @return The DTO
      */
-    public com.netflix.genie.common.dto.Cluster getDTO() {
-        return new com.netflix.genie.common.dto.Cluster.Builder(
+    public Cluster getDTO() {
+        return new Cluster.Builder(
                 this.getName(),
                 this.getUser(),
                 this.getVersion(),
