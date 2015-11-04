@@ -19,12 +19,9 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -38,43 +35,28 @@ import java.util.Set;
  * @since 3.0.0
  */
 @JsonDeserialize(builder = JobRequest.Builder.class)
-public class JobRequest extends BaseDTO {
+public class JobRequest extends CommonDTO {
 
-    @ApiModelProperty(value = "Command line arguments for the job.", example = "-f hive.q", required = true)
-    @NotBlank(message = "Command arguments are required.")
+    @Size(min = 1, max = 1024, message = "Command arguments are required but no longer than 1024 characters")
     private String commandArgs;
 
-    @ApiModelProperty(
-            value = "List of criteria containing tags to use to pick a cluster to run this job, evaluated in order",
-            required = true
-    )
-    @NotEmpty(message = "No cluster criteria entered. At least one required.")
+    @Size(min = 1, message = "No cluster criteria entered. At least one required.")
     private List<ClusterCriteria> clusterCriterias = new ArrayList<>();
 
-    @ApiModelProperty(
-            value = "List of criteria containing tags to use to pick a command to run this job",
-            required = true
-    )
-    @NotEmpty(message = "No command criteria entered. At least one required.")
+    @Size(min = 1, message = "No command criteria entered. At least one required.")
     private Set<String> commandCriteria = new HashSet<>();
 
-    @ApiModelProperty(value = "Group name of the user who submitted this job")
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length is 255 characters")
     private String group;
 
-    @ApiModelProperty(value = "Location of a file which is sourced before job is run where properties can be set")
+    @Size(max = 1024, message = "Max length is 1024 characters")
     private String setupFile;
 
-    @ApiModelProperty(value = "Dependent files for this job to run. Will be downloaded before job starts")
     private Set<String> fileDependencies = new HashSet<>();
 
-    @ApiModelProperty(
-            value = "Boolean variable to decide whether job should be archived after it finishes defaults to true"
-    )
     private boolean disableLogArchival;
 
-    @ApiModelProperty(value = "Email address to send notifications to on job completion")
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length is 255 characters")
     @Email(message = "Must be a valid email address")
     private String email;
 
@@ -176,11 +158,10 @@ public class JobRequest extends BaseDTO {
     /**
      * A builder to create job requests.
      *
-     * @param <T> The type of builder that extends this builder for final implementation
      * @author tgianos
      * @since 3.0.0
      */
-    public static class Builder<T extends Builder> extends BaseDTO.Builder<T> {
+    public static class Builder extends CommonDTO.Builder<Builder> {
 
         private final String bCommandArgs;
         private final List<ClusterCriteria> bClusterCriterias = new ArrayList<>();
@@ -231,9 +212,9 @@ public class JobRequest extends BaseDTO {
          * @param group The group
          * @return The builder
          */
-        public T withGroup(final String group) {
+        public Builder withGroup(final String group) {
             this.bGroup = group;
-            return (T) this;
+            return this;
         }
 
         /**
@@ -242,9 +223,9 @@ public class JobRequest extends BaseDTO {
          * @param setupFile The setup file to use
          * @return The builder
          */
-        public T withSetupFile(final String setupFile) {
+        public Builder withSetupFile(final String setupFile) {
             this.bSetupFile = setupFile;
-            return (T) this;
+            return this;
         }
 
         /**
@@ -253,11 +234,11 @@ public class JobRequest extends BaseDTO {
          * @param fileDependencies The file dependencies
          * @return The builder
          */
-        public T withFileDependencies(final Set<String> fileDependencies) {
+        public Builder withFileDependencies(final Set<String> fileDependencies) {
             if (fileDependencies != null) {
                 this.bFileDependencies.addAll(fileDependencies);
             }
-            return (T) this;
+            return this;
         }
 
         /**
@@ -266,9 +247,9 @@ public class JobRequest extends BaseDTO {
          * @param disableLogArchival true if you want to disable log archival
          * @return The builder
          */
-        public T withDisableLogArchival(final boolean disableLogArchival) {
+        public Builder withDisableLogArchival(final boolean disableLogArchival) {
             this.bDisableLogArchival = disableLogArchival;
-            return (T) this;
+            return this;
         }
 
         /**
@@ -277,9 +258,9 @@ public class JobRequest extends BaseDTO {
          * @param email the email address to use
          * @return The builder
          */
-        public T withEmail(final String email) {
+        public Builder withEmail(final String email) {
             this.bEmail = email;
-            return (T) this;
+            return this;
         }
 
         /**

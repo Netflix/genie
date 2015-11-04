@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.hibernate.validator.constraints.Length;
@@ -328,8 +329,8 @@ public class CommandEntity extends CommonFields {
      *
      * @return The dto
      */
-    public com.netflix.genie.common.dto.Command getDTO() {
-        return new com.netflix.genie.common.dto.Command.Builder(
+    public Command getDTO() {
+        return new Command.Builder(
                 this.getName(),
                 this.getUser(),
                 this.getVersion(),

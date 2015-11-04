@@ -23,7 +23,6 @@ import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.metrics.JobCountManager;
 import com.netflix.genie.core.util.NetUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,13 +103,13 @@ public class JobCountManagerImpl implements JobCountManager {
             LOG.debug("called");
         }
 
-        final String finalHostName;
-        // initialize host name
-        if (StringUtils.isBlank(hostName)) {
-            finalHostName = this.netUtil.getHostName();
-        } else {
-            finalHostName = hostName;
-        }
+//        final String finalHostName;
+//        // initialize host name
+//        if (StringUtils.isBlank(hostName)) {
+//            finalHostName = this.netUtil.getHostName();
+//        } else {
+//            finalHostName = hostName;
+//        }
         final CriteriaBuilder cb = this.em.getCriteriaBuilder();
         final CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         final Root<JobEntity> j = cq.from(JobEntity.class);
@@ -118,7 +117,8 @@ public class JobCountManagerImpl implements JobCountManager {
         final Predicate runningStatus = cb.equal(j.get(JobEntity_.status), JobStatus.RUNNING);
         final Predicate initStatus = cb.equal(j.get(JobEntity_.status), JobStatus.INIT);
         final List<Predicate> predicates = new ArrayList<>();
-        predicates.add(cb.equal(j.get(JobEntity_.hostName), finalHostName));
+        //TODO: FIX
+//        predicates.add(cb.equal(j.get(JobEntity_.hostName), finalHostName));
         predicates.add(cb.or(runningStatus, initStatus));
         if (minStartTime != null) {
             predicates.add(cb.greaterThanOrEqualTo(j.get(JobEntity_.started), new Date(minStartTime)));

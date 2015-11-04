@@ -189,6 +189,9 @@ if [ "$(curl -X HEAD -i -s -o /dev/null -w "%{http_code}" "${ELASTICSEARCH_PROTO
                                     "type": "string",
                                     "index": "not_analyzed"
                                 },
+                                "description": {
+                                    "type": "string"
+                                },
                                 "archiveLocation": {
                                     "type": "string",
                                     "index": "not_analyzed"
@@ -197,7 +200,7 @@ if [ "$(curl -X HEAD -i -s -o /dev/null -w "%{http_code}" "${ELASTICSEARCH_PROTO
                                     "type": "string",
                                     "index": "not_analyzed"
                                 },
-                                "executionClusterId": {
+                                "clusterId": {
                                     "type": "string",
                                     "index": "not_analyzed"
                                 },
@@ -218,8 +221,6 @@ if [ "$(curl -X HEAD -i -s -o /dev/null -w "%{http_code}" "${ELASTICSEARCH_PROTO
     fi
 fi
 
-# "sql" : "SELECT Job.id, Job.created, Job.updated, Job.name, Job.user, Job.version, Job.description, Job.archiveLocation, Job.chosenClusterCriteriaString, Job.clusterCriteriasString, Job.commandCriteriaString, Job.commandId, Job.email, Job.envPropFile as 'setupFile', Job.executionClusterId, Job.exitCode, Job.fileDependencies, Job.finished, Job.groupName as 'group', Job.hostName, Job.killURI, Job.outputURI, Job.started, Job.status, Job.statusMsg, Job_tags.element as 'tags', '${ELASTICSEARCH_INDEX_NAME}' as _index, 'job' as _type, Job.id as _id, Job.entityVersion as _version FROM Job LEFT JOIN Job_tags ON Job.id = Job_tags.JOB_ID ORDER BY _id",
-# "sql" : "select *, '${ELASTICSEARCH_INDEX_NAME}' as _index, 'job' as _type, id as _id from Job",
 echo "$(date) Beginning data import from MySQL ${MYSQL_DATABASE} database into Elasticsearch ${ELASTICSEARCH_INDEX_NAME} index..."
 echo "
 {
@@ -230,7 +231,7 @@ echo "
         \"password\": \"${MYSQL_PASSWORD}\",
         \"sql\": [
             {
-                \"statement\": \"SELECT Job.id, Job.created, Job.updated, Job.name, Job.user, Job.version, Job.description, Job.archiveLocation, Job.chosenClusterCriteriaString, Job.clusterCriteriasString, Job.commandCriteriaString, Job.commandId, Job.email, Job.envPropFile AS 'setupFile', Job.executionClusterId, Job.exitCode, Job.fileDependencies, Job.finished, Job.groupName AS 'group', Job.hostName, Job.killURI, Job.outputURI, Job.started, Job.status, Job.statusMsg, Job_tags.element AS 'tags', Job.id as _id, Job.entityVersion AS _version FROM Job LEFT JOIN Job_tags ON Job.id = Job_tags.JOB_ID ORDER BY _id\"
+                \"statement\": \"SELECT jobs.id, jobs.created, jobs.updated, jobs.name, jobs.user, jobs.version, jobs.description, jobs.archive_location as 'archiveLocation', jobs.chosen_cluster_criteria_string as 'chosenClusterCriteriaString', jobs.cluster_criterias_string as 'clusterCriteriasString', jobs.command_criteria_string as 'commandCriteriaString', jobs.command_id as 'commandId', jobs.email, jobs.setup_file AS 'setupFile', jobs.cluster_id as 'clusterId', jobs.exit_code as 'exitCode', jobs.file_dependencies as 'fileDependencies', jobs.finished, jobs.group_name AS 'group', jobs.host_name as 'hostName', jobs.kill_uri as 'killURI', jobs.output_uri as 'outputURI', jobs.started, jobs.status, jobs.status_msg as 'statusMsg', job_tags.tag AS 'tags', jobs.id as _id, jobs.entity_version AS _version FROM jobs LEFT JOIN job_tags ON jobs.id = job_tags.job_id ORDER BY _id\"
             }
         ],
         \"elasticsearch\": {

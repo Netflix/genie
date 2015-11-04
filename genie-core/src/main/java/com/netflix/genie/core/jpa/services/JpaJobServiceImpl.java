@@ -25,6 +25,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
@@ -104,23 +105,36 @@ public class JpaJobServiceImpl implements OldJobService {
             throw new GenieConflictException("A job with id " + requestId + " already exists. Unable to save.");
         }
 
-        final JobEntity jobEntity = new JobEntity(
-                jobRequest.getUser(),
-                jobRequest.getName(),
-                jobRequest.getVersion(),
-                jobRequest.getCommandArgs(),
-                jobRequest.getCommandCriteria(),
-                jobRequest.getClusterCriterias()
-        );
+        final JobRequestEntity requestEntity = new JobRequestEntity();
+        requestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
+        requestEntity.setCommandArgs(jobRequest.getCommandArgs());
+        requestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
+        requestEntity.setDisableLogArchival(jobRequest.getDisableLogArchival());
+        requestEntity.setEmail(jobRequest.getEmail());
+        requestEntity.setFileDependenciesFromSet(jobRequest.getFileDependencies());
+        requestEntity.setGroup(jobRequest.getGroup());
+        requestEntity.setSetupFile(jobRequest.getSetupFile());
+        requestEntity.setTagsFromSet(jobRequest.getTags());
+        requestEntity.setDescription(jobRequest.getDescription());
+        requestEntity.setName(jobRequest.getName());
+        requestEntity.setUser(jobRequest.getUser());
+        requestEntity.setVersion(jobRequest.getVersion());
+
+        final JobEntity jobEntity = new JobEntity();
+        jobEntity.setUser(jobRequest.getUser());
+        jobEntity.setName(jobRequest.getName());
+        jobEntity.setVersion(jobRequest.getVersion());
 
         jobEntity.setId(StringUtils.isBlank(requestId) ? UUID.randomUUID().toString() : requestId);
         jobEntity.setJobStatus(JobStatus.INIT, "Initializing job");
+
+        jobEntity.setRequest(requestEntity);
 
         // Validation successful. init state in DB - return if job already exists
         try {
             // if job can be launched, update the URIs
             final String hostName = this.netUtil.getHostName();
-            jobEntity.setHostName(hostName);
+//            jobEntity.setHostName(hostName);
             final String endpoint = getEndPoint(hostName);
             jobEntity.setOutputURI(endpoint + "/" + this.jobDirPrefix + "/" + jobEntity.getId());
             jobEntity.setKillURI(endpoint + "/" + this.jobResourcePrefix + "/" + jobEntity.getId());
@@ -270,7 +284,7 @@ public class JpaJobServiceImpl implements OldJobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
         }
-        this.findJob(id).setProcessHandle(pid);
+//        this.findJob(id).setProcessId(pid);
     }
 
     /**
@@ -297,7 +311,6 @@ public class JpaJobServiceImpl implements OldJobService {
         final JobEntity jobEntity = this.findJob(id);
         //TODO: Should we check if this is valid
         jobEntity.setCommandId(commandId);
-        jobEntity.setCommandName(commandName);
     }
 
     /**
@@ -321,9 +334,9 @@ public class JpaJobServiceImpl implements OldJobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting the application info for job with id " + id);
         }
-        final JobEntity jobEntity = this.findJob(id);
-        jobEntity.setApplicationId(appId);
-        jobEntity.setApplicationName(appName);
+//        final JobEntity jobEntity = this.findJob(id);
+//        jobEntity.setApplicationId(appId);
+//        jobEntity.setApplicationName(appName);
     }
 
     /**
@@ -348,8 +361,7 @@ public class JpaJobServiceImpl implements OldJobService {
             LOG.debug("Setting the application info for job with id " + id);
         }
         final JobEntity jobEntity = this.findJob(id);
-        jobEntity.setExecutionClusterId(clusterId);
-        jobEntity.setExecutionClusterName(clusterName);
+        jobEntity.setClusterId(clusterId);
     }
 
     /**

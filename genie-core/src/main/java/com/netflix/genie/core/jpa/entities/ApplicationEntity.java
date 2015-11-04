@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 
@@ -250,8 +251,8 @@ public class ApplicationEntity extends CommonFields {
      *
      * @return DTO of this entity.
      */
-    public com.netflix.genie.common.dto.Application getDTO() {
-        return new com.netflix.genie.common.dto.Application
+    public Application getDTO() {
+        return new Application
                 .Builder(this.getName(), this.getUser(), this.getVersion(), this.status)
                 .withId(this.getId())
                 .withCreated(this.getCreated())
