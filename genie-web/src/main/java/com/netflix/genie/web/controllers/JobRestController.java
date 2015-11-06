@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.AttachmentService;
-import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import org.apache.commons.lang3.StringUtils;
@@ -72,24 +72,25 @@ public class JobRestController {
     private static final Logger LOG = LoggerFactory.getLogger(JobRestController.class);
 //    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-    private final JobPersistenceService jobPersistenceService;
+    private final JobService jobService;
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
 
     /**
      * Constructor.
      *
-     * @param jobPersistenceService   The job search service to use.
-     * @param attachmentService       The attachment service to use to save attachments.
-     * @param jobResourceAssembler    Assemble job resources out of jobs
+     * @param jobService     The job search service to use.
+     * @param attachmentService    The attachment service to use to save attachments.
+     * @param jobResourceAssembler Assemble job resources out of jobs
+
      */
     @Autowired
     public JobRestController(
-            final JobPersistenceService jobPersistenceService,
+            final JobService jobService,
             final AttachmentService attachmentService,
             final JobResourceAssembler jobResourceAssembler
     ) {
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobService = jobService;
         this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
     }
@@ -205,7 +206,7 @@ public class JobRestController {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called for job with id: " + id);
         }
-        return this.jobResourceAssembler.toResource(this.jobPersistenceService.getJob(id));
+        return this.jobResourceAssembler.toResource(this.jobService.getJob(id));
     }
 
     /**
@@ -279,7 +280,7 @@ public class JobRestController {
         }
 
         return assembler.toResource(
-                this.jobPersistenceService.getJobs(
+                this.jobService.getJobs(
                         id,
                         name,
                         userName,

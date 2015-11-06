@@ -21,21 +21,54 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+
+import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobService;
+
 import org.hibernate.validator.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
+import java.util.List;
+
 
 /**
  * Implementation of the JobService apis.
  *
  * @author amsharma
  */
+@Service
 public class JobServiceImpl implements JobService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JobServiceImpl.class);
+    private final List<JobPersistenceService> searchPriorityOrderPersistenceList;
+    private final List<JobPersistenceService> savePriorityOrderPersistenceList;
+
+    /**
+     * Test.
+     *
+     * @param searchPriorityOrderPersistenceList blah
+     * @param savePriorityOrderPersistenceList blah
+     */
+    @Autowired
+    public JobServiceImpl(
+            @Qualifier("search")
+            final Object searchPriorityOrderPersistenceList,
+            @Qualifier("save")
+            final Object savePriorityOrderPersistenceList
+    ) {
+        this.searchPriorityOrderPersistenceList = (List<JobPersistenceService>) searchPriorityOrderPersistenceList;
+        this.savePriorityOrderPersistenceList = (List<JobPersistenceService>) savePriorityOrderPersistenceList;
+    }
+
     /**
      * Takes in a Job Request object and does necessary preparation for execution.
      *
@@ -64,8 +97,11 @@ public class JobServiceImpl implements JobService {
     public Job getJob(
             @NotBlank(message = "No job id provided. Unable to retrieve job.")
             final String jobId) throws GenieException {
-        return null;
 
+
+        searchPriorityOrderPersistenceList.forEach(jpsimpl -> LOG.info(jpsimpl.getClass().toString()));
+        searchPriorityOrderPersistenceList.forEach(jpsimpl -> LOG.info(jpsimpl.getClass().toString()));
+        return null;
     }
 
     /**

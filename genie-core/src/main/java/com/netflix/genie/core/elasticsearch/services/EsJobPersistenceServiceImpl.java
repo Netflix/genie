@@ -38,7 +38,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,6 @@ import java.util.stream.Collectors;
  *
  * @author tgianos
  */
-@Service
 public class EsJobPersistenceServiceImpl implements JobPersistenceService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EsJobPersistenceServiceImpl.class);
