@@ -49,26 +49,26 @@ import java.util.List;
 public class JobServiceImpl implements JobService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobServiceImpl.class);
-
-    @Autowired
-    @Qualifier("search")
     private final List<JobPersistenceService> searchPriorityOrderPersistenceList;
-
-  //  private final List<JobPersistenceService> savePriorityOrderPersistenceList;
+    private final List<JobPersistenceService> savePriorityOrderPersistenceList;
 
     /**
-     *   Constructor.
+     * Test.
      *
+     * @param searchPriorityOrderPersistenceList blah
+     * @param savePriorityOrderPersistenceList blah
      */
+    @Autowired
     public JobServiceImpl(
-//            @Qualifier("search")
-//            final List<JobPersistenceService> searchPriorityOrderPersistenceList
-////            @Qualifier("persistenceSavePriorityOrder")
-////            final List<JobPersistenceService> savePriorityOrderPersistenceList
+            @Qualifier("search")
+            final Object searchPriorityOrderPersistenceList,
+            @Qualifier("save")
+            final Object savePriorityOrderPersistenceList
     ) {
-        this.searchPriorityOrderPersistenceList = null;
-      //  this.savePriorityOrderPersistenceList = savePriorityOrderPersistenceList;
+        this.searchPriorityOrderPersistenceList = (List<JobPersistenceService>) searchPriorityOrderPersistenceList;
+        this.savePriorityOrderPersistenceList = (List<JobPersistenceService>) savePriorityOrderPersistenceList;
     }
+
     /**
      * Takes in a Job Request object and does necessary preparation for execution.
      *
@@ -99,6 +99,7 @@ public class JobServiceImpl implements JobService {
             final String jobId) throws GenieException {
 
 
+        searchPriorityOrderPersistenceList.forEach(jpsimpl -> LOG.info(jpsimpl.getClass().toString()));
         searchPriorityOrderPersistenceList.forEach(jpsimpl -> LOG.info(jpsimpl.getClass().toString()));
         return null;
     }

@@ -66,11 +66,12 @@ import java.util.List;
 public class GenieWeb {
 
     /**
-     * Description.
+     * Elasticsearch bean for job persistence service.
      *
-     * @param repository repo
-     * @param template template
-     * @return foo
+     * @param repository The elastic search repository
+     * @param template   The elastic search template
+     *
+     * @return esbean The elasticsearch bean
      */
     @Bean
     public JobPersistenceService esbean(
@@ -80,9 +81,9 @@ public class GenieWeb {
     }
 
     /**
-     * Description.
+     * JPA bean for job persistence service..
      *
-     * @return foo
+     * @return jpabean The jpa bean.
      */
     @Bean
     public JobPersistenceService jpabean() {
@@ -90,11 +91,13 @@ public class GenieWeb {
     }
 
     /**
-     * Description.
+     * Bean defining the order in which System would search for jobs from the Persistence layer.
+     * If a job is retrieved from a layer, it would ignore the rest.
      *
-     * @param esbean repo
-     * @param jpabean template
-     * @return something
+     * @param esbean The elasticsearch bean reference
+     * @param jpabean The jpabean reference
+     *
+     * @return list of beans implementing job persistence
      */
     @Bean
     @Qualifier("search")
@@ -108,11 +111,12 @@ public class GenieWeb {
     }
 
     /**
-     * Description.
+     * Bean defining the order in which System would save jobs int the Persistence layer.
      *
      * @param jpabean repository
      * @param esbean template
-     * @return something
+     *
+     * @return list of beans implementing job persistence
      */
     @Bean
     @Qualifier("save")
@@ -136,21 +140,6 @@ public class GenieWeb {
     public static void main(final String[] args) throws Exception {
         SpringApplication.run(GenieWeb.class, args);
     }
-//
-//    @Bean(id = "searchPriorityOrder")
-//    public List<JobPersistenceService> getPersistenceImplListSearchPriorityOrder() {
-//        return Lists.newArrayList(
-//                new EsJobPersistenceServiceImpl(repository, template),
-//                new JpaJobPersistenceServiceImpl());
-//    }
-//
-//    @Bean(id = "savePriorityOrder")
-//    public List<JobPersistenceService> getPersistenceImplListSavePriorityOrder() {
-//        return Lists.newArrayList(
-//                new JpaJobPersistenceServiceImpl(),
-//                new EsJobPersistenceServiceImpl(repository, template)
-//        );
-//    }
 
     /**
      * Configure Spring Fox.
