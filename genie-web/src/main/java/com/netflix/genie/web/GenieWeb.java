@@ -17,12 +17,18 @@
  */
 package com.netflix.genie.web;
 
+import com.google.common.collect.Lists;
+import com.netflix.genie.core.elasticsearch.repositories.EsJobRepository;
+import com.netflix.genie.core.jpa.services.JpaJobPersistenceServiceImpl;
+import com.netflix.genie.core.services.JobPersistenceService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
@@ -34,8 +40,10 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import com.netflix.genie.core.elasticsearch.services.EsJobPersistenceServiceImpl;
 
 import javax.validation.Validator;
+import java.util.List;
 
 /**
  * Main Genie Spring Configuration class.
@@ -58,6 +66,68 @@ import javax.validation.Validator;
 public class GenieWeb {
 
     /**
+     * Description.
+     *
+     * @param repository repo
+     * @param template template
+     * @return foo
+     */
+    @Bean
+    public JobPersistenceService esbean(
+            final EsJobRepository repository,
+            final ElasticsearchTemplate template) {
+        return new EsJobPersistenceServiceImpl(repository, template);
+    }
+
+    /**
+     * Description.
+     *
+     * @return foo
+     */
+    @Bean
+    public JobPersistenceService jpabean() {
+        return new JpaJobPersistenceServiceImpl();
+    }
+
+    /**
+     * Description.
+     *
+     * @param esbean repo
+     * @param jpabean template
+     * @return something
+     */
+    @Bean
+    @Qualifier("search")
+    public List<JobPersistenceService> persistenceSearchPriorityOrder(
+            final JobPersistenceService esbean,
+            final JobPersistenceService jpabean
+    ) {
+        return Lists.newArrayList(
+                esbean,
+                jpabean);
+    }
+
+    /**
+     * Description.
+     *
+     * @param jpabean repository
+     * @param esbean template
+     * @return something
+     */
+    @Bean
+    @Qualifier("save")
+    public List<JobPersistenceService> persistenceSavePriorityOrder(
+            final JobPersistenceService jpabean,
+            final JobPersistenceService esbean
+
+    ) {
+        return Lists.newArrayList(
+                jpabean,
+                esbean
+        );
+    }
+
+    /**
      * Spring Boot Main.
      *
      * @param args Program arguments
@@ -66,6 +136,21 @@ public class GenieWeb {
     public static void main(final String[] args) throws Exception {
         SpringApplication.run(GenieWeb.class, args);
     }
+//
+//    @Bean(id = "searchPriorityOrder")
+//    public List<JobPersistenceService> getPersistenceImplListSearchPriorityOrder() {
+//        return Lists.newArrayList(
+//                new EsJobPersistenceServiceImpl(repository, template),
+//                new JpaJobPersistenceServiceImpl());
+//    }
+//
+//    @Bean(id = "savePriorityOrder")
+//    public List<JobPersistenceService> getPersistenceImplListSavePriorityOrder() {
+//        return Lists.newArrayList(
+//                new JpaJobPersistenceServiceImpl(),
+//                new EsJobPersistenceServiceImpl(repository, template)
+//        );
+//    }
 
     /**
      * Configure Spring Fox.
