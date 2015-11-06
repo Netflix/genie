@@ -32,11 +32,16 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,9 +55,9 @@ import java.util.Set;
 @Table(name = "job_requests")
 public class JobRequestEntity extends CommonFields {
 
-    @Basic(optional = false)
-    @Column(name = "command_args", nullable = false, length = 1024)
-    @Size(min = 1, max = 1024, message = "Must have command line arguments and can't be longer than 1024 characters")
+    @Lob
+    @Column(name = "command_args", nullable = false)
+    @Size(min = 1, message = "Must have command line arguments and can't be longer than 1024 characters")
     private String commandArgs;
 
     @Basic
@@ -89,14 +94,19 @@ public class JobRequestEntity extends CommonFields {
     private String email;
 
     @Basic
-    @Column(name = "tags", length = 1024)
-    @Size(max = 1024, message = "Max length in database is 1024 characters")
+    @Column(name = "tags", length = 2048)
+    @Size(max = 2048, message = "Max length in database is 2048 characters")
     private String tags;
 
     @Basic
     @Column(name = "client_host", length = 255)
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String clientHost;
+
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    @MapsId
+    private JobEntity job;
 
     /**
      * Gets the group name of the user who submitted the job.
@@ -124,7 +134,8 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException on any error
      */
     public List<ClusterCriteria> getClusterCriteriasAsList() throws GenieException {
-        return this.unmarshall(this.clusterCriterias);
+        return this.unmarshall(this.clusterCriterias, new TypeReference<List<ClusterCriteria>>() {
+        });
     }
 
     /**
@@ -132,8 +143,17 @@ public class JobRequestEntity extends CommonFields {
      *
      * @return The criteria's from the original request as a JSON string
      */
-    public String getClusterCriterias() {
+    protected String getClusterCriterias() {
         return this.clusterCriterias;
+    }
+
+    /**
+     * Set the cluster criterias JSON string.
+     *
+     * @param clusterCriterias The cluster criterias.
+     */
+    protected void setClusterCriterias(@NotBlank(message = "Can't be empty") final String clusterCriterias) {
+        this.clusterCriterias = clusterCriterias;
     }
 
     /**
@@ -146,15 +166,6 @@ public class JobRequestEntity extends CommonFields {
             @NotEmpty(message = "No cluster criterias entered") final List<ClusterCriteria> clusterCriteriasList
     ) throws GenieException {
         this.clusterCriterias = this.marshall(clusterCriteriasList);
-    }
-
-    /**
-     * Set the cluster criterias JSON string.
-     *
-     * @param clusterCriterias The cluster criterias.
-     */
-    public void setClusterCriterias(@NotBlank(message = "Can't be empty") final String clusterCriterias) {
-        this.clusterCriterias = clusterCriterias;
     }
 
     /**
@@ -188,7 +199,8 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException On any exception
      */
     public Set<String> getFileDependenciesAsSet() throws GenieException {
-        return this.unmarshall(this.fileDependencies);
+        return this.unmarshall(this.fileDependencies, new TypeReference<Set<String>>() {
+        });
     }
 
     /**
@@ -196,7 +208,7 @@ public class JobRequestEntity extends CommonFields {
      *
      * @return fileDependencies
      */
-    public String getFileDependencies() {
+    protected String getFileDependencies() {
         return this.fileDependencies;
     }
 
@@ -216,7 +228,8 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException for any processing error
      */
     public void setFileDependenciesFromSet(final Set<String> fileDependenciesSet) throws GenieException {
-        this.fileDependencies = this.marshall(fileDependenciesSet);
+        this.fileDependencies
+                = fileDependenciesSet == null ? this.marshall(new HashSet<>()) : this.marshall(fileDependenciesSet);
     }
 
     /**
@@ -281,7 +294,8 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException on any processing error
      */
     public Set<String> getCommandCriteriaAsSet() throws GenieException {
-        return this.unmarshall(this.commandCriteria);
+        return this.unmarshall(this.commandCriteria, new TypeReference<Set<String>>() {
+        });
     }
 
     /**
@@ -289,8 +303,18 @@ public class JobRequestEntity extends CommonFields {
      *
      * @return command criteria as a JSON array string
      */
-    public String getCommandCriteria() {
+    protected String getCommandCriteria() {
         return this.commandCriteria;
+    }
+
+    /**
+     * Set the command criteria string of JSON.
+     *
+     * @param commandCriteria A set of command criteria tags as a JSON array
+     * @throws GeniePreconditionException If any precondition isn't met.
+     */
+    protected void setCommandCriteria(final String commandCriteria) throws GeniePreconditionException {
+        this.commandCriteria = commandCriteria;
     }
 
     /**
@@ -303,16 +327,6 @@ public class JobRequestEntity extends CommonFields {
             @NotEmpty(message = "At least one command criteria required") final Set<String> commandCriteriaSet
     ) throws GenieException {
         this.commandCriteria = this.marshall(commandCriteriaSet);
-    }
-
-    /**
-     * Set the command criteria string of JSON.
-     *
-     * @param commandCriteria A set of command criteria tags as a JSON array
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    public void setCommandCriteria(final String commandCriteria) throws GeniePreconditionException {
-        this.commandCriteria = commandCriteria;
     }
 
     /**
@@ -339,8 +353,17 @@ public class JobRequestEntity extends CommonFields {
      *
      * @return the tags as JSON array
      */
-    public String getTags() {
+    protected String getTags() {
         return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this job.
+     *
+     * @param tags the tags to set as JSON array.
+     */
+    protected void setTags(final String tags) {
+        this.tags = tags;
     }
 
     /**
@@ -350,16 +373,8 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException For any processing error
      */
     public Set<String> getTagsAsSet() throws GenieException {
-        return this.unmarshall(this.tags);
-    }
-
-    /**
-     * Sets the tags allocated to this job.
-     *
-     * @param tags the tags to set as JSON array.
-     */
-    public void setTags(final String tags) {
-        this.tags = tags;
+        return this.unmarshall(this.tags, new TypeReference<Set<String>>() {
+        });
     }
 
     /**
@@ -369,7 +384,25 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException for any processing error
      */
     public void setTagsFromSet(final Set<String> tagsSet) throws GenieException {
-        this.tags = marshall(tagsSet);
+        this.tags = tagsSet == null ? marshall(new HashSet<>()) : marshall(tagsSet);
+    }
+
+    /**
+     * Get the job associated with this job request.
+     *
+     * @return The job
+     */
+    public JobEntity getJob() {
+        return this.job;
+    }
+
+    /**
+     * Set the job for this request.
+     *
+     * @param job The job
+     */
+    public void setJob(final JobEntity job) {
+        this.job = job;
     }
 
     /**
@@ -409,11 +442,17 @@ public class JobRequestEntity extends CommonFields {
         }
     }
 
-    protected <T extends Collection> T unmarshall(final String source) throws GenieException {
+    protected <T extends Collection> T unmarshall(
+            final String source,
+            final TypeReference<T> typeReference
+    ) throws GenieException {
         try {
             final ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(source, new TypeReference<T>() {
-            });
+            if (StringUtils.isNotBlank(source)) {
+                return mapper.readValue(source, typeReference);
+            } else {
+                return mapper.readValue("[]", typeReference);
+            }
         } catch (final IOException ioe) {
             throw new GenieServerException(ioe);
         }

@@ -23,6 +23,10 @@ import com.netflix.genie.common.exceptions.GenieException;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -44,6 +48,11 @@ public class JobExecutionEntity extends BaseEntity {
     @Basic(optional = false)
     @Column(name = "process_id", nullable = false)
     private int processId;
+
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    @MapsId
+    private JobEntity job;
 
     /**
      * Get the hostname this job is running on.
@@ -79,6 +88,24 @@ public class JobExecutionEntity extends BaseEntity {
      */
     public void setProcessId(final int processId) {
         this.processId = processId;
+    }
+
+    /**
+     * Get the job associated with this job execution.
+     *
+     * @return The job
+     */
+    public JobEntity getJob() {
+        return this.job;
+    }
+
+    /**
+     * Set the job for this execution.
+     *
+     * @param job The job
+     */
+    public void setJob(final JobEntity job) {
+        this.job = job;
     }
 
     /**

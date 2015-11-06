@@ -25,7 +25,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import springfox.documentation.builders.PathSelectors;
@@ -46,13 +45,8 @@ import javax.validation.Validator;
 @Configuration
 @ComponentScan("com.netflix.genie")
 @EnableAutoConfiguration
-//@EnableConfigurationProperties
 @EnableElasticsearchRepositories("com.netflix.genie.core.elasticsearch.repositories")
-@EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})
 @EnableJpaRepositories("com.netflix.genie.core.jpa.repositories")
-//@EnableRetry
-//@EnableScheduling
-//@EnableTransactionManagement
 @EntityScan("com.netflix.genie.core.jpa.entities")
 @EnableSwagger2
 public class GenieWeb {

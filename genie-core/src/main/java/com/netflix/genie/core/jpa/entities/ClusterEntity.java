@@ -34,6 +34,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -47,7 +48,6 @@ import java.util.Set;
 /**
  * Representation of the state of the Cluster object.
  *
- * @author skrishnan
  * @author amsharma
  * @author tgianos
  */
@@ -72,7 +72,7 @@ public class ClusterEntity extends CommonFields {
             name = "cluster_configs",
             joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
     )
-    @Column(name = "config", nullable = false, length = 255)
+    @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -95,6 +95,9 @@ public class ClusterEntity extends CommonFields {
     )
     @OrderColumn(name = "command_order", nullable = false)
     private List<CommandEntity> commands = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY)
+    private Set<JobEntity> jobs = new HashSet<>();
 
     /**
      * Default Constructor.
@@ -205,27 +208,6 @@ public class ClusterEntity extends CommonFields {
     }
 
     /**
-     * Gets the tags allocated to this cluster.
-     *
-     * @return the tags
-     */
-    public Set<String> getTags() {
-        return this.tags;
-    }
-
-    /**
-     * Sets the tags allocated to this cluster.
-     *
-     * @param tags the tags to set. Not Null.
-     */
-    public void setTags(final Set<String> tags) {
-        this.tags.clear();
-        if (tags != null) {
-            this.tags.addAll(tags);
-        }
-    }
-
-    /**
      * Sets the commands for this cluster.
      *
      * @param commands The commands that this cluster supports
@@ -253,6 +235,27 @@ public class ClusterEntity extends CommonFields {
                     clusterEntities.add(this);
                 }
             }
+        }
+    }
+
+    /**
+     * Gets the tags allocated to this cluster.
+     *
+     * @return the tags
+     */
+    public Set<String> getTags() {
+        return this.tags;
+    }
+
+    /**
+     * Sets the tags allocated to this cluster.
+     *
+     * @param tags the tags to set. Not Null.
+     */
+    public void setTags(final Set<String> tags) {
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
         }
     }
 
@@ -313,6 +316,39 @@ public class ClusterEntity extends CommonFields {
             for (final CommandEntity command : locCommandEntities) {
                 this.removeCommand(command);
             }
+        }
+    }
+
+    /**
+     * Get the jobs which ran on this cluster. Probably shouldn't be used as it will return an enormous list.
+     *
+     * @return The jobs this cluster ran
+     */
+    protected Set<JobEntity> getJobs() {
+        return this.jobs;
+    }
+
+    /**
+     * Add a job to the set of jobs this cluster ran.
+     *
+     * @param job The job
+     */
+    public void addJob(final JobEntity job) {
+        if (job != null) {
+            this.jobs.add(job);
+        }
+    }
+
+    /**
+     * Set the jobs run on this cluster.
+     *
+     * @param jobs The jobs
+     */
+    public void setJobs(final Set<JobEntity> jobs) {
+        this.jobs.clear();
+
+        if (jobs != null) {
+            this.jobs.addAll(jobs);
         }
     }
 

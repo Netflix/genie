@@ -43,7 +43,7 @@ ALTER TABLE `Application`
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
-  CHANGE `envPropFile` `setup_file` TEXT DEFAULT NULL,
+  CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   ADD INDEX `APPLICATIONS_NAME_INDEX` (`name`),
   ADD INDEX `APPLICATIONS_STATUS_INDEX` (`status`);
@@ -53,7 +53,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Altering the Application_configs table for 3.0.
 ALTER TABLE `Application_configs` DROP KEY `I_PPLCFGS_APPLICATION_ID`;
 ALTER TABLE `Application_configs`
   CHANGE `APPLICATION_ID` `application_id` VARCHAR(255) NOT NULL,
-  CHANGE `element` `config` VARCHAR(255) NOT NULL,
+  CHANGE `element` `config` VARCHAR(1024) NOT NULL,
   ADD FOREIGN KEY (`application_id`) REFERENCES `Application` (`id`) ON DELETE CASCADE;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Application_configs table' AS '';
 
@@ -61,7 +61,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Altering the Application_jars table for 3.0...'
 ALTER TABLE `Application_jars` DROP KEY `I_PPLCJRS_APPLICATION_ID`;
 ALTER TABLE `Application_jars`
   CHANGE `APPLICATION_ID` `application_id` VARCHAR(255) NOT NULL,
-  CHANGE `element` `dependency` VARCHAR(255) NOT NULL,
+  CHANGE `element` `dependency` VARCHAR(1024) NOT NULL,
   ADD FOREIGN KEY (`application_id`) REFERENCES `Application` (`id`) ON DELETE CASCADE;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Application_jars table' AS '';
 
@@ -106,7 +106,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Updating the Cluster_configs table for 3.0...' 
 ALTER TABLE `Cluster_configs` DROP KEY `I_CLSTFGS_CLUSTER_ID`;
 ALTER TABLE `Cluster_configs`
   CHANGE `CLUSTER_ID` `cluster_id` VARCHAR(255) NOT NULL,
-  CHANGE `element` `config` VARCHAR(255) NOT NULL,
+  CHANGE `element` `config` VARCHAR(1024) NOT NULL,
   ADD FOREIGN KEY (`cluster_id`) REFERENCES `Cluster` (`id`) ON DELETE CASCADE;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Cluster_configs table' AS '';
 
@@ -129,7 +129,7 @@ ALTER TABLE `Command`
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   MODIFY `executable` VARCHAR(255) NOT NULL,
-  CHANGE `envPropFile` `setup_file` VARCHAR(255) DEFAULT NULL,
+  CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
   CHANGE `jobType` `job_type` VARCHAR(255),
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   DROP `APPLICATION_ID`,
@@ -141,7 +141,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Updating the Command_configs table for 3.0...' 
 ALTER TABLE `Command_configs` DROP KEY `I_CMMNFGS_COMMAND_ID`;
 ALTER TABLE `Command_configs`
   CHANGE `COMMAND_ID` `command_id` VARCHAR(255) NOT NULL,
-  CHANGE `element` `config` VARCHAR(255) NOT NULL,
+  CHANGE `element` `config` VARCHAR(1024) NOT NULL,
   ADD FOREIGN KEY (`command_id`) REFERENCES `Command` (`id`) ON DELETE CASCADE;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Command_configs table' AS '';
 
@@ -165,7 +165,7 @@ CREATE TABLE `job_requests` (
   `version` VARCHAR(255) NOT NULL,
   `description` TEXT DEFAULT NULL,
   `entity_version` INT(11) NOT NULL DEFAULT 0,
-  `command_args` VARCHAR(1024) NOT NULL,
+  `command_args` TEXT NOT NULL,
   `group_name` VARCHAR(255) DEFAULT NULL,
   `setup_file` VARCHAR(1024) DEFAULT NULL,
   `cluster_criterias` VARCHAR(1024) NOT NULL,
@@ -173,7 +173,7 @@ CREATE TABLE `job_requests` (
   `file_dependencies` TEXT DEFAULT NULL,
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
-  `tags` VARCHAR(1024) DEFAULT NULL,
+  `tags` VARCHAR(2048) DEFAULT NULL,
   `client_host` VARCHAR(255) DEFAULT NULL,
   FOREIGN KEY (`id`) REFERENCES `Job` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -226,19 +226,23 @@ INSERT INTO `job_requests` (
   FROM `Job` `j`;
 UPDATE `job_requests` SET `tags` = RPAD(`tags`, LENGTH(`tags`) + 2, '"]');
 UPDATE `job_requests` SET `tags` = LPAD(`tags`, LENGTH(`tags`) + 2, '["');
+UPDATE `job_requests` SET `tags` = '[]' WHERE `tags` = '[""]' OR `tags` IS NULL;
 -- TODO: Do this in one pass instead of 3?
 UPDATE `job_requests` SET `command_criteria` = RPAD(`command_criteria`, LENGTH(`command_criteria`) + 2, '"]');
 UPDATE `job_requests` SET `command_criteria` = LPAD(`command_criteria`, LENGTH(`command_criteria`) + 2, '["');
 UPDATE `job_requests` SET `command_criteria` = REPLACE(`command_criteria`, ',', '","');
+UPDATE `job_requests` SET `command_criteria` = '[]' WHERE `command_criteria` = '[""]' OR `command_criteria` IS NULL;
 -- TODO: Less passes?
 UPDATE `job_requests` SET `cluster_criterias` = RPAD(`cluster_criterias`, LENGTH(`cluster_criterias`) + 4, '"]}]');
-UPDATE `job_requests` SET `cluster_criterias` = LPAD(`cluster_criterias`, LENGTH(`cluster_criterias`) + 12, '[{"tags":["');
+UPDATE `job_requests` SET `cluster_criterias` = LPAD(`cluster_criterias`, LENGTH(`cluster_criterias`) + 11, '[{"tags":["');
 UPDATE `job_requests` SET `cluster_criterias` = REPLACE(`cluster_criterias`, ',', '","');
 UPDATE `job_requests` SET `cluster_criterias` = REPLACE(`cluster_criterias`, '|', '"]},{"tags":["');
+UPDATE `job_requests` SET `cluster_criterias` = '[]' WHERE `cluster_criterias` = '[""]' OR `cluster_criterias` IS NULL;
 -- TODO: Do this in one pass instead of 3?
 UPDATE `job_requests` SET `file_dependencies` = RPAD(`file_dependencies`, LENGTH(`file_dependencies`) + 2, '"]');
 UPDATE `job_requests` SET `file_dependencies` = LPAD(`file_dependencies`, LENGTH(`file_dependencies`) + 2, '["');
 UPDATE `job_requests` SET `file_dependencies` = REPLACE(`file_dependencies`, ',', '","');
+UPDATE `job_requests` SET `file_dependencies` = '[]' WHERE `file_dependencies` = '[""]' OR `file_dependencies` IS NULL;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values...' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_executions table...' AS '';

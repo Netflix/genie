@@ -28,7 +28,6 @@ import javax.validation.ConstraintViolationException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Test case for Job Status utility methods.
@@ -96,27 +95,27 @@ public class JobEntityTests extends EntityTestsBase {
         );
     }
 
-    /**
-     * Test the execution cluster id get/set.
-     */
-    @Test
-    public void testSetGetClusterId() {
-        Assert.assertNull(this.jobEntity.getClusterId());
-        final String executionClusterId = UUID.randomUUID().toString();
-        this.jobEntity.setClusterId(executionClusterId);
-        Assert.assertEquals(executionClusterId, this.jobEntity.getClusterId());
-    }
-
-    /**
-     * Test setter and getter for command id.
-     */
-    @Test
-    public void testSetGetCommandId() {
-        Assert.assertNull(this.jobEntity.getCommandId());
-        final String commandId = UUID.randomUUID().toString();
-        this.jobEntity.setCommandId(commandId);
-        Assert.assertEquals(commandId, this.jobEntity.getCommandId());
-    }
+//    /**
+//     * Test the execution cluster id get/set.
+//     */
+//    @Test
+//    public void testSetGetClusterId() {
+//        Assert.assertNull(this.jobEntity.getClusterId());
+//        final String executionClusterId = UUID.randomUUID().toString();
+//        this.jobEntity.setClusterId(executionClusterId);
+//        Assert.assertEquals(executionClusterId, this.jobEntity.getClusterId());
+//    }
+//
+//    /**
+//     * Test setter and getter for command id.
+//     */
+//    @Test
+//    public void testSetGetCommandId() {
+//        Assert.assertNull(this.jobEntity.getCommandId());
+//        final String commandId = UUID.randomUUID().toString();
+//        this.jobEntity.setCommandId(commandId);
+//        Assert.assertEquals(commandId, this.jobEntity.getCommandId());
+//    }
 
     /**
      * Test the setter and getter for status.

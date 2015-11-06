@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -31,6 +32,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -54,15 +57,15 @@ public class JobEntity extends CommonFields {
      */
     protected static final String DEFAULT_VERSION = "NA";
 
-    @Basic
-    @Column(name = "cluster_id", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String clusterId;
-
-    @Basic
-    @Column(name = "command_id", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String commandId;
+//    @Basic
+//    @Column(name = "cluster_id", length = 255)
+//    @Length(max = 255, message = "Max length in database is 255 characters")
+//    private String clusterId;
+//
+//    @Basic
+//    @Column(name = "command_id", length = 255)
+//    @Length(max = 255, message = "Max length in database is 255 characters")
+//    private String commandId;
 
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
@@ -111,13 +114,30 @@ public class JobEntity extends CommonFields {
     @Column(name = "tag", nullable = false, length = 255)
     private Set<String> tags = new HashSet<>();
 
-//    @OneToOne(optional = false, fetch = FetchType.LAZY)
-//    @MapsId
+    @OneToOne(
+            mappedBy = "job",
+            optional = false,
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private JobRequestEntity request;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @MapsId
+    @OneToOne(
+            mappedBy = "job",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private JobExecutionEntity execution;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cluster_id")
+    private ClusterEntity cluster;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "command_id")
+    private CommandEntity command;
 
     /**
      * Default Constructor.
@@ -133,9 +153,9 @@ public class JobEntity extends CommonFields {
     /**
      * Construct a new Job.
      *
-     * @param user             The name of the user running the job. Not null/empty/blank.
-     * @param name             The name specified for the job. Not null/empty/blank.
-     * @param version          The version of this job. Not null/empty/blank.
+     * @param user    The name of the user running the job. Not null/empty/blank.
+     * @param name    The name specified for the job. Not null/empty/blank.
+     * @param version The version of this job. Not null/empty/blank.
      */
     public JobEntity(
             final String user,
@@ -150,42 +170,42 @@ public class JobEntity extends CommonFields {
         }
     }
 
-    /**
-     * Gets the id of the cluster on which this job was run.
-     *
-     * @return the cluster id
-     */
-    public String getClusterId() {
-        return this.clusterId;
-    }
-
-    /**
-     * Sets the id of the cluster on which this job is run.
-     *
-     * @param clusterId Id of the cluster on which job is executed.
-     *                  Populated by the server.
-     */
-    public void setClusterId(final String clusterId) {
-        this.clusterId = clusterId;
-    }
-
-    /**
-     * Gets the command id for this job.
-     *
-     * @return commandId
-     */
-    public String getCommandId() {
-        return this.commandId;
-    }
-
-    /**
-     * Set command Id with which this job is run.
-     *
-     * @param commandId Id of the command if specified on which the job is run
-     */
-    public void setCommandId(final String commandId) {
-        this.commandId = commandId;
-    }
+//    /**
+//     * Gets the id of the cluster on which this job was run.
+//     *
+//     * @return the cluster id
+//     */
+//    public String getClusterId() {
+//        return this.clusterId;
+//    }
+//
+//    /**
+//     * Sets the id of the cluster on which this job is run.
+//     *
+//     * @param clusterId Id of the cluster on which job is executed.
+//     *                  Populated by the server.
+//     */
+//    public void setClusterId(final String clusterId) {
+//        this.clusterId = clusterId;
+//    }
+//
+//    /**
+//     * Gets the command id for this job.
+//     *
+//     * @return commandId
+//     */
+//    public String getCommandId() {
+//        return this.commandId;
+//    }
+//
+//    /**
+//     * Set command Id with which this job is run.
+//     *
+//     * @param commandId Id of the command if specified on which the job is run
+//     */
+//    public void setCommandId(final String commandId) {
+//        this.commandId = commandId;
+//    }
 
     /**
      * Gets the status for this job.
@@ -415,6 +435,52 @@ public class JobEntity extends CommonFields {
     }
 
     /**
+     * Get the cluster this job ran on.
+     *
+     * @return The cluster
+     */
+    public ClusterEntity getCluster() {
+        return this.cluster;
+    }
+
+    /**
+     * Set the cluster this job ran on.
+     *
+     * @param cluster The cluster this job ran on
+     */
+    public void setCluster(final ClusterEntity cluster) {
+        this.cluster = cluster;
+
+        // Reverse side of the relationship
+        if (this.cluster != null) {
+            this.cluster.addJob(this);
+        }
+    }
+
+    /**
+     * Get the command this job used to run.
+     *
+     * @return The command
+     */
+    public CommandEntity getCommand() {
+        return this.command;
+    }
+
+    /**
+     * Set the command used to run this job.
+     *
+     * @param command The command
+     */
+    public void setCommand(final CommandEntity command) {
+        this.command = command;
+
+        // Reverse side of the relationship
+        if (this.command != null) {
+            this.command.addJob(this);
+        }
+    }
+
+    /**
      * Get a DTO representing this job.
      *
      * @return The read-only DTO.
@@ -431,8 +497,8 @@ public class JobEntity extends CommonFields {
                 .withTags(this.tags)
                 .withUpdated(this.getUpdated())
                 .withArchiveLocation(this.archiveLocation)
-                .withCommandId(this.commandId)
-                .withClusterId(this.clusterId)
+//                .withCommandId(this.commandId)
+//                .withClusterId(this.clusterId)
                 .withExitCode(this.exitCode)
                 .withFinished(this.finished)
                 .withKillURI(this.killURI)

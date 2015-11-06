@@ -32,7 +32,7 @@
           disable_log_archival="true"
           entity_version="0"
           exit_code="0"
-            process_handle="1000"/>
+          process_handle="1000"/>
     <jobs id="job2"
           created="2014-01-03 01:45:00"
           updated="2014-01-03 01:50:00"

@@ -36,6 +36,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.Table;
@@ -81,7 +82,7 @@ public class CommandEntity extends CommonFields {
             name = "command_configs",
             joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
     )
-    @Column(name = "config", nullable = false, length = 255)
+    @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -106,6 +107,9 @@ public class CommandEntity extends CommonFields {
 
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
     private Set<ClusterEntity> clusters = new HashSet<>();
+
+    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY)
+    private Set<JobEntity> jobs = new HashSet<>();
 
     /**
      * Default Constructor.
@@ -321,6 +325,39 @@ public class CommandEntity extends CommonFields {
         this.clusters.clear();
         if (clusters != null) {
             this.clusters.addAll(clusters);
+        }
+    }
+
+    /**
+     * Get the jobs which used this command. Probably shouldn't be used as it will return an enormous list.
+     *
+     * @return The jobs this command is used for
+     */
+    protected Set<JobEntity> getJobs() {
+        return this.jobs;
+    }
+
+    /**
+     * Add a job to the set of jobs this command was used for.
+     *
+     * @param job The job
+     */
+    public void addJob(final JobEntity job) {
+        if (job != null) {
+            this.jobs.add(job);
+        }
+    }
+
+    /**
+     * Set the jobs run using this command.
+     *
+     * @param jobs The jobs
+     */
+    public void setJobs(final Set<JobEntity> jobs) {
+        this.jobs.clear();
+
+        if (jobs != null) {
+            this.jobs.addAll(jobs);
         }
     }
 

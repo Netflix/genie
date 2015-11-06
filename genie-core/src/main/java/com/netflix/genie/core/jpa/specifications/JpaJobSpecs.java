@@ -95,10 +95,10 @@ public final class JpaJobSpecs {
                         .forEach(tag -> predicates.add(cb.isMember(tag, root.get(JobEntity_.tags))));
             }
             if (StringUtils.isNotBlank(clusterId)) {
-                predicates.add(cb.equal(root.get(JobEntity_.clusterId), clusterId));
+                predicates.add(cb.equal(root.get(JobEntity_.cluster), clusterId));
             }
             if (StringUtils.isNotBlank(commandId)) {
-                predicates.add(cb.equal(root.get(JobEntity_.commandId), commandId));
+                predicates.add(cb.equal(root.get(JobEntity_.command), commandId));
             }
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };

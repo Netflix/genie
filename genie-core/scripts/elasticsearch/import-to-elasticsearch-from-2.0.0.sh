@@ -192,10 +192,6 @@ if [ "$(curl -X HEAD -i -s -o /dev/null -w "%{http_code}" "${ELASTICSEARCH_PROTO
                                 "description": {
                                     "type": "string"
                                 },
-                                "archiveLocation": {
-                                    "type": "string",
-                                    "index": "not_analyzed"
-                                },
                                 "commandId": {
                                     "type": "string",
                                     "index": "not_analyzed"
@@ -205,6 +201,19 @@ if [ "$(curl -X HEAD -i -s -o /dev/null -w "%{http_code}" "${ELASTICSEARCH_PROTO
                                     "index": "not_analyzed"
                                 },
                                 "tags": {
+                                    "type": "string",
+                                    "index": "not_analyzed"
+                                },
+                                "statusMsg": {
+                                    "type": "string"
+                                },
+                                "killURI": {
+                                    "type": "string"
+                                },
+                                "outputURI": {
+                                    "type": "string"
+                                },
+                                "archiveLocation": {
                                     "type": "string",
                                     "index": "not_analyzed"
                                 }
@@ -231,7 +240,7 @@ echo "
         \"password\": \"${MYSQL_PASSWORD}\",
         \"sql\": [
             {
-                \"statement\": \"SELECT jobs.id, jobs.created, jobs.updated, jobs.name, jobs.user, jobs.version, jobs.description, jobs.archive_location as 'archiveLocation', jobs.chosen_cluster_criteria_string as 'chosenClusterCriteriaString', jobs.cluster_criterias_string as 'clusterCriteriasString', jobs.command_criteria_string as 'commandCriteriaString', jobs.command_id as 'commandId', jobs.email, jobs.setup_file AS 'setupFile', jobs.cluster_id as 'clusterId', jobs.exit_code as 'exitCode', jobs.file_dependencies as 'fileDependencies', jobs.finished, jobs.group_name AS 'group', jobs.host_name as 'hostName', jobs.kill_uri as 'killURI', jobs.output_uri as 'outputURI', jobs.started, jobs.status, jobs.status_msg as 'statusMsg', job_tags.tag AS 'tags', jobs.id as _id, jobs.entity_version AS _version FROM jobs LEFT JOIN job_tags ON jobs.id = job_tags.job_id ORDER BY _id\"
+                \"statement\": \"SELECT jobs.id, jobs.created, jobs.updated, jobs.name, jobs.user, jobs.version, jobs.description, jobs.archive_location as 'archiveLocation', jobs.exit_code as 'exitCode', jobs.finished, jobs.kill_uri as 'killURI', jobs.output_uri as 'outputURI', jobs.started, jobs.status, jobs.status_msg as 'statusMsg', job_tags.tag AS 'tags', jobs.id as _id, jobs.entity_version AS _version FROM jobs LEFT JOIN job_tags ON jobs.id = job_tags.job_id ORDER BY _id\"
             }
         ],
         \"elasticsearch\": {

@@ -31,7 +31,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -57,9 +56,8 @@ public class ApplicationEntity extends CommonFields {
     @NotNull(message = "No application status entered and is required.")
     private ApplicationStatus status;
 
-    @Lob
     @Basic
-    @Column(name = "setup_file")
+    @Column(name = "setup_file", length = 1024)
     private String setupFile;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -67,7 +65,7 @@ public class ApplicationEntity extends CommonFields {
             name = "application_configs",
             joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
     )
-    @Column(name = "config", nullable = false, length = 255)
+    @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -75,7 +73,7 @@ public class ApplicationEntity extends CommonFields {
             name = "application_dependencies",
             joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
     )
-    @Column(name = "dependency", nullable = false, length = 255)
+    @Column(name = "dependency", nullable = false, length = 1024)
     private Set<String> dependencies = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)

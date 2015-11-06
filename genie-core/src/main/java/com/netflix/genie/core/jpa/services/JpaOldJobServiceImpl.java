@@ -308,9 +308,9 @@ public class JpaOldJobServiceImpl implements OldJobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting the command info for job with id " + id);
         }
-        final JobEntity jobEntity = this.findJob(id);
-        //TODO: Should we check if this is valid
-        jobEntity.setCommandId(commandId);
+//        final JobEntity jobEntity = this.findJob(id);
+//        //TODO: Should we check if this is valid
+//        jobEntity.setCommandId(commandId);
     }
 
     /**
@@ -360,8 +360,8 @@ public class JpaOldJobServiceImpl implements OldJobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Setting the application info for job with id " + id);
         }
-        final JobEntity jobEntity = this.findJob(id);
-        jobEntity.setClusterId(clusterId);
+//        final JobEntity jobEntity = this.findJob(id);
+//        jobEntity.setClusterId(clusterId);
     }
 
     /**
