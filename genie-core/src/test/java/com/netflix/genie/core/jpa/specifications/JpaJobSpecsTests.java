@@ -105,12 +105,12 @@ public class JpaJobSpecsTests {
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(JobStatus.class)))
                 .thenReturn(equalStatusPredicate);
 
-//        final Path<String> clusterNamePath = (Path<String>) Mockito.mock(Path.class);
-//        final Predicate equalClusterNamePredicate = Mockito.mock(Predicate.class);
-//        Mockito.when(this.root.get(JobEntity_.executionClusterName))
-//                .thenReturn(clusterNamePath);
-//        Mockito.when(this.cb.equal(clusterNamePath, CLUSTER_NAME))
-//                .thenReturn(equalClusterNamePredicate);
+        final Path<String> clusterNamePath = (Path<String>) Mockito.mock(Path.class);
+        final Predicate equalClusterNamePredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(JobEntity_.clusterName))
+                .thenReturn(clusterNamePath);
+        Mockito.when(this.cb.equal(clusterNamePath, CLUSTER_NAME))
+                .thenReturn(equalClusterNamePredicate);
 
         final Path<ClusterEntity> clusterIdPath = (Path<ClusterEntity>) Mockito.mock(Path.class);
         final Predicate equalClusterIdPredicate = Mockito.mock(Predicate.class);
@@ -119,12 +119,12 @@ public class JpaJobSpecsTests {
         Mockito.when(this.cb.equal(clusterIdPath, CLUSTER_ID))
                 .thenReturn(equalClusterIdPredicate);
 
-//        final Path<String> commandNamePath = (Path<String>) Mockito.mock(Path.class);
-//        final Predicate equalCommandNamePredicate = Mockito.mock(Predicate.class);
-//        Mockito.when(this.root.get(JobEntity_.commandName))
-//                .thenReturn(commandNamePath);
-//        Mockito.when(this.cb.equal(commandNamePath, COMMAND_NAME))
-//                .thenReturn(equalCommandNamePredicate);
+        final Path<String> commandNamePath = (Path<String>) Mockito.mock(Path.class);
+        final Predicate equalCommandNamePredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(JobEntity_.commandName))
+                .thenReturn(commandNamePath);
+        Mockito.when(this.cb.equal(commandNamePath, COMMAND_NAME))
+                .thenReturn(equalCommandNamePredicate);
 
         final Path<CommandEntity> commandIdPath = (Path<CommandEntity>) Mockito.mock(Path.class);
         final Predicate equalCommandIdPredicate = Mockito.mock(Predicate.class);
@@ -162,12 +162,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
     }
@@ -200,12 +200,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -239,12 +239,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -278,12 +278,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -317,12 +317,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.never())
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -356,12 +356,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.never())
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -396,12 +396,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.never())
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.never())
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -435,12 +435,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -475,12 +475,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.never())
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.never())
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -514,12 +514,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -553,12 +553,12 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
         Mockito.verify(this.cb, Mockito.never()).isMember(TAG, this.root.get(JobEntity_.tags));
@@ -593,8 +593,8 @@ public class JpaJobSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(JobEntity_.status), status);
         }
-//        Mockito.verify(this.cb, Mockito.times(1))
-//                .equal(this.root.get(JobEntity_.executionClusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
         Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
