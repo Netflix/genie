@@ -23,6 +23,9 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
@@ -31,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -75,24 +79,27 @@ public class JobRestController {
     private final JobService jobService;
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
+    private final JpaJobRepository jobRepository;
 
     /**
      * Constructor.
      *
-     * @param jobService     The job search service to use.
+     * @param jobService           The job search service to use.
      * @param attachmentService    The attachment service to use to save attachments.
      * @param jobResourceAssembler Assemble job resources out of jobs
-
+     * @param jobRepository        The job repository to use
      */
     @Autowired
     public JobRestController(
             final JobService jobService,
             final AttachmentService attachmentService,
-            final JobResourceAssembler jobResourceAssembler
+            final JobResourceAssembler jobResourceAssembler,
+            final JpaJobRepository jobRepository
     ) {
         this.jobService = jobService;
         this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
+        this.jobRepository = jobRepository;
     }
 
     /**
@@ -212,17 +219,18 @@ public class JobRestController {
     /**
      * Get jobs for given filter criteria.
      *
-     * @param id          id for job
-     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName    user who submitted job
-     * @param statuses    statuses of jobs to find
-     * @param tags        tags for the job
-     * @param clusterName the name of the cluster
-     * @param clusterId   the id of the cluster
-     * @param commandName the name of the command run by the job
-     * @param commandId   the id of the command run by the job
-     * @param page        page information for job
-     * @param assembler   The paged resources assembler to use
+     * @param id              id for job
+     * @param name            name of job (can be a SQL-style pattern such as HIVE%)
+     * @param userName        user who submitted job
+     * @param statuses        statuses of jobs to find
+     * @param tags            tags for the job
+     * @param clusterName     the name of the cluster
+     * @param clusterId       the id of the cluster
+     * @param commandName     the name of the command run by the job
+     * @param commandId       the id of the command run by the job
+     * @param useEmbeddedTags Whether to use the embedded tags in the search or not
+     * @param page            page information for job
+     * @param assembler       The paged resources assembler to use
      * @return successful response, or one with HTTP error code
      * @throws GenieException For any error
      */
@@ -238,6 +246,8 @@ public class JobRestController {
             @RequestParam(value = "executionClusterId", required = false) final String clusterId,
             @RequestParam(value = "commandName", required = false) final String commandName,
             @RequestParam(value = "commandId", required = false) final String commandId,
+            @RequestParam(value = "useEmbeddedTags", required = false, defaultValue = "true")
+            final boolean useEmbeddedTags,
             @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
             final Pageable page,
             final PagedResourcesAssembler<Job> assembler
@@ -279,8 +289,11 @@ public class JobRestController {
             }
         }
 
-        return assembler.toResource(
-                this.jobService.getJobs(
+        LOG.info("Using embedded tags = " + useEmbeddedTags);
+
+        @SuppressWarnings("unchecked")
+        final Page<JobEntity> jobEntities = this.jobRepository.findAll(
+                JpaJobSpecs.find(
                         id,
                         name,
                         userName,
@@ -290,10 +303,33 @@ public class JobRestController {
                         clusterId,
                         commandName,
                         commandId,
-                        page
+                        useEmbeddedTags
                 ),
+                page
+        );
+
+        final Page<Job> jobs = jobEntities.map(JobEntity::getDTO);
+
+        return assembler.toResource(
+                jobs,
                 this.jobResourceAssembler
         );
+
+//        return assembler.toResource(
+//                this.jobService.getJobs(
+//                        id,
+//                        name,
+//                        userName,
+//                        enumStatuses,
+//                        tags,
+//                        clusterName,
+//                        clusterId,
+//                        commandName,
+//                        commandId,
+//                        page
+//                ),
+//                this.jobResourceAssembler
+//        );
     }
 
     /**

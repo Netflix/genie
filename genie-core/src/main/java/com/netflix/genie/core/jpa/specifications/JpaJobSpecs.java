@@ -19,6 +19,8 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -39,6 +41,8 @@ import java.util.stream.Collectors;
  */
 public final class JpaJobSpecs {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JpaJobSpecs.class);
+
     /**
      * Protected constructor for utility class.
      */
@@ -48,15 +52,16 @@ public final class JpaJobSpecs {
     /**
      * Find jobs based on the parameters.
      *
-     * @param id          The job id
-     * @param jobName     The job name
-     * @param userName    The user who created the job
-     * @param statuses    The job statuses
-     * @param tags        The tags for the jobs to find
-     * @param clusterName The cluster name
-     * @param clusterId   The cluster id
-     * @param commandName The command name
-     * @param commandId   The command id
+     * @param id              The job id
+     * @param jobName         The job name
+     * @param userName        The user who created the job
+     * @param statuses        The job statuses
+     * @param tags            The tags for the jobs to find
+     * @param clusterName     The cluster name
+     * @param clusterId       The cluster id
+     * @param commandName     The command name
+     * @param commandId       The command id
+     * @param useEmbeddedTags Whether to use embedded tags or not
      * @return The specification
      */
     public static Specification<JobEntity> find(
@@ -68,7 +73,9 @@ public final class JpaJobSpecs {
             final String clusterName,
             final String clusterId,
             final String commandName,
-            final String commandId) {
+            final String commandId,
+            final boolean useEmbeddedTags
+    ) {
         return (final Root<JobEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(id)) {
@@ -89,9 +96,22 @@ public final class JpaJobSpecs {
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null) {
-                tags.stream()
-                        .filter(StringUtils::isNotBlank)
-                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(JobEntity_.tags))));
+                if (!useEmbeddedTags) {
+                    tags.stream()
+                            .filter(StringUtils::isNotBlank)
+                            .forEach(tag -> predicates.add(cb.isMember(tag, root.get(JobEntity_.tags))));
+                } else {
+                    final StringBuilder builder = new StringBuilder();
+                    builder.append("%");
+                    tags.stream()
+                            .filter(StringUtils::isNotBlank)
+                            .map(String::toLowerCase)
+                            .sorted()
+                            .forEach(tag -> builder.append(tag).append("%"));
+
+                    LOG.info("REGEX = " + builder.toString());
+                    predicates.add(cb.like(root.get(JobEntity_.sortedTags), builder.toString()));
+                }
             }
             if (StringUtils.isNotBlank(clusterId)) {
                 predicates.add(cb.equal(root.get(JobEntity_.cluster), clusterId));

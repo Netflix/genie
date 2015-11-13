@@ -148,7 +148,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -186,7 +187,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -225,7 +227,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -264,7 +267,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -303,7 +307,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -342,7 +347,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -381,8 +387,8 @@ public class JpaJobSpecsTests {
                 null,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
-
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -421,7 +427,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 null,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -460,8 +467,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 null,
-                COMMAND_ID
-
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -500,7 +507,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                null
+                null,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -539,7 +547,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -579,7 +588,8 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID
+                COMMAND_ID,
+                false
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);

@@ -330,6 +330,8 @@ ALTER TABLE `Job`
   CHANGE `executionClusterName` `cluster_name` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandId` `command_id` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandName` `command_name` VARCHAR(255) DEFAULT NULL,
+  ADD COLUMN `original_tags` VARCHAR(2048) DEFAULT NULL,
+  ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   DROP `forwarded`,
   DROP `applicationId`,
   DROP `applicationName`,
@@ -355,8 +357,26 @@ ALTER TABLE `Job`
   ADD INDEX `JOBS_USER_INDEX` (`user`),
   ADD INDEX `JOBS_UPDATED_INDEX` (`updated`),
   ADD INDEX `JOBS_CLUSTER_NAME_INDEX` (`cluster_name`),
-  ADD INDEX `JOBS_COMMAND_NAME_INDEX` (`command_name`);
+  ADD INDEX `JOBS_COMMAND_NAME_INDEX` (`command_name`),
+  ADD INDEX `JOBS_SORTED_TAGS_INDEX` (`sorted_tags`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Job table' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing tags for 3.0...' AS '';
+UPDATE `Job` as `j` set `j`.`sorted_tags` =
+  (
+    SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
+    FROM `Job_tags` `t`
+    WHERE `j`.`id` = `t`.`JOB_ID`
+    GROUP BY `t`.`JOB_ID`
+  );
+UPDATE `Job` as `j` set `j`.`original_tags` =
+  (
+    SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR ',')
+    FROM `Job_tags` `t`
+    WHERE `j`.`id` = `t`.`JOB_ID`
+    GROUP BY `t`.`JOB_ID`
+  );
+SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing tags for 3.0' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Updating the Job_tags table for 3.0...' AS '';
 ALTER TABLE `Job_tags`

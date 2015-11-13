@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +58,8 @@ public class JobEntity extends CommonFields {
      */
     protected static final String DEFAULT_VERSION = "NA";
 
+    private static final String COMMA = ",";
+
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
@@ -92,7 +95,15 @@ public class JobEntity extends CommonFields {
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String commandName;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @Basic
+    @Column(name = "original_tags", length = 2048)
+    private String originalTags;
+
+    @Basic
+    @Column(name = "sorted_tags", length = 2048)
+    private String sortedTags;
+
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "job_tags",
             joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "id")
@@ -312,11 +323,38 @@ public class JobEntity extends CommonFields {
     }
 
     /**
+     * Get the tags for this job.
+     *
+     * @return The tags as a set
+     */
+    public Set<String> getJobTags() {
+        return Sets.newHashSet(this.originalTags.split(COMMA));
+    }
+
+    /**
+     * Set the tags for this job.
+     *
+     * @param jobTags The job tags
+     */
+    public void setJobTags(final Set<String> jobTags) {
+        if (jobTags != null) {
+            this.originalTags = StringUtils.join(jobTags, COMMA);
+            this.sortedTags = tags
+                    .stream()
+                    .map(String::toLowerCase)
+                    .sorted()
+                    .reduce((one, two) -> one + COMMA + two)
+                    .get();
+            this.tags.addAll(jobTags);
+        }
+    }
+
+    /**
      * Gets the tags allocated to this job.
      *
      * @return the tags
      */
-    public Set<String> getTags() {
+    protected Set<String> getTags() {
         return this.tags;
     }
 
@@ -325,8 +363,47 @@ public class JobEntity extends CommonFields {
      *
      * @param tags the tags to set. Not Null.
      */
-    public void setTags(final Set<String> tags) {
-        this.tags = tags;
+    protected void setTags(final Set<String> tags) {
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
+    }
+
+    /**
+     * Get the original tags as csv.
+     *
+     * @return The original tags delimited with a comma
+     */
+    protected String getOriginalTags() {
+        return this.originalTags;
+    }
+
+    /**
+     * Set the original tags csv.
+     *
+     * @param originalTags the string
+     */
+    protected void setOriginalTags(final String originalTags) {
+        this.originalTags = originalTags;
+    }
+
+    /**
+     * Get the original tags as a sorted lowercase csv.
+     *
+     * @return The sorted tags
+     */
+    protected String getSortedTags() {
+        return this.sortedTags;
+    }
+
+    /**
+     * Set the original tags as a sorted lowercase csv.
+     *
+     * @param sortedTags The new sorted tags
+     */
+    protected void setSortedTags(final String sortedTags) {
+        this.sortedTags = sortedTags;
     }
 
     /**
@@ -427,7 +504,7 @@ public class JobEntity extends CommonFields {
                 .withCommandName(this.commandName)
                 .withCreated(this.getCreated())
                 .withDescription(this.getDescription())
-                .withTags(this.tags)
+                .withTags(this.getJobTags())
                 .withUpdated(this.getUpdated())
                 .withArchiveLocation(this.archiveLocation)
                 .withFinished(this.finished)
