@@ -134,10 +134,6 @@ public class JpaOldJobServiceImpl implements OldJobService {
         try {
             // if job can be launched, update the URIs
             final String hostName = this.netUtil.getHostName();
-//            jobEntity.setHostName(hostName);
-            final String endpoint = getEndPoint(hostName);
-            jobEntity.setOutputURI(endpoint + "/" + this.jobDirPrefix + "/" + jobEntity.getId());
-            jobEntity.setKillURI(endpoint + "/" + this.jobResourcePrefix + "/" + jobEntity.getId());
             final JobEntity attachedJobEntity = this.jobRepo.save(jobEntity);
 
             // increment number of submitted jobs as we have successfully

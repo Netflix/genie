@@ -174,6 +174,8 @@ CREATE TABLE `job_requests` (
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
   `tags` VARCHAR(2048) DEFAULT NULL,
+  `cpu` INT(11) NOT NULL DEFAULT 1,
+  `memory` INT(11) NOT NULL DEFAULT 1560,
   `client_host` VARCHAR(255) DEFAULT NULL,
   FOREIGN KEY (`id`) REFERENCES `Job` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -199,6 +201,8 @@ INSERT INTO `job_requests` (
   `disable_log_archival`,
   `email`,
   `tags`,
+  `cpu`,
+  `memory`,
   `client_host`
 ) SELECT
                 `j`.`id`,
@@ -222,6 +226,8 @@ INSERT INTO `job_requests` (
                   FROM `Job_tags` `t`
                   WHERE `j`.`id` = `t`.`JOB_ID`
                 ),
+                1,
+                1560,
                 `j`.`clientHost`
   FROM `Job` `j`;
 UPDATE `job_requests` SET `tags` = RPAD(`tags`, LENGTH(`tags`) + 2, '"]');
@@ -251,10 +257,13 @@ CREATE TABLE `job_executions` (
   `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `entity_version` INT(11) NOT NULL DEFAULT 0,
-  `host_name` VARCHAR(1024) NOT NULL,
+  `cluster_criteria` VARCHAR(1024),
+  `host_name` VARCHAR(255) NOT NULL,
   `process_id` INT(11) NOT NULL,
+  `exit_code` INT(11) NOT NULL DEFAULT -1,
   FOREIGN KEY (`id`) REFERENCES `Job` (`id`) ON DELETE CASCADE,
-  INDEX `HOST_NAME_INDEX` (`host_name`)
+  INDEX `HOST_NAME_INDEX` (`host_name`),
+  INDEX `EXIT_CODE_INDEX` (`exit_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_executions table' AS '';
 
@@ -264,18 +273,28 @@ INSERT INTO `job_executions` (
   `created`,
   `updated`,
   `entity_version`,
+  `cluster_criteria`,
   `host_name`,
-  `process_id`
+  `process_id`,
+  `exit_code`
 ) SELECT
                 `id`,
                 `created`,
                 `updated`,
                 `entityVersion`,
+                `chosenClusterCriteriaString`,
                 `hostName`,
-                `processHandle`
-  FROM `Job`
-  WHERE `status` = 'RUNNING';
+                `processHandle`,
+                `exitCode`
+  FROM `Job`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into the job_executions table' AS '';
+
+UPDATE `job_executions` SET `cluster_criteria` = RPAD(`cluster_criteria`, LENGTH(`cluster_criteria`) + 2, '"]');
+UPDATE `job_executions` SET `cluster_criteria` = LPAD(`cluster_criteria`, LENGTH(`cluster_criteria`) + 2, '["');
+UPDATE `job_executions` SET `cluster_criteria` = REPLACE(`cluster_criteria`, ',', '","');
+UPDATE `job_executions` SET `cluster_criteria` = '[]' WHERE `cluster_criteria` = '[""]' OR `cluster_criteria` IS NULL;
+
+ALTER TABLE `job_executions` CHANGE `cluster_criteria` `cluster_criteria` VARCHAR(1024) NOT NULL DEFAULT '[]';
 
 -- Modify the job table to remove the cluster id if cluster doesn't exist to prepare for foreign key constraints
 SELECT CURRENT_TIMESTAMP AS '', 'Setting executionClusterId in Job table to NULL if cluster no longer exists...' AS '';
@@ -305,17 +324,15 @@ ALTER TABLE `Job`
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INIT',
   CHANGE `statusMsg` `status_msg` VARCHAR(255) DEFAULT NULL,
-  CHANGE `killURI` `kill_uri` VARCHAR(1024) DEFAULT NULL,
-  CHANGE `outputURI` `output_uri` VARCHAR(1024) DEFAULT NULL,
   CHANGE `exitCode` `exit_code` INT(11) NOT NULL DEFAULT -1,
   CHANGE `archiveLocation` `archive_location` VARCHAR(1024) DEFAULT NULL,
   CHANGE `executionClusterId` `cluster_id` VARCHAR(255) DEFAULT NULL,
+  CHANGE `executionClusterName` `cluster_name` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandId` `command_id` VARCHAR(255) DEFAULT NULL,
+  CHANGE `commandName` `command_name` VARCHAR(255) DEFAULT NULL,
   DROP `forwarded`,
   DROP `applicationId`,
   DROP `applicationName`,
-  DROP `commandName`,
-  DROP `executionClusterName`,
   DROP `hostName`,
   DROP `clientHost`,
   DROP `fileDependencies`,
@@ -328,13 +345,17 @@ ALTER TABLE `Job`
   DROP `email`,
   DROP `groupName`,
   DROP `commandArgs`,
+  DROP `killURI`,
+  DROP `outputURI`,
   ADD FOREIGN KEY (`cluster_id`) REFERENCES `Cluster` (`id`) ON DELETE RESTRICT,
   ADD FOREIGN KEY (`command_id`) REFERENCES `Command` (`id`) ON DELETE RESTRICT,
   ADD INDEX `JOBS_STARTED_INDEX` (`started`),
   ADD INDEX `JOBS_FINISHED_INDEX` (`finished`),
   ADD INDEX `JOBS_STATUS_INDEX` (`status`),
   ADD INDEX `JOBS_USER_INDEX` (`user`),
-  ADD INDEX `JOBS_UPDATED_INDEX` (`updated`);
+  ADD INDEX `JOBS_UPDATED_INDEX` (`updated`),
+  ADD INDEX `JOBS_CLUSTER_NAME_INDEX` (`cluster_name`),
+  ADD INDEX `JOBS_COMMAND_NAME_INDEX` (`command_name`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Job table' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Updating the Job_tags table for 3.0...' AS '';

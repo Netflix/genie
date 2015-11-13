@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.hibernate.validator.constraints.Email;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +61,12 @@ public class JobRequest extends CommonDTO {
     @Email(message = "Must be a valid email address")
     private String email;
 
+    @Min(value = 1, message = "Minimum value for the number of cpu's is 1")
+    private int cpu;
+
+    @Min(value = 1, message = "Minimum value for the amount of memory is 1 MB")
+    private int memory;
+
     /**
      * Constructor used by the builder build() method.
      *
@@ -81,6 +88,8 @@ public class JobRequest extends CommonDTO {
         }
         this.disableLogArchival = builder.bDisableLogArchival;
         this.email = builder.bEmail;
+        this.cpu = builder.bCpu;
+        this.memory = builder.bMemory;
     }
 
     /**
@@ -156,6 +165,33 @@ public class JobRequest extends CommonDTO {
     }
 
     /**
+     * Get whether log archival should be disabled or not.
+     *
+     * @return true if archival should be disabled
+     */
+    public boolean isDisableLogArchival() {
+        return this.disableLogArchival;
+    }
+
+    /**
+     * Get how many CPU's should be assigned to this job. Defaults to 1.
+     *
+     * @return The number of CPU's the user is requesting for this job
+     */
+    public int getCpu() {
+        return this.cpu;
+    }
+
+    /**
+     * Get the amount of memory the user is requesting for the job. Defaults to 1.5 GB (1560 MB).
+     *
+     * @return The amount of memory the user is requesting in MB's.
+     */
+    public int getMemory() {
+        return this.memory;
+    }
+
+    /**
      * A builder to create job requests.
      *
      * @author tgianos
@@ -171,6 +207,8 @@ public class JobRequest extends CommonDTO {
         private Set<String> bFileDependencies = new HashSet<>();
         private boolean bDisableLogArchival;
         private String bEmail;
+        private int bCpu = 1;
+        private int bMemory = 1560;
 
         /**
          * Constructor which has required fields.
@@ -260,6 +298,28 @@ public class JobRequest extends CommonDTO {
          */
         public Builder withEmail(final String email) {
             this.bEmail = email;
+            return this;
+        }
+
+        /**
+         * Set the number of cpu's being requested to run the job. Defaults to 1 if not set.
+         *
+         * @param cpu The number of cpu's. Must be > 0.
+         * @return The builder
+         */
+        public Builder withCpu(@Min(1) final int cpu) {
+            this.bCpu = cpu;
+            return this;
+        }
+
+        /**
+         * Set the amount of memory being requested to run the job. Defaults to 1560 MB if not set.
+         *
+         * @param memory The amount of memory in terms of MB's. Must be > 0.
+         * @return The builder
+         */
+        public Builder withMemory(@Min(1) final int memory) {
+            this.bMemory = memory;
             return this;
         }
 

@@ -36,12 +36,6 @@ import java.util.Date;
 @JsonDeserialize(builder = Job.Builder.class)
 public class Job extends CommonDTO {
 
-    @Size(max = 255, message = "Max length is 255 characters")
-    private String clusterId;
-
-    @Size(max = 255, message = "Max length in database is 255 characters")
-    private String commandId;
-
     @NotNull(message = "A job must have a status")
     private JobStatus status;
 
@@ -55,15 +49,13 @@ public class Job extends CommonDTO {
     private Date finished;
 
     @Size(max = 1024, message = "Max character length is 1024 characters")
-    private String killURI;
-
-    @Size(max = 1024, message = "Max character length is 1024 characters")
-    private String outputURI;
-
-    private int exitCode = -1;
-
-    @Size(max = 1024, message = "Max character length is 1024 characters")
     private String archiveLocation;
+
+    @Size(max = 255, message = "Max character length is 255 characters")
+    private String clusterName;
+
+    @Size(max = 255, message = "Max character length is 255 characters")
+    private String commandName;
 
     /**
      * Constructor used by the builder.
@@ -72,8 +64,6 @@ public class Job extends CommonDTO {
      */
     protected Job(final Builder builder) {
         super(builder);
-        this.clusterId = builder.bClusterId;
-        this.commandId = builder.bCommandId;
         this.status = builder.bStatus;
         this.statusMsg = builder.bStatusMsg;
         if (builder.bStarted != null) {
@@ -82,28 +72,9 @@ public class Job extends CommonDTO {
         if (builder.bFinished != null) {
             this.finished = new Date(builder.bFinished.getTime());
         }
-        this.killURI = builder.bKillURI;
-        this.outputURI = builder.bOutputURI;
-        this.exitCode = builder.bExitCode;
         this.archiveLocation = builder.bArchiveLocation;
-    }
-
-    /**
-     * Get the id of the cluster this job executed on.
-     *
-     * @return The id
-     */
-    public String getClusterId() {
-        return this.clusterId;
-    }
-
-    /**
-     * Get the id of the command used to run this job.
-     *
-     * @return The command id
-     */
-    public String getCommandId() {
-        return this.commandId;
+        this.clusterName = builder.bClusterName;
+        this.commandName = builder.bCommandName;
     }
 
     /**
@@ -143,39 +114,30 @@ public class Job extends CommonDTO {
     }
 
     /**
-     * Get the URI used to kill the job.
-     *
-     * @return The kill URI
-     */
-    public String getKillURI() {
-        return killURI;
-    }
-
-    /**
-     * Get the URI where the job is putting its output.
-     *
-     * @return The output URI
-     */
-    public String getOutputURI() {
-        return outputURI;
-    }
-
-    /**
-     * Get the code the job exitted with.
-     *
-     * @return The exit code
-     */
-    public int getExitCode() {
-        return exitCode;
-    }
-
-    /**
      * Get the location where the jobs' results were archived to.
      *
      * @return The archive location
      */
     public String getArchiveLocation() {
         return archiveLocation;
+    }
+
+    /**
+     * Get the name of the cluster this job executed on.
+     *
+     * @return The name
+     */
+    public String getClusterName() {
+        return this.clusterName;
+    }
+
+    /**
+     * Get the name of the command used to run this job.
+     *
+     * @return The command name
+     */
+    public String getCommandName() {
+        return this.commandName;
     }
 
     /**
@@ -186,16 +148,13 @@ public class Job extends CommonDTO {
      */
     public static class Builder extends CommonDTO.Builder<Builder> {
 
-        private String bClusterId;
-        private String bCommandId;
         private JobStatus bStatus;
         private String bStatusMsg;
         private Date bStarted;
         private Date bFinished;
-        private String bKillURI;
-        private String bOutputURI;
-        private int bExitCode;
         private String bArchiveLocation;
+        private String bClusterName;
+        private String bCommandName;
 
         /**
          * Constructor which has required fields.
@@ -216,24 +175,24 @@ public class Job extends CommonDTO {
         }
 
         /**
-         * Set the execution cluster id for this job.
+         * Set the execution cluster name for this job.
          *
-         * @param clusterId The execution cluster id
+         * @param clusterName The execution cluster name
          * @return The builder
          */
-        public Builder withClusterId(final String clusterId) {
-            this.bClusterId = clusterId;
+        public Builder withClusterName(final String clusterName) {
+            this.bClusterName = clusterName;
             return this;
         }
 
         /**
-         * Set the id of the command used to run this job.
+         * Set the name of the command used to run this job.
          *
-         * @param commandId The id of the command
+         * @param commandName The name of the command
          * @return The builder
          */
-        public Builder withCommandId(final String commandId) {
-            this.bCommandId = commandId;
+        public Builder withCommandName(final String commandName) {
+            this.bCommandName = commandName;
             return this;
         }
 
@@ -285,39 +244,6 @@ public class Job extends CommonDTO {
             if (finished != null) {
                 this.bFinished = new Date(finished.getTime());
             }
-            return this;
-        }
-
-        /**
-         * Set the kill URI for the job.
-         *
-         * @param killURI The kill uri
-         * @return The builder
-         */
-        public Builder withKillURI(final String killURI) {
-            this.bKillURI = killURI;
-            return this;
-        }
-
-        /**
-         * Set the output URI for the job.
-         *
-         * @param outputURI The output uri
-         * @return The builder
-         */
-        public Builder withOutputURI(final String outputURI) {
-            this.bOutputURI = outputURI;
-            return this;
-        }
-
-        /**
-         * Set the exit code of the job.
-         *
-         * @param exitCode The exit code
-         * @return The builder
-         */
-        public Builder withExitCode(final int exitCode) {
-            this.bExitCode = exitCode;
             return this;
         }
 

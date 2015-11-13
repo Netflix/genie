@@ -26,61 +26,57 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Representation of the state of a Genie 2.0 job.
+ * Representation of the Genie 3.1 Job Document in elasticsearch.
  *
- * @author amsharma
  * @author tgianos
+ * @since 3.1.0
  */
 @Document(indexName = "genie", type = "job")
 public class JobDocument extends CommonDocument {
 
     private Set<String> tags = new HashSet<>();
-    private String clusterId;
-    private String commandId;
+    private String clusterName;
+    private String commandName;
     private JobStatus status;
     private String statusMsg;
     private Date started = new Date(0);
     private Date finished = new Date(0);
-    private String killURI;
-    private String outputURI;
-    private int exitCode = -1;
     private String archiveLocation;
 
     /**
      * Gets the id of the cluster on which this job was run.
      *
-     * @return executionClusterId
+     * @return executionClusterName
      */
-    public String getClusterId() {
-        return this.clusterId;
+    public String getClusterName() {
+        return this.clusterName;
     }
 
     /**
      * Sets the id of the cluster on which this job is run.
      *
-     * @param clusterId Id of the cluster on which job is executed.
-     *                  Populated by the server.
+     * @param clusterName Name of the cluster on which job is executed.
      */
-    public void setClusterId(final String clusterId) {
-        this.clusterId = clusterId;
+    public void setClusterName(final String clusterName) {
+        this.clusterName = clusterName;
     }
 
     /**
      * Gets the command id for this job.
      *
-     * @return commandId
+     * @return commandName
      */
-    public String getCommandId() {
-        return this.commandId;
+    public String getCommandName() {
+        return this.commandName;
     }
 
     /**
-     * Set command Id with which this job is run.
+     * Set command Name with which this job is run.
      *
-     * @param commandId Id of the command if specified on which the job is run
+     * @param commandName Name of the command if specified on which the job is run
      */
-    public void setCommandId(final String commandId) {
-        this.commandId = commandId;
+    public void setCommandName(final String commandName) {
+        this.commandName = commandName;
     }
 
     /**
@@ -154,60 +150,6 @@ public class JobDocument extends CommonDocument {
      */
     public void setFinished(final Date finished) {
         this.finished = new Date(finished.getTime());
-    }
-
-    /**
-     * Get the kill URI for this job.
-     *
-     * @return killURI The kill uri.
-     */
-    public String getKillURI() {
-        return this.killURI;
-    }
-
-    /**
-     * Set the kill URI for this job.
-     *
-     * @param killURI The kill URI
-     */
-    public void setKillURI(final String killURI) {
-        this.killURI = killURI;
-    }
-
-    /**
-     * Get the output URI for this job.
-     *
-     * @return outputURI the output uri.
-     */
-    public String getOutputURI() {
-        return this.outputURI;
-    }
-
-    /**
-     * Set the output URI for this job.
-     *
-     * @param outputURI The output URI.
-     */
-    public void setOutputURI(final String outputURI) {
-        this.outputURI = outputURI;
-    }
-
-    /**
-     * Get the exit code for this job.
-     *
-     * @return exitCode The exit code. 0 for Success.
-     */
-    public int getExitCode() {
-        return this.exitCode;
-    }
-
-    /**
-     * Set the exit code for this job.
-     *
-     * @param exitCode The exit code of the job.
-     */
-    public void setExitCode(final int exitCode) {
-        this.exitCode = exitCode;
     }
 
     /**
@@ -291,12 +233,9 @@ public class JobDocument extends CommonDocument {
                 .withTags(this.tags)
                 .withUpdated(this.getUpdated())
                 .withArchiveLocation(this.archiveLocation)
-                .withCommandId(this.commandId)
-                .withClusterId(this.clusterId)
-                .withExitCode(this.exitCode)
+                .withCommandName(this.commandName)
+                .withClusterName(this.clusterName)
                 .withFinished(this.finished)
-                .withKillURI(this.killURI)
-                .withOutputURI(this.outputURI)
                 .withStarted(this.started)
                 .withStatus(this.status)
                 .withStatusMsg(this.statusMsg)

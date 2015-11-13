@@ -57,16 +57,6 @@ public class JobEntity extends CommonFields {
      */
     protected static final String DEFAULT_VERSION = "NA";
 
-//    @Basic
-//    @Column(name = "cluster_id", length = 255)
-//    @Length(max = 255, message = "Max length in database is 255 characters")
-//    private String clusterId;
-//
-//    @Basic
-//    @Column(name = "command_id", length = 255)
-//    @Length(max = 255, message = "Max length in database is 255 characters")
-//    private String commandId;
-
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
@@ -88,23 +78,19 @@ public class JobEntity extends CommonFields {
     private Date finished = new Date(0);
 
     @Basic
-    @Column(name = "kill_uri", length = 1024)
-    @Size(max = 1024, message = "Max length in database is 1024 characters")
-    private String killURI;
-
-    @Basic
-    @Column(name = "output_uri", length = 1024)
-    @Size(max = 1024, message = "Max length in database is 1024 characters")
-    private String outputURI;
-
-    @Basic
-    @Column(name = "exit_code")
-    private int exitCode = -1;
-
-    @Basic
     @Column(name = "archive_location", length = 1024)
     @Size(max = 1024, message = "Max length in database is 1024 characters")
     private String archiveLocation;
+
+    @Basic
+    @Column(name = "cluster_name", length = 255)
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String clusterName;
+
+    @Basic
+    @Column(name = "command_name", length = 255)
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String commandName;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -170,42 +156,41 @@ public class JobEntity extends CommonFields {
         }
     }
 
-//    /**
-//     * Gets the id of the cluster on which this job was run.
-//     *
-//     * @return the cluster id
-//     */
-//    public String getClusterId() {
-//        return this.clusterId;
-//    }
-//
-//    /**
-//     * Sets the id of the cluster on which this job is run.
-//     *
-//     * @param clusterId Id of the cluster on which job is executed.
-//     *                  Populated by the server.
-//     */
-//    public void setClusterId(final String clusterId) {
-//        this.clusterId = clusterId;
-//    }
-//
-//    /**
-//     * Gets the command id for this job.
-//     *
-//     * @return commandId
-//     */
-//    public String getCommandId() {
-//        return this.commandId;
-//    }
-//
-//    /**
-//     * Set command Id with which this job is run.
-//     *
-//     * @param commandId Id of the command if specified on which the job is run
-//     */
-//    public void setCommandId(final String commandId) {
-//        this.commandId = commandId;
-//    }
+    /**
+     * Gets the name of the cluster on which this job was run.
+     *
+     * @return the cluster name
+     */
+    public String getClusterName() {
+        return this.clusterName;
+    }
+
+    /**
+     * Sets the name of the cluster on which this job is run.
+     *
+     * @param clusterName Name of the cluster on which job was executed.
+     */
+    public void setClusterName(final String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    /**
+     * Gets the command name for this job.
+     *
+     * @return The command name
+     */
+    public String getCommandName() {
+        return this.commandName;
+    }
+
+    /**
+     * Set command Name with which this job is run.
+     *
+     * @param commandName Name of the command used to run the job
+     */
+    public void setCommandName(final String commandName) {
+        this.commandName = commandName;
+    }
 
     /**
      * Gets the status for this job.
@@ -278,60 +263,6 @@ public class JobEntity extends CommonFields {
      */
     public void setFinished(final Date finished) {
         this.finished = new Date(finished.getTime());
-    }
-
-    /**
-     * Get the kill URI for this job.
-     *
-     * @return killURI The kill uri.
-     */
-    public String getKillURI() {
-        return this.killURI;
-    }
-
-    /**
-     * Set the kill URI for this job.
-     *
-     * @param killURI The kill URI
-     */
-    public void setKillURI(final String killURI) {
-        this.killURI = killURI;
-    }
-
-    /**
-     * Get the output URI for this job.
-     *
-     * @return outputURI the output uri.
-     */
-    public String getOutputURI() {
-        return this.outputURI;
-    }
-
-    /**
-     * Set the output URI for this job.
-     *
-     * @param outputURI The output URI.
-     */
-    public void setOutputURI(final String outputURI) {
-        this.outputURI = outputURI;
-    }
-
-    /**
-     * Get the exit code for this job.
-     *
-     * @return exitCode The exit code. 0 for Success.
-     */
-    public int getExitCode() {
-        return this.exitCode;
-    }
-
-    /**
-     * Set the exit code for this job.
-     *
-     * @param exitCode The exit code of the job.
-     */
-    public void setExitCode(final int exitCode) {
-        this.exitCode = exitCode;
     }
 
     /**
@@ -492,17 +423,14 @@ public class JobEntity extends CommonFields {
                 this.getVersion()
         )
                 .withId(this.getId())
+                .withClusterName(this.clusterName)
+                .withCommandName(this.commandName)
                 .withCreated(this.getCreated())
                 .withDescription(this.getDescription())
                 .withTags(this.tags)
                 .withUpdated(this.getUpdated())
                 .withArchiveLocation(this.archiveLocation)
-//                .withCommandId(this.commandId)
-//                .withClusterId(this.clusterId)
-                .withExitCode(this.exitCode)
                 .withFinished(this.finished)
-                .withKillURI(this.killURI)
-                .withOutputURI(this.outputURI)
                 .withStarted(this.started)
                 .withStatus(this.status)
                 .withStatusMsg(this.statusMsg)

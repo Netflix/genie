@@ -28,6 +28,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Test case for Job Status utility methods.
@@ -95,27 +96,27 @@ public class JobEntityTests extends EntityTestsBase {
         );
     }
 
-//    /**
-//     * Test the execution cluster id get/set.
-//     */
-//    @Test
-//    public void testSetGetClusterId() {
-//        Assert.assertNull(this.jobEntity.getClusterId());
-//        final String executionClusterId = UUID.randomUUID().toString();
-//        this.jobEntity.setClusterId(executionClusterId);
-//        Assert.assertEquals(executionClusterId, this.jobEntity.getClusterId());
-//    }
-//
-//    /**
-//     * Test setter and getter for command id.
-//     */
-//    @Test
-//    public void testSetGetCommandId() {
-//        Assert.assertNull(this.jobEntity.getCommandId());
-//        final String commandId = UUID.randomUUID().toString();
-//        this.jobEntity.setCommandId(commandId);
-//        Assert.assertEquals(commandId, this.jobEntity.getCommandId());
-//    }
+    /**
+     * Test the execution cluster name get/set.
+     */
+    @Test
+    public void testSetGetClusterName() {
+        Assert.assertNull(this.jobEntity.getClusterName());
+        final String clusterName = UUID.randomUUID().toString();
+        this.jobEntity.setClusterName(clusterName);
+        Assert.assertEquals(clusterName, this.jobEntity.getClusterName());
+    }
+
+    /**
+     * Test setter and getter for command name.
+     */
+    @Test
+    public void testSetGetCommandName() {
+        Assert.assertNull(this.jobEntity.getCommandName());
+        final String commandName = UUID.randomUUID().toString();
+        this.jobEntity.setCommandName(commandName);
+        Assert.assertEquals(commandName, this.jobEntity.getCommandName());
+    }
 
     /**
      * Test the setter and getter for status.
@@ -158,39 +159,6 @@ public class JobEntityTests extends EntityTestsBase {
         final Date finished = new Date(123453L);
         this.jobEntity.setFinished(finished);
         Assert.assertEquals(finished.getTime(), this.jobEntity.getFinished().getTime());
-    }
-
-    /**
-     * Test the setter and getter for the kill uri.
-     */
-    @Test
-    public void testSetGetKillURI() {
-        Assert.assertNull(this.jobEntity.getKillURI());
-        final String killURI = "http://localhost:7001";
-        this.jobEntity.setKillURI(killURI);
-        Assert.assertEquals(killURI, this.jobEntity.getKillURI());
-    }
-
-    /**
-     * Test the setter and getter for the output uri.
-     */
-    @Test
-    public void testSetGetOutputURI() {
-        Assert.assertNull(this.jobEntity.getOutputURI());
-        final String outputURI = "http://localhost:7001";
-        this.jobEntity.setOutputURI(outputURI);
-        Assert.assertEquals(outputURI, this.jobEntity.getOutputURI());
-    }
-
-    /**
-     * Test the setter and getter for the exit code.
-     */
-    @Test
-    public void testSetGetExitCode() {
-        Assert.assertEquals(-1, this.jobEntity.getExitCode());
-        final int exitCode = 0;
-        this.jobEntity.setExitCode(exitCode);
-        Assert.assertEquals(exitCode, this.jobEntity.getExitCode());
     }
 
     /**

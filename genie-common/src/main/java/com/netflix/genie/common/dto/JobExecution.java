@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.validation.constraints.Size;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * All information needed to show state of a running job.
@@ -36,6 +39,10 @@ public class JobExecution extends BaseDTO {
 
     private int processId;
 
+    private int exitCode;
+
+    private Set<String> clusterCriteria = new HashSet<>();
+
     /**
      * Constructor used by the builder build() method.
      *
@@ -45,6 +52,8 @@ public class JobExecution extends BaseDTO {
         super(builder);
         this.hostName = builder.bHostName;
         this.processId = builder.bProcessId;
+        this.exitCode = builder.bExitCode;
+        this.clusterCriteria.addAll(builder.bClusterCriteria);
     }
 
     /**
@@ -66,6 +75,24 @@ public class JobExecution extends BaseDTO {
     }
 
     /**
+     * Get the process exit code. Defaults to -1 before the job is complete.
+     *
+     * @return The process exit code
+     */
+    public int getExitCode() {
+        return this.exitCode;
+    }
+
+    /**
+     * Get the cluster criteria that was used to chose the cluster to run this job as unmodifiable set.
+     *
+     * @return The criteria. Any attempt to modify will throw runtime exception.
+     */
+    public Set<String> getClusterCriteria() {
+        return Collections.unmodifiableSet(this.clusterCriteria);
+    }
+
+    /**
      * A builder to create job requests.
      *
      * @author tgianos
@@ -75,6 +102,8 @@ public class JobExecution extends BaseDTO {
 
         private final String bHostName;
         private final int bProcessId;
+        private int bExitCode = -1;
+        private final Set<String> bClusterCriteria = new HashSet<>();
 
         /**
          * Constructor which has required fields.
@@ -91,6 +120,30 @@ public class JobExecution extends BaseDTO {
             super();
             this.bHostName = hostName;
             this.bProcessId = processId;
+        }
+
+        /**
+         * Set the exit code for the jobs' execution. If not set will default to -1.
+         *
+         * @param exitCode The exit code.
+         * @return The builder
+         */
+        public Builder withExitCode(final int exitCode) {
+            this.bExitCode = exitCode;
+            return this;
+        }
+
+        /**
+         * Set the cluster criteria used to select the cluster this job ran on.
+         *
+         * @param clusterCriteria The cluster criteria
+         * @return The builder
+         */
+        public Builder withClusterCriteria(final Set<String> clusterCriteria) {
+            if (clusterCriteria != null) {
+                this.bClusterCriteria.addAll(clusterCriteria);
+            }
+            return this;
         }
 
         /**

@@ -200,7 +200,6 @@
             name="testPigJob"
             status="SUCCEEDED"
             version="2.4"
-            exit_code="0"
             entity_version="0"/>
 
     <jobs
@@ -211,6 +210,5 @@
             name="testSparkJob"
             status="RUNNING"
             version="2.4"
-            exit_code="-1"
             entity_version="0"/>
 </dataset>

@@ -80,14 +80,11 @@ public class JobJanitorImplIntegrationTests {
         this.janitor.markZombies();
         final JobEntity jobEntity1 = this.jpaJobRepository.findOne("job1");
         Assert.assertThat(jobEntity1.getStatus(), Matchers.is(JobStatus.FAILED));
-        Assert.assertThat(jobEntity1.getExitCode(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getExitCode()));
         Assert.assertThat(jobEntity1.getStatusMsg(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getMessage()));
         final JobEntity jobEntity2 = this.jpaJobRepository.findOne("job2");
         Assert.assertThat(jobEntity2.getStatus(), Matchers.is(JobStatus.FAILED));
-        Assert.assertThat(jobEntity2.getExitCode(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getExitCode()));
         Assert.assertThat(jobEntity2.getStatusMsg(), Matchers.is(ProcessStatus.ZOMBIE_JOB.getMessage()));
         final JobEntity jobEntity3 = this.jpaJobRepository.findOne("job3");
         Assert.assertThat(jobEntity3.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(jobEntity3.getExitCode(), Matchers.is(ProcessStatus.SUCCESS.getExitCode()));
     }
 }

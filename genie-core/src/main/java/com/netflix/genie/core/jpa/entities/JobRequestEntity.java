@@ -17,14 +17,11 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -38,9 +35,8 @@ import javax.persistence.Lob;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
-import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -98,6 +94,16 @@ public class JobRequestEntity extends CommonFields {
     @Size(max = 2048, message = "Max length in database is 2048 characters")
     private String tags;
 
+    @Basic(optional = false)
+    @Column(name = "cpu", nullable = false)
+    @Min(value = 1, message = "Can't have less than 1 CPU")
+    private int cpu = 1;
+
+    @Basic(optional = false)
+    @Column(name = "memory", nullable = false)
+    @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
+    private int memory = 1560;
+
     @Basic
     @Column(name = "client_host", length = 255)
     @Size(max = 255, message = "Max length in database is 255 characters")
@@ -134,7 +140,7 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException on any error
      */
     public List<ClusterCriteria> getClusterCriteriasAsList() throws GenieException {
-        return this.unmarshall(this.clusterCriterias, new TypeReference<List<ClusterCriteria>>() {
+        return EntityUtils.unmarshall(this.clusterCriterias, new TypeReference<List<ClusterCriteria>>() {
         });
     }
 
@@ -165,7 +171,7 @@ public class JobRequestEntity extends CommonFields {
     public void setClusterCriteriasFromList(
             @NotEmpty(message = "No cluster criterias entered") final List<ClusterCriteria> clusterCriteriasList
     ) throws GenieException {
-        this.clusterCriterias = this.marshall(clusterCriteriasList);
+        this.clusterCriterias = EntityUtils.marshall(clusterCriteriasList);
     }
 
     /**
@@ -199,7 +205,7 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException On any exception
      */
     public Set<String> getFileDependenciesAsSet() throws GenieException {
-        return this.unmarshall(this.fileDependencies, new TypeReference<Set<String>>() {
+        return EntityUtils.unmarshall(this.fileDependencies, new TypeReference<Set<String>>() {
         });
     }
 
@@ -228,8 +234,9 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException for any processing error
      */
     public void setFileDependenciesFromSet(final Set<String> fileDependenciesSet) throws GenieException {
-        this.fileDependencies
-                = fileDependenciesSet == null ? this.marshall(new HashSet<>()) : this.marshall(fileDependenciesSet);
+        this.fileDependencies = fileDependenciesSet == null
+                ? EntityUtils.marshall(new HashSet<>())
+                : EntityUtils.marshall(fileDependenciesSet);
     }
 
     /**
@@ -294,7 +301,7 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException on any processing error
      */
     public Set<String> getCommandCriteriaAsSet() throws GenieException {
-        return this.unmarshall(this.commandCriteria, new TypeReference<Set<String>>() {
+        return EntityUtils.unmarshall(this.commandCriteria, new TypeReference<Set<String>>() {
         });
     }
 
@@ -326,7 +333,7 @@ public class JobRequestEntity extends CommonFields {
     public void setCommandCriteriaFromSet(
             @NotEmpty(message = "At least one command criteria required") final Set<String> commandCriteriaSet
     ) throws GenieException {
-        this.commandCriteria = this.marshall(commandCriteriaSet);
+        this.commandCriteria = EntityUtils.marshall(commandCriteriaSet);
     }
 
     /**
@@ -373,7 +380,7 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException For any processing error
      */
     public Set<String> getTagsAsSet() throws GenieException {
-        return this.unmarshall(this.tags, new TypeReference<Set<String>>() {
+        return EntityUtils.unmarshall(this.tags, new TypeReference<Set<String>>() {
         });
     }
 
@@ -384,7 +391,43 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException for any processing error
      */
     public void setTagsFromSet(final Set<String> tagsSet) throws GenieException {
-        this.tags = tagsSet == null ? marshall(new HashSet<>()) : marshall(tagsSet);
+        this.tags = tagsSet == null ? EntityUtils.marshall(new HashSet<>()) : EntityUtils.marshall(tagsSet);
+    }
+
+    /**
+     * Get the number of CPU's requested to run this job.
+     *
+     * @return The number of CPU's
+     */
+    public int getCpu() {
+        return this.cpu;
+    }
+
+    /**
+     * Set the number of CPU's requested to run this job with.
+     *
+     * @param cpu The number of CPU's. Minimum 1.
+     */
+    public void setCpu(@Min(1) final int cpu) {
+        this.cpu = cpu;
+    }
+
+    /**
+     * Get the memory requested to run this job with.
+     *
+     * @return The amount of memory the user requested for this job in MB
+     */
+    public int getMemory() {
+        return this.memory;
+    }
+
+    /**
+     * Set the amount of memory requested to run this job with.
+     *
+     * @param memory The amount of memory requested in MB. Minimum 1.
+     */
+    public void setMemory(@Min(1) final int memory) {
+        this.memory = memory;
     }
 
     /**
@@ -429,32 +472,9 @@ public class JobRequestEntity extends CommonFields {
                 .withGroup(this.group)
                 .withSetupFile(this.setupFile)
                 .withTags(this.getTagsAsSet())
+                .withCpu(this.cpu)
+                .withMemory(this.memory)
                 .withUpdated(this.getUpdated())
                 .build();
-    }
-
-    protected String marshall(final Object value) throws GenieException {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(value);
-        } catch (final JsonProcessingException jpe) {
-            throw new GenieServerException(jpe);
-        }
-    }
-
-    protected <T extends Collection> T unmarshall(
-            final String source,
-            final TypeReference<T> typeReference
-    ) throws GenieException {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            if (StringUtils.isNotBlank(source)) {
-                return mapper.readValue(source, typeReference);
-            } else {
-                return mapper.readValue("[]", typeReference);
-            }
-        } catch (final IOException ioe) {
-            throw new GenieServerException(ioe);
-        }
     }
 }

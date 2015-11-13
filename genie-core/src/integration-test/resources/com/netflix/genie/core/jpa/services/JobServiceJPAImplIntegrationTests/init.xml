@@ -199,12 +199,9 @@
             user="tgianos"
             name="testPigJob"
             version="2.4"
-            command_args="-f -j"
             status="INIT"
             cluster_id="cluster1"
             command_id="command1"
-            process_handle="-1"
-            exit_code="-1"
             entity_version="0"/>
     <job_tags
             job_id="job1"
@@ -225,7 +222,6 @@
             version="2.4.3"
             status="FAILED"
             cluster_id="cluster2"
-            exit_code="1"
             entity_version="0"/>
     <job_tags
             job_id="job2"
