@@ -29,7 +29,6 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,6 @@ import org.springframework.stereotype.Service;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
-import java.util.List;
 
 
 /**
@@ -49,24 +47,19 @@ import java.util.List;
 public class JobServiceImpl implements JobService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobServiceImpl.class);
-    private final List<JobPersistenceService> searchPriorityOrderPersistenceList;
-    private final List<JobPersistenceService> savePriorityOrderPersistenceList;
+    private final JobPersistenceService jps;
+
 
     /**
-     * Test.
+     * Constructor.
      *
-     * @param searchPriorityOrderPersistenceList blah
-     * @param savePriorityOrderPersistenceList blah
+     * @param jps blah
      */
     @Autowired
     public JobServiceImpl(
-            @Qualifier("search")
-            final Object searchPriorityOrderPersistenceList,
-            @Qualifier("save")
-            final Object savePriorityOrderPersistenceList
+            final JobPersistenceService jps
     ) {
-        this.searchPriorityOrderPersistenceList = (List<JobPersistenceService>) searchPriorityOrderPersistenceList;
-        this.savePriorityOrderPersistenceList = (List<JobPersistenceService>) savePriorityOrderPersistenceList;
+        this.jps = jps;
     }
 
     /**
@@ -98,9 +91,6 @@ public class JobServiceImpl implements JobService {
             @NotBlank(message = "No job id provided. Unable to retrieve job.")
             final String jobId) throws GenieException {
 
-
-        searchPriorityOrderPersistenceList.forEach(jpsimpl -> LOG.info(jpsimpl.getClass().toString()));
-        searchPriorityOrderPersistenceList.forEach(jpsimpl -> LOG.info(jpsimpl.getClass().toString()));
         return null;
     }
 

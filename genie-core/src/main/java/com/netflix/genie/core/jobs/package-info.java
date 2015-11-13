@@ -16,27 +16,9 @@
  *
  */
 
-package com.netflix.genie.core.services;
-
-import com.netflix.genie.common.exceptions.GenieException;
-import org.hibernate.validator.constraints.NotBlank;
-
- /**
- * Interface for services to kill jobs.
+/**
+ * Classes for core Genie job execution.
  *
  * @author amsharma
- * @since 3.0.0
  */
-public interface JobKillService {
-
-    /**
-     * Get job information for given job id.
-     *
-     * @param id id of job to kill
-     * @throws GenieException if there is an error
-     */
-    void killJob(
-            @NotBlank(message = "No id entered. Unable to kill job.")
-            final String id
-    ) throws GenieException;
-}
+package com.netflix.genie.core.jobs;

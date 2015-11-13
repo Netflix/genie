@@ -17,18 +17,12 @@
  */
 package com.netflix.genie.web;
 
-import com.google.common.collect.Lists;
-import com.netflix.genie.core.elasticsearch.repositories.EsJobRepository;
-import com.netflix.genie.core.jpa.services.JpaJobPersistenceServiceImpl;
-import com.netflix.genie.core.services.JobPersistenceService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -39,11 +33,8 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-import com.netflix.genie.core.elasticsearch.services.EsJobPersistenceServiceImpl;
 
 import javax.validation.Validator;
-import java.util.List;
-
 /**
  * Main Genie Spring Configuration class.
  *
@@ -58,72 +49,6 @@ import java.util.List;
 @EntityScan("com.netflix.genie.core.jpa.entities")
 @EnableSwagger2
 public class GenieWeb {
-
-    /**
-     * Elasticsearch bean for job persistence service.
-     *
-     * @param repository The elastic search repository
-     * @param template   The elastic search template
-     *
-     * @return esbean The elasticsearch bean
-     */
-    @Bean
-    public JobPersistenceService esbean(
-            final EsJobRepository repository,
-            final ElasticsearchTemplate template) {
-        return new EsJobPersistenceServiceImpl(repository, template);
-    }
-
-    /**
-     * JPA bean for job persistence service..
-     *
-     * @return jpabean The jpa bean.
-     */
-    @Bean
-    public JobPersistenceService jpabean() {
-        return new JpaJobPersistenceServiceImpl();
-    }
-
-    /**
-     * Bean defining the order in which System would search for jobs from the Persistence layer.
-     * If a job is retrieved from a layer, it would ignore the rest.
-     *
-     * @param esbean The elasticsearch bean reference
-     * @param jpabean The jpabean reference
-     *
-     * @return list of beans implementing job persistence
-     */
-    @Bean
-    @Qualifier("search")
-    public List<JobPersistenceService> persistenceSearchPriorityOrder(
-            final JobPersistenceService esbean,
-            final JobPersistenceService jpabean
-    ) {
-        return Lists.newArrayList(
-                esbean,
-                jpabean);
-    }
-
-    /**
-     * Bean defining the order in which System would save jobs int the Persistence layer.
-     *
-     * @param jpabean repository
-     * @param esbean template
-     *
-     * @return list of beans implementing job persistence
-     */
-    @Bean
-    @Qualifier("save")
-    public List<JobPersistenceService> persistenceSavePriorityOrder(
-            final JobPersistenceService jpabean,
-            final JobPersistenceService esbean
-
-    ) {
-        return Lists.newArrayList(
-                jpabean,
-                esbean
-        );
-    }
 
     /**
      * Spring Boot Main.

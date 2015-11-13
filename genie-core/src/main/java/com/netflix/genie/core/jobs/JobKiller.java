@@ -15,36 +15,30 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.services;
 
+package com.netflix.genie.core.jobs;
 
-import com.netflix.genie.common.dto.JobExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieException;
-import org.springframework.validation.annotation.Validated;
+import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-/**
- * Interface for the execution service used to run, kill and monitor jobs.
+ /**
+ * Interface for services to kill jobs.
  *
  * @author amsharma
- * @author tgianos
- * @since 2.0.0
+ * @since 3.0.0
  */
-@Validated
-public interface ExecutionService {
+public class JobKiller {
 
     /**
-     * Submit a new job.
+     * Get job information for given job id.
      *
-     * @param jobExecutionEnvironment The job to submit
-     * @return The id of the job that was submitted
+     * @param id id of job to kill
      * @throws GenieException if there is an error
      */
-    String submitJob(
-            @NotNull(message = "No job request entered to run")
-            @Valid
-            final JobExecutionEnvironment jobExecutionEnvironment
-    ) throws GenieException;
+    void killJob(
+            @NotBlank(message = "No id entered. Unable to kill job.")
+            final String id
+    ) throws GenieException {
+
+    };
 }

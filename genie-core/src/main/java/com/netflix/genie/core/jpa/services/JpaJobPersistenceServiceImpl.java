@@ -24,6 +24,7 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 
 import javax.validation.constraints.NotNull;
@@ -34,6 +35,7 @@ import java.util.Set;
  *
  * @author amsharma
  */
+@Service
 public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     /**
      * Get job information for given job id.
