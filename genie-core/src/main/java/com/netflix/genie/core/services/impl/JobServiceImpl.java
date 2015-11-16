@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobService;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -48,18 +49,20 @@ public class JobServiceImpl implements JobService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobServiceImpl.class);
     private final JobPersistenceService jps;
-
-
+    private final JobSearchService jss;
     /**
      * Constructor.
      *
-     * @param jps blah
+     * @param jps implementation of job persistence service interface
+     * @param jss implementation of job search service interface
      */
     @Autowired
     public JobServiceImpl(
-            final JobPersistenceService jps
+            final JobPersistenceService jps,
+            final JobSearchService jss
     ) {
         this.jps = jps;
+        this.jss = jss;
     }
 
     /**

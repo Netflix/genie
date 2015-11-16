@@ -19,17 +19,14 @@ package com.netflix.genie.core.elasticsearch.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.elasticsearch.documents.JobDocument;
 import com.netflix.genie.core.elasticsearch.repositories.EsJobRepository;
-import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +46,9 @@ import java.util.stream.Collectors;
  *
  * @author tgianos
  */
-public class EsJobPersistenceServiceImpl implements JobPersistenceService {
+public class EsJobSearchServiceImpl implements JobSearchService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EsJobPersistenceServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EsJobSearchServiceImpl.class);
 
     private final EsJobRepository repository;
     private final ElasticsearchTemplate template;
@@ -63,22 +60,9 @@ public class EsJobPersistenceServiceImpl implements JobPersistenceService {
      * @param template   The elastic search template
      */
     @Autowired
-    public EsJobPersistenceServiceImpl(final EsJobRepository repository, final ElasticsearchTemplate template) {
+    public EsJobSearchServiceImpl(final EsJobRepository repository, final ElasticsearchTemplate template) {
         this.repository = repository;
         this.template = template;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Job getJob(@NotBlank(message = "No id entered. Unable to get job.") final String id) throws GenieException {
-        final JobDocument job = this.repository.findOne(id);
-        if (job != null) {
-            return job.getDTO();
-        } else {
-            throw new GenieNotFoundException("No job with id " + id + " exists.");
-        }
     }
 
     /**
@@ -152,15 +136,5 @@ public class EsJobPersistenceServiceImpl implements JobPersistenceService {
         return this.template
                 .queryForPage(query, JobDocument.class)
                 .map(JobDocument::getDTO);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveJob(
-            final Job job
-    ) {
-
     }
 }

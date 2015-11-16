@@ -18,17 +18,14 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
-import com.netflix.genie.common.dto.JobStatus;
+
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
-import java.util.Set;
 import javax.validation.constraints.NotNull;
 
 /**
- * Interfaces for services to find jobs.
+ * Interfaces for providing persistence functions for jobs other than search.
  *
  * @author tgianos
  * @since 3.0.0
@@ -46,34 +43,6 @@ public interface JobPersistenceService {
             @NotBlank(message = "No id entered. Unable to get job.")
             final String id
     ) throws GenieException;
-
-    /**
-     * Get job info for given filter criteria.
-     *
-     * @param id          id for job
-     * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName    user who submitted job
-     * @param statuses    statuses of job
-     * @param tags        tags for the job
-     * @param clusterName name of cluster for job
-     * @param clusterId   id of cluster for job
-     * @param commandName name of the command run in the job
-     * @param commandId   id of the command run in the job
-     * @param page        Page information of job to get
-     * @return All jobs which match the criteria
-     */
-    Page<Job> getJobs(
-            final String id,
-            final String jobName,
-            final String userName,
-            final Set<JobStatus> statuses,
-            final Set<String> tags,
-            final String clusterName,
-            final String clusterId,
-            final String commandName,
-            final String commandId,
-            final Pageable page
-    );
 
     /**
      * Save the job object in the data store.
