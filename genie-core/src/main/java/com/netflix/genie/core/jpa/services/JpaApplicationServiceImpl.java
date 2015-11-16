@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
@@ -111,7 +112,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         applicationEntity.setDescription(app.getDescription());
         applicationEntity.setStatus(app.getStatus());
         applicationEntity.setSetupFile(app.getSetupFile());
-        applicationEntity.setTags(app.getTags());
+        applicationEntity.setApplicationTags(app.getTags());
         applicationEntity.setConfigs(app.getConfigs());
         applicationEntity.setDependencies(app.getDependencies());
 
@@ -191,7 +192,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         applicationEntity.setSetupFile(updateApp.getSetupFile());
         applicationEntity.setConfigs(updateApp.getConfigs());
         applicationEntity.setDependencies(updateApp.getDependencies());
-        applicationEntity.setTags(updateApp.getTags());
+        applicationEntity.setApplicationTags(updateApp.getTags());
 
         this.applicationRepo.save(applicationEntity);
     }
@@ -374,7 +375,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
             @NotEmpty(message = "No tags entered. Unable to add.")
             final Set<String> tags
     ) throws GenieException {
-        this.findApplication(id).getTags().addAll(tags);
+        final ApplicationEntity app = this.findApplication(id);
+        final Set<String> appTags = app.getApplicationTags();
+        appTags.addAll(tags);
+        app.setApplicationTags(appTags);
     }
 
     /**
@@ -386,7 +390,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
             @NotBlank(message = "No application id entered. Cannot retrieve tags.")
             final String id
     ) throws GenieException {
-        return this.findApplication(id).getTags();
+        return this.findApplication(id).getApplicationTags();
     }
 
     /**
@@ -399,7 +403,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
             @NotNull(message = "No tags entered unable to update tags.")
             final Set<String> tags
     ) throws GenieException {
-        this.findApplication(id).setTags(tags);
+        this.findApplication(id).setApplicationTags(tags);
     }
 
     /**
@@ -410,7 +414,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
             @NotBlank(message = "No application id entered. Unable to remove tags.")
             final String id
     ) throws GenieException {
-        this.findApplication(id).getTags().clear();
+        this.findApplication(id).setApplicationTags(Sets.newHashSet());
     }
 
     /**
@@ -423,7 +427,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
             @NotBlank(message = "No tag entered. Unable to remove.")
             final String tag
     ) throws GenieException {
-        this.findApplication(id).getTags().remove(tag);
+        final ApplicationEntity app = this.findApplication(id);
+        final Set<String> tags = app.getApplicationTags();
+        tags.remove(tag);
+        app.setApplicationTags(tags);
     }
 
     /**

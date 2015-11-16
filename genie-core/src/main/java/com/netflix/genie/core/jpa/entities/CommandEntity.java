@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -37,8 +38,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -141,12 +142,12 @@ public class CommandEntity extends CommonFields {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
-    @PostPersist
-    @PostUpdate
-    protected void onCreateOrUpdateCommand() throws GeniePreconditionException {
-        this.addAndValidateSystemTags(this.tags);
+    @PrePersist
+    @PreUpdate
+    protected void onCreateOrUpdateCommand() throws GenieException {
+        this.setCommandTags(this.getFinalTags());
     }
 
     /**
@@ -287,11 +288,35 @@ public class CommandEntity extends CommonFields {
     }
 
     /**
+     * Get the set of tags for this command.
+     *
+     * @return The command tags
+     */
+    public Set<String> getCommandTags() {
+        return this.getOriginalTags() == null
+                ? Sets.newHashSet()
+                : Sets.newHashSet(this.getOriginalTags().split(COMMA));
+    }
+
+    /**
+     * Set the tags for the command.
+     *
+     * @param commandTags The tags for the command
+     */
+    public void setCommandTags(final Set<String> commandTags) {
+        this.tags.clear();
+        this.setOriginalAndSortedTags(commandTags);
+        if (commandTags != null) {
+            this.tags.addAll(commandTags);
+        }
+    }
+
+    /**
      * Gets the tags allocated to this command.
      *
      * @return the tags
      */
-    public Set<String> getTags() {
+    protected Set<String> getTags() {
         return this.tags;
     }
 
@@ -300,7 +325,7 @@ public class CommandEntity extends CommonFields {
      *
      * @param tags the tags to set.
      */
-    public void setTags(final Set<String> tags) {
+    protected void setTags(final Set<String> tags) {
         this.tags.clear();
         if (tags != null) {
             this.tags.addAll(tags);

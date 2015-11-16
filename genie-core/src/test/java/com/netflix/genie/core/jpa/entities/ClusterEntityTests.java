@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -97,10 +98,10 @@ public class ClusterEntityTests extends EntityTestsBase {
     /**
      * Test to make sure validation works.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateCluster() throws GeniePreconditionException {
+    public void testOnCreateOrUpdateCluster() throws GenieException {
         this.c = new ClusterEntity(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         Assert.assertNotNull(this.c.getTags());
         Assert.assertTrue(this.c.getTags().isEmpty());

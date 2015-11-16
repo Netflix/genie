@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieException;
 
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
@@ -32,8 +33,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -76,7 +77,7 @@ public class ApplicationEntity extends CommonFields {
     @Column(name = "dependency", nullable = false, length = 1024)
     private Set<String> dependencies = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "application_tags",
             joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
@@ -114,12 +115,12 @@ public class ApplicationEntity extends CommonFields {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws GeniePreconditionException If any preconditions aren't met.
+     * @throws GenieException If any preconditions aren't met.
      */
-    @PostPersist
-    @PostUpdate
-    protected void onCreateOrUpdateApplication() throws GeniePreconditionException {
-        this.addAndValidateSystemTags(this.tags);
+    @PrePersist
+    @PreUpdate
+    protected void onCreateOrUpdateApplication() throws GenieException {
+        this.setApplicationTags(this.getFinalTags());
     }
 
     /**
@@ -224,11 +225,35 @@ public class ApplicationEntity extends CommonFields {
     }
 
     /**
+     * Get the set of tags for this application.
+     *
+     * @return The application tags
+     */
+    public Set<String> getApplicationTags() {
+        return this.getOriginalTags() == null
+                ? Sets.newHashSet()
+                : Sets.newHashSet(this.getOriginalTags().split(COMMA));
+    }
+
+    /**
+     * Set the tags for the application.
+     *
+     * @param applicationTags The tags for the application
+     */
+    public void setApplicationTags(final Set<String> applicationTags) {
+        this.setOriginalAndSortedTags(applicationTags);
+        this.tags.clear();
+        if (applicationTags != null) {
+            this.tags.addAll(applicationTags);
+        }
+    }
+
+    /**
      * Gets the tags allocated to this application.
      *
      * @return the tags
      */
-    public Set<String> getTags() {
+    protected Set<String> getTags() {
         return this.tags;
     }
 
@@ -237,7 +262,7 @@ public class ApplicationEntity extends CommonFields {
      *
      * @param tags the tags to set. No tag can start with genie. as this is system reserved.
      */
-    public void setTags(final Set<String> tags) {
+    protected void setTags(final Set<String> tags) {
         this.tags.clear();
         if (tags != null) {
             this.tags.addAll(tags);
@@ -256,7 +281,7 @@ public class ApplicationEntity extends CommonFields {
                 .withCreated(this.getCreated())
                 .withUpdated(this.getUpdated())
                 .withDescription(this.getDescription())
-                .withTags(this.tags)
+                .withTags(this.getApplicationTags())
                 .withConfigs(this.configs)
                 .withSetupFile(this.setupFile)
                 .withDependencies(this.dependencies)

@@ -42,12 +42,31 @@ ALTER TABLE `Application`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
+  ADD COLUMN `original_tags` VARCHAR(2048) DEFAULT NULL,
+  ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   ADD INDEX `APPLICATIONS_NAME_INDEX` (`name`),
   ADD INDEX `APPLICATIONS_STATUS_INDEX` (`status`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Application table...' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing application tags for 3.0...' AS '';
+UPDATE `Application` as `a` set `a`.`sorted_tags` =
+(
+  SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
+  FROM `Application_tags` `t`
+  WHERE `a`.`id` = `t`.`APPLICATION_ID`
+  GROUP BY `t`.`APPLICATION_ID`
+);
+UPDATE `Application` as `a` set `a`.`original_tags` =
+(
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR ',')
+  FROM `Application_tags` `t`
+  WHERE `a`.`id` = `t`.`APPLICATION_ID`
+  GROUP BY `t`.`APPLICATION_ID`
+);
+SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing application tags for 3.0' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Altering the Application_configs table for 3.0...' AS '';
 ALTER TABLE `Application_configs` DROP KEY `I_PPLCFGS_APPLICATION_ID`;
@@ -83,12 +102,31 @@ ALTER TABLE `Cluster`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
+  ADD COLUMN `original_tags` VARCHAR(2048) DEFAULT NULL,
+  ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'OUT_OF_SERVICE',
   CHANGE `clusterType` `cluster_type` VARCHAR(255) NOT NULL,
   CHANGE `entityVersion` `entity_version` INT(11) DEFAULT 0,
   ADD INDEX `CLUSTERS_NAME_INDEX` (`name`),
   ADD INDEX `CLUSTERS_STATUS_INDEX` (`status`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Cluster table' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing cluster tags for 3.0...' AS '';
+UPDATE `Cluster` as `c` set `c`.`sorted_tags` =
+(
+  SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
+  FROM `Cluster_tags` `t`
+  WHERE `c`.`id` = `t`.`CLUSTER_ID`
+  GROUP BY `t`.`CLUSTER_ID`
+);
+UPDATE `Cluster` as `c` set `c`.`original_tags` =
+(
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR ',')
+  FROM `Cluster_tags` `t`
+  WHERE `c`.`id` = `t`.`CLUSTER_ID`
+  GROUP BY `t`.`CLUSTER_ID`
+);
+SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing cluster tags for 3.0' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Updating the Cluster_Command table for 3.0...' AS '';
 ALTER TABLE `Cluster_Command`
@@ -127,6 +165,8 @@ ALTER TABLE `Command`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
+  ADD COLUMN `original_tags` VARCHAR(2048) DEFAULT NULL,
+  ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   MODIFY `executable` VARCHAR(255) NOT NULL,
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
@@ -136,6 +176,23 @@ ALTER TABLE `Command`
   ADD INDEX `COMMAND_NAME_INDEX` (`name`),
   ADD INDEX `COMMAND_STATUS_INDEX` (`status`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Command table' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing command tags for 3.0...' AS '';
+UPDATE `Command` as `c` set `c`.`sorted_tags` =
+(
+  SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
+  FROM `Command_tags` `t`
+  WHERE `c`.`id` = `t`.`COMMAND_ID`
+  GROUP BY `t`.`COMMAND_ID`
+);
+UPDATE `Command` as `c` set `c`.`original_tags` =
+(
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR ',')
+  FROM `Command_tags` `t`
+  WHERE `c`.`id` = `t`.`COMMAND_ID`
+  GROUP BY `t`.`COMMAND_ID`
+);
+SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing command tags for 3.0' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Updating the Command_configs table for 3.0...' AS '';
 ALTER TABLE `Command_configs` DROP KEY `I_CMMNFGS_COMMAND_ID`;
@@ -168,8 +225,8 @@ CREATE TABLE `job_requests` (
   `command_args` TEXT NOT NULL,
   `group_name` VARCHAR(255) DEFAULT NULL,
   `setup_file` VARCHAR(1024) DEFAULT NULL,
-  `cluster_criterias` VARCHAR(1024) NOT NULL,
-  `command_criteria` VARCHAR(2048) NOT NULL,
+  `cluster_criterias` VARCHAR(2048) NOT NULL,
+  `command_criteria` VARCHAR(1024) NOT NULL,
   `file_dependencies` TEXT DEFAULT NULL,
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
@@ -361,7 +418,7 @@ ALTER TABLE `Job`
   ADD INDEX `JOBS_SORTED_TAGS_INDEX` (`sorted_tags`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Job table' AS '';
 
-SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing tags for 3.0...' AS '';
+SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing job tags for 3.0...' AS '';
 UPDATE `Job` as `j` set `j`.`sorted_tags` =
   (
     SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
@@ -376,7 +433,7 @@ UPDATE `Job` as `j` set `j`.`original_tags` =
     WHERE `j`.`id` = `t`.`JOB_ID`
     GROUP BY `t`.`JOB_ID`
   );
-SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing tags for 3.0' AS '';
+SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing job tags for 3.0' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Updating the Job_tags table for 3.0...' AS '';
 ALTER TABLE `Job_tags`

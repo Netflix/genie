@@ -18,15 +18,11 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.validation.ConstraintViolationException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Test the CommonFields class and methods.
@@ -153,147 +149,5 @@ public class CommonFieldsTests extends EntityTestsBase {
         final String description = "Test description";
         this.c.setDescription(description);
         Assert.assertEquals(description, this.c.getDescription());
-    }
-
-    /**
-     * Test the method which adds system tags.
-     *
-     * @throws GeniePreconditionException If a precondition isn't met
-     */
-    @Test
-    public void testAddAndValidateSystemTags() throws GeniePreconditionException {
-        final Set<String> tags = new HashSet<>();
-        final String tag1 = UUID.randomUUID().toString();
-        final String tag2 = UUID.randomUUID().toString();
-        final String tag3 = UUID.randomUUID().toString();
-        tags.add(tag1);
-        tags.add(tag2);
-        tags.add(tag3);
-
-        final String id = UUID.randomUUID().toString();
-        this.c.setId(id);
-
-        this.c.addAndValidateSystemTags(tags);
-        Assert.assertEquals(5, tags.size());
-        Assert.assertTrue(tags.contains(tag1));
-        Assert.assertTrue(tags.contains(tag2));
-        Assert.assertTrue(tags.contains(tag3));
-        Assert.assertTrue(tags.contains(CommonFields.GENIE_ID_TAG_NAMESPACE + id));
-        Assert.assertTrue(tags.contains(CommonFields.GENIE_NAME_TAG_NAMESPACE + NAME));
-    }
-
-    /**
-     * Test the method which adds system tags.
-     *
-     * @throws GeniePreconditionException If a precondition isn't met
-     */
-    @Test
-    public void testAddAndValidateSystemTagsWithChangedName() throws GeniePreconditionException {
-        final Set<String> tags = new HashSet<>();
-        final String tag1 = UUID.randomUUID().toString();
-        final String tag2 = UUID.randomUUID().toString();
-        final String tag3 = UUID.randomUUID().toString();
-        tags.add(tag1);
-        tags.add(tag2);
-        tags.add(tag3);
-
-        final String id = UUID.randomUUID().toString();
-        this.c.setId(id);
-
-        this.c.addAndValidateSystemTags(tags);
-        Assert.assertEquals(5, tags.size());
-        Assert.assertTrue(tags.contains(tag1));
-        Assert.assertTrue(tags.contains(tag2));
-        Assert.assertTrue(tags.contains(tag3));
-        Assert.assertTrue(tags.contains(CommonFields.GENIE_ID_TAG_NAMESPACE + id));
-        Assert.assertTrue(tags.contains(CommonFields.GENIE_NAME_TAG_NAMESPACE + NAME));
-
-        final String newName = UUID.randomUUID().toString();
-        this.c.setName(newName);
-
-        this.c.addAndValidateSystemTags(tags);
-        Assert.assertEquals(5, tags.size());
-        Assert.assertTrue(tags.contains(tag1));
-        Assert.assertTrue(tags.contains(tag2));
-        Assert.assertTrue(tags.contains(tag3));
-        Assert.assertTrue(tags.contains(CommonFields.GENIE_ID_TAG_NAMESPACE + id));
-        Assert.assertTrue(tags.contains(CommonFields.GENIE_NAME_TAG_NAMESPACE + newName));
-    }
-
-    /**
-     * Test the method which adds system tags.
-     *
-     * @throws GeniePreconditionException If a precondition isn't met
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testAddAndValidateSystemTagsNullTags() throws GeniePreconditionException {
-        this.c.addAndValidateSystemTags(null);
-    }
-
-    /**
-     * Test the method which adds system tags.
-     *
-     * @throws GeniePreconditionException If a precondition isn't met
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testAddAndValidateSystemTagsWithTooManyIdTags() throws GeniePreconditionException {
-        final Set<String> tags = new HashSet<>();
-        final String tag1 = UUID.randomUUID().toString();
-        final String tag2 = UUID.randomUUID().toString();
-        final String tag3 = UUID.randomUUID().toString();
-        tags.add(tag1);
-        tags.add(tag2);
-        tags.add(tag3);
-
-        final String id = UUID.randomUUID().toString();
-        this.c.setId(id);
-        tags.add(CommonFields.GENIE_ID_TAG_NAMESPACE + UUID.randomUUID().toString());
-
-        this.c.addAndValidateSystemTags(tags);
-    }
-
-    /**
-     * Test the method which adds system tags.
-     *
-     * @throws GeniePreconditionException If a precondition isn't met
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testAddAndValidateSystemTagsWithTooManyNameTags() throws GeniePreconditionException {
-        final Set<String> tags = new HashSet<>();
-        final String tag1 = UUID.randomUUID().toString();
-        final String tag2 = UUID.randomUUID().toString();
-        final String tag3 = UUID.randomUUID().toString();
-        tags.add(tag1);
-        tags.add(tag2);
-        tags.add(tag3);
-        tags.add(CommonFields.GENIE_NAME_TAG_NAMESPACE + UUID.randomUUID().toString());
-        tags.add(CommonFields.GENIE_NAME_TAG_NAMESPACE + UUID.randomUUID().toString());
-
-        final String id = UUID.randomUUID().toString();
-        this.c.setId(id);
-
-        this.c.addAndValidateSystemTags(tags);
-    }
-
-    /**
-     * Test the method which adds system tags.
-     *
-     * @throws GeniePreconditionException If a precondition isn't met
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testAddAndValidateSystemTagsWithTooManyGenieNamespaceTags() throws GeniePreconditionException {
-        final Set<String> tags = new HashSet<>();
-        final String tag1 = UUID.randomUUID().toString();
-        final String tag2 = UUID.randomUUID().toString();
-        final String tag3 = UUID.randomUUID().toString();
-        tags.add(tag1);
-        tags.add(tag2);
-        tags.add(tag3);
-        tags.add(CommonFields.GENIE_TAG_NAMESPACE + UUID.randomUUID().toString());
-
-        final String id = UUID.randomUUID().toString();
-        this.c.setId(id);
-
-        this.c.addAndValidateSystemTags(tags);
     }
 }

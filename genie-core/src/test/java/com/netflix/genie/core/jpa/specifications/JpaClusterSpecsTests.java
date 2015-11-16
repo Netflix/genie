@@ -15,6 +15,7 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -23,7 +24,6 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity_;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -69,6 +69,8 @@ public class JpaClusterSpecsTests {
     private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
     private ListJoin<ClusterEntity, CommandEntity> commands;
+    private String tagLikeStatement;
+    private String commandLikeStatement;
 
     /**
      * Setup test wide variables.
@@ -132,6 +134,24 @@ public class JpaClusterSpecsTests {
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(ClusterStatus.class)))
                 .thenReturn(equalStatusPredicate);
 
+        final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
+        final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(ClusterEntity_.sortedTags)).thenReturn(tagPath);
+        Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class))).thenReturn(likeTagPredicate);
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append("%");
+        TAGS.stream().sorted().forEach(tag -> builder.append(tag).append("%"));
+        this.tagLikeStatement = builder.toString();
+
+        builder.setLength(0);
+        builder.append("%");
+        Sets.newHashSet(COMMAND_CRITERIA_TAG_1, COMMAND_CRITERIA_TAG_2)
+                .stream()
+                .sorted()
+                .forEach(tag -> builder.append(tag).append("%"));
+        this.commandLikeStatement = builder.toString();
+
         // Setup for findByClusterAndCommandCriteria
         Mockito.when(this.root.join(ClusterEntity_.commands)).thenReturn(this.commands);
     }
@@ -161,10 +181,8 @@ public class JpaClusterSpecsTests {
                 .lessThan(
                         this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
                 );
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ClusterEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ClusterEntity_.sortedTags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ClusterEntity_.status), status);
@@ -196,10 +214,8 @@ public class JpaClusterSpecsTests {
                 .lessThan(
                         this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
                 );
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ClusterEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ClusterEntity_.sortedTags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ClusterEntity_.status), status);
@@ -231,10 +247,8 @@ public class JpaClusterSpecsTests {
                 .lessThan(
                         this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
                 );
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ClusterEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ClusterEntity_.sortedTags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
                     .equal(this.root.get(ClusterEntity_.status), status);
@@ -266,10 +280,8 @@ public class JpaClusterSpecsTests {
                 .lessThan(
                         this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
                 );
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ClusterEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ClusterEntity_.sortedTags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
                     .equal(this.root.get(ClusterEntity_.status), status);
@@ -301,10 +313,8 @@ public class JpaClusterSpecsTests {
                 .lessThan(
                         this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
                 );
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.never())
-                    .isMember(tag, this.root.get(ClusterEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.never())
+                .like(this.root.get(ClusterEntity_.sortedTags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ClusterEntity_.status), status);
@@ -336,10 +346,8 @@ public class JpaClusterSpecsTests {
                 .lessThan(
                         this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
                 );
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ClusterEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ClusterEntity_.sortedTags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ClusterEntity_.status), status);
@@ -371,10 +379,8 @@ public class JpaClusterSpecsTests {
                 .lessThan(
                         this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
                 );
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ClusterEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ClusterEntity_.sortedTags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ClusterEntity_.status), status);
@@ -407,15 +413,8 @@ public class JpaClusterSpecsTests {
                 .lessThan(
                         this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
                 );
-        for (final String tag : TAGS) {
-            if (StringUtils.isBlank(tag)) {
-                Mockito.verify(this.cb, Mockito.never())
-                        .isMember(tag, this.root.get(ClusterEntity_.tags));
-            } else {
-                Mockito.verify(this.cb, Mockito.times(1))
-                        .isMember(tag, this.root.get(ClusterEntity_.tags));
-            }
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ClusterEntity_.sortedTags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ClusterEntity_.status), status);
@@ -450,25 +449,19 @@ public class JpaClusterSpecsTests {
     @Test
     public void testFindByClusterAndCommandCriteria() throws GenieException {
         final ClusterCriteria criteria = new ClusterCriteria(CLUSTER_CRITERIA_TAGS);
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .findByClusterAndCommandCriteria(criteria, COMMAND_CRITERIA);
+        final Specification<ClusterEntity> spec
+                = JpaClusterSpecs.findByClusterAndCommandCriteria(criteria, COMMAND_CRITERIA);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cq, Mockito.times(1)).distinct(true);
-        Mockito.verify(this.commands, Mockito.times(1)).get(CommandEntity_.status);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.commands.get(CommandEntity_.status), CommandStatus.ACTIVE);
-        Mockito.verify(this.root, Mockito.times(1)).get(ClusterEntity_.status);
+                .equal(Mockito.eq(this.commands.get(CommandEntity_.status)), Mockito.eq(CommandStatus.ACTIVE));
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ClusterEntity_.status), ClusterStatus.UP);
-        Mockito.verify(this.commands, Mockito.times(COMMAND_CRITERIA.size()))
-                .get(CommandEntity_.tags);
-        Mockito.verify(this.root, Mockito.times(CLUSTER_CRITERIA_TAGS.size()))
-                .get(ClusterEntity_.tags);
-        Mockito.verify(
-                this.cb,
-                Mockito.times(COMMAND_CRITERIA.size() + CLUSTER_CRITERIA_TAGS.size()))
-                .isMember(Mockito.any(String.class), Mockito.any(Expression.class));
+                .equal(Mockito.eq(this.root.get(ClusterEntity_.status)), Mockito.eq(ClusterStatus.UP));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(Mockito.eq(this.root.get(ClusterEntity_.sortedTags)), Mockito.eq(this.tagLikeStatement));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(Mockito.eq(this.commands.get(CommandEntity_.sortedTags)), Mockito.eq(this.commandLikeStatement));
     }
 
     /**

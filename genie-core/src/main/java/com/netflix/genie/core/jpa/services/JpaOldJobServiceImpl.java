@@ -195,8 +195,7 @@ public class JpaOldJobServiceImpl implements OldJobService {
                         clusterName,
                         clusterId,
                         commandName,
-                        commandId,
-                        false),
+                        commandId),
                 page
         );
         return jobEntities.map(JobEntity::getDTO);

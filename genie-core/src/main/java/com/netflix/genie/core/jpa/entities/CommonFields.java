@@ -17,15 +17,19 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import org.hibernate.validator.constraints.Length;
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.exceptions.GenieException;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.Size;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * The common entity fields for all Genie entities.
@@ -35,48 +39,43 @@ import java.util.Set;
  */
 @MappedSuperclass
 public class CommonFields extends BaseEntity {
-
-    /**
-     * The namespace to use for genie specific tags.
-     */
     protected static final String GENIE_TAG_NAMESPACE = "genie.";
-
-    /**
-     * The namespace to use for the id.
-     */
     protected static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
-
-    /**
-     * The namespace to use for the name.
-     */
     protected static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
-
-    private static final int MAX_ID_TAG_NAMESPACE = 1;
-    private static final int MAX_NAME_TAG_NAMESPACE = 1;
-    private static final int MAX_TAG_GENIE_NAMESPACE = 2;
+    protected static final String COMMA = ",";
 
     @Basic(optional = false)
     @Column(name = "version", nullable = false, length = 255)
     @NotBlank(message = "Version is missing and is required.")
-    @Length(max = 255, message = "Max length in database is 255 characters")
+    @Size(max = 255, message = "Max length in database is 255 characters")
     private String version;
 
     @Basic(optional = false)
     @Column(name = "user", nullable = false, length = 255)
     @NotBlank(message = "User name is missing and is required.")
-    @Length(max = 255, message = "Max length in database is 255 characters")
+    @Size(max = 255, message = "Max length in database is 255 characters")
     private String user;
 
     @Basic(optional = false)
     @Column(name = "name", nullable = false, length = 255)
     @NotBlank(message = "Name is missing and is required.")
-    @Length(max = 255, message = "Max length in database is 255 characters")
+    @Size(max = 255, message = "Max length in database is 255 characters")
     private String name;
 
     @Lob
     @Basic
     @Column(name = "description")
     private String description;
+
+    @Basic
+    @Column(name = "original_tags", length = 2048)
+    @Size(max = 2048, message = "Max length in database is 2048 characters")
+    private String originalTags;
+
+    @Basic
+    @Column(name = "sorted_tags", length = 2048)
+    @Size(max = 2048, message = "Max length in database is 2048 characters")
+    private String sortedTags;
 
     /**
      * Default constructor.
@@ -88,9 +87,9 @@ public class CommonFields extends BaseEntity {
     /**
      * Construct a new CommonEntity Object with all required parameters.
      *
-     * @param name        The name of the entity. Not null/empty/blank.
-     * @param user        The user who created the entity. Not null/empty/blank.
-     * @param version     The version of this entity. Not null/empty/blank.
+     * @param name    The name of the entity. Not null/empty/blank.
+     * @param user    The user who created the entity. Not null/empty/blank.
+     * @param version The version of this entity. Not null/empty/blank.
      */
     public CommonFields(
             final String name,
@@ -176,70 +175,68 @@ public class CommonFields extends BaseEntity {
     }
 
     /**
-     * Reusable method for adding the system tags to the set of tags.
+     * Get the original tags as csv.
      *
-     * @param tags The tags to add the system tags to.
-     * @throws GeniePreconditionException If a precondition is violated.
+     * @return The original tags delimited with a comma
      */
-    protected void addAndValidateSystemTags(final Set<String> tags) throws GeniePreconditionException {
-        if (tags == null) {
-            throw new GeniePreconditionException("No tags entered. Unable to continue.");
-        }
-        // Add Genie tags to the app and make sure if old ones existed they're removed
-        tags.add(GENIE_ID_TAG_NAMESPACE + this.getId());
-        String oldNameTag = null;
-        for (final String tag : tags) {
-            if (tag.startsWith(GENIE_NAME_TAG_NAMESPACE)
-                    && !tag.equalsIgnoreCase(GENIE_NAME_TAG_NAMESPACE + this.name)) {
-                oldNameTag = tag;
-                break;
-            }
-        }
-        if (oldNameTag != null) {
-            tags.remove(oldNameTag);
-        }
-        tags.add(GENIE_NAME_TAG_NAMESPACE + this.name);
+    protected String getOriginalTags() {
+        return this.originalTags;
+    }
 
+    /**
+     * Set the original tags csv.
+     *
+     * @param originalTags the string
+     */
+    protected void setOriginalTags(final String originalTags) {
+        this.originalTags = originalTags;
+    }
 
-        int genieNameSpaceCount = 0;
-        int genieIdTagCount = 0;
-        int genieNameTagCount = 0;
-        for (final String tag : tags) {
-            if (tag.contains(GENIE_TAG_NAMESPACE)) {
-                genieNameSpaceCount++;
-                if (tag.contains(GENIE_ID_TAG_NAMESPACE)) {
-                    genieIdTagCount++;
-                } else if (tag.contains(GENIE_NAME_TAG_NAMESPACE)) {
-                    genieNameTagCount++;
-                }
-            }
+    /**
+     * Get the original tags as a sorted lowercase csv.
+     *
+     * @return The sorted tags
+     */
+    protected String getSortedTags() {
+        return this.sortedTags;
+    }
+
+    /**
+     * Set the original tags as a sorted lowercase csv.
+     *
+     * @param sortedTags The new sorted tags
+     */
+    protected void setSortedTags(final String sortedTags) {
+        this.sortedTags = sortedTags;
+    }
+
+    protected void setOriginalAndSortedTags(final Set<String> tags) {
+        this.originalTags = null;
+        this.sortedTags = null;
+        if (tags != null && !tags.isEmpty()) {
+            this.originalTags = StringUtils.join(tags, COMMA);
+            this.sortedTags = tags
+                    .stream()
+                    .map(String::toLowerCase)
+                    .sorted()
+                    .reduce((one, two) -> one + COMMA + two)
+                    .get();
         }
-        if (genieIdTagCount > MAX_ID_TAG_NAMESPACE) {
-            throw new GeniePreconditionException(
-                    "More Genie id namespace tags encountered ("
-                            + genieIdTagCount
-                            + ") than expected ("
-                            + MAX_ID_TAG_NAMESPACE
-                            + ")."
-            );
+    }
+
+    protected Set<String> getFinalTags() throws GenieException {
+        final Set<String> finalTags
+                = this.getOriginalTags() == null
+                ? Sets.newHashSet()
+                : Sets.newHashSet(this.getOriginalTags().split(COMMA))
+                .stream()
+                .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
+                .collect(Collectors.toSet());
+        if (this.getId() == null) {
+            this.setId(UUID.randomUUID().toString());
         }
-        if (genieNameTagCount > MAX_NAME_TAG_NAMESPACE) {
-            throw new GeniePreconditionException(
-                    "More Genie name namespace tags encountered ("
-                            + genieNameTagCount
-                            + ") than expected ("
-                            + MAX_NAME_TAG_NAMESPACE
-                            + ")."
-            );
-        }
-        if (genieNameSpaceCount > MAX_TAG_GENIE_NAMESPACE) {
-            throw new GeniePreconditionException(
-                    "More Genie namespace tags encountered ("
-                            + genieNameSpaceCount
-                            + ") than expected ("
-                            + MAX_TAG_GENIE_NAMESPACE
-                            + ")."
-            );
-        }
+        finalTags.add(GENIE_ID_TAG_NAMESPACE + this.getId());
+        finalTags.add(GENIE_NAME_TAG_NAMESPACE + this.getName());
+        return finalTags;
     }
 }

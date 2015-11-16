@@ -78,9 +78,14 @@ public final class JpaClusterSpecs {
                 predicates.add(cb.lessThan(root.get(ClusterEntity_.updated), new Date(maxUpdateTime)));
             }
             if (tags != null) {
+                final StringBuilder builder = new StringBuilder();
+                builder.append("%");
                 tags.stream()
                         .filter(StringUtils::isNotBlank)
-                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(ClusterEntity_.tags))));
+                        .map(String::toLowerCase)
+                        .sorted()
+                        .forEach(tag -> builder.append(tag).append("%"));
+                predicates.add(cb.like(root.get(ClusterEntity_.sortedTags), builder.toString()));
             }
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
@@ -116,16 +121,25 @@ public final class JpaClusterSpecs {
             predicates.add(cb.equal(root.get(ClusterEntity_.status), ClusterStatus.UP));
 
             if (commandCriteria != null) {
-                for (final String tag : commandCriteria) {
-                    predicates.add(cb.isMember(tag, commands.get(CommandEntity_.tags)));
-
-                }
+                final StringBuilder builder = new StringBuilder();
+                builder.append("%");
+                commandCriteria.stream()
+                        .filter(StringUtils::isNotBlank)
+                        .map(String::toLowerCase)
+                        .sorted()
+                        .forEach(tag -> builder.append(tag).append("%"));
+                predicates.add(cb.like(commands.get(CommandEntity_.sortedTags), builder.toString()));
             }
 
             if (clusterCriteria != null) {
-                for (final String tag : clusterCriteria.getTags()) {
-                    predicates.add(cb.isMember(tag, root.get(ClusterEntity_.tags)));
-                }
+                final StringBuilder builder = new StringBuilder();
+                builder.append("%");
+                clusterCriteria.getTags().stream()
+                        .filter(StringUtils::isNotBlank)
+                        .map(String::toLowerCase)
+                        .sorted()
+                        .forEach(tag -> builder.append(tag).append("%"));
+                predicates.add(cb.like(root.get(ClusterEntity_.sortedTags), builder.toString()));
             }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));

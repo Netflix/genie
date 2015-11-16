@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -69,7 +70,6 @@ import java.util.stream.Collectors;
 public class JpaClusterServiceImpl implements ClusterService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JpaClusterServiceImpl.class);
-    private static final char CRITERIA_DELIMITER = ',';
     private final JpaClusterRepository clusterRepo;
     private final JpaCommandRepository commandRepo;
     private final JpaJobRepository jobRepo;
@@ -118,7 +118,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         clusterEntity.setClusterType(cluster.getClusterType());
         clusterEntity.setStatus(cluster.getStatus());
         clusterEntity.setConfigs(cluster.getConfigs());
-        clusterEntity.setTags(cluster.getTags());
+        clusterEntity.setClusterTags(cluster.getTags());
 
         return this.clusterRepo.save(clusterEntity).getId();
     }
@@ -236,7 +236,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         clusterEntity.setClusterType(updateCluster.getClusterType());
         clusterEntity.setStatus(updateCluster.getStatus());
         clusterEntity.setConfigs(updateCluster.getConfigs());
-        clusterEntity.setTags(updateCluster.getTags());
+        clusterEntity.setClusterTags(updateCluster.getTags());
 
         this.clusterRepo.save(clusterEntity);
     }
@@ -347,7 +347,10 @@ public class JpaClusterServiceImpl implements ClusterService {
             @NotEmpty(message = "No tags entered. Unable to add to tags.")
             final Set<String> tags
     ) throws GenieException {
-        this.findCluster(id).getTags().addAll(tags);
+        final ClusterEntity cluster = this.findCluster(id);
+        final Set<String> clusterTags = cluster.getClusterTags();
+        clusterTags.addAll(tags);
+        cluster.setClusterTags(clusterTags);
     }
 
     /**
@@ -359,7 +362,7 @@ public class JpaClusterServiceImpl implements ClusterService {
             @NotBlank(message = "No cluster id sent. Cannot retrieve tags.")
             final String id
     ) throws GenieException {
-        return this.findCluster(id).getTags();
+        return this.findCluster(id).getClusterTags();
     }
 
     /**
@@ -372,7 +375,7 @@ public class JpaClusterServiceImpl implements ClusterService {
             @NotEmpty(message = "No tags entered. Unable to update.")
             final Set<String> tags
     ) throws GenieException {
-        this.findCluster(id).setTags(tags);
+        this.findCluster(id).setClusterTags(tags);
     }
 
     /**
@@ -383,7 +386,7 @@ public class JpaClusterServiceImpl implements ClusterService {
             @NotBlank(message = "No cluster id entered. Unable to remove tags.")
             final String id
     ) throws GenieException {
-        this.findCluster(id).getTags().clear();
+        this.findCluster(id).setClusterTags(Sets.newHashSet());
     }
 
     /**
@@ -396,7 +399,10 @@ public class JpaClusterServiceImpl implements ClusterService {
             @NotBlank(message = "No tag entered. Unable to remove.")
             final String tag
     ) throws GenieException {
-        this.findCluster(id).getTags().remove(tag);
+        final ClusterEntity cluster = this.findCluster(id);
+        final Set<String> tags = cluster.getClusterTags();
+        tags.remove(tag);
+        cluster.setClusterTags(tags);
     }
 
     /**

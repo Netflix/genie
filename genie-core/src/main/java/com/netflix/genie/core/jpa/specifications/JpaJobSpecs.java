@@ -61,7 +61,6 @@ public final class JpaJobSpecs {
      * @param clusterId       The cluster id
      * @param commandName     The command name
      * @param commandId       The command id
-     * @param useEmbeddedTags Whether to use embedded tags or not
      * @return The specification
      */
     public static Specification<JobEntity> find(
@@ -73,8 +72,7 @@ public final class JpaJobSpecs {
             final String clusterName,
             final String clusterId,
             final String commandName,
-            final String commandId,
-            final boolean useEmbeddedTags
+            final String commandId
     ) {
         return (final Root<JobEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
@@ -96,22 +94,14 @@ public final class JpaJobSpecs {
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null) {
-                if (!useEmbeddedTags) {
-                    tags.stream()
-                            .filter(StringUtils::isNotBlank)
-                            .forEach(tag -> predicates.add(cb.isMember(tag, root.get(JobEntity_.tags))));
-                } else {
-                    final StringBuilder builder = new StringBuilder();
-                    builder.append("%");
-                    tags.stream()
-                            .filter(StringUtils::isNotBlank)
-                            .map(String::toLowerCase)
-                            .sorted()
-                            .forEach(tag -> builder.append(tag).append("%"));
-
-                    LOG.info("REGEX = " + builder.toString());
-                    predicates.add(cb.like(root.get(JobEntity_.sortedTags), builder.toString()));
-                }
+                final StringBuilder builder = new StringBuilder();
+                builder.append("%");
+                tags.stream()
+                        .filter(StringUtils::isNotBlank)
+                        .map(String::toLowerCase)
+                        .sorted()
+                        .forEach(tag -> builder.append(tag).append("%"));
+                predicates.add(cb.like(root.get(JobEntity_.sortedTags), builder.toString()));
             }
             if (StringUtils.isNotBlank(clusterId)) {
                 predicates.add(cb.equal(root.get(JobEntity_.cluster), clusterId));

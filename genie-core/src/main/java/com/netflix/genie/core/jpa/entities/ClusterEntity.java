@@ -17,8 +17,10 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -36,8 +38,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -129,12 +131,12 @@ public class ClusterEntity extends CommonFields {
     /**
      * Check to make sure everything is OK before persisting.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
-    @PostPersist
-    @PostUpdate
-    protected void onCreateOrUpdateCluster() throws GeniePreconditionException {
-        this.addAndValidateSystemTags(this.tags);
+    @PrePersist
+    @PreUpdate
+    protected void onCreateOrUpdateCluster() throws GenieException {
+        this.setClusterTags(this.getFinalTags());
     }
 
     /**
@@ -239,11 +241,35 @@ public class ClusterEntity extends CommonFields {
     }
 
     /**
+     * Get the set of tags for this cluster.
+     *
+     * @return The cluster tags
+     */
+    public Set<String> getClusterTags() {
+        return this.getOriginalTags() == null
+                ? Sets.newHashSet()
+                : Sets.newHashSet(this.getOriginalTags().split(COMMA));
+    }
+
+    /**
+     * Set the tags for the cluster.
+     *
+     * @param clusterTags The tags for the cluster
+     */
+    public void setClusterTags(final Set<String> clusterTags) {
+        this.setOriginalAndSortedTags(clusterTags);
+        this.tags.clear();
+        if (clusterTags != null) {
+            this.tags.addAll(clusterTags);
+        }
+    }
+
+    /**
      * Gets the tags allocated to this cluster.
      *
      * @return the tags
      */
-    public Set<String> getTags() {
+    protected Set<String> getTags() {
         return this.tags;
     }
 
@@ -252,7 +278,7 @@ public class ClusterEntity extends CommonFields {
      *
      * @param tags the tags to set. Not Null.
      */
-    public void setTags(final Set<String> tags) {
+    protected void setTags(final Set<String> tags) {
         this.tags.clear();
         if (tags != null) {
             this.tags.addAll(tags);
@@ -329,17 +355,6 @@ public class ClusterEntity extends CommonFields {
     }
 
     /**
-     * Add a job to the set of jobs this cluster ran.
-     *
-     * @param job The job
-     */
-    public void addJob(final JobEntity job) {
-        if (job != null) {
-            this.jobs.add(job);
-        }
-    }
-
-    /**
      * Set the jobs run on this cluster.
      *
      * @param jobs The jobs
@@ -349,6 +364,17 @@ public class ClusterEntity extends CommonFields {
 
         if (jobs != null) {
             this.jobs.addAll(jobs);
+        }
+    }
+
+    /**
+     * Add a job to the set of jobs this cluster ran.
+     *
+     * @param job The job
+     */
+    public void addJob(final JobEntity job) {
+        if (job != null) {
+            this.jobs.add(job);
         }
     }
 

@@ -18,7 +18,6 @@ package com.netflix.genie.core.jpa.specifications;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -52,6 +50,7 @@ public class JpaApplicationSpecsTests {
     private Root<ApplicationEntity> root;
     private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
+    private String tagLikeStatement;
 
     /**
      * Setup some variables.
@@ -90,11 +89,16 @@ public class JpaApplicationSpecsTests {
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(ApplicationStatus.class)))
                 .thenReturn(equalStatusPredicate);
 
-        final Expression<Set<String>> tagExpression = (Expression<Set<String>>) Mockito.mock(Expression.class);
-        final Predicate isMemberTagPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(ApplicationEntity_.tags)).thenReturn(tagExpression);
-        Mockito.when(this.cb.isMember(Mockito.any(String.class), Mockito.eq(tagExpression)))
-                .thenReturn(isMemberTagPredicate);
+        final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
+        final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(ApplicationEntity_.sortedTags)).thenReturn(tagPath);
+        Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class)))
+                .thenReturn(likeTagPredicate);
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append("%");
+        TAGS.stream().sorted().forEach(tag -> builder.append(tag).append("%"));
+        this.tagLikeStatement = builder.toString();
     }
 
     /**
@@ -114,10 +118,8 @@ public class JpaApplicationSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ApplicationEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -137,10 +139,8 @@ public class JpaApplicationSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ApplicationEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -160,10 +160,8 @@ public class JpaApplicationSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ApplicationEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -183,10 +181,8 @@ public class JpaApplicationSpecsTests {
             Mockito.verify(this.cb, Mockito.never())
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ApplicationEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -206,10 +202,8 @@ public class JpaApplicationSpecsTests {
             Mockito.verify(this.cb, Mockito.never())
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(ApplicationEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -229,10 +223,8 @@ public class JpaApplicationSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.never())
-                    .isMember(tag, this.root.get(ApplicationEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.never())
+                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -253,15 +245,8 @@ public class JpaApplicationSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            if (StringUtils.isBlank(tag)) {
-                Mockito.verify(this.cb, Mockito.never())
-                        .isMember(tag, this.root.get(ApplicationEntity_.tags));
-            } else {
-                Mockito.verify(this.cb, Mockito.times(1))
-                        .isMember(tag, this.root.get(ApplicationEntity_.tags));
-            }
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**

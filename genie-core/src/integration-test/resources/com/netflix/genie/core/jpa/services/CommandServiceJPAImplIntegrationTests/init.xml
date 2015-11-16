@@ -23,7 +23,10 @@
             name="tez"
             version="1.2.3"
             status="ACTIVE"
-            entity_version="0"/>
+            entity_version="0"
+            original_tags="genie.id:app1,genie.name:tez,prod,yarn"
+            sorted_tags="genie.id:app1,genie.name:tez,prod,yarn"
+    />
     <application_tags
             application_id="app1"
             tag="genie.id:app1"/>
@@ -59,7 +62,10 @@
             executable="pig"
             job_type="yarn"
             status="ACTIVE"
-            entity_version="0"/>
+            entity_version="0"
+            original_tags="genie.id:command1,genie.name:pig_13_prod,pig,prod,tez"
+            sorted_tags="genie.id:command1,genie.name:pig_13_prod,pig,prod,tez"
+    />
     <command_configs
             command_id="command1"
             config="s3://some/config/file"/>
@@ -92,7 +98,10 @@
             executable="hive"
             job_type="yarn"
             status="INACTIVE"
-            entity_version="0"/>
+            entity_version="0"
+            original_tags="genie.id:command2,genie.name:hive_11_prod,hive,prod"
+            sorted_tags="genie.id:command2,genie.name:hive_11_prod,hive,prod"
+    />
     <command_configs
             command_id="command2"
             config="s3://some/config/file"/>
@@ -119,7 +128,10 @@
             executable="pig"
             job_type="yarn"
             status="DEPRECATED"
-            entity_version="0"/>
+            entity_version="0"
+            original_tags="deprecated,genie.id:command3,genie.name:pig_11_prod,pig,prod"
+            sorted_tags="deprecated,genie.id:command3,genie.name:pig_11_prod,pig,prod"
+    />
     <command_configs
             command_id="command3"
             config="s3://some/config/file"/>
@@ -148,7 +160,10 @@
             version="2.4.0"
             cluster_type="yarn"
             status="UP"
-            entity_version="0"/>
+            entity_version="0"
+            original_tags="genie.id:cluster1,genie.name:h2prod,hive,pig,prod"
+            sorted_tags="genie.id:cluster1,genie.name:h2prod,hive,pig,prod"
+    />
     <cluster_configs
             cluster_id="cluster1"
             config="s3://some/config/file"/>

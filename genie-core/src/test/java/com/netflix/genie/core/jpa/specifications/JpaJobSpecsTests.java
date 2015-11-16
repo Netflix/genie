@@ -28,7 +28,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -58,6 +57,7 @@ public class JpaJobSpecsTests {
     private Root<JobEntity> root;
     private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
+    private String tagLikeStatement;
 
     /**
      * Setup the mocks.
@@ -93,12 +93,6 @@ public class JpaJobSpecsTests {
         Mockito.when(this.cb.equal(userNamePath, USER_NAME))
                 .thenReturn(equalUserNamePredicate);
 
-        final Expression<Set<String>> tagExpression = (Expression<Set<String>>) Mockito.mock(Expression.class);
-        final Predicate isMemberTagPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.tags)).thenReturn(tagExpression);
-        Mockito.when(this.cb.isMember(Mockito.any(String.class), Mockito.eq(tagExpression)))
-                .thenReturn(isMemberTagPredicate);
-
         final Path<JobStatus> statusPath = (Path<JobStatus>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.status)).thenReturn(statusPath);
@@ -132,6 +126,17 @@ public class JpaJobSpecsTests {
                 .thenReturn(commandIdPath);
         Mockito.when(this.cb.equal(clusterIdPath, COMMAND_ID))
                 .thenReturn(equalCommandIdPredicate);
+
+        final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
+        final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(JobEntity_.sortedTags)).thenReturn(tagPath);
+        Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class)))
+                .thenReturn(likeTagPredicate);
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append("%");
+        TAGS.stream().sorted().forEach(tag -> builder.append(tag).append("%"));
+        this.tagLikeStatement = builder.toString();
     }
 
     /**
@@ -148,8 +153,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -171,6 +175,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -187,8 +193,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -210,7 +215,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -227,8 +233,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -250,7 +255,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -267,8 +273,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -290,7 +295,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -307,8 +313,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -330,7 +335,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -347,8 +353,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -370,7 +375,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -387,8 +393,7 @@ public class JpaJobSpecsTests {
                 null,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -410,7 +415,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -427,8 +433,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 null,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -450,7 +455,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -467,8 +473,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 null,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -490,7 +495,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -507,8 +513,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                null,
-                false
+                null
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -530,7 +535,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -547,8 +553,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -570,7 +575,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.never()).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.never())
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -588,8 +594,7 @@ public class JpaJobSpecsTests {
                 CLUSTER_NAME,
                 CLUSTER_ID,
                 COMMAND_NAME,
-                COMMAND_ID,
-                false
+                COMMAND_ID
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
@@ -607,7 +612,8 @@ public class JpaJobSpecsTests {
                 .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
         Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1)).isMember(TAG, this.root.get(JobEntity_.tags));
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**

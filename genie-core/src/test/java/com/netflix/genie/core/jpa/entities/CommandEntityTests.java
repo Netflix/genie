@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,10 +74,10 @@ public class CommandEntityTests extends EntityTestsBase {
     /**
      * Test the argument Constructor.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testConstructor() throws GeniePreconditionException {
+    public void testConstructor() throws GenieException {
         c = new CommandEntity(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
         Assert.assertNull(this.c.getSetupFile());
         Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
@@ -98,10 +99,10 @@ public class CommandEntityTests extends EntityTestsBase {
     /**
      * Test to make sure validation works.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateCommand() throws GeniePreconditionException {
+    public void testOnCreateOrUpdateCommand() throws GenieException {
         this.c = new CommandEntity(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
         Assert.assertNotNull(this.c.getTags());
         Assert.assertTrue(this.c.getTags().isEmpty());

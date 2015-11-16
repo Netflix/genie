@@ -18,7 +18,6 @@ package com.netflix.genie.core.jpa.specifications;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -52,6 +50,7 @@ public class JpaCommandSpecsTests {
     private Root<CommandEntity> root;
     private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
+    private String tagLikeStatement;
 
     /**
      * Setup some variables.
@@ -90,11 +89,15 @@ public class JpaCommandSpecsTests {
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(CommandStatus.class)))
                 .thenReturn(equalStatusPredicate);
 
-        final Expression<Set<String>> tagExpression = (Expression<Set<String>>) Mockito.mock(Expression.class);
-        final Predicate isMemberTagPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(CommandEntity_.tags)).thenReturn(tagExpression);
-        Mockito.when(this.cb.isMember(Mockito.any(String.class), Mockito.eq(tagExpression)))
-                .thenReturn(isMemberTagPredicate);
+        final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
+        final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(CommandEntity_.sortedTags)).thenReturn(tagPath);
+        Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class))).thenReturn(likeTagPredicate);
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append("%");
+        TAGS.stream().sorted().forEach(tag -> builder.append(tag).append("%"));
+        this.tagLikeStatement = builder.toString();
     }
 
     /**
@@ -115,10 +118,8 @@ public class JpaCommandSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(CommandEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(CommandEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -139,10 +140,8 @@ public class JpaCommandSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(CommandEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(CommandEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -163,10 +162,8 @@ public class JpaCommandSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(CommandEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(CommandEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -187,10 +184,8 @@ public class JpaCommandSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(CommandEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.never())
-                    .isMember(tag, this.root.get(CommandEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.never())
+                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -212,15 +207,8 @@ public class JpaCommandSpecsTests {
             Mockito.verify(this.cb, Mockito.times(1))
                     .equal(this.root.get(CommandEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            if (StringUtils.isBlank(tag)) {
-                Mockito.verify(this.cb, Mockito.never())
-                        .isMember(tag, this.root.get(CommandEntity_.tags));
-            } else {
-                Mockito.verify(this.cb, Mockito.times(1))
-                        .isMember(tag, this.root.get(CommandEntity_.tags));
-            }
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -240,10 +228,8 @@ public class JpaCommandSpecsTests {
             Mockito.verify(this.cb, Mockito.never())
                     .equal(this.root.get(CommandEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(CommandEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**
@@ -263,10 +249,8 @@ public class JpaCommandSpecsTests {
             Mockito.verify(this.cb, Mockito.never())
                     .equal(this.root.get(CommandEntity_.status), status);
         }
-        for (final String tag : TAGS) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .isMember(tag, this.root.get(CommandEntity_.tags));
-        }
+        Mockito.verify(this.cb, Mockito.times(1))
+                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
     }
 
     /**

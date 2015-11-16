@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -93,10 +94,10 @@ public class ApplicationEntityTests extends EntityTestsBase {
     /**
      * Test to make sure validation works.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GenieException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateApplication() throws GeniePreconditionException {
+    public void testOnCreateOrUpdateApplication() throws GenieException {
         this.a = new ApplicationEntity(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         Assert.assertNotNull(this.a.getTags());
         this.a.onCreateOrUpdateApplication();

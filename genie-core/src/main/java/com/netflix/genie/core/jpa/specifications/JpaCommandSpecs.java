@@ -75,9 +75,14 @@ public final class JpaCommandSpecs {
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null) {
+                final StringBuilder builder = new StringBuilder();
+                builder.append("%");
                 tags.stream()
                         .filter(StringUtils::isNotBlank)
-                        .forEach(tag -> predicates.add(cb.isMember(tag, root.get(CommandEntity_.tags))));
+                        .map(String::toLowerCase)
+                        .sorted()
+                        .forEach(tag -> builder.append(tag).append("%"));
+                predicates.add(cb.like(root.get(CommandEntity_.sortedTags), builder.toString()));
             }
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };

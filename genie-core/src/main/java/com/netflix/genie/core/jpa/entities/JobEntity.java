@@ -58,8 +58,6 @@ public class JobEntity extends CommonFields {
      */
     protected static final String DEFAULT_VERSION = "NA";
 
-    private static final String COMMA = ",";
-
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
@@ -94,14 +92,6 @@ public class JobEntity extends CommonFields {
     @Column(name = "command_name", length = 255)
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String commandName;
-
-    @Basic
-    @Column(name = "original_tags", length = 2048)
-    private String originalTags;
-
-    @Basic
-    @Column(name = "sorted_tags", length = 2048)
-    private String sortedTags;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
@@ -328,7 +318,9 @@ public class JobEntity extends CommonFields {
      * @return The tags as a set
      */
     public Set<String> getJobTags() {
-        return Sets.newHashSet(this.originalTags.split(COMMA));
+        return this.getOriginalTags() == null
+                ? Sets.newHashSet()
+                : Sets.newHashSet(this.getOriginalTags().split(COMMA));
     }
 
     /**
@@ -337,14 +329,9 @@ public class JobEntity extends CommonFields {
      * @param jobTags The job tags
      */
     public void setJobTags(final Set<String> jobTags) {
+        this.setOriginalAndSortedTags(jobTags);
+        this.tags.clear();
         if (jobTags != null) {
-            this.originalTags = StringUtils.join(jobTags, COMMA);
-            this.sortedTags = tags
-                    .stream()
-                    .map(String::toLowerCase)
-                    .sorted()
-                    .reduce((one, two) -> one + COMMA + two)
-                    .get();
             this.tags.addAll(jobTags);
         }
     }
@@ -368,42 +355,6 @@ public class JobEntity extends CommonFields {
         if (tags != null) {
             this.tags.addAll(tags);
         }
-    }
-
-    /**
-     * Get the original tags as csv.
-     *
-     * @return The original tags delimited with a comma
-     */
-    protected String getOriginalTags() {
-        return this.originalTags;
-    }
-
-    /**
-     * Set the original tags csv.
-     *
-     * @param originalTags the string
-     */
-    protected void setOriginalTags(final String originalTags) {
-        this.originalTags = originalTags;
-    }
-
-    /**
-     * Get the original tags as a sorted lowercase csv.
-     *
-     * @return The sorted tags
-     */
-    protected String getSortedTags() {
-        return this.sortedTags;
-    }
-
-    /**
-     * Set the original tags as a sorted lowercase csv.
-     *
-     * @param sortedTags The new sorted tags
-     */
-    protected void setSortedTags(final String sortedTags) {
-        this.sortedTags = sortedTags;
     }
 
     /**
