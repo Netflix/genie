@@ -93,15 +93,8 @@ public final class JpaJobSpecs {
                                 .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
-            if (tags != null) {
-                final StringBuilder builder = new StringBuilder();
-                builder.append("%");
-                tags.stream()
-                        .filter(StringUtils::isNotBlank)
-                        .map(String::toLowerCase)
-                        .sorted()
-                        .forEach(tag -> builder.append(tag).append("%"));
-                predicates.add(cb.like(root.get(JobEntity_.sortedTags), builder.toString()));
+            if (tags != null && !tags.isEmpty()) {
+                predicates.add(cb.like(root.get(JobEntity_.sortedTags), JpaSpecificationUtils.getTagLikeString(tags)));
             }
             if (StringUtils.isNotBlank(clusterId)) {
                 predicates.add(cb.equal(root.get(JobEntity_.cluster), clusterId));

@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -88,11 +89,6 @@ public class JobRequestEntity extends CommonFields {
     @Column(name = "email", length = 255)
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String email;
-
-    @Basic
-    @Column(name = "tags", length = 2048)
-    @Size(max = 2048, message = "Max length in database is 2048 characters")
-    private String tags;
 
     @Basic(optional = false)
     @Column(name = "cpu", nullable = false)
@@ -356,42 +352,23 @@ public class JobRequestEntity extends CommonFields {
     }
 
     /**
-     * Gets the tags allocated to this job.
-     *
-     * @return the tags as JSON array
-     */
-    protected String getTags() {
-        return this.tags;
-    }
-
-    /**
-     * Sets the tags allocated to this job.
-     *
-     * @param tags the tags to set as JSON array.
-     */
-    protected void setTags(final String tags) {
-        this.tags = tags;
-    }
-
-    /**
      * Gets the tags allocated to this job as a set of strings.
      *
      * @return the tags
      * @throws GenieException For any processing error
      */
-    public Set<String> getTagsAsSet() throws GenieException {
-        return EntityUtils.unmarshall(this.tags, new TypeReference<Set<String>>() {
-        });
+    public Set<String> getTags() throws GenieException {
+        return this.getSortedTags() == null ? Sets.newHashSet() : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
      * Sets the tags allocated to this job.
      *
-     * @param tagsSet the tags to set.
+     * @param tags the tags to set.
      * @throws GenieException for any processing error
      */
-    public void setTagsFromSet(final Set<String> tagsSet) throws GenieException {
-        this.tags = tagsSet == null ? EntityUtils.marshall(new HashSet<>()) : EntityUtils.marshall(tagsSet);
+    public void setTags(final Set<String> tags) throws GenieException {
+        this.setSortedTags(tags);
     }
 
     /**
@@ -471,7 +448,7 @@ public class JobRequestEntity extends CommonFields {
                 .withFileDependencies(this.getFileDependenciesAsSet())
                 .withGroup(this.group)
                 .withSetupFile(this.setupFile)
-                .withTags(this.getTagsAsSet())
+                .withTags(this.getTags())
                 .withCpu(this.cpu)
                 .withMemory(this.memory)
                 .withUpdated(this.getUpdated())

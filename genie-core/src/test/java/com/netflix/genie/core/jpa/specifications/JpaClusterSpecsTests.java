@@ -139,18 +139,11 @@ public class JpaClusterSpecsTests {
         Mockito.when(this.root.get(ClusterEntity_.sortedTags)).thenReturn(tagPath);
         Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class))).thenReturn(likeTagPredicate);
 
-        final StringBuilder builder = new StringBuilder();
-        builder.append("%");
-        TAGS.stream().sorted().forEach(tag -> builder.append(tag).append("%"));
-        this.tagLikeStatement = builder.toString();
+        this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
 
-        builder.setLength(0);
-        builder.append("%");
-        Sets.newHashSet(COMMAND_CRITERIA_TAG_1, COMMAND_CRITERIA_TAG_2)
-                .stream()
-                .sorted()
-                .forEach(tag -> builder.append(tag).append("%"));
-        this.commandLikeStatement = builder.toString();
+        this.commandLikeStatement = JpaSpecificationUtils.getTagLikeString(
+                Sets.newHashSet(COMMAND_CRITERIA_TAG_1, COMMAND_CRITERIA_TAG_2)
+        );
 
         // Setup for findByClusterAndCommandCriteria
         Mockito.when(this.root.join(ClusterEntity_.commands)).thenReturn(this.commands);

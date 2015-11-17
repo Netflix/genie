@@ -42,7 +42,6 @@ ALTER TABLE `Application`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
-  ADD COLUMN `original_tags` VARCHAR(2048) DEFAULT NULL,
   ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
@@ -54,14 +53,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Application table...' 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing application tags for 3.0...' AS '';
 UPDATE `Application` as `a` set `a`.`sorted_tags` =
 (
-  SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
-  FROM `Application_tags` `t`
-  WHERE `a`.`id` = `t`.`APPLICATION_ID`
-  GROUP BY `t`.`APPLICATION_ID`
-);
-UPDATE `Application` as `a` set `a`.`original_tags` =
-(
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR ',')
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
   FROM `Application_tags` `t`
   WHERE `a`.`id` = `t`.`APPLICATION_ID`
   GROUP BY `t`.`APPLICATION_ID`
@@ -102,7 +94,6 @@ ALTER TABLE `Cluster`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
-  ADD COLUMN `original_tags` VARCHAR(2048) DEFAULT NULL,
   ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'OUT_OF_SERVICE',
   CHANGE `clusterType` `cluster_type` VARCHAR(255) NOT NULL,
@@ -114,14 +105,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Cluster table' AS '';
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing cluster tags for 3.0...' AS '';
 UPDATE `Cluster` as `c` set `c`.`sorted_tags` =
 (
-  SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
-  FROM `Cluster_tags` `t`
-  WHERE `c`.`id` = `t`.`CLUSTER_ID`
-  GROUP BY `t`.`CLUSTER_ID`
-);
-UPDATE `Cluster` as `c` set `c`.`original_tags` =
-(
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR ',')
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
   FROM `Cluster_tags` `t`
   WHERE `c`.`id` = `t`.`CLUSTER_ID`
   GROUP BY `t`.`CLUSTER_ID`
@@ -165,7 +149,6 @@ ALTER TABLE `Command`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
-  ADD COLUMN `original_tags` VARCHAR(2048) DEFAULT NULL,
   ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   MODIFY `executable` VARCHAR(255) NOT NULL,
@@ -180,14 +163,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Command table' AS '';
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing command tags for 3.0...' AS '';
 UPDATE `Command` as `c` set `c`.`sorted_tags` =
 (
-  SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
-  FROM `Command_tags` `t`
-  WHERE `c`.`id` = `t`.`COMMAND_ID`
-  GROUP BY `t`.`COMMAND_ID`
-);
-UPDATE `Command` as `c` set `c`.`original_tags` =
-(
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR ',')
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
   FROM `Command_tags` `t`
   WHERE `c`.`id` = `t`.`COMMAND_ID`
   GROUP BY `t`.`COMMAND_ID`
@@ -230,7 +206,7 @@ CREATE TABLE `job_requests` (
   `file_dependencies` TEXT DEFAULT NULL,
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
-  `tags` VARCHAR(2048) DEFAULT NULL,
+  `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   `cpu` INT(11) NOT NULL DEFAULT 1,
   `memory` INT(11) NOT NULL DEFAULT 1560,
   `client_host` VARCHAR(255) DEFAULT NULL,
@@ -257,7 +233,7 @@ INSERT INTO `job_requests` (
   `file_dependencies`,
   `disable_log_archival`,
   `email`,
-  `tags`,
+  `sorted_tags`,
   `cpu`,
   `memory`,
   `client_host`
@@ -279,7 +255,7 @@ INSERT INTO `job_requests` (
                 `j`.`disableLogArchival`,
                 `j`.`email`,
                 (
-                  SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR '","')
+                  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
                   FROM `Job_tags` `t`
                   WHERE `j`.`id` = `t`.`JOB_ID`
                 ),
@@ -287,9 +263,6 @@ INSERT INTO `job_requests` (
                 1560,
                 `j`.`clientHost`
   FROM `Job` `j`;
-UPDATE `job_requests` SET `tags` = RPAD(`tags`, LENGTH(`tags`) + 2, '"]');
-UPDATE `job_requests` SET `tags` = LPAD(`tags`, LENGTH(`tags`) + 2, '["');
-UPDATE `job_requests` SET `tags` = '[]' WHERE `tags` = '[""]' OR `tags` IS NULL;
 -- TODO: Do this in one pass instead of 3?
 UPDATE `job_requests` SET `command_criteria` = RPAD(`command_criteria`, LENGTH(`command_criteria`) + 2, '"]');
 UPDATE `job_requests` SET `command_criteria` = LPAD(`command_criteria`, LENGTH(`command_criteria`) + 2, '["');
@@ -387,7 +360,6 @@ ALTER TABLE `Job`
   CHANGE `executionClusterName` `cluster_name` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandId` `command_id` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandName` `command_name` VARCHAR(255) DEFAULT NULL,
-  ADD COLUMN `original_tags` VARCHAR(2048) DEFAULT NULL,
   ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
   DROP `forwarded`,
   DROP `applicationId`,
@@ -421,14 +393,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Job table' AS '';
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing job tags for 3.0...' AS '';
 UPDATE `Job` as `j` set `j`.`sorted_tags` =
   (
-    SELECT GROUP_CONCAT(DISTINCT LOWER(`t`.`element`) ORDER BY LOWER(`t`.`element`) SEPARATOR ',')
-    FROM `Job_tags` `t`
-    WHERE `j`.`id` = `t`.`JOB_ID`
-    GROUP BY `t`.`JOB_ID`
-  );
-UPDATE `Job` as `j` set `j`.`original_tags` =
-  (
-    SELECT GROUP_CONCAT(DISTINCT `t`.`element` SEPARATOR ',')
+    SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
     FROM `Job_tags` `t`
     WHERE `j`.`id` = `t`.`JOB_ID`
     GROUP BY `t`.`JOB_ID`

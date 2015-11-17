@@ -19,7 +19,6 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
@@ -66,11 +65,6 @@ public class CommonFields extends BaseEntity {
     @Basic
     @Column(name = "description")
     private String description;
-
-    @Basic
-    @Column(name = "original_tags", length = 2048)
-    @Size(max = 2048, message = "Max length in database is 2048 characters")
-    private String originalTags;
 
     @Basic
     @Column(name = "sorted_tags", length = 2048)
@@ -175,24 +169,6 @@ public class CommonFields extends BaseEntity {
     }
 
     /**
-     * Get the original tags as csv.
-     *
-     * @return The original tags delimited with a comma
-     */
-    protected String getOriginalTags() {
-        return this.originalTags;
-    }
-
-    /**
-     * Set the original tags csv.
-     *
-     * @param originalTags the string
-     */
-    protected void setOriginalTags(final String originalTags) {
-        this.originalTags = originalTags;
-    }
-
-    /**
      * Get the original tags as a sorted lowercase csv.
      *
      * @return The sorted tags
@@ -210,25 +186,33 @@ public class CommonFields extends BaseEntity {
         this.sortedTags = sortedTags;
     }
 
-    protected void setOriginalAndSortedTags(final Set<String> tags) {
-        this.originalTags = null;
+    /**
+     * Set the sorted tags.
+     *
+     * @param tags The tags to set
+     */
+    protected void setSortedTags(final Set<String> tags) {
         this.sortedTags = null;
         if (tags != null && !tags.isEmpty()) {
-            this.originalTags = StringUtils.join(tags, COMMA);
             this.sortedTags = tags
                     .stream()
-                    .map(String::toLowerCase)
-                    .sorted()
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
                     .reduce((one, two) -> one + COMMA + two)
                     .get();
         }
     }
 
+    /**
+     * Get the tags with the current genie.id and genie.name tags added into the set.
+     *
+     * @return The final set of tags for storing in the database
+     * @throws GenieException On any exception
+     */
     protected Set<String> getFinalTags() throws GenieException {
         final Set<String> finalTags
-                = this.getOriginalTags() == null
+                = this.getSortedTags() == null
                 ? Sets.newHashSet()
-                : Sets.newHashSet(this.getOriginalTags().split(COMMA))
+                : Sets.newHashSet(this.getSortedTags().split(COMMA))
                 .stream()
                 .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
                 .collect(Collectors.toSet());

@@ -24,7 +24,6 @@
             version="1.2.3"
             status="INACTIVE"
             entity_version="0"
-            original_tags="genie.id:app1,genie.name:tez,prod"
             sorted_tags="genie.id:app1,genie.name:tez,prod"
     />
     <application_tags
@@ -58,7 +57,6 @@
             version="4.5.6"
             status="ACTIVE"
             entity_version="0"
-            original_tags="genie.id:app2,genie.name:spark,prod,yarn"
             sorted_tags="genie.id:app2,genie.name:spark,prod,yarn"
     />
     <application_tags
@@ -92,7 +90,6 @@
             version="7.8.9"
             status="DEPRECATED"
             entity_version="0"
-            original_tags="genie.id:app3,genie.name:storm,prod"
             sorted_tags="genie.id:app3,genie.name:storm,prod"
     />
     <application_tags
@@ -125,7 +122,6 @@
             job_type="yarn"
             status="INACTIVE"
             entity_version="0"
-            original_tags="genie.id:command1,genie.name:pig_13_prod"
             sorted_tags="genie.id:command1,genie.name:genie.name:pig_13_prod"
     />
     <command_tags

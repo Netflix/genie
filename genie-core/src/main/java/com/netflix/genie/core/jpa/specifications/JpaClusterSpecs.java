@@ -77,15 +77,13 @@ public final class JpaClusterSpecs {
             if (maxUpdateTime != null) {
                 predicates.add(cb.lessThan(root.get(ClusterEntity_.updated), new Date(maxUpdateTime)));
             }
-            if (tags != null) {
-                final StringBuilder builder = new StringBuilder();
-                builder.append("%");
-                tags.stream()
-                        .filter(StringUtils::isNotBlank)
-                        .map(String::toLowerCase)
-                        .sorted()
-                        .forEach(tag -> builder.append(tag).append("%"));
-                predicates.add(cb.like(root.get(ClusterEntity_.sortedTags), builder.toString()));
+            if (tags != null && !tags.isEmpty()) {
+                predicates.add(
+                        cb.like(
+                                root.get(ClusterEntity_.sortedTags),
+                                JpaSpecificationUtils.getTagLikeString(tags)
+                        )
+                );
             }
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
@@ -120,26 +118,22 @@ public final class JpaClusterSpecs {
             predicates.add(cb.equal(commands.get(CommandEntity_.status), CommandStatus.ACTIVE));
             predicates.add(cb.equal(root.get(ClusterEntity_.status), ClusterStatus.UP));
 
-            if (commandCriteria != null) {
-                final StringBuilder builder = new StringBuilder();
-                builder.append("%");
-                commandCriteria.stream()
-                        .filter(StringUtils::isNotBlank)
-                        .map(String::toLowerCase)
-                        .sorted()
-                        .forEach(tag -> builder.append(tag).append("%"));
-                predicates.add(cb.like(commands.get(CommandEntity_.sortedTags), builder.toString()));
+            if (commandCriteria != null && !commandCriteria.isEmpty()) {
+                predicates.add(
+                        cb.like(
+                                commands.get(CommandEntity_.sortedTags),
+                                JpaSpecificationUtils.getTagLikeString(commandCriteria)
+                        )
+                );
             }
 
-            if (clusterCriteria != null) {
-                final StringBuilder builder = new StringBuilder();
-                builder.append("%");
-                clusterCriteria.getTags().stream()
-                        .filter(StringUtils::isNotBlank)
-                        .map(String::toLowerCase)
-                        .sorted()
-                        .forEach(tag -> builder.append(tag).append("%"));
-                predicates.add(cb.like(root.get(ClusterEntity_.sortedTags), builder.toString()));
+            if (clusterCriteria != null && clusterCriteria.getTags() != null && !clusterCriteria.getTags().isEmpty()) {
+                predicates.add(
+                        cb.like(
+                                root.get(ClusterEntity_.sortedTags),
+                                JpaSpecificationUtils.getTagLikeString(clusterCriteria.getTags())
+                        )
+                );
             }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));

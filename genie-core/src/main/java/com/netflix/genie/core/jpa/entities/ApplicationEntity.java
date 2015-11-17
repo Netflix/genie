@@ -230,9 +230,9 @@ public class ApplicationEntity extends CommonFields {
      * @return The application tags
      */
     public Set<String> getApplicationTags() {
-        return this.getOriginalTags() == null
+        return this.getSortedTags() == null
                 ? Sets.newHashSet()
-                : Sets.newHashSet(this.getOriginalTags().split(COMMA));
+                : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
@@ -241,7 +241,7 @@ public class ApplicationEntity extends CommonFields {
      * @param applicationTags The tags for the application
      */
     public void setApplicationTags(final Set<String> applicationTags) {
-        this.setOriginalAndSortedTags(applicationTags);
+        this.setSortedTags(applicationTags);
         this.tags.clear();
         if (applicationTags != null) {
             this.tags.addAll(applicationTags);

@@ -318,9 +318,9 @@ public class JobEntity extends CommonFields {
      * @return The tags as a set
      */
     public Set<String> getJobTags() {
-        return this.getOriginalTags() == null
+        return this.getSortedTags() == null
                 ? Sets.newHashSet()
-                : Sets.newHashSet(this.getOriginalTags().split(COMMA));
+                : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
@@ -329,7 +329,7 @@ public class JobEntity extends CommonFields {
      * @param jobTags The job tags
      */
     public void setJobTags(final Set<String> jobTags) {
-        this.setOriginalAndSortedTags(jobTags);
+        this.setSortedTags(jobTags);
         this.tags.clear();
         if (jobTags != null) {
             this.tags.addAll(jobTags);

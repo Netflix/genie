@@ -293,9 +293,9 @@ public class CommandEntity extends CommonFields {
      * @return The command tags
      */
     public Set<String> getCommandTags() {
-        return this.getOriginalTags() == null
+        return this.getSortedTags() == null
                 ? Sets.newHashSet()
-                : Sets.newHashSet(this.getOriginalTags().split(COMMA));
+                : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
@@ -305,7 +305,7 @@ public class CommandEntity extends CommonFields {
      */
     public void setCommandTags(final Set<String> commandTags) {
         this.tags.clear();
-        this.setOriginalAndSortedTags(commandTags);
+        this.setSortedTags(commandTags);
         if (commandTags != null) {
             this.tags.addAll(commandTags);
         }

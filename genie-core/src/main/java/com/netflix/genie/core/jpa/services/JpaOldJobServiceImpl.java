@@ -114,7 +114,7 @@ public class JpaOldJobServiceImpl implements OldJobService {
         requestEntity.setFileDependenciesFromSet(jobRequest.getFileDependencies());
         requestEntity.setGroup(jobRequest.getGroup());
         requestEntity.setSetupFile(jobRequest.getSetupFile());
-        requestEntity.setTagsFromSet(jobRequest.getTags());
+        requestEntity.setTags(jobRequest.getTags());
         requestEntity.setDescription(jobRequest.getDescription());
         requestEntity.setName(jobRequest.getName());
         requestEntity.setUser(jobRequest.getUser());

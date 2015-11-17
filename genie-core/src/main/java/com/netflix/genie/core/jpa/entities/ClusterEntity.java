@@ -246,9 +246,9 @@ public class ClusterEntity extends CommonFields {
      * @return The cluster tags
      */
     public Set<String> getClusterTags() {
-        return this.getOriginalTags() == null
+        return this.getSortedTags() == null
                 ? Sets.newHashSet()
-                : Sets.newHashSet(this.getOriginalTags().split(COMMA));
+                : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
@@ -257,7 +257,7 @@ public class ClusterEntity extends CommonFields {
      * @param clusterTags The tags for the cluster
      */
     public void setClusterTags(final Set<String> clusterTags) {
-        this.setOriginalAndSortedTags(clusterTags);
+        this.setSortedTags(clusterTags);
         this.tags.clear();
         if (clusterTags != null) {
             this.tags.addAll(clusterTags);

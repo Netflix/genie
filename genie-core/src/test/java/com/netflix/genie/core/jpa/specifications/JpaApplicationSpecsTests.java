@@ -95,10 +95,7 @@ public class JpaApplicationSpecsTests {
         Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class)))
                 .thenReturn(likeTagPredicate);
 
-        final StringBuilder builder = new StringBuilder();
-        builder.append("%");
-        TAGS.stream().sorted().forEach(tag -> builder.append(tag).append("%"));
-        this.tagLikeStatement = builder.toString();
+        this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
     }
 
     /**
