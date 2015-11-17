@@ -304,7 +304,7 @@ public class JobRequest extends CommonDTO {
         /**
          * Set the number of cpu's being requested to run the job. Defaults to 1 if not set.
          *
-         * @param cpu The number of cpu's. Must be > 0.
+         * @param cpu The number of cpu's. Must be greater than 0.
          * @return The builder
          */
         public Builder withCpu(@Min(1) final int cpu) {
@@ -315,7 +315,7 @@ public class JobRequest extends CommonDTO {
         /**
          * Set the amount of memory being requested to run the job. Defaults to 1560 MB if not set.
          *
-         * @param memory The amount of memory in terms of MB's. Must be > 0.
+         * @param memory The amount of memory in terms of MB's. Must be greater than 0.
          * @return The builder
          */
         public Builder withMemory(@Min(1) final int memory) {
