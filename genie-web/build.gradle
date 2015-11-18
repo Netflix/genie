@@ -54,6 +54,12 @@ license {
     excludes(["static/*"])
 }
 
+jar {
+    manifest {
+        attributes("Implementation-Version": version)
+    }
+}
+
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
 
 bootRun {

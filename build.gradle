@@ -105,7 +105,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom 'io.spring.platform:platform-bom:2.0.0.RC1'
+            mavenBom 'io.spring.platform:platform-bom:2.0.0.RELEASE'
         }
     }
 

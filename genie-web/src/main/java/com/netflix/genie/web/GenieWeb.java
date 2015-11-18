@@ -18,11 +18,9 @@
 package com.netflix.genie.web;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -35,15 +33,14 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.validation.Validator;
+
 /**
  * Main Genie Spring Configuration class.
  *
  * @author tgianos
  * @since 3.0.0
  */
-@Configuration
-@ComponentScan("com.netflix.genie")
-@EnableAutoConfiguration
+@SpringBootApplication(scanBasePackages = "com.netflix.genie")
 @EnableElasticsearchRepositories("com.netflix.genie.core.elasticsearch.repositories")
 @EnableJpaRepositories("com.netflix.genie.core.jpa.repositories")
 @EntityScan("com.netflix.genie.core.jpa.entities")
