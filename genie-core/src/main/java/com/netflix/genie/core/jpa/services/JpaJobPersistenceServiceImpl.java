@@ -20,9 +20,16 @@ package com.netflix.genie.core.jpa.services;
 import com.netflix.genie.common.dto.Job;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.services.JobPersistenceService;
 import org.hibernate.validator.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 
@@ -33,26 +40,38 @@ import javax.validation.constraints.NotNull;
  */
 @Service
 public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JpaJobPersistenceServiceImpl.class);
+    private final JpaJobRepository jobRepo;
+
     /**
-     * Get job information for given job id.
+     * Default Constructor.
      *
-     * @param id id of job to look up
-     * @return the job
-     * @throws GenieException if there is an error
+     * @param jobRepo The job repository to use
+     */
+    @Autowired
+    public JpaJobPersistenceServiceImpl(
+            final JpaJobRepository jobRepo
+    ) {
+        this.jobRepo = jobRepo;
+    }
+    /**
+     {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public Job getJob(
             @NotBlank(message = "No id entered. Unable to get job.")
             final String id
     ) throws GenieException {
-        return null;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + id);
+        }
+        return this.findJob(id).getDTO();
     }
 
     /**
-     * Save the job object in the data store.
-     *
-     * @param job the Job object to save
-     * @throws GenieException if there is an error
+     {@inheritDoc}
      */
     @Override
     public void saveJob(
@@ -60,5 +79,25 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             final Job job
     ) throws GenieException {
 
+    }
+
+    /**
+     * Helper to find an application entity based on ID.
+     *
+     * @param id The id of the application to find
+     * @return The application entity if one is found
+     * @throws GenieNotFoundException If no application is found
+     */
+    private JobEntity findJob(final String id)
+            throws GenieNotFoundException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
+        final JobEntity jobEntity = this.jobRepo.findOne(id);
+        if (jobEntity != null) {
+            return jobEntity;
+        } else {
+            throw new GenieNotFoundException("No job with id " + id);
+        }
     }
 }

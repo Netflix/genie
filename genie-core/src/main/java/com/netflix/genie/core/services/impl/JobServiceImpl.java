@@ -93,7 +93,9 @@ public class JobServiceImpl implements JobService {
     public Job getJob(
             @NotBlank(message = "No job id provided. Unable to retrieve job.")
             final String jobId) throws GenieException {
-
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with id " + jobId);
+        }
         return null;
     }
 
@@ -124,7 +126,22 @@ public class JobServiceImpl implements JobService {
             final String commandName,
             final String commandId,
             final Pageable page) {
-        return null;
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
+
+        return this.jss.getJobs(
+                id,
+                jobName,
+                userName,
+                statuses,
+                tags,
+                clusterName,
+                clusterId,
+                commandName,
+                commandId,
+                page);
     }
 
     /**
