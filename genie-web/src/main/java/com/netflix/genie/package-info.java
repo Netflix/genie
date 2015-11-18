@@ -15,17 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.elasticsearch.repositories;
-
-import com.netflix.genie.core.elasticsearch.documents.JobDocument;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import org.springframework.stereotype.Repository;
 
 /**
- * CRUD repository for Job documents within Elasticsearch.
+ * Root Genie package. Will primarily be used to contain Spring Boot application classes.
  *
  * @author tgianos
  */
-@Repository
-public interface EsJobRepository extends ElasticsearchRepository<JobDocument, String> {
-}
+package com.netflix.genie;

@@ -23,7 +23,6 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 
 import javax.persistence.Basic;
-import javax.persistence.Cacheable;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -48,7 +47,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "applications")
-@Cacheable(false)
 public class ApplicationEntity extends CommonFields {
 
     @Basic(optional = false)

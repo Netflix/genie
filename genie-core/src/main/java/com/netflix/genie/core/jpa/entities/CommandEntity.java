@@ -25,7 +25,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
-import javax.persistence.Cacheable;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -53,7 +52,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "commands")
-@Cacheable(false)
 public class CommandEntity extends CommonFields {
 
     @Basic(optional = false)

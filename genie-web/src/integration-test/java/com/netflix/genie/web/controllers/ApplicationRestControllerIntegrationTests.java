@@ -27,7 +27,7 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.GenieWeb;
+import com.netflix.genie.GenieWeb;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import org.hamcrest.Matchers;
 import org.junit.After;

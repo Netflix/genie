@@ -23,7 +23,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
-import com.netflix.genie.web.GenieWeb;
+import com.netflix.genie.GenieWeb;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;

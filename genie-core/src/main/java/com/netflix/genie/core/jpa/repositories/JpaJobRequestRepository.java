@@ -18,6 +18,7 @@ package com.netflix.genie.core.jpa.repositories;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
 /**
  * Job repository.
@@ -25,6 +26,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * @author tgianos
  * @since 3.0.0
  */
+@Repository
 public interface JpaJobRequestRepository extends JpaRepository<JobRequestEntity, String>, JpaSpecificationExecutor {
-
 }

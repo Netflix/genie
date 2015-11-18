@@ -15,14 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web;
+package com.netflix.genie;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import springfox.documentation.builders.PathSelectors;
@@ -40,10 +37,7 @@ import javax.validation.Validator;
  * @author tgianos
  * @since 3.0.0
  */
-@SpringBootApplication(scanBasePackages = "com.netflix.genie")
-@EnableElasticsearchRepositories("com.netflix.genie.core.elasticsearch.repositories")
-@EnableJpaRepositories("com.netflix.genie.core.jpa.repositories")
-@EntityScan("com.netflix.genie.core.jpa.entities")
+@SpringBootApplication
 @EnableSwagger2
 public class GenieWeb {
 

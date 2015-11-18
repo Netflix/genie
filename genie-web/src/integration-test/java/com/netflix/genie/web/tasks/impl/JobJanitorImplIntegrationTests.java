@@ -24,7 +24,7 @@ import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.ProcessStatus;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.GenieWeb;
+import com.netflix.genie.GenieWeb;
 import com.netflix.genie.web.tasks.JobJanitor;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
