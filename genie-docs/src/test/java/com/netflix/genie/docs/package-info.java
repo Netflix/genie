@@ -22,4 +22,4 @@
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.docs;
+package com.netflix.genie.docs;

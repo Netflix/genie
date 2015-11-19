@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.docs;
+package com.netflix.genie.docs;
 
 import com.netflix.genie.GenieWeb;
 import com.netflix.genie.test.categories.DocumentationTest;
