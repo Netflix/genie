@@ -18,8 +18,10 @@
 package com.netflix.genie.web.docs;
 
 import com.netflix.genie.GenieWeb;
+import com.netflix.genie.test.categories.DocumentationTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -40,6 +42,7 @@ import springfox.documentation.staticdocs.Swagger2MarkupResultHandler;
  * @author tgianos
  * @since 3.0.0
  */
+@Category(DocumentationTest.class)
 @ActiveProfiles({"docs"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = GenieWeb.class)

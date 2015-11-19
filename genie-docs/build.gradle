@@ -22,6 +22,7 @@ dependencies {
      * Test Dependencies
      *******************************/
 
+    testCompile(project(":genie-test"))
     testCompile(project(":genie-web"))
     testCompile("com.jayway.jsonpath:json-path")
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:1.0.0.RELEASE")
@@ -32,13 +33,13 @@ clean {
     delete generatedDocumentation
 }
 
-test {
+documentationTests {
     outputs.dir generatedDocumentation
     outputs.dir snippetsDir
 }
 
 asciidoctor {
-    dependsOn test
+    dependsOn documentationTests
     sources {
         include 'index.adoc'
     }

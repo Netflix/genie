@@ -15,8 +15,6 @@ buildscript {
 
 plugins {
     id 'nebula.netflixoss' version '3.1.2'
-    id 'nebula.provided-base' version '3.0.3'
-    id 'nebula.optional-base' version '3.0.3'
     id 'org.unbroken-dome.test-sets' version '1.2.0'
 }
 
@@ -48,30 +46,30 @@ subprojects {
     apply plugin: 'findbugs'
     apply plugin: 'pmd'
     apply plugin: 'jacoco'
-    apply plugin: 'nebula.provided-base'
-    apply plugin: 'nebula.optional-base'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'org.unbroken-dome.test-sets'
 
-    ext {
-        generatedSourcesDir = new File("${projectDir}/src/generated")
-        generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
-    }
-
-    clean {
-        delete generatedSourcesDir
-    }
+    group = "com.netflix.${githubProjectName}"
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    group = "com.netflix.${githubProjectName}"
 
     repositories {
         jcenter()
         maven {
             url 'http://repo.spring.io/milestone'
         }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom 'io.spring.platform:platform-bom:2.0.0.RELEASE'
+        }
+    }
+
+    ext {
+        generatedSourcesDir = new File("${projectDir}/src/generated")
+        generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
     }
 
     sourceSets {
@@ -82,33 +80,12 @@ subprojects {
         }
     }
 
-    testSets {
-        integrationTest {
-            dirName = 'integration-test'
-        }
-    }
-
-    project.integrationTest {
-        outputs.upToDateWhen {
-            false
-        }
-    }
-
-    check.dependsOn integrationTest
-    integrationTest.mustRunAfter test
-
-    tasks.withType(Test) {
-        reports.html.destination = file("${reporting.baseDir}/${name}s")
+    clean {
+        delete generatedSourcesDir
     }
 
     configurations {
         all*.exclude group: "javax.servlet", module: "servlet-api"
-    }
-
-    dependencyManagement {
-        imports {
-            mavenBom 'io.spring.platform:platform-bom:2.0.0.RELEASE'
-        }
     }
 
     dependencies {
@@ -135,6 +112,38 @@ subprojects {
 
         testRuntime("javax.el:javax.el-api")
         testRuntime("org.glassfish:javax.el")
+    }
+
+    test {
+        useJUnit {
+            includeCategories 'com.netflix.genie.test.categories.UnitTest'
+            excludeCategories 'com.netflix.genie.test.categories.IntegrationTest'
+            excludeCategories 'com.netflix.genie.test.categories.DocumentationTest'
+        }
+    }
+
+    task integrationTests(type: Test) {
+        dependsOn test
+        useJUnit {
+            includeCategories 'com.netflix.genie.test.categories.IntegrationTest'
+            excludeCategories 'com.netflix.genie.test.categories.UnitTest'
+            excludeCategories 'com.netflix.genie.test.categories.DocumentationTest'
+        }
+    }
+
+    task documentationTests(type: Test) {
+        dependsOn integrationTests
+        useJUnit {
+            includeCategories 'com.netflix.genie.test.categories.DocumentationTest'
+            excludeCategories 'com.netflix.genie.test.categories.UnitTest'
+            excludeCategories 'com.netflix.genie.test.categories.IntegrationTest'
+        }
+    }
+
+    check.dependsOn documentationTests
+
+    tasks.withType(Test) {
+        reports.html.destination = file("${reporting.baseDir}/test/${name}")
     }
 
     license {

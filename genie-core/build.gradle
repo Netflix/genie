@@ -40,8 +40,9 @@ dependencies {
      * Test Dependencies
      *******************************/
 
-    integrationTestCompile("org.dbunit:dbunit:${dbunit_version}")
-    integrationTestCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
+    testCompile(project(":genie-test"))
+    testCompile("org.dbunit:dbunit:${dbunit_version}")
+    testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
 
     /*******************************
      * JPA Model Gen Dependencies
