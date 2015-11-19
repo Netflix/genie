@@ -15,7 +15,8 @@ buildscript {
 
 plugins {
     id 'nebula.netflixoss' version '3.1.2'
-    id 'nebula.provided-base' version '2.2.2'
+    id 'nebula.provided-base' version '3.0.3'
+    id 'nebula.optional-base' version '3.0.3'
     id 'org.unbroken-dome.test-sets' version '1.2.0'
 }
 
@@ -48,6 +49,7 @@ subprojects {
     apply plugin: 'pmd'
     apply plugin: 'jacoco'
     apply plugin: 'nebula.provided-base'
+    apply plugin: 'nebula.optional-base'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'org.unbroken-dome.test-sets'
 
@@ -136,7 +138,7 @@ subprojects {
     }
 
     license {
-        excludes(["${projectDir}/src/generated"])
+        excludes(["${projectDir}/src/generated/java"])
     }
 
     checkstyle {
@@ -152,16 +154,7 @@ subprojects {
         reports.html.enabled true
     }
 
-    test {
-        jacoco {
-            excludes = ['com/netflix/genie/common/model/*_*']
-        }
-    }
-
     jacocoTestReport {
-        doFirst {
-            classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(['com/netflix/genie/common/model/*_*'])
-        }
         reports.html.enabled true
     }
 }

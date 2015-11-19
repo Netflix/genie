@@ -80,3 +80,15 @@ tasks.withType(FindBugs) {
 tasks.withType(Pmd) {
     exclude metaModelIgnorePattern
 }
+
+test {
+    jacoco {
+        excludes = ['com/netflix/genie/core/jpa/entities/*_*']
+    }
+}
+
+jacocoTestReport {
+    doFirst {
+        classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(['com/netflix/genie/core/jpa/entities/*_*'])
+    }
+}
