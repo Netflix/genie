@@ -46,6 +46,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -153,7 +154,43 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobEntity.setJobTags(job.getTags());
 
         // TODO: where are the ones below set .. update method?
-        // command_id, command_name, cluster_id, cluster_name, exit_code, finished,
+        // finished,
+        this.jobRepo.save(jobEntity);
+    }
+
+    /**
+     * Update a job.
+     *
+     * @param id        The id of the application configuration to update
+     * @param updateJob Information to update for the Job
+     * @throws GenieException if there is an error
+     */
+    @Override
+    public void updateJob(
+            @NotBlank(message = "No job id entered. Unable to update.")
+            final String id,
+            @NotNull(message = "No job information entered. Unable to update.")
+            @Valid
+            final Job updateJob
+    ) throws GenieException {
+        if (!this.jobRepo.exists(id)) {
+            throw new GenieNotFoundException("No job information entered. Unable to update.");
+        }
+        if (!id.equals(updateJob.getId())) {
+            throw new GenieBadRequestException("Job id inconsistent with id passed in.");
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with job " + updateJob.toString());
+        }
+
+        final JobEntity jobEntity = this.jobRepo.findOne(id);
+
+        // TODO should we update only three fields or everything?
+        jobEntity.setFinished(updateJob.getFinished());
+        jobEntity.setStatus(updateJob.getStatus());
+        jobEntity.setStatusMsg(updateJob.getStatusMsg());
+
         this.jobRepo.save(jobEntity);
     }
 
@@ -199,6 +236,8 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             jobEntity.setClusterName(clusterEntity.getName());
             jobEntity.setCommand(commandEntity);
             jobEntity.setCommandName(commandEntity.getName());
+
+            this.jobRepo.save(jobEntity);
 
         } else {
             throw new GenieNotFoundException("No job with id " + jobId);
@@ -333,5 +372,31 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
 
         this.jobExecutionRepo.save(jobExecutionEntity);
+    }
+
+    /**
+     * Method to set exit code for the job execution.
+     *
+     * @param id       the id of the job to update the exit code
+     * @param exitCode The exit code of the process
+     * @throws GenieException if there is an error
+     */
+    @Override
+    public void setExitCode(
+            @NotBlank(message = "No job id entered. Unable to update.")
+            final String id,
+            @NotBlank(message = "Exit code cannot be blank")
+            final int exitCode
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
+        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
+        if (jobExecutionEntity != null) {
+            jobExecutionEntity.setExitCode(exitCode);
+            this.jobExecutionRepo.save(jobExecutionEntity);
+        } else {
+            throw new GenieNotFoundException("No job with id " + id);
+        }
     }
 }

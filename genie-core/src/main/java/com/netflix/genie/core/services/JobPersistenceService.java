@@ -18,14 +18,15 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
-
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobExecutionEnvironment;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobExecutionEnvironment;
+
 import com.netflix.genie.common.exceptions.GenieException;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -57,6 +58,21 @@ public interface JobPersistenceService {
     void createJob(
             @NotNull(message = "Job is null so cannot be saved")
             final Job job
+    ) throws GenieException;
+
+    /**
+     * Update a job.
+     *
+     * @param id        The id of the application configuration to update
+     * @param updateJob Information to update for the Job
+     * @throws GenieException if there is an error
+     */
+    void updateJob(
+            @NotBlank(message = "No job id entered. Unable to update.")
+            final String id,
+            @NotNull(message = "No job information entered. Unable to update.")
+            @Valid
+            final Job updateJob
     ) throws GenieException;
 
     /**
@@ -113,5 +129,19 @@ public interface JobPersistenceService {
     void createJobExecution(
             @NotNull(message = "Job Request is null so cannot be saved")
             final JobExecution jobExecution
+    ) throws GenieException;
+
+    /**
+     * Method to set exit code for the job execution.
+     *
+     * @param id the id of the job to update the exit code
+     * @param exitCode The exit code of the process
+     * @throws GenieException if there is an error
+     */
+    void setExitCode(
+            @NotBlank(message = "No job id entered. Unable to update.")
+            final String id,
+            @NotBlank(message = "Exit code cannot be blank")
+            final int exitCode
     ) throws GenieException;
 }
