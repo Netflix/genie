@@ -18,19 +18,24 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.netflix.genie.common.dto.Job;
-
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobExecutionEnvironment;
-import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
+import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+
 import com.netflix.genie.core.services.JobPersistenceService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
@@ -62,6 +67,8 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     private final JpaJobRepository jobRepo;
     private final JpaJobRequestRepository jobRequestRepo;
     private final JpaJobExecutionRepository jobExecutionRepo;
+    private final JpaClusterRepository clusterRepo;
+    private final JpaCommandRepository commandRepo;
 
     /**
      * Default Constructor.
@@ -69,16 +76,22 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @param jobRepo The job repository to use
      * @param jobRequestRepo The job request repository to use
      * @param jobExecutionRepo The jobExecution Repository to use
+     * @param clusterRepo The cluster repository to use
+     * @param commandRepo The command repository to use
      */
     @Autowired
     public JpaJobPersistenceServiceImpl(
             final JpaJobRepository jobRepo,
             final JpaJobRequestRepository jobRequestRepo,
-            final JpaJobExecutionRepository jobExecutionRepo
+            final JpaJobExecutionRepository jobExecutionRepo,
+            final JpaClusterRepository clusterRepo,
+            final JpaCommandRepository commandRepo
     ) {
         this.jobRepo = jobRepo;
         this.jobRequestRepo = jobRequestRepo;
         this.jobExecutionRepo = jobExecutionRepo;
+        this.clusterRepo = clusterRepo;
+        this.commandRepo = commandRepo;
     }
 
     /**
@@ -148,13 +161,48 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      {@inheritDoc}
      */
     @Override
+    @Transactional
     public void addJobExecutionEnvironmentToJob(
             @NotNull(message = "Job Execution environment is null so cannot update")
             final JobExecutionEnvironment jee
     ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
 
+        if (jee.getJob() == null || jee.getJob().getId() == null) {
+            throw new GenieBadRequestException("Cannot update job as it is null");
+        }
 
+        final String jobId = jee.getJob().getId();
+        ClusterEntity clusterEntity = null;
+        CommandEntity commandEntity = null;
 
+        final JobEntity jobEntity = this.jobRepo.findOne(jobId);
+
+        if (jee.getCluster() != null && jee.getCluster().getId() != null) {
+            clusterEntity = this.clusterRepo.findOne(jee.getCluster().getId());
+            if (clusterEntity == null) {
+                throw new GenieNotFoundException("No cluster with id " + jee.getCluster().getId());
+            }
+        }
+
+        if (jee.getCommand() != null && jee.getCommand().getId() != null) {
+            commandEntity = this.commandRepo.findOne(jee.getCommand().getId());
+            if (commandEntity == null) {
+                throw new GenieNotFoundException("No command with id " + jee.getCommand().getId());
+            }
+        }
+
+        if (jobEntity != null) {
+            jobEntity.setCluster(clusterEntity);
+            jobEntity.setClusterName(clusterEntity.getName());
+            jobEntity.setCommand(commandEntity);
+            jobEntity.setCommandName(commandEntity.getName());
+
+        } else {
+            throw new GenieNotFoundException("No job with id " + jobId);
+        }
     }
 
     /**
