@@ -20,6 +20,7 @@ package com.netflix.genie.core.jpa.services;
 import com.netflix.genie.common.dto.Job;
 
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobExecutionEnvironment;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -79,19 +80,24 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         this.jobRequestRepo = jobRequestRepo;
         this.jobExecutionRepo = jobExecutionRepo;
     }
+
     /**
      {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Job getJob(
             @NotBlank(message = "No id entered. Unable to get job.")
             final String id
-    ) throws GenieException {
+    ) throws GenieNotFoundException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
+            LOG.debug("Called");
         }
-        return this.findJob(id).getDTO();
+        final JobEntity jobEntity = this.jobRepo.findOne(id);
+        if (jobEntity != null) {
+            return jobEntity.getDTO();
+        } else {
+            throw new GenieNotFoundException("No job with id " + id);
+        }
     }
 
     /**
@@ -136,6 +142,39 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         // TODO: where are the ones below set .. update method?
         // command_id, command_name, cluster_id, cluster_name, exit_code, finished,
         this.jobRepo.save(jobEntity);
+    }
+
+    /**
+     {@inheritDoc}
+     */
+    @Override
+    public void addJobExecutionEnvironmentToJob(
+            @NotNull(message = "Job Execution environment is null so cannot update")
+            final JobExecutionEnvironment jee
+    ) throws GenieException {
+
+
+
+    }
+
+    /**
+     {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public JobRequest getJobRequest(
+            @NotBlank(message = "No id entered. Unable to get job request.")
+            final String id
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
+        final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(id);
+        if (jobRequestEntity != null) {
+            return jobRequestEntity.getDTO();
+        } else {
+            throw new GenieNotFoundException("No job with id " + id);
+        }
     }
 
     /**
@@ -192,6 +231,30 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     }
 
     /**
+     * Return the Job Entity for the job id provided.
+     *
+     * @param id The id of the job to return.
+     * @return Job Execution details or null if not found
+     * @throws GenieException if there is an error
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public JobExecution getJobExecution(
+            @NotBlank(message = "No id entered. Unable to get job request.")
+            final String id
+    ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called");
+        }
+        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
+        if (jobExecutionEntity != null) {
+            return jobExecutionEntity.getDTO();
+        } else {
+            throw new GenieNotFoundException("No job with id " + id);
+        }
+    }
+
+    /**
      {@inheritDoc}
      */
     @Override
@@ -204,7 +267,13 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             LOG.debug("Called with jobExecution: " + jobExecution.toString());
         }
 
-        if (jobExecution.getId() != null && this.jobExecutionRepo.exists(jobExecution.getId())) {
+        // Since a job request object should always exist before the job object is saved
+        // the id should never be null
+        if (StringUtils.isBlank(jobExecution.getId())) {
+            throw new GenieConflictException("Cannot create a job execution entry with id blank or null");
+        }
+
+        if (this.jobExecutionRepo.exists(jobExecution.getId())) {
             throw new GenieConflictException("A job with id " + jobExecution.getId() + " already exists");
         }
 
@@ -216,25 +285,5 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
 
         this.jobExecutionRepo.save(jobExecutionEntity);
-    }
-
-    /**
-     * Helper to find an application entity based on ID.
-     *
-     * @param id The id of the application to find
-     * @return The application entity if one is found
-     * @throws GenieNotFoundException If no application is found
-     */
-    private JobEntity findJob(final String id)
-            throws GenieNotFoundException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called");
-        }
-        final JobEntity jobEntity = this.jobRepo.findOne(id);
-        if (jobEntity != null) {
-            return jobEntity;
-        } else {
-            throw new GenieNotFoundException("No job with id " + id);
-        }
     }
 }

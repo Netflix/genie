@@ -20,8 +20,10 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.dto.Job;
 
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobExecutionEnvironment;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -49,8 +51,7 @@ public interface JobPersistenceService {
     /**
      * Save the job object in the data store.
      *
-     * @param job the Job object to save
-     *
+     * @param job the Job object to create
      * @throws GenieException if there is an error
      */
     void createJob(
@@ -59,11 +60,32 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
+     * Update the execution environment for the job.
+     *
+     * @param jee The job execution environment information for a job
+     * @throws GenieException if there is an error
+     */
+    void addJobExecutionEnvironmentToJob(
+            final JobExecutionEnvironment jee
+    ) throws GenieException;
+
+    /**
+     * Return the Job Request Entity for the  id provided.
+     *
+     * @param id The id of the jobRequest to return.
+     * @return The job request details or null if not found
+     * @throws GenieException if there is an error
+     */
+    JobRequest getJobRequest(
+            final String id
+    ) throws GenieException;
+
+    /**
      * Save the jobRequest object in the data store.
      *
      * @param jobRequest the Job object to save
      *
-     * @return The id of the jobReqest that was created
+     * @return The id of the job Request that was created
      * @throws GenieException if there is an error
      */
     String createJobRequest(
@@ -72,10 +94,20 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
+     * Return the Job Entity for the job id provided.
+     *
+     * @param id The id of the job to return.
+     * @return Job Execution details or null if not found
+     * @throws GenieException if there is an error
+     */
+    JobExecution getJobExecution(
+            final String id
+    ) throws GenieException;
+
+    /**
      * Save the jobExecution object in the data store.
      *
      * @param jobExecution the Job object to save
-     *
      * @throws GenieException if there is an error
      */
     void createJobExecution(
