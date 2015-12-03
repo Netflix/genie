@@ -26,6 +26,7 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobService;
 
+import com.netflix.genie.core.services.JobSubmitterService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,21 +49,26 @@ import java.util.Set;
 public class JobServiceImpl implements JobService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobServiceImpl.class);
-    private final JobPersistenceService jps;
-    private final JobSearchService jss;
+    private final JobPersistenceService jobPersistenceService;
+    private final JobSearchService jobSearchService;
+    private final JobSubmitterService jobSubmitterService;
+
     /**
      * Constructor.
      *
-     * @param jps implementation of job persistence service interface
-     * @param jss implementation of job search service interface
+     * @param jobPersistenceService implementation of job persistence service interface
+     * @param jobSearchService implementation of job search service interface
+     * @param jobSubmitterService implementation of the job submitter service
      */
     @Autowired
     public JobServiceImpl(
-            final JobPersistenceService jps,
-            final JobSearchService jss
+            final JobPersistenceService jobPersistenceService,
+            final JobSearchService jobSearchService,
+            final JobSubmitterService jobSubmitterService
     ) {
-        this.jps = jps;
-        this.jss = jss;
+        this.jobPersistenceService = jobPersistenceService;
+        this.jobSearchService = jobSearchService;
+        this.jobSubmitterService = jobSubmitterService;
     }
 
     /**
@@ -77,6 +83,18 @@ public class JobServiceImpl implements JobService {
             @Valid
             final JobRequest jobRequest
     ) throws GenieException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Called with job request " + jobRequest.toString());
+        }
+
+        // TODO get client host at this point?
+        // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
+        // orginal request may or may not have it.
+        final JobRequest jobRequestWithId =
+                this.jobPersistenceService.createJobRequest(jobRequest);
+
+        this.jobSubmitterService.submitJob(jobRequestWithId);
+
         // do basic validation of the request
         // persist in various storage layers
         // submit the job request to Job submitter interface
@@ -131,7 +149,7 @@ public class JobServiceImpl implements JobService {
             LOG.debug("called");
         }
 
-        return this.jss.getJobs(
+        return this.jobSearchService.getJobs(
                 id,
                 jobName,
                 userName,

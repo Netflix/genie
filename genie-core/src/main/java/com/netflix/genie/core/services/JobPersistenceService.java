@@ -101,10 +101,10 @@ public interface JobPersistenceService {
      *
      * @param jobRequest the Job object to save
      *
-     * @return The id of the job Request that was created
+     * @return The job request object that was created
      * @throws GenieException if there is an error
      */
-    String createJobRequest(
+    JobRequest createJobRequest(
             @NotNull(message = "Job Request is null so cannot be saved")
             final JobRequest jobRequest
     ) throws GenieException;

@@ -15,21 +15,27 @@
  *     limitations under the License.
  *
  */
-
-package com.netflix.genie.core.services;
+package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import javax.validation.constraints.NotNull;
+import com.netflix.genie.core.services.JobSubmitterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
- * Interface to handoff job execution based on different environments.
+ * Implementation of the Job Submitter service that runs the job locally on the same host.
  *
  * @author amsharma
- * @since 3.0.0
  */
-public interface JobSubmitterService {
+@Component
+public class LocalJobSubmitterImpl implements JobSubmitterService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LocalJobSubmitterImpl.class);
 
     /**
      * Submit the job for appropriate execution based on environment.
@@ -37,10 +43,15 @@ public interface JobSubmitterService {
      * @param jobRequest of job to run
      * @throws GenieException if there is an error
      */
-    void submitJob(
+    @Override
+    public void submitJob(
             @NotNull(message = "No job provided. Unable to submit job for execution.")
             @Valid
             final JobRequest jobRequest
-    ) throws GenieException;
+    ) throws GenieException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called with job request " + jobRequest.toString());
+        }
+    }
 }

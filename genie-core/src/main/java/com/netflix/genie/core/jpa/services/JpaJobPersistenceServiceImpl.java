@@ -268,7 +268,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      {@inheritDoc}
      */
     @Override
-    public String createJobRequest(
+    public JobRequest createJobRequest(
             @NotNull(message = "Job Request is null so cannot be saved")
             final JobRequest jobRequest
     ) throws GenieException {
@@ -312,9 +312,8 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             jobRequestEntity.setId(UUID.randomUUID().toString());
         }
 
-        final String id = jobRequestEntity.getId();
         this.jobRequestRepo.save(jobRequestEntity);
-        return id;
+        return jobRequestEntity.getDTO();
     }
 
     /**
