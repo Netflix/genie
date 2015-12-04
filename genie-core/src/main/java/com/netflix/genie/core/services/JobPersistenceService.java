@@ -20,7 +20,7 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobExecutionEnvironment;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 
 import com.netflix.genie.common.exceptions.GenieException;
 

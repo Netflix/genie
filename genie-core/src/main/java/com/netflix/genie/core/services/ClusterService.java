@@ -17,10 +17,11 @@
  */
 package com.netflix.genie.core.services;
 
-import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -92,13 +93,13 @@ public interface ClusterService {
     /**
      * Get the clusters on which the job can be run.
      *
-     * @param jobId The id of the Job to run. Not null/empty/blank.
+     * @param jobRequest The request to runt he job. Not null.
      * @return successful response, or one with HTTP error code
      * @throws GenieException if there is an error
      */
-    List<Cluster> chooseClusterForJob(
+    List<Cluster> chooseClusterForJobRequest(
             @NotBlank(message = "No job id entered. Unable to continue.")
-            final String jobId
+            final JobRequest jobRequest
     ) throws GenieException;
 
     /**

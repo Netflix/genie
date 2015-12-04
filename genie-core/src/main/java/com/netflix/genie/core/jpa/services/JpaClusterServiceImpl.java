@@ -19,16 +19,16 @@ package com.netflix.genie.core.jpa.services;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
-import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
@@ -169,21 +169,16 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     @Transactional
-    public List<Cluster> chooseClusterForJob(
+    public List<Cluster> chooseClusterForJobRequest(
             @NotBlank(message = "No job id entered. Unable to continue.")
-            final String jobId
+            final JobRequest jobRequest
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called");
         }
-        final JobEntity jobEntity = this.jobRepo.findOne(jobId);
-        if (jobEntity == null) {
-            throw new GenieNotFoundException("No job with id " + jobId + " exists. Unable to continue."
-            );
-        }
 
-        final List<ClusterCriteria> clusterCriterias = jobEntity.getRequest().getClusterCriteriasAsList();
-        final Set<String> commandCriteria = jobEntity.getRequest().getCommandCriteriaAsSet();
+        final List<ClusterCriteria> clusterCriterias = jobRequest.getClusterCriterias();
+        final Set<String> commandCriteria = jobRequest.getCommandCriteria();
 
         for (final ClusterCriteria clusterCriteria : clusterCriterias) {
             @SuppressWarnings("unchecked")

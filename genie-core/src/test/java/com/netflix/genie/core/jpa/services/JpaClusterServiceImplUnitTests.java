@@ -28,6 +28,7 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -104,18 +105,6 @@ public class JpaClusterServiceImplUnitTests {
     @Test
     @Ignore
     public void testChooseClusterForJob() throws GenieException {
-    }
-
-    /**
-     * Test the choseClusterForJob function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void testChooseClusterForJobNoJobExists() throws GenieException {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaJobRepository.findOne(id)).thenReturn(null);
-        this.service.chooseClusterForJob(id);
     }
 
     /**

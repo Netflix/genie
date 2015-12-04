@@ -274,9 +274,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Ignore
     @Test
     public void testChooseClusterForJob() throws GenieException {
-        final List<Cluster> clusters = this.service.chooseClusterForJob(JOB_1_ID);
-        Assert.assertEquals(1, clusters.size());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
+//        final List<Cluster> clusters = this.service.chooseClusterForJob(JOB_1_ID);
+//        Assert.assertEquals(1, clusters.size());
+//        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
 //        final JobEntity jobEntity = this.jpaJobRepository.findOne(JOB_1_ID);
 //        final String chosen = jobEntity.getChosenClusterCriteriaString();
 //        Assert.assertEquals(8, chosen.length());
@@ -285,26 +285,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
 //        Assert.assertTrue(chosen.contains(","));
     }
 
-    /**
-     * Test the choseClusterForJob function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testChooseClusterForJobNoId() throws GenieException {
-        this.service.chooseClusterForJob(null);
-    }
-
-    /**
-     * Test the choseClusterForJob function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Ignore
-    @Test
-    public void testChooseClusterForJobNoneChosen() throws GenieException {
-        Assert.assertTrue(this.service.chooseClusterForJob(JOB_2_ID).isEmpty());
-    }
+    // TODO Add tests where jobRequest object is
 
     /**
      * Test the create method.

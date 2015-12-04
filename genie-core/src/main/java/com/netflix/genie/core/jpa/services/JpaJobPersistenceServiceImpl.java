@@ -20,7 +20,7 @@ package com.netflix.genie.core.jpa.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobExecutionEnvironment;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -207,11 +207,11 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             LOG.debug("Called");
         }
 
-        if (jee.getJob() == null || jee.getJob().getId() == null) {
+        if (jee.getJobRequest() == null || jee.getJobRequest().getId() == null) {
             throw new GenieBadRequestException("Cannot update job as it is null");
         }
 
-        final String jobId = jee.getJob().getId();
+        final String jobId = jee.getJobRequest().getId();
         ClusterEntity clusterEntity = null;
         CommandEntity commandEntity = null;
 

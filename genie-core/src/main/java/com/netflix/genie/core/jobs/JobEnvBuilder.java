@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jobs;
 
-import com.netflix.genie.common.dto.JobExecutionEnvironment;
 import com.netflix.genie.common.dto.JobRequest;
 
 /**
