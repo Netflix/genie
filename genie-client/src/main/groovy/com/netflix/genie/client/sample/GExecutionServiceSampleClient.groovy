@@ -33,9 +33,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author liviutudor
  */
-public final class GExecutionServiceSampleClient {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceSampleClient.class)
+final class GExecutionServiceSampleClient {
+    private static final def LOG = LoggerFactory.getLogger(ExecutionServiceSampleClient.class)
 
     /**
      * Main for running client code .
@@ -43,8 +42,7 @@ public final class GExecutionServiceSampleClient {
      * @param args command line arguments
      * @throws Exception On any issue.
      */
-    public static void main(final String[] args) throws Exception {
-
+    static void main(final String[] args) throws Exception {
         // Initialize Eureka, if it is being used
         // LOGGER.info("Initializing Eureka");
         // ExecutionServiceClient.initEureka("test");

@@ -28,6 +28,8 @@ import com.netflix.genie.common.model.Job;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.netflix.genie.common.model.JobStatus;
 import org.apache.commons.lang3.StringUtils;
@@ -39,12 +41,28 @@ import org.apache.commons.lang3.StringUtils;
  * @author skrishnan
  * @author tgianos
  */
-public final class ExecutionServiceClient extends BaseGenieClient {
+public final class ExecutionServiceClient extends BaseGenieClient implements AutoCloseable {
+
+    /**
+     * Name of the timer thread created by the singleton instance of this class.
+     */
+    static final String TIMER_NAME = "ExecutionServiceClient - Timer";
+
+    /**
+     * By default poll the job status every 1 seconds.
+     */
+    static final long DEFAULT_POLL_TIME = 1000L;
 
     private static final String BASE_EXECUTION_REST_URL = BASE_REST_URL + "jobs";
 
     // reference to the instance object
     private static ExecutionServiceClient instance;
+
+    /**
+     * This will be used to initiate polling for callers who ask to be notified when their job finishes.
+     * The timer will be cleaned up in {@link #close()}.
+     */
+    private Timer pollingTimer;
 
     /**
      * Private constructor for singleton class.
@@ -53,6 +71,15 @@ public final class ExecutionServiceClient extends BaseGenieClient {
      */
     private ExecutionServiceClient() throws IOException {
         super(null);
+        pollingTimer = new Timer(TIMER_NAME, true);
+    }
+
+    Timer getPollingTimer() {
+        return pollingTimer;
+    }
+
+    void setPollingTimer(final Timer pollingTimer) {
+        this.pollingTimer = pollingTimer;
     }
 
     /**
@@ -147,8 +174,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         //Should we use Future? See:
         //https://github.com/Netflix/ribbon/blob/master/ribbon-examples
         ///src/main/java/com/netflix/ribbon/examples/GetWithDeserialization.java
-        final long pollTime = 10000;
-        return waitForCompletion(id, blockTimeout, pollTime);
+        return waitForCompletion(id, blockTimeout, DEFAULT_POLL_TIME);
     }
 
     /**
@@ -175,7 +201,7 @@ public final class ExecutionServiceClient extends BaseGenieClient {
             final Job job = getJob(id);
 
             final JobStatus status = job.getStatus();
-            if (status == JobStatus.FAILED || status == JobStatus.KILLED || status == JobStatus.SUCCEEDED) {
+            if (isFinished(status)) {
                 return job;
             }
 
@@ -186,6 +212,47 @@ public final class ExecutionServiceClient extends BaseGenieClient {
                 throw new InterruptedException("Timed out waiting for job to finish");
             }
         }
+    }
+
+    /**
+     * Given a job status checks whether it is finished.
+     * A job is considered finished when it's either FAILED, KILLED or SUCCEEDED.
+     *
+     * @param jobStatus Job status to check
+     * @return true if job is finished (see above) or false otherwise
+     */
+    boolean isFinished(final JobStatus jobStatus) {
+        return jobStatus == JobStatus.FAILED || jobStatus == JobStatus.KILLED || jobStatus == JobStatus.SUCCEEDED;
+    }
+
+    /**
+     * Given a job checks whether it is finished.
+     *
+     * @param job Job to check
+     * @return true if job is finished or false otherwise
+     * @see #isFinished(JobStatus)
+     */
+    boolean isFinished(final Job job) {
+        return isFinished(job.getStatus());
+    }
+
+    /**
+     * Request to be notified async when the job finishes.
+     * The system will poll the job every seconds and invokes the notification passed in when the job is finished.
+     *
+     * @param job          Job to monitor
+     * @param notification Notification to be invoked when job is finished.
+     */
+    public void waitAndNotify(final Job job, final JobNotification notification) {
+        pollingTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (isFinished(job)) {
+                    cancel();
+                    notification.jobFinished(job);
+                }
+            }
+        }, DEFAULT_POLL_TIME, DEFAULT_POLL_TIME);
     }
 
     /**
@@ -359,5 +426,18 @@ public final class ExecutionServiceClient extends BaseGenieClient {
         @SuppressWarnings("unchecked")
         final Set<String> tags = (Set<String>) this.executeRequest(request, Set.class, String.class);
         return tags;
+    }
+
+    /**
+     * Cleans up after the client.
+     * Shuts down the timer, cancel any scheduled tasks
+     */
+    @Override
+    public void close() {
+        if (pollingTimer != null) {
+            pollingTimer.purge();
+            pollingTimer.cancel();
+            pollingTimer = null;
+        }
     }
 }
