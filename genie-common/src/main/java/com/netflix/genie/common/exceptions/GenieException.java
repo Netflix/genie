@@ -50,7 +50,7 @@ public class GenieException extends Exception {
      * @param cause reason for this exception
      */
     public GenieException(final int errorCode, final Throwable cause) {
-        super(cause);
+        super(String.valueOf(errorCode), cause);
         this.errorCode = errorCode;
     }
 
