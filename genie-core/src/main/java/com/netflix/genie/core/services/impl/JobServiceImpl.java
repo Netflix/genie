@@ -78,7 +78,7 @@ public class JobServiceImpl implements JobService {
      * @throws GenieException if there is an error
      */
     @Override
-    public void runJob(
+    public String runJob(
             @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
             @Valid
             final JobRequest jobRequest
@@ -94,6 +94,8 @@ public class JobServiceImpl implements JobService {
                 this.jobPersistenceService.createJobRequest(jobRequest);
 
         this.jobSubmitterService.submitJob(jobRequestWithId);
+
+        return jobRequestWithId.getId();
 
         // do basic validation of the request
         // persist in various storage layers
@@ -114,7 +116,7 @@ public class JobServiceImpl implements JobService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + jobId);
         }
-        return null;
+        return this.jobPersistenceService.getJob(jobId);
     }
 
     /**

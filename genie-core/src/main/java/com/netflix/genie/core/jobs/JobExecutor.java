@@ -18,12 +18,16 @@
 
 package com.netflix.genie.core.jobs;
 
+import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileCopyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,12 +39,14 @@ import java.util.List;
  */
 public class JobExecutor {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JobExecutor.class);
+
     // Directory paths env variables
-//    private static final String GENIE_WORKING_DIR_ENV = "GENIE_WORKING_DIR";
-//    private static final String GENIE_JOB_DIR_ENV = "GENIE_JARS_DIR";
-//    private static final String GENIE_CLUSTER_DIR_ENV = "GENIE_CLUSTER_DIR";
-//    private static final String GENIE_COMMAND_DIR_ENV = "GENIE_COMMAND_DIR";
-//    private static final String GENIE_APPLICATION_DIR_ENV = "GENIE_APPLICATION_DIR";
+    private static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
+    private static final String GENIE_JOB_DIR_ENV_VAR = "GENIE_JOB_DIR";
+    private static final String GENIE_CLUSTER_DIR_ENV_VAR = "GENIE_CLUSTER_DIR";
+    private static final String GENIE_COMMAND_DIR_ENV_VAR = "GENIE_COMMAND_DIR";
+    private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
 
     private List<FileCopyService> fileCopyServiceImpls;
 //    private String stderrLogPath;
@@ -57,7 +63,6 @@ public class JobExecutor {
      * @param fileCopyServiceImpls List of implementations of the file copy interface
      * @param jobExecEnv The job execution environment details like the job, cluster, command and applications.
      */
-    @Autowired
     public JobExecutor(
             final List<FileCopyService> fileCopyServiceImpls,
             @NotNull(message = "Cannot initialize with null JobExecEnv")
@@ -72,14 +77,18 @@ public class JobExecutor {
      * This method does not actually run the job.
      */
     public void setup() {
-        setupJobForExecution();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("called");
+        }
+        //setupJobForExecution();
     }
 
     /**
      * Sets up the working directory for the job and starts the job.
      *
+     * @throws GenieException Exception in case of an error
      */
-    public void setupAndRun() {
+    public void setupAndRun() throws GenieException {
         setupJobForExecution();
         startJob();
     }
@@ -88,7 +97,7 @@ public class JobExecutor {
      * Method that setups the job directory and prepares it for execution by creating the runnable script.
      *
      */
-    private void setupJobForExecution() {
+    private void setupJobForExecution() throws GenieException {
 
         setupStandardVariables();
         setupWorkingDirectory();
@@ -108,23 +117,31 @@ public class JobExecutor {
 
     private void setupStandardVariables() {
         // sets up standard vars like stderr and stdout path cmd.log jars dir, config dir
+
     }
 
     /**
      * Method that sets up the current working directory for executing the job.
      */
-    private void setupWorkingDirectory() {
-        //create working directory
-        //create jars dir
-        //create configs dir
-        // create system dir
+    private void setupWorkingDirectory() throws GenieException {
+
+        makeDir(jobExecEnv.getJobWorkingDir());
+        makeDir(jobExecEnv.getJobWorkingDir() + "/job");
+        makeDir(jobExecEnv.getJobWorkingDir() + "/cluster");
+        makeDir(jobExecEnv.getJobWorkingDir() + "/command");
+        makeDir(jobExecEnv.getJobWorkingDir() + "/applications");
     }
 
     /**
      * Process all applications content needed for the job to run.
      *
      */
-    private void processApplications() {
+    private void processApplications() throws GenieException {
+
+        for (Application application: this.jobExecEnv.getApplications()) {
+            makeDir(jobExecEnv.getJobWorkingDir() + "/applications/" + application.getId());
+            //TODO copy down dependencies
+        }
 
     }
 
@@ -132,7 +149,10 @@ public class JobExecutor {
      * Process the command content needed for the job to run.
      *
      */
-    private void processCommand() {
+    private void processCommand() throws GenieException {
+
+        makeDir(jobExecEnv.getJobWorkingDir() + "/command/" + jobExecEnv.getCommand().getId());
+        //TODO copy down dependencies
 
     }
 
@@ -140,25 +160,18 @@ public class JobExecutor {
      * Process the cluster content needed for the job to run.
      *
      */
-    private void processCluster() {
-
+    private void processCluster() throws GenieException {
+        makeDir(jobExecEnv.getJobWorkingDir() + "/cluster/" + jobExecEnv.getCluster().getId());
+        //TODO copy down dependencies
     }
 
     /**
      * Process the Job content needed for the job to run.
      *
      */
-    private void processJob() {
-
-    }
-
-    /**
-     * Helper method that executes a bash command.
-     *
-     * @param command An array consisting of the command to run
-     */
-    private void executeBashCommand(final String[] command) {
-
+    private void processJob() throws GenieException {
+        makeDir(jobExecEnv.getJobWorkingDir() + "/job");
+        //TODO copy down dependencies
     }
 
     /**
@@ -169,7 +182,11 @@ public class JobExecutor {
      */
     private void makeDir(final String dirPath)
             throws GenieException {
+        final List command = new ArrayList<>();
+        command.add("mkdir");
+        command.add("dirPath");
 
+        executeBashCommand(command);
     }
 
     /**
@@ -189,6 +206,26 @@ public class JobExecutor {
             } else {
                 throw new GenieServerException("Genie not equipped to copy down files of this type.");
             }
+        }
+    }
+
+    /**
+     * Helper method that executes a bash command.
+     *
+     * @param command An array consisting of the command to run
+     */
+    private void executeBashCommand(final List command) throws GenieException {
+        final ProcessBuilder pb = new ProcessBuilder(command);
+        try {
+            final Process process = pb.start();
+            final int errCode = process.waitFor();
+            if (errCode != 0) {
+                throw new GenieServerException("Unable to execute bash command" + String.valueOf(command));
+            }
+        } catch (InterruptedException ie) {
+            throw new GenieServerException("Unable to execute bash command" +  String.valueOf(command), ie);
+        } catch (IOException ioe) {
+            throw new GenieServerException("Unable to execute bash command" +  String.valueOf(command), ioe);
         }
     }
 }

@@ -39,9 +39,10 @@ public interface JobService {
      * Takes in a Job Request object and does necessary preparation for execution.
      *
      * @param jobRequest of job to kill
+     * @return the id of the job run
      * @throws GenieException if there is an error
      */
-    void runJob(
+    String runJob(
             @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
             @Valid
             final JobRequest jobRequest

@@ -40,8 +40,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 /**
  * Encapsulates the details of the job, cluster , command and applications needed to run a job.
  *
@@ -52,57 +50,43 @@ public class JobExecutionEnvironment {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobExecutionEnvironment.class);
 
-    private final ClusterService clusterService;
-    private final CommandService commandService;
-    private final ApplicationService applicationService;
-    private final ClusterLoadBalancer clusterLoadBalancer;
-
-    @NotNull(message = "Job cannot be null. Needed for execution.")
     private JobRequest jobRequest;
-
-    @NotNull(message = "Cluster cannot be null. Need it to run job.")
     private Cluster cluster;
-
-    @NotNull(message = "Command cannot null. Need it to run job.")
     private Command command;
-
     private List<Application> applications = new ArrayList<>();
+    private String jobWorkingDir;
 
     /**
-     * Constructor Takes in a job request and figures out the cluster, command and applications
+     * Initializes by Taking in a job request and figures out the cluster, command and applications
      * to run the job.
      *
      * @param clusterService implementation of ClusterService interface
      * @param commandService implementation of CommandService interface
      * @param applicationService implementation of ApplicationService interface
      * @param clusterLoadBalancer implementation of the ClusterLoadBalancer interface
-     * @param jobRequest The jobRequest object
+     * @param jobReq The jobRequest object
+     * @param genieBaseWorkingDir Base working directory for all genie jobs
      * @throws GenieException exception if there is an error
      */
-    @Autowired
-    public JobExecutionEnvironment(
+    public void init(
         final ClusterService clusterService,
         final CommandService commandService,
         final ApplicationService applicationService,
         final ClusterLoadBalancer clusterLoadBalancer,
         @NotNull(message = "Cannot construct environment from null job request")
-        final JobRequest jobRequest
+        final JobRequest jobReq,
+        final String genieBaseWorkingDir
     ) throws GenieException {
 
-        this.clusterService = clusterService;
-        this.commandService = commandService;
-        this.applicationService = applicationService;
-        this.clusterLoadBalancer = clusterLoadBalancer;
-
-        this.jobRequest = jobRequest;
+        this.jobRequest = jobReq;
         final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
         enumStatuses.add(CommandStatus.ACTIVE);
 
-        this.cluster = this.clusterLoadBalancer
-                        .selectCluster(this.clusterService.chooseClusterForJobRequest(jobRequest));
+        this.cluster = clusterLoadBalancer
+                        .selectCluster(clusterService.chooseClusterForJobRequest(jobRequest));
 
         // Find the command for the job
-        for (final Command cmd : this.clusterService.getCommandsForCluster(
+        for (final Command cmd : clusterService.getCommandsForCluster(
                         this.cluster.getId(),
                         enumStatuses
         )) {
@@ -119,7 +103,8 @@ public class JobExecutionEnvironment {
             throw new GeniePreconditionException(msg);
         }
 
-        this.applications.addAll(this.commandService.getApplicationsForCommand(this.command.getId()));
+        this.applications.addAll(commandService.getApplicationsForCommand(this.command.getId()));
+        this.jobWorkingDir = genieBaseWorkingDir + "/" + jobRequest.getId();
     }
 
     /**
@@ -158,4 +143,15 @@ public class JobExecutionEnvironment {
 
         return Collections.unmodifiableList(applications);
     }
+
+    /**
+     * Get the command information from the execution environment.
+     *
+     * @return the working directory for the job
+     */
+    public String getJobWorkingDir() {
+        return jobWorkingDir;
+    }
+
+
 }

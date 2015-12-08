@@ -134,8 +134,8 @@ public class JobRestController {
 //            job.setClientHost(localClientHost);
 //        }
 
-        //final String id = this.executionService.submitJob(jobRequest);
-        final String id = "blah";
+        final String id = this.jobService.runJob(jobRequest);
+        //final String id = "blah";
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 ServletUriComponentsBuilder
