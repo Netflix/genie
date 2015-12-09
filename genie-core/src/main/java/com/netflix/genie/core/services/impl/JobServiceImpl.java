@@ -90,9 +90,10 @@ public class JobServiceImpl implements JobService {
         // TODO get client host at this point?
         // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
         // orginal request may or may not have it.
-        final JobRequest jobRequestWithId =
-                this.jobPersistenceService.createJobRequest(jobRequest);
+    //    final JobRequest jobRequestWithId =
+      //          this.jobPersistenceService.createJobRequest(jobRequest);
 
+        final JobRequest jobRequestWithId = jobRequest;
         this.jobSubmitterService.submitJob(jobRequestWithId);
 
         return jobRequestWithId.getId();

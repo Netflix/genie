@@ -98,7 +98,7 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     List<Cluster> chooseClusterForJobRequest(
-            @NotBlank(message = "No job id entered. Unable to continue.")
+            @NotNull(message = "JobRequest object is null. Unable to continue.")
             final JobRequest jobRequest
     ) throws GenieException;
 

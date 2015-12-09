@@ -170,7 +170,7 @@ public class JobExecutor {
      *
      */
     private void processJob() throws GenieException {
-        makeDir(jobExecEnv.getJobWorkingDir() + "/job");
+        //makeDir(jobExecEnv.getJobWorkingDir() + "/job");
         //TODO copy down dependencies
     }
 
@@ -184,7 +184,7 @@ public class JobExecutor {
             throws GenieException {
         final List command = new ArrayList<>();
         command.add("mkdir");
-        command.add("dirPath");
+        command.add(dirPath);
 
         executeBashCommand(command);
     }
@@ -220,6 +220,7 @@ public class JobExecutor {
             final Process process = pb.start();
             final int errCode = process.waitFor();
             if (errCode != 0) {
+                LOG.error("Encountered error while running command: " + process.getErrorStream().toString());
                 throw new GenieServerException("Unable to execute bash command" + String.valueOf(command));
             }
         } catch (InterruptedException ie) {

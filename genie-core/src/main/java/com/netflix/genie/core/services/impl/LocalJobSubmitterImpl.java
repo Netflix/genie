@@ -110,6 +110,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
                 );
 
         final JobExecutor jobExecutor = new JobExecutor(fileCopyServiceImpls, jee);
-        jobExecutor.setup();
+        jobExecutor.setupAndRun();
     }
 }

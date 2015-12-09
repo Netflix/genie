@@ -170,7 +170,7 @@ public class JpaClusterServiceImpl implements ClusterService {
     @Override
     @Transactional
     public List<Cluster> chooseClusterForJobRequest(
-            @NotBlank(message = "No job id entered. Unable to continue.")
+            @NotNull(message = "JobRequest object is null. Unable to continue.")
             final JobRequest jobRequest
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
