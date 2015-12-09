@@ -22,11 +22,19 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileCopyService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +57,7 @@ public class JobExecutor {
     private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
 
     private List<FileCopyService> fileCopyServiceImpls;
+    private String genieLauncherScript;
 //    private String stderrLogPath;
 //    private String stdoutLogPath;
 //    private String genieLogPath;
@@ -56,6 +65,7 @@ public class JobExecutor {
 
 
     private final JobExecutionEnvironment jobExecEnv;
+    private Writer fileWriter;
 
     /**
      * Constructor Initialize the object using Job execution environment object.
@@ -101,22 +111,31 @@ public class JobExecutor {
 
         setupStandardVariables();
         setupWorkingDirectory();
+        initializeWriter();
         processApplications();
         processCommand();
         processCluster();
         processJob();
+        closeWriter();
+        startJob();
     };
 
     /**
      * Method that starts the execution of the job and updates the database with its execution details.
      *
      */
-    private void startJob() {
-
+    private void startJob() throws GenieException {
+        // TODO set the cwd for the process.
+//        final List command = new ArrayList<>();
+//        command.add("bash");
+//        command.add(genieLauncherScript);
+//
+//        executeBashCommand(command);
     }
 
     private void setupStandardVariables() {
         // sets up standard vars like stderr and stdout path cmd.log jars dir, config dir
+        genieLauncherScript = jobExecEnv.getJobWorkingDir() + "/genie_job_launcher.sh";
 
     }
 
@@ -140,6 +159,18 @@ public class JobExecutor {
 
         for (Application application: this.jobExecEnv.getApplications()) {
             makeDir(jobExecEnv.getJobWorkingDir() + "/applications/" + application.getId());
+
+            final String applicationSetupFile  = application.getSetupFile();
+
+            if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
+                final Path setupFilePath = new File(applicationSetupFile).toPath();
+                final String setupFileLocalPath = jobExecEnv.getJobWorkingDir()
+                        + "/applications/"
+                        + application.getId()
+                        + "/"
+                        + setupFilePath.getFileName();
+                appendToWriter("source " + setupFileLocalPath + ";");
+            }
             //TODO copy down dependencies
         }
 
@@ -152,6 +183,18 @@ public class JobExecutor {
     private void processCommand() throws GenieException {
 
         makeDir(jobExecEnv.getJobWorkingDir() + "/command/" + jobExecEnv.getCommand().getId());
+        final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
+
+        if (commandSetupFile != null && StringUtils.isNotBlank(commandSetupFile)) {
+            final Path setupFilePath = new File(commandSetupFile).toPath();
+            final String setupFileLocalPath = jobExecEnv.getJobWorkingDir()
+                    + "/applications/"
+                    + jobExecEnv.getCommand().getId()
+                    + "/"
+                    + setupFilePath.getFileName();
+            appendToWriter("source " + setupFileLocalPath + ";");
+
+        }
         //TODO copy down dependencies
 
     }
@@ -170,8 +213,18 @@ public class JobExecutor {
      *
      */
     private void processJob() throws GenieException {
-        //makeDir(jobExecEnv.getJobWorkingDir() + "/job");
         //TODO copy down dependencies
+        final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
+
+        if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
+            final Path setupFilePath = new File(jobSetupFile).toPath();
+            final String setupFileLocalPath = jobExecEnv.getJobWorkingDir()
+                    + "/job/"
+                    + setupFilePath.getFileName();
+            appendToWriter("source " + setupFileLocalPath + ";");
+        }
+
+        appendToWriter(jobExecEnv.getCommand().getExecutable() + " " + jobExecEnv.getJobRequest().getCommandArgs());
     }
 
     /**
@@ -220,13 +273,58 @@ public class JobExecutor {
             final Process process = pb.start();
             final int errCode = process.waitFor();
             if (errCode != 0) {
-                LOG.error("Encountered error while running command: " + process.getErrorStream().toString());
                 throw new GenieServerException("Unable to execute bash command" + String.valueOf(command));
             }
         } catch (InterruptedException ie) {
             throw new GenieServerException("Unable to execute bash command" +  String.valueOf(command), ie);
         } catch (IOException ioe) {
             throw new GenieServerException("Unable to execute bash command" +  String.valueOf(command), ioe);
+        }
+    }
+
+    /**
+     * Initializes the writer to create job_launcher_script.sh.
+     * @throws GenieException Throw exception in case of failure while intializing the writer
+     */
+    private void initializeWriter() throws GenieException {
+        try {
+            //fileWriter = new FileWriter(genieLauncherScript);
+            fileWriter =  new OutputStreamWriter(new FileOutputStream(genieLauncherScript), "UTF-8");
+        } catch (IOException ioe) {
+            throw new GenieServerException("Could not open file to crate genie_launcher.sh", ioe);
+        }
+    }
+
+    /**
+     * Closes the writer to create job_launcher_script.sh.
+     * @throws GenieException Throw exception in case of failure while closing the writer
+     */
+    private void closeWriter() throws GenieException {
+
+        try {
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
+        } catch (IOException ioe) {
+            throw new GenieServerException("Error closing file writer", ioe);
+        }
+    }
+
+    /**
+     * Appends content to the writer.
+     *
+     * @param content The content to write.
+     * @throws GenieException Throw exception in case of failure while writing content to writer.
+     */
+    private void appendToWriter(final String content) throws GenieException {
+
+        try {
+            if (content != null && StringUtils.isNotBlank(content)) {
+                fileWriter.write(content);
+                fileWriter.write("\n");
+            }
+        } catch (IOException ioe) {
+            throw new GenieServerException("Error closing file writer", ioe);
         }
     }
 }
