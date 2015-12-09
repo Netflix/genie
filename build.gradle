@@ -15,7 +15,6 @@ buildscript {
 
 plugins {
     id 'nebula.netflixoss' version '3.1.2'
-    id 'org.unbroken-dome.test-sets' version '1.2.0'
 }
 
 ext.githubProjectName = rootProject.name
@@ -30,13 +29,6 @@ nebulaRelease {
     addReleaseBranchPattern(/(release(-|\/))?\d+(\.\d+)?\.(x|\d+)/)
 }
 
-allprojects {
-    clean {
-        delete "${projectDir}/genie-db"
-        delete "${projectDir}/data"
-    }
-}
-
 subprojects {
     apply plugin: 'nebula.netflixoss'
     apply plugin: 'java'
@@ -47,7 +39,6 @@ subprojects {
     apply plugin: 'pmd'
     apply plugin: 'jacoco'
     apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'org.unbroken-dome.test-sets'
 
     group = "com.netflix.${githubProjectName}"
 
@@ -81,7 +72,9 @@ subprojects {
     }
 
     clean {
-        delete generatedSourcesDir
+        delete "${projectDir}/genie-db"
+        delete "${projectDir}/data"
+        delete generatedSourcesDir.toString()
     }
 
     configurations {
@@ -140,7 +133,41 @@ subprojects {
         }
     }
 
-    check.dependsOn documentationTests
+    // See: http://csiebler.github.io/blog/2014/02/09/multi-project-code-coverage-using-gradle-and-jacoco/
+    task unitTestCoverage(type: JacocoReport) {
+        // (change this if you e.g. want to calculate unit test/integration test coverage separately)
+        executionData file("build/jacoco/test.exec")
+
+        // Add all relevant sourcesets from the subprojects
+        sourceSets sourceSets.main
+
+        reports {
+            xml.enabled false
+            html.destination "${reporting.baseDir}/jacoco/unitTests"
+            csv.enabled false
+        }
+    }
+
+    task integrationTestCoverage(type: JacocoReport) {
+        // (change this if you e.g. want to calculate unit test/integration test coverage separately)
+        executionData file("build/jacoco/integrationTests.exec")
+
+        // Add all relevant sourcesets from the subprojects
+        sourceSets sourceSets.main
+
+        reports {
+            xml.enabled false
+            html.destination "${reporting.baseDir}/jacoco/integrationTests"
+            csv.enabled false
+        }
+    }
+
+    // always run the tests before generating the report
+    unitTestCoverage.dependsOn test
+    integrationTestCoverage.dependsOn integrationTests
+
+    check.dependsOn unitTestCoverage
+    check.dependsOn integrationTestCoverage
 
     tasks.withType(Test) {
         reports.html.destination = file("${reporting.baseDir}/test/${name}")
@@ -160,10 +187,6 @@ subprojects {
     }
 
     tasks.withType(Pmd) {
-        reports.html.enabled true
-    }
-
-    jacocoTestReport {
         reports.html.enabled true
     }
 }
