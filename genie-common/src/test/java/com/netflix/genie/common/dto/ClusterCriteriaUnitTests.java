@@ -39,10 +39,19 @@ public class ClusterCriteriaUnitTests {
      * Make sure the constructor create sets properly.
      */
     @Test
-    public void testConstructor() {
+    public void canConstruct() {
         final Set<String> tags = Sets.newHashSet("tag1", "tag2");
         final ClusterCriteria cc = new ClusterCriteria(tags);
         Assert.assertThat(cc.getTags(), Matchers.is(tags));
+    }
+
+    /**
+     * Make sure the constructor create sets properly.
+     */
+    @Test
+    public void canConstructWithNullTags() {
+        final ClusterCriteria cc = new ClusterCriteria(null);
+        Assert.assertThat(cc.getTags(), Matchers.empty());
     }
 
     /**

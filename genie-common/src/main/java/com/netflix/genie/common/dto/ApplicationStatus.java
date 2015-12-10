@@ -56,6 +56,7 @@ public enum ApplicationStatus {
             }
         }
         throw new GeniePreconditionException(
-                "Unacceptable application status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
+            "Unacceptable application status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}"
+        );
     }
 }

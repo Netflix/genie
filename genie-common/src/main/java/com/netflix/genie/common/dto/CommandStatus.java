@@ -56,6 +56,7 @@ public enum CommandStatus {
             }
         }
         throw new GeniePreconditionException(
-                "Unacceptable command status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}");
+            "Unacceptable command status. Must be one of {ACTIVE, DEPRECATED, INACTIVE}"
+        );
     }
 }

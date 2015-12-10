@@ -29,11 +29,22 @@ nebulaRelease {
     addReleaseBranchPattern(/(release(-|\/))?\d+(\.\d+)?\.(x|\d+)/)
 }
 
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+}
+
+idea {
+    project {
+        jdkName = '1.8'
+        languageLevel = '1.8'
+        vcs = 'Git'
+    }
+}
+
 subprojects {
     apply plugin: 'nebula.netflixoss'
     apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
     apply plugin: 'checkstyle'
     apply plugin: 'findbugs'
     apply plugin: 'pmd'
@@ -87,7 +98,6 @@ subprojects {
          *******************************/
 
         compile("org.apache.commons:commons-lang3")
-        compile("org.springframework.boot:spring-boot-starter-logging")
 
         /*******************************
          * Provided Dependencies

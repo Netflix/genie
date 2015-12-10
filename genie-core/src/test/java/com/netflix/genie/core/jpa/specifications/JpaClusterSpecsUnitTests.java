@@ -421,20 +421,17 @@ public class JpaClusterSpecsUnitTests {
      * Test to make sure no member of predicates are added.
      */
     @Test
+    @SuppressWarnings("unchecked")
     public void testFindByClusterAndCommandCriteriaNoCriteria() {
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .findByClusterAndCommandCriteria(null, null);
+        final Specification<ClusterEntity> spec = JpaClusterSpecs.findByClusterAndCommandCriteria(null, null);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cq, Mockito.times(1)).distinct(true);
         Mockito.verify(this.commands, Mockito.times(1)).get(CommandEntity_.status);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.commands.get(CommandEntity_.status), CommandStatus.ACTIVE);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.commands.get(CommandEntity_.status), CommandStatus.ACTIVE);
         Mockito.verify(this.root, Mockito.times(1)).get(ClusterEntity_.status);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ClusterEntity_.status), ClusterStatus.UP);
-        Mockito.verify(this.cb, Mockito.never())
-                .isMember(Mockito.any(String.class), Mockito.any(Expression.class));
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ClusterEntity_.status), ClusterStatus.UP);
+        Mockito.verify(this.cb, Mockito.never()).isMember(Mockito.any(String.class), Mockito.any(Expression.class));
     }
 
     /**

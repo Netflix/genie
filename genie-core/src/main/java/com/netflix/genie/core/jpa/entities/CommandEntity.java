@@ -71,11 +71,6 @@ public class CommandEntity extends CommonFields {
     @Column(name = "setup_file")
     private String setupFile;
 
-    @Basic
-    @Column(name = "job_type", length = 255)
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String jobType;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "command_configs",
@@ -202,24 +197,6 @@ public class CommandEntity extends CommonFields {
      */
     public void setSetupFile(final String setupFile) {
         this.setupFile = setupFile;
-    }
-
-    /**
-     * Gets the type of the command.
-     *
-     * @return jobType --- for eg: hive, pig, presto
-     */
-    public String getJobType() {
-        return this.jobType;
-    }
-
-    /**
-     * Sets the job type for this command.
-     *
-     * @param jobType job type for this command
-     */
-    public void setJobType(final String jobType) {
-        this.jobType = jobType;
     }
 
     /**
@@ -404,7 +381,6 @@ public class CommandEntity extends CommonFields {
                 .withTags(this.tags)
                 .withConfigs(this.configs)
                 .withSetupFile(this.setupFile)
-                .withJobType(this.jobType)
                 .build();
     }
 }

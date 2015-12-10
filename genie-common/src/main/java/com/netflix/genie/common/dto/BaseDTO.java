@@ -114,6 +114,7 @@ public abstract class BaseDTO {
      * @author tgianos
      * @since 3.0.0
      */
+    @SuppressWarnings("unchecked")
     protected abstract static class Builder<T extends Builder> {
 
         private String bId;

@@ -36,11 +36,10 @@ public abstract class ConfigDTO extends CommonDTO {
      *
      * @param builder The builder to use
      */
+    @SuppressWarnings("unchecked")
     protected ConfigDTO(final Builder builder) {
         super(builder);
-        if (builder.bConfigs != null) {
-            this.configs.addAll(builder.bConfigs);
-        }
+        this.configs.addAll(builder.bConfigs);
     }
 
     /**
@@ -59,6 +58,7 @@ public abstract class ConfigDTO extends CommonDTO {
      * @author tgianos
      * @since 3.0.0
      */
+    @SuppressWarnings("unchecked")
     protected abstract static class Builder<T extends Builder> extends CommonDTO.Builder<T> {
 
         private Set<String> bConfigs = new HashSet<>();

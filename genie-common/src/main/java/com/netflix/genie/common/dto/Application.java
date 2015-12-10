@@ -19,8 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
@@ -33,21 +31,12 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-@ApiModel(description = "A resource for an application in Genie.")
 @JsonDeserialize(builder = Application.Builder.class)
 public class Application extends ConfigDTO {
 
-    @ApiModelProperty(value = "Any dependencies needed to run this application which will be downloaded first")
     private final Set<String> dependencies = new HashSet<>();
-
-    @ApiModelProperty(value = "The current status of this application", required = true)
     @NotNull(message = "No application status entered and is required.")
     private ApplicationStatus status;
-
-    @ApiModelProperty(
-            value = "A file location with environment variables or "
-                    + "other settings which will be downloaded and sourced before application used"
-    )
     private String setupFile;
 
     /**
@@ -59,9 +48,7 @@ public class Application extends ConfigDTO {
         super(builder);
         this.status = builder.bStatus;
         this.setupFile = builder.bSetupFile;
-        if (builder.bDependencies != null) {
-            this.dependencies.addAll(builder.bDependencies);
-        }
+        this.dependencies.addAll(builder.bDependencies);
     }
 
     /**
@@ -112,14 +99,14 @@ public class Application extends ConfigDTO {
          * @param status  The status of the Application
          */
         public Builder(
-                @JsonProperty("name")
-                final String name,
-                @JsonProperty("user")
-                final String user,
-                @JsonProperty("version")
-                final String version,
-                @JsonProperty("status")
-                final ApplicationStatus status
+            @JsonProperty("name")
+            final String name,
+            @JsonProperty("user")
+            final String user,
+            @JsonProperty("version")
+            final String version,
+            @JsonProperty("status")
+            final ApplicationStatus status
         ) {
             super(name, user, version);
             this.bStatus = status;

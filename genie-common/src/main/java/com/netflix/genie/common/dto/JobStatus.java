@@ -64,6 +64,7 @@ public enum JobStatus {
             }
         }
         throw new GeniePreconditionException(
-                "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed}");
+            "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed}"
+        );
     }
 }

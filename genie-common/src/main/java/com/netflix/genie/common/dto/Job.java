@@ -148,7 +148,7 @@ public class Job extends CommonDTO {
      */
     public static class Builder extends CommonDTO.Builder<Builder> {
 
-        private JobStatus bStatus;
+        private JobStatus bStatus = JobStatus.INIT;
         private String bStatusMsg;
         private Date bStarted;
         private Date bFinished;
@@ -164,12 +164,12 @@ public class Job extends CommonDTO {
          * @param version The version to use for the Job
          */
         public Builder(
-                @JsonProperty("name")
-                final String name,
-                @JsonProperty("user")
-                final String user,
-                @JsonProperty("version")
-                final String version
+            @JsonProperty("name")
+            final String name,
+            @JsonProperty("user")
+            final String user,
+            @JsonProperty("version")
+            final String version
         ) {
             super(name, user, version);
         }
@@ -204,7 +204,9 @@ public class Job extends CommonDTO {
          * @see JobStatus
          */
         public Builder withStatus(final JobStatus status) {
-            this.bStatus = status;
+            if (status != null) {
+                this.bStatus = status;
+            }
             return this;
         }
 

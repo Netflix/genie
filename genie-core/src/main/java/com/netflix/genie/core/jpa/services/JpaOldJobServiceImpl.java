@@ -109,7 +109,7 @@ public class JpaOldJobServiceImpl implements OldJobService {
         requestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
         requestEntity.setCommandArgs(jobRequest.getCommandArgs());
         requestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
-        requestEntity.setDisableLogArchival(jobRequest.getDisableLogArchival());
+        requestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
         requestEntity.setEmail(jobRequest.getEmail());
         requestEntity.setFileDependenciesFromSet(jobRequest.getFileDependencies());
         requestEntity.setGroup(jobRequest.getGroup());

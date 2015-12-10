@@ -19,12 +19,9 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * A command data transfer object. After creation it is read-only.
@@ -32,36 +29,16 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
-@ApiModel(description = "A resource for a command in Genie.")
 @JsonDeserialize(builder = Command.Builder.class)
 public class Command extends ConfigDTO {
 
-    @ApiModelProperty(
-            value = "The status of the command",
-            required = true
-    )
     @NotNull(message = "No command status entered and is required.")
     private CommandStatus status;
 
-    @ApiModelProperty(
-            value = "Location of the executable for this command",
-            required = true
-    )
-    @NotBlank(message = "No executable entered for command and is required.")
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(min = 1, max = 255, message = "Executable path can't be longer than 255 characters")
     private String executable;
 
-    @ApiModelProperty(
-            value = "Location of a setup file which will be downloaded and run before command execution"
-    )
     private String setupFile;
-
-    //TODO: this doesn't seem useful we don't use it for anything other than human data...remove
-    @ApiModelProperty(
-            value = "Job type of the command. eg: hive, pig , hadoop etc"
-    )
-    @Length(max = 255, message = "Max length is 255 characters")
-    private String jobType;
 
     /**
      * Constructor used by the builder.
@@ -73,7 +50,6 @@ public class Command extends ConfigDTO {
         this.status = builder.bStatus;
         this.executable = builder.bExecutable;
         this.setupFile = builder.bSetupFile;
-        this.jobType = builder.bJobType;
     }
 
     /**
@@ -104,15 +80,6 @@ public class Command extends ConfigDTO {
     }
 
     /**
-     * Get the job type of the command.
-     *
-     * @return The job type
-     */
-    public String getJobType() {
-        return this.jobType;
-    }
-
-    /**
      * A builder to create commands.
      *
      * @author tgianos
@@ -123,28 +90,27 @@ public class Command extends ConfigDTO {
         private final CommandStatus bStatus;
         private final String bExecutable;
         private String bSetupFile;
-        private String bJobType;
 
         /**
          * Constructor which has required fields.
          *
-         * @param name        The name to use for the Command
-         * @param user        The user to use for the Command
-         * @param version     The version to use for the Command
-         * @param status      The status of the Command
+         * @param name       The name to use for the Command
+         * @param user       The user to use for the Command
+         * @param version    The version to use for the Command
+         * @param status     The status of the Command
          * @param executable The executable for the command
          */
         public Builder(
-                @JsonProperty("name")
-                final String name,
-                @JsonProperty("user")
-                final String user,
-                @JsonProperty("version")
-                final String version,
-                @JsonProperty("status")
-                final CommandStatus status,
-                @JsonProperty("executable")
-                final String executable
+            @JsonProperty("name")
+            final String name,
+            @JsonProperty("user")
+            final String user,
+            @JsonProperty("version")
+            final String version,
+            @JsonProperty("status")
+            final CommandStatus status,
+            @JsonProperty("executable")
+            final String executable
         ) {
             super(name, user, version);
             this.bStatus = status;
@@ -159,17 +125,6 @@ public class Command extends ConfigDTO {
          */
         public Builder withSetupFile(final String setupFile) {
             this.bSetupFile = setupFile;
-            return this;
-        }
-
-        /**
-         * Set the job type for the command.
-         *
-         * @param jobType The type of job this command will run
-         * @return The builder
-         */
-        public Builder withJobType(final String jobType) {
-            this.bJobType = jobType;
             return this;
         }
 

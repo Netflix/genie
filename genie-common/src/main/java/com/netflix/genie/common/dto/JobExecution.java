@@ -102,8 +102,8 @@ public class JobExecution extends BaseDTO {
 
         private final String bHostName;
         private final int bProcessId;
-        private int bExitCode = -1;
         private final Set<String> bClusterCriteria = new HashSet<>();
+        private int bExitCode = -1;
 
         /**
          * Constructor which has required fields.
@@ -112,10 +112,10 @@ public class JobExecution extends BaseDTO {
          * @param processId The id of the process running the job
          */
         public Builder(
-                @JsonProperty("hostName")
-                final String hostName,
-                @JsonProperty("processId")
-                final int processId
+            @JsonProperty("hostName")
+            final String hostName,
+            @JsonProperty("processId")
+            final int processId
         ) {
             super();
             this.bHostName = hostName;

@@ -65,7 +65,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_1_USER = "tgianos";
     private static final String COMMAND_1_VERSION = "1.2.3";
     private static final String COMMAND_1_EXECUTABLE = "pig";
-    private static final String COMMAND_1_JOB_TYPE = "yarn";
     private static final CommandStatus COMMAND_1_STATUS = CommandStatus.ACTIVE;
 
     private static final String COMMAND_2_ID = "command2";
@@ -73,7 +72,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_2_USER = "amsharma";
     private static final String COMMAND_2_VERSION = "4.5.6";
     private static final String COMMAND_2_EXECUTABLE = "hive";
-    private static final String COMMAND_2_JOB_TYPE = "yarn";
     private static final CommandStatus COMMAND_2_STATUS = CommandStatus.INACTIVE;
 
     private static final String COMMAND_3_ID = "command3";
@@ -81,7 +79,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_3_USER = "tgianos";
     private static final String COMMAND_3_VERSION = "7.8.9";
     private static final String COMMAND_3_EXECUTABLE = "pig";
-    private static final String COMMAND_3_JOB_TYPE = "yarn";
     private static final CommandStatus COMMAND_3_STATUS = CommandStatus.DEPRECATED;
 
     private static final Pageable PAGE = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
@@ -109,7 +106,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_1_VERSION, command1.getVersion());
         Assert.assertEquals(COMMAND_1_STATUS, command1.getStatus());
         Assert.assertEquals(COMMAND_1_EXECUTABLE, command1.getExecutable());
-        Assert.assertEquals(COMMAND_1_JOB_TYPE, command1.getJobType());
         Assert.assertEquals(5, command1.getTags().size());
         Assert.assertEquals(2, command1.getConfigs().size());
 
@@ -120,7 +116,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_2_VERSION, command2.getVersion());
         Assert.assertEquals(COMMAND_2_STATUS, command2.getStatus());
         Assert.assertEquals(COMMAND_2_EXECUTABLE, command2.getExecutable());
-        Assert.assertEquals(COMMAND_2_JOB_TYPE, command2.getJobType());
         Assert.assertEquals(4, command2.getTags().size());
         Assert.assertEquals(1, command2.getConfigs().size());
 
@@ -131,7 +126,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_3_VERSION, command3.getVersion());
         Assert.assertEquals(COMMAND_3_STATUS, command3.getStatus());
         Assert.assertEquals(COMMAND_3_EXECUTABLE, command3.getExecutable());
-        Assert.assertEquals(COMMAND_3_JOB_TYPE, command3.getJobType());
         Assert.assertEquals(5, command3.getTags().size());
         Assert.assertEquals(1, command3.getConfigs().size());
     }
@@ -395,7 +389,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
                 .withTags(tags)
                 .withConfigs(command.getConfigs())
                 .withSetupFile(command.getSetupFile())
-                .withJobType(command.getJobType())
                 .build();
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
@@ -454,7 +447,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
                 .withTags(init.getTags())
                 .withConfigs(init.getConfigs())
                 .withSetupFile(init.getSetupFile())
-                .withJobType(init.getJobType())
                 .build();
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);

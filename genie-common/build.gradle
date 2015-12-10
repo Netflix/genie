@@ -3,14 +3,14 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
+    // Guava
+    compile("com.google.guava:guava")
+
     // Hibernate Validator Libs
     compile("org.hibernate:hibernate-validator")
 
-    // Spring Libs
-    compile("org.springframework.boot:spring-boot-starter")
-
-    // Swagger Libs
-    compile("io.swagger:swagger-core:${swagger_version}")
+    // Jackson
+    compile("com.fasterxml.jackson.core:jackson-databind")
 
     /*******************************
      * Provided Dependencies

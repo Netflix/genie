@@ -153,9 +153,9 @@ ALTER TABLE `Command`
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   MODIFY `executable` VARCHAR(255) NOT NULL,
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
-  CHANGE `jobType` `job_type` VARCHAR(255),
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   DROP `APPLICATION_ID`,
+  DROP `jobType`,
   ADD INDEX `COMMAND_NAME_INDEX` (`name`),
   ADD INDEX `COMMAND_STATUS_INDEX` (`status`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Command table' AS '';

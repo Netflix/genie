@@ -375,7 +375,6 @@ public class CommandControllerIntegrationTests {
                 .withTags(createdCommand.getTags())
                 .withConfigs(createdCommand.getConfigs())
                 .withSetupFile(createdCommand.getSetupFile())
-                .withJobType(createdCommand.getJobType())
                 .build();
         final HttpEntity<Command> entity = new HttpEntity<>(updateCommand, HEADERS);
         restTemplate.put(location, entity);

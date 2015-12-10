@@ -19,8 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
@@ -35,15 +33,10 @@ import java.util.Set;
  * @author tgianos
  * @since 2.0.0
  */
-@ApiModel(description = "A set of cluster criteria for a job.")
 public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;
 
-    @ApiModelProperty(
-            value = "The tags which are ANDed together to select a viable cluster for the job",
-            required = true
-    )
     @NotEmpty(message = "No tags passed in to set and are required")
     private Set<String> tags = new HashSet<>();
 
@@ -54,9 +47,9 @@ public class ClusterCriteria implements Serializable {
      */
     @JsonCreator
     public ClusterCriteria(
-            @JsonProperty("tags")
-            final Set<String> tags
-    )  {
+        @JsonProperty("tags")
+        final Set<String> tags
+    ) {
         if (tags != null) {
             this.tags.addAll(tags);
         }

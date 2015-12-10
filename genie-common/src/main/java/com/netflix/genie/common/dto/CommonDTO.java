@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.common.dto;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,36 +30,32 @@ import java.util.Set;
  */
 public abstract class CommonDTO extends BaseDTO {
 
-    @NotBlank(message = "Version is missing and is required.")
-    @Size(max = 255, message = "Max length is 255 characters")
+    private final Set<String> tags = new HashSet<>();
+
+    @Size(min = 1, max = 255, message = "Max length is 255 characters")
     private String version;
 
-    @NotBlank(message = "User name is missing and is required.")
-    @Size(max = 255, message = "Max length is 255 characters")
+    @Size(min = 1, max = 255, message = "Max length is 255 characters")
     private String user;
 
-    @NotBlank(message = "Name is missing and is required.")
-    @Size(max = 255, message = "Max length is 255 characters")
+    @Size(min = 1, max = 255, message = "Max length is 255 characters")
     private String name;
 
     private String description;
-
-    private final Set<String> tags = new HashSet<>();
 
     /**
      * Constructor.
      *
      * @param builder The builder to use
      */
+    @SuppressWarnings("unchecked")
     protected CommonDTO(final Builder builder) {
         super(builder);
         this.name = builder.bName;
         this.user = builder.bUser;
         this.version = builder.bVersion;
         this.description = builder.bDescription;
-        if (builder.bTags != null) {
-            this.tags.addAll(builder.bTags);
-        }
+        this.tags.addAll(builder.bTags);
     }
 
     /**
@@ -116,6 +110,7 @@ public abstract class CommonDTO extends BaseDTO {
      * @author tgianos
      * @since 3.0.0
      */
+    @SuppressWarnings("unchecked")
     protected abstract static class Builder<T extends Builder> extends BaseDTO.Builder<T> {
 
         private final String bName;

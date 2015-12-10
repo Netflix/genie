@@ -59,7 +59,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testDefaultConstructor() {
         Assert.assertNull(this.c.getSetupFile());
         Assert.assertNull(this.c.getExecutable());
-        Assert.assertNull(this.c.getJobType());
         Assert.assertNull(this.c.getName());
         Assert.assertNull(this.c.getStatus());
         Assert.assertNull(this.c.getUser());
@@ -84,7 +83,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         c = new CommandEntity(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
         Assert.assertNull(this.c.getSetupFile());
         Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
-        Assert.assertNull(this.c.getJobType());
         Assert.assertEquals(NAME, this.c.getName());
         Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
         Assert.assertEquals(USER, this.c.getUser());
@@ -186,17 +184,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         final String propFile = "s3://netflix.propFile";
         this.c.setSetupFile(propFile);
         Assert.assertEquals(propFile, this.c.getSetupFile());
-    }
-
-    /**
-     * Test setting the job type.
-     */
-    @Test
-    public void testSetJobType() {
-        Assert.assertNull(this.c.getJobType());
-        final String jobType = "pig";
-        this.c.setJobType(jobType);
-        Assert.assertEquals(jobType, this.c.getJobType());
     }
 
     /**

@@ -72,20 +72,15 @@ public class JobRequest extends CommonDTO {
      *
      * @param builder The builder to use
      */
+    @SuppressWarnings("unchecked")
     protected JobRequest(final Builder builder) {
         super(builder);
         this.commandArgs = builder.bCommandArgs;
-        if (builder.bClusterCriterias != null) {
-            this.clusterCriterias.addAll(builder.bClusterCriterias);
-        }
-        if (builder.bCommandCriteria != null) {
-            this.commandCriteria.addAll(builder.bCommandCriteria);
-        }
+        this.clusterCriterias.addAll(builder.bClusterCriterias);
+        this.commandCriteria.addAll(builder.bCommandCriteria);
         this.group = builder.bGroup;
         this.setupFile = builder.bSetupFile;
-        if (builder.bFileDependencies != null) {
-            this.fileDependencies.addAll(builder.bFileDependencies);
-        }
+        this.fileDependencies.addAll(builder.bFileDependencies);
         this.disableLogArchival = builder.bDisableLogArchival;
         this.email = builder.bEmail;
         this.cpu = builder.bCpu;
@@ -144,15 +139,6 @@ public class JobRequest extends CommonDTO {
      */
     public Set<String> getFileDependencies() {
         return Collections.unmodifiableSet(this.fileDependencies);
-    }
-
-    /**
-     * Get whether to disable log archival or not.
-     *
-     * @return true if it should be disabled
-     */
-    public boolean getDisableLogArchival() {
-        return this.disableLogArchival;
     }
 
     /**
@@ -221,18 +207,18 @@ public class JobRequest extends CommonDTO {
          * @param commandCriteria  The list of command criteria for the Job
          */
         public Builder(
-                @JsonProperty("name")
-                final String name,
-                @JsonProperty("user")
-                final String user,
-                @JsonProperty("version")
-                final String version,
-                @JsonProperty("commandArgs")
-                final String commandArgs,
-                @JsonProperty("clusterCriterias")
-                final List<ClusterCriteria> clusterCriterias,
-                @JsonProperty("commandCriteria")
-                final Set<String> commandCriteria
+            @JsonProperty("name")
+            final String name,
+            @JsonProperty("user")
+            final String user,
+            @JsonProperty("version")
+            final String version,
+            @JsonProperty("commandArgs")
+            final String commandArgs,
+            @JsonProperty("clusterCriterias")
+            final List<ClusterCriteria> clusterCriterias,
+            @JsonProperty("commandCriteria")
+            final Set<String> commandCriteria
         ) {
             super(name, user, version);
             this.bCommandArgs = commandArgs;

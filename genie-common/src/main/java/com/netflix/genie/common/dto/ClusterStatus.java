@@ -56,6 +56,7 @@ public enum ClusterStatus {
             }
         }
         throw new GeniePreconditionException(
-                "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}");
+            "Unacceptable cluster status. Must be one of {UP, OUT_OF_SERVICE, TERMINATED}"
+        );
     }
 }

@@ -19,12 +19,9 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Cluster DTO object. Read only after construction.
@@ -32,25 +29,13 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
-@ApiModel(description = "A resource for a cluster in Genie.")
 @JsonDeserialize(builder = Cluster.Builder.class)
 public class Cluster extends ConfigDTO {
 
-    @ApiModelProperty(
-            value = "The status of the cluster",
-            required = true
-    )
     @NotNull(message = "No cluster status entered and is required.")
     private ClusterStatus status;
 
-    @ApiModelProperty(
-            value = "The type of the cluster to use to figure out the job manager for this"
-                    + " cluster. e.g.: yarn, presto, mesos etc. The mapping to a JobManager will be"
-                    + " specified using the property: com.netflix.genie.server.job.manager.<clusterType>.impl",
-            required = true
-    )
-    @NotBlank(message = "No cluster type entered and is required.")
-    @Length(max = 255, message = "Max length is 255 characters")
+    @Size(min = 1, max = 255)
     private String clusterType;
 
     /**
@@ -78,6 +63,7 @@ public class Cluster extends ConfigDTO {
      *
      * @return The type of the cluster
      */
+    //TODO: Remove cluster type if we don't need it
     public String getClusterType() {
         return this.clusterType;
     }
@@ -103,16 +89,16 @@ public class Cluster extends ConfigDTO {
          * @param clusterType The type of the Cluster [yarn, presto, etc]
          */
         public Builder(
-                @JsonProperty("name")
-                final String name,
-                @JsonProperty("user")
-                final String user,
-                @JsonProperty("version")
-                final String version,
-                @JsonProperty("status")
-                final ClusterStatus status,
-                @JsonProperty("clusterType")
-                final String clusterType
+            @JsonProperty("name")
+            final String name,
+            @JsonProperty("user")
+            final String user,
+            @JsonProperty("version")
+            final String version,
+            @JsonProperty("status")
+            final ClusterStatus status,
+            @JsonProperty("clusterType")
+            final String clusterType
         ) {
             super(name, user, version);
             this.bStatus = status;

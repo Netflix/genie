@@ -296,7 +296,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         // TODO convert set to csv
         //jobRequestEntity.setFileDependencies(jobRequest.getFileDependencies());
 
-        jobRequestEntity.setDisableLogArchival(jobRequest.getDisableLogArchival());
+        jobRequestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
         jobRequestEntity.setEmail(jobRequest.getEmail());
 
         // TODO sort tags?
