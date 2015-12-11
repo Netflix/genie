@@ -152,7 +152,7 @@ subprojects {
         sourceSets sourceSets.main
 
         reports {
-            xml.enabled false
+            xml.enabled true
             html.destination "${reporting.baseDir}/jacoco/unitTests"
             csv.enabled false
         }
@@ -166,7 +166,7 @@ subprojects {
         sourceSets sourceSets.main
 
         reports {
-            xml.enabled false
+            xml.enabled true
             html.destination "${reporting.baseDir}/jacoco/integrationTests"
             csv.enabled false
         }

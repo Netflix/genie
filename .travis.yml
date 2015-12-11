@@ -19,3 +19,9 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+# Code coverage
+before_install:
+  - pip install --user codecov
+after_success:
+  - codecov
