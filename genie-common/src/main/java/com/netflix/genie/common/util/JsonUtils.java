@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.jpa.entities;
+package com.netflix.genie.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,16 +28,16 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * Utility methods for JPA entities.
+ * Utility methods for interacting with JSON.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public final class EntityUtils {
+public final class JsonUtils {
     /**
      * Private constructor for a utility class.
      */
-    private EntityUtils() {
+    private JsonUtils() {
     }
 
     /**

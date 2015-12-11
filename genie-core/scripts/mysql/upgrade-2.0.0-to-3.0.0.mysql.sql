@@ -210,7 +210,7 @@ CREATE TABLE `job_requests` (
   `cpu` INT(11) NOT NULL DEFAULT 1,
   `memory` INT(11) NOT NULL DEFAULT 1560,
   `client_host` VARCHAR(255) DEFAULT NULL,
-  FOREIGN KEY (`id`) REFERENCES `Job` (`id`) ON DELETE CASCADE
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_requests table' AS '';
 
@@ -378,6 +378,8 @@ ALTER TABLE `Job`
   DROP `commandArgs`,
   DROP `killURI`,
   DROP `outputURI`,
+  DROP PRIMARY KEY,
+  ADD FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE,
   ADD FOREIGN KEY (`cluster_id`) REFERENCES `Cluster` (`id`) ON DELETE RESTRICT,
   ADD FOREIGN KEY (`command_id`) REFERENCES `Command` (`id`) ON DELETE RESTRICT,
   ADD INDEX `JOBS_STARTED_INDEX` (`started`),

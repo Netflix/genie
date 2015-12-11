@@ -23,20 +23,21 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.util.JsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.List;
@@ -105,9 +106,12 @@ public class JobRequestEntity extends CommonFields {
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String clientHost;
 
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    @MapsId
+    @OneToOne(
+        mappedBy = "request",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private JobEntity job;
 
     /**
@@ -136,7 +140,7 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException on any error
      */
     public List<ClusterCriteria> getClusterCriteriasAsList() throws GenieException {
-        return EntityUtils.unmarshall(this.clusterCriterias, new TypeReference<List<ClusterCriteria>>() {
+        return JsonUtils.unmarshall(this.clusterCriterias, new TypeReference<List<ClusterCriteria>>() {
         });
     }
 
@@ -165,9 +169,9 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException If any precondition isn't met.
      */
     public void setClusterCriteriasFromList(
-            @NotEmpty(message = "No cluster criterias entered") final List<ClusterCriteria> clusterCriteriasList
+        @NotEmpty(message = "No cluster criterias entered") final List<ClusterCriteria> clusterCriteriasList
     ) throws GenieException {
-        this.clusterCriterias = EntityUtils.marshall(clusterCriteriasList);
+        this.clusterCriterias = JsonUtils.marshall(clusterCriteriasList);
     }
 
     /**
@@ -201,7 +205,7 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException On any exception
      */
     public Set<String> getFileDependenciesAsSet() throws GenieException {
-        return EntityUtils.unmarshall(this.fileDependencies, new TypeReference<Set<String>>() {
+        return JsonUtils.unmarshall(this.fileDependencies, new TypeReference<Set<String>>() {
         });
     }
 
@@ -231,8 +235,8 @@ public class JobRequestEntity extends CommonFields {
      */
     public void setFileDependenciesFromSet(final Set<String> fileDependenciesSet) throws GenieException {
         this.fileDependencies = fileDependenciesSet == null
-                ? EntityUtils.marshall(new HashSet<>())
-                : EntityUtils.marshall(fileDependenciesSet);
+            ? JsonUtils.marshall(new HashSet<>())
+            : JsonUtils.marshall(fileDependenciesSet);
     }
 
     /**
@@ -297,7 +301,7 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException on any processing error
      */
     public Set<String> getCommandCriteriaAsSet() throws GenieException {
-        return EntityUtils.unmarshall(this.commandCriteria, new TypeReference<Set<String>>() {
+        return JsonUtils.unmarshall(this.commandCriteria, new TypeReference<Set<String>>() {
         });
     }
 
@@ -327,9 +331,9 @@ public class JobRequestEntity extends CommonFields {
      * @throws GenieException If any precondition isn't met.
      */
     public void setCommandCriteriaFromSet(
-            @NotEmpty(message = "At least one command criteria required") final Set<String> commandCriteriaSet
+        @NotEmpty(message = "At least one command criteria required") final Set<String> commandCriteriaSet
     ) throws GenieException {
-        this.commandCriteria = EntityUtils.marshall(commandCriteriaSet);
+        this.commandCriteria = JsonUtils.marshall(commandCriteriaSet);
     }
 
     /**
@@ -421,7 +425,7 @@ public class JobRequestEntity extends CommonFields {
      *
      * @param job The job
      */
-    public void setJob(final JobEntity job) {
+    public void setJob(@NotNull(message = "Job can't be null") final JobEntity job) {
         this.job = job;
     }
 
@@ -433,25 +437,25 @@ public class JobRequestEntity extends CommonFields {
      */
     public JobRequest getDTO() throws GenieException {
         return new JobRequest.Builder(
-                this.getName(),
-                this.getUser(),
-                this.getVersion(),
-                this.commandArgs,
-                this.getClusterCriteriasAsList(),
-                this.getCommandCriteriaAsSet()
+            this.getName(),
+            this.getUser(),
+            this.getVersion(),
+            this.commandArgs,
+            this.getClusterCriteriasAsList(),
+            this.getCommandCriteriaAsSet()
         )
-                .withCreated(this.getCreated())
-                .withId(this.getId())
-                .withDescription(this.getDescription())
-                .withDisableLogArchival(this.disableLogArchival)
-                .withEmail(this.email)
-                .withFileDependencies(this.getFileDependenciesAsSet())
-                .withGroup(this.group)
-                .withSetupFile(this.setupFile)
-                .withTags(this.getTags())
-                .withCpu(this.cpu)
-                .withMemory(this.memory)
-                .withUpdated(this.getUpdated())
-                .build();
+            .withCreated(this.getCreated())
+            .withId(this.getId())
+            .withDescription(this.getDescription())
+            .withDisableLogArchival(this.disableLogArchival)
+            .withEmail(this.email)
+            .withFileDependencies(this.getFileDependenciesAsSet())
+            .withGroup(this.group)
+            .withSetupFile(this.setupFile)
+            .withTags(this.getTags())
+            .withCpu(this.cpu)
+            .withMemory(this.memory)
+            .withUpdated(this.getUpdated())
+            .build();
     }
 }

@@ -128,8 +128,6 @@ public class JpaOldJobServiceImpl implements OldJobService {
         jobEntity.setId(StringUtils.isBlank(requestId) ? UUID.randomUUID().toString() : requestId);
         jobEntity.setJobStatus(JobStatus.INIT, "Initializing job");
 
-        jobEntity.setRequest(requestEntity);
-
         // Validation successful. init state in DB - return if job already exists
         try {
             // if job can be launched, update the URIs

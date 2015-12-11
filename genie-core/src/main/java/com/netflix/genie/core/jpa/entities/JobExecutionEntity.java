@@ -20,6 +20,7 @@ package com.netflix.genie.core.jpa.entities;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.util.JsonUtils;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -127,7 +128,7 @@ public class JobExecutionEntity extends BaseEntity {
      * @throws GenieException For any serialization error
      */
     public Set<String> getClusterCriteriaAsSet() throws GenieException {
-        return EntityUtils.unmarshall(this.clusterCriteria, new TypeReference<Set<String>>() {
+        return JsonUtils.unmarshall(this.clusterCriteria, new TypeReference<Set<String>>() {
         });
     }
 
@@ -139,8 +140,8 @@ public class JobExecutionEntity extends BaseEntity {
      */
     public void setClusterCriteriaFromSet(final Set<String> clusterCriteriaSet) throws GenieException {
         this.clusterCriteria = clusterCriteria == null
-                ? EntityUtils.marshall(new HashSet<String>())
-                : EntityUtils.marshall(clusterCriteria);
+            ? JsonUtils.marshall(new HashSet<String>())
+            : JsonUtils.marshall(clusterCriteria);
     }
 
     /**
@@ -187,11 +188,11 @@ public class JobExecutionEntity extends BaseEntity {
      */
     public JobExecution getDTO() throws GenieException {
         return new JobExecution.Builder(
-                this.hostName,
-                this.processId
+            this.hostName,
+            this.processId
         )
-                .withExitCode(this.exitCode)
-                .withClusterCriteria(this.getClusterCriteriaAsSet())
-                .build();
+            .withExitCode(this.exitCode)
+            .withClusterCriteria(this.getClusterCriteriaAsSet())
+            .build();
     }
 }

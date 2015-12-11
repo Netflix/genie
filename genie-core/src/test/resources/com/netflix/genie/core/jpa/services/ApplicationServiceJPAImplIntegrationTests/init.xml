@@ -16,119 +16,119 @@
 -->
 <dataset>
     <applications
-            id="app1"
-            created="2014-08-08 01:45:00"
-            updated="2014-08-08 01:50:00"
-            user="tgianos"
-            name="tez"
-            version="1.2.3"
-            status="INACTIVE"
-            entity_version="0"
-            sorted_tags="genie.id:app1,genie.name:tez,prod"
+        id="app1"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        user="tgianos"
+        name="tez"
+        version="1.2.3"
+        status="INACTIVE"
+        entity_version="0"
+        sorted_tags="genie.id:app1,genie.name:tez,prod"
     />
     <application_tags
-            application_id="app1"
-            tag="genie.id:app1"/>
+        application_id="app1"
+        tag="genie.id:app1"/>
     <application_tags
-            application_id="app1"
-            tag="genie.name:tez"/>
+        application_id="app1"
+        tag="genie.name:tez"/>
     <application_tags
-            application_id="app1"
-            tag="prod"/>
+        application_id="app1"
+        tag="prod"/>
     <application_configs
-            application_id="app1"
-            config="s3://some/config/file"/>
+        application_id="app1"
+        config="s3://some/config/file"/>
     <application_configs
-            application_id="app1"
-            config="s3://some/other/config/file"/>
+        application_id="app1"
+        config="s3://some/other/config/file"/>
     <application_dependencies
-            application_id="app1"
-            dependency="tez.jar"/>
+        application_id="app1"
+        dependency="tez.jar"/>
     <application_dependencies
-            application_id="app1"
-            dependency="yarn.jar"/>
+        application_id="app1"
+        dependency="yarn.jar"/>
 
     <applications
-            id="app2"
-            created="2014-08-09 01:45:00"
-            updated="2014-08-09 01:50:00"
-            user="amsharma"
-            name="spark"
-            version="4.5.6"
-            status="ACTIVE"
-            entity_version="0"
-            sorted_tags="genie.id:app2,genie.name:spark,prod,yarn"
+        id="app2"
+        created="2014-08-09 01:45:00"
+        updated="2014-08-09 01:50:00"
+        user="amsharma"
+        name="spark"
+        version="4.5.6"
+        status="ACTIVE"
+        entity_version="0"
+        sorted_tags="genie.id:app2,genie.name:spark,prod,yarn"
     />
     <application_tags
-            application_id="app2"
-            tag="genie.id:app2"/>
+        application_id="app2"
+        tag="genie.id:app2"/>
     <application_tags
-            application_id="app2"
-            tag="genie.name:spark"/>
+        application_id="app2"
+        tag="genie.name:spark"/>
     <application_tags
-            application_id="app2"
-            tag="prod"/>
+        application_id="app2"
+        tag="prod"/>
     <application_tags
-            application_id="app2"
-            tag="yarn"/>
+        application_id="app2"
+        tag="yarn"/>
     <application_configs
-            application_id="app2"
-            config="s3://some/spark/config/file"/>
+        application_id="app2"
+        config="s3://some/spark/config/file"/>
     <application_configs
-            application_id="app2"
-            config="s3://some/other/spark/config/file"/>
+        application_id="app2"
+        config="s3://some/other/spark/config/file"/>
     <application_dependencies
-            application_id="app2"
-            dependency="spark.jar"/>
+        application_id="app2"
+        dependency="spark.jar"/>
 
     <applications
-            id="app3"
-            created="2014-08-10 01:45:00"
-            updated="2014-08-10 01:50:00"
-            user="tgianos"
-            name="storm"
-            version="7.8.9"
-            status="DEPRECATED"
-            entity_version="0"
-            sorted_tags="genie.id:app3,genie.name:storm,prod"
+        id="app3"
+        created="2014-08-10 01:45:00"
+        updated="2014-08-10 01:50:00"
+        user="tgianos"
+        name="storm"
+        version="7.8.9"
+        status="DEPRECATED"
+        entity_version="0"
+        sorted_tags="genie.id:app3,genie.name:storm,prod"
     />
     <application_tags
-            application_id="app3"
-            tag="genie.id:app3"/>
+        application_id="app3"
+        tag="genie.id:app3"/>
     <application_tags
-            application_id="app3"
-            tag="genie.name:storm"/>
+        application_id="app3"
+        tag="genie.name:storm"/>
     <application_tags
-            application_id="app3"
-            tag="prod"/>
+        application_id="app3"
+        tag="prod"/>
     <application_configs
-            application_id="app3"
-            config="s3://some/storm/config/file"/>
+        application_id="app3"
+        config="s3://some/storm/config/file"/>
     <application_dependencies
-            application_id="app3"
-            dependency="storm.jar"/>
+        application_id="app3"
+        dependency="storm.jar"/>
     <application_dependencies
-            application_id="app3"
-            dependency="yarn.jar"/>
+        application_id="app3"
+        dependency="yarn.jar"/>
 
     <commands
-            id="command1"
-            created="2014-08-08 01:47:00"
-            updated="2014-08-08 01:59:00"
-            user="tgianos"
-            name="pig_13_prod"
-            version="1.2.3"
-            executable="pig"
-            status="INACTIVE"
-            entity_version="0"
-            sorted_tags="genie.id:command1,genie.name:genie.name:pig_13_prod"
+        id="command1"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        user="tgianos"
+        name="pig_13_prod"
+        version="1.2.3"
+        executable="pig"
+        status="INACTIVE"
+        entity_version="0"
+        sorted_tags="genie.id:command1,genie.name:genie.name:pig_13_prod"
     />
     <command_tags
-            command_id="command1"
-            tag="genie.id:command1"/>
+        command_id="command1"
+        tag="genie.id:command1"/>
     <command_tags
-            command_id="command1"
-            tag="genie.name:pig_13_prod"/>
+        command_id="command1"
+        tag="genie.name:pig_13_prod"/>
 
     <commands_applications command_id="command1" application_id="app1"/>
 </dataset>

@@ -34,6 +34,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -95,26 +96,22 @@ public class JobEntity extends CommonFields {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
-            name = "job_tags",
-            joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "id")
+        name = "job_tags",
+        joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "id")
     )
     @Column(name = "tag", nullable = false, length = 255)
     private Set<String> tags = new HashSet<>();
 
-    @OneToOne(
-            mappedBy = "job",
-            optional = false,
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    @MapsId
     private JobRequestEntity request;
 
     @OneToOne(
-            mappedBy = "job",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+        mappedBy = "job",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
     )
     private JobExecutionEntity execution;
 
@@ -145,9 +142,9 @@ public class JobEntity extends CommonFields {
      * @param version The version of this job. Not null/empty/blank.
      */
     public JobEntity(
-            final String user,
-            final String name,
-            final String version
+        final String user,
+        final String name,
+        final String version
     ) {
         super(name, user, version);
 
@@ -295,8 +292,8 @@ public class JobEntity extends CommonFields {
         if (jobStatus == JobStatus.INIT) {
             this.setStarted(new Date());
         } else if (jobStatus == JobStatus.SUCCEEDED
-                || jobStatus == JobStatus.KILLED
-                || jobStatus == JobStatus.FAILED) {
+            || jobStatus == JobStatus.KILLED
+            || jobStatus == JobStatus.FAILED) {
             setFinished(new Date());
         }
     }
@@ -319,8 +316,8 @@ public class JobEntity extends CommonFields {
      */
     public Set<String> getJobTags() {
         return this.getSortedTags() == null
-                ? Sets.newHashSet()
-                : Sets.newHashSet(this.getSortedTags().split(COMMA));
+            ? Sets.newHashSet()
+            : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
@@ -362,8 +359,8 @@ public class JobEntity extends CommonFields {
      *
      * @return The original job request
      */
-    public JobRequestEntity getRequest() {
-        return request;
+    protected JobRequestEntity getRequest() {
+        return this.request;
     }
 
     /**
@@ -371,7 +368,7 @@ public class JobEntity extends CommonFields {
      *
      * @param request The job request. Not null.
      */
-    public void setRequest(@NotNull(message = "Request can't be null") final JobRequestEntity request) {
+    protected void setRequest(final JobRequestEntity request) {
         this.request = request;
     }
 
@@ -446,22 +443,22 @@ public class JobEntity extends CommonFields {
      */
     public Job getDTO() {
         return new Job.Builder(
-                this.getName(),
-                this.getUser(),
-                this.getVersion()
+            this.getName(),
+            this.getUser(),
+            this.getVersion()
         )
-                .withId(this.getId())
-                .withClusterName(this.clusterName)
-                .withCommandName(this.commandName)
-                .withCreated(this.getCreated())
-                .withDescription(this.getDescription())
-                .withTags(this.getJobTags())
-                .withUpdated(this.getUpdated())
-                .withArchiveLocation(this.archiveLocation)
-                .withFinished(this.finished)
-                .withStarted(this.started)
-                .withStatus(this.status)
-                .withStatusMsg(this.statusMsg)
-                .build();
+            .withId(this.getId())
+            .withClusterName(this.clusterName)
+            .withCommandName(this.commandName)
+            .withCreated(this.getCreated())
+            .withDescription(this.getDescription())
+            .withTags(this.getJobTags())
+            .withUpdated(this.getUpdated())
+            .withArchiveLocation(this.archiveLocation)
+            .withFinished(this.finished)
+            .withStarted(this.started)
+            .withStatus(this.status)
+            .withStatusMsg(this.statusMsg)
+            .build();
     }
 }
