@@ -35,9 +35,9 @@ import java.util.Collection;
  */
 public final class JsonUtils {
     /**
-     * Private constructor for a utility class.
+     * Protected constructor for a utility class.
      */
-    private JsonUtils() {
+    protected JsonUtils() {
     }
 
     /**

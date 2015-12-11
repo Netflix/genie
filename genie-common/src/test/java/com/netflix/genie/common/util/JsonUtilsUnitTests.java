@@ -38,6 +38,15 @@ import java.util.List;
 public class JsonUtilsUnitTests {
 
     /**
+     * Test the constructor.
+     */
+    @Test
+    public void canConstructInPackage() {
+        final JsonUtils utils = new JsonUtils();
+        Assert.assertThat(utils, Matchers.notNullValue());
+    }
+
+    /**
      * Test to make sure we can marshall an Object to a JSON string.
      *
      * @throws GenieException On marshalling error
