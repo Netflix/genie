@@ -5,8 +5,8 @@
 
 ## In Active Development
 
-This branch contains code in active development towards Genie 3.0. It is not yet ready for use. If you're looking for 
-a version that is ready for production please see the [master](https://github.com/Netflix/genie/tree/master) branch. 
+This branch contains code in active development towards Genie 3.0. It is not yet ready for use. If you're looking for
+a version that is ready for production please see the [master](https://github.com/Netflix/genie/tree/master) branch.
 If you want to see what we're working on see the [3.0.0 Milestone](https://github.com/Netflix/genie/milestones/3.0.0).
 
 ## Introduction
@@ -48,12 +48,19 @@ Please see the [ZeroToDocker](https://github.com/Netflix-Skunkworks/zerotodocker
 
 ## Builds
 
-Genie builds are hosted on CloudBees [here](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/).
+Genie builds are run on Travis CI [here](https://travis-ci.org/Netflix/genie).
 
-|        Build       |                                                                                                   Status                                                                                                  |
-|:------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|      Snapshots     |      [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-snapshot/)      |
-|      Releases      |       [![Build Status](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/badge/icon)](https://netflixoss.ci.cloudbees.com/job/NetflixOSS/job/genie/job/genie-release/)       |
+|  Branch |                                                      Build                                                      |                                                                    Coverage                                                                   |
+|:-------:|:---------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------:|
+|  Master |  [![Build Status](https://img.shields.io/travis/Netflix/genie/master.svg)](https://travis-ci.org/Netflix/genie/branches) |  [![Code Coverage](https://img.shields.io/codecov/c/github/Netflix/genie/master.svg)](https://codecov.io/github/Netflix/genie?branch=master)  |
+| Develop | [![Build Status](https://img.shields.io/travis/Netflix/genie/develop.svg)](https://travis-ci.org/Netflix/genie/branches) | [![Code Coverage](https://img.shields.io/codecov/c/github/Netflix/genie/develop.svg)](https://codecov.io/github/Netflix/genie?branch=develop) |
+
+## Coverage Trends
+
+|  Branch |                                                                    Trend                                                                   |
+|:-------:|:------------------------------------------------------------------------------------------------------------------------------------------:|
+|  Master |  [![codecov.io](https://codecov.io/github/Netflix/genie/branch.svg?branch=master)](https://codecov.io/github/Netflix/genie?branch=master)  |
+| Develop | [![codecov.io](https://codecov.io/github/Netflix/genie/branch.svg?branch=develop)](https://codecov.io/github/Netflix/genie?branch=develop) |
 
 ## Support
 
