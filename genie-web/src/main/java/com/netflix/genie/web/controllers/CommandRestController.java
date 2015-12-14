@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.web.controllers;
 
-import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -30,12 +28,6 @@ import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +51,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -73,7 +64,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(value = "/api/v3/commands")
-@Api(value = "commands", tags = "commands", description = "Manage the available commands")
 public class CommandRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandRestController.class);
@@ -93,10 +83,10 @@ public class CommandRestController {
      */
     @Autowired
     public CommandRestController(
-            final CommandService commandService,
-            final CommandResourceAssembler commandResourceAssembler,
-            final ApplicationResourceAssembler applicationResourceAssembler,
-            final ClusterResourceAssembler clusterResourceAssembler
+        final CommandService commandService,
+        final CommandResourceAssembler commandResourceAssembler,
+        final ApplicationResourceAssembler applicationResourceAssembler,
+        final ClusterResourceAssembler clusterResourceAssembler
     ) {
         this.commandService = commandService;
         this.commandResourceAssembler = commandResourceAssembler;
@@ -113,48 +103,18 @@ public class CommandRestController {
      */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(
-            value = "Create a command",
-            notes = "Create a command from the supplied information."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_CREATED,
-                    message = "Successfully created the command",
-                    responseHeaders = {@ResponseHeader(name = HttpHeaders.LOCATION, response = String.class)}
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_CONFLICT,
-                    message = "A command with the supplied id already exists"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public ResponseEntity<Void> createCommand(
-            @ApiParam(
-                    value = "The command to create.",
-                    required = true
-            )
-            @RequestBody
-            final Command command
-    ) throws GenieException {
+    public ResponseEntity<Void> createCommand(@RequestBody final Command command) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called to create new command configuration " + command.toString());
         }
         final String id = this.commandService.createCommand(command);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(id)
-                        .toUri()
+            ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri()
         );
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
@@ -168,33 +128,7 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Find a command by id",
-            notes = "Get the command by id if it exists",
-            response = CommandResource.class
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public CommandResource getCommand(
-            @ApiParam(
-                    value = "Id of the command to get.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public CommandResource getCommand(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to get command with id " + id);
         }
@@ -215,62 +149,28 @@ public class CommandRestController {
      */
     @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Find commands",
-            notes = "Find commands by the submitted criteria.",
-            response = CommandResource.class,
-            responseContainer = "List"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "One of the statuses was invalid"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public PagedResources<CommandResource> getCommands(
-            @ApiParam(
-                    value = "Name of the command."
-            )
-            @RequestParam(value = "name", required = false)
-            final String name,
-            @ApiParam(
-                    value = "User who created the command."
-            )
-            @RequestParam(value = "userName", required = false)
-            final String userName,
-            @ApiParam(
-                    value = "The statuses of the commands to find.",
-                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
-            )
-            @RequestParam(value = "status", required = false)
-            final Set<String> statuses,
-            @ApiParam(
-                    value = "Tags for the cluster."
-            )
-            @RequestParam(value = "tag", required = false)
-            final Set<String> tags,
-            @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
-            final Pageable page,
-            final PagedResourcesAssembler<Command> assembler
+        @RequestParam(value = "name", required = false) final String name,
+        @RequestParam(value = "userName", required = false) final String userName,
+        @RequestParam(value = "status", required = false) final Set<String> statuses,
+        @RequestParam(value = "tag", required = false) final Set<String> tags,
+        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+        final PagedResourcesAssembler<Command> assembler
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug(
-                    "Called [name | userName | status | tags | page]"
+                "Called [name | userName | status | tags | page]"
             );
             LOG.debug(
-                    name
-                            + " | "
-                            + userName
-                            + " | "
-                            + statuses
-                            + " | "
-                            + tags
-                            + " | "
-                            + page
+                name
+                    + " | "
+                    + userName
+                    + " | "
+                    + statuses
+                    + " | "
+                    + tags
+                    + " | "
+                    + page
             );
         }
 
@@ -284,8 +184,8 @@ public class CommandRestController {
             }
         }
         return assembler.toResource(
-                this.commandService.getCommands(name, userName, enumStatuses, tags, page),
-                this.commandResourceAssembler
+            this.commandService.getCommands(name, userName, enumStatuses, tags, page),
+            this.commandResourceAssembler
         );
     }
 
@@ -298,41 +198,9 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update a command",
-            notes = "Update a command from the supplied information."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully updated"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command to update not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateCommand(
-            @ApiParam(
-                    value = "Id of the command to update.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The command information to update.",
-                    required = true
-            )
-            @RequestBody
-            final Command updateCommand
+        @PathVariable("id") final String id,
+        @RequestBody final Command updateCommand
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to update command");
@@ -347,28 +215,6 @@ public class CommandRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Delete all commands",
-            notes = "Delete all available commands and get them back."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void deleteAllCommands() throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called to delete all commands.");
@@ -384,36 +230,7 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Delete a command",
-            notes = "Delete a command with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void deleteCommand(
-            @ApiParam(
-                    value = "Id of the command to delete.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void deleteCommand(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to delete command with id " + id);
         }
@@ -430,41 +247,9 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add new configuration files to a command",
-            notes = "Add the supplied configuration files to the command with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully added"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addConfigsForCommand(
-            @ApiParam(
-                    value = "Id of the command to add configuration to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The configuration files to add.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> configs
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> configs
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + configs);
@@ -482,34 +267,7 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the configuration files for a command",
-            notes = "Get the configuration files for the command with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> getConfigsForCommand(
-            @ApiParam(
-                    value = "Id of the command to get configurations for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public Set<String> getConfigsForCommand(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -527,41 +285,9 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update configuration files for an command",
-            notes = "Replace the existing configuration files for command with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully updated"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateConfigsForCommand(
-            @ApiParam(
-                    value = "Id of the command to update configurations for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The configuration files to replace existing with.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> configs
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> configs
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and configs " + configs);
@@ -578,36 +304,7 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove all configuration files from a command",
-            notes = "Remove all the configuration files from the command with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllConfigsForCommand(
-            @ApiParam(
-                    value = "Id of the command to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllConfigsForCommand(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -624,41 +321,9 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add new tags to a command",
-            notes = "Add the supplied tags to the command with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully added"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addTagsForCommand(
-            @ApiParam(
-                    value = "Id of the command to add configuration to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tags to add.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> tags
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> tags
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
@@ -676,34 +341,7 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the tags for a command",
-            notes = "Get the tags for the command with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> getTagsForCommand(
-            @ApiParam(
-                    value = "Id of the command to get tags for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public Set<String> getTagsForCommand(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -721,41 +359,9 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update tags for a command",
-            notes = "Replace the existing tags for command with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully updated"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateTagsForCommand(
-            @ApiParam(
-                    value = "Id of the command to update tags for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tags to replace existing with.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> tags
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> tags
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
@@ -772,37 +378,7 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove all tags from a command",
-            notes = "Remove all the tags from the command with given id.  Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllTagsForCommand(
-            @ApiParam(
-                    value = "Id of the command to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllTagsForCommand(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -819,42 +395,9 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove a tag from a command",
-            notes = "Remove the given tag from the command with given id.  Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void removeTagForCommand(
-            @ApiParam(
-                    value = "Id of the command to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tag to remove.",
-                    required = true
-            )
-            @PathVariable("tag")
-            final String tag
+        @PathVariable("id") final String id,
+        @PathVariable("tag") final String tag
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tag " + tag);
@@ -871,46 +414,12 @@ public class CommandRestController {
      * @throws GenieException For any error
      */
     @RequestMapping(
-            value = "/{id}/applications", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
+        value = "/{id}/applications", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add applications for a command",
-            notes = "Add the supplied applications to the command "
-                    + "with the supplied id. Applications should already "
-                    + "have been created."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully added"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addApplicationsForCommand(
-            @ApiParam(
-                    value = "Id of the command to set application for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The ids of the applications to set.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> applicationIds
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> applicationIds
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.info("Called with id " + id + " and application " + applicationIds);
@@ -928,41 +437,16 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the applications for a command",
-            notes = "Get the applications for the command with the supplied id.",
-            response = Application.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public Set<ApplicationResource> getApplicationsForCommand(
-            @ApiParam(
-                    value = "Id of the command to get the application for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
+        @PathVariable("id") final String id
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
         return this.commandService.getApplicationsForCommand(id)
-                .stream()
-                .map(this.applicationResourceAssembler::toResource)
-                .collect(Collectors.toSet());
+            .stream()
+            .map(this.applicationResourceAssembler::toResource)
+            .collect(Collectors.toSet());
     }
 
     /**
@@ -974,46 +458,12 @@ public class CommandRestController {
      * @throws GenieException For any error
      */
     @RequestMapping(
-            value = "/{id}/applications", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
+        value = "/{id}/applications", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Set applications for a command",
-            notes = "Set the supplied applications to the command "
-                    + "with the supplied id. Applications should already "
-                    + "have been created. Replaces existing applications."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully updated"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void setApplicationsForCommand(
-            @ApiParam(
-                    value = "Id of the command to set application for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The ids of the applications to set.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> applicationIds
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> applicationIds
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.info("Called with id " + id + " and application " + applicationIds);
@@ -1030,36 +480,7 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/applications", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove applications from a command",
-            notes = "Remove the applications from the command with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllApplicationsForCommand(
-            @ApiParam(
-                    value = "Id of the command to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllApplicationsForCommand(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id '" + id + "'.");
         }
@@ -1076,41 +497,9 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/applications/{appId}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove applications from a command",
-            notes = "Remove the applications from the command with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void removeApplicationForCommand(
-            @ApiParam(
-                    value = "Id of the command to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "Id of the application to remove.",
-                    required = true
-            )
-            @PathVariable("appId")
-            final String appId
+        @PathVariable("id") final String id,
+        @PathVariable("appId") final String appId
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id '" + id + "' and app id " + appId);
@@ -1129,39 +518,9 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/clusters", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the clusters this command is associated with",
-            notes = "Get the clusters which this command exists on supports.",
-            response = Cluster.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Command not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public Set<ClusterResource> getClustersForCommand(
-            @ApiParam(
-                    value = "Id of the command to get the clusters for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "Status of the cluster.",
-                    allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
-            )
-            @RequestParam(value = "status", required = false)
-            final Set<String> statuses
+        @PathVariable("id") final String id,
+        @RequestParam(value = "status", required = false) final Set<String> statuses
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and statuses " + statuses);
@@ -1178,8 +537,8 @@ public class CommandRestController {
         }
 
         return this.commandService.getClustersForCommand(id, enumStatuses)
-                .stream()
-                .map(this.clusterResourceAssembler::toResource)
-                .collect(Collectors.toSet());
+            .stream()
+            .map(this.clusterResourceAssembler::toResource)
+            .collect(Collectors.toSet());
     }
 }

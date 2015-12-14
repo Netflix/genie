@@ -1,12 +1,4 @@
-//import org.apache.tools.ant.filters.ReplaceTokens
-
 apply plugin: 'spring-boot'
-
-//processResources {
-//    filter ReplaceTokens, tokens: [
-//            "project.version": project.getVersion().toString()
-//    ]
-//}
 
 dependencies {
     /*******************************
@@ -19,10 +11,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_eureka_version}")
-
-    // Swagger Libs
-    compile("io.springfox:springfox-swagger2:${springfox_version}")
-    compile("io.springfox:springfox-swagger-ui:${springfox_version}")
 
     // Web Jars
     compile("org.webjars:bootstrap:${bootstrap_version}")

@@ -19,7 +19,6 @@ package com.netflix.genie.web.controllers;
 
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.ClusterService;
@@ -27,12 +26,6 @@ import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +49,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -70,7 +62,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(value = "/api/v3/clusters")
-@Api(value = "clusters", tags = "clusters", description = "Manage the available clusters")
 public class ClusterRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterRestController.class);
@@ -88,9 +79,9 @@ public class ClusterRestController {
      */
     @Autowired
     public ClusterRestController(
-            final ClusterService clusterService,
-            final ClusterResourceAssembler clusterResourceAssembler,
-            final CommandResourceAssembler commandResourceAssembler
+        final ClusterService clusterService,
+        final ClusterResourceAssembler clusterResourceAssembler,
+        final CommandResourceAssembler commandResourceAssembler
     ) {
         this.clusterService = clusterService;
         this.clusterResourceAssembler = clusterResourceAssembler;
@@ -106,48 +97,18 @@ public class ClusterRestController {
      */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(
-            value = "Create a cluster",
-            notes = "Create a cluster from the supplied information."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_CREATED,
-                    message = "Cluster created successfully.",
-                    responseHeaders = {@ResponseHeader(name = HttpHeaders.LOCATION, response = String.class)}
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_CONFLICT,
-                    message = "A cluster with the supplied id already exists"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public ResponseEntity<Void> createCluster(
-            @ApiParam(
-                    value = "The cluster to create.",
-                    required = true
-            )
-            @RequestBody
-            final Cluster cluster
-    ) throws GenieException {
+    public ResponseEntity<Void> createCluster(@RequestBody final Cluster cluster) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to create new cluster " + cluster);
         }
         final String id = this.clusterService.createCluster(cluster);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(id)
-                        .toUri()
+            ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri()
         );
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
@@ -161,33 +122,7 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Find a cluster by id",
-            notes = "Get the cluster by id if it exists",
-            response = ClusterResource.class
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public ClusterResource getCluster(
-            @ApiParam(
-                    value = "Id of the cluster to get.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public ClusterResource getCluster(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id: " + id);
         }
@@ -210,75 +145,37 @@ public class ClusterRestController {
      */
     @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Find clusters",
-            notes = "Find clusters by the submitted criteria.",
-            response = ClusterResource.class,
-            responseContainer = "List"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "If one of status is invalid"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public PagedResources<ClusterResource> getClusters(
-            @ApiParam(
-                    value = "Name of the cluster."
-            )
-            @RequestParam(value = "name", required = false)
-            final String name,
-            @ApiParam(
-                    value = "Status of the cluster.",
-                    allowableValues = "UP, OUT_OF_SERVICE, TERMINATED"
-            )
-            @RequestParam(value = "status", required = false)
-            final Set<String> statuses,
-            @ApiParam(
-                    value = "Tags for the cluster."
-            )
-            @RequestParam(value = "tag", required = false)
-            final Set<String> tags,
-            @ApiParam(
-                    value = "Minimum time threshold for cluster update"
-            )
-            @RequestParam(value = "minUpdateTime", required = false)
-            final Long minUpdateTime,
-            @ApiParam(
-                    value = "Maximum time threshold for cluster update"
-            )
-            @RequestParam(value = "maxUpdateTime", required = false)
-            final Long maxUpdateTime,
-            @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
-            final Pageable page,
-            final PagedResourcesAssembler<Cluster> assembler
+        @RequestParam(value = "name", required = false) final String name,
+        @RequestParam(value = "status", required = false) final Set<String> statuses,
+        @RequestParam(value = "tag", required = false) final Set<String> tags,
+        @RequestParam(value = "minUpdateTime", required = false) final Long minUpdateTime,
+        @RequestParam(value = "maxUpdateTime", required = false) final Long maxUpdateTime,
+        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+        final PagedResourcesAssembler<Cluster> assembler
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug(
-                    "Called "
-                            + "[name "
-                            + "| statuses "
-                            + "| tags "
-                            + "| minUpdateTime "
-                            + "| maxUpdateTime "
-                            + "| page]"
+                "Called "
+                    + "[name "
+                    + "| statuses "
+                    + "| tags "
+                    + "| minUpdateTime "
+                    + "| maxUpdateTime "
+                    + "| page]"
             );
             LOG.debug(
-                    name
-                            + " | "
-                            + statuses
-                            + " | "
-                            + tags
-                            + " | "
-                            + minUpdateTime
-                            + " | "
-                            + maxUpdateTime
-                            + " | "
-                            + page
+                name
+                    + " | "
+                    + statuses
+                    + " | "
+                    + tags
+                    + " | "
+                    + minUpdateTime
+                    + " | "
+                    + maxUpdateTime
+                    + " | "
+                    + page
             );
         }
         //Create this conversion internal in case someone uses lower case by accident?
@@ -293,8 +190,8 @@ public class ClusterRestController {
         }
 
         return assembler.toResource(
-                this.clusterService.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page),
-                this.clusterResourceAssembler
+            this.clusterService.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page),
+            this.clusterResourceAssembler
         );
     }
 
@@ -307,41 +204,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update a cluster",
-            notes = "Update a cluster from the supplied information."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful update"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster to update not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateCluster(
-            @ApiParam(
-                    value = "Id of the cluster to update.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The cluster information to update with.",
-                    required = true
-            )
-            @RequestBody
-            final Cluster updateCluster
+        @PathVariable("id") final String id,
+        @RequestBody final Cluster updateCluster
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to update cluster with id " + id + " update fields " + updateCluster);
@@ -357,36 +222,7 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Delete a cluster",
-            notes = "Delete a cluster with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void deleteCluster(
-            @ApiParam(
-                    value = "Id of the cluster to delete.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void deleteCluster(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Delete called for id: " + id);
         }
@@ -400,28 +236,6 @@ public class ClusterRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Delete all clusters",
-            notes = "Delete all available clusters and get them back."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void deleteAllClusters() throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called");
@@ -439,41 +253,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add new configuration files to a cluster",
-            notes = "Add the supplied configuration files to the cluster with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful add"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addConfigsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to add configuration to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The configuration files to add.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> configs
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> configs
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + configs);
@@ -491,34 +273,7 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the configuration files for a cluster",
-            notes = "Get the configuration files for the cluster with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> getConfigsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to get configurations for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public Set<String> getConfigsForCluster(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -536,41 +291,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update configuration files for an cluster",
-            notes = "Replace the existing configuration files for cluster with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful update"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateConfigsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to update configurations for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The configuration files to replace existing with.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> configs
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> configs
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and configs " + configs);
@@ -587,36 +310,7 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove all configuration files from a cluster",
-            notes = "Remove all the configuration files from the cluster with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllConfigsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllConfigsForCluster(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -633,41 +327,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add new tags to a cluster",
-            notes = "Add the supplied tags to the cluster with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful add"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addTagsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to add configuration to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tags to add.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> tags
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> tags
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
@@ -685,32 +347,8 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the tags for a cluster",
-            notes = "Get the tags for the cluster with the supplied id.",
-            response = String.class,
-            responseContainer = "Set")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public Set<String> getTagsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to get tags for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
+        @PathVariable("id") final String id
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
@@ -729,41 +367,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update tags for a cluster",
-            notes = "Replace the existing tags for cluster with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully updated"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateTagsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to update tags for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tags to replace existing with.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> tags
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> tags
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
@@ -780,37 +386,7 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove all tags from a cluster",
-            notes = "Remove all the tags from the cluster with given id.  Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllTagsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllTagsForCluster(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -827,42 +403,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove a tag from a cluster",
-            notes = "Remove the given tag from the cluster with given id. Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void removeTagForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tag to remove.",
-                    required = true
-            )
-            @PathVariable("tag")
-            final String tag
+        @PathVariable("id") final String id,
+        @PathVariable("tag") final String tag
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tag " + tag);
@@ -880,42 +423,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add new commandIds to a cluster",
-            notes = "Add the supplied commandIds to the cluster with the supplied id."
-                    + " commandIds should already have been created."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully added"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addCommandsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to add commandIds to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The ids of the commandIds to add.",
-                    required = true
-            )
-            @RequestBody
-            final List<String> commandIds
+        @PathVariable("id") final String id,
+        @RequestBody final List<String> commandIds
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and commandIds " + commandIds);
@@ -934,39 +444,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the commandIds for a cluster",
-            notes = "Get the commandIds for the cluster with the supplied id.",
-            response = Command.class,
-            responseContainer = "List"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public List<CommandResource> getCommandsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to get commandIds for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The statuses of the commandIds to find.",
-                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
-            )
-            @RequestParam(value = "status", required = false)
-            final Set<String> statuses
+        @PathVariable("id") final String id,
+        @RequestParam(value = "status", required = false) final Set<String> statuses
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " status " + statuses);
@@ -983,9 +463,9 @@ public class ClusterRestController {
         }
 
         return this.clusterService.getCommandsForCluster(id, enumStatuses)
-                .stream()
-                .map(this.commandResourceAssembler::toResource)
-                .collect(Collectors.toList());
+            .stream()
+            .map(this.commandResourceAssembler::toResource)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -999,41 +479,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update the commands for a cluster",
-            notes = "Replace the existing commands for cluster with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully updated"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void setCommandsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to update commandIds for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The ids of the commands to replace existing commands with. Should already be created",
-                    required = true
-            )
-            @RequestBody
-            final List<String> commandIds
+        @PathVariable("id") final String id,
+        @RequestBody final List<String> commandIds
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and commandIds " + commandIds);
@@ -1050,36 +498,7 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove all commandIds from an cluster",
-            notes = "Remove all the commandIds from the cluster with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllCommandsForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllCommandsForCluster(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -1096,41 +515,9 @@ public class ClusterRestController {
      */
     @RequestMapping(value = "/{id}/commands/{commandId}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove a command from a cluster",
-            notes = "Remove the given command from the cluster with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successfully deleted"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Cluster not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid required parameter supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void removeCommandForCluster(
-            @ApiParam(
-                    value = "Id of the cluster to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The id of the command to remove.",
-                    required = true
-            )
-            @PathVariable("commandId")
-            final String commandId
+        @PathVariable("id") final String id,
+        @PathVariable("commandId") final String commandId
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and command id " + commandId);

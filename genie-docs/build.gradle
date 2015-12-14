@@ -1,7 +1,6 @@
 apply plugin: 'org.asciidoctor.convert'
 
 ext {
-    generatedDocumentation = file('src/docs/asciidoc/generated')
     snippetsDir = file('build/generated-snippets')
 }
 
@@ -25,39 +24,9 @@ dependencies {
     testCompile(project(":genie-test"))
     testCompile(project(":genie-web"))
     testCompile("com.jayway.jsonpath:json-path")
-    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:1.0.0.RELEASE")
-    testCompile("io.springfox:springfox-staticdocs:${springfox_version}")
-}
-
-clean {
-    delete generatedDocumentation
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:${spring_rest_docs_version}")
 }
 
 documentationTests {
-    outputs.dir generatedDocumentation
     outputs.dir snippetsDir
-}
-
-asciidoctor {
-    dependsOn documentationTests
-    sources {
-        include 'index.adoc'
-    }
-    attributes = [
-            doctype: 'book',
-            toc: 'left',
-            toclevels: '2',
-            numbered: '',
-            sectlinks: '',
-            sectanchors: '',
-            generated: generatedDocumentation
-    ]
-}
-
-// Create a webjar if someone wants to use it
-jar {
-    dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}/html5") {
-        into 'META-INF/resources/genie-docs'
-    }
 }

@@ -26,12 +26,6 @@ import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +51,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.HttpURLConnection;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,7 +63,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(value = "/api/v3/applications")
-@Api(value = "applications", tags = "applications", description = "Manage the available applications")
 public class ApplicationRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationRestController.class);
@@ -88,9 +80,9 @@ public class ApplicationRestController {
      */
     @Autowired
     public ApplicationRestController(
-            final ApplicationService applicationService,
-            final ApplicationResourceAssembler applicationResourceAssembler,
-            final CommandResourceAssembler commandResourceAssembler
+        final ApplicationService applicationService,
+        final ApplicationResourceAssembler applicationResourceAssembler,
+        final CommandResourceAssembler commandResourceAssembler
     ) {
         this.applicationService = applicationService;
         this.applicationResourceAssembler = applicationResourceAssembler;
@@ -106,45 +98,18 @@ public class ApplicationRestController {
      */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(
-            value = "Create an application",
-            notes = "Create an application from the supplied information."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_CREATED,
-                    message = "Application created successfully.",
-                    responseHeaders = {@ResponseHeader(name = HttpHeaders.LOCATION, response = String.class)}
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_CONFLICT,
-                    message = "An application with the supplied id already exists"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "A precondition failed"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public ResponseEntity<Void> createApplication(
-            @ApiParam(value = "The application to create.", required = true)
-            @RequestBody
-            final Application app
-    ) throws GenieException {
+    public ResponseEntity<Void> createApplication(@RequestBody final Application app) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to create new application");
         }
         final String id = this.applicationService.createApplication(app);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(id)
-                        .toUri()
+            ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri()
         );
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
@@ -158,33 +123,7 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Find an application by id",
-            notes = "Get the application by id if it exists",
-            response = ApplicationResource.class
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid id supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public ApplicationResource getApplication(
-            @ApiParam(
-                    value = "Id of the application to get.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called to get Application for id " + id);
         }
@@ -205,62 +144,28 @@ public class ApplicationRestController {
      */
     @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Find applications",
-            notes = "Find applications by the submitted criteria.",
-            response = PagedResources.class,
-            responseContainer = "List"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "If status is invalid."
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public PagedResources<ApplicationResource> getApplications(
-            @ApiParam(
-                    value = "Name of the application."
-            )
-            @RequestParam(value = "name", required = false)
-            final String name,
-            @ApiParam(
-                    value = "User who created the application."
-            )
-            @RequestParam(value = "userName", required = false)
-            final String userName,
-            @ApiParam(
-                    value = "The status of the applications to get.",
-                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
-            )
-            @RequestParam(value = "status", required = false)
-            final Set<String> statuses,
-            @ApiParam(
-                    value = "Tags for the application."
-            )
-            @RequestParam(value = "tag", required = false)
-            final Set<String> tags,
-            @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
-            final Pageable page,
-            final PagedResourcesAssembler<Application> assembler
+        @RequestParam(value = "name", required = false) final String name,
+        @RequestParam(value = "userName", required = false) final String userName,
+        @RequestParam(value = "status", required = false) final Set<String> statuses,
+        @RequestParam(value = "tag", required = false) final Set<String> tags,
+        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+        final PagedResourcesAssembler<Application> assembler
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug(
-                    "Called [name | userName | status | tags | pageable]"
+                "Called [name | userName | status | tags | pageable]"
             );
             LOG.debug(
-                    name
-                            + " | "
-                            + userName
-                            + " | "
-                            + statuses
-                            + " | "
-                            + tags
-                            + " | "
-                            + page
+                name
+                    + " | "
+                    + userName
+                    + " | "
+                    + statuses
+                    + " | "
+                    + tags
+                    + " | "
+                    + page
             );
         }
 
@@ -275,15 +180,15 @@ public class ApplicationRestController {
         }
 
         final Link self = ControllerLinkBuilder.linkTo(
-                ControllerLinkBuilder
-                        .methodOn(ApplicationRestController.class)
-                        .getApplications(name, userName, statuses, tags, page, assembler)
+            ControllerLinkBuilder
+                .methodOn(ApplicationRestController.class)
+                .getApplications(name, userName, statuses, tags, page, assembler)
         ).withSelfRel();
 
         return assembler.toResource(
-                this.applicationService.getApplications(name, userName, enumStatuses, tags, page),
-                this.applicationResourceAssembler,
-                self
+            this.applicationService.getApplications(name, userName, enumStatuses, tags, page),
+            this.applicationResourceAssembler,
+            self
         );
     }
 
@@ -296,35 +201,9 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update an application",
-            notes = "Update an application from the supplied information."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful update"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application to update not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateApplication(
-            @ApiParam(value = "Id of the application to update.", required = true)
-            @PathVariable("id")
-            final String id,
-            @ApiParam(value = "The application information to update.", required = true)
-            @RequestBody
-            final Application updateApp
+        @PathVariable("id") final String id,
+        @RequestBody final Application updateApp
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("called to update application config with info " + updateApp.toString());
@@ -339,20 +218,6 @@ public class ApplicationRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Delete all applications",
-            notes = "Delete all available applications and get them back."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void deleteAllApplications() throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Delete all Applications");
@@ -368,36 +233,7 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Delete an application",
-            notes = "Delete an application with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void deleteApplication(
-            @ApiParam(
-                    value = "Id of the application to delete.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void deleteApplication(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Delete an application with id " + id);
         }
@@ -414,37 +250,9 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add new configuration files to an application",
-            notes = "Add the supplied configuration files to the application with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addConfigsToApplication(
-            @ApiParam(
-                    value = "Id of the application to add configuration to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The configuration files to add.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> configs
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> configs
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + configs);
@@ -462,34 +270,7 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the configuration files for an application",
-            notes = "Get the configuration files for the application with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> getConfigsForApplication(
-            @ApiParam(
-                    value = "Id of the application to get configurations for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public Set<String> getConfigsForApplication(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -507,41 +288,9 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update configuration files for an application",
-            notes = "Replace the existing configuration files for application with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful update"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateConfigsForApplication(
-            @ApiParam(
-                    value = "Id of the application to update configurations for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The configuration files to replace existing with.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> configs
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> configs
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and configs " + configs);
@@ -558,36 +307,7 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove all configuration files from an application",
-            notes = "Remove all the configuration files from the application with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllConfigsForApplication(
-            @ApiParam(
-                    value = "Id of the application to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllConfigsForApplication(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -603,44 +323,12 @@ public class ApplicationRestController {
      * @throws GenieException For any error
      */
     @RequestMapping(
-            value = "/{id}/dependencies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
+        value = "/{id}/dependencies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add new dependency files to an application",
-            notes = "Add the supplied dependency files to the application with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful addition"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addDependenciesForApplication(
-            @ApiParam(
-                    value = "Id of the application to add dependencies to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The dependencies files to add.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> dependencies
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> dependencies
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and dependencies " + dependencies);
@@ -657,37 +345,10 @@ public class ApplicationRestController {
      * @throws GenieException For any error
      */
     @RequestMapping(
-            value = "/{id}/dependencies", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE
+        value = "/{id}/dependencies", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the dependencies for an application",
-            notes = "Get the dependencies for the application with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> getDependenciesForApplication(
-            @ApiParam(
-                    value = "Id of the application to get the dependencies for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public Set<String> getDependenciesForApplication(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -704,44 +365,12 @@ public class ApplicationRestController {
      * @throws GenieException For any error
      */
     @RequestMapping(
-            value = "/{id}/dependencies", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
+        value = "/{id}/dependencies", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update dependency files for an application",
-            notes = "Replace the existing dependency files for application with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful update"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateDependenciesForApplication(
-            @ApiParam(
-                    value = "Id of the application to update configurations for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The dependency files to replace existing with.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> dependencies
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> dependencies
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and dependencies " + dependencies);
@@ -758,36 +387,7 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/dependencies", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove all dependency files from an application",
-            notes = "Remove all the dependency files from the application with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllDependenciesForApplication(
-            @ApiParam(
-                    value = "Id of the application to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllDependenciesForApplication(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -804,41 +404,9 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Add new tags to a application",
-            notes = "Add the supplied tags to the application with the supplied id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful addition"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void addTagsForApplication(
-            @ApiParam(
-                    value = "Id of the application to add configuration to.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tags to add.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> tags
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> tags
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and config " + tags);
@@ -856,34 +424,7 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-            value = "Get the tags for a application",
-            notes = "Get the tags for the application with the supplied id.",
-            response = String.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public Set<String> getTagsForApplication(
-            @ApiParam(
-                    value = "Id of the application to get tags for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public Set<String> getTagsForApplication(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -901,41 +442,9 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Update tags for a application",
-            notes = "Replace the existing tags for application with given id."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful update"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void updateTagsForApplication(
-            @ApiParam(
-                    value = "Id of the application to update tags for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tags to replace existing with.",
-                    required = true
-            )
-            @RequestBody
-            final Set<String> tags
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> tags
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tags " + tags);
@@ -952,37 +461,7 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove all tags from a application",
-            notes = "Remove all the tags from the application with given id.  Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
-    public void removeAllTagsForApplication(
-            @ApiParam(
-                    value = "Id of the application to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id
-    ) throws GenieException {
+    public void removeAllTagsForApplication(@PathVariable("id") final String id) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
         }
@@ -999,42 +478,9 @@ public class ApplicationRestController {
      */
     @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(
-            value = "Remove a tag from a application",
-            notes = "Remove the given tag from the application with given id. Note that the genie name space tags"
-                    + "prefixed with genie.id and genie.name cannot be deleted."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NO_CONTENT,
-                    message = "Successful delete"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public void removeTagForApplication(
-            @ApiParam(
-                    value = "Id of the application to delete from.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The tag to remove.",
-                    required = true
-            )
-            @PathVariable("tag")
-            final String tag
+        @PathVariable("id") final String id,
+        @PathVariable("tag") final String tag
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id + " and tag " + tag);
@@ -1052,39 +498,9 @@ public class ApplicationRestController {
      * @throws GenieException For any error
      */
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    @ApiOperation(
-            value = "Get the commands this application is associated with",
-            notes = "Get the commands which this application supports.",
-            response = CommandResource.class,
-            responseContainer = "Set"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_NOT_FOUND,
-                    message = "Application not found"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_PRECON_FAILED,
-                    message = "Invalid ID supplied"
-            ),
-            @ApiResponse(
-                    code = HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    message = "Genie Server Error due to Unknown Exception"
-            )
-    })
     public Set<CommandResource> getCommandsForApplication(
-            @ApiParam(
-                    value = "Id of the application to get the commands for.",
-                    required = true
-            )
-            @PathVariable("id")
-            final String id,
-            @ApiParam(
-                    value = "The statuses of the commands to find.",
-                    allowableValues = "ACTIVE, DEPRECATED, INACTIVE"
-            )
-            @RequestParam(value = "status", required = false)
-            final Set<String> statuses
+        @PathVariable("id") final String id,
+        @RequestParam(value = "status", required = false) final Set<String> statuses
     ) throws GenieException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Called with id " + id);
@@ -1101,8 +517,8 @@ public class ApplicationRestController {
         }
 
         return this.applicationService.getCommandsForApplication(id, enumStatuses)
-                .stream()
-                .map(this.commandResourceAssembler::toResource)
-                .collect(Collectors.toSet());
+            .stream()
+            .map(this.commandResourceAssembler::toResource)
+            .collect(Collectors.toSet());
     }
 }
