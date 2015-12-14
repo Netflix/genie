@@ -51,7 +51,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      */
     @Autowired
     public JpaJobSearchServiceImpl(
-            final JpaJobRepository jobRepo
+        final JpaJobRepository jobRepo
     ) {
         this.jobRepo = jobRepo;
     }
@@ -74,34 +74,32 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Override
     @Transactional(readOnly = true)
     public Page<Job> getJobs(
-            final String id,
-            final String jobName,
-            final String userName,
-            final Set<JobStatus> statuses,
-            final Set<String> tags,
-            final String clusterName,
-            final String clusterId,
-            final String commandName,
-            final String commandId,
-            final Pageable page) {
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        final String id,
+        final String jobName,
+        final String userName,
+        final Set<JobStatus> statuses,
+        final Set<String> tags,
+        final String clusterName,
+        final String clusterId,
+        final String commandName,
+        final String commandId,
+        final Pageable page
+    ) {
+        LOG.debug("called");
 
         @SuppressWarnings("unchecked")
         final Page<JobEntity> jobEntities = this.jobRepo.findAll(
-                JpaJobSpecs.find(
-                        id,
-                        jobName,
-                        userName,
-                        statuses,
-                        tags,
-                        clusterName,
-                        clusterId,
-                        commandName,
-                        commandId),
-                page
+            JpaJobSpecs.find(
+                id,
+                jobName,
+                userName,
+                statuses,
+                tags,
+                clusterName,
+                clusterId,
+                commandName,
+                commandId),
+            page
         );
         return jobEntities.map(JobEntity::getDTO);
     }

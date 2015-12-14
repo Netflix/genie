@@ -19,8 +19,6 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -40,8 +38,6 @@ import java.util.stream.Collectors;
  * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  */
 public final class JpaJobSpecs {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JpaJobSpecs.class);
 
     /**
      * Protected constructor for utility class.

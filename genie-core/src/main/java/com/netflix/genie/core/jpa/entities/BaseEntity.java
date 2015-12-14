@@ -127,9 +127,7 @@ public class BaseEntity implements Serializable {
      * @param created The created timestamp
      */
     public void setCreated(final Date created) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Tried to set created to " + created + " for entity " + this.id + ". Will not be persisted.");
-        }
+        LOG.debug("Tried to set created to {} for entity {}. Will not be persisted.", created, this.id);
         if (created.before(this.created)) {
             this.created = new Date(created.getTime());
         }

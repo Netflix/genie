@@ -21,11 +21,9 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobService;
-
 import com.netflix.genie.core.services.JobSubmitterService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -57,14 +55,14 @@ public class JobServiceImpl implements JobService {
      * Constructor.
      *
      * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobSearchService implementation of job search service interface
-     * @param jobSubmitterService implementation of the job submitter service
+     * @param jobSearchService      implementation of job search service interface
+     * @param jobSubmitterService   implementation of the job submitter service
      */
     @Autowired
     public JobServiceImpl(
-            final JobPersistenceService jobPersistenceService,
-            final JobSearchService jobSearchService,
-            final JobSubmitterService jobSubmitterService
+        final JobPersistenceService jobPersistenceService,
+        final JobSearchService jobSearchService,
+        final JobSubmitterService jobSubmitterService
     ) {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
@@ -79,19 +77,17 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public String runJob(
-            @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
-            @Valid
-            final JobRequest jobRequest
+        @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
+        @Valid
+        final JobRequest jobRequest
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with job request " + jobRequest.toString());
-        }
+        LOG.debug("Called with job request {}", jobRequest);
 
         // TODO get client host at this point?
         // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
         // orginal request may or may not have it.
-    //    final JobRequest jobRequestWithId =
-      //          this.jobPersistenceService.createJobRequest(jobRequest);
+        //    final JobRequest jobRequestWithId =
+        //          this.jobPersistenceService.createJobRequest(jobRequest);
 
         final JobRequest jobRequestWithId = jobRequest;
         this.jobSubmitterService.submitJob(jobRequestWithId);
@@ -112,11 +108,10 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public Job getJob(
-            @NotBlank(message = "No job id provided. Unable to retrieve job.")
-            final String jobId) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + jobId);
-        }
+        @NotBlank(message = "No job id provided. Unable to retrieve job.")
+        final String jobId
+    ) throws GenieException {
+        LOG.debug("Called with id {}", jobId);
         return this.jobPersistenceService.getJob(jobId);
     }
 
@@ -137,32 +132,30 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public Page<Job> getJobs(
-            final String id,
-            final String jobName,
-            final String userName,
-            final Set<JobStatus> statuses,
-            final Set<String> tags,
-            final String clusterName,
-            final String clusterId,
-            final String commandName,
-            final String commandId,
-            final Pageable page) {
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        final String id,
+        final String jobName,
+        final String userName,
+        final Set<JobStatus> statuses,
+        final Set<String> tags,
+        final String clusterName,
+        final String clusterId,
+        final String commandName,
+        final String commandId,
+        final Pageable page
+    ) {
+        LOG.debug("called");
 
         return this.jobSearchService.getJobs(
-                id,
-                jobName,
-                userName,
-                statuses,
-                tags,
-                clusterName,
-                clusterId,
-                commandName,
-                commandId,
-                page);
+            id,
+            jobName,
+            userName,
+            statuses,
+            tags,
+            clusterName,
+            clusterId,
+            commandName,
+            commandId,
+            page);
     }
 
     /**
@@ -173,8 +166,8 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public void killJob(
-            @NotBlank(message = "No job id provided. Unable to retrieve job.")
-            final String jobId
+        @NotBlank(message = "No job id provided. Unable to retrieve job.")
+        final String jobId
     ) throws GenieException {
 
     }

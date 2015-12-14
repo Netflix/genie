@@ -75,15 +75,15 @@ public class JpaOldJobServiceImpl implements OldJobService {
     /**
      * Constructor.
      *
-     * @param jobRepo           The job repository to use.
-     * @param stats             The GenieNodeStatistics object
-     * @param netUtil           The network utility code to use
+     * @param jobRepo The job repository to use.
+     * @param stats   The GenieNodeStatistics object
+     * @param netUtil The network utility code to use
      */
     @Autowired
     public JpaOldJobServiceImpl(
-            final JpaJobRepository jobRepo,
-            final GenieNodeStatistics stats,
-            final NetUtil netUtil
+        final JpaJobRepository jobRepo,
+        final GenieNodeStatistics stats,
+        final NetUtil netUtil
     ) {
         this.jobRepo = jobRepo;
         this.stats = stats;
@@ -96,9 +96,9 @@ public class JpaOldJobServiceImpl implements OldJobService {
     @Override
     @Transactional
     public Job createJob(
-            @NotNull(message = "No job entered. Unable to create.")
-            @Valid
-            final JobRequest jobRequest
+        @NotNull(message = "No job entered. Unable to create.")
+        @Valid
+        final JobRequest jobRequest
     ) throws GenieException {
         final String requestId = jobRequest.getId();
         if (StringUtils.isNotBlank(requestId) && this.jobRepo.exists(requestId)) {
@@ -151,12 +151,10 @@ public class JpaOldJobServiceImpl implements OldJobService {
     @Override
     @Transactional(readOnly = true)
     public Job getJob(
-            @NotBlank(message = "No id entered. Unable to get job.")
-            final String id
+        @NotBlank(message = "No id entered. Unable to get job.")
+        final String id
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called for id: " + id);
-        }
+        LOG.debug("called for id: {}", id);
 
         return this.findJob(id).getDTO();
     }
@@ -167,34 +165,32 @@ public class JpaOldJobServiceImpl implements OldJobService {
     @Override
     @Transactional(readOnly = true)
     public Page<Job> getJobs(
-            final String id,
-            final String jobName,
-            final String userName,
-            final Set<JobStatus> statuses,
-            final Set<String> tags,
-            final String clusterName,
-            final String clusterId,
-            final String commandName,
-            final String commandId,
-            final Pageable page
+        final String id,
+        final String jobName,
+        final String userName,
+        final Set<JobStatus> statuses,
+        final Set<String> tags,
+        final String clusterName,
+        final String clusterId,
+        final String commandName,
+        final String commandId,
+        final Pageable page
     ) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
 
         @SuppressWarnings("unchecked")
         final Page<JobEntity> jobEntities = this.jobRepo.findAll(
-                JpaJobSpecs.find(
-                        id,
-                        jobName,
-                        userName,
-                        statuses,
-                        tags,
-                        clusterName,
-                        clusterId,
-                        commandName,
-                        commandId),
-                page
+            JpaJobSpecs.find(
+                id,
+                jobName,
+                userName,
+                statuses,
+                tags,
+                clusterName,
+                clusterId,
+                commandName,
+                commandId),
+            page
         );
         return jobEntities.map(JobEntity::getDTO);
     }
@@ -205,8 +201,8 @@ public class JpaOldJobServiceImpl implements OldJobService {
     @Override
     @Transactional(readOnly = true)
     public JobStatus getJobStatus(
-            @NotBlank(message = "No id entered. Unable to get status.")
-            final String id
+        @NotBlank(message = "No id entered. Unable to get status.")
+        final String id
     ) throws GenieException {
         return getJob(id).getStatus();
     }
@@ -216,21 +212,19 @@ public class JpaOldJobServiceImpl implements OldJobService {
      */
     @Override
     @Transactional(
-            rollbackFor = {
-                    GenieException.class,
-                    ConstraintViolationException.class
-            }
+        rollbackFor = {
+            GenieException.class,
+            ConstraintViolationException.class
+        }
     )
     public void setJobStatus(
-            @NotBlank(message = "No id entered for the job. Unable to update the status.")
-            final String id,
-            @NotNull(message = "No status entered unable to update.")
-            final JobStatus status,
-            final String msg
+        @NotBlank(message = "No id entered for the job. Unable to update the status.")
+        final String id,
+        @NotNull(message = "No status entered unable to update.")
+        final JobStatus status,
+        final String msg
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Setting job with id " + id + " to status " + status + " for reason " + msg);
-        }
+        LOG.debug("Setting job with id {} to status {} for reason {}", id, status, msg);
         this.findJob(id).setJobStatus(status, msg);
     }
 
@@ -239,19 +233,17 @@ public class JpaOldJobServiceImpl implements OldJobService {
      */
     @Override
     @Transactional(
-            rollbackFor = {
-                    GenieException.class,
-                    ConstraintViolationException.class
-            }
+        rollbackFor = {
+            GenieException.class,
+            ConstraintViolationException.class
+        }
     )
     @Retryable(JpaOptimisticLockingFailureException.class)
     public long setUpdateTime(
-            @NotBlank(message = "No job id entered. Unable to set update time.")
-            final String id
+        @NotBlank(message = "No job id entered. Unable to set update time.")
+        final String id
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Updating db for job: " + id);
-        }
+        LOG.debug("Updating db for job: {}", id);
         final JobEntity jobEntity = this.findJob(id);
 
         final long lastUpdatedTimeMS = System.currentTimeMillis();
@@ -265,19 +257,17 @@ public class JpaOldJobServiceImpl implements OldJobService {
      */
     @Override
     @Transactional(
-            rollbackFor = {
-                    GenieException.class,
-                    ConstraintViolationException.class
-            }
+        rollbackFor = {
+            GenieException.class,
+            ConstraintViolationException.class
+        }
     )
     public void setProcessIdForJob(
-            @NotBlank(message = "No job id entered. Unable to set process id")
-            final String id,
-            final int pid
+        @NotBlank(message = "No job id entered. Unable to set process id")
+        final String id,
+        final int pid
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Setting the id of process for job with id " + id + " to " + pid);
-        }
+        LOG.debug("Setting the id of process for job with id {} to {}", id, pid);
 //        this.findJob(id).setProcessId(pid);
     }
 
@@ -286,22 +276,20 @@ public class JpaOldJobServiceImpl implements OldJobService {
      */
     @Override
     @Transactional(
-            rollbackFor = {
-                    GenieException.class,
-                    ConstraintViolationException.class
-            }
+        rollbackFor = {
+            GenieException.class,
+            ConstraintViolationException.class
+        }
     )
     public void setCommandInfoForJob(
-            @NotBlank(message = "No job id entered. Unable to set command info for job.")
-            final String id,
-            @NotBlank(message = "No command id entered. Unable to set command info for job.")
-            final String commandId,
-            @NotBlank(message = "No command name entered. Unable to set command info for job.")
-            final String commandName
+        @NotBlank(message = "No job id entered. Unable to set command info for job.")
+        final String id,
+        @NotBlank(message = "No command id entered. Unable to set command info for job.")
+        final String commandId,
+        @NotBlank(message = "No command name entered. Unable to set command info for job.")
+        final String commandName
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Setting the command info for job with id " + id);
-        }
+        LOG.debug("Setting the command info for job with id {}", id);
 //        final JobEntity jobEntity = this.findJob(id);
 //        //TODO: Should we check if this is valid
 //        jobEntity.setCommandId(commandId);
@@ -312,22 +300,20 @@ public class JpaOldJobServiceImpl implements OldJobService {
      */
     @Override
     @Transactional(
-            rollbackFor = {
-                    GenieException.class,
-                    ConstraintViolationException.class
-            }
+        rollbackFor = {
+            GenieException.class,
+            ConstraintViolationException.class
+        }
     )
     public void setApplicationInfoForJob(
-            @NotBlank(message = "No job id entered. Unable to update app info for job.")
-            final String id,
-            @NotBlank(message = "No app id entered. Unable to update app info for job.")
-            final String appId,
-            @NotBlank(message = "No app name entered. unable to update app info for job.")
-            final String appName
+        @NotBlank(message = "No job id entered. Unable to update app info for job.")
+        final String id,
+        @NotBlank(message = "No app id entered. Unable to update app info for job.")
+        final String appId,
+        @NotBlank(message = "No app name entered. unable to update app info for job.")
+        final String appName
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Setting the application info for job with id " + id);
-        }
+        LOG.debug("Setting the application info for job with id: {}", id);
 //        final JobEntity jobEntity = this.findJob(id);
 //        jobEntity.setApplicationId(appId);
 //        jobEntity.setApplicationName(appName);
@@ -338,22 +324,20 @@ public class JpaOldJobServiceImpl implements OldJobService {
      */
     @Override
     @Transactional(
-            rollbackFor = {
-                    GenieException.class,
-                    ConstraintViolationException.class
-            }
+        rollbackFor = {
+            GenieException.class,
+            ConstraintViolationException.class
+        }
     )
     public void setClusterInfoForJob(
-            @NotBlank(message = "No job id entered. Unable to update cluster info for job.")
-            final String id,
-            @NotBlank(message = "No cluster id entered. Unable to update cluster info for job.")
-            final String clusterId,
-            @NotBlank(message = "No cluster name entered. Unable to update cluster info for job.")
-            final String clusterName
+        @NotBlank(message = "No job id entered. Unable to update cluster info for job.")
+        final String id,
+        @NotBlank(message = "No cluster id entered. Unable to update cluster info for job.")
+        final String clusterId,
+        @NotBlank(message = "No cluster name entered. Unable to update cluster info for job.")
+        final String clusterName
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Setting the application info for job with id " + id);
-        }
+        LOG.debug("Setting the application info for job with id: {}", id);
 //        final JobEntity jobEntity = this.findJob(id);
 //        jobEntity.setClusterId(clusterId);
     }
@@ -364,9 +348,9 @@ public class JpaOldJobServiceImpl implements OldJobService {
     @Override
     @Transactional
     public Job runJob(
-            @NotNull(message = "No job entered unable to run")
-            @Valid
-            final Job job
+        @NotNull(message = "No job entered unable to run")
+        @Valid
+        final Job job
     ) throws GenieException {
         return null;
 //        try {

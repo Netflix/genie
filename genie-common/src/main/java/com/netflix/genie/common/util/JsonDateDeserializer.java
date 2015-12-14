@@ -38,8 +38,7 @@ public class JsonDateDeserializer extends JsonDeserializer<Date> {
      * {@inheritDoc}
      */
     @Override
-    public Date deserialize(final JsonParser parser,
-                            final DeserializationContext context) throws IOException {
+    public Date deserialize(final JsonParser parser, final DeserializationContext context) throws IOException {
         final DateFormat format = new ISO8601DateFormat();
 
         final String text = parser.getText();

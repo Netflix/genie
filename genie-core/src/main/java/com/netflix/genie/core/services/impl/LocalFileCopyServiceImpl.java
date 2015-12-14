@@ -33,20 +33,14 @@ public class LocalFileCopyServiceImpl implements FileCopyService {
      * {@inheritDoc}
      */
     @Override
-    public boolean isValid(
-            final String fileName
-    ) throws GenieException {
+    public boolean isValid(final String fileName) throws GenieException {
         return true;
-    };
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void copy(
-            final String srcPath,
-            final String destPath
-    ) throws GenieException {
-
-    };
+    public void copy(final String srcPath, final String destPath) throws GenieException {
+    }
 }

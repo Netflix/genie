@@ -30,8 +30,8 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
-import com.netflix.genie.core.jpa.specifications.JpaApplicationSpecs;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.specifications.JpaApplicationSpecs;
 import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.core.services.ApplicationService;
 import org.apache.commons.lang3.StringUtils;
@@ -54,17 +54,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * OpenJPA based implementation of the ApplicationService.
+ * JPA based implementation of the ApplicationService.
  *
  * @author amsharma
  * @author tgianos
  */
 @Service
 @Transactional(
-        rollbackFor = {
-                GenieException.class,
-                ConstraintViolationException.class
-        }
+    rollbackFor = {
+        GenieException.class,
+        ConstraintViolationException.class
+    }
 )
 public class JpaApplicationServiceImpl implements ApplicationService {
 
@@ -80,8 +80,8 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Autowired
     public JpaApplicationServiceImpl(
-            final JpaApplicationRepository applicationRepo,
-            final JpaCommandRepository commandRepo
+        final JpaApplicationRepository applicationRepo,
+        final JpaCommandRepository commandRepo
     ) {
         this.applicationRepo = applicationRepo;
         this.commandRepo = commandRepo;
@@ -92,19 +92,16 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public String createApplication(
-            @NotNull(message = "No application entered to create.")
-            @Valid
-            final Application app
+        @NotNull(message = "No application entered to create.")
+        @Valid
+        final Application app
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with application: " + app.toString());
-        }
+        LOG.debug("Called with application: {}", app.toString());
         if (app.getId() != null && this.applicationRepo.exists(app.getId())) {
             throw new GenieConflictException("An application with id " + app.getId() + " already exists");
         }
 
-        final ApplicationEntity applicationEntity
-                = new ApplicationEntity();
+        final ApplicationEntity applicationEntity = new ApplicationEntity();
         applicationEntity.setId(app.getId());
         applicationEntity.setName(app.getName());
         applicationEntity.setUser(app.getUser());
@@ -131,12 +128,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional(readOnly = true)
     public Application getApplication(
-            @NotBlank(message = "No id entered. Unable to get")
-            final String id
+        @NotBlank(message = "No id entered. Unable to get")
+        final String id
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         return this.findApplication(id).getDTO();
     }
 
@@ -146,18 +141,17 @@ public class JpaApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional(readOnly = true)
     public Page<Application> getApplications(
-            final String name,
-            final String userName,
-            final Set<ApplicationStatus> statuses,
-            final Set<String> tags,
-            final Pageable page) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called");
-        }
+        final String name,
+        final String userName,
+        final Set<ApplicationStatus> statuses,
+        final Set<String> tags,
+        final Pageable page
+    ) {
+        LOG.debug("Called");
 
         @SuppressWarnings("unchecked")
         final Page<ApplicationEntity> applicationEntities
-                = this.applicationRepo.findAll(JpaApplicationSpecs.find(name, userName, statuses, tags), page);
+            = this.applicationRepo.findAll(JpaApplicationSpecs.find(name, userName, statuses, tags), page);
 
         return applicationEntities.map(ApplicationEntity::getDTO);
     }
@@ -167,11 +161,11 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void updateApplication(
-            @NotBlank(message = "No application id entered. Unable to update.")
-            final String id,
-            @NotNull(message = "No application information entered. Unable to update.")
-            @Valid
-            final Application updateApp
+        @NotBlank(message = "No application id entered. Unable to update.")
+        final String id,
+        @NotNull(message = "No application information entered. Unable to update.")
+        @Valid
+        final Application updateApp
     ) throws GenieException {
         if (!this.applicationRepo.exists(id)) {
             throw new GenieNotFoundException("No application information entered. Unable to update.");
@@ -180,9 +174,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
             throw new GenieBadRequestException("Application id inconsistent with id passed in.");
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with app " + updateApp.toString());
-        }
+        LOG.debug("Called with app {}", updateApp.toString());
         final ApplicationEntity applicationEntity = this.findApplication(id);
         applicationEntity.setName(updateApp.getName());
         applicationEntity.setUser(updateApp.getUser());
@@ -202,16 +194,14 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void deleteAllApplications() throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called");
-        }
+        LOG.debug("Called");
         // Check to make sure the application isn't tied to any existing commands
         for (final ApplicationEntity applicationEntity : this.applicationRepo.findAll()) {
             final Set<CommandEntity> commandEntities = applicationEntity.getCommands();
             if (commandEntities != null && !commandEntities.isEmpty()) {
                 throw new GeniePreconditionException(
-                        "Unable to delete app " + applicationEntity.getId() + " as it is attached to "
-                                + commandEntities.size() + " commands still."
+                    "Unable to delete app " + applicationEntity.getId() + " as it is attached to "
+                        + commandEntities.size() + " commands still."
                 );
             }
         }
@@ -223,18 +213,16 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void deleteApplication(
-            @NotBlank(message = "No application id entered. Unable to delete.")
-            final String id
+        @NotBlank(message = "No application id entered. Unable to delete.")
+        final String id
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         final ApplicationEntity applicationEntity = this.findApplication(id);
         final Set<CommandEntity> commandEntities = applicationEntity.getCommands();
         if (commandEntities != null && !commandEntities.isEmpty()) {
             throw new GeniePreconditionException(
-                    "Unable to delete app " + applicationEntity.getId() + " as it is attached to "
-                            + commandEntities.size() + " commands."
+                "Unable to delete app " + applicationEntity.getId() + " as it is attached to "
+                    + commandEntities.size() + " commands."
             );
         }
 
@@ -246,10 +234,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void addConfigsToApplication(
-            @NotBlank(message = "No application id entered. Unable to add configurations.")
-            final String id,
-            @NotEmpty(message = "No configuration files entered.")
-            final Set<String> configs
+        @NotBlank(message = "No application id entered. Unable to add configurations.")
+        final String id,
+        @NotEmpty(message = "No configuration files entered.")
+        final Set<String> configs
     ) throws GenieException {
         this.findApplication(id).getConfigs().addAll(configs);
     }
@@ -260,8 +248,8 @@ public class JpaApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForApplication(
-            @NotBlank(message = "No application id entered. Unable to get configs.")
-            final String id
+        @NotBlank(message = "No application id entered. Unable to get configs.")
+        final String id
     ) throws GenieException {
         return this.findApplication(id).getConfigs();
     }
@@ -271,10 +259,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void updateConfigsForApplication(
-            @NotBlank(message = "No application id entered. Unable to update configurations.")
-            final String id,
-            @NotNull(message = "No configs entered. Unable to update. If you want, use delete API.")
-            final Set<String> configs
+        @NotBlank(message = "No application id entered. Unable to update configurations.")
+        final String id,
+        @NotNull(message = "No configs entered. Unable to update. If you want, use delete API.")
+        final Set<String> configs
     ) throws GenieException {
         this.findApplication(id).setConfigs(configs);
     }
@@ -284,8 +272,8 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void removeAllConfigsForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove configs.")
-            final String id
+        @NotBlank(message = "No application id entered. Unable to remove configs.")
+        final String id
     ) throws GenieException {
         this.findApplication(id).getConfigs().clear();
     }
@@ -295,10 +283,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void removeConfigForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove configuration.")
-            final String id,
-            @NotBlank(message = "No config entered. Unable to remove.")
-            final String config
+        @NotBlank(message = "No application id entered. Unable to remove configuration.")
+        final String id,
+        @NotBlank(message = "No config entered. Unable to remove.")
+        final String config
     ) throws GenieException {
         this.findApplication(id).getConfigs().remove(config);
     }
@@ -308,10 +296,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void addDependenciesForApplication(
-            @NotBlank(message = "No application id entered. Unable to add dependencies.")
-            final String id,
-            @NotEmpty(message = "No dependencies entered. Unable to add dependencies.")
-            final Set<String> dependencies
+        @NotBlank(message = "No application id entered. Unable to add dependencies.")
+        final String id,
+        @NotEmpty(message = "No dependencies entered. Unable to add dependencies.")
+        final Set<String> dependencies
     ) throws GenieException {
         this.findApplication(id).getDependencies().addAll(dependencies);
     }
@@ -322,8 +310,8 @@ public class JpaApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getDependenciesForApplication(
-            @NotBlank(message = "No application id entered. Unable to get dependencies.")
-            final String id
+        @NotBlank(message = "No application id entered. Unable to get dependencies.")
+        final String id
     ) throws GenieException {
         return this.findApplication(id).getDependencies();
     }
@@ -333,10 +321,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void updateDependenciesForApplication(
-            @NotBlank(message = "No application id entered. Unable to update dependencies.")
-            final String id,
-            @NotNull(message = "No dependencies entered. Unable to update.")
-            final Set<String> dependencies
+        @NotBlank(message = "No application id entered. Unable to update dependencies.")
+        final String id,
+        @NotNull(message = "No dependencies entered. Unable to update.")
+        final Set<String> dependencies
     ) throws GenieException {
         this.findApplication(id).setDependencies(dependencies);
     }
@@ -346,8 +334,8 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void removeAllDependenciesForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove dependencies.")
-            final String id
+        @NotBlank(message = "No application id entered. Unable to remove dependencies.")
+        final String id
     ) throws GenieException {
         this.findApplication(id).getDependencies().clear();
     }
@@ -357,10 +345,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void removeDependencyForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove dependency.")
-            final String id,
-            @NotBlank(message = "No dependency entered. Unable to remove dependency.")
-            final String dependency
+        @NotBlank(message = "No application id entered. Unable to remove dependency.")
+        final String id,
+        @NotBlank(message = "No dependency entered. Unable to remove dependency.")
+        final String dependency
     ) throws GenieException {
         this.findApplication(id).getDependencies().remove(dependency);
     }
@@ -370,10 +358,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void addTagsForApplication(
-            @NotBlank(message = "No application id entered. Unable to add tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered. Unable to add.")
-            final Set<String> tags
+        @NotBlank(message = "No application id entered. Unable to add tags.")
+        final String id,
+        @NotEmpty(message = "No tags entered. Unable to add.")
+        final Set<String> tags
     ) throws GenieException {
         final ApplicationEntity app = this.findApplication(id);
         final Set<String> appTags = app.getApplicationTags();
@@ -387,8 +375,8 @@ public class JpaApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getTagsForApplication(
-            @NotBlank(message = "No application id entered. Cannot retrieve tags.")
-            final String id
+        @NotBlank(message = "No application id entered. Cannot retrieve tags.")
+        final String id
     ) throws GenieException {
         return this.findApplication(id).getApplicationTags();
     }
@@ -398,10 +386,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void updateTagsForApplication(
-            @NotBlank(message = "No application id entered. Unable to update tags.")
-            final String id,
-            @NotNull(message = "No tags entered unable to update tags.")
-            final Set<String> tags
+        @NotBlank(message = "No application id entered. Unable to update tags.")
+        final String id,
+        @NotNull(message = "No tags entered unable to update tags.")
+        final Set<String> tags
     ) throws GenieException {
         this.findApplication(id).setApplicationTags(tags);
     }
@@ -411,8 +399,8 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void removeAllTagsForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove tags.")
-            final String id
+        @NotBlank(message = "No application id entered. Unable to remove tags.")
+        final String id
     ) throws GenieException {
         this.findApplication(id).setApplicationTags(Sets.newHashSet());
     }
@@ -422,10 +410,10 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void removeTagForApplication(
-            @NotBlank(message = "No application id entered. Unable to remove tag.")
-            final String id,
-            @NotBlank(message = "No tag entered. Unable to remove.")
-            final String tag
+        @NotBlank(message = "No application id entered. Unable to remove tag.")
+        final String id,
+        @NotBlank(message = "No tag entered. Unable to remove.")
+        final String tag
     ) throws GenieException {
         final ApplicationEntity app = this.findApplication(id);
         final Set<String> tags = app.getApplicationTags();
@@ -439,21 +427,21 @@ public class JpaApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional(readOnly = true)
     public Set<Command> getCommandsForApplication(
-            @NotBlank(message = "No application id entered. Unable to get commands.")
-            final String id,
-            final Set<CommandStatus> statuses
+        @NotBlank(message = "No application id entered. Unable to get commands.")
+        final String id,
+        final Set<CommandStatus> statuses
     ) throws GenieException {
         if (!this.applicationRepo.exists(id)) {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
         @SuppressWarnings("unchecked")
         final List<CommandEntity> commandEntities = this.commandRepo.findAll(
-                JpaCommandSpecs.findCommandsForApplication(id, statuses)
+            JpaCommandSpecs.findCommandsForApplication(id, statuses)
         );
         return commandEntities
-                .stream()
-                .map(CommandEntity::getDTO)
-                .collect(Collectors.toSet());
+            .stream()
+            .map(CommandEntity::getDTO)
+            .collect(Collectors.toSet());
     }
 
     /**
@@ -464,7 +452,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      * @throws GenieNotFoundException If no application is found
      */
     private ApplicationEntity findApplication(final String id)
-            throws GenieNotFoundException {
+        throws GenieNotFoundException {
         final ApplicationEntity applicationEntity = this.applicationRepo.findOne(id);
         if (applicationEntity != null) {
             return applicationEntity;

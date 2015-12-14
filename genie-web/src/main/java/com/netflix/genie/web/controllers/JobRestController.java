@@ -85,9 +85,9 @@ public class JobRestController {
      */
     @Autowired
     public JobRestController(
-            final JobService jobService,
-            final AttachmentService attachmentService,
-            final JobResourceAssembler jobResourceAssembler
+        final JobService jobService,
+        final AttachmentService attachmentService,
+        final JobResourceAssembler jobResourceAssembler
     ) {
         this.jobService = jobService;
         this.attachmentService = attachmentService;
@@ -104,8 +104,8 @@ public class JobRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
-            @RequestBody
-            final JobRequest jobRequest    //,
+        @RequestBody
+        final JobRequest jobRequest    //,
 //            @RequestHeader(FORWARDED_FOR_HEADER)
 //            final String clientHost,
 //            final HttpServletRequest httpServletRequest
@@ -113,9 +113,7 @@ public class JobRestController {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called to submit job: " + jobRequest);
-        }
+        LOG.debug("Called to submit job: {}", jobRequest);
 
         //TODO: Re-implement with new API type call that passes info along
 //        // get client's host from the context
@@ -128,9 +126,7 @@ public class JobRestController {
 //
 //        // set the clientHost, if it is not overridden already
 //        if (StringUtils.isNotBlank(localClientHost)) {
-//            if (LOG.isDebugEnabled()) {
-//                LOG.debug("called from: " + localClientHost);
-//            }
+//            LOG.debug("called from: {}", localClientHost);
 //            job.setClientHost(localClientHost);
 //        }
 
@@ -138,11 +134,11 @@ public class JobRestController {
         //final String id = "blah";
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(id)
-                        .toUri()
+            ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri()
         );
         return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
     }
@@ -158,21 +154,18 @@ public class JobRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
-            @RequestPart("request") final JobRequest jobRequest,
-            @RequestPart("attachment") final MultipartFile[] attachments
+        @RequestPart("request") final JobRequest jobRequest,
+        @RequestPart("attachment") final MultipartFile[] attachments
     ) throws GenieException {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called to submit job: " + jobRequest);
-        }
+        LOG.debug("Called to submit job: {}", jobRequest);
 
         final String jobId = UUID.randomUUID().toString();
         if (attachments != null) {
             for (final MultipartFile attachment : attachments) {
-                LOG.info("Attachment name: " + attachment.getOriginalFilename()
-                        + " Size " + attachment.getSize());
+                LOG.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
                 try {
                     this.attachmentService.save(jobId, attachment.getOriginalFilename(), attachment.getInputStream());
                 } catch (final IOException ioe) {
@@ -184,11 +177,11 @@ public class JobRestController {
 //        final String id = this.executionService.submitJob(jobRequest);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(jobRequest.getId())
-                        .toUri()
+            ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(jobRequest.getId())
+                .toUri()
         );
         return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
     }
@@ -202,72 +195,60 @@ public class JobRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public JobResource getJob(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called for job with id: " + id);
-        }
+        LOG.debug("called for job with id: {}", id);
         return this.jobResourceAssembler.toResource(this.jobService.getJob(id));
     }
 
     /**
      * Get jobs for given filter criteria.
      *
-     * @param id              id for job
-     * @param name            name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName        user who submitted job
-     * @param statuses        statuses of jobs to find
-     * @param tags            tags for the job
-     * @param clusterName     the name of the cluster
-     * @param clusterId       the id of the cluster
-     * @param commandName     the name of the command run by the job
-     * @param commandId       the id of the command run by the job
-     * @param page            page information for job
-     * @param assembler       The paged resources assembler to use
+     * @param id          id for job
+     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
+     * @param userName    user who submitted job
+     * @param statuses    statuses of jobs to find
+     * @param tags        tags for the job
+     * @param clusterName the name of the cluster
+     * @param clusterId   the id of the cluster
+     * @param commandName the name of the command run by the job
+     * @param commandId   the id of the command run by the job
+     * @param page        page information for job
+     * @param assembler   The paged resources assembler to use
      * @return successful response, or one with HTTP error code
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<JobResource> getJobs(
-            @RequestParam(value = "id", required = false) final String id,
-            @RequestParam(value = "name", required = false) final String name,
-            @RequestParam(value = "userName", required = false) final String userName,
-            @RequestParam(value = "status", required = false) final Set<String> statuses,
-            @RequestParam(value = "tag", required = false) final Set<String> tags,
-            @RequestParam(value = "executionClusterName", required = false) final String clusterName,
-            @RequestParam(value = "executionClusterId", required = false) final String clusterId,
-            @RequestParam(value = "commandName", required = false) final String commandName,
-            @RequestParam(value = "commandId", required = false) final String commandId,
-            @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
-            final Pageable page,
-            final PagedResourcesAssembler<Job> assembler
+        @RequestParam(value = "id", required = false) final String id,
+        @RequestParam(value = "name", required = false) final String name,
+        @RequestParam(value = "userName", required = false) final String userName,
+        @RequestParam(value = "status", required = false) final Set<String> statuses,
+        @RequestParam(value = "tag", required = false) final Set<String> tags,
+        @RequestParam(value = "clusterName", required = false) final String clusterName,
+        @RequestParam(value = "clusterId", required = false) final String clusterId,
+        @RequestParam(value = "commandName", required = false) final String commandName,
+        @RequestParam(value = "commandId", required = false) final String commandId,
+        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
+        final Pageable page,
+        final PagedResourcesAssembler<Job> assembler
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                    "Called with "
-                            + "[id | jobName | userName | statuses | executionClusterName | executionClusterId | page]"
-            );
-            LOG.debug(
-                    id
-                            + " | "
-                            + name
-                            + " | "
-                            + userName
-                            + " | "
-                            + statuses
-                            + " | "
-                            + tags
-                            + " | "
-                            + clusterName
-                            + " | "
-                            + clusterId
-                            + " | "
-                            + commandName
-                            + " | "
-                            + commandId
-                            + " | "
-                            + page
-            );
-        }
+        LOG.debug(
+            "Called with "
+                + "[id | jobName | userName | statuses | clusterName | clusterId | page]"
+        );
+        LOG.debug(
+            "{} | {} | {} | {} | {} | {} | {}",
+            id,
+            name,
+            userName,
+            statuses,
+            tags,
+            clusterName,
+            clusterId,
+            commandName,
+            commandId,
+            page
+        );
         Set<JobStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(JobStatus.class);
@@ -279,19 +260,19 @@ public class JobRestController {
         }
 
         return assembler.toResource(
-                this.jobService.getJobs(
-                        id,
-                        name,
-                        userName,
-                        enumStatuses,
-                        tags,
-                        clusterName,
-                        clusterId,
-                        commandName,
-                        commandId,
-                        page
-                ),
-                this.jobResourceAssembler
+            this.jobService.getJobs(
+                id,
+                name,
+                userName,
+                enumStatuses,
+                tags,
+                clusterName,
+                clusterId,
+                commandName,
+                commandId,
+                page
+            ),
+            this.jobResourceAssembler
         );
     }
 
@@ -304,9 +285,7 @@ public class JobRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void killJob(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called for job id: " + id);
-        }
+        LOG.debug("Called for job id: {}", id);
         //this.executionService.killJob(id);
     }
 

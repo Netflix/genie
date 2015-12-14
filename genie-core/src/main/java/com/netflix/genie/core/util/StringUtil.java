@@ -18,7 +18,6 @@
 package com.netflix.genie.core.util;
 
 import com.netflix.genie.common.exceptions.GenieException;
-
 import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -55,9 +54,7 @@ public final class StringUtil {
      * @throws GenieException If there is any error
      */
     public static String[] splitCmdLine(final String input) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Command line: " + input);
-        }
+        LOG.debug("Command line: {}", input);
         if (StringUtils.isBlank(input)) {
             return new String[0];
         }
@@ -66,7 +63,7 @@ public final class StringUtil {
         try {
             // ignore delimiter if it is within quotes
             output = input.trim().split("[" + ARG_DELIMITER
-                    + "]+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                + "]+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
         } catch (final Exception e) {
             final String msg = "Invalid argument: " + input;
             LOG.error(msg, e);
@@ -79,9 +76,7 @@ public final class StringUtil {
             if (output[i].startsWith("\"") && output[i].endsWith("\"")) {
                 output[i] = output[i].replaceAll("(^\")|(\"$)", "");
             }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(i + ": " + output[i]);
-            }
+            LOG.debug("{}: {}", i, output[i]);
         }
         return output;
     }
@@ -95,9 +90,7 @@ public final class StringUtil {
      * @return trimmed version number as documented
      */
     public static String trimVersion(final String fullVersion) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Returning canonical version for " + fullVersion);
-        }
+            LOG.debug("Returning canonical version for {}", fullVersion);
         if (fullVersion == null) {
             return null;
         }
@@ -114,9 +107,8 @@ public final class StringUtil {
                 break;
             }
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Canonical version for " + fullVersion + " is " + trimmedVersion.toString());
-        }
+        final String finalVersion = trimmedVersion.toString();
+        LOG.debug("Canonical version for {} is {}", fullVersion, finalVersion);
 
         return trimmedVersion.toString();
     }

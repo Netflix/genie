@@ -47,9 +47,9 @@ public class NetUtil {
     // More info about EC2's instance metadata API is here:
     // http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
     private static final String PUBLIC_HOSTNAME_URI
-            = "http://169.254.169.254/latest/meta-data/public-hostname";
+        = "http://169.254.169.254/latest/meta-data/public-hostname";
     private static final String LOCAL_IPV4_URI
-            = "http://169.254.169.254/latest/meta-data/local-ipv4";
+        = "http://169.254.169.254/latest/meta-data/local-ipv4";
 
     @Value("${com.netflix.genie.server.s3.archive.location:null}")
     private String s3ArchiveLocation;
@@ -58,7 +58,7 @@ public class NetUtil {
     @Value("${netflix.datacenter:null}")
     private String dataCenter;
 
-    private  String cloudHostName;
+    private String cloudHostName;
     private String dcHostName;
 
     /**
@@ -68,9 +68,7 @@ public class NetUtil {
      * @return s3 location
      */
     public String getArchiveURI(final String jobID) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called for jobID: " + jobID);
-        }
+        LOG.debug("called for jobID: {}", jobID);
         if (StringUtils.isNotBlank(this.s3ArchiveLocation)) {
             return this.s3ArchiveLocation + "/" + jobID;
         } else {
@@ -88,9 +86,7 @@ public class NetUtil {
      * @throws GenieException For any error.
      */
     public String getHostName() throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
 
         // check the fast property first
         if (StringUtils.isNotBlank(this.hostNameProperty)) {
@@ -115,9 +111,7 @@ public class NetUtil {
     }
 
     private String getCloudHostName() throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
 
         if (StringUtils.isNotBlank(this.cloudHostName)) {
             return cloudHostName;
@@ -167,9 +161,7 @@ public class NetUtil {
     }
 
     private String getDCHostName() throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
 
         if (StringUtils.isNotBlank(this.dcHostName)) {
             return this.dcHostName;

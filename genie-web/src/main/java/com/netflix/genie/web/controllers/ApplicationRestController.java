@@ -99,9 +99,7 @@ public class ApplicationRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createApplication(@RequestBody final Application app) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called to create new application");
-        }
+        LOG.debug("Called to create new application");
         final String id = this.applicationService.createApplication(app);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -124,9 +122,7 @@ public class ApplicationRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called to get Application for id " + id);
-        }
+        LOG.debug("Called to get Application for id {}", id);
         return this.applicationResourceAssembler.toResource(this.applicationService.getApplication(id));
     }
 
@@ -152,22 +148,8 @@ public class ApplicationRestController {
         @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Application> assembler
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                "Called [name | userName | status | tags | pageable]"
-            );
-            LOG.debug(
-                name
-                    + " | "
-                    + userName
-                    + " | "
-                    + statuses
-                    + " | "
-                    + tags
-                    + " | "
-                    + page
-            );
-        }
+        LOG.debug("Called [name | userName | status | tags | pageable]");
+        LOG.debug("{} | {} | {} | {} | {}", name, userName, statuses, tags, page);
 
         Set<ApplicationStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
@@ -205,9 +187,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Application updateApp
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called to update application config with info " + updateApp.toString());
-        }
+        LOG.debug("called to update application config with info {}", updateApp);
         this.applicationService.updateApplication(id, updateApp);
     }
 
@@ -219,9 +199,7 @@ public class ApplicationRestController {
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllApplications() throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Delete all Applications");
-        }
+        LOG.debug("Delete all Applications");
         this.applicationService.deleteAllApplications();
     }
 
@@ -234,9 +212,7 @@ public class ApplicationRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteApplication(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Delete an application with id " + id);
-        }
+        LOG.debug("Delete an application with id {}", id);
         this.applicationService.deleteApplication(id);
     }
 
@@ -254,9 +230,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and config " + configs);
-        }
+        LOG.debug("Called with id {} and config {}", id, configs);
         this.applicationService.addConfigsToApplication(id, configs);
     }
 
@@ -271,9 +245,7 @@ public class ApplicationRestController {
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getConfigsForApplication(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         return this.applicationService.getConfigsForApplication(id);
     }
 
@@ -292,9 +264,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and configs " + configs);
-        }
+        LOG.debug("Called with id {} and configs {}", id, configs);
         this.applicationService.updateConfigsForApplication(id, configs);
     }
 
@@ -308,9 +278,7 @@ public class ApplicationRestController {
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllConfigsForApplication(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         this.applicationService.removeAllConfigsForApplication(id);
     }
 
@@ -330,9 +298,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and dependencies " + dependencies);
-        }
+        LOG.debug("Called with id {} and dependencies {}", id, dependencies);
         this.applicationService.addDependenciesForApplication(id, dependencies);
     }
 
@@ -349,9 +315,7 @@ public class ApplicationRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getDependenciesForApplication(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         return this.applicationService.getDependenciesForApplication(id);
     }
 
@@ -372,9 +336,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and dependencies " + dependencies);
-        }
+        LOG.debug("Called with id {} and dependencies {}", id, dependencies);
         this.applicationService.updateDependenciesForApplication(id, dependencies);
     }
 
@@ -388,9 +350,7 @@ public class ApplicationRestController {
     @RequestMapping(value = "/{id}/dependencies", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllDependenciesForApplication(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         this.applicationService.removeAllDependenciesForApplication(id);
     }
 
@@ -408,9 +368,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and config " + tags);
-        }
+        LOG.debug("Called with id {} and config {}", id, tags);
         this.applicationService.addTagsForApplication(id, tags);
     }
 
@@ -425,9 +383,7 @@ public class ApplicationRestController {
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForApplication(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         return this.applicationService.getTagsForApplication(id);
     }
 
@@ -446,9 +402,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and tags " + tags);
-        }
+        LOG.debug("Called with id {} and tags {}", id, tags);
         this.applicationService.updateTagsForApplication(id, tags);
     }
 
@@ -462,9 +416,7 @@ public class ApplicationRestController {
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllTagsForApplication(@PathVariable("id") final String id) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         this.applicationService.removeAllTagsForApplication(id);
     }
 
@@ -482,9 +434,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @PathVariable("tag") final String tag
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and tag " + tag);
-        }
+        LOG.debug("Called with id {} and tag {}", id, tag);
         this.applicationService.removeTagForApplication(id, tag);
     }
 
@@ -502,9 +452,7 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) final Set<String> statuses
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
 
         Set<CommandStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {

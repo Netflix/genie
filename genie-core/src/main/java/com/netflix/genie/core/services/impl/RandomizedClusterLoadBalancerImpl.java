@@ -44,7 +44,7 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
      */
     @Override
     public Cluster selectCluster(final List<Cluster> clusters) throws GenieException {
-        LOG.info("called");
+        LOG.debug("called");
 
         if (clusters == null || clusters.isEmpty()) {
             final String msg = "No cluster configuration found to match user params";

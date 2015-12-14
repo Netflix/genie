@@ -19,9 +19,9 @@ package com.netflix.genie.core.jpa.services;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
@@ -31,7 +31,6 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.core.services.ClusterService;
 import org.apache.commons.lang3.StringUtils;
@@ -62,34 +61,30 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(
-        rollbackFor = {
-                GenieException.class,
-                ConstraintViolationException.class
-        }
+    rollbackFor = {
+        GenieException.class,
+        ConstraintViolationException.class
+    }
 )
 public class JpaClusterServiceImpl implements ClusterService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JpaClusterServiceImpl.class);
     private final JpaClusterRepository clusterRepo;
     private final JpaCommandRepository commandRepo;
-    private final JpaJobRepository jobRepo;
 
     /**
      * Default constructor - initialize all required dependencies.
      *
      * @param clusterRepo The cluster repository to use.
      * @param commandRepo The command repository to use.
-     * @param jobRepo     The job repository to use.
      */
     @Autowired
     public JpaClusterServiceImpl(
-            final JpaClusterRepository clusterRepo,
-            final JpaCommandRepository commandRepo,
-            final JpaJobRepository jobRepo
+        final JpaClusterRepository clusterRepo,
+        final JpaCommandRepository commandRepo
     ) {
         this.clusterRepo = clusterRepo;
         this.commandRepo = commandRepo;
-        this.jobRepo = jobRepo;
     }
 
     /**
@@ -97,19 +92,17 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public String createCluster(
-            @NotNull(message = "No cluster entered. Unable to create.")
-            @Valid
-            final Cluster cluster
+        @NotNull(message = "No cluster entered. Unable to create.")
+        @Valid
+        final Cluster cluster
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called to create cluster " + cluster.toString());
-        }
+        LOG.debug("Called to create cluster {}", cluster.toString());
         if (StringUtils.isNotBlank(cluster.getId()) && this.clusterRepo.exists(cluster.getId())) {
             throw new GenieConflictException("A cluster with id " + cluster.getId() + " already exists");
         }
 
         final ClusterEntity clusterEntity
-                = new ClusterEntity();
+            = new ClusterEntity();
         clusterEntity.setId(StringUtils.isBlank(cluster.getId()) ? UUID.randomUUID().toString() : cluster.getId());
         clusterEntity.setName(cluster.getName());
         clusterEntity.setUser(cluster.getUser());
@@ -129,12 +122,9 @@ public class JpaClusterServiceImpl implements ClusterService {
     @Override
     @Transactional(readOnly = true)
     public Cluster getCluster(
-            @NotBlank(message = "No id entered. Unable to get.")
-            final String id
+        @NotBlank(message = "No id entered. Unable to get.") final String id
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id);
-        }
+        LOG.debug("Called with id {}", id);
         return this.findCluster(id).getDTO();
     }
 
@@ -144,21 +134,19 @@ public class JpaClusterServiceImpl implements ClusterService {
     @Override
     @Transactional(readOnly = true)
     public Page<Cluster> getClusters(
-            final String name,
-            final Set<ClusterStatus> statuses,
-            final Set<String> tags,
-            final Long minUpdateTime,
-            final Long maxUpdateTime,
-            final Pageable page
+        final String name,
+        final Set<ClusterStatus> statuses,
+        final Set<String> tags,
+        final Long minUpdateTime,
+        final Long maxUpdateTime,
+        final Pageable page
     ) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
 
         @SuppressWarnings("unchecked")
         final Page<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
-                JpaClusterSpecs.find(name, statuses, tags, minUpdateTime, maxUpdateTime),
-                page
+            JpaClusterSpecs.find(name, statuses, tags, minUpdateTime, maxUpdateTime),
+            page
         );
 
         return clusterEntities.map(ClusterEntity::getDTO);
@@ -170,12 +158,10 @@ public class JpaClusterServiceImpl implements ClusterService {
     @Override
     @Transactional
     public List<Cluster> chooseClusterForJobRequest(
-            @NotNull(message = "JobRequest object is null. Unable to continue.")
-            final JobRequest jobRequest
+        @NotNull(message = "JobRequest object is null. Unable to continue.")
+        final JobRequest jobRequest
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called");
-        }
+        LOG.debug("Called");
 
         final List<ClusterCriteria> clusterCriterias = jobRequest.getClusterCriterias();
         final Set<String> commandCriteria = jobRequest.getCommandCriteria();
@@ -183,17 +169,17 @@ public class JpaClusterServiceImpl implements ClusterService {
         for (final ClusterCriteria clusterCriteria : clusterCriterias) {
             @SuppressWarnings("unchecked")
             final List<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
-                    JpaClusterSpecs.findByClusterAndCommandCriteria(
-                            clusterCriteria,
-                            commandCriteria
-                    )
+                JpaClusterSpecs.findByClusterAndCommandCriteria(
+                    clusterCriteria,
+                    commandCriteria
+                )
             );
 
             if (!clusterEntities.isEmpty()) {
                 return clusterEntities
-                        .stream()
-                        .map(ClusterEntity::getDTO)
-                        .collect(Collectors.toList());
+                    .stream()
+                    .map(ClusterEntity::getDTO)
+                    .collect(Collectors.toList());
             }
         }
 
@@ -206,15 +192,13 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void updateCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update.")
-            final String id,
-            @NotNull(message = "No cluster information entered. Unable to update.")
-            @Valid
-            final com.netflix.genie.common.dto.Cluster updateCluster
+        @NotBlank(message = "No cluster id entered. Unable to update.")
+        final String id,
+        @NotNull(message = "No cluster information entered. Unable to update.")
+        @Valid
+        final com.netflix.genie.common.dto.Cluster updateCluster
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called with id " + id + " and cluster " + updateCluster);
-        }
+        LOG.debug("Called with id {} and cluster {}", id, updateCluster);
         if (!this.clusterRepo.exists(id)) {
             throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
@@ -241,9 +225,7 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void deleteAllClusters() throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called to delete all clusters");
-        }
+        LOG.debug("Called to delete all clusters");
         for (final ClusterEntity clusterEntity : this.clusterRepo.findAll()) {
             this.deleteCluster(clusterEntity.getId());
         }
@@ -254,12 +236,10 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void deleteCluster(
-            @NotBlank(message = "No id entered unable to delete.")
-            final String id
+        @NotBlank(message = "No id entered unable to delete.")
+        final String id
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Called");
-        }
+        LOG.debug("Called");
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = clusterEntity.getCommands();
         if (commandEntities != null) {
@@ -279,14 +259,12 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void addConfigsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to add configurations.")
-            final String id,
-            @NotEmpty(message = "No configuration files entered. Unable to add.")
-            final Set<String> configs
+        @NotBlank(message = "No cluster id entered. Unable to add configurations.")
+        final String id,
+        @NotEmpty(message = "No configuration files entered. Unable to add.")
+        final Set<String> configs
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
         this.findCluster(id).getConfigs().addAll(configs);
     }
 
@@ -296,12 +274,10 @@ public class JpaClusterServiceImpl implements ClusterService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getConfigsForCluster(
-            @NotBlank(message = "No cluster id sent. Cannot retrieve configurations.")
-            final String id
+        @NotBlank(message = "No cluster id sent. Cannot retrieve configurations.")
+        final String id
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
         return this.findCluster(id).getConfigs();
     }
 
@@ -310,14 +286,12 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void updateConfigsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update configurations.")
-            final String id,
-            @NotEmpty(message = "No configs entered. Unable to update.")
-            final Set<String> configs
+        @NotBlank(message = "No cluster id entered. Unable to update configurations.")
+        final String id,
+        @NotEmpty(message = "No configs entered. Unable to update.")
+        final Set<String> configs
     ) throws GenieException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called with id " + id + " and configs " + configs);
-        }
+        LOG.debug("called with id {} and configs {}", id, configs);
         this.findCluster(id).setConfigs(configs);
     }
 
@@ -326,8 +300,8 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void removeAllConfigsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove configs.")
-            final String id
+        @NotBlank(message = "No cluster id entered. Unable to remove configs.")
+        final String id
     ) throws GenieException {
         this.findCluster(id).getConfigs().clear();
     }
@@ -337,10 +311,10 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void addTagsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to add tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered. Unable to add to tags.")
-            final Set<String> tags
+        @NotBlank(message = "No cluster id entered. Unable to add tags.")
+        final String id,
+        @NotEmpty(message = "No tags entered. Unable to add to tags.")
+        final Set<String> tags
     ) throws GenieException {
         final ClusterEntity cluster = this.findCluster(id);
         final Set<String> clusterTags = cluster.getClusterTags();
@@ -354,8 +328,8 @@ public class JpaClusterServiceImpl implements ClusterService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getTagsForCluster(
-            @NotBlank(message = "No cluster id sent. Cannot retrieve tags.")
-            final String id
+        @NotBlank(message = "No cluster id sent. Cannot retrieve tags.")
+        final String id
     ) throws GenieException {
         return this.findCluster(id).getClusterTags();
     }
@@ -365,10 +339,10 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void updateTagsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered. Unable to update.")
-            final Set<String> tags
+        @NotBlank(message = "No cluster id entered. Unable to update tags.")
+        final String id,
+        @NotEmpty(message = "No tags entered. Unable to update.")
+        final Set<String> tags
     ) throws GenieException {
         this.findCluster(id).setClusterTags(tags);
     }
@@ -378,8 +352,8 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void removeAllTagsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove tags.")
-            final String id
+        @NotBlank(message = "No cluster id entered. Unable to remove tags.")
+        final String id
     ) throws GenieException {
         this.findCluster(id).setClusterTags(Sets.newHashSet());
     }
@@ -389,10 +363,10 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void removeTagForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove tag.")
-            final String id,
-            @NotBlank(message = "No tag entered. Unable to remove.")
-            final String tag
+        @NotBlank(message = "No cluster id entered. Unable to remove tag.")
+        final String id,
+        @NotBlank(message = "No tag entered. Unable to remove.")
+        final String tag
     ) throws GenieException {
         final ClusterEntity cluster = this.findCluster(id);
         final Set<String> tags = cluster.getClusterTags();
@@ -405,10 +379,10 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void addCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to add commands.")
-            final String id,
-            @NotEmpty(message = "No command ids entered. Unable to add commands.")
-            final List<String> commandIds
+        @NotBlank(message = "No cluster id entered. Unable to add commands.")
+        final String id,
+        @NotEmpty(message = "No command ids entered. Unable to add commands.")
+        final List<String> commandIds
     ) throws GenieException {
         final ClusterEntity clusterEntity = this.findCluster(id);
         for (final String commandId : commandIds) {
@@ -427,17 +401,17 @@ public class JpaClusterServiceImpl implements ClusterService {
     @Override
     @Transactional(readOnly = true)
     public List<com.netflix.genie.common.dto.Command> getCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to get commands.")
-            final String id,
-            final Set<CommandStatus> statuses
+        @NotBlank(message = "No cluster id entered. Unable to get commands.")
+        final String id,
+        final Set<CommandStatus> statuses
     ) throws GenieException {
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = clusterEntity.getCommands();
         if (statuses != null) {
             return commandEntities.stream()
-                    .filter(command -> statuses.contains(command.getStatus()))
-                    .map(CommandEntity::getDTO)
-                    .collect(Collectors.toList());
+                .filter(command -> statuses.contains(command.getStatus()))
+                .map(CommandEntity::getDTO)
+                .collect(Collectors.toList());
         } else {
             return commandEntities.stream().map(CommandEntity::getDTO).collect(Collectors.toList());
         }
@@ -448,10 +422,10 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void updateCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update commands.")
-            final String id,
-            @NotNull(message = "No command ids entered. Unable to update commands.")
-            final List<String> commandIds
+        @NotBlank(message = "No cluster id entered. Unable to update commands.")
+        final String id,
+        @NotNull(message = "No command ids entered. Unable to update commands.")
+        final List<String> commandIds
     ) throws GenieException {
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = new ArrayList<>();
@@ -471,8 +445,8 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void removeAllCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove commands.")
-            final String id
+        @NotBlank(message = "No cluster id entered. Unable to remove commands.")
+        final String id
     ) throws GenieException {
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = new ArrayList<>();
@@ -487,10 +461,10 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void removeCommandForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove command.")
-            final String id,
-            @NotBlank(message = "No command id entered. Unable to remove command.")
-            final String cmdId
+        @NotBlank(message = "No cluster id entered. Unable to remove command.")
+        final String id,
+        @NotBlank(message = "No command id entered. Unable to remove command.")
+        final String cmdId
     ) throws GenieException {
         final ClusterEntity clusterEntity = this.findCluster(id);
         final CommandEntity commandEntity = this.commandRepo.findOne(cmdId);

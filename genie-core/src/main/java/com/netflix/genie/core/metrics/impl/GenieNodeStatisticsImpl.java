@@ -37,63 +37,45 @@ import java.util.concurrent.atomic.AtomicLong;
 public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenieNodeStatisticsImpl.class);
-
-//    @Monitor(name = "2xx_Count", type = DataSourceType.COUNTER)
-    private AtomicLong genie2xxCount = new AtomicLong(0);
-
-//    @Monitor(name = "4xx_Count", type = DataSourceType.COUNTER)
-    private AtomicLong genie4xxCount = new AtomicLong(0);
-
-//    @Monitor(name = "5xx_Count", type = DataSourceType.COUNTER)
-    private AtomicLong genie5xxCount = new AtomicLong(0);
-
-//    @Monitor(name = "Submit_Jobs", type = DataSourceType.COUNTER)
-    private AtomicLong genieJobSubmissions = new AtomicLong(0);
-
-//    @Monitor(name = "Successful_Jobs", type = DataSourceType.COUNTER)
-    private AtomicLong genieSuccessfulJobs = new AtomicLong(0);
-
-//    @Monitor(name = "Forwarded_Jobs", type = DataSourceType.COUNTER)
-    private AtomicLong genieForwardedJobs = new AtomicLong(0);
-
-//    @Monitor(name = "Failed_Jobs", type = DataSourceType.COUNTER)
-    private AtomicLong genieFailedJobs = new AtomicLong(0);
-
-//    @Monitor(name = "Killed_Jobs", type = DataSourceType.COUNTER)
-    private AtomicLong genieKilledJobs = new AtomicLong(0);
-
-//    @Monitor(name = "Running_Jobs", type = DataSourceType.GAUGE)
+    //    @Monitor(name = "Running_Jobs", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs = new AtomicInteger(0);
-
-//    @Monitor(name = "Running_Jobs_0_15m", type = DataSourceType.GAUGE)
+    //    @Monitor(name = "Running_Jobs_0_15m", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs0To15m = new AtomicInteger(0);
-
-//    @Monitor(name = "Running_Jobs_15m_2h", type = DataSourceType.GAUGE)
+    //    @Monitor(name = "Running_Jobs_15m_2h", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs15mTo2h = new AtomicInteger(0);
-
-//    @Monitor(name = "Running_Jobs_2h_8h", type = DataSourceType.GAUGE)
+    //    @Monitor(name = "Running_Jobs_2h_8h", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs2hTo8h = new AtomicInteger(0);
-
-//    @Monitor(name = "Running_Jobs_8h_plus", type = DataSourceType.GAUGE)
+    //    @Monitor(name = "Running_Jobs_8h_plus", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs8hPlus = new AtomicInteger(0);
-
-//    @Monitor(name = "Successful_Email_Count", type = DataSourceType.COUNTER)
+    //    @Monitor(name = "Successful_Email_Count", type = DataSourceType.COUNTER)
     private final AtomicLong successEmailCount = new AtomicLong(0);
-
-//    @Monitor(name = "Job_Submission_Retry_Count", type = DataSourceType.COUNTER)
+    //    @Monitor(name = "Job_Submission_Retry_Count", type = DataSourceType.COUNTER)
     private final AtomicLong jobSubmissionRetryCount = new AtomicLong(0);
-
-//    @Monitor(name = "Failed_Email_Count", type = DataSourceType.COUNTER)
+    //    @Monitor(name = "Failed_Email_Count", type = DataSourceType.COUNTER)
     private final AtomicLong failedEmailCount = new AtomicLong(0);
+    //    @Monitor(name = "2xx_Count", type = DataSourceType.COUNTER)
+    private AtomicLong genie2xxCount = new AtomicLong(0);
+    //    @Monitor(name = "4xx_Count", type = DataSourceType.COUNTER)
+    private AtomicLong genie4xxCount = new AtomicLong(0);
+    //    @Monitor(name = "5xx_Count", type = DataSourceType.COUNTER)
+    private AtomicLong genie5xxCount = new AtomicLong(0);
+    //    @Monitor(name = "Submit_Jobs", type = DataSourceType.COUNTER)
+    private AtomicLong genieJobSubmissions = new AtomicLong(0);
+    //    @Monitor(name = "Successful_Jobs", type = DataSourceType.COUNTER)
+    private AtomicLong genieSuccessfulJobs = new AtomicLong(0);
+    //    @Monitor(name = "Forwarded_Jobs", type = DataSourceType.COUNTER)
+    private AtomicLong genieForwardedJobs = new AtomicLong(0);
+    //    @Monitor(name = "Failed_Jobs", type = DataSourceType.COUNTER)
+    private AtomicLong genieFailedJobs = new AtomicLong(0);
+    //    @Monitor(name = "Killed_Jobs", type = DataSourceType.COUNTER)
+    private AtomicLong genieKilledJobs = new AtomicLong(0);
 
     /**
      * Initialize the object.
      */
     @PostConstruct
     public void initialize() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Registering Servo Monitor");
-        }
+        LOG.debug("Registering Servo Monitor");
         //TODO: Too static no way to decouple
 //        Monitors.registerObject(this);
     }
@@ -103,9 +85,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @PreDestroy
     public void shutdown() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Shutting down Servo monitor");
-        }
+        LOG.debug("Shutting down Servo monitor");
         //TODO: Too static no way to decouple
 //        Monitors.unregisterObject(this);
     }
@@ -115,219 +95,8 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenie2xxCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
         return this.genie2xxCount;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrGenie2xxCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.genie2xxCount.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getGenie4xxCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.genie4xxCount;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrGenie4xxCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.genie4xxCount.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getGenie5xxCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.genie5xxCount;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrGenie5xxCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.genie5xxCount.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getGenieJobSubmissions() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.genieJobSubmissions;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrGenieJobSubmissions() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.genieJobSubmissions.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getSuccessfulEmailSentCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.successEmailCount;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrSuccessfulEmailCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.successEmailCount.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getFailedEmailSentCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.failedEmailCount;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrFailedEmailCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.failedEmailCount.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getGenieSuccessfulJobs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.genieSuccessfulJobs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrGenieSuccessfulJobs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.genieSuccessfulJobs.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getGenieFailedJobs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.genieFailedJobs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrGenieFailedJobs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.genieFailedJobs.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getGenieForwardedJobs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.genieForwardedJobs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrGenieForwardedJobs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.genieForwardedJobs.incrementAndGet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AtomicLong getGenieKilledJobs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        return this.genieKilledJobs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void incrGenieKilledJobs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
-        this.genieKilledJobs.incrementAndGet();
     }
 
     /**
@@ -342,8 +111,44 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      * {@inheritDoc}
      */
     @Override
+    public void incrGenie2xxCount() {
+        LOG.debug("called");
+        this.genie2xxCount.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getGenie4xxCount() {
+        LOG.debug("called");
+        return this.genie4xxCount;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setGenie4xxCount(final AtomicLong genie4xxCount) {
         this.genie4xxCount = genie4xxCount;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void incrGenie4xxCount() {
+        LOG.debug("called");
+        this.genie4xxCount.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getGenie5xxCount() {
+        LOG.debug("called");
+        return this.genie5xxCount;
     }
 
     /**
@@ -358,8 +163,80 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      * {@inheritDoc}
      */
     @Override
+    public void incrGenie5xxCount() {
+        LOG.debug("called");
+        this.genie5xxCount.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getGenieJobSubmissions() {
+        LOG.debug("called");
+        return this.genieJobSubmissions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setGenieJobSubmissions(final AtomicLong genieJobSubmissions) {
         this.genieJobSubmissions = genieJobSubmissions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void incrGenieJobSubmissions() {
+        LOG.debug("called");
+        this.genieJobSubmissions.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getSuccessfulEmailSentCount() {
+        LOG.debug("called");
+        return this.successEmailCount;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void incrSuccessfulEmailCount() {
+        LOG.debug("called");
+        this.successEmailCount.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getFailedEmailSentCount() {
+        LOG.debug("called");
+        return this.failedEmailCount;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void incrFailedEmailCount() {
+        LOG.debug("called");
+        this.failedEmailCount.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getGenieSuccessfulJobs() {
+        LOG.debug("called");
+        return this.genieSuccessfulJobs;
     }
 
     /**
@@ -374,8 +251,18 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      * {@inheritDoc}
      */
     @Override
-    public void setGenieForwardedJobs(final AtomicLong genieForwardedJobs) {
-        this.genieForwardedJobs = genieForwardedJobs;
+    public void incrGenieSuccessfulJobs() {
+        LOG.debug("called");
+        this.genieSuccessfulJobs.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getGenieFailedJobs() {
+        LOG.debug("called");
+        return this.genieFailedJobs;
     }
 
     /**
@@ -390,8 +277,61 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      * {@inheritDoc}
      */
     @Override
+    public void incrGenieFailedJobs() {
+        LOG.debug("called");
+        this.genieFailedJobs.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getGenieForwardedJobs() {
+        LOG.debug("called");
+        return this.genieForwardedJobs;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setGenieForwardedJobs(final AtomicLong genieForwardedJobs) {
+        this.genieForwardedJobs = genieForwardedJobs;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void incrGenieForwardedJobs() {
+        LOG.debug("called");
+        this.genieForwardedJobs.incrementAndGet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AtomicLong getGenieKilledJobs() {
+        LOG.debug("called");
+        return this.genieKilledJobs;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setGenieKilledJobs(final AtomicLong genieKilledJobs) {
         this.genieKilledJobs = genieKilledJobs;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void incrGenieKilledJobs() {
+        LOG.debug("called");
+        this.genieKilledJobs.incrementAndGet();
     }
 
     /**
@@ -479,9 +419,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getJobSubmissionRetryCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
         return this.jobSubmissionRetryCount;
     }
 
@@ -490,9 +428,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrJobSubmissionRetryCount() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("called");
-        }
+        LOG.debug("called");
         this.jobSubmissionRetryCount.incrementAndGet();
     }
 }

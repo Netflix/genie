@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jpa.services;
 
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
@@ -27,8 +26,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-
+import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -57,7 +55,6 @@ public class JpaClusterServiceImplUnitTests {
 
     private JpaClusterServiceImpl service;
     private JpaClusterRepository jpaClusterRepository;
-    private JpaJobRepository jpaJobRepository;
     private JpaCommandRepository jpaCommandRepository;
 
     /**
@@ -66,12 +63,10 @@ public class JpaClusterServiceImplUnitTests {
     @Before
     public void setup() {
         this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
-        this.jpaJobRepository = Mockito.mock(JpaJobRepository.class);
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
         this.service = new JpaClusterServiceImpl(
                 this.jpaClusterRepository,
-                this.jpaCommandRepository,
-                this.jpaJobRepository
+                this.jpaCommandRepository
         );
     }
 
