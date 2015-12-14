@@ -2,6 +2,8 @@
 
 [![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg)]
 (https://bintray.com/netflixoss/maven/genie/_latestVersion)
+[![License](https://img.shields.io/github/license/Netflix/genie.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Issues](https://img.shields.io/github/issues/Netflix/genie.svg)](https://github.com/Netflix/genie/issues)
 
 ## In Active Development
 
@@ -36,6 +38,8 @@ processing cluster configurations and the commands and applications which run on
     * [Java](http://netflix.github.io/genie/docs/javadoc/client/index.html)
 
 ## Example
+
+[![Docker Example](https://img.shields.io/docker/pulls/netflixoss/genie.svg)](https://hub.docker.com/r/netflixoss/genie/)
 
 Please see the [ZeroToDocker](https://github.com/Netflix-Skunkworks/zerotodocker) project for [instructions]
 (https://github.com/Netflix-Skunkworks/zerotodocker/wiki/Genie) of an end to end example in [Docker]
