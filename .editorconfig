@@ -13,11 +13,14 @@ indent_size = 4
 [*.py]
 indent_size = 4
 
-[*.sql]
-indent_size = 2
+[*.sh]
+indent_size = 4
 
-[*.yml]
+[*.sql]
 indent_size = 2
 
 [*.xml]
 indent_size = 4
+
+[*.yml]
+indent_size = 2

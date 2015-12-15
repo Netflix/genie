@@ -1,21 +1,24 @@
 language: java
 jdk:
 - oraclejdk8
+
 sudo: false
-branches:
-  only:
-  - master
-  - develop
+install: "./installViaTravis.sh"
+script: "./buildViaTravis.sh"
+
+# https://docs.travis-ci.com/user/languages/java#Caching
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
+
 before_install:
 - pip install --user codecov
 after_success:
 - codecov
+
 env:
   global:
   - secure: K9TGSpk8MKEoqZcscIHNt9M1JwDA9DQvGVTsb/LiFg8OB+TzJePYhNFAflU7tDpgOhx/ukxAmrWrsB18d3ujpC/PzUM5qv00YUTuoZaoKU0FRtTVbVL+S8E1lHaEfN8/w1lC0kjun2lUAJ2U5FJrdZF0mbzy2YeDNNroALVW4FM=
