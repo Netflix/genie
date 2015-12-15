@@ -29,7 +29,7 @@ import java.util.Set;
  * @since 3.0.0
  */
 public final class JpaSpecificationUtils {
-    private JpaSpecificationUtils() {
+    protected JpaSpecificationUtils() {
     }
 
     /**
