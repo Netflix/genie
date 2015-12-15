@@ -1,27 +1,24 @@
 language: java
 jdk:
-  - oraclejdk8
-
-# Use the container based infrastructure:
-# https://docs.travis-ci.com/user/migrating-from-legacy/
+- oraclejdk8
 sudo: false
-
-# Currently only build these branches
 branches:
   only:
-    - master
-    - develop
-
-# https://docs.travis-ci.com/user/languages/java#Caching
+  - master
+  - develop
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-
-# Code coverage
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
 before_install:
-  - pip install --user codecov
+- pip install --user codecov
 after_success:
-  - codecov
+- codecov
+env:
+  global:
+  - secure: K9TGSpk8MKEoqZcscIHNt9M1JwDA9DQvGVTsb/LiFg8OB+TzJePYhNFAflU7tDpgOhx/ukxAmrWrsB18d3ujpC/PzUM5qv00YUTuoZaoKU0FRtTVbVL+S8E1lHaEfN8/w1lC0kjun2lUAJ2U5FJrdZF0mbzy2YeDNNroALVW4FM=
+  - secure: N59KYsMMJaVz0QEJ9UK8bvb2OCB8Fu1aYBnJt5wwfQlopIZFSByeJahvtDaJW8r9Ae0dPQNP4XR0Ps7nxRYe6yMdX3yr+ptpa8x+eIAX+bpR8hmHnsmpS3XmBMxZBrRZSFwd4N9GET+WVhRDdubcKnwwSyiGRpPkmxz71IWTgqQ=
+  - secure: EQtZL4/gipYNu+YoDuElpowOpak7r9BLgUQ1UE6TAWGHepqp76S6pR8drlwWZDzv8YrP7Ze+QrNZqErKFieDneOTVOhoOqc8YAAd0qV3h8hmmo3xUHNR3CdPErc9QvfxHyZ7yO4+mCW6FP77tKzHVRm2VjkjMIhJBqGmA240Mq4=
+  - secure: HKTf4wmQwXXMduNACwvQ4PSHMIs8DaE3bOMJoS3hx7WpalhqCKoa9vdcCtId4ZIVaY+KJoXRV4H11IYQNcvcagwJ6q5C7NhpYSu/GohpXFpzseIaB8oCC1RKzJCf0oGCMhs3WnNOGhpg/zFj2I+3PGMMaJIdlBG6D0ObLV7BIQs=

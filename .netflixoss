@@ -1,3 +1,4 @@
+cloudbees_disabled=true
 gitflow=true
 environment_variables=GRADLE_OPTS=-Xmx512m
 jdk=1.8
