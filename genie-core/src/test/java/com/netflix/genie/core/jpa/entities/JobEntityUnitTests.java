@@ -89,7 +89,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
     public void testOnCreateOrUpdateJob() throws GeniePreconditionException {
         Assert.assertNull(this.jobEntity.getId());
         //Simulate the call stack JPA will make on persist
-        this.jobEntity.onCreateAuditable();
+        this.jobEntity.onCreateBaseEntity();
         Assert.assertNotNull(this.jobEntity.getId());
         Assert.assertFalse(this.jobEntity.getTags().contains(
                 CommonFields.GENIE_ID_TAG_NAMESPACE + this.jobEntity.getId())

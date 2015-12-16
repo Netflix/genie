@@ -17,18 +17,23 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Test the Application class.
@@ -183,6 +188,9 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
         configs.add("s3://netflix.configFile");
         this.a.setConfigs(configs);
         Assert.assertEquals(configs, this.a.getConfigs());
+
+        this.a.setConfigs(null);
+        Assert.assertThat(this.a.getConfigs(), Matchers.empty());
     }
 
     /**
@@ -191,10 +199,13 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetDependencies() {
         Assert.assertNotNull(this.a.getDependencies());
-        final Set<String> jars = new HashSet<>();
-        jars.add("s3://netflix/jars/myJar.jar");
-        this.a.setDependencies(jars);
-        Assert.assertEquals(jars, this.a.getDependencies());
+        final Set<String> dependencies = new HashSet<>();
+        dependencies.add("s3://netflix/jars/myJar.jar");
+        this.a.setDependencies(dependencies);
+        Assert.assertEquals(dependencies, this.a.getDependencies());
+
+        this.a.setDependencies(null);
+        Assert.assertThat(this.a.getDependencies(), Matchers.empty());
     }
 
     /**
@@ -208,6 +219,9 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
         tags.add("tag2");
         this.a.setTags(tags);
         Assert.assertEquals(tags, this.a.getTags());
+
+        this.a.setTags(null);
+        Assert.assertThat(this.a.getTags(), Matchers.empty());
     }
 
     /**
@@ -220,5 +234,68 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
         commandEntities.add(new CommandEntity());
         this.a.setCommands(commandEntities);
         Assert.assertEquals(commandEntities, this.a.getCommands());
+
+        this.a.setCommands(null);
+        Assert.assertThat(this.a.getCommands(), Matchers.empty());
+    }
+
+    /**
+     * Make sure can properly set the application tags using public api.
+     */
+    @Test
+    public void canSetApplicationTags() {
+        final Set<String> tags = Sets.newHashSet("Third", "first", "second");
+        this.a.setApplicationTags(tags);
+        Assert.assertThat(this.a.getApplicationTags(), Matchers.is(tags));
+        Assert.assertThat(this.a.getTags(), Matchers.is(tags));
+
+        this.a.setApplicationTags(null);
+        Assert.assertThat(this.a.getApplicationTags(), Matchers.empty());
+        Assert.assertThat(this.a.getTags(), Matchers.empty());
+    }
+
+    /**
+     * Test to make sure can properly generate a DTO from the entity.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetDTO() throws GenieException {
+        final ApplicationEntity entity = new ApplicationEntity();
+        final String name = UUID.randomUUID().toString();
+        entity.setName(name);
+        final String user = UUID.randomUUID().toString();
+        entity.setUser(user);
+        final String version = UUID.randomUUID().toString();
+        entity.setVersion(version);
+        final String id = UUID.randomUUID().toString();
+        entity.setId(id);
+        final Date created = entity.getCreated();
+        final Date updated = entity.getUpdated();
+        final String description = UUID.randomUUID().toString();
+        entity.setDescription(description);
+        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setApplicationTags(tags);
+        final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setConfigs(configs);
+        final String setupFile = UUID.randomUUID().toString();
+        entity.setSetupFile(setupFile);
+        final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setDependencies(dependencies);
+        entity.setStatus(ApplicationStatus.ACTIVE);
+
+        final Application application = entity.getDTO();
+        Assert.assertThat(application.getId(), Matchers.is(id));
+        Assert.assertThat(application.getName(), Matchers.is(name));
+        Assert.assertThat(application.getUser(), Matchers.is(user));
+        Assert.assertThat(application.getVersion(), Matchers.is(version));
+        Assert.assertThat(application.getCreated(), Matchers.is(created));
+        Assert.assertThat(application.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(application.getDescription(), Matchers.is(description));
+        Assert.assertThat(application.getTags(), Matchers.is(tags));
+        Assert.assertThat(application.getConfigs(), Matchers.is(configs));
+        Assert.assertThat(application.getSetupFile(), Matchers.is(setupFile));
+        Assert.assertThat(application.getDependencies(), Matchers.is(dependencies));
+        Assert.assertThat(application.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
     }
 }

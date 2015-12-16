@@ -86,9 +86,9 @@ public class CommonFields extends BaseEntity {
      * @param version The version of this entity. Not null/empty/blank.
      */
     public CommonFields(
-            final String name,
-            final String user,
-            final String version) {
+        final String name,
+        final String user,
+        final String version) {
         super();
         this.name = name;
         this.user = user;
@@ -195,10 +195,10 @@ public class CommonFields extends BaseEntity {
         this.sortedTags = null;
         if (tags != null && !tags.isEmpty()) {
             this.sortedTags = tags
-                    .stream()
-                    .sorted(String.CASE_INSENSITIVE_ORDER)
-                    .reduce((one, two) -> one + COMMA + two)
-                    .get();
+                .stream()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .reduce((one, two) -> one + COMMA + two)
+                .get();
         }
     }
 
@@ -209,13 +209,12 @@ public class CommonFields extends BaseEntity {
      * @throws GenieException On any exception
      */
     protected Set<String> getFinalTags() throws GenieException {
-        final Set<String> finalTags
-                = this.getSortedTags() == null
-                ? Sets.newHashSet()
-                : Sets.newHashSet(this.getSortedTags().split(COMMA))
-                .stream()
-                .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
-                .collect(Collectors.toSet());
+        final Set<String> finalTags = this.getSortedTags() == null
+            ? Sets.newHashSet()
+            : Sets.newHashSet(this.getSortedTags().split(COMMA))
+            .stream()
+            .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
+            .collect(Collectors.toSet());
         if (this.getId() == null) {
             this.setId(UUID.randomUUID().toString());
         }

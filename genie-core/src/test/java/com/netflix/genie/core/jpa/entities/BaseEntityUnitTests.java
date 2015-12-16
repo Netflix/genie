@@ -19,6 +19,7 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -82,7 +83,7 @@ public class BaseEntityUnitTests {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateAuditable() throws InterruptedException, GeniePreconditionException {
+    public void testOnCreateBaseEntity() throws InterruptedException, GeniePreconditionException {
         final BaseEntity a = new BaseEntity();
         Assert.assertNull(a.getId());
         Assert.assertNotNull(a.getCreated());
@@ -90,7 +91,7 @@ public class BaseEntityUnitTests {
         final Date originalCreated = a.getCreated();
         final Date originalUpdated = a.getUpdated();
         Thread.sleep(1);
-        a.onCreateAuditable();
+        a.onCreateBaseEntity();
         Assert.assertNotNull(a.getId());
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
@@ -102,7 +103,7 @@ public class BaseEntityUnitTests {
         final BaseEntity baseEntity = new BaseEntity();
         final String id = UUID.randomUUID().toString();
         baseEntity.setId(id);
-        baseEntity.onCreateAuditable();
+        baseEntity.onCreateBaseEntity();
         Assert.assertEquals(id, baseEntity.getId());
     }
 
@@ -112,16 +113,16 @@ public class BaseEntityUnitTests {
      * @throws InterruptedException If the process is interrupted
      */
     @Test
-    public void testOnUpdateAuditable() throws InterruptedException {
+    public void testOnUpdateBaseEntity() throws InterruptedException {
         final BaseEntity a = new BaseEntity();
         Assert.assertNull(a.getId());
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
-        a.onCreateAuditable();
+        a.onCreateBaseEntity();
         final Date originalCreate = a.getCreated();
         final Date originalUpdate = a.getUpdated();
         Thread.sleep(1);
-        a.onUpdateAuditable();
+        a.onUpdateBaseEntity();
         Assert.assertEquals(originalCreate, a.getCreated());
         Assert.assertNotEquals(originalUpdate, a.getUpdated());
     }
@@ -137,9 +138,15 @@ public class BaseEntityUnitTests {
         a.setCreated(date);
         Assert.assertNotNull(a.getCreated());
         Assert.assertEquals(date, a.getCreated());
-        a.onCreateAuditable();
+        a.onCreateBaseEntity();
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotEquals(date, a.getCreated());
+
+        final BaseEntity b = new BaseEntity();
+        final Date created = b.getCreated();
+        final Date newCreated = new Date(created.getTime() + 1);
+        b.setCreated(newCreated);
+        Assert.assertThat(b.getCreated(), Matchers.is(created));
     }
 
     /**
@@ -155,11 +162,11 @@ public class BaseEntityUnitTests {
         a.setUpdated(date);
         Assert.assertNotNull(a.getUpdated());
         Assert.assertEquals(date, a.getUpdated());
-        a.onCreateAuditable();
+        a.onCreateBaseEntity();
         Assert.assertNotEquals(date, a.getUpdated());
         final Date oldUpdated = a.getUpdated();
         Thread.sleep(1);
-        a.onUpdateAuditable();
+        a.onUpdateBaseEntity();
         Assert.assertNotEquals(oldUpdated, a.getUpdated());
     }
 

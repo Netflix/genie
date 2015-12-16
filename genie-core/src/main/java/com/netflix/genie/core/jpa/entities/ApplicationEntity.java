@@ -44,6 +44,7 @@ import java.util.Set;
  *
  * @author amsharma
  * @author tgianos
+ * @since 2.0.0
  */
 @Entity
 @Table(name = "applications")
@@ -61,24 +62,24 @@ public class ApplicationEntity extends CommonFields {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "application_configs",
-            joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
+        name = "application_configs",
+        joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
     )
     @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "application_dependencies",
-            joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
+        name = "application_dependencies",
+        joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
     )
     @Column(name = "dependency", nullable = false, length = 1024)
     private Set<String> dependencies = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
-            name = "application_tags",
-            joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
+        name = "application_tags",
+        joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
     )
     @Column(name = "tag", nullable = false, length = 255)
     private Set<String> tags = new HashSet<>();
@@ -102,10 +103,10 @@ public class ApplicationEntity extends CommonFields {
      * @param status  The status of the application. Not null.
      */
     public ApplicationEntity(
-            final String name,
-            final String user,
-            final String version,
-            final ApplicationStatus status) {
+        final String name,
+        final String user,
+        final String version,
+        final ApplicationStatus status) {
         super(name, user, version);
         this.status = status;
     }
@@ -229,8 +230,8 @@ public class ApplicationEntity extends CommonFields {
      */
     public Set<String> getApplicationTags() {
         return this.getSortedTags() == null
-                ? Sets.newHashSet()
-                : Sets.newHashSet(this.getSortedTags().split(COMMA));
+            ? Sets.newHashSet()
+            : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
@@ -274,15 +275,15 @@ public class ApplicationEntity extends CommonFields {
      */
     public Application getDTO() {
         return new Application
-                .Builder(this.getName(), this.getUser(), this.getVersion(), this.status)
-                .withId(this.getId())
-                .withCreated(this.getCreated())
-                .withUpdated(this.getUpdated())
-                .withDescription(this.getDescription())
-                .withTags(this.getApplicationTags())
-                .withConfigs(this.configs)
-                .withSetupFile(this.setupFile)
-                .withDependencies(this.dependencies)
-                .build();
+            .Builder(this.getName(), this.getUser(), this.getVersion(), this.status)
+            .withId(this.getId())
+            .withCreated(this.getCreated())
+            .withUpdated(this.getUpdated())
+            .withDescription(this.getDescription())
+            .withTags(this.getApplicationTags())
+            .withConfigs(this.configs)
+            .withSetupFile(this.setupFile)
+            .withDependencies(this.dependencies)
+            .build();
     }
 }

@@ -70,7 +70,7 @@ public class BaseEntity implements Serializable {
      * Updates the created and updated timestamps to be creation time.
      */
     @PrePersist
-    protected void onCreateAuditable() {
+    protected void onCreateBaseEntity() {
         final Date date = new Date();
         this.updated = date;
         this.created = date;
@@ -85,7 +85,7 @@ public class BaseEntity implements Serializable {
      * On any update to the entity will update the update time.
      */
     @PreUpdate
-    protected void onUpdateAuditable() {
+    protected void onUpdateBaseEntity() {
         this.updated = new Date();
     }
 

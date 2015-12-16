@@ -17,14 +17,18 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.test.categories.UnitTest;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Test the CommonFields class and methods.
@@ -152,5 +156,57 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
         final String description = "Test description";
         this.c.setDescription(description);
         Assert.assertEquals(description, this.c.getDescription());
+    }
+
+    /**
+     * Make sure can set the sorted tags from the database.
+     */
+    @Test
+    public void canSetSortedTagsFromString() {
+        final String sortedTags = UUID.randomUUID().toString();
+        this.c.setSortedTags(sortedTags);
+        Assert.assertThat(this.c.getSortedTags(), Matchers.is(sortedTags));
+    }
+
+    /**
+     * Make sure can set the sorted tags from an unsorted set.
+     */
+    @Test
+    public void canSetSortedTagsFromSet() {
+        final Set<String> tags = Sets.newHashSet("second", "Third", "Fourth", "first");
+        this.c.setSortedTags(tags);
+        Assert.assertThat(this.c.getSortedTags(), Matchers.is("first,Fourth,second,Third"));
+
+        this.c.setSortedTags((Set<String>) null);
+        Assert.assertThat(this.c.getSortedTags(), Matchers.nullValue());
+
+        this.c.setSortedTags(Sets.newHashSet());
+        Assert.assertThat(this.c.getSortedTags(), Matchers.nullValue());
+    }
+
+    /**
+     * Make sure we generate the proper final tags.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetFinalTags() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        this.c.setId(id);
+
+        Assert.assertThat(this.c.getFinalTags(), Matchers.is(Sets.newHashSet("genie.id:" + id, "genie.name:" + NAME)));
+
+        final String sortedTags = "big,genie.id:id,genie.name:name,tom";
+        this.c.setSortedTags(sortedTags);
+        final Set<String> finalTags = this.c.getFinalTags();
+        Assert.assertThat(
+            finalTags,
+            Matchers.is(Sets.newHashSet("genie.id:" + id, "genie.name:" + NAME, "big", "tom"))
+        );
+        Assert.assertThat(finalTags.size(), Matchers.is(4));
+
+        this.c = new CommonFields();
+        this.c.setName(NAME);
+        Assert.assertThat(this.c.getFinalTags().size(), Matchers.is(2));
     }
 }

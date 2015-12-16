@@ -1,3 +1,11 @@
+# 2.2.3
+
+See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.2.3)
+
+# 2.2.2
+
+See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.2.2)
+
 # 2.2.1
 
 See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.2.1)
@@ -28,7 +36,7 @@ Upping the Version to 1.0 to start the versioning of Genie2 from 2.0.0 version n
 
 # 0.25
 
-* General Improvements 
+* General Improvements
 
 # 0.24
 

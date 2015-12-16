@@ -17,10 +17,13 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.test.categories.UnitTest;
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +31,11 @@ import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Test the Cluster class.
@@ -199,6 +204,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         tags.add("sla");
         this.c.setTags(tags);
         Assert.assertEquals(tags, this.c.getTags());
+
+        this.c.setTags(null);
+        Assert.assertThat(this.c.getTags(), Matchers.empty());
     }
 
     /**
@@ -209,6 +217,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertNotNull(this.c.getConfigs());
         this.c.setConfigs(this.configs);
         Assert.assertEquals(this.configs, this.c.getConfigs());
+
+        this.c.setConfigs(null);
+        Assert.assertThat(c.getConfigs(), Matchers.empty());
     }
 
     /**
@@ -232,7 +243,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertTrue(one.getClusters().contains(this.c));
         Assert.assertTrue(two.getClusters().contains(this.c));
         this.c.setCommands(null);
-        Assert.assertNull(this.c.getCommands());
+        Assert.assertThat(this.c.getCommands(), Matchers.empty());
         Assert.assertFalse(one.getClusters().contains(this.c));
         Assert.assertFalse(two.getClusters().contains(this.c));
     }
@@ -331,5 +342,97 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertTrue(this.c.getCommands().isEmpty());
         Assert.assertFalse(one.getClusters().contains(this.c));
         Assert.assertFalse(two.getClusters().contains(this.c));
+    }
+
+    /**
+     * Test the setClusterTags method.
+     */
+    @Test
+    public void canSetClusterTags() {
+        final Set<String> tags = Sets.newHashSet("one", "two", "Pre");
+        this.c.setClusterTags(tags);
+        Assert.assertThat(this.c.getClusterTags(), Matchers.is(tags));
+        Assert.assertThat(this.c.getTags().size(), Matchers.is(tags.size()));
+        this.c.getTags().forEach(tag -> Assert.assertTrue(tags.contains(tag)));
+
+        this.c.setClusterTags(Sets.newHashSet());
+        Assert.assertThat(this.c.getClusterTags(), Matchers.empty());
+        Assert.assertThat(this.c.getTags(), Matchers.empty());
+
+        this.c.setClusterTags(null);
+        Assert.assertThat(this.c.getClusterTags(), Matchers.empty());
+        Assert.assertThat(this.c.getTags(), Matchers.empty());
+    }
+
+    /**
+     * Test to make sure we can set the jobs for the cluster.
+     */
+    @Test
+    public void canSetJobs() {
+        final Set<JobEntity> jobEntities = Sets.newHashSet(new JobEntity(), new JobEntity());
+        this.c.setJobs(jobEntities);
+        Assert.assertThat(this.c.getJobs(), Matchers.is(jobEntities));
+
+        this.c.setJobs(null);
+        Assert.assertThat(this.c.getJobs(), Matchers.empty());
+    }
+
+    /**
+     * Test to make sure we can add a job to the set of jobs for the cluster.
+     *
+     * @throws GeniePreconditionException for any error
+     */
+    @Test
+    public void canAddJob() throws GeniePreconditionException {
+        final JobEntity job = new JobEntity();
+        job.setId(UUID.randomUUID().toString());
+        this.c.addJob(job);
+        Assert.assertThat(this.c.getJobs(), Matchers.contains(job));
+
+        Assert.assertThat(this.c.getJobs().size(), Matchers.is(1));
+        this.c.addJob(null);
+        Assert.assertThat(this.c.getJobs().size(), Matchers.is(1));
+    }
+
+    /**
+     * Test to make sure the entity can return a valid DTO.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetDTO() throws GenieException {
+        final ClusterEntity entity = new ClusterEntity();
+        final String name = UUID.randomUUID().toString();
+        entity.setName(name);
+        final String user = UUID.randomUUID().toString();
+        entity.setUser(user);
+        final String version = UUID.randomUUID().toString();
+        entity.setVersion(version);
+        entity.setStatus(ClusterStatus.TERMINATED);
+        final String clusterType = UUID.randomUUID().toString();
+        entity.setClusterType(clusterType);
+        final String id = UUID.randomUUID().toString();
+        entity.setId(id);
+        final Date created = entity.getCreated();
+        final Date updated = entity.getUpdated();
+        final String description = UUID.randomUUID().toString();
+        entity.setDescription(description);
+        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setClusterTags(tags);
+        final Set<String> confs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setConfigs(confs);
+
+        final Cluster cluster = entity.getDTO();
+        Assert.assertThat(cluster.getId(), Matchers.is(id));
+        Assert.assertThat(cluster.getName(), Matchers.is(name));
+        Assert.assertThat(cluster.getUser(), Matchers.is(user));
+        Assert.assertThat(cluster.getVersion(), Matchers.is(version));
+        Assert.assertThat(cluster.getDescription(), Matchers.is(description));
+        Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.TERMINATED));
+        Assert.assertThat(cluster.getCreated(), Matchers.is(created));
+        Assert.assertThat(cluster.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(cluster.getClusterType(), Matchers.is(clusterType));
+        Assert.assertThat(cluster.getTags(), Matchers.is(tags));
+        Assert.assertThat(cluster.getConfigs(), Matchers.is(confs));
     }
 }

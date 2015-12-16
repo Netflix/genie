@@ -17,18 +17,23 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.test.categories.UnitTest;
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Test the command class.
@@ -207,6 +212,9 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         configs.add("s3://netflix.configFile");
         this.c.setConfigs(configs);
         Assert.assertEquals(configs, this.c.getConfigs());
+
+        this.c.setConfigs(null);
+        Assert.assertThat(this.c.getConfigs(), Matchers.empty());
     }
 
     /**
@@ -221,6 +229,24 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         tags.add("tag2");
         this.c.setTags(tags);
         Assert.assertEquals(tags, this.c.getTags());
+
+        this.c.setTags(null);
+        Assert.assertThat(this.c.getTags(), Matchers.empty());
+    }
+
+    /**
+     * Test to make sure we can set the command tags.
+     */
+    @Test
+    public void canSetCommandTags() {
+        final Set<String> tags = Sets.newHashSet("Third", "first", "second");
+        this.c.setCommandTags(tags);
+        Assert.assertThat(this.c.getCommandTags(), Matchers.is(tags));
+        Assert.assertThat(this.c.getTags(), Matchers.is(tags));
+
+        this.c.setCommandTags(null);
+        Assert.assertThat(this.c.getCommandTags(), Matchers.empty());
+        Assert.assertThat(this.c.getTags(), Matchers.empty());
     }
 
     /**
@@ -270,5 +296,85 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         clusterEntities.add(new ClusterEntity());
         this.c.setClusters(clusterEntities);
         Assert.assertEquals(clusterEntities, this.c.getClusters());
+
+        this.c.setClusters(null);
+        Assert.assertThat(this.c.getClusters(), Matchers.empty());
+    }
+
+    /**
+     * Test to make sure we can set the jobs for the cluster.
+     */
+    @Test
+    public void canSetJobs() {
+        final CommandEntity entity = new CommandEntity();
+        final Set<JobEntity> jobEntities = Sets.newHashSet(new JobEntity(), new JobEntity());
+        entity.setJobs(jobEntities);
+        Assert.assertThat(entity.getJobs(), Matchers.is(jobEntities));
+
+        entity.setJobs(null);
+        Assert.assertThat(entity.getJobs(), Matchers.empty());
+    }
+
+    /**
+     * Test to make sure we can add a job to the set of jobs for the cluster.
+     *
+     * @throws GeniePreconditionException for any error
+     */
+    @Test
+    public void canAddJob() throws GeniePreconditionException {
+        final CommandEntity entity = new CommandEntity();
+        final JobEntity job = new JobEntity();
+        job.setId(UUID.randomUUID().toString());
+        entity.addJob(job);
+        Assert.assertThat(entity.getJobs(), Matchers.contains(job));
+
+        Assert.assertThat(entity.getJobs().size(), Matchers.is(1));
+        entity.addJob(null);
+        Assert.assertThat(entity.getJobs().size(), Matchers.is(1));
+    }
+
+    /**
+     * Make sure we can get a valid Command DTO.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetDTO() throws GenieException {
+        final CommandEntity entity = new CommandEntity();
+        final String id = UUID.randomUUID().toString();
+        entity.setId(id);
+        final String name = UUID.randomUUID().toString();
+        entity.setName(name);
+        final String user = UUID.randomUUID().toString();
+        entity.setUser(user);
+        final String version = UUID.randomUUID().toString();
+        entity.setVersion(version);
+        final String description = UUID.randomUUID().toString();
+        entity.setDescription(description);
+        final Date created = entity.getCreated();
+        final Date updated = entity.getUpdated();
+        entity.setStatus(CommandStatus.DEPRECATED);
+        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setCommandTags(tags);
+        final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setConfigs(configs);
+        final String setupFile = UUID.randomUUID().toString();
+        entity.setSetupFile(setupFile);
+        final String executable = UUID.randomUUID().toString();
+        entity.setExecutable(executable);
+
+        final Command command = entity.getDTO();
+        Assert.assertThat(command.getId(), Matchers.is(id));
+        Assert.assertThat(command.getName(), Matchers.is(name));
+        Assert.assertThat(command.getUser(), Matchers.is(user));
+        Assert.assertThat(command.getVersion(), Matchers.is(version));
+        Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.DEPRECATED));
+        Assert.assertThat(command.getDescription(), Matchers.is(description));
+        Assert.assertThat(command.getCreated(), Matchers.is(created));
+        Assert.assertThat(command.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(command.getExecutable(), Matchers.is(executable));
+        Assert.assertThat(command.getTags(), Matchers.is(tags));
+        Assert.assertThat(command.getSetupFile(), Matchers.is(setupFile));
+        Assert.assertThat(command.getConfigs(), Matchers.is(configs));
     }
 }

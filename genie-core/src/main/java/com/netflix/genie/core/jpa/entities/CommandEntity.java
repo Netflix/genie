@@ -73,29 +73,29 @@ public class CommandEntity extends CommonFields {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "command_configs",
-            joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
+        name = "command_configs",
+        joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
     )
     @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "command_tags",
-            joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
+        name = "command_tags",
+        joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
     )
     @Column(name = "tag", nullable = false, length = 255)
     private Set<String> tags = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "commands_applications",
-            joinColumns = {
-                    @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false)
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
-            }
+        name = "commands_applications",
+        joinColumns = {
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
+        }
     )
     private Set<ApplicationEntity> applications = new HashSet<>();
 
@@ -122,11 +122,11 @@ public class CommandEntity extends CommonFields {
      * @param executable The executable of the command. Not null/empty/blank.
      */
     public CommandEntity(
-            final String name,
-            final String user,
-            final String version,
-            final CommandStatus status,
-            final String executable) {
+        final String name,
+        final String user,
+        final String version,
+        final CommandStatus status,
+        final String executable) {
         super(name, user, version);
         this.status = status;
         this.executable = executable;
@@ -236,30 +236,19 @@ public class CommandEntity extends CommonFields {
      */
     public void setApplications(final Set<ApplicationEntity> applications) {
         //Clear references to this command in existing applications
-        if (this.applications != null) {
-            this.applications.stream()
-                    .filter(application -> application.getCommands() != null)
-                    .forEach(application -> application.getCommands().remove(this));
+        for (final ApplicationEntity application : this.applications) {
+            application.getCommands().remove(this);
         }
         //set the application for this command
-        if (this.applications == null) {
-            this.applications = new HashSet<>();
-        }
         this.applications.clear();
         if (applications != null) {
             this.applications.addAll(applications);
         }
 
         //Add the reverse reference in the new applications
-        this.applications.stream()
-                .forEach(
-                        application -> {
-                            if (application.getCommands() == null) {
-                                application.setCommands(new HashSet<>());
-                            }
-                            application.getCommands().add(this);
-                        }
-                );
+        for (final ApplicationEntity application : this.applications) {
+            application.getCommands().add(this);
+        }
     }
 
     /**
@@ -269,8 +258,8 @@ public class CommandEntity extends CommonFields {
      */
     public Set<String> getCommandTags() {
         return this.getSortedTags() == null
-                ? Sets.newHashSet()
-                : Sets.newHashSet(this.getSortedTags().split(COMMA));
+            ? Sets.newHashSet()
+            : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
@@ -338,17 +327,6 @@ public class CommandEntity extends CommonFields {
     }
 
     /**
-     * Add a job to the set of jobs this command was used for.
-     *
-     * @param job The job
-     */
-    public void addJob(final JobEntity job) {
-        if (job != null) {
-            this.jobs.add(job);
-        }
-    }
-
-    /**
      * Set the jobs run using this command.
      *
      * @param jobs The jobs
@@ -362,25 +340,36 @@ public class CommandEntity extends CommonFields {
     }
 
     /**
+     * Add a job to the set of jobs this command was used for.
+     *
+     * @param job The job
+     */
+    public void addJob(final JobEntity job) {
+        if (job != null) {
+            this.jobs.add(job);
+        }
+    }
+
+    /**
      * Get a dto based on the information in this entity.
      *
      * @return The dto
      */
     public Command getDTO() {
         return new Command.Builder(
-                this.getName(),
-                this.getUser(),
-                this.getVersion(),
-                this.status,
-                this.executable
+            this.getName(),
+            this.getUser(),
+            this.getVersion(),
+            this.status,
+            this.executable
         )
-                .withId(this.getId())
-                .withCreated(this.getCreated())
-                .withUpdated(this.getUpdated())
-                .withDescription(this.getDescription())
-                .withTags(this.tags)
-                .withConfigs(this.configs)
-                .withSetupFile(this.setupFile)
-                .build();
+            .withId(this.getId())
+            .withCreated(this.getCreated())
+            .withUpdated(this.getUpdated())
+            .withDescription(this.getDescription())
+            .withTags(this.tags)
+            .withConfigs(this.configs)
+            .withSetupFile(this.setupFile)
+            .build();
     }
 }

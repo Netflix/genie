@@ -52,6 +52,7 @@ import java.util.Set;
  *
  * @author amsharma
  * @author tgianos
+ * @since 2.0.0
  */
 @Entity
 @Table(name = "clusters")
@@ -71,29 +72,29 @@ public class ClusterEntity extends CommonFields {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "cluster_configs",
-            joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
+        name = "cluster_configs",
+        joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
     )
     @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "cluster_tags",
-            joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
+        name = "cluster_tags",
+        joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
     )
     @Column(name = "tag", nullable = false, length = 255)
     private Set<String> tags = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "clusters_commands",
-            joinColumns = {
-                    @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false)
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false)
-            }
+        name = "clusters_commands",
+        joinColumns = {
+            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false)
+        }
     )
     @OrderColumn(name = "command_order", nullable = false)
     private List<CommandEntity> commands = new ArrayList<>();
@@ -118,11 +119,11 @@ public class ClusterEntity extends CommonFields {
      * @param clusterType The type of the cluster. Not null/empty/blank.
      */
     public ClusterEntity(
-            final String name,
-            final String user,
-            final String version,
-            final ClusterStatus status,
-            final String clusterType) {
+        final String name,
+        final String user,
+        final String version,
+        final ClusterStatus status,
+        final String clusterType) {
         super(name, user, version);
         this.status = status;
         this.clusterType = clusterType;
@@ -216,27 +217,18 @@ public class ClusterEntity extends CommonFields {
      */
     public void setCommands(final List<CommandEntity> commands) {
         //Clear references to this cluster in existing commands
-        if (this.commands != null) {
-            this.commands
-                    .stream()
-                    .filter(command -> command.getClusters() != null)
-                    .forEach(command -> command.getClusters().remove(this));
+        for (final CommandEntity command : this.commands) {
+            command.getClusters().remove(this);
         }
-        //set the commands for this command
-        this.commands = commands;
+
+        this.commands.clear();
+        if (commands != null) {
+            this.commands.addAll(commands);
+        }
 
         //Add the reference in the new commands
-        if (this.commands != null) {
-            for (final CommandEntity command : this.commands) {
-                Set<ClusterEntity> clusterEntities = command.getClusters();
-                if (clusterEntities == null) {
-                    clusterEntities = new HashSet<>();
-                    command.setClusters(clusterEntities);
-                }
-                if (!clusterEntities.contains(this)) {
-                    clusterEntities.add(this);
-                }
-            }
+        for (final CommandEntity command : this.commands) {
+            command.getClusters().add(this);
         }
     }
 
@@ -247,8 +239,8 @@ public class ClusterEntity extends CommonFields {
      */
     public Set<String> getClusterTags() {
         return this.getSortedTags() == null
-                ? Sets.newHashSet()
-                : Sets.newHashSet(this.getSortedTags().split(COMMA));
+            ? Sets.newHashSet()
+            : Sets.newHashSet(this.getSortedTags().split(COMMA));
     }
 
     /**
@@ -291,23 +283,12 @@ public class ClusterEntity extends CommonFields {
      * @param command The command to add. Not null.
      * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void addCommand(final CommandEntity command)
-            throws GeniePreconditionException {
+    public void addCommand(final CommandEntity command) throws GeniePreconditionException {
         if (command == null) {
             throw new GeniePreconditionException("No command entered unable to add.");
         }
-
-        if (this.commands == null) {
-            this.commands = new ArrayList<>();
-        }
         this.commands.add(command);
-
-        Set<ClusterEntity> clusterEntities = command.getClusters();
-        if (clusterEntities == null) {
-            clusterEntities = new HashSet<>();
-            command.setClusters(clusterEntities);
-        }
-        clusterEntities.add(this);
+        command.getClusters().add(this);
     }
 
     /**
@@ -316,18 +297,12 @@ public class ClusterEntity extends CommonFields {
      * @param command The command to remove. Not null.
      * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void removeCommand(final CommandEntity command)
-            throws GeniePreconditionException {
+    public void removeCommand(final CommandEntity command) throws GeniePreconditionException {
         if (command == null) {
             throw new GeniePreconditionException("No command entered unable to remove.");
         }
-
-        if (this.commands != null) {
-            this.commands.remove(command);
-        }
-        if (command.getClusters() != null) {
-            command.getClusters().remove(this);
-        }
+        this.commands.remove(command);
+        command.getClusters().remove(this);
     }
 
     /**
@@ -336,12 +311,10 @@ public class ClusterEntity extends CommonFields {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     public void removeAllCommands() throws GeniePreconditionException {
-        if (this.commands != null) {
-            final List<CommandEntity> locCommandEntities = new ArrayList<>();
-            locCommandEntities.addAll(this.commands);
-            for (final CommandEntity command : locCommandEntities) {
-                this.removeCommand(command);
-            }
+        final List<CommandEntity> locCommandEntities = new ArrayList<>();
+        locCommandEntities.addAll(this.commands);
+        for (final CommandEntity command : locCommandEntities) {
+            this.removeCommand(command);
         }
     }
 
@@ -385,18 +358,18 @@ public class ClusterEntity extends CommonFields {
      */
     public Cluster getDTO() {
         return new Cluster.Builder(
-                this.getName(),
-                this.getUser(),
-                this.getVersion(),
-                this.status,
-                this.clusterType
+            this.getName(),
+            this.getUser(),
+            this.getVersion(),
+            this.status,
+            this.clusterType
         )
-                .withId(this.getId())
-                .withCreated(this.getCreated())
-                .withUpdated(this.getUpdated())
-                .withDescription(this.getDescription())
-                .withTags(this.tags)
-                .withConfigs(this.configs)
-                .build();
+            .withId(this.getId())
+            .withCreated(this.getCreated())
+            .withUpdated(this.getUpdated())
+            .withDescription(this.getDescription())
+            .withTags(this.tags)
+            .withConfigs(this.configs)
+            .build();
     }
 }
