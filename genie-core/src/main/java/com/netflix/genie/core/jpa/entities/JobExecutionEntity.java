@@ -139,9 +139,9 @@ public class JobExecutionEntity extends BaseEntity {
      * @throws GenieException For any serialization error
      */
     public void setClusterCriteriaFromSet(final Set<String> clusterCriteriaSet) throws GenieException {
-        this.clusterCriteria = clusterCriteria == null
+        this.clusterCriteria = clusterCriteriaSet == null
             ? JsonUtils.marshall(new HashSet<String>())
-            : JsonUtils.marshall(clusterCriteria);
+            : JsonUtils.marshall(clusterCriteriaSet);
     }
 
     /**

@@ -3,6 +3,9 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
+    // Spring Libs
+    compile("org.springframework.boot:spring-boot-starter")
+
     // Swagger Libs
     compile("io.springfox:springfox-swagger2:${springfox_version}")
     compile("io.springfox:springfox-swagger-ui:${springfox_version}")
