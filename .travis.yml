@@ -3,8 +3,8 @@ jdk:
   - oraclejdk8
 
 sudo: false
-install: "./installViaTravis.sh"
-script: "./buildViaTravis.sh"
+install: "./gradle/installViaTravis.sh"
+script: "./gradle/buildViaTravis.sh"
 
 # https://docs.travis-ci.com/user/languages/java#Caching
 before_cache:
