@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.swagger;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -34,6 +35,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @since 3.0.0
  */
 @Configuration
+@ConditionalOnProperty("swagger.enabled")
 @EnableSwagger2
 public class SwaggerConfig {
     /**

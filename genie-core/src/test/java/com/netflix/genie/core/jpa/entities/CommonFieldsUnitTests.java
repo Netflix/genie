@@ -48,7 +48,10 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Before
     public void setup() {
-        this.c = new CommonFields(NAME, USER, VERSION);
+        this.c = new CommonFields();
+        this.c.setName(NAME);
+        this.c.setUser(USER);
+        this.c.setVersion(VERSION);
     }
 
     /**
@@ -60,16 +63,6 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
         Assert.assertNull(local.getName());
         Assert.assertNull(local.getUser());
         Assert.assertNull(local.getVersion());
-    }
-
-    /**
-     * Test the argument Constructor.
-     */
-    @Test
-    public void testConstructor() {
-        Assert.assertEquals(NAME, this.c.getName());
-        Assert.assertEquals(USER, this.c.getUser());
-        Assert.assertEquals(VERSION, this.c.getVersion());
     }
 
     /**
@@ -95,7 +88,8 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.validate(new CommonFields(null, USER, VERSION));
+        this.c.setName(null);
+        this.validate(this.c);
     }
 
     /**
@@ -103,7 +97,8 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoUser() {
-        this.validate(new CommonFields(NAME, "     ", VERSION));
+        this.c.setUser("     ");
+        this.validate(this.c);
     }
 
     /**
@@ -111,7 +106,8 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
-        this.validate(new CommonFields(NAME, USER, ""));
+        this.c.setVersion("");
+        this.validate(this.c);
     }
 
     /**

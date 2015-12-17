@@ -30,6 +30,8 @@ dependencies {
      * Runtime Dependencies
      *******************************/
 
+    runtime(project(":genie-swagger"))
+
     /*******************************
      * Test Dependencies
      *******************************/

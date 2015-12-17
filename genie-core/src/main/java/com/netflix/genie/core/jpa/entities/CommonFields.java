@@ -79,23 +79,6 @@ public class CommonFields extends BaseEntity {
     }
 
     /**
-     * Construct a new CommonEntity Object with all required parameters.
-     *
-     * @param name    The name of the entity. Not null/empty/blank.
-     * @param user    The user who created the entity. Not null/empty/blank.
-     * @param version The version of this entity. Not null/empty/blank.
-     */
-    public CommonFields(
-        final String name,
-        final String user,
-        final String version) {
-        super();
-        this.name = name;
-        this.user = user;
-        this.version = version;
-    }
-
-    /**
      * Gets the version of this entity.
      *
      * @return version

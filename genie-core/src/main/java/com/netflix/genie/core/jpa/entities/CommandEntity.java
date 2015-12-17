@@ -113,26 +113,6 @@ public class CommandEntity extends CommonFields {
     }
 
     /**
-     * Construct a new Command with all required parameters.
-     *
-     * @param name       The name of the command. Not null/empty/blank.
-     * @param user       The user who created the command. Not null/empty/blank.
-     * @param version    The version of this command. Not null/empty/blank.
-     * @param status     The status of the command. Not null.
-     * @param executable The executable of the command. Not null/empty/blank.
-     */
-    public CommandEntity(
-        final String name,
-        final String user,
-        final String version,
-        final CommandStatus status,
-        final String executable) {
-        super(name, user, version);
-        this.status = status;
-        this.executable = executable;
-    }
-
-    /**
      * Check to make sure everything is OK before persisting.
      *
      * @throws GenieException If any precondition isn't met.

@@ -55,6 +55,11 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     @Before
     public void setup() {
         this.c = new CommandEntity();
+        this.c.setName(NAME);
+        this.c.setUser(USER);
+        this.c.setVersion(VERSION);
+        this.c.setStatus(CommandStatus.ACTIVE);
+        this.c.setExecutable(EXECUTABLE);
     }
 
     /**
@@ -62,44 +67,21 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testDefaultConstructor() {
-        Assert.assertNull(this.c.getSetupFile());
-        Assert.assertNull(this.c.getExecutable());
-        Assert.assertNull(this.c.getName());
-        Assert.assertNull(this.c.getStatus());
-        Assert.assertNull(this.c.getUser());
-        Assert.assertNull(this.c.getVersion());
-        Assert.assertNotNull(this.c.getConfigs());
-        Assert.assertTrue(this.c.getConfigs().isEmpty());
-        Assert.assertNotNull(this.c.getTags());
-        Assert.assertTrue(this.c.getTags().isEmpty());
-        Assert.assertNotNull(this.c.getClusters());
-        Assert.assertTrue(this.c.getClusters().isEmpty());
-        Assert.assertNotNull(this.c.getApplications());
-        Assert.assertTrue(this.c.getApplications().isEmpty());
-    }
-
-    /**
-     * Test the argument Constructor.
-     *
-     * @throws GenieException If any precondition isn't met.
-     */
-    @Test
-    public void testConstructor() throws GenieException {
-        c = new CommandEntity(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
-        Assert.assertNull(this.c.getSetupFile());
-        Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
-        Assert.assertEquals(NAME, this.c.getName());
-        Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
-        Assert.assertEquals(USER, this.c.getUser());
-        Assert.assertEquals(VERSION, this.c.getVersion());
-        Assert.assertNotNull(this.c.getConfigs());
-        Assert.assertTrue(this.c.getConfigs().isEmpty());
-        Assert.assertNotNull(this.c.getTags());
-        Assert.assertTrue(this.c.getTags().isEmpty());
-        Assert.assertNotNull(this.c.getClusters());
-        Assert.assertTrue(this.c.getClusters().isEmpty());
-        Assert.assertNotNull(this.c.getApplications());
-        Assert.assertTrue(this.c.getApplications().isEmpty());
+        final CommandEntity entity = new CommandEntity();
+        Assert.assertNull(entity.getSetupFile());
+        Assert.assertNull(entity.getExecutable());
+        Assert.assertNull(entity.getName());
+        Assert.assertNull(entity.getStatus());
+        Assert.assertNull(entity.getUser());
+        Assert.assertNull(entity.getVersion());
+        Assert.assertNotNull(entity.getConfigs());
+        Assert.assertTrue(entity.getConfigs().isEmpty());
+        Assert.assertNotNull(entity.getTags());
+        Assert.assertTrue(entity.getTags().isEmpty());
+        Assert.assertNotNull(entity.getClusters());
+        Assert.assertTrue(entity.getClusters().isEmpty());
+        Assert.assertNotNull(entity.getApplications());
+        Assert.assertTrue(entity.getApplications().isEmpty());
     }
 
     /**
@@ -109,7 +91,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testOnCreateOrUpdateCommand() throws GenieException {
-        this.c = new CommandEntity(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
         Assert.assertNotNull(this.c.getTags());
         Assert.assertTrue(this.c.getTags().isEmpty());
         this.c.onCreateOrUpdateCommand();
@@ -121,7 +102,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testValidate() {
-        this.c = new CommandEntity(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
         this.validate(this.c);
     }
 
@@ -130,7 +110,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.c = new CommandEntity(null, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        this.c.setName(null);
         this.validate(this.c);
     }
 
@@ -139,7 +119,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoUser() {
-        this.c = new CommandEntity(NAME, "   ", VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        this.c.setUser("   ");
         this.validate(this.c);
     }
 
@@ -148,7 +128,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
-        this.c = new CommandEntity(NAME, USER, "", CommandStatus.ACTIVE, EXECUTABLE);
+        this.c.setVersion("");
         this.validate(this.c);
     }
 
@@ -157,7 +137,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoStatus() {
-        this.c = new CommandEntity(NAME, USER, VERSION, null, EXECUTABLE);
+        this.c.setStatus(null);
         this.validate(this.c);
     }
 
@@ -166,7 +146,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoExecutable() {
-        this.c = new CommandEntity(NAME, USER, VERSION, CommandStatus.ACTIVE, "    ");
+        this.c.setExecutable("    ");
         this.validate(this.c);
     }
 
@@ -175,7 +155,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetStatus() {
-        Assert.assertNull(this.c.getStatus());
         this.c.setStatus(CommandStatus.ACTIVE);
         Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
     }
@@ -196,7 +175,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetExecutable() {
-        Assert.assertNull(this.c.getExecutable());
         this.c.setExecutable(EXECUTABLE);
         Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
     }
