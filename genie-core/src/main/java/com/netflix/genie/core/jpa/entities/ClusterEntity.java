@@ -110,26 +110,6 @@ public class ClusterEntity extends CommonFields {
     }
 
     /**
-     * Construct a new Cluster.
-     *
-     * @param name        The name of the cluster. Not null/empty/blank.
-     * @param user        The user who created the cluster. Not null/empty/blank.
-     * @param version     The version of the cluster. Not null/empty/blank.
-     * @param status      The status of the cluster. Not null.
-     * @param clusterType The type of the cluster. Not null/empty/blank.
-     */
-    public ClusterEntity(
-        final String name,
-        final String user,
-        final String version,
-        final ClusterStatus status,
-        final String clusterType) {
-        super(name, user, version);
-        this.status = status;
-        this.clusterType = clusterType;
-    }
-
-    /**
      * Check to make sure everything is OK before persisting.
      *
      * @throws GenieException If any precondition isn't met.

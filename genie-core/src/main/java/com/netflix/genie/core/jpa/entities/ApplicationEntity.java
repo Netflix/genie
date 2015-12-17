@@ -95,23 +95,6 @@ public class ApplicationEntity extends CommonFields {
     }
 
     /**
-     * Construct a new Application with all required parameters.
-     *
-     * @param name    The name of the application. Not null/empty/blank.
-     * @param user    The user who created the application. Not null/empty/blank.
-     * @param version The version of this application. Not null/empty/blank.
-     * @param status  The status of the application. Not null.
-     */
-    public ApplicationEntity(
-        final String name,
-        final String user,
-        final String version,
-        final ApplicationStatus status) {
-        super(name, user, version);
-        this.status = status;
-    }
-
-    /**
      * Check to make sure everything is OK before persisting.
      *
      * @throws GenieException If any preconditions aren't met.

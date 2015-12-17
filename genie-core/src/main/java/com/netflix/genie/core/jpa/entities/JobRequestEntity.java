@@ -22,9 +22,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -71,16 +69,16 @@ public class JobRequestEntity extends CommonFields {
     @Basic(optional = false)
     @Column(name = "cluster_criterias", nullable = false, length = 2048)
     @Size(min = 1, max = 2048, message = "Maximum length is 1024 characters min 1")
-    private String clusterCriterias;
+    private String clusterCriterias = "[]";
 
     @Basic(optional = false)
     @Column(name = "command_criteria", nullable = false, length = 1024)
     @Size(min = 1, max = 1024, message = "Maximum length is 1024 characters min 1")
-    private String commandCriteria;
+    private String commandCriteria = "[]";
 
     @Lob
     @Column(name = "file_dependencies")
-    private String fileDependencies;
+    private String fileDependencies = "[]";
 
     @Basic
     @Column(name = "disable_log_archival")
@@ -145,6 +143,18 @@ public class JobRequestEntity extends CommonFields {
     }
 
     /**
+     * Sets the list of cluster criteria specified to pick a cluster.
+     *
+     * @param clusterCriteriasList The criteria list. Not null or empty.
+     * @throws GenieException If any precondition isn't met.
+     */
+    public void setClusterCriteriasFromList(
+        @NotEmpty(message = "No cluster criterias entered") final List<ClusterCriteria> clusterCriteriasList
+    ) throws GenieException {
+        this.clusterCriterias = JsonUtils.marshall(clusterCriteriasList);
+    }
+
+    /**
      * Get the cluster criteria's as a JSON string.
      *
      * @return The criteria's from the original request as a JSON string
@@ -158,20 +168,8 @@ public class JobRequestEntity extends CommonFields {
      *
      * @param clusterCriterias The cluster criterias.
      */
-    protected void setClusterCriterias(@NotBlank(message = "Can't be empty") final String clusterCriterias) {
+    protected void setClusterCriterias(@NotBlank final String clusterCriterias) {
         this.clusterCriterias = clusterCriterias;
-    }
-
-    /**
-     * Sets the list of cluster criteria specified to pick a cluster.
-     *
-     * @param clusterCriteriasList The criteria list. Not null or empty.
-     * @throws GenieException If any precondition isn't met.
-     */
-    public void setClusterCriteriasFromList(
-        @NotEmpty(message = "No cluster criterias entered") final List<ClusterCriteria> clusterCriteriasList
-    ) throws GenieException {
-        this.clusterCriterias = JsonUtils.marshall(clusterCriteriasList);
     }
 
     /**
@@ -189,12 +187,8 @@ public class JobRequestEntity extends CommonFields {
      *
      * @param commandArgs Arguments to be used to run the command with. Not
      *                    null/empty/blank.
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void setCommandArgs(final String commandArgs) throws GeniePreconditionException {
-        if (StringUtils.isBlank(commandArgs)) {
-            throw new GeniePreconditionException("No command args entered.");
-        }
+    public void setCommandArgs(@NotBlank final String commandArgs) {
         this.commandArgs = commandArgs;
     }
 
@@ -207,6 +201,18 @@ public class JobRequestEntity extends CommonFields {
     public Set<String> getFileDependenciesAsSet() throws GenieException {
         return JsonUtils.unmarshall(this.fileDependencies, new TypeReference<Set<String>>() {
         });
+    }
+
+    /**
+     * Sets the fileDependencies for the job request from a set of strings.
+     *
+     * @param fileDependenciesSet Dependent files for the job
+     * @throws GenieException for any processing error
+     */
+    public void setFileDependenciesFromSet(final Set<String> fileDependenciesSet) throws GenieException {
+        this.fileDependencies = fileDependenciesSet == null
+            ? JsonUtils.marshall(new HashSet<>())
+            : JsonUtils.marshall(fileDependenciesSet);
     }
 
     /**
@@ -225,18 +231,6 @@ public class JobRequestEntity extends CommonFields {
      */
     public void setFileDependencies(final String fileDependencies) {
         this.fileDependencies = fileDependencies;
-    }
-
-    /**
-     * Sets the fileDependencies for the job request from a set of strings.
-     *
-     * @param fileDependenciesSet Dependent files for the job
-     * @throws GenieException for any processing error
-     */
-    public void setFileDependenciesFromSet(final Set<String> fileDependenciesSet) throws GenieException {
-        this.fileDependencies = fileDependenciesSet == null
-            ? JsonUtils.marshall(new HashSet<>())
-            : JsonUtils.marshall(fileDependenciesSet);
     }
 
     /**
@@ -287,7 +281,7 @@ public class JobRequestEntity extends CommonFields {
     /**
      * Set the client host for the job.
      *
-     * @param clientHost The client host anme.
+     * @param clientHost The client host name.
      */
     public void setClientHost(final String clientHost) {
         this.clientHost = clientHost;
@@ -306,6 +300,18 @@ public class JobRequestEntity extends CommonFields {
     }
 
     /**
+     * Sets the set of command criteria specified to pick a command.
+     *
+     * @param commandCriteriaSet The criteria set. Not null/empty
+     * @throws GenieException If any precondition isn't met.
+     */
+    public void setCommandCriteriaFromSet(
+        @NotEmpty(message = "At least one command criteria required") final Set<String> commandCriteriaSet
+    ) throws GenieException {
+        this.commandCriteria = JsonUtils.marshall(commandCriteriaSet);
+    }
+
+    /**
      * Get the command criteria specified to run this job in string format.
      *
      * @return command criteria as a JSON array string
@@ -318,22 +324,9 @@ public class JobRequestEntity extends CommonFields {
      * Set the command criteria string of JSON.
      *
      * @param commandCriteria A set of command criteria tags as a JSON array
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    protected void setCommandCriteria(final String commandCriteria) throws GeniePreconditionException {
+    protected void setCommandCriteria(final String commandCriteria) {
         this.commandCriteria = commandCriteria;
-    }
-
-    /**
-     * Sets the set of command criteria specified to pick a command.
-     *
-     * @param commandCriteriaSet The criteria set. Not null/empty
-     * @throws GenieException If any precondition isn't met.
-     */
-    public void setCommandCriteriaFromSet(
-        @NotEmpty(message = "At least one command criteria required") final Set<String> commandCriteriaSet
-    ) throws GenieException {
-        this.commandCriteria = JsonUtils.marshall(commandCriteriaSet);
     }
 
     /**
@@ -425,7 +418,7 @@ public class JobRequestEntity extends CommonFields {
      *
      * @param job The job
      */
-    public void setJob(@NotNull(message = "Job can't be null") final JobEntity job) {
+    public void setJob(@NotNull final JobEntity job) {
         this.job = job;
     }
 

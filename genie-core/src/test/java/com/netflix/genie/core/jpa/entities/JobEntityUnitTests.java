@@ -17,10 +17,13 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.test.categories.UnitTest;
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,10 +95,10 @@ public class JobEntityUnitTests extends EntityTestsBase {
         this.jobEntity.onCreateBaseEntity();
         Assert.assertNotNull(this.jobEntity.getId());
         Assert.assertFalse(this.jobEntity.getTags().contains(
-                CommonFields.GENIE_ID_TAG_NAMESPACE + this.jobEntity.getId())
+            CommonFields.GENIE_ID_TAG_NAMESPACE + this.jobEntity.getId())
         );
         Assert.assertFalse(this.jobEntity.getTags().contains(
-                CommonFields.GENIE_NAME_TAG_NAMESPACE + this.jobEntity.getName())
+            CommonFields.GENIE_NAME_TAG_NAMESPACE + this.jobEntity.getName())
         );
     }
 
@@ -192,6 +195,10 @@ public class JobEntityUnitTests extends EntityTestsBase {
         Assert.assertNotNull(localJobEntity.getStarted());
         Assert.assertTrue(dt.compareTo(localJobEntity.getFinished()) == 0);
 
+        // Shouldn't affect finish time
+        localJobEntity.setJobStatus(JobStatus.RUNNING);
+        Assert.assertTrue(dt.compareTo(localJobEntity.getFinished()) == 0);
+
         // finish time is non-zero on completion
         localJobEntity.setJobStatus(JobStatus.SUCCEEDED);
         Assert.assertFalse(dt.compareTo(localJobEntity.getFinished()) == 0);
@@ -227,6 +234,9 @@ public class JobEntityUnitTests extends EntityTestsBase {
         tags.add("someOtherTag");
         this.jobEntity.setTags(tags);
         Assert.assertEquals(tags, this.jobEntity.getTags());
+
+        this.jobEntity.setTags(null);
+        Assert.assertThat(this.jobEntity.getTags(), Matchers.empty());
     }
 
     /**
@@ -245,5 +255,138 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test(expected = ConstraintViolationException.class)
     public void testValidateBadSuperClass() throws GenieException {
         this.validate(new JobEntity());
+    }
+
+    /**
+     * Test to make sure can successfully set the job tags.
+     */
+    @Test
+    public void canSetJobTags() {
+        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        this.jobEntity.setJobTags(tags);
+        Assert.assertThat(this.jobEntity.getJobTags(), Matchers.is(tags));
+        Assert.assertThat(this.jobEntity.getTags(), Matchers.is(tags));
+        Assert.assertThat(this.jobEntity.getSortedTags(), Matchers.notNullValue());
+
+        this.jobEntity.setJobTags(null);
+        Assert.assertThat(this.jobEntity.getJobTags(), Matchers.empty());
+        Assert.assertThat(this.jobEntity.getTags(), Matchers.empty());
+        Assert.assertThat(this.jobEntity.getSortedTags(), Matchers.nullValue());
+    }
+
+    /**
+     * Test to make sure can successfully set the Job request that launched this job.
+     */
+    @Test
+    public void canSetJobRequest() {
+        final JobRequestEntity entity = new JobRequestEntity();
+        this.jobEntity.setRequest(entity);
+        Assert.assertThat(this.jobEntity.getRequest(), Matchers.is(entity));
+    }
+
+    /**
+     * Test to make sure can successfully set the Job Execution for this job.
+     */
+    @Test
+    public void canSetJobExecution() {
+        final JobExecutionEntity entity = new JobExecutionEntity();
+        this.jobEntity.setExecution(entity);
+        Assert.assertThat(this.jobEntity.getExecution(), Matchers.is(entity));
+    }
+
+    /**
+     * Test to make sure can successfully set the Cluster this job ran on.
+     */
+    @Test
+    public void canSetCluster() {
+        final ClusterEntity cluster = new ClusterEntity();
+        final String clusterName = UUID.randomUUID().toString();
+        cluster.setName(clusterName);
+        Assert.assertThat(cluster.getJobs(), Matchers.empty());
+        Assert.assertThat(this.jobEntity.getClusterName(), Matchers.nullValue());
+        this.jobEntity.setCluster(cluster);
+        Assert.assertThat(this.jobEntity.getCluster(), Matchers.is(cluster));
+        Assert.assertThat(cluster.getJobs(), Matchers.contains(this.jobEntity));
+        Assert.assertThat(this.jobEntity.getClusterName(), Matchers.is(clusterName));
+
+        this.jobEntity.setCluster(null);
+        Assert.assertThat(this.jobEntity.getCluster(), Matchers.nullValue());
+        Assert.assertThat(cluster.getJobs(), Matchers.empty());
+        Assert.assertThat(this.jobEntity.getClusterName(), Matchers.nullValue());
+    }
+
+    /**
+     * Test to make sure can successfully set the Command this job ran used.
+     */
+    @Test
+    public void canSetCommand() {
+        final CommandEntity command = new CommandEntity();
+        final String commandName = UUID.randomUUID().toString();
+        command.setName(commandName);
+        Assert.assertThat(command.getJobs(), Matchers.empty());
+        Assert.assertThat(this.jobEntity.getCommandName(), Matchers.nullValue());
+        this.jobEntity.setCommand(command);
+        Assert.assertThat(this.jobEntity.getCommand(), Matchers.is(command));
+        Assert.assertThat(command.getJobs(), Matchers.contains(this.jobEntity));
+        Assert.assertThat(this.jobEntity.getCommandName(), Matchers.is(commandName));
+
+        this.jobEntity.setCommand(null);
+        Assert.assertThat(this.jobEntity.getCommand(), Matchers.nullValue());
+        Assert.assertThat(command.getJobs(), Matchers.empty());
+        Assert.assertThat(this.jobEntity.getCommandName(), Matchers.nullValue());
+    }
+
+    /**
+     * Test to make sure can get a valid DTO from the job entity.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetDTO() throws GenieException {
+        final JobEntity entity = new JobEntity();
+        final String id = UUID.randomUUID().toString();
+        entity.setId(id);
+        final String name = UUID.randomUUID().toString();
+        entity.setName(name);
+        final String user = UUID.randomUUID().toString();
+        entity.setUser(user);
+        final String version = UUID.randomUUID().toString();
+        entity.setVersion(version);
+        final String clusterName = UUID.randomUUID().toString();
+        entity.setClusterName(clusterName);
+        final String commandName = UUID.randomUUID().toString();
+        entity.setCommandName(commandName);
+        final Date created = entity.getCreated();
+        final Date updated = entity.getUpdated();
+        final String description = UUID.randomUUID().toString();
+        entity.setDescription(description);
+        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setJobTags(tags);
+        final String archiveLocation = UUID.randomUUID().toString();
+        entity.setArchiveLocation(archiveLocation);
+        final Date started = new Date();
+        entity.setStarted(started);
+        final Date finished = new Date();
+        entity.setFinished(finished);
+        entity.setStatus(JobStatus.SUCCEEDED);
+        final String statusMessage = UUID.randomUUID().toString();
+        entity.setStatusMsg(statusMessage);
+
+        final Job job = entity.getDTO();
+        Assert.assertThat(job.getId(), Matchers.is(id));
+        Assert.assertThat(job.getName(), Matchers.is(name));
+        Assert.assertThat(job.getUser(), Matchers.is(user));
+        Assert.assertThat(job.getVersion(), Matchers.is(version));
+        Assert.assertThat(job.getDescription(), Matchers.is(description));
+        Assert.assertThat(job.getCreated(), Matchers.is(created));
+        Assert.assertThat(job.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(job.getClusterName(), Matchers.is(clusterName));
+        Assert.assertThat(job.getCommandName(), Matchers.is(commandName));
+        Assert.assertThat(job.getTags(), Matchers.is(tags));
+        Assert.assertThat(job.getArchiveLocation(), Matchers.is(archiveLocation));
+        Assert.assertThat(job.getStarted(), Matchers.is(started));
+        Assert.assertThat(job.getFinished(), Matchers.is(finished));
+        Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
+        Assert.assertThat(job.getStatusMsg(), Matchers.is(statusMessage));
     }
 }

@@ -38,7 +38,7 @@ import javax.validation.Validator;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-public class GenieCoreTestApplication {
+public class  GenieCoreTestApplication {
 
     /**
      * Setup bean validation.

@@ -21,7 +21,6 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -54,6 +53,10 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Before
     public void setup() {
         this.a = new ApplicationEntity();
+        this.a.setName(NAME);
+        this.a.setUser(USER);
+        this.a.setVersion(VERSION);
+        this.a.setStatus(ApplicationStatus.ACTIVE);
     }
 
     /**
@@ -61,42 +64,20 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testDefaultConstructor() {
-        Assert.assertNull(this.a.getSetupFile());
-        Assert.assertNull(this.a.getStatus());
-        Assert.assertNull(this.a.getName());
-        Assert.assertNull(this.a.getUser());
-        Assert.assertNull(this.a.getVersion());
-        Assert.assertNotNull(this.a.getDependencies());
-        Assert.assertTrue(this.a.getDependencies().isEmpty());
-        Assert.assertNotNull(this.a.getConfigs());
-        Assert.assertTrue(this.a.getConfigs().isEmpty());
-        Assert.assertNotNull(this.a.getTags());
-        Assert.assertTrue(this.a.getTags().isEmpty());
-        Assert.assertNotNull(this.a.getCommands());
-        Assert.assertTrue(this.a.getCommands().isEmpty());
-    }
-
-    /**
-     * Test the argument Constructor.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    public void testConstructor() throws GeniePreconditionException {
-        this.a = new ApplicationEntity(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
-        Assert.assertNull(this.a.getSetupFile());
-        Assert.assertEquals(ApplicationStatus.ACTIVE, this.a.getStatus());
-        Assert.assertEquals(NAME, this.a.getName());
-        Assert.assertEquals(USER, this.a.getUser());
-        Assert.assertEquals(VERSION, this.a.getVersion());
-        Assert.assertNotNull(this.a.getDependencies());
-        Assert.assertTrue(this.a.getDependencies().isEmpty());
-        Assert.assertNotNull(this.a.getConfigs());
-        Assert.assertTrue(this.a.getConfigs().isEmpty());
-        Assert.assertNotNull(this.a.getTags());
-        Assert.assertTrue(this.a.getTags().isEmpty());
-        Assert.assertNotNull(this.a.getCommands());
-        Assert.assertTrue(this.a.getCommands().isEmpty());
+        final ApplicationEntity entity = new ApplicationEntity();
+        Assert.assertNull(entity.getSetupFile());
+        Assert.assertNull(entity.getStatus());
+        Assert.assertNull(entity.getName());
+        Assert.assertNull(entity.getUser());
+        Assert.assertNull(entity.getVersion());
+        Assert.assertNotNull(entity.getDependencies());
+        Assert.assertTrue(entity.getDependencies().isEmpty());
+        Assert.assertNotNull(entity.getConfigs());
+        Assert.assertTrue(entity.getConfigs().isEmpty());
+        Assert.assertNotNull(entity.getTags());
+        Assert.assertTrue(entity.getTags().isEmpty());
+        Assert.assertNotNull(entity.getCommands());
+        Assert.assertTrue(entity.getCommands().isEmpty());
     }
 
     /**
@@ -106,7 +87,6 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testOnCreateOrUpdateApplication() throws GenieException {
-        this.a = new ApplicationEntity(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         Assert.assertNotNull(this.a.getTags());
         this.a.onCreateOrUpdateApplication();
         Assert.assertEquals(2, this.a.getTags().size());
@@ -117,7 +97,10 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testValidate() {
-        this.a = new ApplicationEntity(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        this.a.setName(NAME);
+        this.a.setUser(USER);
+        this.a.setVersion(VERSION);
+        this.a.setStatus(ApplicationStatus.ACTIVE);
         this.validate(this.a);
     }
 
@@ -126,7 +109,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.a = new ApplicationEntity(null, USER, VERSION, ApplicationStatus.ACTIVE);
+        this.a.setName(null);
         this.validate(this.a);
     }
 
@@ -135,7 +118,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoUser() {
-        this.a = new ApplicationEntity(NAME, "", VERSION, ApplicationStatus.ACTIVE);
+        this.a.setUser("");
         this.validate(this.a);
     }
 
@@ -144,7 +127,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
-        this.a = new ApplicationEntity(NAME, USER, " ", ApplicationStatus.ACTIVE);
+        this.a.setVersion(" ");
         this.validate(this.a);
     }
 
@@ -153,7 +136,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoStatus() {
-        this.a = new ApplicationEntity(NAME, USER, VERSION, null);
+        this.a.setStatus(null);
         this.validate(this.a);
     }
 
@@ -162,7 +145,6 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetStatus() {
-        Assert.assertNull(this.a.getStatus());
         this.a.setStatus(ApplicationStatus.ACTIVE);
         Assert.assertEquals(ApplicationStatus.ACTIVE, this.a.getStatus());
     }

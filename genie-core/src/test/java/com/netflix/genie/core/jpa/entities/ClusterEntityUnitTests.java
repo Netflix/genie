@@ -62,6 +62,11 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         this.c = new ClusterEntity();
         this.configs = new HashSet<>();
         this.configs.add(CONFIG);
+        this.c.setName(NAME);
+        this.c.setUser(USER);
+        this.c.setVersion(VERSION);
+        this.c.setStatus(ClusterStatus.UP);
+        this.c.setClusterType(CLUSTER_TYPE);
     }
 
     /**
@@ -69,38 +74,18 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testDefaultConstructor() {
-        Assert.assertNull(this.c.getClusterType());
-        Assert.assertNull(this.c.getName());
-        Assert.assertNull(this.c.getStatus());
-        Assert.assertNull(this.c.getUser());
-        Assert.assertNull(this.c.getVersion());
-        Assert.assertNotNull(this.c.getConfigs());
-        Assert.assertTrue(this.c.getConfigs().isEmpty());
-        Assert.assertNotNull(this.c.getTags());
-        Assert.assertTrue(this.c.getTags().isEmpty());
-        Assert.assertNotNull(this.c.getCommands());
-        Assert.assertTrue(this.c.getCommands().isEmpty());
-    }
-
-    /**
-     * Test the argument Constructor.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    public void testConstructor() throws GeniePreconditionException {
-        this.c = new ClusterEntity(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
-        Assert.assertEquals(CLUSTER_TYPE, this.c.getClusterType());
-        Assert.assertEquals(NAME, this.c.getName());
-        Assert.assertEquals(ClusterStatus.UP, this.c.getStatus());
-        Assert.assertEquals(USER, this.c.getUser());
-        Assert.assertEquals(VERSION, this.c.getVersion());
-        Assert.assertNotNull(this.c.getConfigs());
-        Assert.assertTrue(this.c.getConfigs().isEmpty());
-        Assert.assertNotNull(this.c.getTags());
-        Assert.assertTrue(this.c.getTags().isEmpty());
-        Assert.assertNotNull(this.c.getCommands());
-        Assert.assertTrue(this.c.getCommands().isEmpty());
+        final ClusterEntity entity = new ClusterEntity();
+        Assert.assertNull(entity.getClusterType());
+        Assert.assertNull(entity.getName());
+        Assert.assertNull(entity.getStatus());
+        Assert.assertNull(entity.getUser());
+        Assert.assertNull(entity.getVersion());
+        Assert.assertNotNull(entity.getConfigs());
+        Assert.assertTrue(entity.getConfigs().isEmpty());
+        Assert.assertNotNull(entity.getTags());
+        Assert.assertTrue(entity.getTags().isEmpty());
+        Assert.assertNotNull(entity.getCommands());
+        Assert.assertTrue(entity.getCommands().isEmpty());
     }
 
     /**
@@ -110,7 +95,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testOnCreateOrUpdateCluster() throws GenieException {
-        this.c = new ClusterEntity(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         Assert.assertNotNull(this.c.getTags());
         Assert.assertTrue(this.c.getTags().isEmpty());
         this.c.onCreateOrUpdateCluster();
@@ -122,7 +106,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testValidate() {
-        this.c = new ClusterEntity(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
         this.validate(this.c);
     }
 
@@ -131,7 +114,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.c = new ClusterEntity(null, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        this.c.setName(null);
         this.validate(this.c);
     }
 
@@ -140,7 +123,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoUser() {
-        this.c = new ClusterEntity(NAME, " ", VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        this.c.setUser(" ");
         this.validate(this.c);
     }
 
@@ -149,7 +132,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
-        this.c = new ClusterEntity(NAME, USER, "", ClusterStatus.UP, CLUSTER_TYPE);
+        this.c.setVersion("");
         this.validate(this.c);
     }
 
@@ -158,7 +141,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoStatus() {
-        this.c = new ClusterEntity(NAME, USER, VERSION, null, CLUSTER_TYPE);
+        this.c.setStatus(null);
         this.validate(this.c);
     }
 
@@ -167,7 +150,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoClusterType() {
-        this.c = new ClusterEntity(NAME, USER, VERSION, ClusterStatus.UP, null);
+        this.c.setClusterType(null);
         this.validate(this.c);
     }
 
@@ -176,7 +159,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetStatus() {
-        Assert.assertNull(this.c.getStatus());
         this.c.setStatus(ClusterStatus.TERMINATED);
         Assert.assertEquals(ClusterStatus.TERMINATED, this.c.getStatus());
     }
@@ -186,7 +168,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetClusterType() {
-        Assert.assertNull(this.c.getClusterType());
         this.c.setClusterType(CLUSTER_TYPE);
         Assert.assertEquals(CLUSTER_TYPE, this.c.getClusterType());
     }

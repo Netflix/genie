@@ -20,7 +20,6 @@ package com.netflix.genie.core.jpa.entities;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Basic;
@@ -128,30 +127,7 @@ public class JobEntity extends CommonFields {
      */
     public JobEntity() {
         super();
-        // Set version to default if not specified
-        if (StringUtils.isBlank(this.getVersion())) {
-            this.setVersion(DEFAULT_VERSION);
-        }
-    }
-
-    /**
-     * Construct a new Job.
-     *
-     * @param user    The name of the user running the job. Not null/empty/blank.
-     * @param name    The name specified for the job. Not null/empty/blank.
-     * @param version The version of this job. Not null/empty/blank.
-     */
-    public JobEntity(
-        final String user,
-        final String name,
-        final String version
-    ) {
-        super(name, user, version);
-
-        // Set version to default if not specified
-        if (StringUtils.isBlank(this.getVersion())) {
-            this.setVersion(DEFAULT_VERSION);
-        }
+        this.setVersion(DEFAULT_VERSION);
     }
 
     /**
@@ -291,9 +267,7 @@ public class JobEntity extends CommonFields {
 
         if (jobStatus == JobStatus.INIT) {
             this.setStarted(new Date());
-        } else if (jobStatus == JobStatus.SUCCEEDED
-            || jobStatus == JobStatus.KILLED
-            || jobStatus == JobStatus.FAILED) {
+        } else if (jobStatus != JobStatus.RUNNING) {
             setFinished(new Date());
         }
     }
@@ -405,11 +379,17 @@ public class JobEntity extends CommonFields {
      * @param cluster The cluster this job ran on
      */
     public void setCluster(final ClusterEntity cluster) {
+        if (this.cluster != null) {
+            this.cluster.getJobs().remove(this);
+            this.clusterName = null;
+        }
+
         this.cluster = cluster;
 
         // Reverse side of the relationship
         if (this.cluster != null) {
             this.cluster.addJob(this);
+            this.clusterName = cluster.getName();
         }
     }
 
@@ -428,11 +408,17 @@ public class JobEntity extends CommonFields {
      * @param command The command
      */
     public void setCommand(final CommandEntity command) {
+        if (this.command != null) {
+            this.command.getJobs().remove(this);
+            this.commandName = null;
+        }
+
         this.command = command;
 
         // Reverse side of the relationship
         if (this.command != null) {
             this.command.addJob(this);
+            this.commandName = command.getName();
         }
     }
 
