@@ -52,6 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.EnumSet;
@@ -311,5 +312,20 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/execution", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public JobExecution getJobExecution(@PathVariable("id") final String id) throws GenieException {
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Get the job output directory.
+     *
+     * @param id The id of the job to get output for
+     * @param response the servlet response to send the redirect with
+     * @throws IOException on redirect error
+     */
+    @RequestMapping(value = "/{id}/output", method = RequestMethod.GET)
+    public void getJobOutput(
+        @PathVariable("id") final String id,
+        final HttpServletResponse response
+    ) throws IOException {
+        response.sendRedirect("http://localhost:8080/genie-jobs/" + id);
     }
 }
