@@ -16,18 +16,13 @@
 #
 ##
 
-###########################################################################
-# Spring Settings
-###########################################################################
+spring:
+  datasource:
+    url: jdbc:derby:genie-db;create=true
+    username: me
+    password: mine
 
-# Datasource settings (driver class name inferred by spring boot)
-spring.datasource.url=jdbc:hsqldb:mem:genie-int-db;hsqldb.lock_file=false;shutdown=true
-spring.datasource.username=SA
-spring.datasource.password=
-
-# Elasticsearch settings
-spring.data.elasticsearch.properties.path.data=build/elasticsearch/data
-spring.data.elasticsearch.properties.path.logs=build/elasticsearch/logs
-
-eureka.client.enabled=false
-
+com:
+  netflix:
+    genie:
+      environment: test

@@ -17,11 +17,9 @@
  */
 package com.netflix.genie.web.tasks.impl;
 
-//import com.netflix.genie.core.services.ExecutionService;
 import com.netflix.genie.web.tasks.JobJanitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

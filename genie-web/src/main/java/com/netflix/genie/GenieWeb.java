@@ -17,6 +17,7 @@
  */
 package com.netflix.genie;
 
+import com.google.common.collect.Maps;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import javax.validation.Validator;
+import java.util.Map;
 
 /**
  * Main Genie Spring Configuration class.
@@ -41,7 +43,11 @@ public class GenieWeb {
      * @throws Exception For any failure during program execution
      */
     public static void main(final String[] args) throws Exception {
-        SpringApplication.run(GenieWeb.class, args);
+        final Map<String, Object> defaultProperties = Maps.newHashMap();
+        defaultProperties.put("spring.config.location", "${user.home}/.genie/");
+        final SpringApplication genie = new SpringApplication(GenieWeb.class);
+        genie.setDefaultProperties(defaultProperties);
+        genie.run(args);
     }
 
     /**

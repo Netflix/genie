@@ -16,18 +16,34 @@
 #
 ##
 
-###########################################################################
-# Spring Settings
-###########################################################################
+spring:
+  datasource:
+    url: jdbc:hsqldb:mem:genie-db;hsqldb.lock_file=false;shutdown=true
+    username: SA
+    password:
 
-# Datasource settings (driver class name inferred by spring boot)
-spring.datasource.url=jdbc:derby:genie-db;create=true
-spring.datasource.username=me
-spring.datasource.password=mine
-
-###########################################################################
-# Environment Settings
-###########################################################################
-
-# Used to display environment in UI
-com.netflix.genie.environment=test
+com:
+  netflix:
+    genie:
+      environment: dev
+      server:
+        janitor:
+          min:
+            sleep:
+              ms: 150000
+          max:
+            sleep:
+              ms: 300000
+          zombie:
+            delta:
+              ms: 360000
+        max:
+          running:
+            jobs: 3
+        idle:
+          host:
+            threshold:
+              delta: 1
+        forward:
+          jobs:
+            treshold: 5

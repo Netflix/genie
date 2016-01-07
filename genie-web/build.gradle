@@ -1,3 +1,4 @@
+apply plugin: 'application'
 apply plugin: 'spring-boot'
 
 dependencies {
@@ -8,9 +9,12 @@ dependencies {
     compile(project(":genie-core"))
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
+    compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_eureka_version}")
+    compile("org.springframework.security.extensions:spring-security-saml2-core:${spring_security_saml_version}")
+    compile("org.springframework.security.oauth:spring-security-oauth2")
 
     // Web Jars
     compile("org.webjars:bootstrap:${bootstrap_version}")
@@ -42,7 +46,7 @@ dependencies {
 }
 
 license {
-    excludes(["static/*"])
+    excludes(["static/*", "*.yml", "genie-banner.txt"])
 }
 
 jar {
@@ -51,9 +55,31 @@ jar {
     }
 }
 
+// Configure the application
+mainClassName = "com.netflix.genie.GenieWeb"
+applicationDistribution.from(project.file('config')) {
+    into 'config'
+}
+
+startScripts {
+    doLast {
+        unixScript.text = unixScript.text.replace('CLASSPATH=$APP_HOME', 'CLASSPATH=$APP_HOME/config:$APP_HOME')
+        windowsScript.text = windowsScript.text.replace('set CLASSPATH=', 'set CLASSPATH=%APP_HOME%\\config;%APP_HOME%;')
+    }
+}
+
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
+
+//tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
+//    classpath configurations.runtime + file('config')
+//    systemProperty('spring.profiles.active', env)
+//    addResources false
+//}
 
 bootRun {
     addResources = false
     systemProperty 'spring.profiles.active', env
 }
+
+// Turn off the boot "fatjar" repackaging so as to use the Application deployment
+tasks.bootRepackage.enabled = false
