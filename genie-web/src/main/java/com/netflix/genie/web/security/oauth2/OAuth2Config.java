@@ -19,8 +19,10 @@ package com.netflix.genie.web.security.oauth2;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 
 /**
  * Security Configuration for OAuth2.
@@ -32,26 +34,23 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
  */
 @ConditionalOnProperty("security.oauth2.enabled")
 @Configuration
-@EnableWebSecurity
 @EnableResourceServer
-public class OAuth2Config /* extends ResourceServerConfigurerAdapter */ {
+public class OAuth2Config extends ResourceServerConfigurerAdapter {
 
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
-//        super.configure(resources);
-//    }
-//
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public void configure(final HttpSecurity http) throws Exception {
-//        super.configure(http);
-//    }
-//
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void configure(final HttpSecurity http) throws Exception {
+    }
+
 //    /**
 //     * blah.
 //     *

@@ -36,7 +36,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.saml.SAMLAuthenticationProvider;
 import org.springframework.security.saml.SAMLBootstrap;
@@ -105,7 +104,6 @@ import java.util.Timer;
  */
 @ConditionalOnProperty("security.saml.enabled")
 @Configuration
-@EnableWebSecurity
 //@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SAMLConfig extends WebSecurityConfigurerAdapter {
 

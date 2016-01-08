@@ -17,7 +17,11 @@
  */
 package com.netflix.genie.web.security;
 
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 /**
  * Primary Genie Security configuration.
@@ -25,8 +29,30 @@ import org.springframework.context.annotation.Configuration;
  * @author tgianos
  * @since 3.0.0
  */
+@Conditional(SecurityConfig.OnAnySecurityEnabled.class)
 @Configuration
-//@EnableOAuth2Sso
-//@EnableResourceServer
+@EnableWebSecurity
 public class SecurityConfig {
+
+    static class OnAnySecurityEnabled extends AnyNestedCondition {
+
+        /**
+         * Default Constructor sets the class parse time.
+         */
+        OnAnySecurityEnabled() {
+            super(ConfigurationPhase.PARSE_CONFIGURATION);
+        }
+
+        @ConditionalOnProperty("security.saml.enabled")
+        private static class OnSAML {
+        }
+
+        @ConditionalOnProperty("security.x509.enabled")
+        private static class OnX509 {
+        }
+
+        @ConditionalOnProperty("security.oauth2.enabled")
+        private static class OnOAuth2 {
+        }
+    }
 }

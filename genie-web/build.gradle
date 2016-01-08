@@ -55,18 +55,9 @@ jar {
     }
 }
 
-// Configure the application
+// Configure the Application Plugin
 mainClassName = "com.netflix.genie.GenieWeb"
-applicationDistribution.from(project.file('config')) {
-    into 'config'
-}
-
-startScripts {
-    doLast {
-        unixScript.text = unixScript.text.replace('CLASSPATH=$APP_HOME', 'CLASSPATH=$APP_HOME/config:$APP_HOME')
-        windowsScript.text = windowsScript.text.replace('set CLASSPATH=', 'set CLASSPATH=%APP_HOME%\\config;%APP_HOME%;')
-    }
-}
+startScripts.classpath.add(files('ext'))
 
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
 
