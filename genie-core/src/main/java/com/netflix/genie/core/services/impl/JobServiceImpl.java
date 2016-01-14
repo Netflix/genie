@@ -86,12 +86,27 @@ public class JobServiceImpl implements JobService {
         // TODO get client host at this point?
         // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
         // orginal request may or may not have it.
-        //    final JobRequest jobRequestWithId =
-        //          this.jobPersistenceService.createJobRequest(jobRequest);
+            final JobRequest jobRequestWithId =
+                  this.jobPersistenceService.createJobRequest(jobRequest);
 
-        final JobRequest jobRequestWithId = jobRequest;
+        // create the job object in the database with status INIT
+        // TODO rethink status for jobs
+        // TODO get archive location logic
+        final Job job  = new Job.Builder(
+                jobRequest.getName(),
+                jobRequest.getUser(),
+                jobRequest.getVersion()
+            )
+            .withArchiveLocation("Blah")
+            .withDescription(jobRequest.getDescription())
+            .withId(jobRequest.getId())
+            .withStatus(JobStatus.INIT)
+            .withStatusMsg("Job Accepted and in initialization phase.")
+            .build();
+
+        this.jobPersistenceService.createJob(job);
+
         this.jobSubmitterService.submitJob(jobRequestWithId);
-
         return jobRequestWithId.getId();
 
         // do basic validation of the request

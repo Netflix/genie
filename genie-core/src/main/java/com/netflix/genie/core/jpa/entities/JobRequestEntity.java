@@ -420,6 +420,7 @@ public class JobRequestEntity extends CommonFields {
      */
     public void setJob(@NotNull final JobEntity job) {
         this.job = job;
+        job.setRequest(this);
     }
 
     /**

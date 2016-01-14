@@ -20,13 +20,13 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 
 import com.netflix.genie.common.exceptions.GenieException;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -61,18 +61,20 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
-     * Update a job.
+     * Update the status and status message of the job.
      *
-     * @param id        The id of the application configuration to update
-     * @param updateJob Information to update for the Job
+     * @param id The id of the job to update the status for.
+     * @param jobStatus The updated status of the job.
+     * @param statusMsg The updated status message of the job.
      * @throws GenieException if there is an error
      */
-    void updateJob(
-            @NotBlank(message = "No job id entered. Unable to update.")
-            final String id,
-            @NotNull(message = "No job information entered. Unable to update.")
-            @Valid
-            final Job updateJob
+    void updateJobStatus(
+        @NotBlank(message = "No job id entered. Unable to update.")
+        final String id,
+        @NotNull (message = "Status cannot be null.")
+        final JobStatus jobStatus,
+        @NotBlank(message = "Status message cannot be empty.")
+        final String statusMsg
     ) throws GenieException;
 
     /**
