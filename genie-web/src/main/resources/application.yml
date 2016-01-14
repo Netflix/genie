@@ -36,7 +36,11 @@ security:
     enabled: false
   oauth2:
     enabled: false
+  rest:
+    secured: false
   saml:
+    enabled: false
+  x509:
     enabled: false
 
 spring:

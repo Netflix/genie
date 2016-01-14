@@ -18,6 +18,7 @@
 package com.netflix.genie.web.security.saml;
 
 import com.google.common.collect.Lists;
+import com.netflix.genie.web.security.x509.X509AuthenticationProvider;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.velocity.app.VelocityEngine;
@@ -25,12 +26,15 @@ import org.opensaml.saml2.metadata.provider.HTTPMetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.opensaml.xml.parse.ParserPool;
 import org.opensaml.xml.parse.StaticBasicParserPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -104,8 +108,14 @@ import java.util.Timer;
  */
 @ConditionalOnProperty("security.saml.enabled")
 @Configuration
+@Order(4)
 //@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SAMLConfig extends WebSecurityConfigurerAdapter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SAMLConfig.class);
+
+    @Value("${security.rest.secured}")
+    private boolean secureRest;
 
     @Autowired
     private SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl;
@@ -752,6 +762,7 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
+        // @formatter:off
         http
             .httpBasic()
             .authenticationEntryPoint(samlEntryPoint());
@@ -761,16 +772,30 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
         http
             .addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
             .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class);
+        if (this.secureRest) {
+            http
+                .antMatcher("/**")
+                    .authorizeRequests()
+                        .antMatchers("/error").permitAll()
+                        .antMatchers("/saml/**").permitAll()
+                        .antMatchers("/upload.html").hasRole("ADMIN")
+                        .anyRequest().authenticated();
+        } else {
+            http
+                .antMatcher("/**")
+                    .authorizeRequests()
+                        .antMatchers("/error").permitAll()
+                        .antMatchers("/api/**").permitAll()
+                        .antMatchers("/saml/**").permitAll()
+                        .antMatchers("/upload.html").hasRole("ADMIN")
+                        .anyRequest().authenticated();
+        }
         http
-            .authorizeRequests()
-            .antMatchers("/error").permitAll()
-            .antMatchers("/saml/**").permitAll()
-            .antMatchers("/api/**").permitAll()
-            .antMatchers("/upload.html").hasAuthority("ROLE_ADMIN")
-            .anyRequest().authenticated();
+            .x509();
         http
             .logout()
             .logoutSuccessUrl("/");
+        // @formatter:on
     }
 
     /**
@@ -782,6 +807,7 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth
-            .authenticationProvider(samlAuthenticationProvider());
+            .authenticationProvider(samlAuthenticationProvider())
+            .authenticationProvider(new X509AuthenticationProvider());
     }
 }

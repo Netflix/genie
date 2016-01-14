@@ -34,12 +34,18 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableWebSecurity
 public class SecurityConfig {
 
-    static class OnAnySecurityEnabled extends AnyNestedCondition {
+    /**
+     * A class used to enable the security config any time any of the supported security platforms is enabled.
+     *
+     * @author tgianos
+     * @since 3.0.0
+     */
+    public static class OnAnySecurityEnabled extends AnyNestedCondition {
 
         /**
          * Default Constructor sets the class parse time.
          */
-        OnAnySecurityEnabled() {
+        public OnAnySecurityEnabled() {
             super(ConfigurationPhase.PARSE_CONFIGURATION);
         }
 

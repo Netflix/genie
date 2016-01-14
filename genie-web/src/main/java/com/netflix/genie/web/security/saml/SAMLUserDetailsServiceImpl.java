@@ -18,6 +18,7 @@
 package com.netflix.genie.web.security.saml;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,40 +46,55 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SAMLUserDetailsServiceImpl.class);
 
+    private static final GrantedAuthority USER = new SimpleGrantedAuthority("ROLE_USER");
+    private static final GrantedAuthority ADMIN = new SimpleGrantedAuthority("ROLE_ADMIN");
+
     @Value("${security.saml.attributes.user.name}")
-    private String userAttributeName;
+    protected String userAttributeName;
     @Value("${security.saml.attributes.groups.name}")
-    private String groupAttributeName;
+    protected String groupAttributeName;
     @Value("${security.saml.attributes.groups.admin}")
-    private String adminGroup;
+    protected String adminGroup;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Object loadUserBySAML(final SAMLCredential credential) throws UsernameNotFoundException {
-//        final String userId = credential.getNameID().getValue();
-        final String userId = credential.getAttributeAsString(this.userAttributeName);
-        final String[] groups = credential.getAttributeAsStringArray(this.groupAttributeName);
+        if (credential == null) {
+            throw new UsernameNotFoundException("No credential entered. Unable to get username.");
+        }
 
-        LOG.info("{} is logged in", userId);
+        //final String userId = credential.getNameID().getValue();
+        final String userId = credential.getAttributeAsString(this.userAttributeName);
+        if (StringUtils.isBlank(userId)) {
+            throw new UsernameNotFoundException("No user id found using attribute: " + this.userAttributeName);
+        }
+
+        // User exists. Give them at least USER role
+        final List<GrantedAuthority> authorities = Lists.newArrayList(USER);
+
+        // See if we can get any other roles
+        final String[] groups = credential.getAttributeAsStringArray(this.groupAttributeName);
+        if (groups == null) {
+            LOG.warn("No groups found. User will only get ROLE_USER by default.");
+        } else if (Arrays.asList(groups).contains(this.adminGroup)) {
+            authorities.add(ADMIN);
+        }
+
+        // For debugging what's available in the credential from the IDP
         if (LOG.isDebugEnabled()) {
             LOG.debug("Attributes:");
             credential.getAttributes().stream().forEach(attribute -> {
                 LOG.debug("Attribute: {}", attribute.getName());
                 LOG.debug(
                     "Values: {}",
-                    StringUtils.arrayToCommaDelimitedString(credential.getAttributeAsStringArray(attribute.getName()))
+                    StringUtils.join(credential.getAttributeAsStringArray(attribute.getName()), ',')
                 );
             });
         }
 
-        final List<GrantedAuthority> authorities = Lists.newArrayList(new SimpleGrantedAuthority("ROLE_USER"));
-
-        if (Arrays.asList(groups).contains(this.adminGroup)) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        }
-
+        LOG.info("{} is logged in with authorities {}", userId, authorities);
         return new User(userId, "DUMMY", authorities);
     }
 }

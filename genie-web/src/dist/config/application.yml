@@ -17,21 +17,19 @@
 ##
 
 security:
-  basic:
-    enabled: false
   oauth2:
     enabled: false
     client:
-      access-token-uri: yourAccessTokenURI
+#      access-token-uri: yourAccessTokenURI
       client-id: yourClientId
       client-secret: yourClientSecret
       scope:
         - somescope
         - anotherScope
-      user-authorization-uri: yourUserAuthorizationURI
+#      user-authorization-uri: yourUserAuthorizationURI
     resource:
       id: genie
-      user-info-uri: yourUserInfoURI
+#      user-info-uri: yourUserInfoURI
       token-info-uri: yourTokenInfoURI
   saml:
     enabled: false

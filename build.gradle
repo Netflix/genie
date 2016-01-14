@@ -15,6 +15,8 @@ buildscript {
 
 plugins {
     id 'nebula.netflixoss' version '3.1.2'
+    id 'nebula.optional-base' version '3.0.3'
+    id 'nebula.provided-base' version '3.0.3'
 }
 
 ext.githubProjectName = rootProject.name
@@ -50,6 +52,8 @@ subprojects {
     apply plugin: 'pmd'
     apply plugin: 'jacoco'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'nebula.optional-base'
+    apply plugin: 'nebula.provided-base'
 
     group = "com.netflix.${githubProjectName}"
 

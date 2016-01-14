@@ -18,11 +18,10 @@
 package com.netflix.genie.web.security.oauth2;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
  * Security Configuration for OAuth2.
@@ -34,41 +33,30 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
  */
 @ConditionalOnProperty("security.oauth2.enabled")
 @Configuration
-@EnableResourceServer
-public class OAuth2Config extends ResourceServerConfigurerAdapter {
+//@EnableResourceServer
+@EnableOAuth2Sso
+//public class OAuth2Config extends ResourceServerConfigurerAdapter {
+public class OAuth2Config extends WebSecurityConfigurerAdapter {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
+////        resources.tokenServices(new MeechumTokenServices()).stateless(true);
+//        resources.stateless(false);
+//    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void configure(final HttpSecurity http) throws Exception {
+        // @formatter:off
+        http
+            .antMatcher("/**")
+                .authorizeRequests()
+                    .anyRequest().authenticated();
+        // @formatter:on
     }
-
-//    /**
-//     * blah.
-//     *
-//     * @param checkTokenUrl blah
-//     * @param clientId blah
-//     * @param clientSecret blah
-//     * @return who cares
-//     */
-//    @Bean
-//    public RemoteTokenServices remoteTokenServices(
-//        @Value("${auth.server.url}") final String checkTokenUrl,
-//        @Value("${auth.server.clientId}") final String clientId,
-//        @Value("${auth.server.clientsecret}") final String clientSecret
-//    ) {
-//        final RemoteTokenServices remoteTokenServices = new RemoteTokenServices();
-//        remoteTokenServices.setCheckTokenEndpointUrl(checkTokenUrl);
-//        remoteTokenServices.setClientId(clientId);
-//        remoteTokenServices.setClientSecret(clientSecret);
-//        return remoteTokenServices;
-//    }
 }
