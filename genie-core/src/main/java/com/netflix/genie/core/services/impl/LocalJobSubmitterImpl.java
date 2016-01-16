@@ -17,12 +17,14 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.JobExecutor;
+import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;

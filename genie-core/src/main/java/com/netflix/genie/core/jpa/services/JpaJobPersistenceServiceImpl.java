@@ -349,6 +349,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             throw new GenieConflictException("A job with id " + jobExecution.getId() + " already exists");
         }
 
+        final JobEntity jobEntity = jobRepo.findOne(jobExecution.getId());
+
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("Cannot find the job for the id of the jobExecution specified.");
+        }
+
         final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
 
         jobExecutionEntity.setId(jobExecution.getId());
@@ -356,7 +362,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobExecutionEntity.setHostName(jobExecution.getHostName());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
 
-        this.jobExecutionRepo.save(jobExecutionEntity);
+        jobEntity.setExecution(jobExecutionEntity);
     }
 
     /**

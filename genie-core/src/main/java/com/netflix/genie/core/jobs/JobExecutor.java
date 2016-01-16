@@ -35,6 +35,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Class that contains the logic to setup a genie job and run it.
@@ -116,11 +117,15 @@ public class JobExecutor {
      */
     private void startJob() throws GenieException {
         // TODO set the cwd for the process.
-//        final List command = new ArrayList<>();
-//        command.add("bash");
-//        command.add(genieLauncherScript);
-//
-//        executeBashCommand(command);
+        final List command = new ArrayList<>();
+        command.add("bash");
+        command.add(genieLauncherScript);
+        command.add(">");
+        command.add("stdout.log");
+        command.add("2>");
+        command.add("stderr.log");
+
+        executeBashCommand(command, this.jobExecEnv.getJobWorkingDir());
     }
 
     private void setupStandardVariables() {
@@ -220,7 +225,7 @@ public class JobExecutor {
      * @throws GenieException
      */
     private void makeDir(final String dirPath) throws GenieException {
-        this.executeBashCommand(Lists.newArrayList("mkdir", dirPath));
+        this.executeBashCommand(Lists.newArrayList("mkdir", dirPath), null);
     }
 
     /**
@@ -244,8 +249,11 @@ public class JobExecutor {
      *
      * @param command An array consisting of the command to run
      */
-    private void executeBashCommand(final List<String> command) throws GenieException {
+    private void executeBashCommand(final List<String> command, final String workingDirectory) throws GenieException {
         final ProcessBuilder pb = new ProcessBuilder(command);
+        if (workingDirectory != null) {
+            pb.directory(new File(workingDirectory));
+        }
         try {
             final Process process = pb.start();
             final int errCode = process.waitFor();
