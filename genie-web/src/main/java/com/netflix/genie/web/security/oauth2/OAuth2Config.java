@@ -18,10 +18,12 @@
 package com.netflix.genie.web.security.oauth2;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 
 /**
  * Security Configuration for OAuth2.
@@ -33,19 +35,18 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @ConditionalOnProperty("security.oauth2.enabled")
 @Configuration
-//@EnableResourceServer
-@EnableOAuth2Sso
-//public class OAuth2Config extends ResourceServerConfigurerAdapter {
-public class OAuth2Config extends WebSecurityConfigurerAdapter {
+@EnableResourceServer
+//@EnableOAuth2Sso
+public class OAuth2Config extends ResourceServerConfigurerAdapter {
 
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
-////        resources.tokenServices(new MeechumTokenServices()).stateless(true);
-//        resources.stateless(false);
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
+//        resources.tokenServices(new PingFederateTokenServices()).stateless(true);
+        resources.stateless(false);
+    }
 
     /**
      * {@inheritDoc}
@@ -54,9 +55,11 @@ public class OAuth2Config extends WebSecurityConfigurerAdapter {
     public void configure(final HttpSecurity http) throws Exception {
         // @formatter:off
         http
-            .antMatcher("/**")
+            .antMatcher("/api/**")
                 .authorizeRequests()
-                    .anyRequest().authenticated();
+                    .anyRequest().authenticated()
+            .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
         // @formatter:on
     }
 }

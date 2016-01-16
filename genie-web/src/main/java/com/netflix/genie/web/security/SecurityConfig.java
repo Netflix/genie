@@ -17,11 +17,23 @@
  */
 package com.netflix.genie.web.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import java.util.Collection;
 
 /**
  * Primary Genie Security configuration.
@@ -32,7 +44,64 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Conditional(SecurityConfig.OnAnySecurityEnabled.class)
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
+
+    /**
+     * Global Authentication Manager.
+     *
+     * @return The authentication manager
+     * @throws Exception
+     */
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    /**
+     * Configure the global authentication manager.
+     *
+     * @param auth The builder to configure
+     */
+    @Autowired(required = false)
+    protected void configureGlobal(
+        final AuthenticationManagerBuilder auth,
+        final Collection<AuthenticationProvider> providers
+    ) throws Exception {
+        if (providers == null) {
+            LOG.info("\n\n\nProviders was NULL\n\n\n");
+        } else {
+            LOG.info("\n\n\nProviders was not NULL\n\n\n");
+            for (final AuthenticationProvider provider : providers) {
+                LOG.info(provider.toString());
+                auth.authenticationProvider(provider);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void configure(final WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/webjars/**", "/images/**", "/css/**");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void configure(final HttpSecurity http) throws Exception {
+        // This is a catch all in the case that SAML isn't turned on but one of the API security is.
+        // If this isn't all the default implementation of WebSecurityConfigurerAdapter kicks in and presents
+        // a default login page with the Spring Boot generated password. This allows everything through but the UI
+        // won't be able to call the server to get any information. As such that configuration (SAML off but something
+        // else on) is kind of pointless if you want to use the UI.
+        // TODO: Revisit if there is a way to enforce this or at least provide some in memory login if nothing else
+        http.antMatcher("/**").authorizeRequests().anyRequest().permitAll();
+    }
 
     /**
      * A class used to enable the security config any time any of the supported security platforms is enabled.

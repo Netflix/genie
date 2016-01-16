@@ -17,11 +17,10 @@
  */
 package com.netflix.genie.web.security.x509;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -34,16 +33,17 @@ import org.springframework.security.config.http.SessionCreationPolicy;
  */
 @ConditionalOnProperty("security.x509.enabled")
 @Configuration
+@Order(2)
 public class X509Config extends WebSecurityConfigurerAdapter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(X509Config.class);
-
     /**
-     * {@inheritDoc}
+     * An authentication provider for x509 certificates.
+     *
+     * @return The custom authentication provider
      */
-    @Override
-    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(new X509AuthenticationProvider());
+    @Bean
+    public X509AuthenticationProvider x509AuthenticationProvider() {
+        return new X509AuthenticationProvider();
     }
 
     /**
@@ -51,10 +51,9 @@ public class X509Config extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-        LOG.info("\n\n\nx509 Http Security configuration\n\n\n");
         // @formatter:off
         http
-            .antMatcher("/**")
+            .antMatcher("/api/**")
                 .authorizeRequests().anyRequest().authenticated()
             .and()
                 .x509()
