@@ -99,7 +99,7 @@ public class JobServiceImpl implements JobService {
             )
             .withArchiveLocation("Blah")
             .withDescription(jobRequest.getDescription())
-            .withId(jobRequest.getId())
+            .withId(jobRequestWithId.getId())
             .withStatus(JobStatus.INIT)
             .withStatusMsg("Job Accepted and in initialization phase.")
             .build();

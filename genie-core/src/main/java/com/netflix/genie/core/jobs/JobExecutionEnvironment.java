@@ -55,6 +55,7 @@ public class JobExecutionEnvironment {
     private Command command;
     private List<Application> applications = new ArrayList<>();
     private String jobWorkingDir;
+    private String jobId;
 
     /**
      * Initializes by Taking in a job request and figures out the cluster, command and applications
@@ -105,6 +106,7 @@ public class JobExecutionEnvironment {
 
         this.applications.addAll(commandService.getApplicationsForCommand(this.command.getId()));
         this.jobWorkingDir = genieBaseWorkingDir + "/" + jobRequest.getId();
+        this.jobId = this.jobRequest.getId();
     }
 
     /**
@@ -145,7 +147,7 @@ public class JobExecutionEnvironment {
     }
 
     /**
-     * Get the command information from the execution environment.
+     * Get the current working directory for the job to run.
      *
      * @return the working directory for the job
      */
@@ -153,5 +155,12 @@ public class JobExecutionEnvironment {
         return jobWorkingDir;
     }
 
-
+    /**
+     * Get the id of the Job to be run.
+     *
+     * @return the id for the job
+     */
+    public String getJobId() {
+        return jobId;
+    }
 }

@@ -20,9 +20,11 @@ package com.netflix.genie.core.jobs;
 
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileCopyService;
+import com.netflix.genie.core.services.JobPersistenceService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,8 @@ import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.ArrayList;
+import java.net.InetAddress;
+import java.lang.reflect.Field;
 
 /**
  * Class that contains the logic to setup a genie job and run it.
@@ -46,6 +50,7 @@ import java.util.ArrayList;
 public class JobExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobExecutor.class);
+    private static final String PID = "pid";
 
     // Directory paths env variables
 //    private static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
@@ -55,6 +60,7 @@ public class JobExecutor {
 //    private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
     private final JobExecutionEnvironment jobExecEnv;
     private List<FileCopyService> fileCopyServiceImpls;
+    private JobPersistenceService jobPersistenceServiceImpl;
 //    private String stderrLogPath;
 //    private String stdoutLogPath;
 //    private String genieLogPath;
@@ -62,18 +68,22 @@ public class JobExecutor {
     private String genieLauncherScript;
     private Writer fileWriter;
 
+
     /**
      * Constructor Initialize the object using Job execution environment object.
      *
+     * @param jps Job Persistence Service implementation
      * @param fileCopyServiceImpls List of implementations of the file copy interface
      * @param jobExecEnv           The job execution environment details like the job, cluster,
      *                             command and applications
      */
     public JobExecutor(
+        final JobPersistenceService jps,
         final List<FileCopyService> fileCopyServiceImpls,
         @NotNull(message = "Cannot initialize with null JobExecEnv")
         final JobExecutionEnvironment jobExecEnv) {
 
+        this.jobPersistenceServiceImpl = jps;
         this.fileCopyServiceImpls = fileCopyServiceImpls;
         this.jobExecEnv = jobExecEnv;
     }
@@ -109,7 +119,6 @@ public class JobExecutor {
         processCluster();
         processJob();
         closeWriter();
-        startJob();
     }
 
     /**
@@ -120,12 +129,28 @@ public class JobExecutor {
         final List command = new ArrayList<>();
         command.add("bash");
         command.add(genieLauncherScript);
-        command.add(">");
-        command.add("stdout.log");
-        command.add("2>");
-        command.add("stderr.log");
 
-        executeBashCommand(command, this.jobExecEnv.getJobWorkingDir());
+        final ProcessBuilder pb = new ProcessBuilder(command);
+        pb.directory(new File(this.jobExecEnv.getJobWorkingDir()));
+        pb.redirectOutput(new File(this.jobExecEnv.getJobWorkingDir() + "/stdout.log"));
+        pb.redirectError(new File(this.jobExecEnv.getJobWorkingDir() + "/stderr.log"));
+
+        try {
+            final Process process = pb.start();
+            final String hostname = InetAddress.getLocalHost().getHostAddress();
+            final int processId = this.getProcessId(process);
+            final JobExecution jobExecution = new JobExecution.Builder(hostname, processId)
+                .withId(this.jobExecEnv.getJobId())
+                .build();
+
+            this.jobPersistenceServiceImpl.createJobExecution(jobExecution);
+//            final int errCode = process.waitFor();
+//            if (errCode != 0) {
+//                throw new GenieServerException("Unable to execute bash command" + String.valueOf(command));
+//            }
+        } catch (IOException ie) {
+            throw new GenieServerException("Unable to start command" + String.valueOf(command), ie);
+        }
     }
 
     private void setupStandardVariables() {
@@ -310,6 +335,27 @@ public class JobExecutor {
             }
         } catch (IOException ioe) {
             throw new GenieServerException("Error closing file writer", ioe);
+        }
+    }
+
+    /**
+     * Get process id for the given process.
+     *
+     * @param proc java process object representing the job launcher
+     * @return pid for this process
+     * @throws GenieException if there is an error getting the process id
+     */
+    private int getProcessId(final Process proc) throws GenieException {
+        LOG.debug("called");
+
+        try {
+            final Field f = proc.getClass().getDeclaredField(PID);
+            f.setAccessible(true);
+            return f.getInt(proc);
+        } catch (final IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
+            final String msg = "Can't get process id for job";
+            LOG.error(msg, e);
+            throw new GenieServerException(msg, e);
         }
     }
 }

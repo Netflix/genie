@@ -21,10 +21,11 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GenieBadRequestException;
-import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GenieConflictException;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
@@ -46,7 +47,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -342,11 +342,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         // Since a job request object should always exist before the job object is saved
         // the id should never be null
         if (StringUtils.isBlank(jobExecution.getId())) {
-            throw new GenieConflictException("Cannot create a job execution entry with id blank or null");
-        }
-
-        if (this.jobExecutionRepo.exists(jobExecution.getId())) {
-            throw new GenieConflictException("A job with id " + jobExecution.getId() + " already exists");
+            throw new GenieServerException("Cannot create a job execution entry with id blank or null");
         }
 
         final JobEntity jobEntity = jobRepo.findOne(jobExecution.getId());
@@ -358,7 +354,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
 
         jobExecutionEntity.setId(jobExecution.getId());
-        jobExecutionEntity.setClusterCriteriaFromSet(jobExecution.getClusterCriteria());
+        //jobExecutionEntity.setClusterCriteriaFromSet(jobExecution.getClusterCriteria());
         jobExecutionEntity.setHostName(jobExecution.getHostName());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
 
