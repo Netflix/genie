@@ -17,7 +17,9 @@
  */
 package com.netflix.genie.web.security.oauth2;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -39,13 +41,25 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 //@EnableOAuth2Sso
 public class OAuth2Config extends ResourceServerConfigurerAdapter {
 
+    @Autowired
+    private ResourceServerProperties resourceServerProperties;
+
+//    /**
+//     * When we want to use Ping Federate as our provider/authorization server.
+//     *
+//     * @return The ping federate configuration.
+//     */
+//    @Bean
+//    public PingFederateTokenServices pingFederateTokenServices() {
+//        return new PingFederateTokenServices(this.resourceServerProperties);
+//    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
-//        resources.tokenServices(new PingFederateTokenServices()).stateless(true);
-        resources.stateless(false);
+        resources.tokenServices(new PingFederateTokenServices(this.resourceServerProperties)).stateless(false);
     }
 
     /**
