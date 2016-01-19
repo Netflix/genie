@@ -48,6 +48,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
+    @Autowired(required = false)
+    private Collection<AuthenticationProvider> providers;
+
     /**
      * Global Authentication Manager.
      *
@@ -65,17 +68,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      *
      * @param auth The builder to configure
      */
-    @Autowired(required = false)
-    protected void configureGlobal(
-        final AuthenticationManagerBuilder auth,
-        final Collection<AuthenticationProvider> providers
-    ) throws Exception {
-        if (providers == null) {
-            LOG.info("\n\n\nProviders was NULL\n\n\n");
-        } else {
-            LOG.info("\n\n\nProviders was not NULL\n\n\n");
-            for (final AuthenticationProvider provider : providers) {
-                LOG.info(provider.toString());
+    @Autowired
+    protected void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+        if (this.providers != null) {
+            for (final AuthenticationProvider provider : this.providers) {
+                LOG.debug("Adding authentication provider {} to authentication provider.", provider.toString());
                 auth.authenticationProvider(provider);
             }
         }

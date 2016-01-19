@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.security.oauth2;
+package com.netflix.genie.web.security.oauth2.pingfederate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +41,7 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
     private static final String SCOPE_KEY = "scope";
     private static final String GRANT_TYPE = "urn:pingidentity.com:oauth2:grant_type:validate_bearer";
 
-    private final AccessTokenConverter converter = new DefaultAccessTokenConverter();
+    private final AccessTokenConverter converter;
 
     private final String checkTokenEndpointUrl;
     private final String clientId;
@@ -73,9 +74,11 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
      * Constructor.
      *
      * @param serverProperties The properties of the resource server (Genie)
+     * @param converter The access token converter to use
      */
     public PingFederateTokenServices(
-        final ResourceServerProperties serverProperties
+        @NotNull final ResourceServerProperties serverProperties,
+        final AccessTokenConverter converter
     ) {
         this.restOperations = new RestTemplate();
         ((RestTemplate) this.restOperations).setErrorHandler(new DefaultResponseErrorHandler() {
@@ -92,9 +95,15 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
         this.clientId = serverProperties.getClientId();
         this.clientSecret = serverProperties.getClientSecret();
 
-        LOG.info("checkTokenEnpointUrl = {}", this.checkTokenEndpointUrl);
-        LOG.info("clientId = {}", this.clientId);
-        LOG.info("clientSecret = {}", this.clientSecret);
+        LOG.debug("checkTokenEnpointUrl = {}", this.checkTokenEndpointUrl);
+        LOG.debug("clientId = {}", this.clientId);
+        LOG.debug("clientSecret = {}", this.clientSecret);
+
+        if (converter != null) {
+            this.converter = converter;
+        } else {
+            this.converter = new DefaultAccessTokenConverter();
+        }
     }
 
     /**
@@ -119,6 +128,9 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
         Assert.state(map.containsKey(CLIENT_ID_KEY), "Client id must be present in response from auth server");
         Assert.state(map.containsKey(SCOPE_KEY), "No scopes included in response from authentication server");
         this.convertScopes(map);
+        final OAuth2Authentication authentication = this.converter.extractAuthentication(map);
+        LOG.info("User {}", authentication.getPrincipal());
+        LOG.info("Authorities {}", authentication.getAuthorities());
         return this.converter.extractAuthentication(map);
     }
 

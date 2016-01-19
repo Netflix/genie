@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.security.oauth2;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -38,28 +37,14 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 @ConditionalOnProperty("security.oauth2.enabled")
 @Configuration
 @EnableResourceServer
-//@EnableOAuth2Sso
 public class OAuth2Config extends ResourceServerConfigurerAdapter {
-
-    @Autowired
-    private ResourceServerProperties resourceServerProperties;
-
-//    /**
-//     * When we want to use Ping Federate as our provider/authorization server.
-//     *
-//     * @return The ping federate configuration.
-//     */
-//    @Bean
-//    public PingFederateTokenServices pingFederateTokenServices() {
-//        return new PingFederateTokenServices(this.resourceServerProperties);
-//    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void configure(final ResourceServerSecurityConfigurer resources) throws Exception {
-        resources.tokenServices(new PingFederateTokenServices(this.resourceServerProperties)).stateless(false);
+        resources.stateless(false);
     }
 
     /**
@@ -71,6 +56,7 @@ public class OAuth2Config extends ResourceServerConfigurerAdapter {
         http
             .antMatcher("/api/**")
                 .authorizeRequests()
+                    .regexMatchers(HttpMethod.GET, "/api/.*/jobs.*").hasRole("ADMIN")
                     .anyRequest().authenticated()
             .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);

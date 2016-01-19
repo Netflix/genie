@@ -36,6 +36,8 @@ security:
     enabled: false
   oauth2:
     enabled: false
+    pingfederate:
+      enabled: false
   rest:
     secured: false
   saml:
