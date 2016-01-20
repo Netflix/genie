@@ -20,11 +20,9 @@ package com.netflix.genie.core.jobs;
 
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileCopyService;
-import com.netflix.genie.core.services.JobPersistenceService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
