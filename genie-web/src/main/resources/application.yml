@@ -24,8 +24,7 @@ eureka:
     enabled: false
 
 management:
-  security:
-    enabled: false
+  context-path: /actuator
 
 multipart:
   max-file-size: 100MB

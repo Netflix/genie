@@ -7,14 +7,17 @@ dependencies {
      *******************************/
 
     compile(project(":genie-core"))
+//    compile("org.springframework.boot:spring-boot-devtools")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
+    compile("org.springframework.boot:spring-boot-starter-redis")
     compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_eureka_version}")
     compile("org.springframework.security.extensions:spring-security-saml2-core:${spring_security_saml_version}")
     compile("org.springframework.security.oauth:spring-security-oauth2")
+    compile("org.springframework.session:spring-session")
 
     // Web Jars
     compile("org.webjars:bootstrap:${bootstrap_version}")
@@ -31,6 +34,10 @@ dependencies {
      *******************************/
 
     provided("org.projectlombok:lombok")
+
+    /*******************************
+     * Optional Dependencies
+     *******************************/
 
     /*******************************
      * Runtime Dependencies
