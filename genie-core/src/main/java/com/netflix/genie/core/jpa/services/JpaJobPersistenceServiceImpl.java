@@ -357,7 +357,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         //jobExecutionEntity.setClusterCriteriaFromSet(jobExecution.getClusterCriteria());
         jobExecutionEntity.setHostName(jobExecution.getHostName());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
-        jobExecutionEntity.setJob(jobEntity);
+
         jobEntity.setExecution(jobExecutionEntity);
 
     }
