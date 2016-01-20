@@ -56,6 +56,8 @@ public class JobExecutionEnvironment {
     private List<Application> applications = new ArrayList<>();
     private String jobWorkingDir;
     private String jobId;
+    private String hostname;
+    private int processId;
 
     /**
      * Initializes by Taking in a job request and figures out the cluster, command and applications
@@ -162,5 +164,41 @@ public class JobExecutionEnvironment {
      */
     public String getJobId() {
         return jobId;
+    }
+
+    /**
+     * Get the hostname on which the jobs runs.
+     *
+     * @return the hostname for the job
+     */
+    public String getHostname() {
+        return hostname;
+    }
+
+    /**
+     * Set the hostname of the Job to be run.
+     *
+     * @param hostname host on which the job runs
+     */
+    public void setHostname(final String hostname) {
+        this.hostname = hostname;
+    }
+
+    /**
+     * Get the pid of the Job running.
+     *
+     * @return the process id for the job
+     */
+    public int getProcessId() {
+        return processId;
+    }
+
+    /**
+     * Set the pid of the Job running.
+     *
+     * @param processId The pid for the job running.
+     */
+    public void setProcessId(final int processId) {
+        this.processId = processId;
     }
 }

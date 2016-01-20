@@ -20,6 +20,7 @@ package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
@@ -115,7 +116,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
                 baseWorkingDirPath
             );
         } catch (GeniePreconditionException gpe) {
-            // TODO update status to INVALID_REQUEST
             this.jobPersistenceService.updateJobStatus(
                 jobRequest.getId(),
                 JobStatus.INVALID,
@@ -124,8 +124,17 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         }
 
         // Job can be run as there is a valid cluster/command combination for it.
-        final JobExecutor jobExecutor = new JobExecutor(jobPersistenceService, fileCopyServiceImpls, jee);
+        final JobExecutor jobExecutor = new JobExecutor(fileCopyServiceImpls, jee);
         jobExecutor.setupAndRun();
+
+        final JobExecution jobExecution = new JobExecution.Builder(
+                jee.getHostname(),
+                jee.getProcessId()
+            )
+            .withId(jobRequest.getId())
+            .build();
+
+        this.jobPersistenceService.createJobExecution(jobExecution);
         this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
     }
 }

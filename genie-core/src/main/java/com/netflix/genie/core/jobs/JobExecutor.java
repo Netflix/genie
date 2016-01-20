@@ -60,7 +60,6 @@ public class JobExecutor {
 //    private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
     private final JobExecutionEnvironment jobExecEnv;
     private List<FileCopyService> fileCopyServiceImpls;
-    private JobPersistenceService jobPersistenceServiceImpl;
 //    private String stderrLogPath;
 //    private String stdoutLogPath;
 //    private String genieLogPath;
@@ -72,18 +71,15 @@ public class JobExecutor {
     /**
      * Constructor Initialize the object using Job execution environment object.
      *
-     * @param jps Job Persistence Service implementation
      * @param fileCopyServiceImpls List of implementations of the file copy interface
      * @param jobExecEnv           The job execution environment details like the job, cluster,
      *                             command and applications
      */
     public JobExecutor(
-        final JobPersistenceService jps,
         final List<FileCopyService> fileCopyServiceImpls,
         @NotNull(message = "Cannot initialize with null JobExecEnv")
         final JobExecutionEnvironment jobExecEnv) {
 
-        this.jobPersistenceServiceImpl = jps;
         this.fileCopyServiceImpls = fileCopyServiceImpls;
         this.jobExecEnv = jobExecEnv;
     }
@@ -139,11 +135,8 @@ public class JobExecutor {
             final Process process = pb.start();
             final String hostname = InetAddress.getLocalHost().getHostAddress();
             final int processId = this.getProcessId(process);
-            final JobExecution jobExecution = new JobExecution.Builder(hostname, processId)
-                .withId(this.jobExecEnv.getJobId())
-                .build();
-
-            this.jobPersistenceServiceImpl.createJobExecution(jobExecution);
+            jobExecEnv.setProcessId(processId);
+            jobExecEnv.setHostname(hostname);
 //            final int errCode = process.waitFor();
 //            if (errCode != 0) {
 //                throw new GenieServerException("Unable to execute bash command" + String.valueOf(command));
