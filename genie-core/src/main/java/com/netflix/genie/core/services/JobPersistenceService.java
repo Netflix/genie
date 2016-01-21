@@ -112,6 +112,19 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
+     * Add the information of client host to jobRequest.
+     *
+     * @param id The id of the job request
+     * @param clientHost Host of the client that sent the request.
+     * @throws GenieException If there is an error
+     */
+    void addClientHostToJobRequest(
+        @NotNull(message = "job request id not provided.")
+        final String id,
+        @NotBlank(message = "client host cannot be null")
+        final String clientHost
+    ) throws GenieException;
+    /**
      * Return the Job Entity for the job id provided.
      *
      * @param id The id of the job to return.

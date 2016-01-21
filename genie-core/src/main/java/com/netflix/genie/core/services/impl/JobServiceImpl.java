@@ -25,10 +25,12 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.core.services.JobSubmitterService;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,6 +52,8 @@ public class JobServiceImpl implements JobService {
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
+    @Value("${com.netflix.genie.server.s3.archive.location:blah//}")
+    private String baseArchiveLocation;
 
     /**
      * Constructor.
@@ -79,16 +83,24 @@ public class JobServiceImpl implements JobService {
     public String runJob(
         @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
         @Valid
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String clientHost
     ) throws GenieException {
         LOG.debug("Called with job request {}", jobRequest);
 
-        // TODO get client host at this point?
         // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
         // orginal request may or may not have it.
-            final JobRequest jobRequestWithId =
-                  this.jobPersistenceService.createJobRequest(jobRequest);
+        final JobRequest jobRequestWithId =
+            this.jobPersistenceService.createJobRequest(jobRequest);
 
+        if (StringUtils.isNotBlank(clientHost)) {
+            this.jobPersistenceService.addClientHostToJobRequest(jobRequestWithId.getId(), clientHost);
+        }
+
+        String jobArchivalLocation = null;
+        if (!jobRequestWithId.isDisableLogArchival()) {
+           jobArchivalLocation = baseArchiveLocation + "/" + jobRequestWithId.getId();
+        }
         // create the job object in the database with status INIT
         // TODO rethink status for jobs
         // TODO get archive location logic
@@ -97,7 +109,7 @@ public class JobServiceImpl implements JobService {
                 jobRequest.getUser(),
                 jobRequest.getVersion()
             )
-            .withArchiveLocation("Blah")
+            .withArchiveLocation(jobArchivalLocation)
             .withDescription(jobRequest.getDescription())
             .withId(jobRequestWithId.getId())
             .withStatus(JobStatus.INIT)

@@ -116,7 +116,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
     public void createJob(
         @NotNull(message = "Job is null so cannot be saved")
         final Job job
@@ -145,7 +144,10 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobEntity.setName(job.getName());
         jobEntity.setUser(job.getUser());
         jobEntity.setVersion(job.getVersion());
-        jobEntity.setArchiveLocation(job.getArchiveLocation());
+        if (job.getArchiveLocation() != null) {
+            jobEntity.setArchiveLocation(job.getArchiveLocation());
+        }
+
         jobEntity.setDescription(job.getDescription());
         if (job.getStarted() != null) {
             jobEntity.setStarted(job.getStarted());
@@ -159,7 +161,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
         // TODO: where are the ones below set .. update method?
         // finished,
-
         jobRequestEntity.setJob(jobEntity);
     }
 
@@ -193,7 +194,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
     public void addJobExecutionEnvironmentToJob(
         @NotNull(message = "Job Execution environment is null so cannot update")
         final JobExecutionEnvironment jee
@@ -305,6 +305,27 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
         this.jobRequestRepo.save(jobRequestEntity);
         return jobRequestEntity.getDTO();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addClientHostToJobRequest(
+        @NotNull(message = "job request id not provided.")
+        final String id,
+        @NotBlank(message = "client host cannot be null")
+        final String clientHost)
+        throws GenieException {
+
+        LOG.debug("Called with id: {} and client host: {}", id, clientHost);
+
+        final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(id);
+        if (jobRequestEntity == null) {
+            throw new GenieNotFoundException("Cannot find the job request for id: " + id);
+        }
+
+        jobRequestEntity.setClientHost(clientHost);
     }
 
     /**
