@@ -52,7 +52,7 @@ public class JobServiceImpl implements JobService {
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
-    @Value("${com.netflix.genie.server.s3.archive.location:blah//}")
+    @Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
     private String baseArchiveLocation;
 
     /**
@@ -98,7 +98,7 @@ public class JobServiceImpl implements JobService {
         }
 
         String jobArchivalLocation = null;
-        if (!jobRequestWithId.isDisableLogArchival()) {
+        if (!jobRequestWithId.isDisableLogArchival() && baseArchiveLocation != null) {
            jobArchivalLocation = baseArchiveLocation + "/" + jobRequestWithId.getId();
         }
         // create the job object in the database with status INIT

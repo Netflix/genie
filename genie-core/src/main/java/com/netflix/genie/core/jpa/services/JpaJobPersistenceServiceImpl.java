@@ -157,10 +157,11 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobEntity.setStatusMsg(job.getStatusMsg());
 
         // TODO where are tags sorted?
-        jobEntity.setJobTags(job.getTags());
+        jobEntity.setJobTags(jobRequestEntity.getTags());
 
         // TODO: where are the ones below set .. update method?
         // finished,
+
         jobRequestEntity.setJob(jobEntity);
     }
 
