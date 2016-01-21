@@ -283,21 +283,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setSetupFile(jobRequest.getSetupFile());
         jobRequestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
         jobRequestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
-
-        // TODO convert set to csv
-        //jobRequestEntity.setFileDependencies(jobRequest.getFileDependencies());
-
+        jobRequestEntity.setFileDependenciesFromSet(jobRequest.getFileDependencies());
         jobRequestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
         jobRequestEntity.setEmail(jobRequest.getEmail());
-
-        // TODO sort tags?
         jobRequestEntity.setTags(jobRequest.getTags());
-
         jobRequestEntity.setCpu(jobRequest.getCpu());
         jobRequestEntity.setMemory(jobRequest.getMemory());
-
-        // TODO client host should be part of jobRequest?
-        //jobRequestEntity.setClientHost(jobRequest.);
 
         if (StringUtils.isBlank(jobRequestEntity.getId())) {
             jobRequestEntity.setId(UUID.randomUUID().toString());

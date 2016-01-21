@@ -97,7 +97,7 @@ public class JobRequestEntity extends CommonFields {
     @Basic(optional = false)
     @Column(name = "memory", nullable = false)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
-    private int memory = 1560;
+    private int memory = 1536;
 
     @Basic
     @Column(name = "client_host", length = 255)
