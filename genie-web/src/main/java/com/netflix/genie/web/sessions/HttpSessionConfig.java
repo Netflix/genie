@@ -17,12 +17,16 @@
  */
 package com.netflix.genie.web.sessions;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+
 /**
  * Class to replace HTTP Session from Tomcat with one persisted to Redis for sharing session across a cluster.
  *
  * @author tgianos
  * @since 3.0.0
  */
-//@EnableRedisHttpSession
+@ConditionalOnProperty("spring.redis.enabled")
+@EnableRedisHttpSession
 public class HttpSessionConfig {
 }

@@ -49,3 +49,5 @@ spring:
     name: genie
   profiles:
     active: dev
+  redis:
+    enabled: false
