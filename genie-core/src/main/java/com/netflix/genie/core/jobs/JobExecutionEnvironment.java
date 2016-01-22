@@ -24,21 +24,19 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.ApplicationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates the details of the job, cluster , command and applications needed to run a job.
@@ -55,7 +53,6 @@ public class JobExecutionEnvironment {
     private Command command;
     private List<Application> applications = new ArrayList<>();
     private String jobWorkingDir;
-    private String jobId;
     private String hostname;
     private int processId;
 
@@ -108,7 +105,6 @@ public class JobExecutionEnvironment {
 
         this.applications.addAll(commandService.getApplicationsForCommand(this.command.getId()));
         this.jobWorkingDir = genieBaseWorkingDir + "/" + jobRequest.getId();
-        this.jobId = this.jobRequest.getId();
     }
 
     /**
@@ -155,15 +151,6 @@ public class JobExecutionEnvironment {
      */
     public String getJobWorkingDir() {
         return jobWorkingDir;
-    }
-
-    /**
-     * Get the id of the Job to be run.
-     *
-     * @return the id for the job
-     */
-    public String getJobId() {
-        return jobId;
     }
 
     /**

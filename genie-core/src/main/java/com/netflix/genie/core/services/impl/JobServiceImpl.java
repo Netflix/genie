@@ -30,7 +30,6 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,7 +51,7 @@ public class JobServiceImpl implements JobService {
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
-    @Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
+    //@Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
     private String baseArchiveLocation;
 
     /**

@@ -78,6 +78,34 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
+     * Method that updates the cluster information on which a job is run.
+     *
+     * @param jobId The id of the job
+     * @param clusterId The id of the cluster
+     * @throws GenieException Throw exception in case of an error.
+     */
+    void updateClusterForJob(
+        @NotNull(message = "Job id cannot be null while updating cluster information")
+        final String jobId,
+        @NotNull(message = "Cluster id cannot be null while updating cluster information")
+        final String clusterId
+    ) throws GenieException;
+
+    /**
+     * Method that updates the cluster information on which a job is run.
+     *
+     * @param jobId The id of the job
+     * @param commandId The id of the cluster
+     * @throws GenieException Throw exception in case of an error.
+     */
+    void updateCommandForJob(
+        @NotNull(message = "Job id cannot be null while updating command information")
+        final String jobId,
+        @NotNull(message = "Command id cannot be null while updating command information")
+        final String commandId
+    ) throws GenieException;
+
+    /**
      * Update the execution environment for the job.
      *
      * @param jee The job execution environment information for a job

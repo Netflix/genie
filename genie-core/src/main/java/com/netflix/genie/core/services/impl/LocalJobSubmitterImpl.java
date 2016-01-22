@@ -135,6 +135,18 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
             .build();
 
         this.jobPersistenceService.createJobExecution(jobExecution);
+
+        // Change status of job to Running
         this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
+
+        // Update the Cluster Information for the job
+        this.jobPersistenceService.updateClusterForJob(
+            jobRequest.getId(),
+            jee.getCluster().getId());
+
+        // Update the Command Information for the job
+        this.jobPersistenceService.updateCommandForJob(
+            jobRequest.getId(),
+            jee.getCommand().getId());
     }
 }

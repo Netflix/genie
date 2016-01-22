@@ -195,6 +195,58 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
+    public void updateClusterForJob(
+        @NotNull(message = "Job id cannot be null while updating cluster information")
+        final String jobId,
+        @NotNull(message = "Cluster id cannot be null while updating cluster information")
+        final String clusterId
+    ) throws GenieException {
+        LOG.info("Called with jobId {} and clusterID {}", jobId, clusterId);
+
+        final JobEntity jobEntity = this.jobRepo.findOne(jobId);
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("Cannot find job with ID " + jobId);
+        }
+
+        final ClusterEntity clusterEntity = this.clusterRepo.findOne(clusterId);
+        if (clusterEntity == null) {
+            throw new GenieNotFoundException("Cannot find cluster with ID " + clusterId);
+        }
+
+        jobEntity.setCluster(clusterEntity);
+        jobEntity.setClusterName(clusterEntity.getName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateCommandForJob(
+        @NotNull(message = "Job id cannot be null while updating command information")
+        final String jobId,
+        @NotNull(message = "Command id cannot be null while updating command information")
+        final String commandId
+    ) throws GenieException {
+        LOG.info("Called with jobId {} and commandId {}", jobId, commandId);
+
+        final JobEntity jobEntity = this.jobRepo.findOne(jobId);
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("Cannot find job with ID " + jobId);
+        }
+
+        final CommandEntity commandEntity = this.commandRepo.findOne(commandId);
+        if (commandEntity == null) {
+            throw new GenieNotFoundException("Cannot find command with ID " + commandId);
+        }
+
+        jobEntity.setCommand(commandEntity);
+        jobEntity.setCommandName(commandEntity.getName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addJobExecutionEnvironmentToJob(
         @NotNull(message = "Job Execution environment is null so cannot update")
         final JobExecutionEnvironment jee
