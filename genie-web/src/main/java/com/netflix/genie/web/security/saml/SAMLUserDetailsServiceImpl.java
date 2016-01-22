@@ -29,7 +29,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +41,7 @@ import java.util.List;
  * @since 3.0.0
  */
 @ConditionalOnProperty("security.saml.enabled")
-@Service
+@Component
 public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SAMLUserDetailsServiceImpl.class);

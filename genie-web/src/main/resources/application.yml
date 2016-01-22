@@ -37,8 +37,6 @@ security:
     enabled: false
     pingfederate:
       enabled: false
-  rest:
-    secured: false
   saml:
     enabled: false
   x509:

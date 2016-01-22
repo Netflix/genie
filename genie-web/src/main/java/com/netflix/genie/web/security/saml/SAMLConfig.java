@@ -18,6 +18,7 @@
 package com.netflix.genie.web.security.saml;
 
 import com.google.common.collect.Lists;
+import com.netflix.genie.web.security.x509.X509UserDetailsService;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.velocity.app.VelocityEngine;
@@ -104,9 +105,12 @@ import java.util.Timer;
  */
 @ConditionalOnProperty("security.saml.enabled")
 @Configuration
-@Order(4)
+@Order(5)
 //@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SAMLConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private X509UserDetailsService x509UserDetailsService;
 
     @Autowired
     private SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl;
@@ -770,9 +774,9 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/api/**").permitAll()
                     .antMatchers("/saml/**").permitAll()
                     .antMatchers("/upload.html").hasRole("ADMIN")
-                    .anyRequest().authenticated();
-//        http
-//            .x509();
+                    .anyRequest().authenticated()
+            .and()
+                .x509().authenticationUserDetailsService(this.x509UserDetailsService);
         http
             .logout()
             .logoutSuccessUrl("/");

@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.security.x509;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,18 +33,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
  */
 @ConditionalOnProperty("security.x509.enabled")
 @Configuration
-@Order(2)
+@Order(4)
 public class X509Config extends WebSecurityConfigurerAdapter {
 
-    /**
-     * An authentication provider for x509 certificates.
-     *
-     * @return The custom authentication provider
-     */
-    @Bean
-    public X509AuthenticationProvider x509AuthenticationProvider() {
-        return new X509AuthenticationProvider();
-    }
+    @Autowired
+    private X509UserDetailsService x509UserDetailsService;
 
     /**
      * {@inheritDoc}
@@ -56,7 +49,7 @@ public class X509Config extends WebSecurityConfigurerAdapter {
             .antMatcher("/api/**")
                 .authorizeRequests().anyRequest().authenticated()
             .and()
-                .x509()
+                .x509().authenticationUserDetailsService(this.x509UserDetailsService)
             .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             .and()
