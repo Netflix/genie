@@ -38,10 +38,10 @@ import java.util.Set;
  */
 public class PingFederateUserAuthenticationConverter extends DefaultUserAuthenticationConverter {
 
-    private static final String CLIENT_ID_KEY = "client_id";
-    private static final String SCOPE_KEY = "scope";
-    private static final String GENIE_PREFIX = "genie_";
-    private static final String ROLE_PREFIX = "ROLE_";
+    protected static final String CLIENT_ID_KEY = "client_id";
+    protected static final String SCOPE_KEY = "scope";
+    protected static final String GENIE_PREFIX = "genie_";
+    protected static final String ROLE_PREFIX = "ROLE_";
     private static final GrantedAuthority USER_AUTHORITY = new SimpleGrantedAuthority("ROLE_USER");
 
     /**
@@ -71,14 +71,14 @@ public class PingFederateUserAuthenticationConverter extends DefaultUserAuthenti
             throw new InvalidTokenException("Scopes were not a collection");
         }
 
-        // Default to user role
-        final Set<GrantedAuthority> authorities = Sets.newHashSet(USER_AUTHORITY);
-
         @SuppressWarnings("unchecked")
         final Collection<String> scopes = (Collection<String>) scopeObject;
         if (scopes.isEmpty()) {
             throw new InvalidTokenException("No scopes available. Unable to authenticate");
         }
+
+        // Default to user role
+        final Set<GrantedAuthority> authorities = Sets.newHashSet(USER_AUTHORITY);
 
         scopes
             .stream()

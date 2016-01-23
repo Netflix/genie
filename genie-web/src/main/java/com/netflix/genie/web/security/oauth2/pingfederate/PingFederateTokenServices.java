@@ -32,7 +32,6 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
@@ -54,31 +53,32 @@ import java.util.Map;
  */
 public class PingFederateTokenServices implements ResourceServerTokenServices {
 
+    protected static final String TOKEN_NAME_KEY = "token";
+    protected static final String CLIENT_ID_KEY = "client_id";
+    protected static final String CLIENT_SECRET_KEY = "client_secret";
+    protected static final String GRANT_TYPE_KEY = "grant_type";
+    protected static final String ERROR_KEY = "error";
+    protected static final String SCOPE_KEY = "scope";
+    protected static final String GRANT_TYPE = "urn:pingidentity.com:oauth2:grant_type:validate_bearer";
+
     private static final Logger LOG = LoggerFactory.getLogger(PingFederateTokenServices.class);
-    private static final String TOKEN_NAME_KEY = "token";
-    private static final String CLIENT_ID_KEY = "client_id";
-    private static final String CLIENT_SECRET_KEY = "client_secret";
-    private static final String GRANT_TYPE_KEY = "grant_type";
-    private static final String ERROR_KEY = "error";
-    private static final String SCOPE_KEY = "scope";
-    private static final String GRANT_TYPE = "urn:pingidentity.com:oauth2:grant_type:validate_bearer";
 
     private final AccessTokenConverter converter;
 
     private final String checkTokenEndpointUrl;
     private final String clientId;
     private final String clientSecret;
-    private final RestOperations restOperations;
+    private RestOperations restOperations;
 
     /**
      * Constructor.
      *
      * @param serverProperties The properties of the resource server (Genie)
-     * @param converter The access token converter to use
+     * @param converter        The access token converter to use
      */
     public PingFederateTokenServices(
         @NotNull final ResourceServerProperties serverProperties,
-        final AccessTokenConverter converter
+        @NotNull final AccessTokenConverter converter
     ) {
         this.restOperations = new RestTemplate();
         ((RestTemplate) this.restOperations).setErrorHandler(new DefaultResponseErrorHandler() {
@@ -95,15 +95,15 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
         this.clientId = serverProperties.getClientId();
         this.clientSecret = serverProperties.getClientSecret();
 
+        Assert.state(StringUtils.isNotBlank(this.checkTokenEndpointUrl), "Check Endpoint URL is required");
+        Assert.state(StringUtils.isNotBlank(this.clientId), "Client ID is required");
+        Assert.state(StringUtils.isNotBlank(this.clientSecret), "Client secret is required");
+
         LOG.debug("checkTokenEnpointUrl = {}", this.checkTokenEndpointUrl);
         LOG.debug("clientId = {}", this.clientId);
         LOG.debug("clientSecret = {}", this.clientSecret);
 
-        if (converter != null) {
-            this.converter = converter;
-        } else {
-            this.converter = new DefaultAccessTokenConverter();
-        }
+        this.converter = converter;
     }
 
     /**
@@ -121,17 +121,21 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
         final Map<String, Object> map = this.postForMap(this.checkTokenEndpointUrl, formData);
 
         if (map.containsKey(ERROR_KEY)) {
-            LOG.debug("Validating the token produced an error: {}", map.get(ERROR_KEY));
-            throw new InvalidTokenException(accessToken);
+            final String error = map.get(ERROR_KEY).toString();
+            LOG.debug("Validating the token produced an error: {}", error);
+            throw new InvalidTokenException(error);
         }
 
         Assert.state(map.containsKey(CLIENT_ID_KEY), "Client id must be present in response from auth server");
         Assert.state(map.containsKey(SCOPE_KEY), "No scopes included in response from authentication server");
         this.convertScopes(map);
         final OAuth2Authentication authentication = this.converter.extractAuthentication(map);
-        LOG.info("User {}", authentication.getPrincipal());
-        LOG.info("Authorities {}", authentication.getAuthorities());
-        return this.converter.extractAuthentication(map);
+        LOG.info(
+            "User {} authenticated with authorities {}",
+            authentication.getPrincipal(),
+            authentication.getAuthorities()
+        );
+        return authentication;
     }
 
     /**
@@ -140,6 +144,60 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
     @Override
     public OAuth2AccessToken readAccessToken(final String accessToken) {
         throw new UnsupportedOperationException("readAccessToken not implemented for Ping Federate");
+    }
+
+    /**
+     * Get the access token converter.
+     *
+     * @return The access token converter used by this token service implementation.
+     */
+    protected AccessTokenConverter getAccessTokenConverter() {
+        return this.converter;
+    }
+
+    /**
+     * Get the rest operations used.
+     *
+     * @return The rest operations used by this token services.
+     */
+    protected RestOperations getRestOperations() {
+        return this.restOperations;
+    }
+
+    /**
+     * Set the rest operations to use.
+     *
+     * @param restOperations The rest operations to use. Not null.
+     */
+    protected void setRestOperations(@NotNull final RestOperations restOperations) {
+        this.restOperations = restOperations;
+    }
+
+    /**
+     * Get the endpoint where tokens will be checked.
+     *
+     * @return The check token endpoint.
+     */
+    protected String getCheckTokenEndpointUrl() {
+        return this.checkTokenEndpointUrl;
+    }
+
+    /**
+     * Get the client id sent to the check token endpoint.
+     *
+     * @return The client id
+     */
+    protected String getClientId() {
+        return this.clientId;
+    }
+
+    /**
+     * Get the client secret sent to the check token endpoint.
+     *
+     * @return The client secret
+     */
+    protected String getClientSecret() {
+        return this.clientSecret;
     }
 
     private Map<String, Object> postForMap(
