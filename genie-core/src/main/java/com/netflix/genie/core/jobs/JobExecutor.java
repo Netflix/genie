@@ -49,6 +49,12 @@ public class JobExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobExecutor.class);
     private static final String PID = "pid";
+    private static final String GENIE_JOB_LAUNCHER_SCRIPT = "genie_job_launcher.sh";
+    private static final String  STDERR_LOG_PATH = "./job/stderr";
+    private static final String STDOUT_LOG_PATH = "./job/stdout";
+    private static final String GENIE_LOG_PATH = "/genie/logs/genie.log";
+    private static final String GENIE_DONE_FILE = "./genie/genie.done";
+
 
     // Directory paths env variables
     private static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
@@ -58,13 +64,10 @@ public class JobExecutor {
     private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
     private final JobExecutionEnvironment jobExecEnv;
     private List<FileCopyService> fileCopyServiceImpls;
-    private String stderrLogPath;
-    private String stdoutLogPath;
-    private String genieLogPath;
+
     private String genieLauncherScript;
     private Writer fileWriter;
     private String jobWorkingDir;
-    private String genieDoneFile;
 
     // This determines whether we just want to setup the job to run or execute it as well and archive the directory.
     private String mode;
@@ -97,11 +100,7 @@ public class JobExecutor {
         }
 
         // iniitalize variables
-        genieLauncherScript = this.jobWorkingDir + "/genie_job_launcher.sh";
-        stderrLogPath = this.jobWorkingDir + "/job/stderr";
-        stdoutLogPath = this.jobWorkingDir + "/job/stdout";
-        genieLogPath = this.jobWorkingDir + "/genie/logs/genie.log";
-        genieDoneFile = this.jobWorkingDir + "/genie/genie.done";
+        genieLauncherScript = this.jobWorkingDir + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
 
         // create system directories
         makeDir(jobExecEnv.getJobWorkingDir());
@@ -140,8 +139,8 @@ public class JobExecutor {
 
         final ProcessBuilder pb = new ProcessBuilder(command);
         pb.directory(new File(this.jobWorkingDir));
-        pb.redirectOutput(new File(this.genieLogPath));
-        pb.redirectError(new File(this.genieLogPath));
+        pb.redirectOutput(new File(this.jobWorkingDir + GENIE_LOG_PATH));
+        pb.redirectError(new File(this.jobWorkingDir + GENIE_LOG_PATH));
 
         try {
             final Process process = pb.start();
@@ -150,7 +149,7 @@ public class JobExecutor {
             jobExecEnv.setProcessId(processId);
             jobExecEnv.setHostname(hostname);
         } catch (IOException ie) {
-            throw new GenieServerException("Unable to start command" + String.valueOf(command), ie);
+            throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
         }
     }
 
@@ -211,7 +210,6 @@ public class JobExecutor {
 
         }
         //TODO copy down dependencies
-
     }
 
     /**
@@ -239,20 +237,19 @@ public class JobExecutor {
             appendToWriter("source " + setupFileLocalPath + ";");
         }
 
-
-
         // TODO temporary solution figure out best way to handle two modes
         if (this.mode.equals("genie")) {
             appendToWriter(
                 jobExecEnv.getCommand().getExecutable()
                     + " "
                     + jobExecEnv.getJobRequest().getCommandArgs()
-                    + " > " + this.stdoutLogPath
+                    + " > "
+                    + STDOUT_LOG_PATH
                     + " 2> "
-                    + this.stderrLogPath
+                    + STDERR_LOG_PATH
             );
             // capture exit code and write to genie.done file
-            appendToWriter("echo $? > " + this.genieDoneFile);
+            appendToWriter("echo $? > " + GENIE_DONE_FILE);
         } else {
             appendToWriter(jobExecEnv.getCommand().getExecutable() + " " + jobExecEnv.getJobRequest().getCommandArgs());
         }
