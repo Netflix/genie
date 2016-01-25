@@ -30,6 +30,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class JobServiceImpl implements JobService {
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
-    //@Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
+    @Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
     private String baseArchiveLocation;
 
     /**
@@ -73,13 +74,13 @@ public class JobServiceImpl implements JobService {
     }
 
     /**
-     * Takes in a Job Request object and does necessary preparation for execution.
+     * Takes in a Job Request persists it in db and then hands of the job to submitter interface to submit.
      *
-     * @param jobRequest of job to kill
+     * @param jobRequest of job to run
      * @throws GenieException if there is an error
      */
     @Override
-    public String runJob(
+    public String processJob(
         @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
         @Valid
         final JobRequest jobRequest,
@@ -101,8 +102,6 @@ public class JobServiceImpl implements JobService {
            jobArchivalLocation = baseArchiveLocation + "/" + jobRequestWithId.getId();
         }
         // create the job object in the database with status INIT
-        // TODO rethink status for jobs
-        // TODO get archive location logic
         final Job job  = new Job.Builder(
                 jobRequest.getName(),
                 jobRequest.getUser(),
@@ -119,10 +118,6 @@ public class JobServiceImpl implements JobService {
 
         this.jobSubmitterService.submitJob(jobRequestWithId);
         return jobRequestWithId.getId();
-
-        // do basic validation of the request
-        // persist in various storage layers
-        // submit the job request to Job submitter interface
     }
 
     /**

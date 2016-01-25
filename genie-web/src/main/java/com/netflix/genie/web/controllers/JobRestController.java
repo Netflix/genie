@@ -127,7 +127,7 @@ public class JobRestController {
             localClientHost = httpServletRequest.getRemoteAddr();
         }
 
-        final String id = this.jobService.runJob(jobRequest, localClientHost);
+        final String id = this.jobService.processJob(jobRequest, localClientHost);
         //final String id = "blah";
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(

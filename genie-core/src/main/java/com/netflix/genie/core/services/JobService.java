@@ -43,7 +43,7 @@ public interface JobService {
      * @return the id of the job run
      * @throws GenieException if there is an error
      */
-    String runJob(
+    String processJob(
             @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
             @Valid
             final JobRequest jobRequest,

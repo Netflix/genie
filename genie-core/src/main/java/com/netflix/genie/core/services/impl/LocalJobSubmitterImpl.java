@@ -124,8 +124,9 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         }
 
         // Job can be run as there is a valid cluster/command combination for it.
-        final JobExecutor jobExecutor = new JobExecutor(fileCopyServiceImpls, jee);
-        jobExecutor.setupAndRun();
+        // TODO figure out mode
+        final JobExecutor jobExecutor = new JobExecutor(fileCopyServiceImpls, jee, "genie");
+        jobExecutor.execute();
 
         final JobExecution jobExecution = new JobExecution.Builder(
                 jee.getHostname(),
