@@ -176,7 +176,7 @@ public class JobExecutionEntity extends BaseEntity {
      *
      * @param job The job
      */
-    public void setJob(final JobEntity job) {
+    protected void setJob(final JobEntity job) {
         this.job = job;
     }
 

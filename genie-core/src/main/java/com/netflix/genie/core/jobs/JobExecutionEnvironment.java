@@ -24,21 +24,19 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.ApplicationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates the details of the job, cluster , command and applications needed to run a job.
@@ -55,6 +53,8 @@ public class JobExecutionEnvironment {
     private Command command;
     private List<Application> applications = new ArrayList<>();
     private String jobWorkingDir;
+    private String hostname;
+    private int processId;
 
     /**
      * Initializes by Taking in a job request and figures out the cluster, command and applications
@@ -145,7 +145,7 @@ public class JobExecutionEnvironment {
     }
 
     /**
-     * Get the command information from the execution environment.
+     * Get the current working directory for the job to run.
      *
      * @return the working directory for the job
      */
@@ -153,5 +153,39 @@ public class JobExecutionEnvironment {
         return jobWorkingDir;
     }
 
+    /**
+     * Get the hostname on which the jobs runs.
+     *
+     * @return the hostname for the job
+     */
+    public String getHostname() {
+        return hostname;
+    }
 
+    /**
+     * Set the hostname of the Job to be run.
+     *
+     * @param hostname host on which the job runs
+     */
+    public void setHostname(final String hostname) {
+        this.hostname = hostname;
+    }
+
+    /**
+     * Get the pid of the Job running.
+     *
+     * @return the process id for the job
+     */
+    public int getProcessId() {
+        return processId;
+    }
+
+    /**
+     * Set the pid of the Job running.
+     *
+     * @param processId The pid for the job running.
+     */
+    public void setProcessId(final int processId) {
+        this.processId = processId;
+    }
 }

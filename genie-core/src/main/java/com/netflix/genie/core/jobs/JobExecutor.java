@@ -35,6 +35,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.ArrayList;
+import java.net.InetAddress;
+import java.lang.reflect.Field;
 
 /**
  * Class that contains the logic to setup a genie job and run it.
@@ -45,21 +48,29 @@ import java.util.List;
 public class JobExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobExecutor.class);
+    private static final String PID = "pid";
+    private static final String GENIE_JOB_LAUNCHER_SCRIPT = "genie_job_launcher.sh";
+    private static final String  STDERR_LOG_PATH = "./job/stderr";
+    private static final String STDOUT_LOG_PATH = "./job/stdout";
+    private static final String GENIE_LOG_PATH = "/genie/logs/genie.log";
+    private static final String GENIE_DONE_FILE = "./genie/genie.done";
+
 
     // Directory paths env variables
-//    private static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
-//    private static final String GENIE_JOB_DIR_ENV_VAR = "GENIE_JOB_DIR";
-//    private static final String GENIE_CLUSTER_DIR_ENV_VAR = "GENIE_CLUSTER_DIR";
-//    private static final String GENIE_COMMAND_DIR_ENV_VAR = "GENIE_COMMAND_DIR";
-//    private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
+    private static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
+    private static final String GENIE_JOB_DIR_ENV_VAR = "GENIE_JOB_DIR";
+    private static final String GENIE_CLUSTER_DIR_ENV_VAR = "GENIE_CLUSTER_DIR";
+    private static final String GENIE_COMMAND_DIR_ENV_VAR = "GENIE_COMMAND_DIR";
+    private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
     private final JobExecutionEnvironment jobExecEnv;
     private List<FileCopyService> fileCopyServiceImpls;
-//    private String stderrLogPath;
-//    private String stdoutLogPath;
-//    private String genieLogPath;
-//    private String jarsDirectory;
+
     private String genieLauncherScript;
     private Writer fileWriter;
+    private String jobWorkingDir;
+
+    // This determines whether we just want to setup the job to run or execute it as well and archive the directory.
+    private String mode;
 
     /**
      * Constructor Initialize the object using Job execution environment object.
@@ -67,66 +78,79 @@ public class JobExecutor {
      * @param fileCopyServiceImpls List of implementations of the file copy interface
      * @param jobExecEnv           The job execution environment details like the job, cluster,
      *                             command and applications
+     * @param mode Whether to run it in full genie mode or just local.
+     *
+     * @throws GenieException Exception in case of an error
      */
     public JobExecutor(
         final List<FileCopyService> fileCopyServiceImpls,
         @NotNull(message = "Cannot initialize with null JobExecEnv")
-        final JobExecutionEnvironment jobExecEnv) {
+        final JobExecutionEnvironment jobExecEnv,
+        final String mode
+    ) throws GenieException {
 
         this.fileCopyServiceImpls = fileCopyServiceImpls;
         this.jobExecEnv = jobExecEnv;
-    }
+        this.mode = mode;
 
-    /**
-     * Sets up the working directory for the job , ready for execution.
-     * This method does not actually run the job.
-     */
-    public void setup() {
-        LOG.debug("called");
-        //setupJobForExecution();
-    }
+        if ((this.jobExecEnv.getJobWorkingDir() == null) || (StringUtils.isBlank(this.jobExecEnv.getJobWorkingDir()))) {
+            throw new GenieServerException("Cannot run job as working directory is not set");
+        } else {
+            this.jobWorkingDir = jobExecEnv.getJobWorkingDir();
+        }
 
-    /**
-     * Sets up the working directory for the job and starts the job.
-     *
-     * @throws GenieException Exception in case of an error
-     */
-    public void setupAndRun() throws GenieException {
-        setupJobForExecution();
-        startJob();
-    }
+        // iniitalize variables
+        genieLauncherScript = this.jobWorkingDir + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
 
-    /**
-     * Method that setups the job directory and prepares it for execution by creating the runnable script.
-     */
-    private void setupJobForExecution() throws GenieException {
-        setupStandardVariables();
-        setupWorkingDirectory();
+        // create system directories
+        makeDir(jobExecEnv.getJobWorkingDir());
+        makeDir(jobExecEnv.getJobWorkingDir() + "/genie");
+        makeDir(jobExecEnv.getJobWorkingDir() + "/genie/logs");
+
+        // initialize the writer to create the joblauncher script
         initializeWriter();
+    }
+
+    /**
+     * Method that sets up the job directory and runs based on mode specified.
+     *
+     * @throws GenieException Throw exception in case of error.
+     */
+    public void execute() throws GenieException {
         processApplications();
         processCommand();
         processCluster();
         processJob();
         closeWriter();
-        startJob();
+
+        if (this.mode.equals("genie")) {
+            startJob();
+        }
     }
+
 
     /**
      * Method that starts the execution of the job and updates the database with its execution details.
      */
     private void startJob() throws GenieException {
-        // TODO set the cwd for the process.
-//        final List command = new ArrayList<>();
-//        command.add("bash");
-//        command.add(genieLauncherScript);
-//
-//        executeBashCommand(command);
-    }
+        final List command = new ArrayList<>();
+        command.add("bash");
+        command.add(genieLauncherScript);
 
-    private void setupStandardVariables() {
-        // sets up standard vars like stderr and stdout path cmd.log jars dir, config dir
-        genieLauncherScript = jobExecEnv.getJobWorkingDir() + "/genie_job_launcher.sh";
+        final ProcessBuilder pb = new ProcessBuilder(command);
+        pb.directory(new File(this.jobWorkingDir));
+        pb.redirectOutput(new File(this.jobWorkingDir + GENIE_LOG_PATH));
+        pb.redirectError(new File(this.jobWorkingDir + GENIE_LOG_PATH));
 
+        try {
+            final Process process = pb.start();
+            final String hostname = InetAddress.getLocalHost().getHostAddress();
+            final int processId = this.getProcessId(process);
+            jobExecEnv.setProcessId(processId);
+            jobExecEnv.setHostname(hostname);
+        } catch (IOException ie) {
+            throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
+        }
     }
 
     /**
@@ -146,6 +170,7 @@ public class JobExecutor {
      */
     private void processApplications() throws GenieException {
 
+        makeDir(this.jobWorkingDir + "/applications");
         for (Application application : this.jobExecEnv.getApplications()) {
             makeDir(jobExecEnv.getJobWorkingDir() + "/applications/" + application.getId());
 
@@ -170,6 +195,7 @@ public class JobExecutor {
      */
     private void processCommand() throws GenieException {
 
+        makeDir(this.jobWorkingDir + "/command");
         makeDir(jobExecEnv.getJobWorkingDir() + "/command/" + jobExecEnv.getCommand().getId());
         final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
 
@@ -184,13 +210,13 @@ public class JobExecutor {
 
         }
         //TODO copy down dependencies
-
     }
 
     /**
      * Process the cluster content needed for the job to run.
      */
     private void processCluster() throws GenieException {
+        makeDir(this.jobWorkingDir + "/cluster");
         makeDir(jobExecEnv.getJobWorkingDir() + "/cluster/" + jobExecEnv.getCluster().getId());
         //TODO copy down dependencies
     }
@@ -200,6 +226,7 @@ public class JobExecutor {
      */
     private void processJob() throws GenieException {
         //TODO copy down dependencies
+        makeDir(jobExecEnv.getJobWorkingDir() + "/job");
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
 
         if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
@@ -210,7 +237,22 @@ public class JobExecutor {
             appendToWriter("source " + setupFileLocalPath + ";");
         }
 
-        appendToWriter(jobExecEnv.getCommand().getExecutable() + " " + jobExecEnv.getJobRequest().getCommandArgs());
+        // TODO temporary solution figure out best way to handle two modes
+        if (this.mode.equals("genie")) {
+            appendToWriter(
+                jobExecEnv.getCommand().getExecutable()
+                    + " "
+                    + jobExecEnv.getJobRequest().getCommandArgs()
+                    + " > "
+                    + STDOUT_LOG_PATH
+                    + " 2> "
+                    + STDERR_LOG_PATH
+            );
+            // capture exit code and write to genie.done file
+            appendToWriter("echo $? > " + GENIE_DONE_FILE);
+        } else {
+            appendToWriter(jobExecEnv.getCommand().getExecutable() + " " + jobExecEnv.getJobRequest().getCommandArgs());
+        }
     }
 
     /**
@@ -220,7 +262,7 @@ public class JobExecutor {
      * @throws GenieException
      */
     private void makeDir(final String dirPath) throws GenieException {
-        this.executeBashCommand(Lists.newArrayList("mkdir", dirPath));
+        this.executeBashCommand(Lists.newArrayList("mkdir", "-p", dirPath), null);
     }
 
     /**
@@ -244,8 +286,11 @@ public class JobExecutor {
      *
      * @param command An array consisting of the command to run
      */
-    private void executeBashCommand(final List<String> command) throws GenieException {
+    private void executeBashCommand(final List<String> command, final String workingDirectory) throws GenieException {
         final ProcessBuilder pb = new ProcessBuilder(command);
+        if (workingDirectory != null) {
+            pb.directory(new File(workingDirectory));
+        }
         try {
             final Process process = pb.start();
             final int errCode = process.waitFor();
@@ -302,6 +347,27 @@ public class JobExecutor {
             }
         } catch (IOException ioe) {
             throw new GenieServerException("Error closing file writer", ioe);
+        }
+    }
+
+    /**
+     * Get process id for the given process.
+     *
+     * @param proc java process object representing the job launcher
+     * @return pid for this process
+     * @throws GenieException if there is an error getting the process id
+     */
+    private int getProcessId(final Process proc) throws GenieException {
+        LOG.debug("called");
+
+        try {
+            final Field f = proc.getClass().getDeclaredField(PID);
+            f.setAccessible(true);
+            return f.getInt(proc);
+        } catch (final IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
+            final String msg = "Can't get process id for job";
+            LOG.error(msg, e);
+            throw new GenieServerException(msg, e);
         }
     }
 }

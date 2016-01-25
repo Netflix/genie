@@ -39,13 +39,15 @@ public interface JobService {
      * Takes in a Job Request object and does necessary preparation for execution.
      *
      * @param jobRequest of job to kill
+     * @param clientHost Host which is sending the job request
      * @return the id of the job run
      * @throws GenieException if there is an error
      */
-    String runJob(
+    String processJob(
             @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
             @Valid
-            final JobRequest jobRequest
+            final JobRequest jobRequest,
+            final String clientHost
     ) throws GenieException;
 
     /**
