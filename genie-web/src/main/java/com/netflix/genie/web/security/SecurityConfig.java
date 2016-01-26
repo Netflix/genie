@@ -20,8 +20,6 @@ package com.netflix.genie.web.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -36,12 +34,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import java.util.Collection;
 
 /**
- * Primary Genie Security configuration.
+ * Primary Genie Security configuration for all but only x509 client certification.
  *
  * @author tgianos
  * @since 3.0.0
  */
-@Conditional(SecurityConfig.OnAnySecurityEnabled.class)
+@Conditional({SecurityConditions.CoreSecurityEnabled.class, SecurityConditions.X509Disabled.class})
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -98,33 +96,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // else on) is kind of pointless if you want to use the UI.
         // TODO: Revisit if there is a way to enforce this or at least provide some in memory login if nothing else
         http.antMatcher("/**").authorizeRequests().anyRequest().permitAll();
-    }
-
-    /**
-     * A class used to enable the security config any time any of the supported security platforms is enabled.
-     *
-     * @author tgianos
-     * @since 3.0.0
-     */
-    public static class OnAnySecurityEnabled extends AnyNestedCondition {
-
-        /**
-         * Default Constructor sets the class parse time.
-         */
-        public OnAnySecurityEnabled() {
-            super(ConfigurationPhase.PARSE_CONFIGURATION);
-        }
-
-        @ConditionalOnProperty("security.saml.enabled")
-        private static class OnSAML {
-        }
-
-        @ConditionalOnProperty("security.x509.enabled")
-        private static class OnX509 {
-        }
-
-        @ConditionalOnProperty("security.oauth2.enabled")
-        private static class OnOAuth2 {
-        }
     }
 }

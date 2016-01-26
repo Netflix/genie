@@ -17,15 +17,21 @@
  */
 package com.netflix.genie.web.security.x509;
 
-import com.netflix.genie.web.security.SecurityConfig;
+import com.google.common.collect.Sets;
+import com.netflix.genie.web.security.SecurityConditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 /**
  * Get user details from an X509 Certificate Token passed in.
@@ -33,11 +39,13 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.0.0
  */
-@Conditional(SecurityConfig.OnAnySecurityEnabled.class)
+@Conditional(SecurityConditions.AnySecurityEnabled.class)
 @Component
 public class X509UserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
     private static final Logger LOG = LoggerFactory.getLogger(X509UserDetailsService.class);
+    private static final String ROLE_PREFIX = "ROLE_";
+    private static final GrantedAuthority USER_AUTHORITY = new SimpleGrantedAuthority(ROLE_PREFIX + "USER");
 
     /**
      * {@inheritDoc}
@@ -46,8 +54,34 @@ public class X509UserDetailsService implements AuthenticationUserDetailsService<
     public UserDetails loadUserDetails(
         final PreAuthenticatedAuthenticationToken token
     ) throws UsernameNotFoundException {
-        LOG.info("Entering loadUserDetails with token {}", token);
+        LOG.debug("Entering loadUserDetails with token {}", token);
 
-        throw new UsernameNotFoundException("No yet supported");
+        // Assuming format of the principal is {username}:{role1,role2....}
+        final Object principalObject = token.getPrincipal();
+        if (!(principalObject instanceof String)) {
+            throw new UsernameNotFoundException("Expected principal to be a String");
+        }
+
+        final String principal = (String) principalObject;
+        final String[] usernameAndRoles = principal.split(":");
+        if (usernameAndRoles.length != 2) {
+            throw new UsernameNotFoundException("User and roles not found. Must be in format {user}:{role1,role2...}");
+        }
+
+        final String username = usernameAndRoles[0];
+        final String[] roles = usernameAndRoles[1].split(",");
+        if (roles.length == 0) {
+            throw new UsernameNotFoundException("No roles found. Unable to authenticate");
+        }
+
+        // If the certificate is valid the client is at the least a valid user
+        final Set<GrantedAuthority> authorities = Sets.newHashSet(USER_AUTHORITY);
+        for (final String role : roles) {
+            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.toUpperCase()));
+        }
+
+        final User user = new User(username, "NA", authorities);
+        LOG.info("User {} authenticated via client certificate", user);
+        return user;
     }
 }
