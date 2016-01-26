@@ -58,7 +58,7 @@ public class X509UserDetailsService implements AuthenticationUserDetailsService<
 
         // Assuming format of the principal is {username}:{role1,role2....}
         final Object principalObject = token.getPrincipal();
-        if (!(principalObject instanceof String)) {
+        if (principalObject == null || !(principalObject instanceof String)) {
             throw new UsernameNotFoundException("Expected principal to be a String");
         }
 
