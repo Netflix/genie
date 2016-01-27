@@ -39,7 +39,7 @@ import java.util.Collection;
  * @author tgianos
  * @since 3.0.0
  */
-@Conditional({SecurityConditions.CoreSecurityEnabled.class, SecurityConditions.X509Disabled.class})
+@Conditional(SecurityConditions.AnySecurityEnabled.class)
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -73,6 +73,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 LOG.debug("Adding authentication provider {} to authentication provider.", provider.toString());
                 auth.authenticationProvider(provider);
             }
+        } else {
+            // in the case nothing was configured
+            LOG.debug("No providers were found. Configuring in memory authentication to avoid NPE.");
+            auth.inMemoryAuthentication();
         }
     }
 

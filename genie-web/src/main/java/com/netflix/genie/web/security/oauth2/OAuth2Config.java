@@ -70,7 +70,6 @@ public class OAuth2Config extends ResourceServerConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             .and()
                 .x509()
-//                    .subjectPrincipalRegex("CN=(.*?),")
                     .authenticationUserDetailsService(this.x509UserDetailsService);
         // @formatter:on
     }

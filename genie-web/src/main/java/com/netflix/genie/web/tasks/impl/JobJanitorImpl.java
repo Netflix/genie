@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
  * @author skrishnan
  * @author tgianos
  */
+//TODO: Add conditionals to enable or disable
 @Component
 public class JobJanitorImpl implements JobJanitor {
 

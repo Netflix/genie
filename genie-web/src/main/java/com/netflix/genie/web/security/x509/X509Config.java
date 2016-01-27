@@ -17,13 +17,12 @@
  */
 package com.netflix.genie.web.security.x509;
 
-import com.netflix.genie.web.security.SecurityConditions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
@@ -33,9 +32,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
  * @author tgianos
  * @since 3.0.0
  */
-@Conditional({SecurityConditions.X509Enabled.class, SecurityConditions.CoreSecurityDisabled.class})
+@ConditionalOnProperty("security.x509.enabled")
 @Configuration
-@EnableWebSecurity
+@Order(4)
 public class X509Config extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -48,7 +47,7 @@ public class X509Config extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         // @formatter:off
         http
-            .antMatcher("/**")
+            .antMatcher("/api/**")
                 .authorizeRequests()
                     .regexMatchers(HttpMethod.GET, "/api/.*/jobs.*").hasRole("ADMIN")
                     .anyRequest().authenticated()
@@ -56,8 +55,8 @@ public class X509Config extends WebSecurityConfigurerAdapter {
                 .x509().authenticationUserDetailsService(this.x509UserDetailsService)
             .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .and()
-                .requiresChannel().anyRequest().requiresSecure()
+//            .and()
+//                .requiresChannel().anyRequest().requiresSecure()
             .and()
                 .csrf().disable();
         // @formatter:on

@@ -50,8 +50,9 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-test"))
-    testCompile("org.dbunit:dbunit:${dbunit_version}")
     testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
+    testCompile("org.dbunit:dbunit:${dbunit_version}")
+    testCompile("org.springframework.security:spring-security-test")
 }
 
 license {

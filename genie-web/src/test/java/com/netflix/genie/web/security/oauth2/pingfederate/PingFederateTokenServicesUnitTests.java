@@ -210,4 +210,16 @@ public class PingFederateTokenServicesUnitTests {
         // Should throw exception based on error key being present
         services.loadAuthentication(accessToken);
     }
+
+    /**
+     * This method isn't implemented for Ping Federate currently. Make sure this fails in case we ever implement it
+     * and need to update the tests.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void cantReadAccessToken() {
+        final AccessTokenConverter converter = new DefaultAccessTokenConverter();
+        final PingFederateTokenServices services
+            = new PingFederateTokenServices(this.resourceServerProperties, converter);
+        services.readAccessToken(UUID.randomUUID().toString());
+    }
 }

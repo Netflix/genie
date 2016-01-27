@@ -15,17 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.security.oauth2.pingfederate;
-
-import com.netflix.genie.test.categories.UnitTest;
-import org.junit.experimental.categories.Category;
 
 /**
- * Unit tests for PingFederateConfig.
+ * Tests for session related classes.
  *
  * @author tgianos
  * @since 3.0.0
  */
-@Category(UnitTest.class)
-public class PingFederateConfigUnitTests {
-}
+package com.netflix.genie.web.sessions;

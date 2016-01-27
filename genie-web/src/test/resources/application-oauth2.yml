@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2015 Netflix, Inc.
+#  Copyright 2016 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 #
 ##
 
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
-  datasource:
-    url: jdbc:hsqldb:mem:genie-int-db;hsqldb.lock_file=false;shutdown=true
-    username: SA
-    password:
+security:
+  oauth2:
+    enabled: true
+    client:
+      client-id: genie-resourceserver
+      client-secret: someClientSecret
+    pingfederate:
+      enabled: true
+    resource:
+      id: genie-resourceserver
+      token-info-uri: https://pingfederate.mydomain.com/as/token.oauth2

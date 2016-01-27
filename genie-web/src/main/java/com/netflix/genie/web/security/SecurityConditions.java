@@ -20,7 +20,6 @@ package com.netflix.genie.web.security;
 import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.NoneNestedConditions;
 
 /**
  * Container class for all the security conditions we want to use.
@@ -59,90 +58,26 @@ public class SecurityConditions {
     }
 
     /**
-     * A class used to enable the security config any time anything but x509 only is enabled.
+     * A class used to enable the Ping Federate based configuration any time both OAuth2 and Ping Federate are enabled.
      *
      * @author tgianos
      * @since 3.0.0
      */
-    public static class CoreSecurityEnabled extends AnyNestedCondition {
+    public static class OnPingFederateEnabled extends AllNestedConditions {
 
         /**
          * Default Constructor sets the class parse time.
          */
-        public CoreSecurityEnabled() {
+        public OnPingFederateEnabled() {
             super(ConfigurationPhase.PARSE_CONFIGURATION);
-        }
-
-        @ConditionalOnProperty("security.saml.enabled")
-        private static class OnSAML {
         }
 
         @ConditionalOnProperty("security.oauth2.enabled")
         private static class OnOAuth2 {
         }
-    }
 
-    /**
-     * A class used to signify that the core (SAML, OAUTH2 configurations are both disabled).
-     *
-     * @author tgianos
-     * @since 3.0.0
-     */
-    public static class CoreSecurityDisabled extends NoneNestedConditions {
-
-        /**
-         * Default Constructor sets the class parse time.
-         */
-        public CoreSecurityDisabled() {
-            super(ConfigurationPhase.PARSE_CONFIGURATION);
-        }
-
-        @ConditionalOnProperty("security.saml.enabled")
-        private static class SAMLEnabled {
-        }
-
-        @ConditionalOnProperty("security.oauth2.enabled")
-        private static class OAUTH2Enabled {
-        }
-    }
-
-    /**
-     * A class used to enable the security config any time anything but x509 only is enabled.
-     *
-     * @author tgianos
-     * @since 3.0.0
-     */
-    public static class X509Enabled extends AllNestedConditions {
-
-        /**
-         * Default Constructor sets the class parse time.
-         */
-        public X509Enabled() {
-            super(ConfigurationPhase.PARSE_CONFIGURATION);
-        }
-
-        @ConditionalOnProperty("security.x509.enabled")
-        private static class X509 {
-        }
-    }
-
-    /**
-     * A class used to enable the security config any time anything but x509 only is enabled.
-     *
-     * @author tgianos
-     * @since 3.0.0
-     */
-    public static class X509Disabled extends NoneNestedConditions {
-
-        /**
-         * Default Constructor sets the class parse time.
-         */
-        public X509Disabled() {
-            super(ConfigurationPhase.PARSE_CONFIGURATION);
-        }
-
-        @ConditionalOnProperty("security.x509.enabled")
-        private static class X509 {
+        @ConditionalOnProperty("security.oauth2.pingfederate.enabled")
+        private static class OnPingFederate {
         }
     }
 }

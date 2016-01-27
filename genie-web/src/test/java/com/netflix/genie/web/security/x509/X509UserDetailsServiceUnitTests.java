@@ -93,8 +93,19 @@ public class X509UserDetailsServiceUnitTests {
      * @throws UsernameNotFoundException on on principal roles section being empty
      */
     @Test(expected = UsernameNotFoundException.class)
-    public void cantAuthenticateWithoutRoles() throws UsernameNotFoundException {
+    public void cantAuthenticateWithoutRoleString() throws UsernameNotFoundException {
         Mockito.when(this.token.getPrincipal()).thenReturn("donthaveroles:");
+        this.service.loadUserDetails(this.token);
+    }
+
+    /**
+     * Make sure if the roles are empty it fails.
+     *
+     * @throws UsernameNotFoundException on on principal roles section being empty
+     */
+    @Test(expected = UsernameNotFoundException.class)
+    public void cantAuthenticateWithoutRoles() throws UsernameNotFoundException {
+        Mockito.when(this.token.getPrincipal()).thenReturn("donthaveroles:,");
         this.service.loadUserDetails(this.token);
     }
 

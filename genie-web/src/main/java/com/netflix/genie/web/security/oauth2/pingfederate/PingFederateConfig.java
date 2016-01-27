@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
+import com.netflix.genie.web.security.SecurityConditions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -33,7 +32,7 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
  * @author tgianos
  * @since 3.0.0
  */
-@Conditional(PingFederateConfig.OnPingFederateEnabled.class)
+@Conditional(SecurityConditions.OnPingFederateEnabled.class)
 @Configuration
 public class PingFederateConfig {
 
@@ -51,29 +50,5 @@ public class PingFederateConfig {
         final DefaultAccessTokenConverter converter = new DefaultAccessTokenConverter();
         converter.setUserTokenConverter(new PingFederateUserAuthenticationConverter());
         return new PingFederateTokenServices(this.resourceServerProperties, converter);
-    }
-
-    /**
-     * A class used to enable the Ping Federate based configuration any time both OAuth2 and Ping Federate are enabled.
-     *
-     * @author tgianos
-     * @since 3.0.0
-     */
-    public static class OnPingFederateEnabled extends AllNestedConditions {
-
-        /**
-         * Default Constructor sets the class parse time.
-         */
-        public OnPingFederateEnabled() {
-            super(ConfigurationPhase.PARSE_CONFIGURATION);
-        }
-
-        @ConditionalOnProperty("security.oauth2.enabled")
-        private static class OnOAuth2 {
-        }
-
-        @ConditionalOnProperty("security.oauth2.pingfederate.enabled")
-        private static class OnPingFederate {
-        }
     }
 }
