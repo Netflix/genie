@@ -18,10 +18,11 @@
 package com.netflix.genie.web.security;
 
 import com.netflix.genie.web.security.x509.X509UserDetailsService;
-import com.sun.istack.internal.NotNull;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Utility methods for common functionality in security configurations that ONLY configure security on API paths.
