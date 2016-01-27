@@ -15,49 +15,40 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.sessions;
+package com.netflix.genie.web.security;
 
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 /**
- * Unit tests for HttpSessionConfig.
+ * Unit tests for the SecurityUtils utility methods.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class HttpSessionConfigUnitTests {
-
-    //TODO: Add more tests as these tests are pretty much useless.
-    //      Likely integration tests to make sure sessions are persisted in Redis.
-
-    private HttpSessionConfig httpSessionConfig;
+public class SecurityUtilsUnitTests {
 
     /**
-     * Setup the tests.
-     */
-    @Before
-    public void setup() {
-        this.httpSessionConfig = new HttpSessionConfig();
-    }
-
-    /**
-     * Make sure we can construct the config class.
+     * This should be accessible due to being protected.
      */
     @Test
-    public void canConstruct() {
-        Assert.assertNotNull(this.httpSessionConfig);
+    public void canConstructUsingProtectedConstructor() {
+        Assert.assertNotNull(new SecurityUtils());
     }
 
-    /**
-     * Make sure the post construct method is called.
-     */
-    @Test
-    public void canPostConstruct() {
-        this.httpSessionConfig.postConstruct();
-    }
+//    /**
+//     * Test to make sure we can build the proper API security.
+//     *
+//     * @throws Exception on any error
+//     */
+//    @Test
+//    public void canBuildAPIHttpSecurity() throws Exception {
+//        final HttpSecurity http = Mockito.mock(HttpSecurity.class);
+//        final X509UserDetailsService x509UserDetailsService = Mockito.mock(X509UserDetailsService.class);
+//
+//        SecurityUtils.buildAPIHttpSecurity(http, x509UserDetailsService);
+//    }
 }

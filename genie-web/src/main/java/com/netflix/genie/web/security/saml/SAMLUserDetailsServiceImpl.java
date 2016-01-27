@@ -18,9 +18,8 @@
 package com.netflix.genie.web.security.saml;
 
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,9 +41,8 @@ import java.util.List;
  */
 @ConditionalOnProperty("security.saml.enabled")
 @Component
+@Slf4j
 public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SAMLUserDetailsServiceImpl.class);
 
     private static final GrantedAuthority USER = new SimpleGrantedAuthority("ROLE_USER");
     private static final GrantedAuthority ADMIN = new SimpleGrantedAuthority("ROLE_ADMIN");
@@ -77,24 +75,24 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
         // See if we can get any other roles
         final String[] groups = credential.getAttributeAsStringArray(this.groupAttributeName);
         if (groups == null) {
-            LOG.warn("No groups found. User will only get ROLE_USER by default.");
+            log.warn("No groups found. User will only get ROLE_USER by default.");
         } else if (Arrays.asList(groups).contains(this.adminGroup)) {
             authorities.add(ADMIN);
         }
 
         // For debugging what's available in the credential from the IDP
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Attributes:");
+        if (log.isDebugEnabled()) {
+            log.debug("Attributes:");
             credential.getAttributes().stream().forEach(attribute -> {
-                LOG.debug("Attribute: {}", attribute.getName());
-                LOG.debug(
+                log.debug("Attribute: {}", attribute.getName());
+                log.debug(
                     "Values: {}",
                     StringUtils.join(credential.getAttributeAsStringArray(attribute.getName()), ',')
                 );
             });
         }
 
-        LOG.info("{} is logged in with authorities {}", userId, authorities);
+        log.info("{} is logged in with authorities {}", userId, authorities);
         return new User(userId, "DUMMY", authorities);
     }
 }

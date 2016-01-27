@@ -21,8 +21,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
 import com.netflix.genie.core.metrics.JobCountManager;
 import com.netflix.genie.web.tasks.JobCountMonitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,9 +35,8 @@ import org.springframework.stereotype.Component;
  */
 //TODO: Add conditionals to enable or disable
 @Component
+@Slf4j
 public class JobCountMonitorImpl implements JobCountMonitor {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JobCountMonitorImpl.class);
 
     private final JobCountManager jobCountManager;
     private final GenieNodeStatistics stats;
@@ -49,7 +47,7 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     /**
      * Constructor.
      *
-     * @param stats reference to the statistics object that must be updated
+     * @param stats           reference to the statistics object that must be updated
      * @param jobCountManager The job count manager
      */
     @Autowired
@@ -64,26 +62,26 @@ public class JobCountMonitorImpl implements JobCountMonitor {
     @Override
     @Scheduled(fixedRate = 60000)  // TODO: Randomize? Do we need this to be a property?
     public void updateJobCounts() throws GenieException {
-        LOG.info("Updating job counts...");
+        log.info("Updating job counts...");
 
         final long time = System.currentTimeMillis();
 
         this.stats.setGenieRunningJobs(
-                this.jobCountManager.getNumInstanceJobs()
+            this.jobCountManager.getNumInstanceJobs()
         );
         this.stats.setGenieRunningJobs0To15m(
-                this.jobCountManager.getNumInstanceJobs(time - 15 * 60 * 1000, null)
+            this.jobCountManager.getNumInstanceJobs(time - 15 * 60 * 1000, null)
         );
         this.stats.setGenieRunningJobs15mTo2h(
-                this.jobCountManager.getNumInstanceJobs(time - 2 * 60 * 60 * 1000, time - 15 * 60 * 1000)
+            this.jobCountManager.getNumInstanceJobs(time - 2 * 60 * 60 * 1000, time - 15 * 60 * 1000)
         );
         this.stats.setGenieRunningJobs2hTo8h(
-                this.jobCountManager.getNumInstanceJobs(time - 8 * 60 * 60 * 1000, time - 2 * 60 * 60 * 1000)
+            this.jobCountManager.getNumInstanceJobs(time - 8 * 60 * 60 * 1000, time - 2 * 60 * 60 * 1000)
         );
         this.stats.setGenieRunningJobs8hPlus(
-                this.jobCountManager.getNumInstanceJobs(null, time - 8 * 60 * 60 * 1000)
+            this.jobCountManager.getNumInstanceJobs(null, time - 8 * 60 * 60 * 1000)
         );
 
-        LOG.info("Finished updating job counts");
+        log.info("Finished updating job counts");
     }
 }

@@ -17,8 +17,11 @@
  */
 package com.netflix.genie.web.sessions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Class to replace HTTP Session from Tomcat with one persisted to Redis for sharing session across a cluster.
@@ -28,5 +31,14 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  */
 @ConditionalOnProperty("spring.redis.enabled")
 @EnableRedisHttpSession
+@Slf4j
 public class HttpSessionConfig {
+
+    /**
+     * Log out that Redis based HTTP Session storage is enabled.
+     */
+    @PostConstruct
+    public void postConstruct() {
+        log.info("Spring Session with Redis as storage is ENABLED");
+    }
 }

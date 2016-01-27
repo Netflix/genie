@@ -23,8 +23,7 @@ import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.metrics.JobCountManager;
 import com.netflix.genie.core.util.NetUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,9 +46,9 @@ import java.util.List;
  * @author tgianos
  */
 @Component
+@Slf4j
 public class JobCountManagerImpl implements JobCountManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobCountManagerImpl.class);
     private final NetUtil netUtil;
     @PersistenceContext
     private EntityManager em;
@@ -69,7 +68,7 @@ public class JobCountManagerImpl implements JobCountManager {
      */
     @Override
     public int getNumInstanceJobs() throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
         return getNumInstanceJobs(null, null, null);
     }
 
@@ -81,7 +80,7 @@ public class JobCountManagerImpl implements JobCountManager {
         final Long minStartTime,
         final Long maxStartTime
     ) throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
 
         return getNumInstanceJobs(null, minStartTime, maxStartTime);
     }
@@ -94,7 +93,7 @@ public class JobCountManagerImpl implements JobCountManager {
     //TODO: Move to specification
     public int getNumInstanceJobs(final String hostName, final Long minStartTime, final Long maxStartTime)
         throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
 
 //        final String finalHostName;
 //        // initialize host name
@@ -133,12 +132,12 @@ public class JobCountManagerImpl implements JobCountManager {
      */
     @Override
     public String getIdleInstance(final long minJobThreshold) throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
         final String localhost = this.netUtil.getHostName();
 
 //        // Get the App Name from Configuration
 //        final String appName = this.config.getString("APPNAME", "genie2");
-//        LOG.info("Using App Name" + appName);
+//        log.info("Using App Name" + appName);
 //
 //        // naive implementation where we loop through all instances in discovery
 //        // no need to raise any exceptions here, just return localhost if there
@@ -147,12 +146,12 @@ public class JobCountManagerImpl implements JobCountManager {
 //        final DiscoveryClient discoveryClient = DiscoveryManager.getInstance()
 //                .getDiscoveryClient();
 //        if (discoveryClient == null) {
-//            LOG.warn("Can't instantiate DiscoveryClient - returning localhost");
+//            log.warn("Can't instantiate DiscoveryClient - returning localhost");
 //            return localhost;
 //        }
 //        final Application app = discoveryClient.getApplication(appName);
 //        if (app == null) {
-//            LOG.warn("Discovery client can't find genie - returning localhost");
+//            log.warn("Discovery client can't find genie - returning localhost");
 //            return localhost;
 //        }
 //
@@ -165,14 +164,14 @@ public class JobCountManagerImpl implements JobCountManager {
 //
 //            // if instance is UP, check if job can be forwarded to it
 //            final String hostName = instance.getHostName();
-//            LOG.debug("Trying host name: " + hostName);
+//            log.debug("Trying host name: " + hostName);
 //            final int numInstanceJobs = getNumInstanceJobs(hostName, null, null);
 //            if (numInstanceJobs <= minJobThreshold) {
-//                LOG.info("Returning idle host: " + hostName + ", who has "
+//                log.info("Returning idle host: " + hostName + ", who has "
 //                        + numInstanceJobs + " jobs running");
 //                return hostName;
 //            } else {
-//                LOG.debug("Host: " + hostName + " skipped since it has "
+//                log.debug("Host: " + hostName + " skipped since it has "
 //                        + numInstanceJobs + " running jobs, threshold is: "
 //                        + minJobThreshold);
 //            }
@@ -180,7 +179,7 @@ public class JobCountManagerImpl implements JobCountManager {
 
         // no hosts found with numInstanceJobs < minJobThreshold, return current
         // instance
-        LOG.info("Can't find any host to forward to - returning localhost");
+        log.info("Can't find any host to forward to - returning localhost");
         return localhost;
     }
 }

@@ -18,10 +18,9 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -42,9 +41,9 @@ import java.util.UUID;
  * @author tgianos
  */
 @MappedSuperclass
+@Slf4j
 public class BaseEntity implements Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseEntity.class);
     private static final long serialVersionUID = 7526472297322776147L;
 
     @Id
@@ -127,7 +126,7 @@ public class BaseEntity implements Serializable {
      * @param created The created timestamp
      */
     public void setCreated(final Date created) {
-        LOG.debug("Tried to set created to {} for entity {}. Will not be persisted.", created, this.id);
+        log.debug("Tried to set created to {} for entity {}. Will not be persisted.", created, this.id);
         if (created.before(this.created)) {
             this.created = new Date(created.getTime());
         }

@@ -25,9 +25,8 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.core.services.JobSubmitterService;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,9 +43,9 @@ import java.util.Set;
  * @author amsharma
  */
 @Service
+@Slf4j
 public class JobServiceImpl implements JobService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobServiceImpl.class);
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
@@ -81,7 +80,7 @@ public class JobServiceImpl implements JobService {
         @Valid
         final JobRequest jobRequest
     ) throws GenieException {
-        LOG.debug("Called with job request {}", jobRequest);
+        log.debug("Called with job request {}", jobRequest);
 
         // TODO get client host at this point?
         // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
@@ -111,7 +110,7 @@ public class JobServiceImpl implements JobService {
         @NotBlank(message = "No job id provided. Unable to retrieve job.")
         final String jobId
     ) throws GenieException {
-        LOG.debug("Called with id {}", jobId);
+        log.debug("Called with id {}", jobId);
         return this.jobPersistenceService.getJob(jobId);
     }
 
@@ -143,7 +142,7 @@ public class JobServiceImpl implements JobService {
         final String commandId,
         final Pageable page
     ) {
-        LOG.debug("called");
+        log.debug("called");
 
         return this.jobSearchService.getJobs(
             id,

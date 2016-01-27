@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -51,6 +50,7 @@ import java.util.Map;
  * @author tgianos
  * @since 3.0.0
  */
+@Slf4j
 public class PingFederateTokenServices implements ResourceServerTokenServices {
 
     protected static final String TOKEN_NAME_KEY = "token";
@@ -60,8 +60,6 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
     protected static final String ERROR_KEY = "error";
     protected static final String SCOPE_KEY = "scope";
     protected static final String GRANT_TYPE = "urn:pingidentity.com:oauth2:grant_type:validate_bearer";
-
-    private static final Logger LOG = LoggerFactory.getLogger(PingFederateTokenServices.class);
 
     private final AccessTokenConverter converter;
 
@@ -99,9 +97,9 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
         Assert.state(StringUtils.isNotBlank(this.clientId), "Client ID is required");
         Assert.state(StringUtils.isNotBlank(this.clientSecret), "Client secret is required");
 
-        LOG.debug("checkTokenEnpointUrl = {}", this.checkTokenEndpointUrl);
-        LOG.debug("clientId = {}", this.clientId);
-        LOG.debug("clientSecret = {}", this.clientSecret);
+        log.debug("checkTokenEnpointUrl = {}", this.checkTokenEndpointUrl);
+        log.debug("clientId = {}", this.clientId);
+        log.debug("clientSecret = {}", this.clientSecret);
 
         this.converter = converter;
     }
@@ -122,7 +120,7 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
 
         if (map.containsKey(ERROR_KEY)) {
             final String error = map.get(ERROR_KEY).toString();
-            LOG.debug("Validating the token produced an error: {}", error);
+            log.debug("Validating the token produced an error: {}", error);
             throw new InvalidTokenException(error);
         }
 
@@ -130,7 +128,7 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
         Assert.state(map.containsKey(SCOPE_KEY), "No scopes included in response from authentication server");
         this.convertScopes(map);
         final OAuth2Authentication authentication = this.converter.extractAuthentication(map);
-        LOG.info(
+        log.info(
             "User {} authenticated with authorities {}",
             authentication.getPrincipal(),
             authentication.getAuthorities()

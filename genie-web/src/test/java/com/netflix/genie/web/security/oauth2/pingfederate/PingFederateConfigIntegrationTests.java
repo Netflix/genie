@@ -107,9 +107,22 @@ public class PingFederateConfigIntegrationTests {
      */
     @Test
     @WithMockUser
-    public void cantGetAdminAPIAsRegularUser() throws Exception {
+    public void canGetAdminAPIAsRegularUser() throws Exception {
         this.mvc
-            .perform(MockMvcRequestBuilders.get("/api/v3/jobs"))
+            .perform(MockMvcRequestBuilders.get("/api/v3/applications"))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    /**
+     * Make sure we can't delete anything under admin control.
+     *
+     * @throws Exception on any error
+     */
+    @Test
+    @WithMockUser
+    public void cantDeleteAdminAPIAsRegularUser() throws Exception {
+        this.mvc
+            .perform(MockMvcRequestBuilders.delete("/api/v3/applications"))
             .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
@@ -120,9 +133,35 @@ public class PingFederateConfigIntegrationTests {
      */
     @Test
     @WithMockUser(roles = {"USER", "ADMIN"})
-    public void canGetAdminAPIAsAdminUser() throws Exception {
+    public void canCallDeleteAPIAsAdminUser() throws Exception {
         this.mvc
-            .perform(MockMvcRequestBuilders.get("/api/v3/jobs"))
+            .perform(MockMvcRequestBuilders.delete("/api/v3/applications"))
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    /**
+     * Make sure we can't delete anything under admin control.
+     *
+     * @throws Exception on any error
+     */
+    @Test
+    @WithMockUser
+    public void cantGetActuatorAPIAsRegularUser() throws Exception {
+        this.mvc
+            .perform(MockMvcRequestBuilders.get("/actuator/beans"))
+            .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    /**
+     * Make sure we get get anything under admin control if we're an admin.
+     *
+     * @throws Exception on any error
+     */
+    @Test
+    @WithMockUser(roles = {"USER", "ADMIN"})
+    public void canGetActuatorAPIAsAdminUser() throws Exception {
+        this.mvc
+            .perform(MockMvcRequestBuilders.get("/actuator/beans"))
             .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

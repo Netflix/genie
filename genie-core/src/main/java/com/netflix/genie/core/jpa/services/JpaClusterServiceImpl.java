@@ -33,11 +33,10 @@ import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.core.services.ClusterService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,9 +65,9 @@ import java.util.stream.Collectors;
         ConstraintViolationException.class
     }
 )
+@Slf4j
 public class JpaClusterServiceImpl implements ClusterService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JpaClusterServiceImpl.class);
     private final JpaClusterRepository clusterRepo;
     private final JpaCommandRepository commandRepo;
 
@@ -96,7 +95,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @Valid
         final Cluster cluster
     ) throws GenieException {
-        LOG.debug("Called to create cluster {}", cluster.toString());
+        log.debug("Called to create cluster {}", cluster.toString());
         if (StringUtils.isNotBlank(cluster.getId()) && this.clusterRepo.exists(cluster.getId())) {
             throw new GenieConflictException("A cluster with id " + cluster.getId() + " already exists");
         }
@@ -124,7 +123,7 @@ public class JpaClusterServiceImpl implements ClusterService {
     public Cluster getCluster(
         @NotBlank(message = "No id entered. Unable to get.") final String id
     ) throws GenieException {
-        LOG.debug("Called with id {}", id);
+        log.debug("Called with id {}", id);
         return this.findCluster(id).getDTO();
     }
 
@@ -141,7 +140,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         final Long maxUpdateTime,
         final Pageable page
     ) {
-        LOG.debug("called");
+        log.debug("called");
 
         @SuppressWarnings("unchecked")
         final Page<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
@@ -161,7 +160,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotNull(message = "JobRequest object is null. Unable to continue.")
         final JobRequest jobRequest
     ) throws GenieException {
-        LOG.debug("Called");
+        log.debug("Called");
 
         final List<ClusterCriteria> clusterCriterias = jobRequest.getClusterCriterias();
         final Set<String> commandCriteria = jobRequest.getCommandCriteria();
@@ -198,7 +197,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @Valid
         final com.netflix.genie.common.dto.Cluster updateCluster
     ) throws GenieException {
-        LOG.debug("Called with id {} and cluster {}", id, updateCluster);
+        log.debug("Called with id {} and cluster {}", id, updateCluster);
         if (!this.clusterRepo.exists(id)) {
             throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
@@ -225,7 +224,7 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     public void deleteAllClusters() throws GenieException {
-        LOG.debug("Called to delete all clusters");
+        log.debug("Called to delete all clusters");
         for (final ClusterEntity clusterEntity : this.clusterRepo.findAll()) {
             this.deleteCluster(clusterEntity.getId());
         }
@@ -239,7 +238,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotBlank(message = "No id entered unable to delete.")
         final String id
     ) throws GenieException {
-        LOG.debug("Called");
+        log.debug("Called");
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = clusterEntity.getCommands();
         if (commandEntities != null) {
@@ -264,7 +263,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotEmpty(message = "No configuration files entered. Unable to add.")
         final Set<String> configs
     ) throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
         this.findCluster(id).getConfigs().addAll(configs);
     }
 
@@ -277,7 +276,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotBlank(message = "No cluster id sent. Cannot retrieve configurations.")
         final String id
     ) throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
         return this.findCluster(id).getConfigs();
     }
 
@@ -291,7 +290,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotEmpty(message = "No configs entered. Unable to update.")
         final Set<String> configs
     ) throws GenieException {
-        LOG.debug("called with id {} and configs {}", id, configs);
+        log.debug("called with id {} and configs {}", id, configs);
         this.findCluster(id).setConfigs(configs);
     }
 

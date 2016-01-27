@@ -28,7 +28,6 @@ import org.opensaml.xml.parse.ParserPool;
 import org.opensaml.xml.parse.StaticBasicParserPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -115,18 +114,8 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl;
 
-    @Value("${security.saml.keystore.name}")
-    private String keystoreFile;
-    @Value("${security.saml.keystore.password}")
-    private String keystorePassword;
-    @Value("${security.saml.keystore.defaultKey.name}")
-    private String defaultKeyName;
-    @Value("${security.saml.keystore.defaultKey.password}")
-    private String defaultKeyPassword;
-    @Value("${security.saml.idp.serviceProviderMetadataURL}")
-    private String serviceProviderMetadataURL;
-    @Value("${security.saml.sp.entityId}")
-    private String serviceProviderEntityId;
+    @Autowired
+    private SAMLProperties samlProperties;
 
     /**
      * Initialization of OpenSAML library.
@@ -308,61 +297,19 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public KeyManager keyManager() {
         final ResourceLoader loader = new DefaultResourceLoader();
-        final Resource storeFile = loader.getResource("classpath:" + this.keystoreFile);
+        final Resource storeFile = loader.getResource("classpath:" + this.samlProperties.getKeystore().getName());
         final Map<String, String> passwords = new HashMap<>();
-        passwords.put(this.defaultKeyName, this.defaultKeyPassword);
-        return new JKSKeyManager(storeFile, this.keystorePassword, passwords, this.defaultKeyName);
+        passwords.put(
+            this.samlProperties.getKeystore().getDefaultKey().getName(),
+            this.samlProperties.getKeystore().getDefaultKey().getPassword()
+        );
+        return new JKSKeyManager(
+            storeFile,
+            this.samlProperties.getKeystore().getPassword(),
+            passwords,
+            this.samlProperties.getKeystore().getDefaultKey().getName()
+        );
     }
-
-//    /**
-//     * TLS configurer.
-//     *
-//     * @return The TLS configurer for the http client
-//     * @see TLSProtocolConfigurer
-//     */
-//    @Bean
-//    public TLSProtocolConfigurer tlsProtocolConfigurer() {
-//        return new TLSProtocolConfigurer();
-//    }
-//
-//    /**
-//     * The TLS socket factory.
-//     *
-//     * @return Socket factory
-//     * @see ProtocolSocketFactory
-//     * @see TLSProtocolSocketFactory
-//     */
-//    @Bean
-//    public ProtocolSocketFactory socketFactory() {
-//        return new TLSProtocolSocketFactory(keyManager(), null, "default");
-//    }
-//
-//    /**
-//     * The TLS socket factory protocol to use.
-//     *
-//     * @return The socket factory protocol (https)
-//     * @see Protocol
-//     */
-//    @Bean
-//    public Protocol socketFactoryProtocol() {
-//        return new Protocol("https", socketFactory(), 443);
-//    }
-//
-//    /**
-//     * Invocation bean for the https protocol.
-//     *
-//     * @return The invocation bean
-//     * @see MethodInvokingFactoryBean
-//     */
-//    @Bean
-//    public MethodInvokingFactoryBean socketFactoryInitialization() {
-//        final MethodInvokingFactoryBean methodInvokingFactoryBean = new MethodInvokingFactoryBean();
-//        methodInvokingFactoryBean.setTargetClass(Protocol.class);
-//        methodInvokingFactoryBean.setTargetMethod("registerProtocol");
-//        final Object[] args = {"https", socketFactoryProtocol()};
-//        methodInvokingFactoryBean.setArguments(args);
-//        return methodInvokingFactoryBean;
-//    }
 
     /**
      * The Web SSO profile options.
@@ -429,8 +376,11 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     public ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider() throws MetadataProviderException {
         // Create a daemon timer for updating the IDP metadata from the server
         final Timer backgroundTaskTimer = new Timer(true);
-        final HTTPMetadataProvider httpMetadataProvider
-            = new HTTPMetadataProvider(backgroundTaskTimer, httpClient(), this.serviceProviderMetadataURL);
+        final HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
+            backgroundTaskTimer,
+            httpClient(),
+            this.samlProperties.getIdp().getServiceProviderMetadataURL()
+        );
         httpMetadataProvider.setParserPool(parserPool());
         final ExtendedMetadataDelegate extendedMetadataDelegate
             = new ExtendedMetadataDelegate(httpMetadataProvider, extendedMetadata());
@@ -461,7 +411,7 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public MetadataGenerator metadataGenerator() {
         final MetadataGenerator metadataGenerator = new MetadataGenerator();
-        metadataGenerator.setEntityId(this.serviceProviderEntityId);
+        metadataGenerator.setEntityId(this.samlProperties.getSp().getEntityId());
         metadataGenerator.setExtendedMetadata(extendedMetadata());
         metadataGenerator.setIncludeDiscoveryExtension(false);
         metadataGenerator.setKeyManager(keyManager());

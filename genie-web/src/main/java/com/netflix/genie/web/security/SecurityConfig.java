@@ -17,8 +17,7 @@
  */
 package com.netflix.genie.web.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -42,9 +41,8 @@ import java.util.Collection;
 @Conditional(SecurityConditions.AnySecurityEnabled.class)
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Autowired(required = false)
     private Collection<AuthenticationProvider> providers;
@@ -70,12 +68,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
         if (this.providers != null) {
             for (final AuthenticationProvider provider : this.providers) {
-                LOG.debug("Adding authentication provider {} to authentication provider.", provider.toString());
+                log.debug("Adding authentication provider {} to authentication provider.", provider.toString());
                 auth.authenticationProvider(provider);
             }
         } else {
             // in the case nothing was configured
-            LOG.debug("No providers were found. Configuring in memory authentication to avoid NPE.");
+            log.debug("No providers were found. Configuring in memory authentication to avoid NPE.");
             auth.inMemoryAuthentication();
         }
     }

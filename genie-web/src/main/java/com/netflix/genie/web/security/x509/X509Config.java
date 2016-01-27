@@ -17,14 +17,13 @@
  */
 package com.netflix.genie.web.security.x509;
 
+import com.netflix.genie.web.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 
 /**
  * Spring Security configuration based on authentication of x509 certificates only.
@@ -45,20 +44,6 @@ public class X509Config extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-        // @formatter:off
-        http
-            .antMatcher("/api/**")
-                .authorizeRequests()
-                    .regexMatchers(HttpMethod.GET, "/api/.*/jobs.*").hasRole("ADMIN")
-                    .anyRequest().authenticated()
-            .and()
-                .x509().authenticationUserDetailsService(this.x509UserDetailsService)
-            .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-//            .and()
-//                .requiresChannel().anyRequest().requiresSecure()
-            .and()
-                .csrf().disable();
-        // @formatter:on
+        SecurityUtils.buildAPIHttpSecurity(http, this.x509UserDetailsService);
     }
 }

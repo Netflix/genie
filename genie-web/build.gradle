@@ -33,8 +33,6 @@ dependencies {
      * Provided Dependencies
      *******************************/
 
-    provided("org.projectlombok:lombok")
-
     /*******************************
      * Optional Dependencies
      *******************************/

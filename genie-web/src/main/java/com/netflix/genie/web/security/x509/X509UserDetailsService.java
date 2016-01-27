@@ -19,8 +19,7 @@ package com.netflix.genie.web.security.x509;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.web.security.SecurityConditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -41,9 +40,9 @@ import java.util.Set;
  */
 @Conditional(SecurityConditions.AnySecurityEnabled.class)
 @Component
+@Slf4j
 public class X509UserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(X509UserDetailsService.class);
     private static final String ROLE_PREFIX = "ROLE_";
     private static final GrantedAuthority USER_AUTHORITY = new SimpleGrantedAuthority(ROLE_PREFIX + "USER");
 
@@ -54,7 +53,7 @@ public class X509UserDetailsService implements AuthenticationUserDetailsService<
     public UserDetails loadUserDetails(
         final PreAuthenticatedAuthenticationToken token
     ) throws UsernameNotFoundException {
-        LOG.debug("Entering loadUserDetails with token {}", token);
+        log.debug("Entering loadUserDetails with token {}", token);
 
         // Assuming format of the principal is {username}:{role1,role2....}
         final Object principalObject = token.getPrincipal();
@@ -81,7 +80,7 @@ public class X509UserDetailsService implements AuthenticationUserDetailsService<
         }
 
         final User user = new User(username, "NA", authorities);
-        LOG.info("User {} authenticated via client certificate", user);
+        log.info("User {} authenticated via client certificate", user);
         return user;
     }
 }
