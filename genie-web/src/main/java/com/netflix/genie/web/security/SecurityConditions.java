@@ -45,15 +45,15 @@ public class SecurityConditions {
         }
 
         @ConditionalOnProperty("security.saml.enabled")
-        private static class OnSAML {
+        static class OnSAML {
         }
 
         @ConditionalOnProperty("security.x509.enabled")
-        private static class OnX509 {
+        static class OnX509 {
         }
 
         @ConditionalOnProperty("security.oauth2.enabled")
-        private static class OnOAuth2 {
+        static class OnOAuth2 {
         }
     }
 
@@ -73,11 +73,11 @@ public class SecurityConditions {
         }
 
         @ConditionalOnProperty("security.oauth2.enabled")
-        private static class OnOAuth2 {
+        static class OnOAuth2 {
         }
 
         @ConditionalOnProperty("security.oauth2.pingfederate.enabled")
-        private static class OnPingFederate {
+        static class OnPingFederate {
         }
     }
 }

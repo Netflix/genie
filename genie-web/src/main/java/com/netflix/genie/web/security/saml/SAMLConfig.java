@@ -108,6 +108,8 @@ import java.util.Timer;
 //@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SAMLConfig extends WebSecurityConfigurerAdapter {
 
+    private ResourceLoader resourceLoader = new DefaultResourceLoader();
+
     @Autowired
     private X509UserDetailsService x509UserDetailsService;
 
@@ -296,8 +298,8 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     public KeyManager keyManager() {
-        final ResourceLoader loader = new DefaultResourceLoader();
-        final Resource storeFile = loader.getResource("classpath:" + this.samlProperties.getKeystore().getName());
+        final Resource storeFile
+            = this.resourceLoader.getResource("classpath:" + this.samlProperties.getKeystore().getName());
         final Map<String, String> passwords = new HashMap<>();
         passwords.put(
             this.samlProperties.getKeystore().getDefaultKey().getName(),
@@ -731,5 +733,17 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
             .logout()
             .logoutSuccessUrl("/");
         // @formatter:on
+    }
+
+    protected void setSamlUserDetailsServiceImpl(final SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl) {
+        this.samlUserDetailsServiceImpl = samlUserDetailsServiceImpl;
+    }
+
+    protected void setSamlProperties(final SAMLProperties samlProperties) {
+        this.samlProperties = samlProperties;
+    }
+
+    protected void setResourceLoader(final ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
     }
 }

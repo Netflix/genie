@@ -35,7 +35,7 @@ import org.springframework.web.context.WebApplicationContext;
  * @author tgianos
  * @since 3.0.0
  */
-public abstract class AbstractAPIIntegrationTests {
+public abstract class AbstractAPISecurityIntegrationTests {
 
     @Autowired
     private WebApplicationContext context;

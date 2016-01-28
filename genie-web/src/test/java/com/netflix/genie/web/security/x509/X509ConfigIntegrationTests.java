@@ -19,7 +19,7 @@ package com.netflix.genie.web.security.x509;
 
 import com.netflix.genie.GenieWeb;
 import com.netflix.genie.test.categories.IntegrationTest;
-import com.netflix.genie.web.security.AbstractAPIIntegrationTests;
+import com.netflix.genie.web.security.AbstractAPISecurityIntegrationTests;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -40,5 +40,5 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @WebIntegrationTest(randomPort = true)
 @ActiveProfiles({"integration"})
 @TestPropertySource(properties = { "security.x509.enabled = true" })
-public class X509ConfigIntegrationTests extends AbstractAPIIntegrationTests {
+public class X509ConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
 }
