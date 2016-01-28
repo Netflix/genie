@@ -27,6 +27,8 @@ import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 /**
  * Integration tests for the X509 based security configuration.
@@ -41,4 +43,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ActiveProfiles({"integration"})
 @TestPropertySource(properties = { "security.x509.enabled = true" })
 public class X509ConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResultMatcher getUnauthorizedExpectedStatus() {
+        return MockMvcResultMatchers.status().isForbidden();
+    }
 }

@@ -26,6 +26,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 /**
  * Integration tests for PingFederateConfig.
@@ -39,4 +41,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @WebIntegrationTest(randomPort = true)
 @ActiveProfiles({"oauth2", "integration"})
 public class PingFederateConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResultMatcher getUnauthorizedExpectedStatus() {
+        return MockMvcResultMatchers.status().isUnauthorized();
+    }
 }
