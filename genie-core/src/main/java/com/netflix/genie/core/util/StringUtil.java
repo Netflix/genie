@@ -19,9 +19,8 @@ package com.netflix.genie.core.util;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to parse string (for command-line arguments, versions, etc).
@@ -29,9 +28,8 @@ import org.slf4j.LoggerFactory;
  * @author skrishnan
  * @author tgianos
  */
+@Slf4j
 public final class StringUtil {
-
-    private static final Logger LOG = LoggerFactory.getLogger(StringUtil.class);
 
     /**
      * The argument delimiter, which is set to white space.
@@ -54,7 +52,7 @@ public final class StringUtil {
      * @throws GenieException If there is any error
      */
     public static String[] splitCmdLine(final String input) throws GenieException {
-        LOG.debug("Command line: {}", input);
+        log.debug("Command line: {}", input);
         if (StringUtils.isBlank(input)) {
             return new String[0];
         }
@@ -66,7 +64,7 @@ public final class StringUtil {
                 + "]+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
         } catch (final Exception e) {
             final String msg = "Invalid argument: " + input;
-            LOG.error(msg, e);
+            log.error(msg, e);
             throw new GenieServerException(msg, e);
         }
 
@@ -76,7 +74,7 @@ public final class StringUtil {
             if (output[i].startsWith("\"") && output[i].endsWith("\"")) {
                 output[i] = output[i].replaceAll("(^\")|(\"$)", "");
             }
-            LOG.debug("{}: {}", i, output[i]);
+            log.debug("{}: {}", i, output[i]);
         }
         return output;
     }
@@ -90,7 +88,7 @@ public final class StringUtil {
      * @return trimmed version number as documented
      */
     public static String trimVersion(final String fullVersion) {
-            LOG.debug("Returning canonical version for {}", fullVersion);
+            log.debug("Returning canonical version for {}", fullVersion);
         if (fullVersion == null) {
             return null;
         }
@@ -108,7 +106,7 @@ public final class StringUtil {
             }
         }
         final String finalVersion = trimmedVersion.toString();
-        LOG.debug("Canonical version for {} is {}", fullVersion, finalVersion);
+        log.debug("Canonical version for {} is {}", fullVersion, finalVersion);
 
         return trimmedVersion.toString();
     }

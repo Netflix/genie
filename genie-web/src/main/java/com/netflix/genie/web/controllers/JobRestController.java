@@ -99,8 +99,8 @@ public class JobRestController {
     /**
      * Submit a new job.
      *
-     * @param jobRequest The job request information
-     * @param clientHost client host sending the request
+     * @param jobRequest         The job request information
+     * @param clientHost         client host sending the request
      * @param httpServletRequest The http servlet request
      * @return The submitted job
      * @throws GenieException For any error
@@ -110,9 +110,9 @@ public class JobRestController {
     public ResponseEntity<Void> submitJob(
         @RequestBody
         final JobRequest jobRequest,
-            @RequestHeader(FORWARDED_FOR_HEADER)
-            final String clientHost,
-            final HttpServletRequest httpServletRequest
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
+        final String clientHost,
+        final HttpServletRequest httpServletRequest
     ) throws GenieException {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
@@ -128,7 +128,6 @@ public class JobRestController {
         }
 
         final String id = this.jobService.processJob(jobRequest, localClientHost);
-        //final String id = "blah";
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -171,7 +170,6 @@ public class JobRestController {
             }
         }
 
-//        final String id = this.executionService.submitJob(jobRequest);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder

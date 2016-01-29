@@ -14,7 +14,7 @@
 
     <!-- Checks that all packages have a package documentation. -->
     <module name="JavadocPackage">
-        <property name="allowLegacy" value="true"/>
+        <property name="allowLegacy" value="false"/>
     </module>
 
     <!-- Checks that there is a newline at the end of each file. -->

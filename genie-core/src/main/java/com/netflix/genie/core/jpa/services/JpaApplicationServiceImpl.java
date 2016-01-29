@@ -34,11 +34,10 @@ import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.specifications.JpaApplicationSpecs;
 import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.core.services.ApplicationService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,9 +65,9 @@ import java.util.stream.Collectors;
         ConstraintViolationException.class
     }
 )
+@Slf4j
 public class JpaApplicationServiceImpl implements ApplicationService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JpaApplicationServiceImpl.class);
     private final JpaApplicationRepository applicationRepo;
     private final JpaCommandRepository commandRepo;
 
@@ -96,7 +95,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         @Valid
         final Application app
     ) throws GenieException {
-        LOG.debug("Called with application: {}", app.toString());
+        log.debug("Called with application: {}", app.toString());
         if (app.getId() != null && this.applicationRepo.exists(app.getId())) {
             throw new GenieConflictException("An application with id " + app.getId() + " already exists");
         }
@@ -131,7 +130,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         @NotBlank(message = "No id entered. Unable to get")
         final String id
     ) throws GenieException {
-        LOG.debug("Called with id {}", id);
+        log.debug("Called with id {}", id);
         return this.findApplication(id).getDTO();
     }
 
@@ -147,7 +146,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         final Set<String> tags,
         final Pageable page
     ) {
-        LOG.debug("Called");
+        log.debug("Called");
 
         @SuppressWarnings("unchecked")
         final Page<ApplicationEntity> applicationEntities
@@ -174,7 +173,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
             throw new GenieBadRequestException("Application id inconsistent with id passed in.");
         }
 
-        LOG.debug("Called with app {}", updateApp.toString());
+        log.debug("Called with app {}", updateApp.toString());
         final ApplicationEntity applicationEntity = this.findApplication(id);
         applicationEntity.setName(updateApp.getName());
         applicationEntity.setUser(updateApp.getUser());
@@ -194,7 +193,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      */
     @Override
     public void deleteAllApplications() throws GenieException {
-        LOG.debug("Called");
+        log.debug("Called");
         // Check to make sure the application isn't tied to any existing commands
         for (final ApplicationEntity applicationEntity : this.applicationRepo.findAll()) {
             final Set<CommandEntity> commandEntities = applicationEntity.getCommands();
@@ -216,7 +215,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         @NotBlank(message = "No application id entered. Unable to delete.")
         final String id
     ) throws GenieException {
-        LOG.debug("Called with id {}", id);
+        log.debug("Called with id {}", id);
         final ApplicationEntity applicationEntity = this.findApplication(id);
         final Set<CommandEntity> commandEntities = applicationEntity.getCommands();
         if (commandEntities != null && !commandEntities.isEmpty()) {

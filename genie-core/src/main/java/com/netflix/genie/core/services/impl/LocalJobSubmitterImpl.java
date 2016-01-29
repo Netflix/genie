@@ -18,24 +18,21 @@
 package com.netflix.genie.core.services.impl;
 
 
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.JobExecutor;
-
-import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.ApplicationService;
+import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.ApplicationService;
-import com.netflix.genie.core.services.JobSubmitterService;
-import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.FileCopyService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSubmitterService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -50,9 +47,9 @@ import java.util.List;
  * @author amsharma
  */
 @Service
+@Slf4j
 public class LocalJobSubmitterImpl implements JobSubmitterService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LocalJobSubmitterImpl.class);
     private final JobPersistenceService jobPersistenceService;
     private final ClusterService clusterService;
     private final CommandService commandService;
@@ -65,7 +62,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     /**
      * Constructor create the object.
      *
-     * @param jps Implementation of the job persistence service
+     * @param jps                  Implementation of the job persistence service
      * @param clusterService       Implementation of cluster service interface
      * @param commandService       Implementation of command service interface
      * @param applicationService   Implementation of the application service interface
@@ -101,7 +98,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         @Valid
         final JobRequest jobRequest
     ) throws GenieException {
-        LOG.debug("called with job request {}", jobRequest);
+        log.debug("called with job request {}", jobRequest);
 
         // construct the job execution environment object for this job request
         final JobExecutionEnvironment jee = new JobExecutionEnvironment();
@@ -129,9 +126,9 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         jobExecutor.execute();
 
         final JobExecution jobExecution = new JobExecution.Builder(
-                jee.getHostname(),
-                jee.getProcessId()
-            )
+            jee.getHostname(),
+            jee.getProcessId()
+        )
             .withId(jobRequest.getId())
             .build();
 

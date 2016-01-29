@@ -26,9 +26,8 @@ import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import org.apache.commons.lang3.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -46,9 +45,9 @@ import java.util.Set;
  * @author amsharma
  */
 @Service
+@Slf4j
 public class JobServiceImpl implements JobService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobServiceImpl.class);
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
@@ -86,7 +85,7 @@ public class JobServiceImpl implements JobService {
         final JobRequest jobRequest,
         final String clientHost
     ) throws GenieException {
-        LOG.debug("Called with job request {}", jobRequest);
+        log.debug("Called with job request {}", jobRequest);
 
         // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
         // orginal request may or may not have it.
@@ -132,7 +131,7 @@ public class JobServiceImpl implements JobService {
         @NotBlank(message = "No job id provided. Unable to retrieve job.")
         final String jobId
     ) throws GenieException {
-        LOG.debug("Called with id {}", jobId);
+        log.debug("Called with id {}", jobId);
         return this.jobPersistenceService.getJob(jobId);
     }
 
@@ -164,7 +163,7 @@ public class JobServiceImpl implements JobService {
         final String commandId,
         final Pageable page
     ) {
-        LOG.debug("called");
+        log.debug("called");
 
         return this.jobSearchService.getJobs(
             id,
