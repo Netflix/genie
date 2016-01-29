@@ -60,11 +60,6 @@ Please see the [ZeroToDocker](https://github.com/Netflix-Skunkworks/zerotodocker
 (https://github.com/Netflix-Skunkworks/zerotodocker/wiki/Genie) of an end to end example in [Docker]
 (https://www.docker.com/).
 
-## API Validation
-
-[![Swagger Validation](http://online.swagger.io/validator?url=http://netflix.github.io/genie/docs/rest/swagger.json)]
-(http://netflix.github.io/genie/docs/rest/swagger.json)
-
 ## Support
 
 Please use the [Google Group](https://groups.google.com/d/forum/genieoss) for general questions and discussion.
