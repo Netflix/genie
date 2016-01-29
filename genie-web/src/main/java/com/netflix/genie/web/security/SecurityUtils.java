@@ -18,6 +18,7 @@
 package com.netflix.genie.web.security;
 
 import com.netflix.genie.web.security.x509.X509UserDetailsService;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,7 +38,6 @@ public final class SecurityUtils {
     private static final String APPLICATIONS_API_REGEX = "/api/.*/applications.*";
     private static final String CLUSTERS_API_REGEX = "/api/.*/clusters.*";
     private static final String COMMANDS_API_REGEX = "/api/.*/commands.*";
-    private static final String ACTUATOR_API_REGEX = "/actuator/.*";
 
     /**
      * Protected constructor for utility class.
@@ -50,15 +50,17 @@ public final class SecurityUtils {
      *
      * @param http                   The http security object to use
      * @param x509UserDetailsService The x509 authentication user details service to use
+     * @param actuatorEndpoint       The endpoint where the Spring Actuator sits
      * @throws Exception when there is a problem configuring HTTP errors
      */
     public static void buildAPIHttpSecurity(
         @NotNull final HttpSecurity http,
-        @NotNull final X509UserDetailsService x509UserDetailsService
+        @NotNull final X509UserDetailsService x509UserDetailsService,
+        @NotBlank final String actuatorEndpoint
     ) throws Exception {
         // @formatter:off
         http
-            .regexMatcher("/(api|actuator)/.*")
+            .regexMatcher("(/api|" + actuatorEndpoint + ")/.*")
                 .authorizeRequests()
                     .regexMatchers(HttpMethod.DELETE, APPLICATIONS_API_REGEX).hasRole(ADMIN_ROLE)
                     .regexMatchers(HttpMethod.PATCH, APPLICATIONS_API_REGEX).hasRole(ADMIN_ROLE)
@@ -72,7 +74,7 @@ public final class SecurityUtils {
                     .regexMatchers(HttpMethod.PATCH, COMMANDS_API_REGEX).hasRole(ADMIN_ROLE)
                     .regexMatchers(HttpMethod.POST, COMMANDS_API_REGEX).hasRole(ADMIN_ROLE)
                     .regexMatchers(HttpMethod.PUT, COMMANDS_API_REGEX).hasRole(ADMIN_ROLE)
-                    .regexMatchers(ACTUATOR_API_REGEX).hasRole(ADMIN_ROLE)
+                    .regexMatchers(actuatorEndpoint + "/.*").hasRole(ADMIN_ROLE)
                     .anyRequest().hasRole(USER_ROLE)
             .and()
                 .x509().authenticationUserDetailsService(x509UserDetailsService)

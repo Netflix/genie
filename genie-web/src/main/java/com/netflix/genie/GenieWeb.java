@@ -20,6 +20,7 @@ package com.netflix.genie;
 import com.google.common.collect.Maps;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -34,7 +35,7 @@ import java.util.Map;
  * @author tgianos
  * @since 3.0.0
  */
-@SpringBootApplication(exclude = SessionAutoConfiguration.class)
+@SpringBootApplication(exclude = {SessionAutoConfiguration.class, RedisAutoConfiguration.class})
 public class GenieWeb {
 
     /**

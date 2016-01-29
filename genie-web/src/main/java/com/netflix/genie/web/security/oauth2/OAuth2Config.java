@@ -20,6 +20,7 @@ package com.netflix.genie.web.security.oauth2;
 import com.netflix.genie.web.security.SecurityUtils;
 import com.netflix.genie.web.security.x509.X509UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,6 +46,9 @@ public class OAuth2Config extends ResourceServerConfigurerAdapter {
     @Autowired
     private X509UserDetailsService x509UserDetailsService;
 
+    @Value("${management.context-path}")
+    private String actuatorEndpoint;
+
     /**
      * {@inheritDoc}
      */
@@ -58,6 +62,6 @@ public class OAuth2Config extends ResourceServerConfigurerAdapter {
      */
     @Override
     public void configure(final HttpSecurity http) throws Exception {
-        SecurityUtils.buildAPIHttpSecurity(http, this.x509UserDetailsService);
+        SecurityUtils.buildAPIHttpSecurity(http, this.x509UserDetailsService, this.actuatorEndpoint);
     }
 }

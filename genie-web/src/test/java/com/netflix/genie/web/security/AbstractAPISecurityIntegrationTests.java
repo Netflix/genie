@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -93,28 +94,15 @@ public abstract class AbstractAPISecurityIntegrationTests {
     private static final String COMMANDS_API = "/api/v3/commands";
     private static final String JOBS_API = "/api/v3/jobs";
 
-    //    private static final String ACTUATOR_ACTUATOR_ENDPOINT = "/actuator/actuator";
-    private static final String ACTUATOR_AUTOCONFIG_ENDPOINT = "/actuator/autoconfig";
-    private static final String ACTUATOR_BEANS_ENDPOINT = "/actuator/beans";
-    private static final String ACTUATOR_CONFIGPROPS_ENDPOINT = "/actuator/configprops";
-    //    private static final String ACTUATOR_DOCS_ENDPOINT = "/actuator/docs";
-    private static final String ACTUATOR_ENV_ENDPOINT = "/actuator/env";
-    //    private static final String ACTUATOR_FLYWAY_ENDPOINT = "/actuator/flyway";
-    private static final String ACTUATOR_HEALTH_ENDPOINT = "/actuator/health";
-    private static final String ACTUATOR_INFO_ENDPOINT = "/actuator/info";
-    //    private static final String ACTUATOR_LIQUIBASE_ENDPOINT = "/actuator/liquibase";
-//    private static final String ACTUATOR_LOGFILE_ENDPOINT = "/actuator/logfile";
-    private static final String ACTUATOR_METRICS_ENDPOINT = "/actuator/metrics";
-    private static final String ACTUATOR_MAPPINGS_ENDPOINT = "/actuator/mappings";
-    //    private static final String ACTUATOR_SHUTDOWN_ENDPOINT = "/actuator/shutdown";
-    private static final String ACTUATOR_TRACE_ENDPOINT = "/actuator/trace";
-
     private static final ResultMatcher OK = MockMvcResultMatchers.status().isOk();
     private static final ResultMatcher CREATED = MockMvcResultMatchers.status().isCreated();
     private static final ResultMatcher NO_CONTENT = MockMvcResultMatchers.status().isNoContent();
     private static final ResultMatcher PRECONDITION_FAILED = MockMvcResultMatchers.status().isPreconditionFailed();
     private static final ResultMatcher NOT_FOUND = MockMvcResultMatchers.status().isNotFound();
     private static final ResultMatcher FORBIDDEN = MockMvcResultMatchers.status().isForbidden();
+
+    @Value("${management.context-path}")
+    private String actuatorEndpoint;
 
     @Autowired
     private WebApplicationContext context;
@@ -262,14 +250,15 @@ public abstract class AbstractAPISecurityIntegrationTests {
     }
 
     private void checkActuatorEndpoints(final ResultMatcher expectedResult) throws Exception {
-        this.get(ACTUATOR_AUTOCONFIG_ENDPOINT, expectedResult);
-        this.get(ACTUATOR_BEANS_ENDPOINT, expectedResult);
-        this.get(ACTUATOR_CONFIGPROPS_ENDPOINT, expectedResult);
-        this.get(ACTUATOR_ENV_ENDPOINT, expectedResult);
-        this.get(ACTUATOR_HEALTH_ENDPOINT, expectedResult);
-        this.get(ACTUATOR_INFO_ENDPOINT, expectedResult);
-        this.get(ACTUATOR_MAPPINGS_ENDPOINT, expectedResult);
-        this.get(ACTUATOR_METRICS_ENDPOINT, expectedResult);
-        this.get(ACTUATOR_TRACE_ENDPOINT, expectedResult);
+        // See: https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html
+        this.get(this.actuatorEndpoint + "/autoconfig", expectedResult);
+        this.get(this.actuatorEndpoint + "/beans", expectedResult);
+        this.get(this.actuatorEndpoint + "/configprops", expectedResult);
+        this.get(this.actuatorEndpoint + "/env", expectedResult);
+        this.get(this.actuatorEndpoint + "/health", expectedResult);
+        this.get(this.actuatorEndpoint + "/info", expectedResult);
+        this.get(this.actuatorEndpoint + "/mappings", expectedResult);
+        this.get(this.actuatorEndpoint + "/metrics", expectedResult);
+        this.get(this.actuatorEndpoint + "/trace", expectedResult);
     }
 }

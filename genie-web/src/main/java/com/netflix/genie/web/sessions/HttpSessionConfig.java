@@ -19,6 +19,8 @@ package com.netflix.genie.web.sessions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 import javax.annotation.PostConstruct;
@@ -30,6 +32,7 @@ import javax.annotation.PostConstruct;
  * @since 3.0.0
  */
 @ConditionalOnProperty("spring.redis.enabled")
+@Import(RedisAutoConfiguration.class)
 @EnableRedisHttpSession
 @Slf4j
 public class HttpSessionConfig {
