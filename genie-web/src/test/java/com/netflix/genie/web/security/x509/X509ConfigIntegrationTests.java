@@ -24,6 +24,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,6 +42,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringApplicationConfiguration(classes = GenieWeb.class)
 @WebIntegrationTest(randomPort = true)
 @ActiveProfiles({"integration"})
+@DirtiesContext
 @TestPropertySource(properties = { "security.x509.enabled = true" })
 public class X509ConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
 

@@ -25,6 +25,9 @@ eureka:
 
 management:
   context-path: /actuator
+  health:
+    redis:
+      enabled: false
 
 multipart:
   max-file-size: 100MB
