@@ -93,7 +93,7 @@ public class JobExecutor {
         this.jobExecEnv = jobExecEnv;
         this.mode = mode;
 
-        if ((this.jobExecEnv.getJobWorkingDir() == null) || (StringUtils.isBlank(this.jobExecEnv.getJobWorkingDir()))) {
+        if (this.jobExecEnv.getJobWorkingDir() == null || StringUtils.isBlank(this.jobExecEnv.getJobWorkingDir())) {
             throw new GenieServerException("Cannot run job as working directory is not set");
         } else {
             this.jobWorkingDir = jobExecEnv.getJobWorkingDir();
