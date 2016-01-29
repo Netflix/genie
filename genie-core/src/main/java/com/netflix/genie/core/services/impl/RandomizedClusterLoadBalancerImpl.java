@@ -21,8 +21,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,20 +34,19 @@ import java.util.Random;
  * @author tgianos
  */
 @Service
+@Slf4j
 public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RandomizedClusterLoadBalancerImpl.class);
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Cluster selectCluster(final List<Cluster> clusters) throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
 
         if (clusters == null || clusters.isEmpty()) {
             final String msg = "No cluster configuration found to match user params";
-            LOG.error(msg);
+            log.error(msg);
             throw new GeniePreconditionException(msg);
         }
 

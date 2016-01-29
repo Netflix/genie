@@ -16,18 +16,13 @@
 #
 ##
 
-###########################################################################
-# Spring Settings
-###########################################################################
+spring:
+  datasource:
+    url: jdbc:derby:genie-db;create=true
+    username: me
+    password: mine
 
-# Datasource settings (driver class name inferred by spring boot)
-spring.datasource.url=jdbc:derby:genie-db;create=true
-spring.datasource.username=me
-spring.datasource.password=mine
-
-###########################################################################
-# Environment Settings
-###########################################################################
-
-# Used to display environment in UI
-com.netflix.genie.environment=test
+com:
+  netflix:
+    genie:
+      environment: test

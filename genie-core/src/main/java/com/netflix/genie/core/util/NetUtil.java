@@ -19,12 +19,11 @@ package com.netflix.genie.core.util;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +38,8 @@ import java.net.UnknownHostException;
  * @author skrishnan
  */
 @Component
+@Slf4j
 public class NetUtil {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NetUtil.class);
 
     // The instance meta-data uri's for public and private host/ip's
     // More info about EC2's instance metadata API is here:
@@ -68,7 +66,7 @@ public class NetUtil {
      * @return s3 location
      */
     public String getArchiveURI(final String jobID) {
-        LOG.debug("called for jobID: {}", jobID);
+        log.debug("called for jobID: {}", jobID);
         if (StringUtils.isNotBlank(this.s3ArchiveLocation)) {
             return this.s3ArchiveLocation + "/" + jobID;
         } else {
@@ -86,7 +84,7 @@ public class NetUtil {
      * @throws GenieException For any error.
      */
     public String getHostName() throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
 
         // check the fast property first
         if (StringUtils.isNotBlank(this.hostNameProperty)) {
@@ -103,7 +101,7 @@ public class NetUtil {
 
         if (hostName == null || hostName.isEmpty()) {
             final String msg = "Can't figure out host name for instance";
-            LOG.error(msg);
+            log.error(msg);
             throw new GenieServerException(msg);
         }
 
@@ -111,7 +109,7 @@ public class NetUtil {
     }
 
     private String getCloudHostName() throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
 
         if (StringUtils.isNotBlank(this.cloudHostName)) {
             return cloudHostName;
@@ -122,7 +120,7 @@ public class NetUtil {
             cloudHostName = httpGet(PUBLIC_HOSTNAME_URI);
         } catch (final IOException ioe) {
             final String msg = "Unable to get public hostname from instance metadata";
-            LOG.error(msg, ioe);
+            log.error(msg, ioe);
             throw new GenieServerException(msg, ioe);
         }
         if (StringUtils.isBlank(this.cloudHostName)) {
@@ -130,11 +128,11 @@ public class NetUtil {
                 this.cloudHostName = httpGet(LOCAL_IPV4_URI);
             } catch (final IOException ioe) {
                 final String msg = "Unable to get local IP from instance metadata";
-                LOG.error(msg, ioe);
+                log.error(msg, ioe);
                 throw new GenieServerException(msg, ioe);
             }
         }
-        LOG.info("cloudHostName=" + this.cloudHostName);
+        log.info("cloudHostName=" + this.cloudHostName);
 
         return this.cloudHostName;
     }
@@ -161,7 +159,7 @@ public class NetUtil {
     }
 
     private String getDCHostName() throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
 
         if (StringUtils.isNotBlank(this.dcHostName)) {
             return this.dcHostName;
@@ -174,7 +172,7 @@ public class NetUtil {
             return this.dcHostName;
         } catch (final UnknownHostException e) {
             final String msg = "Unable to get the hostname";
-            LOG.error(msg, e);
+            log.error(msg, e);
             throw new GenieServerException(msg, e);
         }
     }

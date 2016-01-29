@@ -24,7 +24,7 @@ dependencies {
     testCompile(project(":genie-test"))
     testCompile(project(":genie-web"))
     testCompile("com.jayway.jsonpath:json-path")
-    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:${spring_rest_docs_version}")
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
 }
 
 documentationTests {

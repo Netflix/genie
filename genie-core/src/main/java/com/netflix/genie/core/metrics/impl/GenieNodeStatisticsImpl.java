@@ -18,8 +18,7 @@
 package com.netflix.genie.core.metrics.impl;
 
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -34,9 +33,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author tgianos
  */
 @Component
+@Slf4j
 public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GenieNodeStatisticsImpl.class);
     //    @Monitor(name = "Running_Jobs", type = DataSourceType.GAUGE)
     private final AtomicInteger genieRunningJobs = new AtomicInteger(0);
     //    @Monitor(name = "Running_Jobs_0_15m", type = DataSourceType.GAUGE)
@@ -75,7 +74,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @PostConstruct
     public void initialize() {
-        LOG.debug("Registering Servo Monitor");
+        log.debug("Registering Servo Monitor");
         //TODO: Too static no way to decouple
 //        Monitors.registerObject(this);
     }
@@ -85,7 +84,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @PreDestroy
     public void shutdown() {
-        LOG.debug("Shutting down Servo monitor");
+        log.debug("Shutting down Servo monitor");
         //TODO: Too static no way to decouple
 //        Monitors.unregisterObject(this);
     }
@@ -95,7 +94,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenie2xxCount() {
-        LOG.debug("called");
+        log.debug("called");
         return this.genie2xxCount;
     }
 
@@ -112,7 +111,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrGenie2xxCount() {
-        LOG.debug("called");
+        log.debug("called");
         this.genie2xxCount.incrementAndGet();
     }
 
@@ -121,7 +120,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenie4xxCount() {
-        LOG.debug("called");
+        log.debug("called");
         return this.genie4xxCount;
     }
 
@@ -138,7 +137,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrGenie4xxCount() {
-        LOG.debug("called");
+        log.debug("called");
         this.genie4xxCount.incrementAndGet();
     }
 
@@ -147,7 +146,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenie5xxCount() {
-        LOG.debug("called");
+        log.debug("called");
         return this.genie5xxCount;
     }
 
@@ -164,7 +163,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrGenie5xxCount() {
-        LOG.debug("called");
+        log.debug("called");
         this.genie5xxCount.incrementAndGet();
     }
 
@@ -173,7 +172,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenieJobSubmissions() {
-        LOG.debug("called");
+        log.debug("called");
         return this.genieJobSubmissions;
     }
 
@@ -190,7 +189,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrGenieJobSubmissions() {
-        LOG.debug("called");
+        log.debug("called");
         this.genieJobSubmissions.incrementAndGet();
     }
 
@@ -199,7 +198,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getSuccessfulEmailSentCount() {
-        LOG.debug("called");
+        log.debug("called");
         return this.successEmailCount;
     }
 
@@ -208,7 +207,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrSuccessfulEmailCount() {
-        LOG.debug("called");
+        log.debug("called");
         this.successEmailCount.incrementAndGet();
     }
 
@@ -217,7 +216,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getFailedEmailSentCount() {
-        LOG.debug("called");
+        log.debug("called");
         return this.failedEmailCount;
     }
 
@@ -226,7 +225,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrFailedEmailCount() {
-        LOG.debug("called");
+        log.debug("called");
         this.failedEmailCount.incrementAndGet();
     }
 
@@ -235,7 +234,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenieSuccessfulJobs() {
-        LOG.debug("called");
+        log.debug("called");
         return this.genieSuccessfulJobs;
     }
 
@@ -252,7 +251,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrGenieSuccessfulJobs() {
-        LOG.debug("called");
+        log.debug("called");
         this.genieSuccessfulJobs.incrementAndGet();
     }
 
@@ -261,7 +260,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenieFailedJobs() {
-        LOG.debug("called");
+        log.debug("called");
         return this.genieFailedJobs;
     }
 
@@ -278,7 +277,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrGenieFailedJobs() {
-        LOG.debug("called");
+        log.debug("called");
         this.genieFailedJobs.incrementAndGet();
     }
 
@@ -287,7 +286,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenieForwardedJobs() {
-        LOG.debug("called");
+        log.debug("called");
         return this.genieForwardedJobs;
     }
 
@@ -304,7 +303,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrGenieForwardedJobs() {
-        LOG.debug("called");
+        log.debug("called");
         this.genieForwardedJobs.incrementAndGet();
     }
 
@@ -313,7 +312,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getGenieKilledJobs() {
-        LOG.debug("called");
+        log.debug("called");
         return this.genieKilledJobs;
     }
 
@@ -330,7 +329,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrGenieKilledJobs() {
-        LOG.debug("called");
+        log.debug("called");
         this.genieKilledJobs.incrementAndGet();
     }
 
@@ -419,7 +418,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public AtomicLong getJobSubmissionRetryCount() {
-        LOG.debug("called");
+        log.debug("called");
         return this.jobSubmissionRetryCount;
     }
 
@@ -428,7 +427,7 @@ public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
      */
     @Override
     public void incrJobSubmissionRetryCount() {
-        LOG.debug("called");
+        log.debug("called");
         this.jobSubmissionRetryCount.incrementAndGet();
     }
 }

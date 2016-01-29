@@ -21,9 +21,8 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.AttachmentService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -40,9 +39,8 @@ import java.io.InputStream;
  * @since 3.0.0
  */
 @Service
+@Slf4j
 public class FileSystemAttachmentService implements AttachmentService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(FileSystemAttachmentService.class);
 
     @Value("${com.netflix.genie.core.attachments.dir:#{null}}")
     private String attachmentsDirectory;
@@ -59,7 +57,7 @@ public class FileSystemAttachmentService implements AttachmentService {
         final File attachment = new File(this.getAttachmentDirectory(), jobId + "/" + filename);
         try {
             FileUtils.copyInputStreamToFile(content, attachment);
-            LOG.info("Saved " + filename + " to " + attachment.getAbsolutePath());
+            log.info("Saved " + filename + " to " + attachment.getAbsolutePath());
         } catch (final IOException ioe) {
             throw new GenieServerException(ioe);
         }
