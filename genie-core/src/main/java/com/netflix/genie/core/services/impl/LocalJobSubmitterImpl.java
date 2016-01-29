@@ -27,8 +27,7 @@ import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.FileCopyService;
 import com.netflix.genie.core.services.JobSubmitterService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,9 +42,9 @@ import java.util.List;
  * @author amsharma
  */
 @Service
+@Slf4j
 public class LocalJobSubmitterImpl implements JobSubmitterService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LocalJobSubmitterImpl.class);
     private final ClusterService clusterService;
     private final CommandService commandService;
     private final ApplicationService applicationService;
@@ -90,7 +89,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         @Valid
         final JobRequest jobRequest
     ) throws GenieException {
-        LOG.debug("called with job request {}", jobRequest);
+        log.debug("called with job request {}", jobRequest);
 
         // construct the job execution environment object for this job request
         final JobExecutionEnvironment jee = new JobExecutionEnvironment();

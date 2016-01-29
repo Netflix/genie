@@ -17,6 +17,21 @@ Genie is a federated job execution engine developed by Netflix. Genie provides R
 data jobs like Hadoop, Pig, Hive, Spark, Presto, Sqoop and more. It also provides APIs for managing many distributed
 processing cluster configurations and the commands and applications which run on them.
 
+## Builds
+
+Genie builds are run on Travis CI [here](https://travis-ci.org/Netflix/genie).
+
+|  Branch |                                                      Build                                                      |                                                                    Coverage                                                                   |
+|:-------:|:---------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------:|
+|  Master |  [![Build Status](https://img.shields.io/travis/Netflix/genie/master.svg)](https://travis-ci.org/Netflix/genie/branches) |  [![Code Coverage](https://img.shields.io/codecov/c/github/Netflix/genie/master.svg)](https://codecov.io/github/Netflix/genie?branch=master)  |
+| Develop | [![Build Status](https://img.shields.io/travis/Netflix/genie/develop.svg)](https://travis-ci.org/Netflix/genie/branches) | [![Code Coverage](https://img.shields.io/codecov/c/github/Netflix/genie/develop.svg)](https://codecov.io/github/Netflix/genie?branch=develop) |
+
+## Coverage Trends
+
+|  Branch |                                              Trend                                              |
+|:-------:|:-----------------------------------------------------------------------------------------------:|
+| develop | ![code coverage trend graph](https://codecov.io/github/Netflix/genie/branch.svg?branch=develop) |
+
 ## Documentation
 
 * Netflix Tech Blog Posts
@@ -44,27 +59,6 @@ processing cluster configurations and the commands and applications which run on
 Please see the [ZeroToDocker](https://github.com/Netflix-Skunkworks/zerotodocker) project for [instructions]
 (https://github.com/Netflix-Skunkworks/zerotodocker/wiki/Genie) of an end to end example in [Docker]
 (https://www.docker.com/).
-
-## API Validation
-
-[![Swagger Validation](http://online.swagger.io/validator?url=http://netflix.github.io/genie/docs/rest/swagger.json)]
-(http://netflix.github.io/genie/docs/rest/swagger.json)
-
-## Builds
-
-Genie builds are run on Travis CI [here](https://travis-ci.org/Netflix/genie).
-
-|  Branch |                                                      Build                                                      |                                                                    Coverage                                                                   |
-|:-------:|:---------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------:|
-|  Master |  [![Build Status](https://img.shields.io/travis/Netflix/genie/master.svg)](https://travis-ci.org/Netflix/genie/branches) |  [![Code Coverage](https://img.shields.io/codecov/c/github/Netflix/genie/master.svg)](https://codecov.io/github/Netflix/genie?branch=master)  |
-| Develop | [![Build Status](https://img.shields.io/travis/Netflix/genie/develop.svg)](https://travis-ci.org/Netflix/genie/branches) | [![Code Coverage](https://img.shields.io/codecov/c/github/Netflix/genie/develop.svg)](https://codecov.io/github/Netflix/genie?branch=develop) |
-
-## Coverage Trends
-
-|  Branch |                                                                    Trend                                                                   |
-|:-------:|:------------------------------------------------------------------------------------------------------------------------------------------:|
-|  Master |  [![codecov.io](https://codecov.io/github/Netflix/genie/branch.svg?branch=master)](https://codecov.io/github/Netflix/genie?branch=master)  |
-| Develop | [![codecov.io](https://codecov.io/github/Netflix/genie/branch.svg?branch=develop)](https://codecov.io/github/Netflix/genie?branch=develop) |
 
 ## Support
 

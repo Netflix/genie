@@ -37,11 +37,10 @@ import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.core.services.CommandService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,9 +68,9 @@ import java.util.stream.Collectors;
         ConstraintViolationException.class
     }
 )
+@Slf4j
 public class JpaCommandServiceImpl implements CommandService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JpaCommandServiceImpl.class);
     private final JpaCommandRepository commandRepo;
     private final JpaApplicationRepository appRepo;
     private final JpaClusterRepository clusterRepo;
@@ -103,7 +102,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @Valid
         final Command command
     ) throws GenieException {
-        LOG.debug("Called to create command {}", command);
+        log.debug("Called to create command {}", command);
         if (StringUtils.isNotBlank(command.getId()) && this.commandRepo.exists(command.getId())) {
             throw new GenieConflictException("A command with id " + command.getId() + " already exists");
         }
@@ -132,7 +131,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @NotBlank(message = "No id entered unable to get.")
         final String id
     ) throws GenieException {
-        LOG.debug("called");
+        log.debug("called");
         return this.findCommand(id).getDTO();
     }
 
@@ -148,7 +147,7 @@ public class JpaCommandServiceImpl implements CommandService {
         final Set<String> tags,
         final Pageable page
     ) {
-        LOG.debug("Called");
+        log.debug("Called");
 
         @SuppressWarnings("unchecked")
         final Page<CommandEntity> commandEntities = this.commandRepo.findAll(
@@ -182,7 +181,7 @@ public class JpaCommandServiceImpl implements CommandService {
             throw new GenieBadRequestException("Command id inconsistent with id passed in.");
         }
 
-        LOG.debug("Called to update command with id {} {}", id, updateCommand);
+        log.debug("Called to update command with id {} {}", id, updateCommand);
 
         final CommandEntity commandEntity = this.findCommand(id);
         commandEntity.setName(updateCommand.getName());
@@ -202,7 +201,7 @@ public class JpaCommandServiceImpl implements CommandService {
      */
     @Override
     public void deleteAllCommands() throws GenieException {
-        LOG.debug("Called to delete all commands");
+        log.debug("Called to delete all commands");
         for (final CommandEntity commandEntity : this.commandRepo.findAll()) {
             this.deleteCommand(commandEntity.getId());
         }
@@ -216,7 +215,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @NotBlank(message = "No id entered. Unable to delete.")
         final String id
     ) throws GenieException {
-        LOG.debug("Called to delete command config with id {}");
+        log.debug("Called to delete command config with id {}");
         final CommandEntity commandEntity = this.findCommand(id);
 
         //Remove the command from the associated Application references

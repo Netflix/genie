@@ -26,9 +26,8 @@ import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -62,9 +61,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(value = "/api/v3/clusters")
+@Slf4j
 public class ClusterRestController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterRestController.class);
 
     private final ClusterService clusterService;
     private final ClusterResourceAssembler clusterResourceAssembler;
@@ -98,7 +96,7 @@ public class ClusterRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createCluster(@RequestBody final Cluster cluster) throws GenieException {
-            LOG.debug("Called to create new cluster {}", cluster);
+        log.debug("Called to create new cluster {}", cluster);
         final String id = this.clusterService.createCluster(cluster);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -121,7 +119,7 @@ public class ClusterRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ClusterResource getCluster(@PathVariable("id") final String id) throws GenieException {
-            LOG.debug("Called with id: {}", id);
+        log.debug("Called with id: {}", id);
         return this.clusterResourceAssembler.toResource(this.clusterService.getCluster(id));
     }
 
@@ -150,8 +148,8 @@ public class ClusterRestController {
         @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Cluster> assembler
     ) throws GenieException {
-            LOG.debug("Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page]");
-            LOG.debug("{} | {} | {} | {} | {} | {}", name, statuses, tags, minUpdateTime, maxUpdateTime, page);
+        log.debug("Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page]");
+        log.debug("{} | {} | {} | {} | {} | {}", name, statuses, tags, minUpdateTime, maxUpdateTime, page);
         //Create this conversion internal in case someone uses lower case by accident?
         Set<ClusterStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
@@ -182,7 +180,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @RequestBody final Cluster updateCluster
     ) throws GenieException {
-            LOG.debug("Called to update cluster with id {} update fields {}", id, updateCluster);
+        log.debug("Called to update cluster with id {} update fields {}", id, updateCluster);
         this.clusterService.updateCluster(id, updateCluster);
     }
 
@@ -195,7 +193,7 @@ public class ClusterRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCluster(@PathVariable("id") final String id) throws GenieException {
-            LOG.debug("Delete called for id: {}", id);
+        log.debug("Delete called for id: {}", id);
         this.clusterService.deleteCluster(id);
     }
 
@@ -207,7 +205,7 @@ public class ClusterRestController {
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllClusters() throws GenieException {
-            LOG.debug("called");
+        log.debug("called");
         this.clusterService.deleteAllClusters();
     }
 
@@ -225,7 +223,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
     ) throws GenieException {
-            LOG.debug("Called with id {} and config {}", id, configs);
+        log.debug("Called with id {} and config {}", id, configs);
         this.clusterService.addConfigsForCluster(id, configs);
     }
 
@@ -240,7 +238,7 @@ public class ClusterRestController {
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getConfigsForCluster(@PathVariable("id") final String id) throws GenieException {
-            LOG.debug("Called with id {}", id);
+        log.debug("Called with id {}", id);
         return this.clusterService.getConfigsForCluster(id);
     }
 
@@ -259,7 +257,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
     ) throws GenieException {
-            LOG.debug("Called with id {} and configs {}", id, configs);
+        log.debug("Called with id {} and configs {}", id, configs);
         this.clusterService.updateConfigsForCluster(id, configs);
     }
 
@@ -273,7 +271,7 @@ public class ClusterRestController {
     @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllConfigsForCluster(@PathVariable("id") final String id) throws GenieException {
-            LOG.debug("Called with id {}", id);
+        log.debug("Called with id {}", id);
         this.clusterService.removeAllConfigsForCluster(id);
     }
 
@@ -291,7 +289,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
     ) throws GenieException {
-            LOG.debug("Called with id {} and tags {}", id, tags);
+        log.debug("Called with id {} and tags {}", id, tags);
         this.clusterService.addTagsForCluster(id, tags);
     }
 
@@ -308,7 +306,7 @@ public class ClusterRestController {
     public Set<String> getTagsForCluster(
         @PathVariable("id") final String id
     ) throws GenieException {
-            LOG.debug("Called with id {}", id);
+        log.debug("Called with id {}", id);
         return this.clusterService.getTagsForCluster(id);
     }
 
@@ -327,7 +325,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
     ) throws GenieException {
-            LOG.debug("Called with id {} and tags {}", id, tags);
+        log.debug("Called with id {} and tags {}", id, tags);
         this.clusterService.updateTagsForCluster(id, tags);
     }
 
@@ -341,7 +339,7 @@ public class ClusterRestController {
     @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllTagsForCluster(@PathVariable("id") final String id) throws GenieException {
-            LOG.debug("Called with id {}", id);
+        log.debug("Called with id {}", id);
         this.clusterService.removeAllTagsForCluster(id);
     }
 
@@ -359,7 +357,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @PathVariable("tag") final String tag
     ) throws GenieException {
-            LOG.debug("Called with id {} and tag {}", id, tag);
+        log.debug("Called with id {} and tag {}", id, tag);
         this.clusterService.removeTagForCluster(id, tag);
     }
 
@@ -377,7 +375,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @RequestBody final List<String> commandIds
     ) throws GenieException {
-            LOG.debug("Called with id {} and commandIds {}", id, commandIds);
+        log.debug("Called with id {} and commandIds {}", id, commandIds);
         this.clusterService.addCommandsForCluster(id, commandIds);
     }
 
@@ -396,7 +394,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) final Set<String> statuses
     ) throws GenieException {
-            LOG.debug("Called with id {} status {}", id, statuses);
+        log.debug("Called with id {} status {}", id, statuses);
 
         Set<CommandStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
@@ -429,7 +427,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @RequestBody final List<String> commandIds
     ) throws GenieException {
-            LOG.debug("Called with id {} and commandIds {}", id, commandIds);
+        log.debug("Called with id {} and commandIds {}", id, commandIds);
         this.clusterService.updateCommandsForCluster(id, commandIds);
     }
 
@@ -443,7 +441,7 @@ public class ClusterRestController {
     @RequestMapping(value = "/{id}/commands", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllCommandsForCluster(@PathVariable("id") final String id) throws GenieException {
-            LOG.debug("Called with id {}", id);
+        log.debug("Called with id {}", id);
         this.clusterService.removeAllCommandsForCluster(id);
     }
 
@@ -461,7 +459,7 @@ public class ClusterRestController {
         @PathVariable("id") final String id,
         @PathVariable("commandId") final String commandId
     ) throws GenieException {
-            LOG.debug("Called with id {} and command id {}", id, commandId);
+        log.debug("Called with id {} and command id {}", id, commandId);
         this.clusterService.removeCommandForCluster(id, commandId);
     }
 }
