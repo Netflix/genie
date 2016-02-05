@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.JobExecutor;
+import com.netflix.genie.core.jobs.JobExecutionHandler;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
@@ -121,16 +121,19 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         }
 
         // Job can be run as there is a valid cluster/command combination for it.
-        // TODO figure out mode
-        final JobExecutor jobExecutor = new JobExecutor(fileCopyServiceImpls, jee, "genie");
-        jobExecutor.execute();
 
-        final JobExecution jobExecution = new JobExecution.Builder(
-            jee.getHostname(),
-            jee.getProcessId()
-        )
-            .withId(jobRequest.getId())
-            .build();
+        final JobExecutionHandler jobExecutionHandler = new JobExecutionHandler();
+        final JobExecution jobExecution = jobExecutionHandler.handleJob(fileCopyServiceImpls, jee);
+        // TODO figure out mode
+//        final JobExecutor jobExecutor = new JobExecutor(fileCopyServiceImpls, jee, "genie");
+//        jobExecutor.execute();
+//
+//        final JobExecution jobExecution = new JobExecution.Builder(
+//            jee.getHostname(),
+//            jee.getProcessId()
+//        )
+//            .withId(jobRequest.getId())
+//            .build();
 
         this.jobPersistenceService.createJobExecution(jobExecution);
 
