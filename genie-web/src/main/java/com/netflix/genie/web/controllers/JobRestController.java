@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.AttachmentService;
-import com.netflix.genie.core.services.JobService;
+import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +74,7 @@ public class JobRestController {
     private static final Logger LOG = LoggerFactory.getLogger(JobRestController.class);
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-    private final JobService jobService;
+    private final JobCoordinatorService jobService;
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
 
@@ -87,7 +87,7 @@ public class JobRestController {
      */
     @Autowired
     public JobRestController(
-        final JobService jobService,
+        final JobCoordinatorService jobService,
         final AttachmentService attachmentService,
         final JobResourceAssembler jobResourceAssembler
     ) {
@@ -127,7 +127,7 @@ public class JobRestController {
             localClientHost = httpServletRequest.getRemoteAddr();
         }
 
-        final String id = this.jobService.processJob(jobRequest, localClientHost);
+        final String id = this.jobService.coordinateJob(jobRequest, localClientHost);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
