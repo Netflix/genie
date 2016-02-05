@@ -21,9 +21,9 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
-import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import org.apache.commons.lang3.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ import java.util.Set;
  */
 @Service
 @Slf4j
-public class JobServiceImpl implements JobService {
+public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
@@ -62,7 +62,7 @@ public class JobServiceImpl implements JobService {
      * @param jobSubmitterService   implementation of the job submitter service
      */
     @Autowired
-    public JobServiceImpl(
+    public JobCoordinatorServiceImpl(
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
         final JobSubmitterService jobSubmitterService
@@ -79,7 +79,7 @@ public class JobServiceImpl implements JobService {
      * @throws GenieException if there is an error
      */
     @Override
-    public String processJob(
+    public String coordinateJob(
         @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
         @Valid
         final JobRequest jobRequest,

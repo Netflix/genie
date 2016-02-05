@@ -34,7 +34,7 @@ import java.util.Set;
  * @author amsharma
  * @since 3.0.0
  */
-public interface JobService {
+public interface JobCoordinatorService {
     /**
      * Takes in a Job Request object and does necessary preparation for execution.
      *
@@ -43,7 +43,7 @@ public interface JobService {
      * @return the id of the job run
      * @throws GenieException if there is an error
      */
-    String processJob(
+    String coordinateJob(
             @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
             @Valid
             final JobRequest jobRequest,
