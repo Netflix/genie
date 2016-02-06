@@ -51,6 +51,7 @@ dependencies {
     testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
     testCompile("org.dbunit:dbunit:${dbunit_version}")
     testCompile("org.springframework.security:spring-security-test")
+    testCompile("net.sf.jtidy:jtidy:${jtidy_version}")
 }
 
 license {

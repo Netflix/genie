@@ -27,9 +27,9 @@ import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.JobResource;
+import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -41,6 +41,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,8 +51,11 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -68,31 +72,35 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping(value = "/api/v3/jobs")
+@Slf4j
 public class JobRestController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobRestController.class);
 //    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
     private final JobService jobService;
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
+    private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
 
     /**
      * Constructor.
      *
-     * @param jobService           The job search service to use.
-     * @param attachmentService    The attachment service to use to save attachments.
-     * @param jobResourceAssembler Assemble job resources out of jobs
+     * @param jobService                 The job search service to use.
+     * @param attachmentService          The attachment service to use to save attachments.
+     * @param jobResourceAssembler       Assemble job resources out of jobs
+     * @param resourceHttpRequestHandler The handler to return requests for static resources on the Genie File System.
      */
     @Autowired
     public JobRestController(
         final JobService jobService,
         final AttachmentService attachmentService,
-        final JobResourceAssembler jobResourceAssembler
+        final JobResourceAssembler jobResourceAssembler,
+        final GenieResourceHttpRequestHandler resourceHttpRequestHandler
     ) {
         this.jobService = jobService;
         this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
+        this.resourceHttpRequestHandler = resourceHttpRequestHandler;
     }
 
     /**
@@ -114,7 +122,7 @@ public class JobRestController {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
-        LOG.debug("Called to submit job: {}", jobRequest);
+        log.debug("Called to submit job: {}", jobRequest);
 
         //TODO: Re-implement with new API type call that passes info along
 //        // get client's host from the context
@@ -127,7 +135,7 @@ public class JobRestController {
 //
 //        // set the clientHost, if it is not overridden already
 //        if (StringUtils.isNotBlank(localClientHost)) {
-//            LOG.debug("called from: {}", localClientHost);
+//            log.debug("called from: {}", localClientHost);
 //            job.setClientHost(localClientHost);
 //        }
 
@@ -161,12 +169,12 @@ public class JobRestController {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
-        LOG.debug("Called to submit job: {}", jobRequest);
+        log.debug("Called to submit job: {}", jobRequest);
 
         final String jobId = UUID.randomUUID().toString();
         if (attachments != null) {
             for (final MultipartFile attachment : attachments) {
-                LOG.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
+                log.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
                 try {
                     this.attachmentService.save(jobId, attachment.getOriginalFilename(), attachment.getInputStream());
                 } catch (final IOException ioe) {
@@ -196,7 +204,7 @@ public class JobRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public JobResource getJob(@PathVariable("id") final String id) throws GenieException {
-        LOG.debug("called for job with id: {}", id);
+        log.debug("called for job with id: {}", id);
         return this.jobResourceAssembler.toResource(this.jobService.getJob(id));
     }
 
@@ -233,11 +241,11 @@ public class JobRestController {
         final Pageable page,
         final PagedResourcesAssembler<Job> assembler
     ) throws GenieException {
-        LOG.debug(
+        log.debug(
             "Called with "
                 + "[id | jobName | userName | statuses | clusterName | clusterId | page]"
         );
-        LOG.debug(
+        log.debug(
             "{} | {} | {} | {} | {} | {} | {}",
             id,
             name,
@@ -286,7 +294,7 @@ public class JobRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void killJob(@PathVariable("id") final String id) throws GenieException {
-        LOG.debug("Called for job id: {}", id);
+        log.debug("Called for job id: {}", id);
         //this.executionService.killJob(id);
     }
 
@@ -317,15 +325,41 @@ public class JobRestController {
     /**
      * Get the job output directory.
      *
-     * @param id The id of the job to get output for
+     * @param id       The id of the job to get output for
+     * @param request  the servlet request
      * @param response the servlet response to send the redirect with
-     * @throws IOException on redirect error
+     * @throws IOException      on redirect error
+     * @throws ServletException when trying to handle the request
      */
-    @RequestMapping(value = "/{id}/output", method = RequestMethod.GET)
+    @RequestMapping(
+        value = {
+            "/{id}/output",
+            "/{id}/output/",
+            "/{id}/output/**"
+        },
+        method = RequestMethod.GET,
+        produces = MediaType.ALL_VALUE
+    )
     public void getJobOutput(
         @PathVariable("id") final String id,
+        final HttpServletRequest request,
         final HttpServletResponse response
-    ) throws IOException {
-        response.sendRedirect("http://localhost:8080/genie-jobs/" + id);
+    ) throws IOException, ServletException {
+        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        if (path != null) {
+            final String bestMatchPattern
+                = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+            log.debug("bestMatchPattern = {}", bestMatchPattern);
+            path = new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, path);
+            if (StringUtils.isNotBlank(path)) {
+                request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, false);
+            } else {
+                request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
+            }
+        }
+        log.debug("PATH = {}", path);
+        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, id + "/" + path);
+
+        this.resourceHttpRequestHandler.handleRequest(request, response);
     }
 }
