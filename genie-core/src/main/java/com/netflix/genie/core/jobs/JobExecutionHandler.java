@@ -47,6 +47,7 @@ public class JobExecutionHandler extends JobSetupHandler {
     ) throws GenieException {
 
         super.handleJob(fileCopyServiceImpls, jobExecEnv);
+        startJob();
         return this.jobExecution;
     }
 
@@ -56,7 +57,6 @@ public class JobExecutionHandler extends JobSetupHandler {
      */
     protected void processJob() throws GenieException {
         //TODO copy down dependencies
-        makeDir(jobExecEnv.getJobWorkingDir() + "/job");
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
 
         if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
@@ -64,10 +64,10 @@ public class JobExecutionHandler extends JobSetupHandler {
             final String setupFileLocalPath = jobExecEnv.getJobWorkingDir()
                 + "/job/"
                 + setupFilePath.getFileName();
-            appendToWriter("source " + setupFileLocalPath + ";");
+            appendToGenieLauncherScript("source " + setupFileLocalPath + ";");
         }
 
-        appendToWriter(
+        appendToGenieLauncherScript(
             jobExecEnv.getCommand().getExecutable()
                 + " "
                 + jobExecEnv.getJobRequest().getCommandArgs()
@@ -77,8 +77,7 @@ public class JobExecutionHandler extends JobSetupHandler {
                 + STDERR_LOG_PATH
         );
             // capture exit code and write to genie.done file
-        appendToWriter("echo $? > " + GENIE_DONE_FILE);
-
+        appendToGenieLauncherScript("echo $? > " + GENIE_DONE_FILE);
     }
 
     /**
@@ -98,7 +97,7 @@ public class JobExecutionHandler extends JobSetupHandler {
             final Process process = pb.start();
             final String hostname = InetAddress.getLocalHost().getHostAddress();
             final int processId = getProcessId(process);
-            this.jobExecution = new JobExecution.Builder(hostname, processId).build();
+            this.jobExecution = new JobExecution.Builder(hostname, processId).withId(jobExecEnv.getId()).build();
         } catch (IOException ie) {
             throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
         }

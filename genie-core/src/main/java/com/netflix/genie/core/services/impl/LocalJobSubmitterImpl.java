@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.JobExecutionHandler;
+import com.netflix.genie.core.jobs.JobHandler;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
@@ -55,6 +55,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     private final CommandService commandService;
     private final ApplicationService applicationService;
     private final ClusterLoadBalancer clusterLoadBalancer;
+    private final JobHandler jobHandler;
     @Value("${com.netflix.genie.server.user.working.dir:/mnt/tomcat/genie-jobs}")
     private String baseWorkingDirPath;
     private List<FileCopyService> fileCopyServiceImpls;
@@ -68,6 +69,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param applicationService   Implementation of the application service interface
      * @param fileCopyServiceImpls List of implementations of the file copy interface
      * @param clusterLoadBalancer  Implementation of the cluster load balancer interface
+     * @param jobHandlerImpl       Implementation of the Job Handler Interface
      */
     @Autowired
     public LocalJobSubmitterImpl(
@@ -76,7 +78,8 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final CommandService commandService,
         final ApplicationService applicationService,
         final ClusterLoadBalancer clusterLoadBalancer,
-        final List<FileCopyService> fileCopyServiceImpls
+        final List<FileCopyService> fileCopyServiceImpls,
+        final JobHandler jobHandlerImpl
     ) {
 
         this.jobPersistenceService = jps;
@@ -84,6 +87,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         this.commandService = commandService;
         this.applicationService = applicationService;
         this.clusterLoadBalancer = clusterLoadBalancer;
+        this.jobHandler = jobHandlerImpl;
     }
 
     /**
@@ -101,10 +105,10 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         log.debug("called with job request {}", jobRequest);
 
         // construct the job execution environment object for this job request
-        final JobExecutionEnvironment jee = new JobExecutionEnvironment();
+        JobExecutionEnvironment jee = null;
 
         try {
-            jee.init(
+            jee = new JobExecutionEnvironment(
                 this.clusterService,
                 this.commandService,
                 this.applicationService,
@@ -120,22 +124,9 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
             throw gpe;
         }
 
+        // TODO need null check for jee here?
         // Job can be run as there is a valid cluster/command combination for it.
-
-        final JobExecutionHandler jobExecutionHandler = new JobExecutionHandler();
-        final JobExecution jobExecution = jobExecutionHandler.handleJob(fileCopyServiceImpls, jee);
-        // TODO figure out mode
-//        final JobExecutor jobExecutor = new JobExecutor(fileCopyServiceImpls, jee, "genie");
-//        jobExecutor.execute();
-//
-//        final JobExecution jobExecution = new JobExecution.Builder(
-//            jee.getHostname(),
-//            jee.getProcessId()
-//        )
-//            .withId(jobRequest.getId())
-//            .build();
-
-        this.jobPersistenceService.createJobExecution(jobExecution);
+        final JobExecution jobExecution = jobHandler.handleJob(fileCopyServiceImpls, jee);
 
         // Change status of job to Running
         this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
@@ -149,5 +140,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         this.jobPersistenceService.updateCommandForJob(
             jobRequest.getId(),
             jee.getCommand().getId());
+
+        this.jobPersistenceService.createJobExecution(jobExecution);
     }
 }

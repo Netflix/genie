@@ -25,9 +25,7 @@ import java.util.List;
  */
 public class JobSetupHandler implements JobHandler {
 
-
     private static final Logger LOG = LoggerFactory.getLogger(JobSetupHandler.class);
-    private static final String PID = "pid";
     private static final String GENIE_JOB_LAUNCHER_SCRIPT = "genie_job_launcher.sh";
 
     // Directory paths env variables
@@ -45,7 +43,6 @@ public class JobSetupHandler implements JobHandler {
 
     private Writer fileWriter;
 
-
     /**
      * Handles the job differently based on environment.
      *
@@ -60,7 +57,6 @@ public class JobSetupHandler implements JobHandler {
         final JobExecutionEnvironment jobExecuctionEnvironment
     ) throws GenieException {
 
-
         this.fileCopyServices = fileCopyServiceImpls;
         this.jobExecEnv = jobExecuctionEnvironment;
 
@@ -73,10 +69,8 @@ public class JobSetupHandler implements JobHandler {
         // iniitalize variables
         genieLauncherScript = this.jobWorkingDir + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
 
-        // create system directories
-        makeDir(jobExecEnv.getJobWorkingDir());
-        makeDir(jobExecEnv.getJobWorkingDir() + "/genie");
-        makeDir(jobExecEnv.getJobWorkingDir() + "/genie/logs");
+        // create top level directories
+        createTopLevelDirectories();
 
         // initialize the writer to create the joblauncher script
         initializeWriter();
@@ -90,25 +84,12 @@ public class JobSetupHandler implements JobHandler {
     }
 
     /**
-     * Method that sets up the current working directory for executing the job.
-     */
-    protected void setupWorkingDirectory() throws GenieException {
-
-        makeDir(jobExecEnv.getJobWorkingDir());
-        makeDir(jobExecEnv.getJobWorkingDir() + "/job");
-        makeDir(jobExecEnv.getJobWorkingDir() + "/cluster");
-        makeDir(jobExecEnv.getJobWorkingDir() + "/command");
-        makeDir(jobExecEnv.getJobWorkingDir() + "/applications");
-    }
-
-    /**
      * Process all applications content needed for the job to run.
      */
     protected void processApplications() throws GenieException {
 
-        makeDir(this.jobWorkingDir + "/applications");
         for (Application application : this.jobExecEnv.getApplications()) {
-            makeDir(jobExecEnv.getJobWorkingDir() + "/applications/" + application.getId());
+            createDirectory(jobExecEnv.getJobWorkingDir() + "/applications/" + application.getId());
 
             final String applicationSetupFile = application.getSetupFile();
 
@@ -119,7 +100,7 @@ public class JobSetupHandler implements JobHandler {
                     + application.getId()
                     + "/"
                     + setupFilePath.getFileName();
-                appendToWriter("source " + setupFileLocalPath + ";");
+                appendToGenieLauncherScript("source " + setupFileLocalPath + ";");
             }
             //TODO copy down dependencies
         }
@@ -131,8 +112,7 @@ public class JobSetupHandler implements JobHandler {
      */
     protected void processCommand() throws GenieException {
 
-        makeDir(this.jobWorkingDir + "/command");
-        makeDir(jobExecEnv.getJobWorkingDir() + "/command/" + jobExecEnv.getCommand().getId());
+        createDirectory(jobExecEnv.getJobWorkingDir() + "/command/" + jobExecEnv.getCommand().getId());
         final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
 
         if (commandSetupFile != null && StringUtils.isNotBlank(commandSetupFile)) {
@@ -142,7 +122,7 @@ public class JobSetupHandler implements JobHandler {
                 + jobExecEnv.getCommand().getId()
                 + "/"
                 + setupFilePath.getFileName();
-            appendToWriter("source " + setupFileLocalPath + ";");
+            appendToGenieLauncherScript("source " + setupFileLocalPath + ";");
 
         }
         //TODO copy down dependencies
@@ -152,8 +132,7 @@ public class JobSetupHandler implements JobHandler {
      * Process the cluster content needed for the job to run.
      */
     protected void processCluster() throws GenieException {
-        makeDir(this.jobWorkingDir + "/cluster");
-        makeDir(jobExecEnv.getJobWorkingDir() + "/cluster/" + jobExecEnv.getCluster().getId());
+        createDirectory(jobExecEnv.getJobWorkingDir() + "/cluster/" + jobExecEnv.getCluster().getId());
         //TODO copy down dependencies
     }
 
@@ -162,7 +141,6 @@ public class JobSetupHandler implements JobHandler {
      */
     protected void processJob() throws GenieException {
         //TODO copy down dependencies
-        makeDir(jobExecEnv.getJobWorkingDir() + "/job");
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
 
         if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
@@ -170,20 +148,12 @@ public class JobSetupHandler implements JobHandler {
             final String setupFileLocalPath = jobExecEnv.getJobWorkingDir()
                 + "/job/"
                 + setupFilePath.getFileName();
-            appendToWriter("source " + setupFileLocalPath + ";");
+            appendToGenieLauncherScript("source " + setupFileLocalPath + ";");
         }
 
-        appendToWriter(jobExecEnv.getCommand().getExecutable() + " " + jobExecEnv.getJobRequest().getCommandArgs());
-    }
-
-    /**
-     * Method to create directories on local unix filesystem.
-     *
-     * @param dirPath The directory path to create
-     * @throws GenieException
-     */
-    protected void makeDir(final String dirPath) throws GenieException {
-        this.executeBashCommand(Lists.newArrayList("mkdir", "-p", dirPath), null);
+        appendToGenieLauncherScript(jobExecEnv.getCommand().getExecutable()
+            + " "
+            + jobExecEnv.getJobRequest().getCommandArgs());
     }
 
     /**
@@ -203,11 +173,59 @@ public class JobSetupHandler implements JobHandler {
     }
 
     /**
+     * Appends content to the writer.
+     *
+     * @param content The content to write.
+     * @throws GenieException Throw exception in case of failure while writing content to writer.
+     */
+    protected void appendToGenieLauncherScript(final String content) throws GenieException {
+
+        try {
+            if (content != null && StringUtils.isNotBlank(content)) {
+                fileWriter.write(content);
+                fileWriter.write("\n");
+            }
+        } catch (IOException ioe) {
+            throw new GenieServerException("Error closing file writer", ioe);
+        }
+    }
+
+    /**
+     * Initializes the writer to create job_launcher_script.sh.
+     *
+     * @throws GenieException Throw exception in case of failure while intializing the writer
+     */
+    private void initializeWriter() throws GenieException {
+        try {
+            //fileWriter = new FileWriter(genieLauncherScript);
+            fileWriter = new OutputStreamWriter(new FileOutputStream(genieLauncherScript), "UTF-8");
+        } catch (IOException ioe) {
+            throw new GenieServerException("Could not open file to crate genie_launcher.sh", ioe);
+        }
+    }
+
+    /**
+     * Closes the writer to create job_launcher_script.sh.
+     *
+     * @throws GenieException Throw exception in case of failure while closing the writer
+     */
+    private void closeWriter() throws GenieException {
+
+        try {
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
+        } catch (IOException ioe) {
+            throw new GenieServerException("Error closing file writer", ioe);
+        }
+    }
+
+    /**
      * Helper method that executes a bash command.
      *
      * @param command An array consisting of the command to run
      */
-    protected void executeBashCommand(final List<String> command, final String workingDirectory) throws GenieException {
+    private void executeBashCommand(final List<String> command, final String workingDirectory) throws GenieException {
         final ProcessBuilder pb = new ProcessBuilder(command);
         if (workingDirectory != null) {
             pb.directory(new File(workingDirectory));
@@ -224,50 +242,22 @@ public class JobSetupHandler implements JobHandler {
     }
 
     /**
-     * Initializes the writer to create job_launcher_script.sh.
+     * Method to create directories on local unix filesystem.
      *
-     * @throws GenieException Throw exception in case of failure while intializing the writer
+     * @param dirPath The directory path to create
+     * @throws GenieException
      */
-    protected void initializeWriter() throws GenieException {
-        try {
-            //fileWriter = new FileWriter(genieLauncherScript);
-            fileWriter = new OutputStreamWriter(new FileOutputStream(genieLauncherScript), "UTF-8");
-        } catch (IOException ioe) {
-            throw new GenieServerException("Could not open file to crate genie_launcher.sh", ioe);
-        }
+    private void createDirectory(final String dirPath) throws GenieException {
+        this.executeBashCommand(Lists.newArrayList("mkdir", "-p", dirPath), null);
     }
 
-    /**
-     * Closes the writer to create job_launcher_script.sh.
-     *
-     * @throws GenieException Throw exception in case of failure while closing the writer
-     */
-    protected void closeWriter() throws GenieException {
-
-        try {
-            if (fileWriter != null) {
-                fileWriter.close();
-            }
-        } catch (IOException ioe) {
-            throw new GenieServerException("Error closing file writer", ioe);
-        }
-    }
-
-    /**
-     * Appends content to the writer.
-     *
-     * @param content The content to write.
-     * @throws GenieException Throw exception in case of failure while writing content to writer.
-     */
-    protected void appendToWriter(final String content) throws GenieException {
-
-        try {
-            if (content != null && StringUtils.isNotBlank(content)) {
-                fileWriter.write(content);
-                fileWriter.write("\n");
-            }
-        } catch (IOException ioe) {
-            throw new GenieServerException("Error closing file writer", ioe);
-        }
+    private void createTopLevelDirectories() throws GenieException {
+        createDirectory(this.jobExecEnv.getJobWorkingDir());
+        createDirectory(this.jobExecEnv.getJobWorkingDir() + "/genie");
+        createDirectory(this.jobExecEnv.getJobWorkingDir() + "/genie/logs");
+        createDirectory(this.jobWorkingDir + "/applications");
+        createDirectory(this.jobWorkingDir + "/command");
+        createDirectory(this.jobWorkingDir + "/cluster");
+        createDirectory(jobExecEnv.getJobWorkingDir() + "/job");
     }
 }
