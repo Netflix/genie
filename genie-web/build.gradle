@@ -69,7 +69,7 @@ startScripts.classpath.add(files('ext'))
 
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
 
-//tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
+//impl.withType(org.springframework.boot.gradle.run.BootRunTask) {
 //    classpath configurations.runtime + file('config')
 //    systemProperty('spring.profiles.active', env)
 //    addResources false

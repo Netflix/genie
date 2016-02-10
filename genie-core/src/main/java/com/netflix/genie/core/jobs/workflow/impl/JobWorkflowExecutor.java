@@ -1,6 +1,9 @@
-package com.netflix.genie.core.jobs;
+package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.jobs.workflow.Context;
+import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
+import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +14,7 @@ import java.util.List;
  * Implements the workflow executor to execute the job workflow.
  *
  * @author amsharma
+ * @since 3.0.0
  */
 @Slf4j
 @Component
@@ -37,7 +41,7 @@ public class JobWorkflowExecutor implements WorkflowExecutor {
         }
 
         // TODO need to throw this exception
-//        tasks.forEach(workflowTask -> {
+//        impl.forEach(workflowTask -> {
 //            try {
 //                workflowTask.executeTask(context);
 //            } catch (GenieException e) {

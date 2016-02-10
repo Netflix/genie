@@ -15,11 +15,25 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.jobs.workflow;
+
+import com.netflix.genie.common.exceptions.GenieException;
 
 /**
- * Classes which Genie will run basically as cron jobs to do various impl.
+ * Interface that defines a task in a workflow.
  *
- * @author tgianos
+ * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.web.tasks;
+public interface WorkflowTask {
+
+    /**
+     * Execute the task.
+     *
+     * @param context Information needed to execute the task
+     * @throws GenieException if there is an error
+     */
+    void executeTask(
+        Context context
+    ) throws GenieException;
+}

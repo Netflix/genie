@@ -17,9 +17,8 @@
  */
 
 /**
- * Classes which Genie will run basically as cron jobs to do various impl.
+ * Classes for core Genie job execution.
  *
- * @author tgianos
- * @since 3.0.0
+ * @author amsharma
  */
-package com.netflix.genie.web.tasks;
+package com.netflix.genie.core.jobs.workflow.impl;

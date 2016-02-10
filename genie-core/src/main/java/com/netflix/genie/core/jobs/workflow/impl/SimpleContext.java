@@ -1,5 +1,6 @@
-package com.netflix.genie.core.jobs;
+package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.netflix.genie.core.jobs.workflow.Context;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;

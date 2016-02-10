@@ -25,9 +25,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.SimpleContext;
-import com.netflix.genie.core.jobs.WorkflowExecutor;
-import com.netflix.genie.core.jobs.WorkflowTask;
+import com.netflix.genie.core.jobs.workflow.impl.SimpleContext;
+import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
+import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
@@ -82,7 +82,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param applicationService   Implementation of the application service interface
      * @param fileCopyServiceImpls List of implementations of the file copy interface
      * @param clusterLoadBalancer  Implementation of the cluster load balancer interface
-     * @param workflowExecutor An executor that executes tasks in a workflow
+     * @param workflowExecutor An executor that executes impl in a workflow
      */
     @Autowired
     // TODO Abuse of DI?
@@ -93,7 +93,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final ApplicationService applicationService,
         final ClusterLoadBalancer clusterLoadBalancer,
         final List<FileCopyService> fileCopyServiceImpls,
-       // final List<WorkflowTask> tasks,
+       // final List<WorkflowTask> impl,
         final WorkflowExecutor workflowExecutor
     ) {
 
@@ -102,7 +102,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         this.commandService = commandService;
         this.applicationService = applicationService;
         this.clusterLoadBalancer = clusterLoadBalancer;
-       // this.jobWorkflowTasks = tasks;
+       // this.jobWorkflowTasks = impl;
         this.wfExecutor = workflowExecutor;
     }
 

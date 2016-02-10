@@ -15,11 +15,26 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.jobs.workflow;
+
+import java.util.List;
 
 /**
- * Classes which Genie will run basically as cron jobs to do various impl.
+ * Execute a workflow. Any class implementing this interface should be able to take in a list of impl and execute them
+ * in order.
  *
- * @author tgianos
+ * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.web.tasks;
+public interface WorkflowExecutor {
+
+    /**
+     * Execute the workflow using the list of impl provided.
+     *
+     * @param tasks List of workflow impl to be executed
+     * @param context Information needed by individual impl in the workflow
+     *
+     * @return return true in case of successfull execution of workflow.
+     */
+    boolean executeWorkflow(List<WorkflowTask> tasks, Context context);
+}

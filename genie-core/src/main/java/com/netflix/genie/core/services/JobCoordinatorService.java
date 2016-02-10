@@ -29,7 +29,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
- * Interface that handles all job related tasks.
+ * Interface that handles all job related impl.
  *
  * @author amsharma
  * @since 3.0.0

@@ -18,12 +18,13 @@
 package com.netflix.genie;
 
 import com.google.common.collect.Maps;
-import com.netflix.genie.core.jobs.ApplicationTask;
-import com.netflix.genie.core.jobs.ClusterTask;
-import com.netflix.genie.core.jobs.CommandTask;
-import com.netflix.genie.core.jobs.IntialSetupTask;
-import com.netflix.genie.core.jobs.JobTask;
-import com.netflix.genie.core.jobs.WorkflowTask;
+import com.netflix.genie.core.jobs.workflow.impl.ApplicationTask;
+import com.netflix.genie.core.jobs.workflow.impl.ClusterTask;
+import com.netflix.genie.core.jobs.workflow.impl.CommandTask;
+import com.netflix.genie.core.jobs.workflow.impl.IntialSetupTask;
+import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
+import com.netflix.genie.core.jobs.workflow.impl.JobTask;
+import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -80,11 +81,10 @@ public class GenieWeb {
         return new MethodValidationPostProcessor();
     }
 
-
     /**
-     * Setup a bean to provide the list of tasks in the workflow.
+     * Setup a bean to provide the list of impl in the workflow.
      *
-     * @return List of workflow tasks.
+     * @return List of workflow impl.
      */
     @Bean
     public List<WorkflowTask> taskList() {
@@ -94,6 +94,7 @@ public class GenieWeb {
         taskList.add(new CommandTask());
         taskList.add(new ClusterTask());
         taskList.add(new JobTask());
+        taskList.add(new JobKickoffTask());
         return taskList;
     }
 }

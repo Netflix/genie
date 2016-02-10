@@ -23,7 +23,9 @@ import com.netflix.genie.common.dto.JobRequest;
  * Contains the logic to get all the details needed to run a job.
  * Resolves the criteria provided in the job request to construct the
  * JobExecutionEnvironment dto.
+ *
  * @author amsharma
+ * @since 3.0.0
  */
 public class JobEnvBuilder {
 
