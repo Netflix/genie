@@ -163,8 +163,9 @@ public class GenieResourceHttpRequestHandlerUnitTests {
         final String path = UUID.randomUUID().toString();
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(path);
         Mockito.when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(MediaType.TEXT_HTML_VALUE);
-        final String requestUrl = UUID.randomUUID().toString();
-        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(requestUrl));
+        final String forwardedUrl = UUID.randomUUID().toString();
+        Mockito.when(request.getHeader(GenieResourceHttpRequestHandler.GENIE_FORWARDED_FROM_HEADER))
+            .thenReturn(forwardedUrl);
         final Resource resource = Mockito.mock(Resource.class);
         Mockito.when(this.location.createRelative(Mockito.eq(path))).thenReturn(resource);
         Mockito.when(resource.exists()).thenReturn(true);
@@ -175,7 +176,7 @@ public class GenieResourceHttpRequestHandlerUnitTests {
         final String html = UUID.randomUUID().toString();
 
         Mockito.when(
-            this.directoryWriter.toHtml(Mockito.eq(file), Mockito.eq(requestUrl), Mockito.eq(false))
+            this.directoryWriter.toHtml(Mockito.eq(file), Mockito.eq(forwardedUrl), Mockito.eq(false))
         ).thenReturn(html);
 
         final ServletOutputStream os = Mockito.mock(ServletOutputStream.class);
@@ -186,7 +187,7 @@ public class GenieResourceHttpRequestHandlerUnitTests {
         Mockito.verify(response, Mockito.times(1)).setContentType(MediaType.TEXT_HTML_VALUE);
         Mockito.verify(response, Mockito.times(1)).getOutputStream();
         Mockito.verify(this.directoryWriter, Mockito.times(1))
-            .toHtml(Mockito.eq(file), Mockito.eq(requestUrl), Mockito.eq(false));
+            .toHtml(Mockito.eq(file), Mockito.eq(forwardedUrl), Mockito.eq(false));
         Mockito.verify(os, Mockito.times(1)).write(html.getBytes(Charset.forName("UTF-8")));
     }
 

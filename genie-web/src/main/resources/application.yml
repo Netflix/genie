@@ -25,7 +25,10 @@ eureka:
 
 genie:
   jobs:
-    dir: file:///tmp/genie/jobs/
+    dir:
+      forwarding:
+        enabled: true
+      location: file:///tmp/genie/jobs/
 
 management:
   context-path: /actuator

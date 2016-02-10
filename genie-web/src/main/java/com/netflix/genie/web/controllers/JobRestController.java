@@ -35,8 +35,8 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -84,13 +84,13 @@ import java.util.UUID;
 @Slf4j
 public class JobRestController {
 
-//    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
-
     private final JobService jobService;
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
-    private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
     private final String hostname;
+    private final HttpClient httpClient;
+    private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
+    private final boolean directoryForwardingEnabled;
 
     /**
      * Constructor.
@@ -99,7 +99,9 @@ public class JobRestController {
      * @param attachmentService          The attachment service to use to save attachments.
      * @param jobResourceAssembler       Assemble job resources out of jobs
      * @param hostname                   The hostname this Genie instance is running on
+     * @param httpClient                 The http client to use for forwarding requests
      * @param resourceHttpRequestHandler The handler to return requests for static resources on the Genie File System.
+     * @param directoryForwardingEnabled Whether job directory forwarding is enabled or not
      */
     @Autowired
     public JobRestController(
@@ -107,13 +109,17 @@ public class JobRestController {
         final AttachmentService attachmentService,
         final JobResourceAssembler jobResourceAssembler,
         final String hostname,
-        final GenieResourceHttpRequestHandler resourceHttpRequestHandler
+        final HttpClient httpClient,
+        final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
+        @Value("${genie.jobs.dir.forwarding.enabled}") final boolean directoryForwardingEnabled
     ) {
         this.jobService = jobService;
         this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
         this.hostname = hostname;
+        this.httpClient = httpClient;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
+        this.directoryForwardingEnabled = directoryForwardingEnabled;
     }
 
     /**
@@ -344,6 +350,7 @@ public class JobRestController {
      * @param response      the servlet response to send the redirect with
      * @throws IOException      on redirect error
      * @throws ServletException when trying to handle the request
+     * @throws GenieException   on any Genie internal error
      */
     @RequestMapping(
         value = {
@@ -362,68 +369,70 @@ public class JobRestController {
         ) final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
-    ) throws IOException, ServletException {
-        if (forwardedFrom != null) {
-            log.info("Forwarded from = {}", forwardedFrom);
-            //TODO: Query for hostname here?
-        }
-        //TODO: this is temporary for testing. remove for more robust solution
-        if (this.hostname.equals("a")) {
-            String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-            if (path != null) {
-                final String bestMatchPattern
-                    = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-                log.debug("bestMatchPattern = {}", bestMatchPattern);
-                path = new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, path);
-                if (StringUtils.isNotBlank(path)) {
-                    request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, false);
-                } else {
-                    request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
+    ) throws IOException, ServletException, GenieException {
+        // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
+        if (this.directoryForwardingEnabled && forwardedFrom == null) {
+            final String jobHostName = this.jobService.getJobHost(id);
+            if (!this.hostname.equals(jobHostName)) {
+                // Use Apache HttpClient for easier access to result bytes as stream than RestTemplate
+                // RestTemplate read entire byte[] payload into memory before the result object even given back to
+                // application control. Concerned about people getting stdout which could be huge file.
+                final HttpGet getRequest = new HttpGet(
+                    request.getScheme() + "://" + jobHostName + ":" + request.getServerPort() + request.getRequestURI()
+                );
+
+                // Copy all the headers (necessary for ACCEPT and security headers especially)
+                final Enumeration<String> headerNames = request.getHeaderNames();
+                if (headerNames != null) {
+                    while (headerNames.hasMoreElements()) {
+                        final String headerName = headerNames.nextElement();
+                        final String headerValue = request.getHeader(headerName);
+                        log.debug("Request Header: name = {} value = {}", headerName, headerValue);
+                        getRequest.addHeader(headerName, headerValue);
+                    }
                 }
-            }
-            log.debug("PATH = {}", path);
-            request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, id + "/" + path);
+                getRequest.addHeader(
+                    GenieResourceHttpRequestHandler.GENIE_FORWARDED_FROM_HEADER,
+                    request.getRequestURL().toString()
+                );
 
-            this.resourceHttpRequestHandler.handleRequest(request, response);
-        } else {
-            // Use Apache HttpClient for easier access to result bytes as stream than RestTemplate
-            // RestTemplate read entire byte[] payload into memory before the result object even given back to
-            // application control. Concerned about people getting stdout which could be huge file.
-            final HttpClient client = HttpClientBuilder.create().build();
-            final String url = "http://localhost:8080" + request.getRequestURI();
-            final HttpGet getRequest = new HttpGet(url);
-
-            // Copy all the headers (necessary for ACCEPT and security headers especially)
-            final Enumeration<String> headerNames = request.getHeaderNames();
-            if (headerNames != null) {
-                while (headerNames.hasMoreElements()) {
-                    final String headerName = headerNames.nextElement();
-                    final String headerValue = request.getHeader(headerName);
-                    log.debug("Request Header: name = {} value = {}", headerName, headerValue);
-                    getRequest.addHeader(headerName, headerValue);
+                final HttpResponse getResponse = this.httpClient.execute(getRequest);
+                if (getResponse.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
+                    response.sendError(getResponse.getStatusLine().getStatusCode());
+                    return;
                 }
-            }
-            getRequest.addHeader(
-                GenieResourceHttpRequestHandler.GENIE_FORWARDED_FROM_HEADER,
-                request.getRequestURL().toString()
-            );
 
-            final HttpResponse getResponse = client.execute(getRequest);
-            if (getResponse.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
-                response.sendError(getResponse.getStatusLine().getStatusCode());
+                response.setStatus(HttpStatus.OK.value());
+                for (final Header header : getResponse.getAllHeaders()) {
+                    response.setHeader(header.getName(), header.getValue());
+                }
+
+                // Documentation I could find pointed to the HttpEntity reading the bytes off the stream so this should
+                // resolve memory problems if the file returned is large
+                try (final InputStream inputStream = getResponse.getEntity().getContent()) {
+                    ByteStreams.copy(inputStream, response.getOutputStream());
+                }
+
+                //No need to search on this node
                 return;
             }
+        }
 
-            response.setStatus(HttpStatus.OK.value());
-            for (final Header header : getResponse.getAllHeaders()) {
-                response.setHeader(header.getName(), header.getValue());
-            }
-
-            // Documentation I could find pointed to the HttpEntity reading the bytes off the stream so this should
-            // resolve memory problems if the file returned is large
-            try (final InputStream inputStream = getResponse.getEntity().getContent()) {
-                ByteStreams.copy(inputStream, response.getOutputStream());
+        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        if (path != null) {
+            final String bestMatchPattern
+                = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+            log.debug("bestMatchPattern = {}", bestMatchPattern);
+            path = new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, path);
+            if (StringUtils.isNotBlank(path)) {
+                request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, false);
+            } else {
+                request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
             }
         }
+        log.debug("PATH = {}", path);
+        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, id + "/" + path);
+
+        this.resourceHttpRequestHandler.handleRequest(request, response);
     }
 }

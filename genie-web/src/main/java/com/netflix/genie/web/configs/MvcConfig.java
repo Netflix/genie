@@ -47,8 +47,8 @@ import java.net.UnknownHostException;
 @Configuration
 public class MvcConfig {
 
-    @Value("${genie.jobs.dir}")
-    private String jobsDir;
+    @Value("${genie.jobs.dir.location}")
+    private String jobsDirLocation;
 
     @Autowired
     private ApplicationContext context;
@@ -64,8 +64,7 @@ public class MvcConfig {
     @Bean
     @ConditionalOnMissingBean
     public String hostname() throws UnknownHostException {
-        return "a";
-//        return InetAddress.getLocalHost().getCanonicalHostName();
+        return InetAddress.getLocalHost().getCanonicalHostName();
     }
 
     /**
@@ -105,8 +104,8 @@ public class MvcConfig {
         final ResourceLoader loader = new DefaultResourceLoader();
 
         final String slash = "/";
-        String localJobsDir = this.jobsDir;
-        if (!this.jobsDir.endsWith(slash)) {
+        String localJobsDir = this.jobsDirLocation;
+        if (!this.jobsDirLocation.endsWith(slash)) {
             localJobsDir = localJobsDir + slash;
         }
         final Resource jobsDirResource = loader.getResource(localJobsDir);
@@ -115,7 +114,7 @@ public class MvcConfig {
             final File file = jobsDirResource.getFile();
             if (!file.mkdirs()) {
                 throw new IllegalStateException(
-                    "Unable to create jobs directory " + this.jobsDir + " and it doesn't exist."
+                    "Unable to create jobs directory " + this.jobsDirLocation + " and it doesn't exist."
                 );
             }
         }
