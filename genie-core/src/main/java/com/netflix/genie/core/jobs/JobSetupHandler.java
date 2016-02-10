@@ -66,7 +66,7 @@ public class JobSetupHandler implements JobHandler {
             this.jobWorkingDir = jobExecEnv.getJobWorkingDir();
         }
 
-        // iniitalize variables
+        // initialize variables
         genieLauncherScript = this.jobWorkingDir + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
 
         // create top level directories

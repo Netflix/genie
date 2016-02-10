@@ -18,6 +18,12 @@
 package com.netflix.genie;
 
 import com.google.common.collect.Maps;
+import com.netflix.genie.core.jobs.ApplicationTask;
+import com.netflix.genie.core.jobs.ClusterTask;
+import com.netflix.genie.core.jobs.CommandTask;
+import com.netflix.genie.core.jobs.IntialSetupTask;
+import com.netflix.genie.core.jobs.JobTask;
+import com.netflix.genie.core.jobs.WorkflowTask;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -27,6 +33,8 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,5 +78,22 @@ public class GenieWeb {
     @Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
+    }
+
+
+    /**
+     * Setup a bean to provide the list of tasks in the workflow.
+     *
+     * @return List of workflow tasks.
+     */
+    @Bean
+    public List<WorkflowTask> taskList() {
+        final List<WorkflowTask> taskList = new ArrayList<>();
+        taskList.add(new IntialSetupTask());
+        taskList.add(new ApplicationTask());
+        taskList.add(new CommandTask());
+        taskList.add(new ClusterTask());
+        taskList.add(new JobTask());
+        return taskList;
     }
 }

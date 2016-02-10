@@ -24,22 +24,24 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.core.jobs.WorkflowTask;
-import com.netflix.genie.core.jobs.WorkflowExecutor;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.SimpleContext;
-import com.netflix.genie.core.services.ApplicationService;
-import com.netflix.genie.core.services.ClusterLoadBalancer;
+import com.netflix.genie.core.jobs.WorkflowExecutor;
+import com.netflix.genie.core.jobs.WorkflowTask;
+import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.FileCopyService;
-import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.ApplicationService;
+import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.services.FileCopyService;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -54,12 +56,18 @@ import java.util.List;
 @Slf4j
 public class LocalJobSubmitterImpl implements JobSubmitterService {
 
+    private static final String JOB_EXECUTION_ENV_KEY = "jee";
+    private static final String JOB_EXECUTION_DTO_KEY = "jexecdto";
+
     private final JobPersistenceService jobPersistenceService;
     private final ClusterService clusterService;
     private final CommandService commandService;
     private final ApplicationService applicationService;
     private final ClusterLoadBalancer clusterLoadBalancer;
-    private final List<WorkflowTask> jobWorkflowTasks;
+
+    @Resource(name = "taskList")
+    private List<WorkflowTask> jobWorkflowTasks;
+
     @Value("${com.netflix.genie.server.user.working.dir:/mnt/tomcat/genie-jobs}")
     private String baseWorkingDirPath;
     private List<FileCopyService> fileCopyServiceImpls;
@@ -74,7 +82,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param applicationService   Implementation of the application service interface
      * @param fileCopyServiceImpls List of implementations of the file copy interface
      * @param clusterLoadBalancer  Implementation of the cluster load balancer interface
-     * @param tasks       Implementation of the Job Handler Interface
      * @param workflowExecutor An executor that executes tasks in a workflow
      */
     @Autowired
@@ -86,7 +93,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final ApplicationService applicationService,
         final ClusterLoadBalancer clusterLoadBalancer,
         final List<FileCopyService> fileCopyServiceImpls,
-        final List<WorkflowTask> tasks,
+       // final List<WorkflowTask> tasks,
         final WorkflowExecutor workflowExecutor
     ) {
 
@@ -95,7 +102,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         this.commandService = commandService;
         this.applicationService = applicationService;
         this.clusterLoadBalancer = clusterLoadBalancer;
-        this.jobWorkflowTasks = tasks;
+       // this.jobWorkflowTasks = tasks;
         this.wfExecutor = workflowExecutor;
     }
 
@@ -136,12 +143,12 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         // TODO need null check for jee here?
         // Job can be run as there is a valid cluster/command combination for it.
         final HashMap<String, Object> contextDetails = new HashMap<>();
-        contextDetails.put("jee", jee);
+        contextDetails.put(JOB_EXECUTION_ENV_KEY, jee);
         contextDetails.put("fc", fileCopyServiceImpls);
         final SimpleContext sc = new SimpleContext(contextDetails);
 
         if (this.wfExecutor.executeWorkflow(this.jobWorkflowTasks, sc)) {
-            final JobExecution jobExecution = (JobExecution) sc.getAttribute("jobExecDTO");
+            final JobExecution jobExecution = (JobExecution) sc.getAttribute(JOB_EXECUTION_DTO_KEY);
 
             // Change status of job to Running
             this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
@@ -160,6 +167,5 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         } else {
             throw new GenieServerException("Could not start genie job");
         }
-
     }
 }
