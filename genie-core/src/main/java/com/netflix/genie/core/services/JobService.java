@@ -99,4 +99,13 @@ public interface JobService {
             @NotBlank(message = "No job id provided. Unable to retrieve job.")
             final String jobId
     ) throws GenieException;
+
+    /**
+     * Get the hostname a job is running on.
+     *
+     * @param jobId The id of the job to get the hostname for
+     * @return The hostname
+     * @throws GenieException If the job isn't found or any other error
+     */
+    String getJobHost(@NotBlank final String jobId) throws GenieException;
 }

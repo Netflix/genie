@@ -22,11 +22,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import javax.validation.Validator;
 import java.util.Map;
 
 /**
@@ -38,6 +34,15 @@ import java.util.Map;
 @SpringBootApplication(exclude = {SessionAutoConfiguration.class, RedisAutoConfiguration.class})
 public class GenieWeb {
 
+    protected static final String SPRING_CONFIG_LOCATION = "spring.config.location";
+    protected static final String USER_HOME_GENIE = "${user.home}/.genie/";
+
+    /**
+     * Protected constructor.
+     */
+    protected GenieWeb() {
+    }
+
     /**
      * Spring Boot Main.
      *
@@ -45,30 +50,14 @@ public class GenieWeb {
      * @throws Exception For any failure during program execution
      */
     public static void main(final String[] args) throws Exception {
-        final Map<String, Object> defaultProperties = Maps.newHashMap();
-        defaultProperties.put("spring.config.location", "${user.home}/.genie/");
         final SpringApplication genie = new SpringApplication(GenieWeb.class);
-        genie.setDefaultProperties(defaultProperties);
+        genie.setDefaultProperties(getDefaultProperties());
         genie.run(args);
     }
 
-    /**
-     * Setup bean validation.
-     *
-     * @return The bean validator
-     */
-    @Bean
-    public Validator localValidatorFactoryBean() {
-        return new LocalValidatorFactoryBean();
-    }
-
-    /**
-     * Setup method parameter bean validation.
-     *
-     * @return The method validation processor
-     */
-    @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
-        return new MethodValidationPostProcessor();
+    protected static Map<String, Object> getDefaultProperties() {
+        final Map<String, Object> defaultProperties = Maps.newHashMap();
+        defaultProperties.put(SPRING_CONFIG_LOCATION, USER_HOME_GENIE);
+        return defaultProperties;
     }
 }

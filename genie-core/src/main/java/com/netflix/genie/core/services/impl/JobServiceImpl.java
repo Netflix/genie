@@ -18,9 +18,11 @@
 package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobService;
@@ -38,7 +40,7 @@ import java.util.Set;
 
 
 /**
- * Implementation of the JobService apis.
+ * Implementation of the JobService APIs.
  *
  * @author amsharma
  */
@@ -169,5 +171,18 @@ public class JobServiceImpl implements JobService {
         final String jobId
     ) throws GenieException {
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getJobHost(@NotBlank final String jobId) throws GenieException {
+        final JobExecution jobExecution = this.jobPersistenceService.getJobExecution(jobId);
+        if (jobExecution != null) {
+            return jobExecution.getHostName();
+        } else {
+            throw new GenieNotFoundException("No job execution found for id " + jobId);
+        }
     }
 }

@@ -23,6 +23,13 @@ eureka:
   client:
     enabled: false
 
+genie:
+  jobs:
+    dir:
+      forwarding:
+        enabled: true
+      location: file:///tmp/genie/jobs/
+
 management:
   context-path: /actuator
 

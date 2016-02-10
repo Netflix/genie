@@ -22,7 +22,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.metrics.JobCountManager;
-import com.netflix.genie.core.util.NetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,18 +48,18 @@ import java.util.List;
 @Slf4j
 public class JobCountManagerImpl implements JobCountManager {
 
-    private final NetUtil netUtil;
+    private final String hostname;
     @PersistenceContext
     private EntityManager em;
 
     /**
      * Constructor.
      *
-     * @param netUtil The net utility code to use.
+     * @param hostname the host name of this instance.
      */
     @Autowired
-    public JobCountManagerImpl(final NetUtil netUtil) {
-        this.netUtil = netUtil;
+    public JobCountManagerImpl(final String hostname) {
+        this.hostname = hostname;
     }
 
     /**
@@ -133,7 +132,6 @@ public class JobCountManagerImpl implements JobCountManager {
     @Override
     public String getIdleInstance(final long minJobThreshold) throws GenieException {
         log.debug("called");
-        final String localhost = this.netUtil.getHostName();
 
 //        // Get the App Name from Configuration
 //        final String appName = this.config.getString("APPNAME", "genie2");
@@ -180,6 +178,6 @@ public class JobCountManagerImpl implements JobCountManager {
         // no hosts found with numInstanceJobs < minJobThreshold, return current
         // instance
         log.info("Can't find any host to forward to - returning localhost");
-        return localhost;
+        return this.hostname;
     }
 }
