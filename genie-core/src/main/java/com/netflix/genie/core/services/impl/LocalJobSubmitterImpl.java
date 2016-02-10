@@ -23,8 +23,11 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.jobs.WorkflowTask;
+import com.netflix.genie.core.jobs.WorkflowExecutor;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.JobHandler;
+import com.netflix.genie.core.jobs.SimpleContext;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
@@ -39,6 +42,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -55,10 +59,11 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     private final CommandService commandService;
     private final ApplicationService applicationService;
     private final ClusterLoadBalancer clusterLoadBalancer;
-    private final JobHandler jobHandler;
+    private final List<WorkflowTask> jobWorkflowTasks;
     @Value("${com.netflix.genie.server.user.working.dir:/mnt/tomcat/genie-jobs}")
     private String baseWorkingDirPath;
     private List<FileCopyService> fileCopyServiceImpls;
+    private final WorkflowExecutor wfExecutor;
 
     /**
      * Constructor create the object.
@@ -69,9 +74,11 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param applicationService   Implementation of the application service interface
      * @param fileCopyServiceImpls List of implementations of the file copy interface
      * @param clusterLoadBalancer  Implementation of the cluster load balancer interface
-     * @param jobHandlerImpl       Implementation of the Job Handler Interface
+     * @param tasks       Implementation of the Job Handler Interface
+     * @param workflowExecutor An executor that executes tasks in a workflow
      */
     @Autowired
+    // TODO Abuse of DI?
     public LocalJobSubmitterImpl(
         final JobPersistenceService jps,
         final ClusterService clusterService,
@@ -79,7 +86,8 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final ApplicationService applicationService,
         final ClusterLoadBalancer clusterLoadBalancer,
         final List<FileCopyService> fileCopyServiceImpls,
-        final JobHandler jobHandlerImpl
+        final List<WorkflowTask> tasks,
+        final WorkflowExecutor workflowExecutor
     ) {
 
         this.jobPersistenceService = jps;
@@ -87,7 +95,8 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         this.commandService = commandService;
         this.applicationService = applicationService;
         this.clusterLoadBalancer = clusterLoadBalancer;
-        this.jobHandler = jobHandlerImpl;
+        this.jobWorkflowTasks = tasks;
+        this.wfExecutor = workflowExecutor;
     }
 
     /**
@@ -126,21 +135,31 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
 
         // TODO need null check for jee here?
         // Job can be run as there is a valid cluster/command combination for it.
-        final JobExecution jobExecution = jobHandler.handleJob(fileCopyServiceImpls, jee);
+        final HashMap<String, Object> contextDetails = new HashMap<>();
+        contextDetails.put("jee", jee);
+        contextDetails.put("fc", fileCopyServiceImpls);
+        final SimpleContext sc = new SimpleContext(contextDetails);
 
-        // Change status of job to Running
-        this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
+        if (this.wfExecutor.executeWorkflow(this.jobWorkflowTasks, sc)) {
+            final JobExecution jobExecution = (JobExecution) sc.getAttribute("jobExecDTO");
 
-        // Update the Cluster Information for the job
-        this.jobPersistenceService.updateClusterForJob(
-            jobRequest.getId(),
-            jee.getCluster().getId());
+            // Change status of job to Running
+            this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
 
-        // Update the Command Information for the job
-        this.jobPersistenceService.updateCommandForJob(
-            jobRequest.getId(),
-            jee.getCommand().getId());
+            // Update the Cluster Information for the job
+            this.jobPersistenceService.updateClusterForJob(
+                jobRequest.getId(),
+                jee.getCluster().getId());
 
-        this.jobPersistenceService.createJobExecution(jobExecution);
+            // Update the Command Information for the job
+            this.jobPersistenceService.updateCommandForJob(
+                jobRequest.getId(),
+                jee.getCommand().getId());
+
+            this.jobPersistenceService.createJobExecution(jobExecution);
+        } else {
+            throw new GenieServerException("Could not start genie job");
+        }
+
     }
 }
