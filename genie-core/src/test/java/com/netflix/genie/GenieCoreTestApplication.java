@@ -70,6 +70,16 @@ public class  GenieCoreTestApplication {
     }
 
     /**
+     * The hostname bean to use for integration tests.
+     *
+     * @return localhost always
+     */
+    @Bean
+    public String hostname() {
+        return "localhost";
+    }
+
+    /**
      * Get the DBUnit configuration.
      *
      * @return The config bean

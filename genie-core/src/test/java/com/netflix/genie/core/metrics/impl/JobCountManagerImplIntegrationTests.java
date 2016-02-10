@@ -19,13 +19,12 @@ package com.netflix.genie.core.metrics.impl;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
-import com.netflix.genie.test.categories.IntegrationTest;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.GenieCoreTestApplication;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.metrics.JobCountManager;
-import com.netflix.genie.core.util.NetUtil;
+import com.netflix.genie.test.categories.IntegrationTest;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -65,7 +64,7 @@ public class JobCountManagerImplIntegrationTests {
     private JobCountManager manager;
 
     @Autowired
-    private NetUtil netUtil;
+    private String hostname;
 
     /**
      * Test getting number of running jobs on one instance.
@@ -80,7 +79,6 @@ public class JobCountManagerImplIntegrationTests {
     public void testNumInstanceJobs() throws GenieException {
         //Force the hostname of the jobs to be the machine running the build
         //TODO: Can we do this via spring and injection of properties?
-        final String hostName = this.netUtil.getHostName();
         for (final JobEntity jobEntity : this.jobRepo.findAll()) {
 //            jobEntity.setHostName(hostName);
         }
@@ -113,7 +111,7 @@ public class JobCountManagerImplIntegrationTests {
         );
         Assert.assertEquals(1,
                 this.manager.getNumInstanceJobs(
-                        hostName,
+                        this.hostname,
                         two.getTimeInMillis(),
                         three.getTimeInMillis()
                 )

@@ -18,10 +18,13 @@
 package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+
 import com.netflix.genie.core.services.JobCoordinatorService;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
@@ -40,7 +43,7 @@ import java.util.Set;
 
 
 /**
- * Implementation of the JobService apis.
+ * Implementation of the JobService APIs.
  *
  * @author amsharma
  */
@@ -76,6 +79,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      * Takes in a Job Request persists it in db and then hands of the job to submitter interface to submit.
      *
      * @param jobRequest of job to run
+     * @param clientHost Hostname of the client sending request
      * @throws GenieException if there is an error
      */
     @Override
@@ -190,5 +194,18 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final String jobId
     ) throws GenieException {
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getJobHost(@NotBlank final String jobId) throws GenieException {
+        final JobExecution jobExecution = this.jobPersistenceService.getJobExecution(jobId);
+        if (jobExecution != null) {
+            return jobExecution.getHostName();
+        } else {
+            throw new GenieNotFoundException("No job execution found for id " + jobId);
+        }
     }
 }
