@@ -60,21 +60,6 @@ public class NetUtil {
     private String dcHostName;
 
     /**
-     * Returns the s3 location where job logs will be archived.
-     *
-     * @param jobID to build archive location for
-     * @return s3 location
-     */
-    public String getArchiveURI(final String jobID) {
-        log.debug("called for jobID: {}", jobID);
-        if (StringUtils.isNotBlank(this.s3ArchiveLocation)) {
-            return this.s3ArchiveLocation + "/" + jobID;
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Return either the cloud or dc host name, depending on the datacenter. If
      * the property com.netflix.genie.server.host is set, that value will always be
      * returned. If the property is not set, then the instance metadata will be
@@ -92,7 +77,7 @@ public class NetUtil {
         }
 
         // if hostName is not set by property, figure it out based on the datacenter
-        String hostName;
+        final String hostName;
         if (this.dataCenter != null && this.dataCenter.equals("cloud")) {
             hostName = getCloudHostName();
         } else {

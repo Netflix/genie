@@ -49,6 +49,11 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
     public static final String GENIE_JOB_IS_ROOT_DIRECTORY
         = GenieResourceHttpRequestHandler.class.getName() + ".isRootDirectory";
 
+    /**
+     * The header to use to mark a forwarded from another Genie node.
+     */
+    public static final String GENIE_FORWARDED_FROM_HEADER = "Genie-Forwarded-From";
+
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private DirectoryWriter directoryWriter;
@@ -89,7 +94,12 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
             final Object rootDirAttribute = request.getAttribute(GENIE_JOB_IS_ROOT_DIRECTORY);
             final boolean isRootDirectory = rootDirAttribute != null ? (Boolean) rootDirAttribute : true;
             final String accept = request.getHeader(HttpHeaders.ACCEPT);
-            final String requestUrl = request.getRequestURL().toString();
+            final String requestUrl;
+            if (request.getHeader(GENIE_FORWARDED_FROM_HEADER) != null) {
+                requestUrl = request.getHeader(GENIE_FORWARDED_FROM_HEADER);
+            } else {
+                requestUrl = request.getRequestURL().toString();
+            }
 
             try {
                 if (accept != null && accept.contains(MediaType.TEXT_HTML_VALUE)) {
