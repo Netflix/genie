@@ -36,6 +36,7 @@ public interface FileCopyService {
      * @return where the implementation can handle file based on prefix
      * @throws GenieException if there are errors
      */
+    // TODO can we use a map of file system type to impl
     boolean isValid(final String fileName) throws GenieException;
 
     /**

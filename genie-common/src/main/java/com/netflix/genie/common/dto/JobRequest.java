@@ -169,7 +169,7 @@ public class JobRequest extends CommonDTO {
     }
 
     /**
-     * Get the amount of memory the user is requesting for the job. Defaults to 1.5 GB (1560 MB).
+     * Get the amount of memory the user is requesting for the job. Defaults to 1.5 GB (1536 MB).
      *
      * @return The amount of memory the user is requesting in MB's.
      */
@@ -194,7 +194,7 @@ public class JobRequest extends CommonDTO {
         private boolean bDisableLogArchival;
         private String bEmail;
         private int bCpu = 1;
-        private int bMemory = 1560;
+        private int bMemory = 1536;
 
         /**
          * Constructor which has required fields.
@@ -299,7 +299,7 @@ public class JobRequest extends CommonDTO {
         }
 
         /**
-         * Set the amount of memory being requested to run the job. Defaults to 1560 MB if not set.
+         * Set the amount of memory being requested to run the job. Defaults to 1536 MB if not set.
          *
          * @param memory The amount of memory in terms of MB's. Must be greater than     0.
          * @return The builder

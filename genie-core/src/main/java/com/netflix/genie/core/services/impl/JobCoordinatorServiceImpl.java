@@ -21,13 +21,15 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
-import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.core.services.JobSubmitterService;
+import org.apache.commons.lang3.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,11 +46,13 @@ import java.util.Set;
  */
 @Service
 @Slf4j
-public class JobServiceImpl implements JobService {
+public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
+    @Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
+    private String baseArchiveLocation;
 
     /**
      * Constructor.
@@ -58,7 +62,7 @@ public class JobServiceImpl implements JobService {
      * @param jobSubmitterService   implementation of the job submitter service
      */
     @Autowired
-    public JobServiceImpl(
+    public JobCoordinatorServiceImpl(
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
         final JobSubmitterService jobSubmitterService
@@ -69,33 +73,50 @@ public class JobServiceImpl implements JobService {
     }
 
     /**
-     * Takes in a Job Request object and does necessary preparation for execution.
+     * Takes in a Job Request persists it in db and then hands of the job to submitter interface to submit.
      *
-     * @param jobRequest of job to kill
+     * @param jobRequest of job to run
      * @throws GenieException if there is an error
      */
     @Override
-    public String runJob(
+    public String coordinateJob(
         @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
         @Valid
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String clientHost
     ) throws GenieException {
         log.debug("Called with job request {}", jobRequest);
 
-        // TODO get client host at this point?
         // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
         // orginal request may or may not have it.
-        //    final JobRequest jobRequestWithId =
-        //          this.jobPersistenceService.createJobRequest(jobRequest);
+        final JobRequest jobRequestWithId =
+            this.jobPersistenceService.createJobRequest(jobRequest);
 
-        final JobRequest jobRequestWithId = jobRequest;
+        if (StringUtils.isNotBlank(clientHost)) {
+            this.jobPersistenceService.addClientHostToJobRequest(jobRequestWithId.getId(), clientHost);
+        }
+
+        String jobArchivalLocation = null;
+        if (!jobRequestWithId.isDisableLogArchival() && baseArchiveLocation != null) {
+           jobArchivalLocation = baseArchiveLocation + "/" + jobRequestWithId.getId();
+        }
+        // create the job object in the database with status INIT
+        final Job job  = new Job.Builder(
+                jobRequest.getName(),
+                jobRequest.getUser(),
+                jobRequest.getVersion()
+            )
+            .withArchiveLocation(jobArchivalLocation)
+            .withDescription(jobRequest.getDescription())
+            .withId(jobRequestWithId.getId())
+            .withStatus(JobStatus.INIT)
+            .withStatusMsg("Job Accepted and in initialization phase.")
+            .build();
+
+        this.jobPersistenceService.createJob(job);
+
         this.jobSubmitterService.submitJob(jobRequestWithId);
-
         return jobRequestWithId.getId();
-
-        // do basic validation of the request
-        // persist in various storage layers
-        // submit the job request to Job submitter interface
     }
 
     /**

@@ -24,21 +24,19 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.ApplicationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates the details of the job, cluster , command and applications needed to run a job.
@@ -55,10 +53,10 @@ public class JobExecutionEnvironment {
     private Command command;
     private List<Application> applications = new ArrayList<>();
     private String jobWorkingDir;
+    private String id;
 
     /**
-     * Initializes by Taking in a job request and figures out the cluster, command and applications
-     * to run the job.
+     * Constructor.
      *
      * @param clusterService implementation of ClusterService interface
      * @param commandService implementation of CommandService interface
@@ -68,7 +66,7 @@ public class JobExecutionEnvironment {
      * @param genieBaseWorkingDir Base working directory for all genie jobs
      * @throws GenieException exception if there is an error
      */
-    public void init(
+    public JobExecutionEnvironment(
         final ClusterService clusterService,
         final CommandService commandService,
         final ApplicationService applicationService,
@@ -77,18 +75,17 @@ public class JobExecutionEnvironment {
         final JobRequest jobReq,
         final String genieBaseWorkingDir
     ) throws GenieException {
-
         this.jobRequest = jobReq;
         final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
         enumStatuses.add(CommandStatus.ACTIVE);
 
         this.cluster = clusterLoadBalancer
-                        .selectCluster(clusterService.chooseClusterForJobRequest(jobRequest));
+            .selectCluster(clusterService.chooseClusterForJobRequest(jobRequest));
 
         // Find the command for the job
         for (final Command cmd : clusterService.getCommandsForCluster(
-                        this.cluster.getId(),
-                        enumStatuses
+            this.cluster.getId(),
+            enumStatuses
         )) {
             if (cmd.getTags().containsAll(this.jobRequest.getCommandCriteria())) {
                 this.command = cmd;
@@ -105,7 +102,60 @@ public class JobExecutionEnvironment {
 
         this.applications.addAll(commandService.getApplicationsForCommand(this.command.getId()));
         this.jobWorkingDir = genieBaseWorkingDir + "/" + jobRequest.getId();
+        this.id = jobRequest.getId();
     }
+
+//    /**
+//     * Initializes by Taking in a job request and figures out the cluster, command and applications
+//     * to run the job.
+//     *
+//     * @param clusterService implementation of ClusterService interface
+//     * @param commandService implementation of CommandService interface
+//     * @param applicationService implementation of ApplicationService interface
+//     * @param clusterLoadBalancer implementation of the ClusterLoadBalancer interface
+//     * @param jobReq The jobRequest object
+//     * @param genieBaseWorkingDir Base working directory for all genie jobs
+//     * @throws GenieException exception if there is an error
+//     */
+//    public void init(
+//        final ClusterService clusterService,
+//        final CommandService commandService,
+//        final ApplicationService applicationService,
+//        final ClusterLoadBalancer clusterLoadBalancer,
+//        @NotNull(message = "Cannot construct environment from null job request")
+//        final JobRequest jobReq,
+//        final String genieBaseWorkingDir
+//    ) throws GenieException {
+//
+//        this.jobRequest = jobReq;
+//        final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
+//        enumStatuses.add(CommandStatus.ACTIVE);
+//
+//        this.cluster = clusterLoadBalancer
+//                        .selectCluster(clusterService.chooseClusterForJobRequest(jobRequest));
+//
+//        // Find the command for the job
+//        for (final Command cmd : clusterService.getCommandsForCluster(
+//                        this.cluster.getId(),
+//                        enumStatuses
+//        )) {
+//            if (cmd.getTags().containsAll(this.jobRequest.getCommandCriteria())) {
+//                this.command = cmd;
+//                break;
+//            }
+//        }
+//
+//        //Avoiding NPE
+//        if (this.command == null) {
+//            final String msg = "No command found for params. Unable to continue.";
+//            LOG.error(msg);
+//            throw new GeniePreconditionException(msg);
+//        }
+//
+//        this.applications.addAll(commandService.getApplicationsForCommand(this.command.getId()));
+//        this.jobWorkingDir = genieBaseWorkingDir + "/" + jobRequest.getId();
+//        this.id = jobRequest.getId();
+//    }
 
     /**
      * Get the job information from the execution environment.
@@ -145,7 +195,7 @@ public class JobExecutionEnvironment {
     }
 
     /**
-     * Get the command information from the execution environment.
+     * Get the current working directory for the job to run.
      *
      * @return the working directory for the job
      */
@@ -153,5 +203,12 @@ public class JobExecutionEnvironment {
         return jobWorkingDir;
     }
 
-
+    /**
+     * Get the id assigned to the job.
+     *
+     * @return the id of the job
+     */
+    public String getId() {
+        return id;
+    }
 }

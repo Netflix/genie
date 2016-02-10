@@ -29,7 +29,7 @@ import javax.validation.Valid;
  * @author amsharma
  * @since 3.0.0
  */
-public interface JobSubmitterService {
+public interface  JobSubmitterService {
 
     /**
      * Submit the job for appropriate execution based on environment.

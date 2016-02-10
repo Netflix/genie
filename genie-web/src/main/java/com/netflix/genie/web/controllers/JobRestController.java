@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.AttachmentService;
-import com.netflix.genie.core.services.JobService;
+import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +43,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,6 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.EnumSet;
@@ -70,9 +72,9 @@ import java.util.UUID;
 public class JobRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobRestController.class);
-//    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
+    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-    private final JobService jobService;
+    private final JobCoordinatorService jobService;
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
 
@@ -85,7 +87,7 @@ public class JobRestController {
      */
     @Autowired
     public JobRestController(
-        final JobService jobService,
+        final JobCoordinatorService jobService,
         final AttachmentService attachmentService,
         final JobResourceAssembler jobResourceAssembler
     ) {
@@ -97,7 +99,9 @@ public class JobRestController {
     /**
      * Submit a new job.
      *
-     * @param jobRequest The job request information
+     * @param jobRequest         The job request information
+     * @param clientHost         client host sending the request
+     * @param httpServletRequest The http servlet request
      * @return The submitted job
      * @throws GenieException For any error
      */
@@ -105,33 +109,25 @@ public class JobRestController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
         @RequestBody
-        final JobRequest jobRequest    //,
-//            @RequestHeader(FORWARDED_FOR_HEADER)
-//            final String clientHost,
-//            final HttpServletRequest httpServletRequest
+        final JobRequest jobRequest,
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
+        final String clientHost,
+        final HttpServletRequest httpServletRequest
     ) throws GenieException {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
         LOG.debug("Called to submit job: {}", jobRequest);
 
-        //TODO: Re-implement with new API type call that passes info along
-//        // get client's host from the context
-//        String localClientHost;
-//        if (StringUtils.isNotBlank(clientHost)) {
-//            localClientHost = clientHost.split(",")[0];
-//        } else {
-//            localClientHost = httpServletRequest.getRemoteAddr();
-//        }
-//
-//        // set the clientHost, if it is not overridden already
-//        if (StringUtils.isNotBlank(localClientHost)) {
-//            LOG.debug("called from: {}", localClientHost);
-//            job.setClientHost(localClientHost);
-//        }
+        // get client's host from the context
+        String localClientHost;
+        if (StringUtils.isNotBlank(clientHost)) {
+            localClientHost = clientHost.split(",")[0];
+        } else {
+            localClientHost = httpServletRequest.getRemoteAddr();
+        }
 
-        final String id = this.jobService.runJob(jobRequest);
-        //final String id = "blah";
+        final String id = this.jobService.coordinateJob(jobRequest, localClientHost);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -174,7 +170,6 @@ public class JobRestController {
             }
         }
 
-//        final String id = this.executionService.submitJob(jobRequest);
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
