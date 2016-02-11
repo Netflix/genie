@@ -48,13 +48,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private Collection<AuthenticationProvider> providers;
 
     /**
-     * Global Authentication Manager.
-     *
-     * @return The authentication manager
-     * @throws Exception
+     * {@inheritDoc}
      */
-    @Override
     @Bean
+    @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }

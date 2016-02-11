@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.security;
 
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -54,30 +53,6 @@ public class SecurityConditions {
 
         @ConditionalOnProperty("security.oauth2.enabled")
         static class OnOAuth2 {
-        }
-    }
-
-    /**
-     * A class used to enable the Ping Federate based configuration any time both OAuth2 and Ping Federate are enabled.
-     *
-     * @author tgianos
-     * @since 3.0.0
-     */
-    public static class OnPingFederateEnabled extends AllNestedConditions {
-
-        /**
-         * Default Constructor sets the class parse time.
-         */
-        public OnPingFederateEnabled() {
-            super(ConfigurationPhase.PARSE_CONFIGURATION);
-        }
-
-        @ConditionalOnProperty("security.oauth2.enabled")
-        static class OnOAuth2 {
-        }
-
-        @ConditionalOnProperty("security.oauth2.pingfederate.enabled")
-        static class OnPingFederate {
         }
     }
 }
