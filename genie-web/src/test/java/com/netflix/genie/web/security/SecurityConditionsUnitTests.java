@@ -140,83 +140,6 @@ public class SecurityConditionsUnitTests {
         context.close();
     }
 
-    /**
-     * Test the OnPingFederateEnabled class.
-     */
-    @Test
-    public void testOnPingFederateEnabledConfiguration() {
-        final SecurityConditions.OnPingFederateEnabled onPingFederateEnabled
-            = new SecurityConditions.OnPingFederateEnabled();
-        Assert.assertThat(
-            onPingFederateEnabled.getConfigurationPhase(),
-            Matchers.is(ConfigurationCondition.ConfigurationPhase.PARSE_CONFIGURATION)
-        );
-    }
-
-    /**
-     * Test to make sure when Ping federate configuration isn't right the bean doesn't exist.
-     *
-     * @throws Exception on any error
-     */
-    @Test
-    public void cantEnableBeanWithPingFederateDisabled() throws Exception {
-        final AnnotationConfigApplicationContext context = this.load(
-            PingFederateEnabled.class,
-            "security.oauth2.enabled:false",
-            "security.oauth2.pingfederate.enabled:false"
-        );
-        Assert.assertFalse(context.containsBean("myBean"));
-        context.close();
-    }
-
-    /**
-     * Test to make sure when Ping federate configuration isn't right the bean doesn't exist.
-     *
-     * @throws Exception on any error
-     */
-    @Test
-    public void cantEnablePingFederateWithOauth2Disabled() throws Exception {
-        final AnnotationConfigApplicationContext context = this.load(
-            PingFederateEnabled.class,
-            "security.oauth2.enabled:false",
-            "security.oauth2.pingfederate.enabled:true"
-        );
-        Assert.assertFalse(context.containsBean("myBean"));
-        context.close();
-    }
-
-    /**
-     * Test to make sure when Ping federate configuration isn't right the bean doesn't exist.
-     *
-     * @throws Exception on any error
-     */
-    @Test
-    public void cantEnablePingFederateWithPingFederateDisabled() throws Exception {
-        final AnnotationConfigApplicationContext context = this.load(
-            PingFederateEnabled.class,
-            "security.oauth2.enabled:true",
-            "security.oauth2.pingfederate.enabled:false"
-        );
-        Assert.assertFalse(context.containsBean("myBean"));
-        context.close();
-    }
-
-    /**
-     * Test to make sure when Ping federate configuration is right the bean exists.
-     *
-     * @throws Exception on any error
-     */
-    @Test
-    public void canEnablePingFederate() throws Exception {
-        final AnnotationConfigApplicationContext context = this.load(
-            PingFederateEnabled.class,
-            "security.oauth2.enabled:true",
-            "security.oauth2.pingfederate.enabled:true"
-        );
-        Assert.assertTrue(context.containsBean("myBean"));
-        context.close();
-    }
-
     private AnnotationConfigApplicationContext load(final Class<?> config, final String... env) {
         final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
         EnvironmentTestUtils.addEnvironment(context, env);
@@ -231,24 +154,6 @@ public class SecurityConditionsUnitTests {
     @Configuration
     @Conditional(SecurityConditions.AnySecurityEnabled.class)
     public static class SecurityEnabled {
-
-        /**
-         * Stupid placeholder for tests.
-         *
-         * @return The bean
-         */
-        @Bean
-        public String myBean() {
-            return UUID.randomUUID().toString();
-        }
-    }
-
-    /**
-     * Configuration class for testing OnPingFederate enabled class.
-     */
-    @Configuration
-    @Conditional(SecurityConditions.OnPingFederateEnabled.class)
-    public static class PingFederateEnabled {
 
         /**
          * Stupid placeholder for tests.

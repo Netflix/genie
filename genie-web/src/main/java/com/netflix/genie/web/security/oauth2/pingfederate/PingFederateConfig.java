@@ -17,11 +17,10 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
-import com.netflix.genie.web.security.SecurityConditions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
@@ -32,7 +31,7 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
  * @author tgianos
  * @since 3.0.0
  */
-@Conditional(SecurityConditions.OnPingFederateEnabled.class)
+@ConditionalOnProperty(name = {"security.oauth2.enabled", "security.oauth2.pingfederate.enabled"})
 @Configuration
 public class PingFederateConfig {
 
