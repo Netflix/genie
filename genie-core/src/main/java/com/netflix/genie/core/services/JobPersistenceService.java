@@ -21,10 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-
 import com.netflix.genie.common.exceptions.GenieException;
-
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -103,16 +100,6 @@ public interface JobPersistenceService {
         final String jobId,
         @NotNull(message = "Command id cannot be null while updating command information")
         final String commandId
-    ) throws GenieException;
-
-    /**
-     * Update the execution environment for the job.
-     *
-     * @param jee The job execution environment information for a job
-     * @throws GenieException if there is an error
-     */
-    void addJobExecutionEnvironmentToJob(
-            final JobExecutionEnvironment jee
     ) throws GenieException;
 
     /**
