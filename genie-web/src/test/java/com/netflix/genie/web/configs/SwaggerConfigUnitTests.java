@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.swagger;
+package com.netflix.genie.web.configs;
 
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;

@@ -52,6 +52,12 @@ security:
 spring:
   application:
     name: genie
+  cloud:
+    cluster:
+      leader:
+        enabled: false
+      zookeeper:
+        namespace: /genie/leader/
   profiles:
     active: dev
   redis:
