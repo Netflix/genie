@@ -150,8 +150,11 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         if (this.wfExecutor.executeWorkflow(this.jobWorkflowTasks, sc)) {
             final JobExecution jobExecution = (JobExecution) sc.getAttribute(JOB_EXECUTION_DTO_KEY);
 
+            // Persist the jobExecution information. This also updates jobStatus to Running
+            this.jobPersistenceService.createJobExecution(jobExecution);
+
             // Change status of job to Running
-            this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
+            //this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
 
             // Update the Cluster Information for the job
             this.jobPersistenceService.updateClusterForJob(
@@ -163,7 +166,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
                 jobRequest.getId(),
                 jee.getCommand().getId());
 
-            this.jobPersistenceService.createJobExecution(jobExecution);
+
         } else {
             throw new GenieServerException("Could not start genie job");
         }

@@ -25,7 +25,6 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
@@ -196,9 +195,9 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      */
     @Override
     public void updateClusterForJob(
-        @NotNull(message = "Job id cannot be null while updating cluster information")
+        @NotBlank(message = "Job id cannot be null while updating cluster information")
         final String jobId,
-        @NotNull(message = "Cluster id cannot be null while updating cluster information")
+        @NotBlank(message = "Cluster id cannot be null while updating cluster information")
         final String clusterId
     ) throws GenieException {
         log.info("Called with jobId {} and clusterID {}", jobId, clusterId);
@@ -222,9 +221,9 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      */
     @Override
     public void updateCommandForJob(
-        @NotNull(message = "Job id cannot be null while updating command information")
+        @NotBlank(message = "Job id cannot be null while updating command information")
         final String jobId,
-        @NotNull(message = "Command id cannot be null while updating command information")
+        @NotBlank(message = "Command id cannot be null while updating command information")
         final String commandId
     ) throws GenieException {
         log.info("Called with jobId {} and commandId {}", jobId, commandId);
@@ -252,12 +251,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotBlank(message = "No id entered. Unable to get job request.")
         final String id
     ) throws GenieException {
-        log.debug("Called");
+        log.debug("Called with id {}", id);
         final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(id);
         if (jobRequestEntity != null) {
             return jobRequestEntity.getDTO();
         } else {
-            throw new GenieNotFoundException("No job with id " + id);
+            throw new GenieNotFoundException("No jobrequest with id " + id);
         }
     }
 
@@ -360,11 +359,10 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         // Since a job request object should always exist before the job object is saved
         // the id should never be null
         if (StringUtils.isBlank(jobExecution.getId())) {
-            throw new GenieServerException("Cannot create a job execution entry with id blank or null");
+            throw new GeniePreconditionException("Cannot create a job execution entry with id blank or null");
         }
 
         final JobEntity jobEntity = jobRepo.findOne(jobExecution.getId());
-
         if (jobEntity == null) {
             throw new GenieNotFoundException("Cannot find the job for the id of the jobExecution specified.");
         }
@@ -377,7 +375,8 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
 
         jobEntity.setExecution(jobExecutionEntity);
-
+        jobEntity.setStatus(JobStatus.RUNNING);
+        jobEntity.setStatusMsg("Job is Running");
     }
 
     /**
@@ -388,13 +387,14 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @throws GenieException if there is an error
      */
     @Override
+    //TODO get rid of exit code
     public void setExitCode(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
         @NotBlank(message = "Exit code cannot be blank")
         final int exitCode
     ) throws GenieException {
-        log.debug("Called");
+        log.debug("Called with id {} and exit code {}", id, exitCode);
         final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
         if (jobExecutionEntity != null) {
             jobExecutionEntity.setExitCode(exitCode);
