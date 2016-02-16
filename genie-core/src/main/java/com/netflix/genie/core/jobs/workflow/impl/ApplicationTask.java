@@ -18,18 +18,18 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.Context;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
+import com.netflix.genie.core.services.GenieFileTransferService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.io.Writer;
-import java.nio.file.Path;
 
 /**
  * Implementation of the workflow task for handling Applications that a job needs.
@@ -39,6 +39,9 @@ import java.nio.file.Path;
  */
 @Slf4j
 public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
+
+    private static final String APPLICATION_PATH_VAR = "applications";
+    private GenieFileTransferService fts;
 
     /**
      * {@inheritDoc}
@@ -54,8 +57,10 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
             (JobExecutionEnvironment) context.getAttribute(JOB_EXECUTION_ENV_KEY);
 
         if (jobExecEnv == null) {
-            throw new GenieServerException("Cannot run application task as jobExecutionEnvironment is null");
+            throw new GeniePreconditionException("Cannot run application task as jobExecutionEnvironment is null");
         }
+
+        this.fts = (GenieFileTransferService) context.getAttribute(FILE_TRANSFER_SERVICE_KEY);
 
         final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
         final Writer writer = getWriter(jobLauncherScriptPath);
@@ -65,18 +70,77 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
 
             final String applicationSetupFile = application.getSetupFile();
 
+            // Get the setup file if specified
             if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
-                final Path setupFilePath = new File(applicationSetupFile).toPath();
-                final String setupFileLocalPath = jobExecEnv.getJobWorkingDir()
-                    + "/applications/"
-                    + application.getId()
-                    + "/"
-                    + setupFilePath.getFileName();
-                appendToWriter(writer, "source " + setupFileLocalPath + ";");
-            }
-            //TODO copy down dependencies
-        }
+                final String localPath = fetchLocalFile(
+                    jobExecEnv.getJobWorkingDir(),
+                    application.getId(),
+                    applicationSetupFile,
+                    SETUP_FILE_PATH_PREFIX
+                );
 
+                fts.getFile(applicationSetupFile, localPath);
+                appendToWriter(writer, "source " + localPath + ";");
+            }
+
+            // Iterate over and get all dependencies
+            for (final String dependencyFile: application.getDependencies()) {
+                fetchLocalFile(
+                    jobExecEnv.getJobWorkingDir(),
+                    application.getId(),
+                    applicationSetupFile,
+                    DEPENDENCY_FILE_PATH_PREFIX
+                );
+            }
+
+            // Iterate over and get all configuration files
+            for (final String configFile: application.getConfigs()) {
+                fetchLocalFile(
+                    jobExecEnv.getJobWorkingDir(),
+                    application.getId(),
+                    applicationSetupFile,
+                    CONFIG_FILE_PATH_PREFIX
+                );
+            }
+        }
         closeWriter(writer);
+    }
+
+    /**
+     * Helper Function to fetch file to local dir.
+     *
+     * @param dir The directory where to copy the file
+     * @param id The id to be appended to the destination path
+     * @param filePath Source file path
+     * @param fileType Type of file like setup, config or dependency
+     * @return Local file path constructed where the file is copied to
+     *
+     * @throws GenieException If there is any problem
+     */
+    private String fetchLocalFile(
+        final String dir,
+        final String id,
+        final String filePath,
+        final String fileType
+    ) throws GenieException {
+        if (filePath != null && StringUtils.isNotBlank(filePath)) {
+            final String fileName = getFileNameFromPath(filePath);
+            final String localPath = new StringBuilder()
+                .append(dir)
+                .append(FILE_PATH_DELIMITER)
+                .append(APPLICATION_PATH_VAR)
+                .append(FILE_PATH_DELIMITER)
+                .append(id)
+                .append(FILE_PATH_DELIMITER)
+                .append(fileType)
+                .append(FILE_PATH_DELIMITER)
+                .append(fileName)
+                .toString();
+
+            this.fts.getFile(filePath, localPath);
+            return localPath;
+        } else {
+            throw new GenieBadRequestException("Invalid file path");
+        }
     }
 }

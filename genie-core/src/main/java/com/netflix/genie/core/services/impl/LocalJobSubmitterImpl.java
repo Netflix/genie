@@ -28,13 +28,14 @@ import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.impl.SimpleContext;
 import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
+import com.netflix.genie.core.services.GenieFileTransferService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.JobSubmitterService;
-import com.netflix.genie.core.services.FileCopyService;
+
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
 
     private static final String JOB_EXECUTION_ENV_KEY = "jee";
     private static final String JOB_EXECUTION_DTO_KEY = "jexecdto";
+    private static final String FILE_TRANSFER_SERVICE_KEY = "fts";
 
     private final JobPersistenceService jobPersistenceService;
     private final ClusterService clusterService;
@@ -70,7 +72,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
 
     @Value("${com.netflix.genie.server.user.working.dir:/mnt/tomcat/genie-jobs}")
     private String baseWorkingDirPath;
-    private List<FileCopyService> fileCopyServiceImpls;
+    private GenieFileTransferService fileTransferService;
     private final WorkflowExecutor wfExecutor;
 
     /**
@@ -80,7 +82,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param clusterService       Implementation of cluster service interface
      * @param commandService       Implementation of command service interface
      * @param applicationService   Implementation of the application service interface
-     * @param fileCopyServiceImpls List of implementations of the file copy interface
+     * @param fts File Transfer service
      * @param clusterLoadBalancer  Implementation of the cluster load balancer interface
      * @param workflowExecutor An executor that executes impl in a workflow
      */
@@ -92,7 +94,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final CommandService commandService,
         final ApplicationService applicationService,
         final ClusterLoadBalancer clusterLoadBalancer,
-        final List<FileCopyService> fileCopyServiceImpls,
+        final GenieFileTransferService fts,
        // final List<WorkflowTask> impl,
         final WorkflowExecutor workflowExecutor
     ) {
@@ -104,6 +106,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         this.clusterLoadBalancer = clusterLoadBalancer;
        // this.jobWorkflowTasks = impl;
         this.wfExecutor = workflowExecutor;
+        this.fileTransferService = fts;
     }
 
     /**
@@ -140,13 +143,11 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
             throw gpe;
         }
 
-       // Job can be run as there is a valid cluster/command combination for it.
+        // Job can be run as there is a valid cluster/command combination for it.
         final HashMap<String, Object> contextDetails = new HashMap<>();
 
         contextDetails.put(JOB_EXECUTION_ENV_KEY, jee);
-
-       // TODO replace with the filetransferservice abstraction
-        contextDetails.put("fc", fileCopyServiceImpls);
+        contextDetails.put(FILE_TRANSFER_SERVICE_KEY, fileTransferService);
 
         final SimpleContext sc = new SimpleContext(contextDetails);
 
@@ -155,9 +156,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
 
             // Persist the jobExecution information. This also updates jobStatus to Running
             this.jobPersistenceService.createJobExecution(jobExecution);
-
-            // Change status of job to Running
-            //this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.RUNNING, "Job is Running");
 
             // Update the Cluster Information for the job
             this.jobPersistenceService.updateClusterForJob(

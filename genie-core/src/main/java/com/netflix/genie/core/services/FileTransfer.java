@@ -20,32 +20,50 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.exceptions.GenieException;
 
 /**
- * API to handle file copying requested by genie jobs. There will be an implementation for different files systems
+ * API to handle file transfer for genie jobs. There will be an implementation for different files systems
  * including local.
  *
  * @author amsharma
  * @since 3.0.0
  */
-public interface FileCopyService {
+public interface FileTransfer {
 
     /**
-     * This method validates whether it can handle copy operation for a particular file
+     * This method validates whether it can handle operations for a particular file
      * based on the prefix of the file like s3://, hdfs:// etc.
      *
      * @param fileName file name to validate
-     * @return where the implementation can handle file based on prefix
+     * @return whether the implementation can handle file based on prefix
+     *
      * @throws GenieException if there are errors
      */
     // TODO can we use a map of file system type to impl
     boolean isValid(final String fileName) throws GenieException;
 
     /**
-     * Copies the files from source to destination.
+     * Gets a file from any remote location to Genie's local working directory.
      *
-     * @param srcPath Source path of the files to copy
-     * @param destPath Destination path of the files to copy to
+     * @param srcRemotePath Source path of the files to copy
+     * @param dstLocalPath Destination path of the files to copy to
+     *
      * @throws GenieException exception in case of an error
      */
-    void copy(final String srcPath, final String destPath) throws GenieException;
+    void getFile(String srcRemotePath, String dstLocalPath) throws GenieException;
 
+    /**
+     * Puts a file from Genie's local working directory to a remote location.
+     *
+     * @param srcLocalPath Source path of the files to copy
+     * @param dstRemotePath Destination path of the files to copy to
+     *
+     * @throws GenieException exception in case of an error
+     */
+    void putFile(String srcLocalPath, String dstRemotePath) throws GenieException;
 }
+
+//
+//    GenieFileTransferService {
+//
+//    Iterate over S3FileTransferService, LocalFileTransferService and try to get file/put file
+//
+//    }

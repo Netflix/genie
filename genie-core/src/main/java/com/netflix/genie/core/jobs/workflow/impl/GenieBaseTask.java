@@ -18,15 +18,18 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotBlank;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -41,6 +44,11 @@ public abstract class GenieBaseTask {
     // TODO move to common String constants class?
     protected static final String JOB_EXECUTION_ENV_KEY = "jee";
     protected static final String GENIE_JOB_LAUNCHER_SCRIPT = "genie_job_launcher.sh";
+    protected static final String FILE_TRANSFER_SERVICE_KEY = "fts";
+    protected static final String SETUP_FILE_PATH_PREFIX = "setup_file";
+    protected static final String DEPENDENCY_FILE_PATH_PREFIX = "dependencies";
+    protected static final String CONFIG_FILE_PATH_PREFIX = "config";
+    protected static final String FILE_PATH_DELIMITER = "/";
 
     // Directory paths env variables
     private static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
@@ -142,20 +150,23 @@ public abstract class GenieBaseTask {
         }
     }
 
-    //TODO get rid of this method and abstract it out in a different service
-//    /**
-//     * Method to iterate over a list of fileCopyImpls to copy files.
-//     *
-//     * @param src  The source path to copy
-//     * @param dest The destination path to copy
-//     */
-//    protected void copyFiles(final String src, final String dest) throws GenieException {
-//        for (final FileCopyService fcs : this.fileCopyServices) {
-//            if (fcs.isValid(src)) {
-//                fcs.copy(src, dest);
-//            } else {
-//                throw new GenieServerException("Genie not equipped to copy down files of this type.");
-//            }
-//        }
-//    }
+    /**
+     * Get the name of the file specified in the path.
+     *
+     * @param filePath Path of the file
+     * @return The name of the file
+     *
+     * @throws GenieException if there is any problem
+     */
+    protected String getFileNameFromPath(
+        @NotBlank
+        final String filePath
+    ) throws GenieException {
+        final Path path = new File(filePath).toPath().getFileName();
+        if (path != null) {
+            return path.toString();
+        } else {
+            throw new GenieBadRequestException("Could not figure filename for path");
+        }
+    }
 }
