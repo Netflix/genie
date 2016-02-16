@@ -92,7 +92,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         log.debug("Called with job request {}", jobRequest);
 
         // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
-        // orginal request may or may not have it.
+        // orginal request may or may not have an id.
         final JobRequest jobRequestWithId =
             this.jobPersistenceService.createJobRequest(jobRequest);
 
@@ -118,7 +118,6 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             .build();
 
         this.jobPersistenceService.createJob(job);
-
         this.jobSubmitterService.submitJob(jobRequestWithId);
         return jobRequestWithId.getId();
     }

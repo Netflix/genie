@@ -140,11 +140,14 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
             throw gpe;
         }
 
-        // TODO need null check for jee here?
-        // Job can be run as there is a valid cluster/command combination for it.
+       // Job can be run as there is a valid cluster/command combination for it.
         final HashMap<String, Object> contextDetails = new HashMap<>();
+
         contextDetails.put(JOB_EXECUTION_ENV_KEY, jee);
+
+       // TODO replace with the filetransferservice abstraction
         contextDetails.put("fc", fileCopyServiceImpls);
+
         final SimpleContext sc = new SimpleContext(contextDetails);
 
         if (this.wfExecutor.executeWorkflow(this.jobWorkflowTasks, sc)) {
@@ -165,8 +168,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
             this.jobPersistenceService.updateCommandForJob(
                 jobRequest.getId(),
                 jee.getCommand().getId());
-
-
         } else {
             throw new GenieServerException("Could not start genie job");
         }

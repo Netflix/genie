@@ -17,7 +17,10 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.JobCoordinatorService;
@@ -30,8 +33,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -43,7 +49,12 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class JobCoordinatorServiceImplUnitTests {
 
-    private JobCoordinatorService jobService;
+    private static final String JOB_1_ID = "job1";
+    private static final String JOB_1_NAME = "relativity";
+    private static final String JOB_1_USER = "einstien";
+    private static final String JOB_1_VERSION = "1.0";
+
+    private JobCoordinatorService jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
     private JobSearchService jobSearchService;
     private JobSubmitterService jobSubmitterService;
@@ -57,13 +68,69 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
 
-        this.jobService = new JobCoordinatorServiceImpl(
+        this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
             this.jobSearchService,
             this.jobSubmitterService
         );
     }
 
+    /**
+     * Test the coordinate job method.
+     *
+     * @throws GenieException If there is any problem
+     */
+    @Test
+    public void testCoordinateJob() throws GenieException {
+        final int cpu = 1;
+        final int mem = 1;
+        final String email = "name@domain.com";
+        final String setupFile = "setupFilePath";
+        final String group = "group";
+        final String description = "job description";
+        final Set<String> tags = new HashSet<>();
+        final String clientHost = "localhost";
+        tags.add("foo");
+        tags.add("bar");
+
+
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_1_NAME,
+            JOB_1_USER,
+            JOB_1_VERSION,
+            null,
+            null,
+            null
+
+        ).withId(JOB_1_ID)
+            .withDescription(description)
+            .withCpu(cpu)
+            .withMemory(mem)
+            .withEmail(email)
+            .withSetupFile(setupFile)
+            .withGroup(group)
+            .withTags(tags)
+            .withDisableLogArchival(false)
+            .build();
+
+        Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
+        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+
+        this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
+
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).addClientHostToJobRequest(JOB_1_ID, clientHost);
+        Mockito.verify(this.jobSubmitterService, Mockito.times(1)).submitJob(jobRequest);
+
+        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
+
+        Assert.assertEquals(JOB_1_ID, argument.getValue().getId());
+        Assert.assertEquals(JOB_1_NAME, argument.getValue().getName());
+        Assert.assertEquals(JOB_1_USER, argument.getValue().getUser());
+        Assert.assertEquals(JOB_1_VERSION, argument.getValue().getVersion());
+        Assert.assertEquals(JobStatus.INIT, argument.getValue().getStatus());
+        Assert.assertEquals(description, argument.getValue().getDescription());
+        Assert.assertNull(argument.getValue().getArchiveLocation());
+    }
     /**
      * Make sure if a job execution isn't found it returns a GenieNotFound exception.
      *
@@ -73,7 +140,7 @@ public class JobCoordinatorServiceImplUnitTests {
     public void cantGetJobHostIfNoJobExecution() throws GenieException {
         final String jobId = UUID.randomUUID().toString();
         Mockito.when(this.jobPersistenceService.getJobExecution(Mockito.eq(jobId))).thenReturn(null);
-        this.jobService.getJobHost(jobId);
+        this.jobCoordinatorService.getJobHost(jobId);
     }
 
     /**
@@ -89,6 +156,6 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(jobExecution.getHostName()).thenReturn(hostname);
         Mockito.when(this.jobPersistenceService.getJobExecution(Mockito.eq(jobId))).thenReturn(jobExecution);
 
-        Assert.assertThat(this.jobService.getJobHost(jobId), Matchers.is(hostname));
+        Assert.assertThat(this.jobCoordinatorService.getJobHost(jobId), Matchers.is(hostname));
     }
 }
