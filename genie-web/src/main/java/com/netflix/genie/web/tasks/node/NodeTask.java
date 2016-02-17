@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,28 +15,16 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.tasks.impl;
+package com.netflix.genie.web.tasks.node;
 
-import com.netflix.genie.test.categories.UnitTest;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import com.netflix.genie.web.tasks.GenieTask;
 
 /**
- * Test code for the job janitor class, which marks un-updated jobs as zombies.
+ * Interface that should be implemented by any class that represents a task the Genie system should run periodically
+ * on a node.
  *
  * @author tgianos
+ * @since 3.0.0
  */
-@Category(UnitTest.class)
-public class JobJanitorImplUnitTests {
-
-    /**
-     * Test whether the janitor cleans up zombie jobs correctly.
-     *
-     * @throws Exception For any issue
-     */
-    @Test
-    @Ignore
-    public void testMarkZombies() throws Exception {
-    }
+public interface NodeTask extends GenieTask {
 }

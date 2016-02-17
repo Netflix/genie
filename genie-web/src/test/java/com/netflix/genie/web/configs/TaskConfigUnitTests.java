@@ -15,11 +15,27 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.configs;
+
+import com.netflix.genie.test.categories.UnitTest;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
- * Classes involved in leadership election and tasks associated with being a cluster leader.
+ * Unit tests for the TaskConfig class.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.leader;
+@Category(UnitTest.class)
+public class TaskConfigUnitTests {
+
+    /**
+     * Make sure we get a valid task scheduler to use.
+     */
+    @Test
+    public void canGetTaskScheduler() {
+        Assert.assertNotNull(new TaskConfig().taskScheduler());
+    }
+}

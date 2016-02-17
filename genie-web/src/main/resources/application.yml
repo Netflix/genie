@@ -29,6 +29,8 @@ genie:
       forwarding:
         enabled: true
       location: file:///tmp/genie/jobs/
+  leader:
+    enabled: false
 
 management:
   context-path: /actuator
