@@ -17,10 +17,16 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.cloud:spring-cloud-cluster-autoconfigure:${spring_cloud_cluster_version}")
+    compile("org.springframework.cloud:spring-cloud-cluster-zookeeper:${spring_cloud_cluster_version}")
 //    compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_eureka_version}")
     compile("org.springframework.security.extensions:spring-security-saml2-core:${spring_security_saml_version}")
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("org.springframework.session:spring-session")
+
+    // Swagger libs
+    compile("io.springfox:springfox-swagger2:${springfox_version}")
+    compile("io.springfox:springfox-swagger-ui:${springfox_version}")
 
     // Web Jars
     compile("org.webjars:bootstrap:${bootstrap_version}")
@@ -43,8 +49,6 @@ dependencies {
     /*******************************
      * Runtime Dependencies
      *******************************/
-
-    runtime(project(":genie-swagger"))
 
     /*******************************
      * Test Dependencies

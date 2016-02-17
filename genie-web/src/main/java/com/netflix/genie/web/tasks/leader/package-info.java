@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,20 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.tasks;
 
 /**
- * Janitor thread that marks jobs as zombies if status hasn't been updated for
- * the configured timeout.
+ * Classes involved in leadership election and tasks associated with being a cluster leader.
  *
- * @author skrishnan
  * @author tgianos
+ * @since 3.0.0
  */
-public interface JobJanitor {
-
-    /**
-     * Mark jobs as zombies if status hasn't been updated for
-     * com.netflix.genie.server.janitor.zombie.delta.ms.
-     */
-    void markZombies();
-}
+package com.netflix.genie.web.tasks.leader;

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
  */
 
 /**
- * Swagger related classes for Genie. Optional to run Genie so broken out into their own project.
+ * Tests for AWS config classes.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.swagger;
+package com.netflix.genie.web.configs.aws;

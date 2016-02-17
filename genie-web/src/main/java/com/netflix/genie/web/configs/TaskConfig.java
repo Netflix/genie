@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,22 +15,29 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.tasks;
+package com.netflix.genie.web.configs;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- * Monitor thread that routinely updates the statistics object.
+ * Configuration of beans for asynchronous tasks within Genie.
  *
- * @author skrishnan
  * @author tgianos
+ * @since 3.0.0
  */
-public interface JobCountMonitor {
+@Configuration
+public class TaskConfig {
 
     /**
-     * Update all the job counts.
+     * Get a task scheduler.
      *
-     * @throws GenieException for any issue during execution
+     * @return The task scheduler
      */
-    void updateJobCounts() throws GenieException;
+    @Bean
+    public TaskScheduler taskScheduler() {
+        return new ThreadPoolTaskScheduler();
+    }
 }
