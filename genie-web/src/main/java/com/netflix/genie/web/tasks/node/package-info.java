@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
  */
 
 /**
- * Implementations of the task interfaces.
+ * Classes that run as tasks on every node in a Genie cluster.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.tasks.impl;
+package com.netflix.genie.web.tasks.node;

@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.swagger;
+package com.netflix.genie.web.configs;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -70,4 +70,7 @@ public class SwaggerConfig {
             .pathMapping("/")
             .useDefaultResponseMessages(false);
     }
+
+    //TODO: Update with more detailed swagger configurations
+    //      see: http://tinyurl.com/glla6vc
 }

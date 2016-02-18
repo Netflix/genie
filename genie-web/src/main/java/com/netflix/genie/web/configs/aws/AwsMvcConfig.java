@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * Beans and configuration specifically for MVC on AWS.
@@ -40,6 +41,12 @@ import java.io.IOException;
 @Slf4j
 public class AwsMvcConfig {
 
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
+
+    // See: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
+    protected HttpGet publicHostnameGet = new HttpGet("http://169.254.169.254/latest/meta-data/public-hostname");
+    protected HttpGet localIPV4HostnameGet = new HttpGet("http://169.254.169.254/latest/meta-data/local-ipv4");
+
     /**
      * Get the hostname for this application by calling the AWS metadata endpoints. Overrides default implementation
      * which defaults to using InetAddress class. Only active when profile enabled.
@@ -50,21 +57,17 @@ public class AwsMvcConfig {
      */
     @Bean
     public String hostname(final HttpClient httpClient) throws IOException {
-        // See: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
-        final HttpGet publicHostnameGet = new HttpGet("http://169.254.169.254/latest/meta-data/public-hostname");
-        final HttpGet localIPV4HostnameGet = new HttpGet("http://169.254.169.254/latest/meta-data/local-ipv4");
-
-        final HttpResponse publicHostnameResponse = httpClient.execute(publicHostnameGet);
+        final HttpResponse publicHostnameResponse = httpClient.execute(this.publicHostnameGet);
         if (publicHostnameResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-            final String hostname = EntityUtils.toString(publicHostnameResponse.getEntity());
-            log.info("\n\n\nPublic Hostname: {}\n\n\n", hostname);
+            final String hostname = EntityUtils.toString(publicHostnameResponse.getEntity(), UTF_8);
+            log.debug("AWS Public Hostname: {}", hostname);
             return hostname;
         }
 
-        final HttpResponse ipv4Response = httpClient.execute(localIPV4HostnameGet);
+        final HttpResponse ipv4Response = httpClient.execute(this.localIPV4HostnameGet);
         if (ipv4Response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-            final String hostname = EntityUtils.toString(ipv4Response.getEntity());
-            log.info("\n\n\nIPV4 Hostname: {}\n\n\n", hostname);
+            final String hostname = EntityUtils.toString(ipv4Response.getEntity(), UTF_8);
+            log.debug("AWS IPV4 Hostname: {}", hostname);
             return hostname;
         }
 

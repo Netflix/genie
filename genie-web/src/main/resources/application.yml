@@ -29,6 +29,8 @@ genie:
       forwarding:
         enabled: true
       location: file:///tmp/genie/jobs/
+  leader:
+    enabled: false
 
 management:
   context-path: /actuator
@@ -52,6 +54,12 @@ security:
 spring:
   application:
     name: genie
+  cloud:
+    cluster:
+      leader:
+        enabled: false
+      zookeeper:
+        namespace: /genie/leader/
   profiles:
     active: dev
   redis:

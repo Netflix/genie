@@ -23,7 +23,6 @@ import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -47,11 +46,16 @@ import java.net.UnknownHostException;
 @Configuration
 public class MvcConfig {
 
-    @Value("${genie.jobs.dir.location}")
-    private String jobsDirLocation;
-
-    @Autowired
-    private ApplicationContext context;
+    /**
+     * Get a resource loader.
+     *
+     * @return a DefaultResourceLoader
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public ResourceLoader resourceLoader() {
+        return new DefaultResourceLoader();
+    }
 
     /**
      * Get the hostname for this application. This is the default fallback implementation if no other bean with
@@ -92,35 +96,45 @@ public class MvcConfig {
     /**
      * Get a static resource handler for Genie Jobs.
      *
+     * @param resourceLoader  The resource loader to use
      * @param directoryWriter The directory writer to use for converting directory resources
+     * @param context         The spring application context
+     * @param jobsDirLocation The location the user is requesting the jobs be stored
      * @return The genie resource http request handler.
      * @throws IOException For any issues with files
      */
     @Bean
     @ConditionalOnMissingBean
     public GenieResourceHttpRequestHandler genieResourceHttpRequestHandler(
-        final DirectoryWriter directoryWriter
+        final ResourceLoader resourceLoader,
+        final DirectoryWriter directoryWriter,
+        final ApplicationContext context,
+        @Value("${genie.jobs.dir.location}") final String jobsDirLocation
     ) throws IOException {
-        final ResourceLoader loader = new DefaultResourceLoader();
+        final Resource tmpJobsDirResource = resourceLoader.getResource(jobsDirLocation);
+        if (tmpJobsDirResource.exists() && !tmpJobsDirResource.getFile().isDirectory()) {
+            throw new IllegalStateException(jobsDirLocation + " exists but isn't a directory. Unable to continue");
+        }
 
+        // We want the resource to end in a slash for use later in the generation of URL's
         final String slash = "/";
-        String localJobsDir = this.jobsDirLocation;
-        if (!this.jobsDirLocation.endsWith(slash)) {
+        String localJobsDir = jobsDirLocation;
+        if (!jobsDirLocation.endsWith(slash)) {
             localJobsDir = localJobsDir + slash;
         }
-        final Resource jobsDirResource = loader.getResource(localJobsDir);
+        final Resource jobsDirResource = resourceLoader.getResource(localJobsDir);
 
         if (!jobsDirResource.exists()) {
             final File file = jobsDirResource.getFile();
             if (!file.mkdirs()) {
                 throw new IllegalStateException(
-                    "Unable to create jobs directory " + this.jobsDirLocation + " and it doesn't exist."
+                    "Unable to create jobs directory " + jobsDirLocation + " and it doesn't exist."
                 );
             }
         }
 
         final GenieResourceHttpRequestHandler handler = new GenieResourceHttpRequestHandler(directoryWriter);
-        handler.setApplicationContext(this.context);
+        handler.setApplicationContext(context);
         handler.setLocations(Lists.newArrayList(jobsDirResource));
 
         return handler;

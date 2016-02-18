@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,11 +15,27 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.configs;
+
+import com.netflix.genie.test.categories.UnitTest;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
- * Tests for Swagger related functionality for Genie.
+ * Unit tests for the TaskConfig class.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.swagger;
+@Category(UnitTest.class)
+public class TaskConfigUnitTests {
+
+    /**
+     * Make sure we get a valid task scheduler to use.
+     */
+    @Test
+    public void canGetTaskScheduler() {
+        Assert.assertNotNull(new TaskConfig().taskScheduler());
+    }
+}

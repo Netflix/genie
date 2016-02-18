@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,32 +15,57 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.swagger;
+package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
 
 /**
- * Unit tests for the SwaggerConfig class.
+ * Unit tests for the ZombieTask class.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class SwaggerConfigUnitTests {
+public class ZombieTaskUnitTests {
+
+    private ZombieTask task;
 
     /**
-     * Test to make sure the Swagger SpringFox docket is created properly.
+     * Setup for the tests.
+     */
+    @Before
+    public void setup() {
+        this.task = new ZombieTask();
+    }
+
+    /**
+     * Make sure run method works.
      */
     @Test
-    public void canCreateDocket() {
-        final SwaggerConfig config = new SwaggerConfig();
-        final Docket docket = config.genieApi();
-        Assert.assertThat(docket.getDocumentationType(), Matchers.is(DocumentationType.SWAGGER_2));
+    public void canRun() {
+        // TODO: flesh out once this is implemented
+        this.task.run();
+    }
+
+    /**
+     * Make sure the trigger is null.
+     */
+    @Test
+    public void canGetTrigger() {
+        Assert.assertNull(this.task.getTrigger());
+    }
+
+    /**
+     * Make sure the get period returns the correct value.
+     */
+    @Test
+    public void canGetPeriod() {
+        // TODO: flesh out
+        Assert.assertThat(this.task.getPeriod(), Matchers.is(45000L));
     }
 }

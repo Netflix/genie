@@ -28,6 +28,7 @@ import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -55,6 +56,7 @@ public class  GenieCoreTestApplication {
      * @return The bean validator
      */
     @Bean
+    @ConditionalOnMissingBean
     public Validator localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
     }
@@ -65,6 +67,7 @@ public class  GenieCoreTestApplication {
      * @return The method validation processor
      */
     @Bean
+    @ConditionalOnMissingBean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }
