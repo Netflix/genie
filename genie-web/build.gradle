@@ -30,6 +30,7 @@ dependencies {
     // Web Jars
     compile("org.webjars:bootstrap:${bootstrap_version}")
     compile("org.webjars:datatables:${datatables_version}")
+    compile("org.webjars:hal-browser")
     compile("org.webjars:jquery:${jquery_version}")
     compile("org.webjars:knockout:${knockout_version}")
     compile("org.webjars:lodash:${lodash_version}")
