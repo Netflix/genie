@@ -255,7 +255,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.get(this.actuatorEndpoint + "/beans", expectedResult);
         this.get(this.actuatorEndpoint + "/configprops", expectedResult);
         this.get(this.actuatorEndpoint + "/env", expectedResult);
-        this.get(this.actuatorEndpoint + "/health", expectedResult);
+        this.get(this.actuatorEndpoint + "/health", OK);
         this.get(this.actuatorEndpoint + "/info", expectedResult);
         this.get(this.actuatorEndpoint + "/mappings", expectedResult);
         this.get(this.actuatorEndpoint + "/metrics", expectedResult);
