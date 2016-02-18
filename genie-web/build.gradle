@@ -1,4 +1,3 @@
-apply plugin: 'application'
 apply plugin: 'spring-boot'
 
 dependencies {
@@ -71,22 +70,13 @@ jar {
     }
 }
 
-// Configure the Application Plugin
-mainClassName = "com.netflix.genie.GenieWeb"
-startScripts.classpath.add(files('ext'))
+springBoot {
+    layout = 'ZIP'
+}
 
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
-
-//tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
-//    classpath configurations.runtime + file('config')
-//    systemProperty('spring.profiles.active', env)
-//    addResources false
-//}
 
 bootRun {
     addResources = false
     systemProperty 'spring.profiles.active', env
 }
-
-// Turn off the boot "fatjar" repackaging so as to use the Application deployment
-tasks.bootRepackage.enabled = false
