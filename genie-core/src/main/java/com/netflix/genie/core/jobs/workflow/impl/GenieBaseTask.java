@@ -24,6 +24,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
+
 
 /**
  * An abstract class that all classes that implement a workflow task should inherit from. Provides some
@@ -61,8 +63,12 @@ public abstract class GenieBaseTask {
      * Helper method that executes a bash command.
      *
      * @param command An array consisting of the command to run
+     * @param workingDirectory The working directory to set while running the command
+     *
+     * @throws GenieException If there is problem.
      */
-    protected void executeBashCommand(
+    public void executeBashCommand(
+        @NotNull(message = "The command to be run cannot be empty.")
         final List<String> command,
         final String workingDirectory
     ) throws GenieException {
@@ -74,11 +80,13 @@ public abstract class GenieBaseTask {
             final Process process = pb.start();
             final int errCode = process.waitFor();
             if (errCode != 0) {
-                throw new GenieServerException("Unable to execute bash command {}" + String.valueOf(command));
+                throw new GenieServerException("Unable to execute bash command " + String.valueOf(command));
             }
         } catch (InterruptedException | IOException ie) {
-            throw new GenieServerException("Unable to execute bash command {} with exception {}"
-                + String.valueOf(command), ie);
+            throw new GenieServerException("Unable to execute bash command "
+                + String.valueOf(command)
+                + " with exception "
+                +  ie.toString());
         }
     }
 
@@ -86,9 +94,10 @@ public abstract class GenieBaseTask {
      * Method to create directories on local unix filesystem.
      *
      * @param dirPath The directory path to create
-     * @throws GenieException
+     * @throws GenieException If there is a problem.
      */
-    protected void createDirectory(
+    public void createDirectory(
+        @NotBlank(message = "Directory path cannot be blank.")
         final String dirPath
     ) throws GenieException {
         this.executeBashCommand(Lists.newArrayList("mkdir", "-p", dirPath), null);
@@ -97,10 +106,15 @@ public abstract class GenieBaseTask {
     /**
      * Initializes the writer to create job_launcher_script.sh.
      *
+     * @param filePath The path of the file to which we need a file handle.
+     * @return Return a writer object to the file specified
+     *
      * @throws GenieException Throw exception in case of failure while intializing the writer
      */
-    protected Writer getWriter(
-        final String filePath) throws GenieException {
+    public Writer getWriter(
+        @NotBlank(message = "Path of the file cannot be blank.")
+        final String filePath
+    ) throws GenieException {
         try {
             //fileWriter = new FileWriter(genieLauncherScript);
             return new OutputStreamWriter(new FileOutputStream(filePath, true), "UTF-8");
@@ -113,9 +127,11 @@ public abstract class GenieBaseTask {
     /**
      * Closes the stream to the writer supplied.
      *
+     * @param writer The writer object to close
+     *
      * @throws GenieException Throw exception in case of failure while closing the writer
      */
-    protected void closeWriter(
+    public void closeWriter(
         final Writer writer
     ) throws GenieException {
 
@@ -136,6 +152,7 @@ public abstract class GenieBaseTask {
      * @throws GenieException Throw exception in case of failure while writing content to writer.
      */
     protected void appendToWriter(
+        @NotNull(message = "Cannot write to null writer")
         final Writer writer,
         final String content
     ) throws GenieException {
@@ -158,8 +175,8 @@ public abstract class GenieBaseTask {
      *
      * @throws GenieException if there is any problem
      */
-    protected String getFileNameFromPath(
-        @NotBlank
+    public String getFileNameFromPath(
+        @NotBlank (message = "The path of the file cannot be blank.")
         final String filePath
     ) throws GenieException {
         final Path path = new File(filePath).toPath().getFileName();

@@ -22,6 +22,12 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.retry:spring-retry")
+    compile("org.springframework.cloud:spring-cloud-aws-context:1.0.4.RELEASE")
+    compile("org.springframework.cloud:spring-cloud-aws-autoconfigure:1.0.4.RELEASE")
+
+    // AWS Libs
+    compile('com.amazonaws:aws-java-sdk-sts:1.9.6')
+
 
     /*******************************
      * Provided Dependencies

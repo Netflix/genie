@@ -67,9 +67,11 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     private final ApplicationService applicationService;
     private final ClusterLoadBalancer clusterLoadBalancer;
 
+    // TODO move to construtor
     @Resource(name = "taskList")
     private List<WorkflowTask> jobWorkflowTasks;
 
+    // TODO move to new property name
     @Value("${com.netflix.genie.server.user.working.dir:/mnt/tomcat/genie-jobs}")
     private String baseWorkingDirPath;
     private GenieFileTransferService fileTransferService;

@@ -88,7 +88,7 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
                 fetchLocalFile(
                     jobExecEnv.getJobWorkingDir(),
                     application.getId(),
-                    applicationSetupFile,
+                    dependencyFile,
                     DEPENDENCY_FILE_PATH_PREFIX
                 );
             }
@@ -98,7 +98,7 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
                 fetchLocalFile(
                     jobExecEnv.getJobWorkingDir(),
                     application.getId(),
-                    applicationSetupFile,
+                    configFile,
                     CONFIG_FILE_PATH_PREFIX
                 );
             }

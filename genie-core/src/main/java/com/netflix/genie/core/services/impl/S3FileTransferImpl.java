@@ -17,10 +17,12 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.FileTransfer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +36,29 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Component
 public class S3FileTransferImpl implements FileTransfer {
+
+    private AmazonS3Client s3Client;
+
+    @Value("${cloud.aws.credentials.accessKey:ACCESS_ID}")
+    private String awsAccessid;
+
+    @Value("${cloud.aws.credentials.secretKey:SECRET}")
+    private String awsSecret;
+
+    S3FileTransferImpl() throws GenieException {
+
+        // TODO implement support for Assuming IAM Roles
+//        final AWSCredentialsProvider cp =
+//            new STSAssumeRoleSessionCredentialsProvider("rolename", "sessionname");
+
+//        final AWSCredentials cp = new BasicAWSCredentials(
+//            this.awsAccessid,
+//            this.awsSecret
+//        );
+//
+//        s3Client = new AmazonS3Client(cp);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -55,7 +80,9 @@ public class S3FileTransferImpl implements FileTransfer {
         final String dstLocalPath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
-
+//        s3Client.getObject(
+//            new GetObjectRequest("amsharma-test-prod", "bar"),
+//            new File("/tmp/file"));
     }
 
     /**

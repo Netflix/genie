@@ -398,7 +398,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
         if (jobExecutionEntity != null) {
             jobExecutionEntity.setExitCode(exitCode);
-            this.jobExecutionRepo.save(jobExecutionEntity);
+             this.jobExecutionRepo.save(jobExecutionEntity);
         } else {
             throw new GenieNotFoundException("No job with id " + id);
         }

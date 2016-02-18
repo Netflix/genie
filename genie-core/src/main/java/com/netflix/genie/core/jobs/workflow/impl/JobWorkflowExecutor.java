@@ -40,14 +40,6 @@ public class JobWorkflowExecutor implements WorkflowExecutor {
             return false;
         }
 
-        // TODO need to throw this exception
-//        impl.forEach(workflowTask -> {
-//            try {
-//                workflowTask.executeTask(context);
-//            } catch (GenieException e) {
-//                log.error("Got Exception {} while executing task", e.toString());
-//            }
-//        });
         return true;
     }
 }
