@@ -200,7 +200,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotBlank(message = "Cluster id cannot be null while updating cluster information")
         final String clusterId
     ) throws GenieException {
-        log.info("Called with jobId {} and clusterID {}", jobId, clusterId);
+        log.debug("Called with jobId {} and clusterID {}", jobId, clusterId);
 
         final JobEntity jobEntity = this.jobRepo.findOne(jobId);
         if (jobEntity == null) {
@@ -226,7 +226,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotBlank(message = "Command id cannot be null while updating command information")
         final String commandId
     ) throws GenieException {
-        log.info("Called with jobId {} and commandId {}", jobId, commandId);
+        log.debug("Called with jobId {} and commandId {}", jobId, commandId);
 
         final JobEntity jobEntity = this.jobRepo.findOne(jobId);
         if (jobEntity == null) {

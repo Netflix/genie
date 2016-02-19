@@ -23,7 +23,7 @@ public class S3FileTransferImplUnitTests {
      */
     @Before
     public void setup() throws GenieException {
-        s3FileTransfer = new S3FileTransferImpl();
+        s3FileTransfer = new S3FileTransferImpl("foo", "bar");
     }
     /**
      * Test the getFile method.

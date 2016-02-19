@@ -17,14 +17,22 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An implementation of the FileTransferService interface in which the remote locations are on Amazon S3.
@@ -32,31 +40,42 @@ import org.springframework.stereotype.Service;
  * @author amsharma
  * @since 3.0.0
  */
-@Service
 @Slf4j
 @Component
 public class S3FileTransferImpl implements FileTransfer {
 
     private AmazonS3Client s3Client;
 
-    @Value("${cloud.aws.credentials.accessKey:ACCESS_ID}")
-    private String awsAccessid;
+    private final Pattern s3FilePattern =
+        Pattern.compile("^(s3[n]?://)(.*?)/(.*/.*)");
 
-    @Value("${cloud.aws.credentials.secretKey:SECRET}")
-    private String awsSecret;
+    private final Pattern s3PrefixPattern =
+        Pattern.compile("^s3[n]?://.*$");
 
-    S3FileTransferImpl() throws GenieException {
+    /**
+     * Constructor.
+     *
+     * @param awsAccessid Aws acccess id
+     * @param awsSecret Aws secret
+     * @throws GenieException If there is a problem
+     */
+    @Autowired
+    public S3FileTransferImpl(
+        @Value("${cloud.aws.credentials.accessKey:ACCESS_ID}")
+        final String awsAccessid,
+        @Value("${cloud.aws.credentials.secretKey:SECRET}")
+        final String awsSecret
+    ) throws GenieException {
 
         // TODO implement support for Assuming IAM Roles
 //        final AWSCredentialsProvider cp =
 //            new STSAssumeRoleSessionCredentialsProvider("rolename", "sessionname");
+        final AWSCredentials cp = new BasicAWSCredentials(
+            awsAccessid,
+            awsSecret
+        );
 
-//        final AWSCredentials cp = new BasicAWSCredentials(
-//            this.awsAccessid,
-//            this.awsSecret
-//        );
-//
-//        s3Client = new AmazonS3Client(cp);
+        s3Client = new AmazonS3Client(cp);
     }
 
 
@@ -66,7 +85,9 @@ public class S3FileTransferImpl implements FileTransfer {
     @Override
     public boolean isValid(final String fileName) throws GenieException {
         log.debug("Called with file name {}", fileName);
-        return true;
+        final Matcher matcher =
+            s3PrefixPattern.matcher(fileName);
+        return matcher.matches();
     }
 
     /**
@@ -80,9 +101,18 @@ public class S3FileTransferImpl implements FileTransfer {
         final String dstLocalPath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
-//        s3Client.getObject(
-//            new GetObjectRequest("amsharma-test-prod", "bar"),
-//            new File("/tmp/file"));
+
+        final Matcher matcher = s3FilePattern.matcher(srcRemotePath);
+        if (matcher.matches()) {
+            final String bucket = matcher.group(2);
+            final String key = matcher.group(3);
+
+            s3Client.getObject(
+                new GetObjectRequest(bucket, key),
+                new File(dstLocalPath));
+        } else {
+            throw new GenieServerException("Invalid path for s3 file");
+        }
     }
 
     /**

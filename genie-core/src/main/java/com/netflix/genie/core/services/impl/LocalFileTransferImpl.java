@@ -39,7 +39,7 @@ public class LocalFileTransferImpl implements FileTransfer {
     @Override
     public boolean isValid(final String fileName) throws GenieException {
         log.debug("Called with file name {}", fileName);
-        return true;
+        return false;
     }
 
     /**
