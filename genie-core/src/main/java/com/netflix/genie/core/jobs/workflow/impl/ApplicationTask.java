@@ -72,7 +72,7 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
 
             // Get the setup file if specified
             if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
-                final String localPath = fetchLocalFile(
+                final String localPath = fetchFile(
                     jobExecEnv.getJobWorkingDir(),
                     application.getId(),
                     applicationSetupFile,
@@ -85,7 +85,7 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
 
             // Iterate over and get all dependencies
             for (final String dependencyFile: application.getDependencies()) {
-                fetchLocalFile(
+                fetchFile(
                     jobExecEnv.getJobWorkingDir(),
                     application.getId(),
                     dependencyFile,
@@ -95,7 +95,7 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
 
             // Iterate over and get all configuration files
             for (final String configFile: application.getConfigs()) {
-                fetchLocalFile(
+                fetchFile(
                     jobExecEnv.getJobWorkingDir(),
                     application.getId(),
                     configFile,
@@ -117,7 +117,7 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
      *
      * @throws GenieException If there is any problem
      */
-    private String fetchLocalFile(
+    private String fetchFile(
         final String dir,
         final String id,
         final String filePath,

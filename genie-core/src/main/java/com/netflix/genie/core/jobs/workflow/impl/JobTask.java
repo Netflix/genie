@@ -17,18 +17,18 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.Context;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
+import com.netflix.genie.core.services.GenieFileTransferService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.io.Writer;
-import java.nio.file.Path;
 
 /**
  * Implementation of the workflow task for processing job information for genie mode.
@@ -39,9 +39,12 @@ import java.nio.file.Path;
 @Slf4j
 public class JobTask extends GenieBaseTask implements WorkflowTask {
 
+    private static final String JOB_PATH_VAR = "job";
     private static final String  STDERR_LOG_PATH = "./job/stderr";
     private static final String STDOUT_LOG_PATH = "./job/stdout";
     private static final String GENIE_DONE_FILE = "./genie/genie.done";
+
+    private GenieFileTransferService fts;
 
     /**
      * {@inheritDoc}
@@ -63,15 +66,31 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
         final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
         final Writer writer = getWriter(jobLauncherScriptPath);
 
+        this.fts = (GenieFileTransferService) context.getAttribute(FILE_TRANSFER_SERVICE_KEY);
+
         //TODO copy down dependencies
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
 
         if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
-            final Path setupFilePath = new File(jobSetupFile).toPath();
-            final String setupFileLocalPath = jobExecEnv.getJobWorkingDir()
-                + "/job/"
-                + setupFilePath.getFileName();
-            appendToWriter(writer, "source " + setupFileLocalPath + ";");
+            final String localPath = fetchFile(
+                jobExecEnv.getJobWorkingDir(),
+                jobExecEnv.getCommand().getId(),
+                jobSetupFile,
+                SETUP_FILE_PATH_PREFIX
+            );
+
+            fts.getFile(jobSetupFile, localPath);
+            appendToWriter(writer, "source " + localPath + ";");
+        }
+
+        // Iterate over and get all dependencies
+        for (final String dependencyFile: jobExecEnv.getJobRequest().getFileDependencies()) {
+            fetchFile(
+                jobExecEnv.getJobWorkingDir(),
+                jobExecEnv.getId(),
+                dependencyFile,
+                DEPENDENCY_FILE_PATH_PREFIX
+            );
         }
 
         appendToWriter(
@@ -87,5 +106,43 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
         // capture exit code and write to genie.done file
         appendToWriter(writer, "echo $? > " + GENIE_DONE_FILE);
         closeWriter(writer);
+    }
+
+    /**
+     * Helper Function to fetch file to local dir.
+     *
+     * @param dir The directory where to copy the file
+     * @param id The id to be appended to the destination path
+     * @param filePath Source file path
+     * @param fileType Type of file like setup, config or dependency
+     * @return Local file path constructed where the file is copied to
+     *
+     * @throws GenieException If there is any problem
+     */
+    private String fetchFile(
+        final String dir,
+        final String id,
+        final String filePath,
+        final String fileType
+    ) throws GenieException {
+        if (filePath != null && StringUtils.isNotBlank(filePath)) {
+            final String fileName = getFileNameFromPath(filePath);
+            final String localPath = new StringBuilder()
+                .append(dir)
+                .append(FILE_PATH_DELIMITER)
+                .append(JOB_PATH_VAR)
+                .append(FILE_PATH_DELIMITER)
+                .append(id)
+                .append(FILE_PATH_DELIMITER)
+                .append(fileType)
+                .append(FILE_PATH_DELIMITER)
+                .append(fileName)
+                .toString();
+
+            this.fts.getFile(filePath, localPath);
+            return localPath;
+        } else {
+            throw new GenieBadRequestException("Invalid file path");
+        }
     }
 }

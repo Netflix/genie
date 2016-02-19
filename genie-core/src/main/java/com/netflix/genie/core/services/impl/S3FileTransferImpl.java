@@ -20,6 +20,7 @@ package com.netflix.genie.core.services.impl;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -107,9 +108,14 @@ public class S3FileTransferImpl implements FileTransfer {
             final String bucket = matcher.group(2);
             final String key = matcher.group(3);
 
-            s3Client.getObject(
-                new GetObjectRequest(bucket, key),
-                new File(dstLocalPath));
+            try {
+                s3Client.getObject(
+                    new GetObjectRequest(bucket, key),
+                    new File(dstLocalPath));
+            } catch (AmazonS3Exception ase) {
+                log.error("Error fetching file {} from s3 due to exception {}", srcRemotePath, ase);
+                throw new GenieServerException("Error downloading file from s3. Filename: " + srcRemotePath);
+            }
         } else {
             throw new GenieServerException("Invalid path for s3 file");
         }

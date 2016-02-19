@@ -387,7 +387,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @throws GenieException if there is an error
      */
     @Override
-    //TODO get rid of exit code
+    //TODO get rid of exit code? maybe not
     public void setExitCode(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
