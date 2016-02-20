@@ -133,4 +133,49 @@ public class CommandUnitTests {
         Assert.assertThat(command.getTags(), Matchers.empty());
         Assert.assertThat(command.getUpdated(), Matchers.nullValue());
     }
+
+    /**
+     * Test equals.
+     */
+    @Test
+    public void canFindEquality() {
+        final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        builder.withSetupFile(null);
+        builder.withConfigs(null);
+        builder.withCreated(null);
+        builder.withDescription(null);
+        builder.withId(null);
+        builder.withTags(null);
+        builder.withUpdated(null);
+        final Command command1 = builder.build();
+        final Command command2 = builder.build();
+        builder.withDescription(UUID.randomUUID().toString());
+        final Command command3 = builder.build();
+
+        Assert.assertTrue(command1.equals(command2));
+        Assert.assertTrue(command2.equals(command1));
+        Assert.assertFalse(command1.equals(command3));
+    }
+
+    /**
+     * Test hash code.
+     */
+    @Test
+    public void canUseHashCode() {
+        final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, null, EXECUTABLE);
+        builder.withSetupFile(null);
+        builder.withConfigs(null);
+        builder.withCreated(null);
+        builder.withDescription(null);
+        builder.withId(null);
+        builder.withTags(null);
+        builder.withUpdated(null);
+        final Command command1 = builder.build();
+        final Command command2 = builder.build();
+        builder.withDescription(UUID.randomUUID().toString());
+        final Command command3 = builder.build();
+
+        Assert.assertEquals(command1.hashCode(), command2.hashCode());
+        Assert.assertNotEquals(command1.hashCode(), command3.hashCode());
+    }
 }

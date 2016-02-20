@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
@@ -33,6 +34,7 @@ import java.util.Set;
  * @author tgianos
  * @since 2.0.0
  */
+@EqualsAndHashCode(doNotUseGetters = true)
 public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;

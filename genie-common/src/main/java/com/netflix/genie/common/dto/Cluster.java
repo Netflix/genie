@@ -19,8 +19,9 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -30,11 +31,13 @@ import javax.validation.constraints.Size;
  * @since 3.0.0
  */
 @JsonDeserialize(builder = Cluster.Builder.class)
+@Getter
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public class Cluster extends ConfigDTO {
 
-    @NotNull(message = "No cluster status entered and is required.")
-    private ClusterStatus status;
+    private static final long serialVersionUID = 8562447832504925029L;
 
+    private ClusterStatus status;
     @Size(min = 1, max = 255)
     private String clusterType;
 
@@ -47,25 +50,6 @@ public class Cluster extends ConfigDTO {
         super(builder);
         this.status = builder.bStatus;
         this.clusterType = builder.bClusterType;
-    }
-
-    /**
-     * Get the cluster status.
-     *
-     * @return The status of the cluster
-     */
-    public ClusterStatus getStatus() {
-        return this.status;
-    }
-
-    /**
-     * Get the type of the cluster.
-     *
-     * @return The type of the cluster
-     */
-    //TODO: Remove cluster type if we don't need it
-    public String getClusterType() {
-        return this.clusterType;
     }
 
     /**
@@ -101,7 +85,11 @@ public class Cluster extends ConfigDTO {
             final String clusterType
         ) {
             super(name, user, version);
-            this.bStatus = status;
+            if (status != null) {
+                this.bStatus = status;
+            } else {
+                this.bStatus = ClusterStatus.OUT_OF_SERVICE;
+            }
             this.bClusterType = clusterType;
         }
 

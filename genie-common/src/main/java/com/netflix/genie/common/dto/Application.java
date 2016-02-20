@@ -19,8 +19,9 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,10 +33,13 @@ import java.util.Set;
  * @since 3.0.0
  */
 @JsonDeserialize(builder = Application.Builder.class)
+@Getter
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public class Application extends ConfigDTO {
 
+    private static final long serialVersionUID = 212266105066344180L;
+
     private final Set<String> dependencies = new HashSet<>();
-    @NotNull(message = "No application status entered and is required.")
     private ApplicationStatus status;
     private String setupFile;
 
@@ -49,24 +53,6 @@ public class Application extends ConfigDTO {
         this.status = builder.bStatus;
         this.setupFile = builder.bSetupFile;
         this.dependencies.addAll(builder.bDependencies);
-    }
-
-    /**
-     * Get the status of the application.
-     *
-     * @return The application status
-     */
-    public ApplicationStatus getStatus() {
-        return this.status;
-    }
-
-    /**
-     * Get the setup file for the application.
-     *
-     * @return The setup file location
-     */
-    public String getSetupFile() {
-        return this.setupFile;
     }
 
     /**
@@ -109,7 +95,11 @@ public class Application extends ConfigDTO {
             final ApplicationStatus status
         ) {
             super(name, user, version);
-            this.bStatus = status;
+            if (status != null) {
+                this.bStatus = status;
+            } else {
+                this.bStatus = ApplicationStatus.INACTIVE;
+            }
         }
 
         /**

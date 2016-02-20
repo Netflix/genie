@@ -19,8 +19,11 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 /**
@@ -30,14 +33,16 @@ import javax.validation.constraints.Size;
  * @since 3.0.0
  */
 @JsonDeserialize(builder = Command.Builder.class)
+@Getter
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public class Command extends ConfigDTO {
 
-    @NotNull(message = "No command status entered and is required.")
+    private static final long serialVersionUID = -3559641165667609041L;
+
     private CommandStatus status;
-
-    @Size(min = 1, max = 255, message = "Executable path can't be longer than 255 characters")
+    @NotEmpty
+    @Size(max = 255, message = "Executable path can't be longer than 255 characters")
     private String executable;
-
     private String setupFile;
 
     /**
@@ -45,38 +50,11 @@ public class Command extends ConfigDTO {
      *
      * @param builder The builder to get data from
      */
-    protected Command(final Builder builder) {
+    protected Command(@Valid final Builder builder) {
         super(builder);
         this.status = builder.bStatus;
         this.executable = builder.bExecutable;
         this.setupFile = builder.bSetupFile;
-    }
-
-    /**
-     * Get the status of the command.
-     *
-     * @return The command status
-     */
-    public CommandStatus getStatus() {
-        return this.status;
-    }
-
-    /**
-     * Get the executable of the command.
-     *
-     * @return the executable
-     */
-    public String getExecutable() {
-        return this.executable;
-    }
-
-    /**
-     * Get the setup file for command.
-     *
-     * @return The setup file for the command
-     */
-    public String getSetupFile() {
-        return this.setupFile;
     }
 
     /**
@@ -113,7 +91,11 @@ public class Command extends ConfigDTO {
             final String executable
         ) {
             super(name, user, version);
-            this.bStatus = status;
+            if (status != null) {
+                this.bStatus = status;
+            } else {
+                this.bStatus = CommandStatus.INACTIVE;
+            }
             this.bExecutable = executable;
         }
 

@@ -196,4 +196,57 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getTags(), Matchers.empty());
         Assert.assertThat(request.getUpdated(), Matchers.nullValue());
     }
+
+    /**
+     * Test equals.
+     */
+    @Test
+    public void canFindEquality() {
+        final JobRequest.Builder builder
+            = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
+        builder.withEmail(null);
+        builder.withFileDependencies(null);
+        builder.withGroup(null);
+        builder.withSetupFile(null);
+        builder.withCreated(null);
+        builder.withDescription(null);
+        builder.withId(null);
+        builder.withTags(null);
+        builder.withUpdated(null);
+
+        final JobRequest jobRequest1 = builder.build();
+        final JobRequest jobRequest2 = builder.build();
+        builder.withDescription(UUID.randomUUID().toString());
+        final JobRequest jobRequest3 = builder.build();
+
+        Assert.assertTrue(jobRequest1.equals(jobRequest2));
+        Assert.assertTrue(jobRequest2.equals(jobRequest1));
+        Assert.assertFalse(jobRequest1.equals(jobRequest3));
+    }
+
+    /**
+     * Test hash code.
+     */
+    @Test
+    public void canUseHashCode() {
+        final JobRequest.Builder builder
+            = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
+        builder.withEmail(null);
+        builder.withFileDependencies(null);
+        builder.withGroup(null);
+        builder.withSetupFile(null);
+        builder.withCreated(null);
+        builder.withDescription(null);
+        builder.withId(null);
+        builder.withTags(null);
+        builder.withUpdated(null);
+
+        final JobRequest jobRequest1 = builder.build();
+        final JobRequest jobRequest2 = builder.build();
+        builder.withDescription(UUID.randomUUID().toString());
+        final JobRequest jobRequest3 = builder.build();
+
+        Assert.assertEquals(jobRequest1.hashCode(), jobRequest2.hashCode());
+        Assert.assertNotEquals(jobRequest1.hashCode(), jobRequest3.hashCode());
+    }
 }
