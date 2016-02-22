@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Getter;
 
 import javax.validation.constraints.Size;
 import java.util.Collections;
@@ -32,15 +33,15 @@ import java.util.Set;
  * @since 3.0.0
  */
 @JsonDeserialize(builder = JobExecution.Builder.class)
+@Getter
 public class JobExecution extends BaseDTO {
+
+    private static final long serialVersionUID = 5005391660522052211L;
 
     @Size(min = 1, max = 1024, message = "Host name is required but no longer than 1024 characters")
     private String hostName;
-
     private int processId;
-
     private int exitCode;
-
     private Set<String> clusterCriteria = new HashSet<>();
 
     /**
@@ -54,33 +55,6 @@ public class JobExecution extends BaseDTO {
         this.processId = builder.bProcessId;
         this.exitCode = builder.bExitCode;
         this.clusterCriteria.addAll(builder.bClusterCriteria);
-    }
-
-    /**
-     * Get the host name this job is running on.
-     *
-     * @return The host name
-     */
-    public String getHostName() {
-        return this.hostName;
-    }
-
-    /**
-     * Get the process id on the system.
-     *
-     * @return the process id
-     */
-    public int getProcessId() {
-        return this.processId;
-    }
-
-    /**
-     * Get the process exit code. Defaults to -1 before the job is complete.
-     *
-     * @return The process exit code
-     */
-    public int getExitCode() {
-        return this.exitCode;
     }
 
     /**

@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.common.dto;
 
+import lombok.Getter;
+import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,19 +31,22 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
+@Getter
 public abstract class CommonDTO extends BaseDTO {
+
+    private static final long serialVersionUID = -2082573569004634251L;
 
     private final Set<String> tags = new HashSet<>();
 
-    @Size(min = 1, max = 255, message = "Max length is 255 characters")
+    @NotEmpty
+    @Size(max = 255)
     private String version;
-
-    @Size(min = 1, max = 255, message = "Max length is 255 characters")
+    @NotEmpty
+    @Size(max = 255)
     private String user;
-
-    @Size(min = 1, max = 255, message = "Max length is 255 characters")
+    @NotEmpty
+    @Size(max = 255)
     private String name;
-
     private String description;
 
     /**
@@ -56,42 +62,6 @@ public abstract class CommonDTO extends BaseDTO {
         this.version = builder.bVersion;
         this.description = builder.bDescription;
         this.tags.addAll(builder.bTags);
-    }
-
-    /**
-     * Get the version.
-     *
-     * @return the version
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Get the user.
-     *
-     * @return The user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Get the name.
-     *
-     * @return The name
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Get the description.
-     *
-     * @return The desciption
-     */
-    public String getDescription() {
-        return this.description;
     }
 
     /**

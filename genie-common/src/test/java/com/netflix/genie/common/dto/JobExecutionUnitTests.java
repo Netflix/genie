@@ -107,4 +107,45 @@ public class JobExecutionUnitTests {
         Assert.assertThat(execution.getId(), Matchers.nullValue());
         Assert.assertThat(execution.getUpdated(), Matchers.nullValue());
     }
+
+    /**
+     * Test equals.
+     */
+    @Test
+    public void canFindEquality() {
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID);
+        builder.withClusterCriteria(null);
+        builder.withCreated(null);
+        builder.withId(UUID.randomUUID().toString());
+        builder.withUpdated(null);
+
+        final JobExecution jobExecution1 = builder.build();
+        final JobExecution jobExecution2 = builder.build();
+        builder.withId(UUID.randomUUID().toString());
+        final JobExecution jobExecution3 = builder.build();
+
+        Assert.assertTrue(jobExecution1.equals(jobExecution2));
+        Assert.assertTrue(jobExecution2.equals(jobExecution1));
+        Assert.assertFalse(jobExecution1.equals(jobExecution3));
+    }
+
+    /**
+     * Test hash code.
+     */
+    @Test
+    public void canUseHashCode() {
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID);
+        builder.withClusterCriteria(null);
+        builder.withCreated(null);
+        builder.withId(UUID.randomUUID().toString());
+        builder.withUpdated(null);
+
+        final JobExecution jobExecution1 = builder.build();
+        final JobExecution jobExecution2 = builder.build();
+        builder.withId(UUID.randomUUID().toString());
+        final JobExecution jobExecution3 = builder.build();
+
+        Assert.assertEquals(jobExecution1.hashCode(), jobExecution2.hashCode());
+        Assert.assertNotEquals(jobExecution1.hashCode(), jobExecution3.hashCode());
+    }
 }

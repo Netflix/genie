@@ -21,8 +21,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateSerializer;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -31,14 +34,16 @@ import java.util.Date;
  * @author tgianos
  * @since 3.0.0
  */
-public abstract class BaseDTO {
+@Getter
+@EqualsAndHashCode(of = "id", doNotUseGetters = true)
+public abstract class BaseDTO implements Serializable {
+
+    private static final long serialVersionUID = 9093424855934127120L;
 
     @Size(max = 255, message = "Max length is 255 characters")
     private String id;
-
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date created;
-
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date updated;
 
@@ -55,15 +60,6 @@ public abstract class BaseDTO {
         if (builder.bUpdated != null) {
             this.updated = new Date(builder.bUpdated.getTime());
         }
-    }
-
-    /**
-     * Get the id.
-     *
-     * @return The id
-     */
-    public String getId() {
-        return this.id;
     }
 
     /**

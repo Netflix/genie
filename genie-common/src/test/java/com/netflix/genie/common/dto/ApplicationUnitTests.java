@@ -136,4 +136,51 @@ public class ApplicationUnitTests {
         Assert.assertThat(application.getTags(), Matchers.empty());
         Assert.assertThat(application.getUpdated(), Matchers.nullValue());
     }
+
+    /**
+     * Test equals.
+     */
+    @Test
+    public void canFindEquality() {
+        final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        builder.withDependencies(null);
+        builder.withSetupFile(null);
+        builder.withConfigs(null);
+        builder.withCreated(null);
+        builder.withDescription(null);
+        builder.withId(UUID.randomUUID().toString());
+        builder.withTags(null);
+        builder.withUpdated(null);
+        final Application app1 = builder.build();
+        final Application app2 = builder.build();
+        builder.withId(UUID.randomUUID().toString());
+        final Application app3 = builder.build();
+
+        Assert.assertTrue(app1.equals(app2));
+        Assert.assertTrue(app2.equals(app1));
+        Assert.assertFalse(app1.equals(app3));
+    }
+
+    /**
+     * Test equals.
+     */
+    @Test
+    public void canUseHashCode() {
+        final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, null);
+        builder.withDependencies(null);
+        builder.withSetupFile(null);
+        builder.withConfigs(null);
+        builder.withCreated(null);
+        builder.withDescription(null);
+        builder.withId(UUID.randomUUID().toString());
+        builder.withTags(null);
+        builder.withUpdated(null);
+        final Application app1 = builder.build();
+        final Application app2 = builder.build();
+        builder.withId(UUID.randomUUID().toString());
+        final Application app3 = builder.build();
+
+        Assert.assertEquals(app1.hashCode(), app2.hashCode());
+        Assert.assertNotEquals(app1.hashCode(), app3.hashCode());
+    }
 }

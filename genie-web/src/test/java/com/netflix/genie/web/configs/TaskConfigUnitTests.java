@@ -17,10 +17,17 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.TaskScheduler;
+
+import java.util.Collection;
 
 /**
  * Unit tests for the TaskConfig class.
@@ -37,5 +44,24 @@ public class TaskConfigUnitTests {
     @Test
     public void canGetTaskScheduler() {
         Assert.assertNotNull(new TaskConfig().taskScheduler());
+    }
+
+    /**
+     * Make sure can get a valid leadership tasks coordinator.
+     */
+    @Test
+    public void canGetLeadershipTasksCoordinator() {
+        final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
+        final Collection<LeadershipTask> tasks = Sets.newHashSet();
+        Assert.assertNotNull(new TaskConfig().leadershipTasksCoordinator(scheduler, tasks));
+    }
+
+    /**
+     * Make sure we can get a valid LocalLeader if it's needed.
+     */
+    @Test
+    public void canGetLocalLeader() {
+        final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
+        Assert.assertNotNull(new TaskConfig().localLeader(publisher, true));
     }
 }

@@ -19,8 +19,11 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Getter;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
@@ -36,35 +39,29 @@ import java.util.Set;
  * @since 3.0.0
  */
 @JsonDeserialize(builder = JobRequest.Builder.class)
+@Getter
 public class JobRequest extends CommonDTO {
+
+    private static final long serialVersionUID = 3163971970144435277L;
 
     @Size(min = 1, max = 1024, message = "Command arguments are required but no longer than 1024 characters")
     private String commandArgs;
-
-    @Size(min = 1, message = "No cluster criteria entered. At least one required.")
+    @NotEmpty
     private List<ClusterCriteria> clusterCriterias = new ArrayList<>();
-
-    @Size(min = 1, message = "No command criteria entered. At least one required.")
+    @NotEmpty
     private Set<String> commandCriteria = new HashSet<>();
-
     @Size(max = 255, message = "Max length is 255 characters")
     private String group;
-
     @Size(max = 1024, message = "Max length is 1024 characters")
     private String setupFile;
-
     private Set<String> fileDependencies = new HashSet<>();
-
     private boolean disableLogArchival;
-
     @Size(max = 255, message = "Max length is 255 characters")
     @Email(message = "Must be a valid email address")
     private String email;
-
-    @Min(value = 1, message = "Minimum value for the number of cpu's is 1")
+    @Min(1)
     private int cpu;
-
-    @Min(value = 1, message = "Minimum value for the amount of memory is 1 MB")
+    @Min(1)
     private int memory;
 
     /**
@@ -73,7 +70,7 @@ public class JobRequest extends CommonDTO {
      * @param builder The builder to use
      */
     @SuppressWarnings("unchecked")
-    protected JobRequest(final Builder builder) {
+    protected JobRequest(@Valid final Builder builder) {
         super(builder);
         this.commandArgs = builder.bCommandArgs;
         this.clusterCriterias.addAll(builder.bClusterCriterias);
@@ -85,15 +82,6 @@ public class JobRequest extends CommonDTO {
         this.email = builder.bEmail;
         this.cpu = builder.bCpu;
         this.memory = builder.bMemory;
-    }
-
-    /**
-     * Get the command arguments for this job.
-     *
-     * @return The command arguments
-     */
-    public String getCommandArgs() {
-        return this.commandArgs;
     }
 
     /**
@@ -115,66 +103,12 @@ public class JobRequest extends CommonDTO {
     }
 
     /**
-     * Get the group of the user running the job.
-     *
-     * @return The group
-     */
-    public String getGroup() {
-        return this.group;
-    }
-
-    /**
-     * Get the setup file that should be run before the job is executed.
-     *
-     * @return The setup file
-     */
-    public String getSetupFile() {
-        return this.setupFile;
-    }
-
-    /**
      * Get the dependencies that should be downloaded for this job.
      *
      * @return The file dependencies as a read-only set. Attempts to modify will throw exception
      */
     public Set<String> getFileDependencies() {
         return Collections.unmodifiableSet(this.fileDependencies);
-    }
-
-    /**
-     * Get the email to use for alerts.
-     *
-     * @return The email address
-     */
-    public String getEmail() {
-        return this.email;
-    }
-
-    /**
-     * Get whether log archival should be disabled or not.
-     *
-     * @return true if archival should be disabled
-     */
-    public boolean isDisableLogArchival() {
-        return this.disableLogArchival;
-    }
-
-    /**
-     * Get how many CPU's should be assigned to this job. Defaults to 1.
-     *
-     * @return The number of CPU's the user is requesting for this job
-     */
-    public int getCpu() {
-        return this.cpu;
-    }
-
-    /**
-     * Get the amount of memory the user is requesting for the job. Defaults to 1.5 GB (1560 MB).
-     *
-     * @return The amount of memory the user is requesting in MB's.
-     */
-    public int getMemory() {
-        return this.memory;
     }
 
     /**
@@ -293,7 +227,7 @@ public class JobRequest extends CommonDTO {
          * @param cpu The number of cpu's. Must be greater than 0.
          * @return The builder
          */
-        public Builder withCpu(@Min(1) final int cpu) {
+        public Builder withCpu(final int cpu) {
             this.bCpu = cpu;
             return this;
         }
@@ -304,7 +238,7 @@ public class JobRequest extends CommonDTO {
          * @param memory The amount of memory in terms of MB's. Must be greater than     0.
          * @return The builder
          */
-        public Builder withMemory(@Min(1) final int memory) {
+        public Builder withMemory(final int memory) {
             this.bMemory = memory;
             return this;
         }

@@ -164,4 +164,61 @@ public class JobUnitTests {
         Assert.assertThat(job.getTags(), Matchers.empty());
         Assert.assertThat(job.getUpdated(), Matchers.nullValue());
     }
+
+    /**
+     * Test equals.
+     */
+    @Test
+    public void canFindEquality() {
+        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
+        builder.withArchiveLocation(null);
+        builder.withClusterName(null);
+        builder.withCommandName(null);
+        builder.withFinished(null);
+        builder.withStarted(null);
+        builder.withStatus(null);
+        builder.withStatusMsg(null);
+        builder.withCreated(null);
+        builder.withDescription(null);
+        builder.withId(UUID.randomUUID().toString());
+        builder.withTags(null);
+        builder.withUpdated(null);
+
+        final Job job1 = builder.build();
+        final Job job2 = builder.build();
+        builder.withId(UUID.randomUUID().toString());
+        final Job job3 = builder.build();
+
+        Assert.assertTrue(job1.equals(job2));
+        Assert.assertTrue(job2.equals(job1));
+        Assert.assertFalse(job1.equals(job3));
+    }
+
+    /**
+     * Test hash code.
+     */
+    @Test
+    public void canUseHashCode() {
+        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
+        builder.withArchiveLocation(null);
+        builder.withClusterName(null);
+        builder.withCommandName(null);
+        builder.withFinished(null);
+        builder.withStarted(null);
+        builder.withStatus(null);
+        builder.withStatusMsg(null);
+        builder.withCreated(null);
+        builder.withDescription(null);
+        builder.withId(UUID.randomUUID().toString());
+        builder.withTags(null);
+        builder.withUpdated(null);
+
+        final Job job1 = builder.build();
+        final Job job2 = builder.build();
+        builder.withId(UUID.randomUUID().toString());
+        final Job job3 = builder.build();
+
+        Assert.assertEquals(job1.hashCode(), job2.hashCode());
+        Assert.assertNotEquals(job1.hashCode(), job3.hashCode());
+    }
 }
