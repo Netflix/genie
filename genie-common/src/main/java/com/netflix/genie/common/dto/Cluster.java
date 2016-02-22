@@ -19,7 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import javax.validation.constraints.Size;
@@ -32,7 +31,6 @@ import javax.validation.constraints.Size;
  */
 @JsonDeserialize(builder = Cluster.Builder.class)
 @Getter
-@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public class Cluster extends ConfigDTO {
 
     private static final long serialVersionUID = 8562447832504925029L;

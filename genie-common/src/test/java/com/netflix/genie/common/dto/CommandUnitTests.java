@@ -144,12 +144,12 @@ public class CommandUnitTests {
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
         final Command command1 = builder.build();
         final Command command2 = builder.build();
-        builder.withDescription(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final Command command3 = builder.build();
 
         Assert.assertTrue(command1.equals(command2));
@@ -167,12 +167,12 @@ public class CommandUnitTests {
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
         final Command command1 = builder.build();
         final Command command2 = builder.build();
-        builder.withDescription(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final Command command3 = builder.build();
 
         Assert.assertEquals(command1.hashCode(), command2.hashCode());

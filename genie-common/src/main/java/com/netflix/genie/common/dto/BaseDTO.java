@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -33,7 +34,8 @@ import java.util.Date;
  * @author tgianos
  * @since 3.0.0
  */
-@EqualsAndHashCode(doNotUseGetters = true)
+@Getter
+@EqualsAndHashCode(of = "id", doNotUseGetters = true)
 public abstract class BaseDTO implements Serializable {
 
     private static final long serialVersionUID = 9093424855934127120L;
@@ -58,15 +60,6 @@ public abstract class BaseDTO implements Serializable {
         if (builder.bUpdated != null) {
             this.updated = new Date(builder.bUpdated.getTime());
         }
-    }
-
-    /**
-     * Get the id.
-     *
-     * @return The id
-     */
-    public String getId() {
-        return this.id;
     }
 
     /**

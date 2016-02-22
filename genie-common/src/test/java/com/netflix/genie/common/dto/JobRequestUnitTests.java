@@ -210,13 +210,13 @@ public class JobRequestUnitTests {
         builder.withSetupFile(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
 
         final JobRequest jobRequest1 = builder.build();
         final JobRequest jobRequest2 = builder.build();
-        builder.withDescription(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final JobRequest jobRequest3 = builder.build();
 
         Assert.assertTrue(jobRequest1.equals(jobRequest2));
@@ -237,13 +237,13 @@ public class JobRequestUnitTests {
         builder.withSetupFile(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
 
         final JobRequest jobRequest1 = builder.build();
         final JobRequest jobRequest2 = builder.build();
-        builder.withDescription(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final JobRequest jobRequest3 = builder.build();
 
         Assert.assertEquals(jobRequest1.hashCode(), jobRequest2.hashCode());

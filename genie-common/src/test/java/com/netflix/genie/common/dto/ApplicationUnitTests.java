@@ -148,12 +148,12 @@ public class ApplicationUnitTests {
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
         final Application app1 = builder.build();
         final Application app2 = builder.build();
-        builder.withSetupFile(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final Application app3 = builder.build();
 
         Assert.assertTrue(app1.equals(app2));
@@ -172,12 +172,12 @@ public class ApplicationUnitTests {
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
         final Application app1 = builder.build();
         final Application app2 = builder.build();
-        builder.withSetupFile(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final Application app3 = builder.build();
 
         Assert.assertEquals(app1.hashCode(), app2.hashCode());

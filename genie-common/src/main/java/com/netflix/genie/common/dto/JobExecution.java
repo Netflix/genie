@@ -19,7 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import javax.validation.constraints.Size;
@@ -35,7 +34,6 @@ import java.util.Set;
  */
 @JsonDeserialize(builder = JobExecution.Builder.class)
 @Getter
-@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public class JobExecution extends BaseDTO {
 
     private static final long serialVersionUID = 5005391660522052211L;

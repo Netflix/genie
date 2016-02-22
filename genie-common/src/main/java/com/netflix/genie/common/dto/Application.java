@@ -19,7 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Collections;
@@ -34,7 +33,6 @@ import java.util.Set;
  */
 @JsonDeserialize(builder = Application.Builder.class)
 @Getter
-@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public class Application extends ConfigDTO {
 
     private static final long serialVersionUID = 212266105066344180L;

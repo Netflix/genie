@@ -116,7 +116,7 @@ public class JobExecutionUnitTests {
         final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID);
         builder.withClusterCriteria(null);
         builder.withCreated(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);
 
         final JobExecution jobExecution1 = builder.build();
@@ -137,7 +137,7 @@ public class JobExecutionUnitTests {
         final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID);
         builder.withClusterCriteria(null);
         builder.withCreated(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);
 
         final JobExecution jobExecution1 = builder.build();

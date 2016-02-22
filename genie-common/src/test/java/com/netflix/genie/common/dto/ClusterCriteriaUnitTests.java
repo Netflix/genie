@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Tests for ClusterCriteria.
@@ -58,9 +59,41 @@ public class ClusterCriteriaUnitTests {
      * Test to make sure clients can't modify the internal state.
      */
     @Test(expected = UnsupportedOperationException.class)
-    public void testUnmodifiableTags() {
+    public void cantModifyTags() {
         final Set<String> tags = Sets.newHashSet("tag1", "tag2");
         final ClusterCriteria cc = new ClusterCriteria(tags);
         cc.getTags().add("this should fail");
+    }
+
+    /**
+     * Make sure we can use equals.
+     */
+    @Test
+    public void canGetEquality() {
+        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        final ClusterCriteria clusterCriteria1 = new ClusterCriteria(tags);
+        final ClusterCriteria clusterCriteria2 = new ClusterCriteria(tags);
+
+        tags.add(UUID.randomUUID().toString());
+        final ClusterCriteria clusterCriteria3 = new ClusterCriteria(tags);
+
+        Assert.assertTrue(clusterCriteria1.equals(clusterCriteria2));
+        Assert.assertFalse(clusterCriteria1.equals(clusterCriteria3));
+    }
+
+    /**
+     * Make sure we can use equals.
+     */
+    @Test
+    public void canGetHashCode() {
+        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        final ClusterCriteria clusterCriteria1 = new ClusterCriteria(tags);
+        final ClusterCriteria clusterCriteria2 = new ClusterCriteria(tags);
+
+        tags.add(UUID.randomUUID().toString());
+        final ClusterCriteria clusterCriteria3 = new ClusterCriteria(tags);
+
+        Assert.assertEquals(clusterCriteria1.hashCode(), clusterCriteria2.hashCode());
+        Assert.assertNotEquals(clusterCriteria1.hashCode(), clusterCriteria3.hashCode());
     }
 }

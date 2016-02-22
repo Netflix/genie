@@ -134,17 +134,20 @@ public class ClusterUnitTests {
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
         final Cluster cluster1 = builder.build();
         final Cluster cluster2 = builder.build();
         builder.withDescription(UUID.randomUUID().toString());
         final Cluster cluster3 = builder.build();
+        builder.withId(UUID.randomUUID().toString());
+        final Cluster cluster4 = builder.build();
 
         Assert.assertTrue(cluster1.equals(cluster2));
         Assert.assertTrue(cluster2.equals(cluster1));
-        Assert.assertFalse(cluster1.equals(cluster3));
+        Assert.assertTrue(cluster1.equals(cluster3));
+        Assert.assertFalse(cluster1.equals(cluster4));
     }
 
     /**
@@ -156,12 +159,12 @@ public class ClusterUnitTests {
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
         final Cluster cluster1 = builder.build();
         final Cluster cluster2 = builder.build();
-        builder.withDescription(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final Cluster cluster3 = builder.build();
 
         Assert.assertEquals(cluster1.hashCode(), cluster2.hashCode());

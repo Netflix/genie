@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.common.dto;
 
-import lombok.EqualsAndHashCode;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +27,6 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public abstract class ConfigDTO extends CommonDTO {
 
     private static final long serialVersionUID = 147545317805515362L;

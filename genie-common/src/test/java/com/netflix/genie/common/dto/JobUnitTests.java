@@ -180,7 +180,7 @@ public class JobUnitTests {
         builder.withStatusMsg(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
 
@@ -209,7 +209,7 @@ public class JobUnitTests {
         builder.withStatusMsg(null);
         builder.withCreated(null);
         builder.withDescription(null);
-        builder.withId(null);
+        builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
 

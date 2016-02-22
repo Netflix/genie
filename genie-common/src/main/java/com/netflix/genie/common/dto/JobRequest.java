@@ -19,7 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -41,7 +40,6 @@ import java.util.Set;
  */
 @JsonDeserialize(builder = JobRequest.Builder.class)
 @Getter
-@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public class JobRequest extends CommonDTO {
 
     private static final long serialVersionUID = 3163971970144435277L;

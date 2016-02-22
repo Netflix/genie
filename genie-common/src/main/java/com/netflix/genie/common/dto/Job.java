@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import javax.validation.constraints.Size;
@@ -36,7 +35,6 @@ import java.util.Date;
  */
 @JsonDeserialize(builder = Job.Builder.class)
 @Getter
-@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public class Job extends CommonDTO {
 
     private static final long serialVersionUID = -4218933066048954819L;

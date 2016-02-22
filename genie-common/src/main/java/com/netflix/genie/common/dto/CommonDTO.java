@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.common.dto;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -33,7 +32,6 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Getter
-@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 public abstract class CommonDTO extends BaseDTO {
 
     private static final long serialVersionUID = -2082573569004634251L;
