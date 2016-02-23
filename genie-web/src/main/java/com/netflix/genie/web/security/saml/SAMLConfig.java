@@ -722,8 +722,9 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
         http
             .antMatcher("/**")
                 .authorizeRequests()
-                    .antMatchers("/error").permitAll()
+                    .antMatchers("/actuator/**").permitAll()
                     .antMatchers("/api/**").permitAll()
+                    .antMatchers("/error").permitAll()
                     .antMatchers("/saml/**").permitAll()
                     .antMatchers("/upload.html").hasRole("ADMIN")
                     .anyRequest().authenticated()

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -39,6 +40,7 @@ public class ValidationConfig {
      * @return The bean validator
      */
     @Bean
+    @ConditionalOnMissingBean
     public Validator localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
     }
@@ -49,6 +51,7 @@ public class ValidationConfig {
      * @return The method validation processor
      */
     @Bean
+    @ConditionalOnMissingBean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }

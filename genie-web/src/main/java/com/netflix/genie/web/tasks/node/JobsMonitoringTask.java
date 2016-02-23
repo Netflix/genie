@@ -15,11 +15,41 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.tasks.node;
+
+import org.springframework.scheduling.Trigger;
+import org.springframework.stereotype.Component;
 
 /**
- * Tests for session related classes.
+ * A Task to monitor running jobs on a Genie node.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.sessions;
+@Component
+public class JobsMonitoringTask implements NodeTask {
+
+    /**
+     * Checks the status' of all the processes running on the node to see if they're done.
+     */
+    @Override
+    public void run() {
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Trigger getTrigger() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getPeriod() {
+        return 0;
+    }
+}

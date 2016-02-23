@@ -29,6 +29,8 @@ import java.util.Set;
  */
 public abstract class ConfigDTO extends CommonDTO {
 
+    private static final long serialVersionUID = 147545317805515362L;
+
     private final Set<String> configs = new HashSet<>();
 
     /**

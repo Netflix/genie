@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
+import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -34,26 +34,21 @@ import java.util.Date;
  * @since 3.0.0
  */
 @JsonDeserialize(builder = Job.Builder.class)
+@Getter
 public class Job extends CommonDTO {
 
-    @NotNull(message = "A job must have a status")
+    private static final long serialVersionUID = -4218933066048954819L;
     private JobStatus status;
-
     @Size(max = 255, message = "Max length is 255 characters")
     private String statusMsg;
-
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date started;
-
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date finished;
-
     @Size(max = 1024, message = "Max character length is 1024 characters")
     private String archiveLocation;
-
     @Size(max = 255, message = "Max character length is 255 characters")
     private String clusterName;
-
     @Size(max = 255, message = "Max character length is 255 characters")
     private String commandName;
 
@@ -78,24 +73,6 @@ public class Job extends CommonDTO {
     }
 
     /**
-     * Get the status of the job.
-     *
-     * @return The status
-     */
-    public JobStatus getStatus() {
-        return this.status;
-    }
-
-    /**
-     * Get the detailed status message for the job.
-     *
-     * @return The detailed status message
-     */
-    public String getStatusMsg() {
-        return statusMsg;
-    }
-
-    /**
      * Get the time the job started.
      *
      * @return The started time or null if not set
@@ -111,33 +88,6 @@ public class Job extends CommonDTO {
      */
     public Date getFinished() {
         return this.finished == null ? null : new Date(this.finished.getTime());
-    }
-
-    /**
-     * Get the location where the jobs' results were archived to.
-     *
-     * @return The archive location
-     */
-    public String getArchiveLocation() {
-        return archiveLocation;
-    }
-
-    /**
-     * Get the name of the cluster this job executed on.
-     *
-     * @return The name
-     */
-    public String getClusterName() {
-        return this.clusterName;
-    }
-
-    /**
-     * Get the name of the command used to run this job.
-     *
-     * @return The command name
-     */
-    public String getCommandName() {
-        return this.commandName;
     }
 
     /**

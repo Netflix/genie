@@ -38,17 +38,4 @@ public class SecurityUtilsUnitTests {
     public void canConstructUsingProtectedConstructor() {
         Assert.assertNotNull(new SecurityUtils());
     }
-
-//    /**
-//     * Test to make sure we can build the proper API security.
-//     *
-//     * @throws Exception on any error
-//     */
-//    @Test
-//    public void canBuildAPIHttpSecurity() throws Exception {
-//        final HttpSecurity http = Mockito.mock(HttpSecurity.class);
-//        final X509UserDetailsService x509UserDetailsService = Mockito.mock(X509UserDetailsService.class);
-//
-//        SecurityUtils.buildAPIHttpSecurity(http, x509UserDetailsService);
-//    }
 }

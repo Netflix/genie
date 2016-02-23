@@ -28,7 +28,7 @@ security:
       idp:
         serviceProviderMetadataURL: https://idp.something.com/MetadataQuery?partnerId=genie
       keystore:
-        name: genie-keystore.jks
+#        name: genie-keystore.jks
         password: password
         defaultKey:
           name: genie
