@@ -15,27 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.jobs.workflow;
-
-import java.util.List;
-import java.util.Map;
 
 /**
- * Execute a workflow. Any class implementing this interface should be able to take in a list of impl and execute them
- * in order.
+ * Package for Job Configs to be used for Integration tests in genie-core.
  *
  * @author amsharma
  * @since 3.0.0
  */
-public interface WorkflowExecutor {
-
-    /**
-     * Execute the workflow using the list of impl provided.
-     *
-     * @param tasks List of workflow impl to be executed
-     * @param context Information needed by individual tasks in the workflow
-     *
-     * @return return true in case of successful execution of workflow.
-     */
-    boolean executeWorkflow(List<WorkflowTask> tasks, Map<String, Object> context);
-}
+package com.netflix.genie.core.configs;

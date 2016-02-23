@@ -21,7 +21,6 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.workflow.Context;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +31,7 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of the workflow task for processing job information for genie mode.
@@ -55,12 +55,12 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
     @Override
     public void executeTask(
         @NotNull
-        final Context context
+        final Map<String, Object> context
     ) throws GenieException {
-        log.info("Execution Job Task in the workflow.");
+        log.info("Executing Job Kickoff Task in the workflow.");
 
         final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.getAttribute(JOB_EXECUTION_ENV_KEY);
+            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
 
         if (jobExecEnv == null) {
             throw new GenieServerException("Cannot run application task as jobExecutionEnvironment is null");
@@ -83,7 +83,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
             final int processId = getProcessId(process);
             final JobExecution jobExecution =
                 new JobExecution.Builder(hostname, processId).withId(jobExecEnv.getId()).build();
-            context.setAttribute(JOB_EXECUTION_DTO_KEY, jobExecution);
+            context.put(JOB_EXECUTION_DTO_KEY, jobExecution);
         } catch (IOException ie) {
             throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
         }

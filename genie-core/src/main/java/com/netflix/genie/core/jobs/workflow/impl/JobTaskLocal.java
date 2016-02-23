@@ -20,7 +20,6 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.workflow.Context;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +28,7 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * Implementation of the workflow task for processing job information in non genie-mode.
@@ -49,12 +49,12 @@ public class JobTaskLocal extends GenieBaseTask implements WorkflowTask {
     @Override
     public void executeTask(
         @NotNull
-        final Context context
+        final Map<String, Object> context
     ) throws GenieException {
         log.info("Execution Job Task in the workflow.");
 
         final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.getAttribute(JOB_EXECUTION_ENV_KEY);
+            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
 
         if (jobExecEnv == null) {
             throw new GenieServerException("Cannot run application task as jobExecutionEnvironment is null");

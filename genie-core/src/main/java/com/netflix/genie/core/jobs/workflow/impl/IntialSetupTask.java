@@ -20,11 +20,11 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.workflow.Context;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 /**
  * Implementation of the workflow task for handling Applications that a job needs.
@@ -41,12 +41,12 @@ public class IntialSetupTask extends GenieBaseTask implements WorkflowTask {
     @Override
     public void executeTask(
         @NotNull
-        final Context context
+        final Map<String, Object> context
     ) throws GenieException {
-        log.info("Execution Initial setup Task in the workflow.");
+        log.info("Executing Initial setup Task in the workflow.");
 
         final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.getAttribute(JOB_EXECUTION_ENV_KEY);
+            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
 
         if (jobExecEnv == null) {
             throw new GenieServerException("Cannot run setup task as jobExecutionEnvironment is null");

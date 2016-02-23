@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.workflow.Context;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.GenieFileTransferService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.Writer;
+import java.util.Map;
 
 /**
  * Implementation of the workflow task for processing job information for genie mode.
@@ -52,12 +52,12 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
     @Override
     public void executeTask(
         @NotNull
-        final Context context
+        final Map<String, Object> context
     ) throws GenieException {
         log.info("Execution Job Task in the workflow.");
 
         final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.getAttribute(JOB_EXECUTION_ENV_KEY);
+            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
 
         if (jobExecEnv == null) {
             throw new GenieServerException("Cannot run application task as jobExecutionEnvironment is null");
@@ -66,7 +66,7 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
         final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
         final Writer writer = getWriter(jobLauncherScriptPath);
 
-        this.fts = (GenieFileTransferService) context.getAttribute(FILE_TRANSFER_SERVICE_KEY);
+        this.fts = (GenieFileTransferService) context.get(FILE_TRANSFER_SERVICE_KEY);
 
         //TODO copy down dependencies
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();

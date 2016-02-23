@@ -1,7 +1,6 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.core.jobs.workflow.Context;
 import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implements the workflow executor to execute the job workflow.
@@ -28,7 +28,7 @@ public class JobWorkflowExecutor implements WorkflowExecutor {
         @NotNull
         final List<WorkflowTask> tasks,
         @NotNull
-        final Context context
+        final Map<String, Object> context
     ) {
 
         try {

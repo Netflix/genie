@@ -19,6 +19,8 @@ package com.netflix.genie.core.jobs.workflow;
 
 import com.netflix.genie.common.exceptions.GenieException;
 
+import java.util.Map;
+
 /**
  * Interface that defines a task in a workflow.
  *
@@ -34,6 +36,6 @@ public interface WorkflowTask {
      * @throws GenieException if there is an error
      */
     void executeTask(
-        Context context
+        Map<String, Object> context
     ) throws GenieException;
 }

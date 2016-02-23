@@ -18,21 +18,11 @@
 package com.netflix.genie;
 
 import com.google.common.collect.Maps;
-import com.netflix.genie.core.jobs.workflow.WorkflowTask;
-import com.netflix.genie.core.jobs.workflow.impl.ApplicationTask;
-import com.netflix.genie.core.jobs.workflow.impl.ClusterTask;
-import com.netflix.genie.core.jobs.workflow.impl.CommandTask;
-import com.netflix.genie.core.jobs.workflow.impl.IntialSetupTask;
-import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
-import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
-import org.springframework.context.annotation.Bean;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,22 +59,5 @@ public class GenieWeb {
         final Map<String, Object> defaultProperties = Maps.newHashMap();
         defaultProperties.put(SPRING_CONFIG_LOCATION, USER_HOME_GENIE);
         return defaultProperties;
-    }
-
-    /**
-     * Setup a bean to provide the list of impl in the workflow.
-     *
-     * @return List of workflow impl.
-     */
-    @Bean
-    public List<WorkflowTask> taskList() {
-        final List<WorkflowTask> taskList = new ArrayList<>();
-        taskList.add(new IntialSetupTask());
-        taskList.add(new ApplicationTask());
-        taskList.add(new CommandTask());
-        taskList.add(new ClusterTask());
-        taskList.add(new JobTask());
-        taskList.add(new JobKickoffTask());
-        return taskList;
     }
 }
