@@ -1,11 +1,13 @@
 package com.netflix.genie.core.services.impl;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mockito;
 
 /**
  * Class to test the S3FileTransferImpl class.
@@ -16,6 +18,7 @@ import org.junit.experimental.categories.Category;
 public class S3FileTransferImplUnitTests {
 
     private S3FileTransferImpl s3FileTransfer;
+    private AmazonS3Client s3Client;
     /**
      * Setup the tests.
      *
@@ -23,9 +26,10 @@ public class S3FileTransferImplUnitTests {
      */
     @Before
     public void setup() throws GenieException {
-        s3FileTransfer = new S3FileTransferImpl("foo", "bar");
+        s3Client = Mockito.mock(AmazonS3Client.class);
+        s3FileTransfer = new S3FileTransferImpl(s3Client);
     }
-    
+
     /**
      * Test the getFile method.
      *
