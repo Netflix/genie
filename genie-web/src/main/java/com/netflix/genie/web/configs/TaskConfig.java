@@ -20,6 +20,8 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import com.netflix.genie.web.tasks.leader.LeadershipTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,13 +43,26 @@ import java.util.Collection;
 public class TaskConfig {
 
     /**
+     * Get an {@link Executor} to use for executing processes from tasks.
+     *
+     * @return The executor to use
+     */
+    @Bean
+    public Executor processExecutor() {
+        return new DefaultExecutor();
+    }
+
+    /**
      * Get a task scheduler.
      *
+     * @param poolSize The initial size of the thread pool that should be allocated
      * @return The task scheduler
      */
     @Bean
-    public TaskScheduler taskScheduler() {
-        return new ThreadPoolTaskScheduler();
+    public ThreadPoolTaskScheduler taskScheduler(@Value("${genie.tasks.pool.size:1}") final int poolSize) {
+        final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(poolSize);
+        return scheduler;
     }
 
     /**

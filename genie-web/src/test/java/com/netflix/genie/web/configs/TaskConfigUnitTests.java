@@ -39,11 +39,19 @@ import java.util.Collection;
 public class TaskConfigUnitTests {
 
     /**
+     * Make sure we get a valid process executor to use.
+     */
+    @Test
+    public void canGetExecutor() {
+        Assert.assertNotNull(new TaskConfig().processExecutor());
+    }
+
+    /**
      * Make sure we get a valid task scheduler to use.
      */
     @Test
     public void canGetTaskScheduler() {
-        Assert.assertNotNull(new TaskConfig().taskScheduler());
+        Assert.assertNotNull(new TaskConfig().taskScheduler(7));
     }
 
     /**

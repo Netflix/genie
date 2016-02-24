@@ -31,6 +31,9 @@ genie:
       location: file:///tmp/genie/jobs/
   leader:
     enabled: false
+  tasks:
+    pool:
+      size: 10
 
 management:
   context-path: /actuator

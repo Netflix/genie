@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,19 +54,35 @@ public class ZombieTaskUnitTests {
     }
 
     /**
-     * Make sure the trigger is null.
+     * Make sure we get the right schedule type.
      */
     @Test
+    public void canGetScheduleType() {
+        Assert.assertThat(this.task.getScheduleType(), Matchers.is(GenieTaskScheduleType.FIXED_RATE));
+    }
+
+    /**
+     * Make sure the trigger is null.
+     */
+    @Test(expected = UnsupportedOperationException.class)
     public void canGetTrigger() {
-        Assert.assertNull(this.task.getTrigger());
+        this.task.getTrigger();
     }
 
     /**
      * Make sure the get period returns the correct value.
      */
     @Test
-    public void canGetPeriod() {
+    public void canGetFixedRate() {
         // TODO: flesh out
-        Assert.assertThat(this.task.getPeriod(), Matchers.is(45000L));
+        Assert.assertThat(this.task.getFixedRate(), Matchers.is(45000L));
+    }
+
+    /**
+     * Make sure the trigger is null.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void canGetFixedDelay() {
+        this.task.getFixedDelay();
     }
 }

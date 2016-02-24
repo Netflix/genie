@@ -19,6 +19,7 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -55,11 +56,8 @@ public class LeadershipTasksCoordinatorUnitTests {
     public void setup() {
         this.scheduler = Mockito.mock(TaskScheduler.class);
         this.task1 = Mockito.mock(LeadershipTask.class);
-        Mockito.when(this.task1.getTrigger()).thenReturn(null);
         this.task2 = Mockito.mock(LeadershipTask.class);
-        Mockito.when(this.task2.getTrigger()).thenReturn(null);
         this.task3 = Mockito.mock(LeadershipTask.class);
-        Mockito.when(this.task3.getTrigger()).thenReturn(null);
         final Set<LeadershipTask> tasks = Sets.newHashSet(this.task1, this.task2, this.task3);
         this.coordinator = new LeadershipTasksCoordinator(this.scheduler, tasks);
     }
@@ -71,10 +69,13 @@ public class LeadershipTasksCoordinatorUnitTests {
     @SuppressWarnings("unchecked")
     public void canStartLeadershipTasks() {
         final long task1Period = 13238;
-        Mockito.when(this.task1.getPeriod()).thenReturn(task1Period);
+        Mockito.when(this.task1.getScheduleType()).thenReturn(GenieTaskScheduleType.FIXED_RATE);
+        Mockito.when(this.task1.getFixedRate()).thenReturn(task1Period);
         final long task2Period = 3891082;
-        Mockito.when(this.task2.getPeriod()).thenReturn(task2Period);
+        Mockito.when(this.task2.getScheduleType()).thenReturn(GenieTaskScheduleType.FIXED_DELAY);
+        Mockito.when(this.task2.getFixedDelay()).thenReturn(task2Period);
         final Trigger task3Trigger = Mockito.mock(Trigger.class);
+        Mockito.when(this.task3.getScheduleType()).thenReturn(GenieTaskScheduleType.TRIGGER);
         Mockito.when(this.task3.getTrigger()).thenReturn(task3Trigger);
 
         final OnGrantedEvent event = new OnGrantedEvent(this, null);
@@ -82,15 +83,20 @@ public class LeadershipTasksCoordinatorUnitTests {
         this.coordinator.onLeaderEvent(event);
 
         Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, task1Period);
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task2, task2Period);
-        Mockito.verify(this.task3, Mockito.never()).getPeriod();
+        Mockito.verify(this.task1, Mockito.never()).getFixedDelay();
+        Mockito.verify(this.task1, Mockito.never()).getTrigger();
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, task2Period);
+        Mockito.verify(this.task2, Mockito.never()).getFixedRate();
+        Mockito.verify(this.task2, Mockito.never()).getTrigger();
         Mockito.verify(this.scheduler, Mockito.times(1)).schedule(this.task3, task3Trigger);
+        Mockito.verify(this.task3, Mockito.never()).getFixedRate();
+        Mockito.verify(this.task3, Mockito.never()).getFixedDelay();
 
         //Make sure a second OnGrantedEvent doesn't do anything if it's already running
         this.coordinator.onLeaderEvent(event);
 
         Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, task1Period);
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task2, task2Period);
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, task2Period);
         Mockito.verify(this.scheduler, Mockito.times(1)).schedule(this.task3, task3Trigger);
     }
 
@@ -100,29 +106,41 @@ public class LeadershipTasksCoordinatorUnitTests {
     @Test
     @SuppressWarnings("unchecked")
     public void canStopLeadershipTasks() {
-        final Trigger task1Trigger = Mockito.mock(Trigger.class);
-        Mockito.when(this.task1.getTrigger()).thenReturn(task1Trigger);
-        final long task2Period = -2;
-        Mockito.when(this.task2.getPeriod()).thenReturn(task2Period);
-        final long task3Period = 135234;
-        Mockito.when(this.task3.getPeriod()).thenReturn(task3Period);
+        final long task1Period = 13238;
+        Mockito.when(this.task1.getScheduleType()).thenReturn(GenieTaskScheduleType.FIXED_RATE);
+        Mockito.when(this.task1.getFixedRate()).thenReturn(task1Period);
+        final long task2Period = 3891082;
+        Mockito.when(this.task2.getScheduleType()).thenReturn(GenieTaskScheduleType.FIXED_DELAY);
+        Mockito.when(this.task2.getFixedDelay()).thenReturn(task2Period);
+        final Trigger task3Trigger = Mockito.mock(Trigger.class);
+        Mockito.when(this.task3.getScheduleType()).thenReturn(GenieTaskScheduleType.TRIGGER);
+        Mockito.when(this.task3.getTrigger()).thenReturn(task3Trigger);
 
         final ScheduledFuture future1 = Mockito.mock(ScheduledFuture.class);
         Mockito.when(future1.cancel(true)).thenReturn(true);
-        Mockito.when(this.scheduler.schedule(this.task1, task1Trigger)).thenReturn(future1);
+        Mockito.when(this.scheduler.scheduleAtFixedRate(this.task1, task1Period)).thenReturn(future1);
+
+        final ScheduledFuture future2 = Mockito.mock(ScheduledFuture.class);
+        Mockito.when(future2.cancel(true)).thenReturn(true);
+        Mockito.when(this.scheduler.scheduleWithFixedDelay(this.task2, task2Period)).thenReturn(future2);
 
         final ScheduledFuture future3 = Mockito.mock(ScheduledFuture.class);
         Mockito.when(future3.cancel(true)).thenReturn(false);
-        Mockito.when(this.scheduler.scheduleAtFixedRate(this.task3, task3Period)).thenReturn(future3);
+        Mockito.when(this.scheduler.schedule(this.task3, task3Trigger)).thenReturn(future3);
 
         final OnGrantedEvent grantedEvent = new OnGrantedEvent(this, null);
 
         this.coordinator.onLeaderEvent(grantedEvent);
 
-        Mockito.verify(this.scheduler, Mockito.times(1)).schedule(this.task1, task1Trigger);
-        Mockito.verify(this.scheduler, Mockito.never())
-            .scheduleAtFixedRate(Mockito.eq(this.task2), Mockito.anyLong());
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task3, task3Period);
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, task1Period);
+        Mockito.verify(this.task1, Mockito.never()).getFixedDelay();
+        Mockito.verify(this.task1, Mockito.never()).getTrigger();
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, task2Period);
+        Mockito.verify(this.task2, Mockito.never()).getFixedRate();
+        Mockito.verify(this.task2, Mockito.never()).getTrigger();
+        Mockito.verify(this.scheduler, Mockito.times(1)).schedule(this.task3, task3Trigger);
+        Mockito.verify(this.task3, Mockito.never()).getFixedRate();
+        Mockito.verify(this.task3, Mockito.never()).getFixedDelay();
 
         // Should now be running
 
@@ -131,11 +149,15 @@ public class LeadershipTasksCoordinatorUnitTests {
         this.coordinator.onLeaderEvent(revokedEvent);
 
         Mockito.verify(future1, Mockito.times(1)).cancel(true);
+        Mockito.verify(future2, Mockito.times(1)).cancel(true);
+        Mockito.verify(future3, Mockito.times(1)).cancel(true);
 
         // Call again to make sure nothing is invoked even though they were cancelled
         this.coordinator.onLeaderEvent(revokedEvent);
 
         Mockito.verify(future1, Mockito.times(1)).cancel(true);
+        Mockito.verify(future2, Mockito.times(1)).cancel(true);
+        Mockito.verify(future3, Mockito.times(1)).cancel(true);
     }
 
     /**
