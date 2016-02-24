@@ -59,7 +59,7 @@ public class TaskConfig {
      * @return The task scheduler
      */
     @Bean
-    public TaskScheduler taskScheduler(@Value("${genie.tasks.pool.size:1}") final int poolSize) {
+    public ThreadPoolTaskScheduler taskScheduler(@Value("${genie.tasks.pool.size:1}") final int poolSize) {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(poolSize);
         return scheduler;
