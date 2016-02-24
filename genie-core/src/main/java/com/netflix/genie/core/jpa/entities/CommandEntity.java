@@ -54,6 +54,8 @@ import java.util.Set;
 @Table(name = "commands")
 public class CommandEntity extends CommonFields {
 
+    private static final long serialVersionUID = -8058995173025433517L;
+    
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)

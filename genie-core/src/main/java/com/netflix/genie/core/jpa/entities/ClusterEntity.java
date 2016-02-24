@@ -58,6 +58,8 @@ import java.util.Set;
 @Table(name = "clusters")
 public class ClusterEntity extends CommonFields {
 
+    private static final long serialVersionUID = -5674870110962005872L;
+
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)

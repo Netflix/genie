@@ -18,11 +18,16 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
+import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import com.netflix.genie.core.services.JobSearchService;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +36,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -42,34 +49,26 @@ import java.util.Set;
 public class JpaJobSearchServiceImpl implements JobSearchService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JpaJobSearchServiceImpl.class);
-    private final JpaJobRepository jobRepo;
+    private final JpaJobRepository jobRepository;
+    private final JpaJobExecutionRepository jobExecutionRepository;
 
     /**
-     * Default constructor.
+     * Constructor.
      *
-     * @param jobRepo Repository to use for jobs.
+     * @param jobRepository          Repository to use for jobs.
+     * @param jobExecutionRepository The repository to use for job execution objects
      */
     @Autowired
     public JpaJobSearchServiceImpl(
-        final JpaJobRepository jobRepo
+        final JpaJobRepository jobRepository,
+        final JpaJobExecutionRepository jobExecutionRepository
     ) {
-        this.jobRepo = jobRepo;
+        this.jobRepository = jobRepository;
+        this.jobExecutionRepository = jobExecutionRepository;
     }
 
     /**
-     * Get job info for given filter criteria.
-     *
-     * @param id          id for job
-     * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName    user who submitted job
-     * @param statuses    statuses of job
-     * @param tags        tags for the job
-     * @param clusterName name of cluster for job
-     * @param clusterId   id of cluster for job
-     * @param commandName name of the command run in the job
-     * @param commandId   id of the command run in the job
-     * @param page        Page information of job to get
-     * @return All jobs which match the criteria
+     * {@inheritDoc}
      */
     @Override
     @Transactional(readOnly = true)
@@ -83,12 +82,12 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         final String clusterId,
         final String commandName,
         final String commandId,
-        final Pageable page
+        @NotNull final Pageable page
     ) {
         LOG.debug("called");
 
         @SuppressWarnings("unchecked")
-        final Page<JobEntity> jobEntities = this.jobRepo.findAll(
+        final Page<JobEntity> jobEntities = this.jobRepository.findAll(
             JpaJobSpecs.find(
                 id,
                 jobName,
@@ -98,9 +97,26 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 clusterName,
                 clusterId,
                 commandName,
-                commandId),
+                commandId
+            ),
             page
         );
         return jobEntities.map(JobEntity::getDTO);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<JobExecution> getAllJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException {
+        final Set<JobExecutionEntity> entities
+            = this.jobExecutionRepository.findByHostNameAndExitCode(hostname, JobExecutionEntity.DEFAULT_EXIT_CODE);
+
+        final Set<JobExecution> executions = new HashSet<>();
+        for (final JobExecutionEntity entity : entities) {
+            executions.add(entity.getDTO());
+        }
+        return executions;
     }
 }

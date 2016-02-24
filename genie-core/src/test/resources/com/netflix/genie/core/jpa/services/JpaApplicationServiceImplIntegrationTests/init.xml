@@ -121,7 +121,7 @@
         executable="pig"
         status="INACTIVE"
         entity_version="0"
-        sorted_tags="genie.id:command1,genie.name:genie.name:pig_13_prod"
+        sorted_tags="genie.id:command1,genie.name:pig_13_prod"
     />
     <command_tags
         command_id="command1"

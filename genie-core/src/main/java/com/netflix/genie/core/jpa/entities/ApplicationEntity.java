@@ -50,6 +50,8 @@ import java.util.Set;
 @Table(name = "applications")
 public class ApplicationEntity extends CommonFields {
 
+    private static final long serialVersionUID = -8780722054561507963L;
+
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)

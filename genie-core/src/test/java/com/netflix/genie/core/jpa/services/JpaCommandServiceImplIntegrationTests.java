@@ -53,7 +53,7 @@ import java.util.UUID;
  * @author tgianos
  */
 @Category(IntegrationTest.class)
-@DatabaseSetup("CommandServiceJPAImplIntegrationTests/init.xml")
+@DatabaseSetup("JpaCommandServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
 public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
 

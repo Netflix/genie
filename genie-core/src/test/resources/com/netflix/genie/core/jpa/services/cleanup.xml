@@ -27,6 +27,8 @@
     <application_dependencies/>
     <application_tags/>
     <commands_applications/>
+    <job_requests/>
     <jobs/>
     <job_tags/>
+    <job_executions/>
 </dataset>

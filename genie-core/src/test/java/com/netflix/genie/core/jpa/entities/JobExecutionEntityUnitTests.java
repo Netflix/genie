@@ -36,14 +36,18 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class JobExecutionEntityUnitTests {
 
+    private static final String ID = UUID.randomUUID().toString();
     private JobExecutionEntity entity;
 
     /**
      * Setup the for each test.
+     *
+     * @throws GenieException on error
      */
     @Before
-    public void setup() {
+    public void setup() throws GenieException {
         this.entity = new JobExecutionEntity();
+        this.entity.setId(ID);
     }
 
     /**
@@ -138,6 +142,9 @@ public class JobExecutionEntityUnitTests {
         this.entity.setClusterCriteriaFromSet(clusterCriteria);
 
         final JobExecution execution = this.entity.getDTO();
+        Assert.assertThat(execution.getId(), Matchers.is(ID));
+        Assert.assertThat(execution.getCreated(), Matchers.is(this.entity.getCreated()));
+        Assert.assertThat(execution.getUpdated(), Matchers.is(this.entity.getUpdated()));
         Assert.assertThat(execution.getClusterCriteria(), Matchers.is(clusterCriteria));
         Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
         Assert.assertThat(execution.getHostName(), Matchers.is(hostName));

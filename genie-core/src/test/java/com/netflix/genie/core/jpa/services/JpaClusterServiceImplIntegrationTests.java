@@ -56,7 +56,7 @@ import java.util.UUID;
  * @author tgianos
  */
 @Category(IntegrationTest.class)
-@DatabaseSetup("ClusterServiceJPAImplIntegrationTests/init.xml")
+@DatabaseSetup("JpaClusterServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
 public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
 
