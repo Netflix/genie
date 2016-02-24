@@ -49,8 +49,8 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
     private static final String GENIE_LOG_PATH = "/genie/logs/genie.log";
     private static final String JOB_EXECUTION_DTO_KEY = "jexecdto";
     private static final String PID = "pid";
-    private static boolean isRunAsUserEnabled;
-    private static boolean isUserCreationEnabled;
+    private boolean isRunAsUserEnabled;
+    private boolean isUserCreationEnabled;
 
     /**
      * Constructor.

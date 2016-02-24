@@ -109,6 +109,6 @@ public class JobConfig {
         @Value("${genie.jobs.createuser.enabled:false}")
         final boolean isUserCreationEnabled
     ) {
-        return new JobKickoffTask(isRunAsUserEnabled, isUserCreationEnabled );
+        return new JobKickoffTask(isRunAsUserEnabled, isUserCreationEnabled);
     }
 }
