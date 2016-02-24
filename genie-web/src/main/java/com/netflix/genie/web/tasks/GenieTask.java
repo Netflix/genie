@@ -28,10 +28,16 @@ import org.springframework.scheduling.Trigger;
 public interface GenieTask extends Runnable {
 
     /**
-     * Get the Trigger which this task should be scheduled with. If no trigger is necessary return null and callers
-     * will fall back to getPeriod().
+     * Get the type of scheduling mechanism which should be used to schedule this task.
      *
-     * @return The trigger or null if prefer to use a period fixed rate scheduling mechanism
+     * @return The schedule type
+     */
+    GenieTaskScheduleType getScheduleType();
+
+    /**
+     * Get the Trigger which this task should be scheduled with.
+     *
+     * @return The trigger
      */
     Trigger getTrigger();
 
@@ -40,5 +46,13 @@ public interface GenieTask extends Runnable {
      *
      * @return The period to wait between invocations of run for this task
      */
-    long getPeriod();
+    long getFixedRate();
+
+    /**
+     * Get how long the system should wait between invoking the run() method of this task in milliseconds after the
+     * last successful run of the task.
+     *
+     * @return The time to delay between task completions
+     */
+    long getFixedDelay();
 }

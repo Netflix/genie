@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Component;
@@ -47,16 +48,32 @@ public class ZombieTask implements LeadershipTask {
      * {@inheritDoc}
      */
     @Override
-    public Trigger getTrigger() {
-        return null;
+    public GenieTaskScheduleType getScheduleType() {
+        return GenieTaskScheduleType.FIXED_RATE;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public long getPeriod() {
+    public Trigger getTrigger() {
+        throw new UnsupportedOperationException("This task should only be scheduled at a fixed rate.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getFixedRate() {
         //TODO: Implement getting this value from a property...for now for testing just hard code
         return 45000;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getFixedDelay() {
+        throw new UnsupportedOperationException("This task should only be scheduled at a fixed rate.");
     }
 }
