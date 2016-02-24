@@ -89,30 +89,36 @@ public class LeadershipTasksCoordinator {
             this.isRunning = true;
             this.tasks.stream().forEach(
                 task -> {
-                    final Trigger trigger = task.getTrigger();
-                    if (trigger != null) {
-                        log.info(
-                            "Scheduling leadership task {} to run with trigger {}",
-                            task.getClass().getCanonicalName(),
-                            trigger
-                        );
-                        this.futures.add(this.taskScheduler.schedule(task, trigger));
-                    } else {
-                        final long period = task.getPeriod();
-                        if (period < 1) {
-                            log.error(
-                                "Task {} had a period of {}. Must be > 0. Ignoring.",
+                    switch (task.getScheduleType()) {
+                        case TRIGGER:
+                            final Trigger trigger = task.getTrigger();
+                            log.info(
+                                "Scheduling leadership task {} to run with trigger {}",
                                 task.getClass().getCanonicalName(),
-                                period
+                                trigger
                             );
-                        } else {
+                            this.futures.add(this.taskScheduler.schedule(task, trigger));
+                            break;
+                        case FIXED_RATE:
+                            final long rate = task.getFixedRate();
                             log.info(
                                 "Scheduling leadership task {} to run every {} second(s)",
                                 task.getClass().getCanonicalName(),
-                                period / 1000.0
+                                rate / 1000.0
                             );
-                            this.futures.add(this.taskScheduler.scheduleAtFixedRate(task, period));
-                        }
+                            this.futures.add(this.taskScheduler.scheduleAtFixedRate(task, rate));
+                            break;
+                        case FIXED_DELAY:
+                            final long delay = task.getFixedDelay();
+                            log.info(
+                                "Scheduling leadership task {} to run at a fixed delay of every {} second(s)",
+                                task.getClass().getCanonicalName(),
+                                delay / 1000.0
+                            );
+                            this.futures.add(this.taskScheduler.scheduleWithFixedDelay(task, delay));
+                            break;
+                        default:
+                            log.error("Unknown Genie task type {}", task.getScheduleType());
                     }
                 }
             );
