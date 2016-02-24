@@ -58,6 +58,8 @@ public class JobEntity extends CommonFields {
      */
     protected static final String DEFAULT_VERSION = "NA";
 
+    private static final long serialVersionUID = 2849367731657512224L;
+
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)

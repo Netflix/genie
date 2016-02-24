@@ -51,6 +51,8 @@ import java.util.Set;
 @Table(name = "job_requests")
 public class JobRequestEntity extends CommonFields {
 
+    private static final long serialVersionUID = -1895413051636217614L;
+
     @Lob
     @Column(name = "command_args", nullable = false)
     @Size(min = 1, message = "Must have command line arguments and can't be longer than 1024 characters")

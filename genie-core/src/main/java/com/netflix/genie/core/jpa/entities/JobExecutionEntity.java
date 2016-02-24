@@ -43,6 +43,12 @@ import java.util.Set;
 @Entity
 @Table(name = "job_executions")
 public class JobExecutionEntity extends BaseEntity {
+    /**
+     * The exit code that will be set to indicate a job is currently executing.
+     */
+    public static final int DEFAULT_EXIT_CODE = -1;
+
+    private static final long serialVersionUID = -5073493356472801960L;
 
     @Basic(optional = false)
     @Column(name = "host_name", nullable = false, length = 255)
@@ -55,7 +61,7 @@ public class JobExecutionEntity extends BaseEntity {
 
     @Basic(optional = false)
     @Column(name = "exit_code", nullable = false)
-    private int exitCode = -1;
+    private int exitCode = DEFAULT_EXIT_CODE;
 
     @Basic(optional = false)
     @Column(name = "cluster_criteria", nullable = false, length = 1024)
@@ -186,6 +192,7 @@ public class JobExecutionEntity extends BaseEntity {
      * @return The read-only DTO.
      * @throws GenieException For any processing error
      */
+    //TODO: when we remove the cluster criteria need to remove throwing this exception
     public JobExecution getDTO() throws GenieException {
         return new JobExecution.Builder(
             this.hostName,
@@ -193,6 +200,9 @@ public class JobExecutionEntity extends BaseEntity {
         )
             .withExitCode(this.exitCode)
             .withClusterCriteria(this.getClusterCriteriaAsSet())
+            .withId(this.getId())
+            .withCreated(this.getCreated())
+            .withUpdated(this.getUpdated())
             .build();
     }
 }

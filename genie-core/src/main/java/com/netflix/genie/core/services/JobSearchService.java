@@ -18,10 +18,14 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -57,6 +61,15 @@ public interface JobSearchService {
             final String clusterId,
             final String commandName,
             final String commandId,
-            final Pageable page
+            @NotNull final Pageable page
     );
+
+    /**
+     * Given a hostname return a set of all the job executions currently running on that host.
+     *
+     * @param hostname The host name to search for. Not null or empty.
+     * @return All the jobs running on the host as a set of JobExecution objects
+     * @throws GenieException on error
+     */
+    Set<JobExecution> getAllJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException;
 }

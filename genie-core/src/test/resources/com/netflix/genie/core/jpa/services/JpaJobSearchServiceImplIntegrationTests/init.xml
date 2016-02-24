@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2016 Netflix, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<dataset>
+
+    <job_requests
+        id="job1"
+        created="2015-08-11 01:48:00"
+        updated="2014-08-11 02:59:00"
+        user="tgianos"
+        name="testPigJob"
+        version="2.4"
+        command_args="-f query.pig"
+        cluster_criterias="[
+            {&quot;tags&quot;:[&quot;sla&quot;,&quot;yarn&quot;]},
+            {&quot;tags&quot;:[&quot;adhoc&quot;,&quot;yarn&quot;]}
+        ]"
+        command_criteria="[&quot;pig&quot;,&quot;0.15.0&quot;]"
+        cpu="1"
+        memory="1560"
+        entity_version="1"
+    />
+    <jobs
+        id="job1"
+        created="2015-08-11 01:49:00"
+        updated="2014-08-11 02:59:00"
+        user="tgianos"
+        name="testPigJob"
+        status="SUCCEEDED"
+        version="2.4"
+        entity_version="0"/>
+    <job_executions
+        id="job1"
+        created="2015-08-11 01:49:00"
+        updated="2014-08-11 02:59:00"
+        host_name="a.netflix.com"
+        exit_code="0"
+        process_id="318"
+        cluster_criteria="[]"
+        entity_version="2"/>
+
+    <job_requests
+        id="job2"
+        created="2015-08-12 01:48:00"
+        updated="2015-08-12 02:59:00"
+        user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        command_args="-f spark.jar"
+        cluster_criterias="[
+            {&quot;tags&quot;:[&quot;sla&quot;,&quot;yarn&quot;]},
+            {&quot;tags&quot;:[&quot;adhoc&quot;,&quot;yarn&quot;]}
+        ]"
+        command_criteria="[&quot;spark&quot;]"
+        cpu="2"
+        memory="2048"
+        entity_version="1"
+    />
+    <jobs
+        id="job2"
+        created="2015-08-12 01:49:00"
+        updated="2015-08-12 02:59:00"
+        user="tgianos"
+        name="testSparkJob"
+        status="RUNNING"
+        version="2.4"
+        entity_version="0"/>
+    <job_executions
+        id="job2"
+        created="2015-08-12 01:49:00"
+        updated="2015-08-12 02:59:00"
+        host_name="a.netflix.com"
+        exit_code="-1"
+        process_id="319"
+        cluster_criteria="[]"
+        entity_version="0"/>
+
+    <job_requests
+        id="job3"
+        created="2016-02-24 01:48:00"
+        updated="2016-02-24 02:59:00"
+        user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        command_args="-f spark.jar"
+        cluster_criterias="[
+            {&quot;tags&quot;:[&quot;sla&quot;,&quot;yarn&quot;]},
+            {&quot;tags&quot;:[&quot;adhoc&quot;,&quot;yarn&quot;]}
+        ]"
+        command_criteria="[&quot;spark&quot;]"
+        cpu="2"
+        memory="2048"
+        entity_version="1"
+    />
+    <jobs
+        id="job3"
+        created="2016-02-24 01:49:00"
+        updated="2016-02-24 02:59:00"
+        user="tgianos"
+        name="testSparkJob"
+        status="RUNNING"
+        version="2.4"
+        entity_version="0"/>
+    <job_executions
+        id="job3"
+        created="2016-02-24 01:49:00"
+        updated="2014-02-24 02:59:00"
+        host_name="b.netflix.com"
+        exit_code="-1"
+        process_id="319"
+        cluster_criteria="[]"
+        entity_version="0"/>
+</dataset>

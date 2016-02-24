@@ -17,11 +17,15 @@
  */
 package com.netflix.genie.web.tasks.job;
 
+import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
+import com.netflix.genie.core.services.JobSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
@@ -29,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -42,6 +47,8 @@ import java.util.concurrent.ScheduledFuture;
 public class JobMonitoringCoordinator {
 
     private final Map<String, ScheduledFuture<?>> jobMonitors;
+    private final String hostname;
+    private final JobSearchService jobSearchService;
     private final TaskScheduler scheduler;
     private final ApplicationEventPublisher publisher;
     private final Executor executor;
@@ -49,20 +56,59 @@ public class JobMonitoringCoordinator {
     /**
      * Constructor.
      *
-     * @param publisher The event publisher to use to publish events
-     * @param scheduler The task scheduler to use to register scheduling of job checkers
-     * @param executor  The executor to use to launch processes
+     * @param hostname         The name of the host this Genie process is running on
+     * @param jobSearchService The search service to use to find jobs
+     * @param publisher        The event publisher to use to publish events
+     * @param scheduler        The task scheduler to use to register scheduling of job checkers
+     * @param executor         The executor to use to launch processes
      */
     @Autowired
     public JobMonitoringCoordinator(
+        final String hostname,
+        final JobSearchService jobSearchService,
         final ApplicationEventPublisher publisher,
         final TaskScheduler scheduler,
         final Executor executor
     ) {
         this.jobMonitors = new HashMap<>();
+        this.hostname = hostname;
+        this.jobSearchService = jobSearchService;
         this.publisher = publisher;
         this.scheduler = scheduler;
         this.executor = executor;
+    }
+
+    /**
+     * When this application is fully up and running this method should be triggered by an event. It will query the
+     * database to find any jobs already running on this node that aren't in the map. The use case for this is if
+     * the Genie application crashes when it comes back up it can find the jobs again and not leave them orphaned.
+     *
+     * @param event The spring boot application ready event indicating the application is ready to start taking load
+     */
+    @EventListener
+    public void attachToRunningJobs(final ApplicationReadyEvent event) {
+        log.info("Application is ready according to event {}. Attempting to re-attach to any running jobs", event);
+        try {
+            final Set<JobExecution> executions = this.jobSearchService.getAllJobExecutionsOnHost(this.hostname);
+            if (executions.isEmpty()) {
+                log.info("No jobs currently running on this node.");
+                return;
+            } else {
+                log.info("{} jobs currently running on this node at startup", executions.size());
+            }
+
+            for (final JobExecution execution : executions) {
+                if (this.jobMonitors.containsKey(execution.getId())) {
+                    log.info("Job {} is already being tracked. Ignoring.");
+                } else {
+                    this.scheduleMonitor(execution);
+                    log.info("Re-attached a job monitor to job {}", execution.getId());
+                }
+            }
+        } catch (final GenieException ge) {
+            log.error("Unable to fetch running jobs. Any running jobs will be orphaned", ge);
+            //TODO: log error?
+        }
     }
 
     /**
@@ -74,23 +120,7 @@ public class JobMonitoringCoordinator {
     @EventListener
     public void onJobStarted(final JobStartedEvent event) {
         if (!this.jobMonitors.containsKey(event.getJobExecution().getId())) {
-            final JobMonitor monitor
-                = new JobMonitor(event.getJobExecution(), this.executor, this.publisher);
-            final ScheduledFuture<?> future;
-            switch (monitor.getScheduleType()) {
-                case TRIGGER:
-                    future = this.scheduler.schedule(monitor, monitor.getTrigger());
-                    break;
-                case FIXED_DELAY:
-                    future = this.scheduler.scheduleWithFixedDelay(monitor, monitor.getFixedDelay());
-                    break;
-                case FIXED_RATE:
-                    future = this.scheduler.scheduleAtFixedRate(monitor, monitor.getFixedRate());
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unknown schedule type: " + monitor.getScheduleType());
-            }
-            this.jobMonitors.put(event.getJobExecution().getId(), future);
+            this.scheduleMonitor(event.getJobExecution());
         }
     }
 
@@ -113,5 +143,25 @@ public class JobMonitoringCoordinator {
                 //TODO: Add metric here
             }
         }
+    }
+
+    private void scheduleMonitor(final JobExecution jobExecution) {
+        final JobMonitor monitor
+            = new JobMonitor(jobExecution, this.executor, this.publisher);
+        final ScheduledFuture<?> future;
+        switch (monitor.getScheduleType()) {
+            case TRIGGER:
+                future = this.scheduler.schedule(monitor, monitor.getTrigger());
+                break;
+            case FIXED_DELAY:
+                future = this.scheduler.scheduleWithFixedDelay(monitor, monitor.getFixedDelay());
+                break;
+            case FIXED_RATE:
+                future = this.scheduler.scheduleAtFixedRate(monitor, monitor.getFixedRate());
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown schedule type: " + monitor.getScheduleType());
+        }
+        this.jobMonitors.put(jobExecution.getId(), future);
     }
 }
