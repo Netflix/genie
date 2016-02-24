@@ -29,8 +29,13 @@ genie:
       forwarding:
         enabled: true
       location: file:///tmp/genie/jobs/
+    runasuser:
+      enabled: true
+    createuser:
+      enabled: true
   leader:
     enabled: false
+
   tasks:
     pool:
       size: 10

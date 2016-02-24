@@ -23,6 +23,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -48,7 +49,22 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
     private static final String GENIE_LOG_PATH = "/genie/logs/genie.log";
     private static final String JOB_EXECUTION_DTO_KEY = "jexecdto";
     private static final String PID = "pid";
+    private static boolean isRunAsUserEnabled;
+    private static boolean isUserCreationEnabled;
 
+    /**
+     * Constructor.
+     *
+     * @param runAsUserEnabled Flag that tells if job should be run as user specified in the request
+     * @param userCreationEnabled Flag that tells if the user specified should be created
+     */
+    public JobKickoffTask(
+        final boolean runAsUserEnabled,
+        final boolean userCreationEnabled
+    ) {
+        this.isRunAsUserEnabled = runAsUserEnabled;
+        this.isUserCreationEnabled = userCreationEnabled;
+    }
     /**
      * {@inheritDoc}
      */
@@ -66,9 +82,19 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
             throw new GenieServerException("Cannot run application task as jobExecutionEnvironment is null");
         }
 
+        if (this.isUserCreationEnabled) {
+            createUser(jobExecEnv.getJobRequest().getUser(), jobExecEnv.getJobRequest().getGroup());
+        }
+
         final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
 
         final List command = new ArrayList<>();
+        if (this.isRunAsUserEnabled) {
+            changeOwnershipOfDirectory(jobExecEnv.getJobWorkingDir(), jobExecEnv.getJobRequest().getUser());
+            command.add("sudo");
+            command.add("-u");
+            command.add(jobExecEnv.getJobRequest().getUser());
+        }
         command.add("bash");
         command.add(jobLauncherScriptPath);
 
@@ -87,6 +113,52 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
         } catch (IOException ie) {
             throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
         }
+    }
+
+    private void createUser(
+        final String user,
+        final String group) throws GenieException {
+
+        // First check if user already exists
+        final List checkUserExistsCommand = new ArrayList<>();
+        checkUserExistsCommand.add("id");
+        checkUserExistsCommand.add("-u");
+        checkUserExistsCommand.add(user);
+
+        try {
+            this.executeBashCommand(checkUserExistsCommand, null);
+            log.info("User already exists");
+            return;
+        } catch (GenieException ge) {
+            log.info("User does not exist. Creating it now.");
+            final List command = new ArrayList<>();
+            command.add("sudo");
+            command.add("useradd");
+            command.add(user);
+
+            if (StringUtils.isNotBlank(group)) {
+                command.add("-G");
+                command.add(group);
+            }
+
+            command.add("-M");
+            this.executeBashCommand(command, null);
+        }
+    }
+
+    private void changeOwnershipOfDirectory(
+        final String jobWorkingDir,
+        final String user) throws GenieException {
+
+        final List command = new ArrayList<>();
+        // Don;t need sudo probably as the genie user is the one creating the working directory.
+        //command.add("sudo");
+        command.add("chown");
+        command.add("-R");
+        command.add(user);
+        command.add(jobWorkingDir);
+
+        this.executeBashCommand(command, null);
     }
 
     /**
