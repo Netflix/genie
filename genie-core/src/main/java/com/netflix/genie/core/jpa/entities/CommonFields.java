@@ -43,6 +43,8 @@ public class CommonFields extends BaseEntity {
     protected static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
     protected static final String COMMA = ",";
 
+    private static final long serialVersionUID = -5040659007494311180L;
+
     @Basic(optional = false)
     @Column(name = "version", nullable = false, length = 255)
     @NotBlank(message = "Version is missing and is required.")
@@ -161,15 +163,6 @@ public class CommonFields extends BaseEntity {
     }
 
     /**
-     * Set the original tags as a sorted lowercase csv.
-     *
-     * @param sortedTags The new sorted tags
-     */
-    protected void setSortedTags(final String sortedTags) {
-        this.sortedTags = sortedTags;
-    }
-
-    /**
      * Set the sorted tags.
      *
      * @param tags The tags to set
@@ -183,6 +176,15 @@ public class CommonFields extends BaseEntity {
                 .reduce((one, two) -> one + COMMA + two)
                 .get();
         }
+    }
+
+    /**
+     * Set the original tags as a sorted lowercase csv.
+     *
+     * @param sortedTags The new sorted tags
+     */
+    protected void setSortedTags(final String sortedTags) {
+        this.sortedTags = sortedTags;
     }
 
     /**

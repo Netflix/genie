@@ -20,6 +20,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 /**
  * Job repository.
  *
@@ -28,4 +30,13 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface JpaJobExecutionRepository extends JpaRepository<JobExecutionEntity, String>, JpaSpecificationExecutor {
+
+    /**
+     * Get all the job executions which are on the given host with the given exit code.
+     *
+     * @param hostName The hostname to search for
+     * @param exitCode The exit code to search for
+     * @return All the job executions currently running on that host
+     */
+    Set<JobExecutionEntity> findByHostNameAndExitCode(final String hostName, final int exitCode);
 }

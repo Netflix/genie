@@ -17,18 +17,23 @@
  */
 package com.netflix.genie.web.tasks.job;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
 import org.apache.commons.exec.Executor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 
@@ -41,19 +46,82 @@ import java.util.concurrent.ScheduledFuture;
 @Category(UnitTest.class)
 public class JobMonitoringCoordinatorUnitTests {
 
+    private static final String HOSTNAME = UUID.randomUUID().toString();
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
+    private JobSearchService jobSearchService;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
+        this.jobSearchService = Mockito.mock(JobSearchService.class);
         final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
         final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
 
-        this.coordinator = new JobMonitoringCoordinator(publisher, this.scheduler, executor);
+        this.coordinator
+            = new JobMonitoringCoordinator(HOSTNAME, this.jobSearchService, publisher, this.scheduler, executor);
+    }
+
+    /**
+     * Make sure the system will re-attach to running jobs.
+     *
+     * @throws GenieException on issue
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void canAttachToRunningJobs() throws GenieException {
+        final ApplicationReadyEvent event = Mockito.mock(ApplicationReadyEvent.class);
+
+        Mockito.when(this.jobSearchService.getAllJobExecutionsOnHost(HOSTNAME)).thenReturn(Sets.newHashSet());
+        this.coordinator.attachToRunningJobs(event);
+        Mockito
+            .verify(this.scheduler, Mockito.never())
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+
+        // Simulate a job being started
+        final String job1Id = UUID.randomUUID().toString();
+        final String job2Id = UUID.randomUUID().toString();
+        final String job3Id = UUID.randomUUID().toString();
+        final String job4Id = UUID.randomUUID().toString();
+        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818);
+        builder.withId(job1Id);
+        final JobExecution job1 = builder.build();
+        builder.withId(job2Id);
+        final JobExecution job2 = builder.build();
+        builder.withId(job3Id);
+        final JobExecution job3 = builder.build();
+        builder.withId(job4Id);
+        final JobExecution job4 = builder.build();
+
+        final JobStartedEvent event1 = new JobStartedEvent(job1, this);
+        final ScheduledFuture future = Mockito.mock(ScheduledFuture.class);
+        Mockito
+            .when(this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L)))
+            .thenReturn(future);
+        this.coordinator.onJobStarted(event1);
+        Mockito
+            .verify(this.scheduler, Mockito.times(1))
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+
+        final Set<JobExecution> executions = Sets.newHashSet(job1, job2, job3, job4);
+        Mockito.when(this.jobSearchService.getAllJobExecutionsOnHost(HOSTNAME)).thenReturn(executions);
+        this.coordinator.attachToRunningJobs(event);
+
+        Mockito
+            .verify(this.scheduler, Mockito.times(4))
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+
+        Mockito
+            .when(this.jobSearchService.getAllJobExecutionsOnHost(HOSTNAME))
+            .thenThrow(new GenieException(404, "blah"));
+        this.coordinator.attachToRunningJobs(event);
+        Mockito
+            .verify(this.scheduler, Mockito.times(4))
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+        Mockito.verifyNoMoreInteractions(this.scheduler);
     }
 
     /**
