@@ -20,7 +20,7 @@ package com.netflix.genie.web.security.saml;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +30,7 @@ import org.springframework.security.saml.SAMLCredential;
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,7 +40,7 @@ import java.util.List;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("security.saml.enabled")
+@ConditionalOnProperty("genie.security.saml.enabled")
 @Component
 @Slf4j
 public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
@@ -47,12 +48,17 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
     private static final GrantedAuthority USER = new SimpleGrantedAuthority("ROLE_USER");
     private static final GrantedAuthority ADMIN = new SimpleGrantedAuthority("ROLE_ADMIN");
 
-    @Value("${security.saml.attributes.user.name}")
-    protected String userAttributeName;
-    @Value("${security.saml.attributes.groups.name}")
-    protected String groupAttributeName;
-    @Value("${security.saml.attributes.groups.admin}")
-    protected String adminGroup;
+    private final SAMLProperties samlProperties;
+
+    /**
+     * Constructor.
+     *
+     * @param samlProperties The saml properties to use
+     */
+    @Autowired
+    public SAMLUserDetailsServiceImpl(@NotNull final SAMLProperties samlProperties) {
+        this.samlProperties = samlProperties;
+    }
 
     /**
      * {@inheritDoc}
@@ -63,20 +69,22 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
             throw new UsernameNotFoundException("No credential entered. Unable to get username.");
         }
 
-        //final String userId = credential.getNameID().getValue();
-        final String userId = credential.getAttributeAsString(this.userAttributeName);
+        final String userAttributeName = this.samlProperties.getAttributes().getUser().getName();
+        final String userId = credential.getAttributeAsString(userAttributeName);
         if (StringUtils.isBlank(userId)) {
-            throw new UsernameNotFoundException("No user id found using attribute: " + this.userAttributeName);
+            throw new UsernameNotFoundException("No user id found using attribute: " + userAttributeName);
         }
 
         // User exists. Give them at least USER role
         final List<GrantedAuthority> authorities = Lists.newArrayList(USER);
 
         // See if we can get any other roles
-        final String[] groups = credential.getAttributeAsStringArray(this.groupAttributeName);
+        final String groupAttributeName = this.samlProperties.getAttributes().getGroups().getName();
+        final String adminGroup = this.samlProperties.getAttributes().getGroups().getAdmin();
+        final String[] groups = credential.getAttributeAsStringArray(groupAttributeName);
         if (groups == null) {
             log.warn("No groups found. User will only get ROLE_USER by default.");
-        } else if (Arrays.asList(groups).contains(this.adminGroup)) {
+        } else if (Arrays.asList(groups).contains(adminGroup)) {
             authorities.add(ADMIN);
         }
 

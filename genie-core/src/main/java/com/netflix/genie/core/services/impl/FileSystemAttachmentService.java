@@ -23,11 +23,10 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.AttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,17 +41,28 @@ import java.io.InputStream;
 @Slf4j
 public class FileSystemAttachmentService implements AttachmentService {
 
-    @Value("${com.netflix.genie.core.attachments.dir:#{null}}")
     private String attachmentsDirectory;
+
+    /**
+     * Constructor.
+     *
+     * @param attachmentsDirectory The directory to use or null if want to default to system temp directory
+     */
+    @Autowired
+    public FileSystemAttachmentService(
+        @Value("${genie.jobs.attachments.dir:#{null}}") final String attachmentsDirectory
+    ) {
+        this.attachmentsDirectory = attachmentsDirectory;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void save(
-            final String jobId,
-            final String filename,
-            final InputStream content
+        final String jobId,
+        final String filename,
+        final InputStream content
     ) throws GenieException {
         final File attachment = new File(this.getAttachmentDirectory(), jobId + "/" + filename);
         try {
@@ -96,15 +106,6 @@ public class FileSystemAttachmentService implements AttachmentService {
         }
     }
 
-    /**
-     * Set the attachments directory. Used primarily for testing.
-     *
-     * @param attachmentsDirectory The new directory location to store attachments
-     */
-    protected void setAttachmentsDirectory(@NotNull @Size(min = 1) final String attachmentsDirectory) {
-        this.attachmentsDirectory = attachmentsDirectory;
-    }
-
     private File getAttachmentDirectory() throws GenieException {
         if (this.attachmentsDirectory == null) {
             this.attachmentsDirectory = System.getProperty("java.io.tmpdir") + "/genie/attachments";
@@ -112,7 +113,7 @@ public class FileSystemAttachmentService implements AttachmentService {
         final File dir = new File(this.attachmentsDirectory);
         if (dir.exists() && !dir.isDirectory()) {
             throw new GenieServerException(
-                    "Attachment directory configured isn't actually a directory: " + this.attachmentsDirectory
+                "Attachment directory configured isn't actually a directory: " + this.attachmentsDirectory
             );
         }
         return dir;

@@ -16,22 +16,23 @@
 #
 ##
 
-security:
-  saml:
-      enabled: true
-      attributes:
-        user:
-          name: userName
-        groups:
-          name: googleGroups
-          admin: genie-admin@gmail.com
-      idp:
-        serviceProviderMetadataURL: https://idp.something.com/MetadataQuery?partnerId=genie
-      keystore:
-#        name: genie-keystore.jks
-        password: password
-        defaultKey:
-          name: genie
+genie:
+  security:
+    saml:
+        enabled: true
+        attributes:
+          user:
+            name: userName
+          groups:
+            name: googleGroups
+            admin: genie-admin@gmail.com
+        idp:
+          serviceProviderMetadataURL: https://idp.something.com/MetadataQuery?partnerId=genie
+        keystore:
+  #        name: genie-keystore.jks
           password: password
-      sp:
-        entityId: genie
+          defaultKey:
+            name: genie
+            password: password
+        sp:
+          entityId: genie

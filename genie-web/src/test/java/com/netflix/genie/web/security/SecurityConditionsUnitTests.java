@@ -81,9 +81,9 @@ public class SecurityConditionsUnitTests {
     public void canEnableBeanWithSAMLEnabled() throws Exception {
         final AnnotationConfigApplicationContext context = this.load(
             SecurityEnabled.class,
-            "security.saml.enabled:true",
-            "security.x509.enabled:false",
-            "security.oauth2.enabled:false"
+            "genie.security.saml.enabled:true",
+            "genie.security.x509.enabled:false",
+            "genie.security.oauth2.enabled:false"
         );
         Assert.assertTrue(context.containsBean("myBean"));
         context.close();
@@ -98,9 +98,9 @@ public class SecurityConditionsUnitTests {
     public void canEnableBeanWithX509Enabled() throws Exception {
         final AnnotationConfigApplicationContext context = this.load(
             SecurityEnabled.class,
-            "security.saml.enabled:false",
-            "security.x509.enabled:true",
-            "security.oauth2.enabled:false"
+            "genie.security.saml.enabled:false",
+            "genie.security.x509.enabled:true",
+            "genie.security.oauth2.enabled:false"
         );
         Assert.assertTrue(context.containsBean("myBean"));
         context.close();
@@ -115,9 +115,9 @@ public class SecurityConditionsUnitTests {
     public void canEnableBeanWithOAuth2Enabled() throws Exception {
         final AnnotationConfigApplicationContext context = this.load(
             SecurityEnabled.class,
-            "security.saml.enabled:false",
-            "security.x509.enabled:false",
-            "security.oauth2.enabled:true"
+            "genie.security.saml.enabled:false",
+            "genie.security.x509.enabled:false",
+            "genie.security.oauth2.enabled:true"
         );
         Assert.assertTrue(context.containsBean("myBean"));
         context.close();
@@ -132,9 +132,9 @@ public class SecurityConditionsUnitTests {
     public void canEnableBeanWithAllSecurityEnabled() throws Exception {
         final AnnotationConfigApplicationContext context = this.load(
             SecurityEnabled.class,
-            "security.saml.enabled:true",
-            "security.x509.enabled:true",
-            "security.oauth2.enabled:true"
+            "genie.security.saml.enabled:true",
+            "genie.security.x509.enabled:true",
+            "genie.security.oauth2.enabled:true"
         );
         Assert.assertTrue(context.containsBean("myBean"));
         context.close();
