@@ -163,5 +163,6 @@ public class JobMonitoringCoordinator {
                 throw new UnsupportedOperationException("Unknown schedule type: " + monitor.getScheduleType());
         }
         this.jobMonitors.put(jobExecution.getId(), future);
+        log.info("Scheduled job monitoring for Job {}", jobExecution.getId());
     }
 }
