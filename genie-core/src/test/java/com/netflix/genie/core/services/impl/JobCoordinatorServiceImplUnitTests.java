@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
@@ -31,6 +32,7 @@ import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
@@ -53,6 +55,7 @@ public class JobCoordinatorServiceImplUnitTests {
     private static final String JOB_1_NAME = "relativity";
     private static final String JOB_1_USER = "einstien";
     private static final String JOB_1_VERSION = "1.0";
+    private static final String BASE_ARCHIVE_LOCATION = "file://baselocation";
 
     private JobCoordinatorService jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
@@ -71,7 +74,8 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
             this.jobSearchService,
-            this.jobSubmitterService
+            this.jobSubmitterService,
+            this.BASE_ARCHIVE_LOCATION
         );
     }
 
@@ -110,7 +114,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .withSetupFile(setupFile)
             .withGroup(group)
             .withTags(tags)
-            .withDisableLogArchival(false)
+            .withDisableLogArchival(true)
             .build();
 
         Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
@@ -129,8 +133,92 @@ public class JobCoordinatorServiceImplUnitTests {
         Assert.assertEquals(JOB_1_VERSION, argument.getValue().getVersion());
         Assert.assertEquals(JobStatus.INIT, argument.getValue().getStatus());
         Assert.assertEquals(description, argument.getValue().getDescription());
+    }
+
+    @Test
+    public void testCoordinateJobArchiveLocationEnabled() throws GenieException {
+
+        final String clientHost = "localhost";
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_1_NAME,
+            JOB_1_USER,
+            JOB_1_VERSION,
+            null,
+            null,
+            null
+        ).withDisableLogArchival(false)
+            .withId(JOB_1_ID)
+            .build();
+
+        Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
+        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
+        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
+        Assert.assertEquals(BASE_ARCHIVE_LOCATION + "/" + JOB_1_ID, argument.getValue().getArchiveLocation());
+
+    }
+
+    @Test(expected = GeniePreconditionException.class)
+    public void testCoordinateJobArchiveLocationEnabledBaseLocationMissing() throws GenieException {
+        final String clientHost = "localhost";
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_1_NAME,
+            JOB_1_USER,
+            JOB_1_VERSION,
+            null,
+            null,
+            null
+        ).withDisableLogArchival(false)
+            .withId(JOB_1_ID)
+            .build();
+
+        Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
+        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        final JobCoordinatorService jobCoordinatorService = new JobCoordinatorServiceImpl(
+            this.jobPersistenceService,
+            this.jobSearchService,
+            this.jobSubmitterService,
+            null
+        );
+        jobCoordinatorService.coordinateJob(jobRequest, clientHost);
+        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
+        Assert.assertEquals(BASE_ARCHIVE_LOCATION + "/" + JOB_1_ID, argument.getValue().getArchiveLocation());
+    }
+
+    @Test
+    public void testCoordinateJobArchiveLocationDisabled() throws GenieException {
+        final String clientHost = "localhost";
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_1_NAME,
+            JOB_1_USER,
+            JOB_1_VERSION,
+            null,
+            null,
+            null
+        ).withDisableLogArchival(true)
+            .withId(JOB_1_ID)
+            .build();
+
+        Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
+        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
+        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
         Assert.assertNull(argument.getValue().getArchiveLocation());
     }
+
+    @Test
+    public void testGetJob() throws GenieException {
+        final ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        this.jobCoordinatorService.getJob(JOB_1_ID);
+        Mockito.verify(this.jobPersistenceService).getJob(argument.capture());
+        Assert.assertEquals(JOB_1_ID, argument.getValue());
+    }
+
+    @Test
+    @Ignore
+    public void testGetJobs() {
+    }
+
     /**
      * Make sure if a job execution isn't found it returns a GenieNotFound exception.
      *

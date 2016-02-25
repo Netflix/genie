@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -63,16 +64,20 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      * @param jobPersistenceService implementation of job persistence service interface
      * @param jobSearchService      implementation of job search service interface
      * @param jobSubmitterService   implementation of the job submitter service
+     * @param baseArchiveLocation The base directory location of where the job dir should be archived
      */
     @Autowired
     public JobCoordinatorServiceImpl(
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
-        final JobSubmitterService jobSubmitterService
+        final JobSubmitterService jobSubmitterService,
+        @Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
+        final String baseArchiveLocation
     ) {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
         this.jobSubmitterService = jobSubmitterService;
+        this.baseArchiveLocation = baseArchiveLocation;
     }
 
     /**
@@ -101,8 +106,12 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         }
 
         String jobArchivalLocation = null;
-        if (!jobRequestWithId.isDisableLogArchival() && baseArchiveLocation != null) {
-           jobArchivalLocation = baseArchiveLocation + "/" + jobRequestWithId.getId();
+        if (!jobRequestWithId.isDisableLogArchival()) {
+            if(baseArchiveLocation == null) {
+                throw new
+                    GeniePreconditionException("Job archival is enabled but base location for archival is null.");
+            }
+            jobArchivalLocation = baseArchiveLocation + "/" + jobRequestWithId.getId();
         }
         // create the job object in the database with status INIT
         final Job job  = new Job.Builder(
