@@ -19,9 +19,11 @@ package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.hamcrest.Matchers;
@@ -83,9 +85,15 @@ public class JobMonitorUnitTests {
     @Test
     public void canCheckRunningProcessOnUnixLikeSystem() throws IOException {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenReturn(0);
+        Mockito
+            .when(this.executor.execute(Mockito.any(CommandLine.class)))
+            .thenReturn(0)
+            .thenThrow(new IOException())
+            .thenReturn(0);
 
-        this.monitor.run();
+        for (int i = 0; i < 3; i++) {
+            this.monitor.run();
+        }
 
         Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(ApplicationEvent.class));
     }
@@ -98,7 +106,7 @@ public class JobMonitorUnitTests {
     @Test
     public void canCheckFinishedProcessOnUnixLikeSystem() throws IOException {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenReturn(1);
+        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new ExecuteException("done", 1));
 
         this.monitor.run();
 
@@ -113,7 +121,7 @@ public class JobMonitorUnitTests {
     }
 
     /**
-     * Make sure that an error doesn't publish anything.
+     * Make sure that an error doesn't publish anything until it runs too many times then it tries to kill the job.
      *
      * @throws IOException on error
      */
@@ -122,9 +130,18 @@ public class JobMonitorUnitTests {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
 
-        this.monitor.run();
+        // Run six times to force error
+        for (int i = 0; i < 6; i++) {
+            this.monitor.run();
+        }
 
-        Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(ApplicationEvent.class));
+        final ArgumentCaptor<KillJobEvent> captor = ArgumentCaptor.forClass(KillJobEvent.class);
+        Mockito
+            .verify(this.publisher, Mockito.times(1))
+            .publishEvent(captor.capture());
+        Assert.assertNotNull(captor.getValue());
+        Assert.assertThat(captor.getValue().getId(), Matchers.is(this.jobExecution.getId()));
+        Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
     }
 
     /**
