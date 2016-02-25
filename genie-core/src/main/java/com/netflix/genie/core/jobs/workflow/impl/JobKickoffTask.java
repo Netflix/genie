@@ -110,7 +110,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
             final String hostname = InetAddress.getLocalHost().getHostAddress();
             final int processId = getProcessId(process);
             final JobExecution jobExecution =
-                new JobExecution.Builder(hostname, processId).withId(jobExecEnv.getId()).build();
+                new JobExecution.Builder(hostname, processId).withId(jobExecEnv.getJobRequest().getId()).build();
             context.put(JOB_EXECUTION_DTO_KEY, jobExecution);
         } catch (IOException ie) {
             throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);

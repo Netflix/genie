@@ -17,7 +17,10 @@
  */
 package com.netflix.genie.core.services.impl;
 
-
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
@@ -28,7 +31,6 @@ import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
-import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
@@ -43,9 +45,12 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of the Job Submitter service that runs the job locally on the same host.
@@ -63,13 +68,11 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     private final JobPersistenceService jobPersistenceService;
     private final ClusterService clusterService;
     private final CommandService commandService;
-    private final ApplicationService applicationService;
     private final ClusterLoadBalancer clusterLoadBalancer;
     private final List<WorkflowTask> jobWorkflowTasks;
-
-    private String baseWorkingDirPath;
-    private ApplicationEventPublisher applicationEventPublisher;
-    private GenieFileTransferService fileTransferService;
+    private final String baseWorkingDirPath;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final GenieFileTransferService fileTransferService;
     private final WorkflowExecutor wfExecutor;
 
     /**
@@ -78,33 +81,30 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param jps                  Implementation of the job persistence service
      * @param clusterService       Implementation of cluster service interface
      * @param commandService       Implementation of command service interface
-     * @param applicationService   Implementation of the application service interface
-     * @param fts File Transfer service
      * @param clusterLoadBalancer  Implementation of the cluster load balancer interface
-     * @param workflowTasks List of all the workflow tasks to be executed
-     * @param genieWorkingDir Working directory for genie where it creates jobs directories
+     * @param fts File Transfer service
      * @param workflowExecutor An executor that executes impl in a workflow
      * @param aep Instance of the event publisher
+     * @param workflowTasks List of all the workflow tasks to be executed
+     * @param genieWorkingDir Working directory for genie where it creates jobs directories
      */
     @Autowired
     public LocalJobSubmitterImpl(
         final JobPersistenceService jps,
         final ClusterService clusterService,
         final CommandService commandService,
-        final ApplicationService applicationService,
         final ClusterLoadBalancer clusterLoadBalancer,
         final GenieFileTransferService fts,
+        final WorkflowExecutor workflowExecutor,
+        final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
         @Value("${genie.jobs.dir.location:/mnt/tomcat/genie-jobs}")
-        final String genieWorkingDir,
-        final WorkflowExecutor workflowExecutor,
-        final ApplicationEventPublisher aep
+        final String genieWorkingDir
     ) {
 
         this.jobPersistenceService = jps;
         this.clusterService = clusterService;
         this.commandService = commandService;
-        this.applicationService = applicationService;
         this.clusterLoadBalancer = clusterLoadBalancer;
         this.jobWorkflowTasks = workflowTasks;
         this.baseWorkingDirPath = genieWorkingDir;
@@ -127,18 +127,11 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     ) throws GenieException {
         log.debug("called with job request {}", jobRequest);
 
-        // construct the job execution environment object for this job request
-        JobExecutionEnvironment jee = null;
-
+        final Cluster cluster;
+        // Resolve the cluster for the job request
         try {
-            jee = new JobExecutionEnvironment(
-                this.clusterService,
-                this.commandService,
-                this.applicationService,
-                this.clusterLoadBalancer,
-                jobRequest,
-                baseWorkingDirPath
-            );
+            cluster = clusterLoadBalancer
+                .selectCluster(clusterService.chooseClusterForJobRequest(jobRequest));
         } catch (GeniePreconditionException gpe) {
             this.jobPersistenceService.updateJobStatus(
                 jobRequest.getId(),
@@ -146,6 +139,41 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
                 "Unable to resolve to valid cluster/command combination for criteria specified.");
             throw gpe;
         }
+
+        // Resolve the command for the job request
+        final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
+        enumStatuses.add(CommandStatus.ACTIVE);
+        Command command = null;
+
+        for (final Command cmd : this.clusterService.getCommandsForCluster(
+            cluster.getId(),
+            enumStatuses
+        )) {
+            if (cmd.getTags().containsAll(jobRequest.getCommandCriteria())) {
+                command = cmd;
+                break;
+            }
+        }
+
+        if (command == null) {
+            final String msg = "No command found for params. Unable to continue.";
+            log.error(msg);
+            throw new GeniePreconditionException(msg);
+        }
+
+        final List<Application> applications = new ArrayList<>();
+        applications.addAll(commandService.getApplicationsForCommand(command.getId()));
+
+        final String jobWorkingDir = baseWorkingDirPath + "/" + jobRequest.getId();
+
+        // construct the job execution environment object for this job request
+        final JobExecutionEnvironment jee = new JobExecutionEnvironment.Builder()
+            .withJobRequest(jobRequest)
+            .withCluster(cluster)
+            .withCommand(command)
+            .withApplications(applications)
+            .withJobWorkingDir(jobWorkingDir)
+            .build();
 
         // Job can be run as there is a valid cluster/command combination for it.
         final Map<String, Object> context = new HashMap<>();

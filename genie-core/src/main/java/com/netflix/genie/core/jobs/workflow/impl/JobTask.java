@@ -87,7 +87,7 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
         for (final String dependencyFile: jobExecEnv.getJobRequest().getFileDependencies()) {
             fetchFile(
                 jobExecEnv.getJobWorkingDir(),
-                jobExecEnv.getId(),
+                jobExecEnv.getJobRequest().getId(),
                 dependencyFile,
                 DEPENDENCY_FILE_PATH_PREFIX
             );

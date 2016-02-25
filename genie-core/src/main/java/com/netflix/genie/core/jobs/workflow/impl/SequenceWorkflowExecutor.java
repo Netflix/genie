@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class JobWorkflowExecutor implements WorkflowExecutor {
+public class SequenceWorkflowExecutor implements WorkflowExecutor {
 
     /**
      * {@inheritDoc}
