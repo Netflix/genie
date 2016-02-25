@@ -135,6 +135,11 @@ public class JobCoordinatorServiceImplUnitTests {
         Assert.assertEquals(description, argument.getValue().getDescription());
     }
 
+    /**
+     * Test the coordinate job method with archive location enabled.
+     *
+     * @throws GenieException If there is any problem
+     */
     @Test
     public void testCoordinateJobArchiveLocationEnabled() throws GenieException {
 
@@ -158,6 +163,11 @@ public class JobCoordinatorServiceImplUnitTests {
 
     }
 
+    /**
+     * Test the coordinate job method with archive location enabled but base archive directory not set.
+     *
+     * @throws GenieException If there is any problem
+     */
     @Test(expected = GeniePreconditionException.class)
     public void testCoordinateJobArchiveLocationEnabledBaseLocationMissing() throws GenieException {
         final String clientHost = "localhost";
@@ -174,17 +184,22 @@ public class JobCoordinatorServiceImplUnitTests {
 
         Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
         final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
-        final JobCoordinatorService jobCoordinatorService = new JobCoordinatorServiceImpl(
+        final JobCoordinatorService jcs = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
             this.jobSearchService,
             this.jobSubmitterService,
             null
         );
-        jobCoordinatorService.coordinateJob(jobRequest, clientHost);
+        jcs.coordinateJob(jobRequest, clientHost);
         Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
         Assert.assertEquals(BASE_ARCHIVE_LOCATION + "/" + JOB_1_ID, argument.getValue().getArchiveLocation());
     }
 
+    /**
+     * Test the coordinate job method with archive location disabled.
+     *
+     * @throws GenieException If there is any problem
+     */
     @Test
     public void testCoordinateJobArchiveLocationDisabled() throws GenieException {
         final String clientHost = "localhost";
@@ -206,6 +221,11 @@ public class JobCoordinatorServiceImplUnitTests {
         Assert.assertNull(argument.getValue().getArchiveLocation());
     }
 
+    /**
+     * Test the get job method to verify that the id sent is used to fetch from persistence service.
+     *
+     * @throws GenieException If there is any problem
+     */
     @Test
     public void testGetJob() throws GenieException {
         final ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
@@ -214,9 +234,14 @@ public class JobCoordinatorServiceImplUnitTests {
         Assert.assertEquals(JOB_1_ID, argument.getValue());
     }
 
+    /**
+     * Test the get jobs method.
+     *
+     * @throws GenieException If there is any problem
+     */
     @Test
     @Ignore
-    public void testGetJobs() {
+    public void testGetJobs() throws GenieException {
     }
 
     /**

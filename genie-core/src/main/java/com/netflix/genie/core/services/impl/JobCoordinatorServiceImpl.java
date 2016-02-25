@@ -85,6 +85,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      *
      * @param jobRequest of job to run
      * @param clientHost Hostname of the client sending request
+     *
+     * @return The id of the job just submitted.
      * @throws GenieException if there is an error
      */
     @Override
@@ -107,7 +109,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
         String jobArchivalLocation = null;
         if (!jobRequestWithId.isDisableLogArchival()) {
-            if(baseArchiveLocation == null) {
+            if (baseArchiveLocation == null) {
                 throw new
                     GeniePreconditionException("Job archival is enabled but base location for archival is null.");
             }
