@@ -30,9 +30,9 @@ genie:
         enabled: true
       location: file:///tmp/genie/jobs/
     runasuser:
-      enabled: true
+      enabled: false
     createuser:
-      enabled: true
+      enabled: false
   leader:
     enabled: false
 
