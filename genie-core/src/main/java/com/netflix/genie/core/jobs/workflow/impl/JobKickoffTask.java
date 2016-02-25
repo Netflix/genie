@@ -24,6 +24,7 @@ import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -51,6 +52,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
     private static final String PID = "pid";
     private boolean isRunAsUserEnabled;
     private boolean isUserCreationEnabled;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * Constructor.

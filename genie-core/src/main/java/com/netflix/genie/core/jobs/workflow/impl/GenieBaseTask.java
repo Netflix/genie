@@ -51,13 +51,12 @@ public abstract class GenieBaseTask {
     protected static final String DEPENDENCY_FILE_PATH_PREFIX = "dependencies";
     protected static final String CONFIG_FILE_PATH_PREFIX = "config";
     protected static final String FILE_PATH_DELIMITER = "/";
-
-    // Directory paths env variables
-    private static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
-    private static final String GENIE_JOB_DIR_ENV_VAR = "GENIE_JOB_DIR";
-    private static final String GENIE_CLUSTER_DIR_ENV_VAR = "GENIE_CLUSTER_DIR";
-    private static final String GENIE_COMMAND_DIR_ENV_VAR = "GENIE_COMMAND_DIR";
-    private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
+    protected static final String APPLICATION_PATH_VAR = "applications";
+    protected static final String COMMAND_PATH_VAR = "commmand";
+    protected static final String CLUSTER_PATH_VAR = "cluster";
+    protected static final String JOB_PATH_VAR = "job";
+    protected static final String GENIE_PATH_VAR = "genie";
+    protected static final String LOGS_PATH_VAR = "logs";
 
     /**
      * Helper method that executes a bash command.

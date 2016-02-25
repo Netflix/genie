@@ -104,7 +104,7 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
                 + STDERR_LOG_PATH
         );
         // capture exit code and write to genie.done file
-        appendToWriter(writer, "echo $? > " + GENIE_DONE_FILE);
+        appendToWriter(writer, "printf '{\"exitCode\": \"%s\"}\\n' \"$?\" > " + GENIE_DONE_FILE);
         closeWriter(writer);
     }
 

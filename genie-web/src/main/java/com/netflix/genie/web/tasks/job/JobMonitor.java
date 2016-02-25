@@ -93,9 +93,6 @@ public class JobMonitor implements NodeTask {
         final CommandLine commandLine = new CommandLine("ps");
         commandLine.addArgument("-p");
         commandLine.addArgument("${" + PID_KEY + "}");
-        commandLine.addArgument(">");
-        commandLine.addArgument("/dev/null");
-        commandLine.addArgument("2>&1");
         commandLine.setSubstitutionMap(substitutionMap);
 
         // TODO: Should we add a timeout?

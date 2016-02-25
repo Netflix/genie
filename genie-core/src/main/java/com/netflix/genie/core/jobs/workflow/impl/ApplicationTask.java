@@ -40,7 +40,6 @@ import java.util.Map;
 @Slf4j
 public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
 
-    private static final String APPLICATION_PATH_VAR = "applications";
     private GenieFileTransferService fts;
 
     /**

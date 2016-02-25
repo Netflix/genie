@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
@@ -37,6 +38,7 @@ import com.netflix.genie.core.services.JobSubmitterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
@@ -66,6 +68,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     private final List<WorkflowTask> jobWorkflowTasks;
 
     private String baseWorkingDirPath;
+    private ApplicationEventPublisher applicationEventPublisher;
     private GenieFileTransferService fileTransferService;
     private final WorkflowExecutor wfExecutor;
 
@@ -81,6 +84,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param workflowTasks List of all the workflow tasks to be executed
      * @param genieWorkingDir Working directory for genie where it creates jobs directories
      * @param workflowExecutor An executor that executes impl in a workflow
+     * @param aep Instance of the event publisher
      */
     @Autowired
     public LocalJobSubmitterImpl(
@@ -93,7 +97,8 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final List<WorkflowTask> workflowTasks,
         @Value("${genie.jobs.dir.location:/mnt/tomcat/genie-jobs}")
         final String genieWorkingDir,
-        final WorkflowExecutor workflowExecutor
+        final WorkflowExecutor workflowExecutor,
+        final ApplicationEventPublisher aep
     ) {
 
         this.jobPersistenceService = jps;
@@ -105,6 +110,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         this.baseWorkingDirPath = genieWorkingDir;
         this.wfExecutor = workflowExecutor;
         this.fileTransferService = fts;
+        this.applicationEventPublisher = aep;
     }
 
     /**
@@ -163,6 +169,10 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
             this.jobPersistenceService.updateCommandForJob(
                 jobRequest.getId(),
                 jee.getCommand().getId());
+
+            // Publish a job start Event
+            this.applicationEventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
+
         } else {
             throw new GenieServerException("Job Submission failed.");
         }

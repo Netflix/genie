@@ -25,7 +25,7 @@ import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jobs.workflow.impl.ApplicationTask;
 import com.netflix.genie.core.jobs.workflow.impl.ClusterTask;
 import com.netflix.genie.core.jobs.workflow.impl.CommandTask;
-import com.netflix.genie.core.jobs.workflow.impl.IntialSetupTask;
+import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +49,7 @@ public class JobConfigTest {
     @Bean
     @Order(value = 1)
     public WorkflowTask initialSetupTask() {
-        return new IntialSetupTask();
+        return new InitialSetupTask();
     }
 
     /**

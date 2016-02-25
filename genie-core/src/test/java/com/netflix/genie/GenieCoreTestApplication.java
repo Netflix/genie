@@ -98,46 +98,4 @@ public class  GenieCoreTestApplication {
         dbConnection.setDatabaseConfig(dbUnitDatabaseConfig());
         return dbConnection;
     }
-
-    /**
-     * Setup a bean to provide the list of impl in the workflow.
-     *
-     * @return List of workflow impl.
-     */
-//    @Bean
-//    // TODO Maybe return an empty list for testing? How is this used in testing.
-//    public List<WorkflowTask> taskList() {
-//        final List<WorkflowTask> taskList = new ArrayList<>();
-//        taskList.add(new IntialSetupTask());
-//        taskList.add(new ApplicationTask());
-//        taskList.add(new CommandTask());
-//        taskList.add(new ClusterTask());
-//        taskList.add(new JobTask());
-//        taskList.add(new JobKickoffTask());
-//        return taskList;
-//    }
-
-//    /**
-//     * Create an Application Task bean that processes all Applications needed for a job.
-//     *
-//     * @return An application task object
-//     */
-//    @Bean
-//    public WorkflowTask applicationProcessorTask() {
-//        return new ApplicationTask();
-//    }
-//
-//    /**
-//     * Setup a bean to provide the list of impl in the workflow.
-//     *
-//     * @return List of workflow impl.
-//     */
-//    @Bean
-//    public List<WorkflowTask> taskList(
-//    ) {
-//        final List<WorkflowTask> taskList = new ArrayList<>();
-//        taskList.add(applicationProcessorTask());
-//
-//        return taskList;
-//    }
 }

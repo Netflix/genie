@@ -22,6 +22,7 @@ import com.netflix.genie.web.tasks.leader.LeadershipTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -49,7 +50,9 @@ public class TaskConfig {
      */
     @Bean
     public Executor processExecutor() {
-        return new DefaultExecutor();
+        final Executor executor = new DefaultExecutor();
+        executor.setStreamHandler(new PumpStreamHandler(null, null));
+        return executor;
     }
 
     /**
