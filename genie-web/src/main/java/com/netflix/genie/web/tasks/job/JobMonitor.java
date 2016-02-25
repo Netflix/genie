@@ -19,10 +19,12 @@ package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -44,8 +46,12 @@ import java.util.Map;
 public class JobMonitor implements NodeTask {
 
     private static final String PID_KEY = "pid";
-    private static final int PS_SUCCESS = 0;
 
+    // How many error iterations we can handle
+    // TODO: Make this a variable
+    private static final int MAX_ERRORS = 5;
+
+    private int errorCount;
     private final JobExecution execution;
     private final Executor executor;
     private final ApplicationEventPublisher publisher;
@@ -62,6 +68,7 @@ public class JobMonitor implements NodeTask {
         @NotNull final Executor executor,
         @NotNull final ApplicationEventPublisher publisher
     ) {
+        this.errorCount = 0;
         this.execution = execution;
         this.executor = executor;
         this.publisher = publisher;
@@ -81,25 +88,35 @@ public class JobMonitor implements NodeTask {
         final Map<String, Object> substitutionMap = new HashMap<>();
         substitutionMap.put(PID_KEY, pid);
 
+        // Using PS for now but could instead check for existence of done file if this proves to have bad performance
+        // send output to /dev/null so it doesn't print to the logs
         final CommandLine commandLine = new CommandLine("ps");
         commandLine.addArgument("-p");
         commandLine.addArgument("${" + PID_KEY + "}");
+        commandLine.addArgument(">");
+        commandLine.addArgument("/dev/null");
+        commandLine.addArgument("2>&1");
         commandLine.setSubstitutionMap(substitutionMap);
 
         // TODO: Should we add a timeout?
         try {
             // Blocks until result
-            final int result = this.executor.execute(commandLine);
-            if (result == PS_SUCCESS) {
-                //TODO: If the process is still running check the length of the Stdout and Stderr
-                log.debug("Job {} is still running...", this.execution.getId());
-            } else {
-                log.info("Job {} has finished", this.execution.getId());
-                this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
+            this.executor.execute(commandLine);
+            log.debug("Job {} is still running...", this.execution.getId());
+            if (this.errorCount != 0) {
+                this.errorCount = 0;
             }
+        } catch (final ExecuteException ee) {
+            log.info("Job {} has finished", this.execution.getId());
+            this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
         } catch (final IOException ioe) {
             // Some other error
             log.error("Some IOException happened unable to check process status for pid {}", pid, ioe);
+            this.errorCount++;
+            // If this keeps throwing errors out we should kill the job
+            if (this.errorCount > MAX_ERRORS) {
+                this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), this));
+            }
         }
     }
 
