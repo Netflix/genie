@@ -32,7 +32,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("security.x509.enabled")
+@ConditionalOnProperty("genie.security.x509.enabled")
 @Configuration
 @Order(4)
 public class X509Config extends WebSecurityConfigurerAdapter {

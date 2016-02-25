@@ -31,7 +31,7 @@ import javax.annotation.PostConstruct;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("spring.redis.enabled")
+@ConditionalOnProperty("genie.redis.enabled")
 @Import(RedisAutoConfiguration.class)
 @EnableRedisHttpSession
 @Slf4j

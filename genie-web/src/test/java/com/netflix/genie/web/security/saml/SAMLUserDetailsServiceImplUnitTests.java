@@ -55,10 +55,17 @@ public class SAMLUserDetailsServiceImplUnitTests {
      */
     @Before
     public void setup() {
-        this.service = new SAMLUserDetailsServiceImpl();
-        this.service.adminGroup = ADMIN_GROUP;
-        this.service.userAttributeName = USER_ATTRIBUTE_NAME;
-        this.service.groupAttributeName = GROUP_ATTRIBUTE_NAME;
+        final SAMLProperties samlProperties = new SAMLProperties();
+        final SAMLProperties.Attributes attributes = new SAMLProperties.Attributes();
+        final SAMLProperties.Attributes.User user = new SAMLProperties.Attributes.User();
+        user.setName(USER_ATTRIBUTE_NAME);
+        attributes.setUser(user);
+        final SAMLProperties.Attributes.Groups groups = new SAMLProperties.Attributes.Groups();
+        groups.setName(GROUP_ATTRIBUTE_NAME);
+        groups.setAdmin(ADMIN_GROUP);
+        attributes.setGroups(groups);
+        samlProperties.setAttributes(attributes);
+        this.service = new SAMLUserDetailsServiceImpl(samlProperties);
     }
 
     /**

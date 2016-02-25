@@ -58,8 +58,7 @@ public class FileSystemAttachmentServiceUnitTests {
      */
     @Before
     public void setup() throws IOException {
-        this.service = new FileSystemAttachmentService();
-        this.service.setAttachmentsDirectory(this.folder.getRoot().getAbsolutePath());
+        this.service = new FileSystemAttachmentService(this.folder.getRoot().getAbsolutePath());
     }
 
     /**
