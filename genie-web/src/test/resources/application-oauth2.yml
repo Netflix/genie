@@ -16,14 +16,18 @@
 #
 ##
 
+genie:
+  security:
+    oauth2:
+      enabled: true
+      pingfederate:
+        enabled: true
+
 security:
   oauth2:
-    enabled: true
     client:
       client-id: genie-resourceserver
       client-secret: someClientSecret
-    pingfederate:
-      enabled: true
     resource:
       id: genie-resourceserver
       token-info-uri: https://pingfederate.mydomain.com/as/token.oauth2

@@ -19,10 +19,6 @@
 banner:
   location: genie-banner.txt
 
-eureka:
-  client:
-    enabled: false
-
 genie:
   jobs:
     dir:
@@ -30,6 +26,20 @@ genie:
         enabled: true
       location: file:///tmp/genie/jobs/
   leader:
+    enabled: false
+  redis:
+    enabled: false
+  security:
+    oauth2:
+      enabled: false
+      pingfederate:
+        enabled:
+          false
+    saml:
+      enabled: false
+    x509:
+      enabled: false
+  swagger:
     enabled: false
   tasks:
     pool:
@@ -45,14 +55,6 @@ multipart:
 security:
   basic:
     enabled: false
-  oauth2:
-    enabled: false
-    pingfederate:
-      enabled: false
-  saml:
-    enabled: false
-  x509:
-    enabled: false
 
 spring:
   application:
@@ -65,5 +67,3 @@ spring:
         namespace: /genie/leader/
   profiles:
     active: dev
-  redis:
-    enabled: false

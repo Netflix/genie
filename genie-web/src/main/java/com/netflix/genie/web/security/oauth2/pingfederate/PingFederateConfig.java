@@ -31,7 +31,7 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty(name = {"security.oauth2.enabled", "security.oauth2.pingfederate.enabled"})
+@ConditionalOnProperty(name = {"genie.security.oauth2.enabled", "genie.security.oauth2.pingfederate.enabled"})
 @Configuration
 public class PingFederateConfig {
 

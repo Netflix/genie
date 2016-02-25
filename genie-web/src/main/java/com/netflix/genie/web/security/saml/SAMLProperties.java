@@ -32,8 +32,8 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("security.saml.enabled")
-@ConfigurationProperties(prefix = "security.saml")
+@ConditionalOnProperty("genie.security.saml.enabled")
+@ConfigurationProperties(prefix = "genie.security.saml")
 @Component
 @Data
 public class SAMLProperties {
