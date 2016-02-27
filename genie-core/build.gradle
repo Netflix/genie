@@ -16,6 +16,7 @@ dependencies {
     // Commons Libs
     compile("commons-httpclient:commons-httpclient")
     compile("commons-io:commons-io")
+    compile("org.apache.commons:commons-exec:${commons_exec_version}")
 
     // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-aop")

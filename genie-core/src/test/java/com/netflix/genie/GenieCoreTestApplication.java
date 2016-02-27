@@ -19,6 +19,9 @@ package com.netflix.genie;
 
 import com.github.springtestdbunit.bean.DatabaseConfigBean;
 import com.github.springtestdbunit.bean.DatabaseDataSourceConnectionFactoryBean;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -97,5 +100,17 @@ public class  GenieCoreTestApplication {
                 = new DatabaseDataSourceConnectionFactoryBean(dataSource);
         dbConnection.setDatabaseConfig(dbUnitDatabaseConfig());
         return dbConnection;
+    }
+
+    /**
+     * Get an {@link Executor} to use for executing processes from tasks.
+     *
+     * @return The executor to use
+     */
+    @Bean
+    public Executor processExecutor() {
+        final Executor executor = new DefaultExecutor();
+        executor.setStreamHandler(new PumpStreamHandler(null, null));
+        return executor;
     }
 }
