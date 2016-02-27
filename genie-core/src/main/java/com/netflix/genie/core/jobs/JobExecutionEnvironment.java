@@ -20,15 +20,18 @@ package com.netflix.genie.core.jobs;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
-
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import lombok.Getter;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -45,7 +48,7 @@ public class JobExecutionEnvironment {
     private JobRequest jobRequest;
     private Cluster cluster;
     private Command command;
-    private List<Application> applications = new ArrayList<>();
+    private Set<Application> applications = new HashSet<>();
     private String jobWorkingDir;
 
     /**
@@ -75,59 +78,40 @@ public class JobExecutionEnvironment {
         private String jobWorkingDir;
 
         /**
-         * Set the jobRequest for the jobs' execution.
+         * Constructor.
          *
          * @param request The job request object.
-         * @return The builder
-         */
-        public Builder withJobRequest(final JobRequest request) {
-            this.jobRequest = request;
-            return this;
-        }
-
-        /**
-         * Set the cluster for the jobs' execution.
-         *
          * @param clusterObj The cluster object.
-         * @return The builder
-         */
-        public Builder withCluster(final Cluster clusterObj) {
-            this.cluster = clusterObj;
-            return this;
-        }
-
-        /**
-         * Set the command for the jobs' execution.
-         *
          * @param commandObj The command object.
-         * @return The builder
+         * @param dir The directory location for the jobs
+         * @throws GenieException If there is an error
          */
-        public Builder withCommand(final Command commandObj) {
+        public Builder(
+            @NotNull(message = "Job Request cannot be null")
+            final JobRequest request,
+            @NotNull(message = "Cluster cannot be null")
+            final Cluster clusterObj,
+            @NotNull(message = "Command cannot be null")
+            final Command commandObj,
+            @NotBlank(message = "Job working directory cannot be empty")
+            final String dir
+        ) throws GenieException {
+            this.jobRequest = request;
+            this.cluster = clusterObj;
             this.command = commandObj;
-            return this;
+            this.jobWorkingDir = dir;
         }
 
         /**
          * Set the applications needed for the jobs' execution.
          *
-         * @param applicationList The list of application objects.
+         * @param applicationSet The set of application objects.
          * @return The builder
          */
-        public Builder withApplications(final List<Application> applicationList) {
-            if (applicationList != null) {
-                this.applications.addAll(applicationList);
+        public Builder withApplications(final Set<Application> applicationSet) {
+            if (applicationSet != null) {
+                this.applications.addAll(applicationSet);
             }
-            return this;
-        }
-
-        /**
-         * Set the working directory for the jobs' execution.
-         *
-         * @param dir The directory location for the job
-         * @return The builder
-         */
-        public Builder withJobWorkingDir(final String dir) {
-            this.jobWorkingDir = dir;
             return this;
         }
 

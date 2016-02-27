@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.services.impl;
 
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -38,6 +37,7 @@ import com.netflix.genie.core.services.GenieFileTransferService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -45,7 +45,6 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -98,7 +97,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final WorkflowExecutor workflowExecutor,
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
-        @Value("${genie.jobs.dir.location:/mnt/tomcat/genie-jobs}")
+        @Value("${genie.jobs.dir.location:${null}")
         final String genieWorkingDir
     ) {
 
@@ -127,8 +126,14 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     ) throws GenieException {
         log.debug("called with job request {}", jobRequest);
 
+        if (StringUtils.isBlank(this.baseWorkingDirPath)) {
+            throw new GenieServerException("Genie jobs dir location not set.");
+        }
+
+        final String jobWorkingDir = baseWorkingDirPath + "/" + jobRequest.getId();
+
+        // Resolve the cluster for the job request based on the tags specified
         final Cluster cluster;
-        // Resolve the cluster for the job request
         try {
             cluster = clusterLoadBalancer
                 .selectCluster(clusterService.chooseClusterForJobRequest(jobRequest));
@@ -140,7 +145,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
             throw gpe;
         }
 
-        // Resolve the command for the job request
+        // Resolve the command for the job request based on command tags and cluster choosen
         final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
         enumStatuses.add(CommandStatus.ACTIVE);
         Command command = null;
@@ -161,21 +166,27 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
             throw new GeniePreconditionException(msg);
         }
 
-        final List<Application> applications = new ArrayList<>();
-        applications.addAll(commandService.getApplicationsForCommand(command.getId()));
+        // Job can be run as there is a valid cluster/command combination for it.
+        // Update cluster and command information for the job
+        this.jobPersistenceService.updateClusterForJob(
+            jobRequest.getId(),
+            cluster.getId());
 
-        final String jobWorkingDir = baseWorkingDirPath + "/" + jobRequest.getId();
+        this.jobPersistenceService.updateCommandForJob(
+            jobRequest.getId(),
+            command.getId());
 
         // construct the job execution environment object for this job request
-        final JobExecutionEnvironment jee = new JobExecutionEnvironment.Builder()
-            .withJobRequest(jobRequest)
-            .withCluster(cluster)
-            .withCommand(command)
-            .withApplications(applications)
-            .withJobWorkingDir(jobWorkingDir)
+        final JobExecutionEnvironment jee = new JobExecutionEnvironment.Builder(
+            jobRequest,
+            cluster,
+            command,
+            jobWorkingDir
+        )
+            .withApplications(commandService.getApplicationsForCommand(command.getId()))
             .build();
 
-        // Job can be run as there is a valid cluster/command combination for it.
+        // The map object stores the context for all the workflow tasks
         final Map<String, Object> context = new HashMap<>();
 
         context.put(JOB_EXECUTION_ENV_KEY, jee);
@@ -184,23 +195,14 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         if (this.wfExecutor.executeWorkflow(this.jobWorkflowTasks, context)) {
             final JobExecution jobExecution = (JobExecution) context.get(JOB_EXECUTION_DTO_KEY);
 
-            // TODO Null check for jobExecution and maybe persist only for non-local mode where this is null?
-            // Persist the jobExecution information. This also updates jobStatus to Running
-            this.jobPersistenceService.createJobExecution(jobExecution);
+            // Job Execution will be null in local mode.
+            if (jobExecution != null) {
+                // Persist the jobExecution information. This also updates jobStatus to Running
+                this.jobPersistenceService.createJobExecution(jobExecution);
 
-            // Update the Cluster Information for the job
-            this.jobPersistenceService.updateClusterForJob(
-                jobRequest.getId(),
-                jee.getCluster().getId());
-
-            // Update the Command Information for the job
-            this.jobPersistenceService.updateCommandForJob(
-                jobRequest.getId(),
-                jee.getCommand().getId());
-
-            // Publish a job start Event
-            this.applicationEventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
-
+                // Publish a job start Event
+                this.applicationEventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
+            }
         } else {
             throw new GenieServerException("Job Submission failed.");
         }
