@@ -51,7 +51,6 @@ public class JpaClusterServiceImplUnitTests {
     private static final String CLUSTER_1_USER = "tgianos";
     private static final String CLUSTER_1_NAME = "h2prod";
     private static final String CLUSTER_1_VERSION = "2.4.0";
-    private static final String CLUSTER_1_TYPE = "yarn";
 
     private JpaClusterServiceImpl service;
     private JpaClusterRepository jpaClusterRepository;
@@ -127,8 +126,7 @@ public class JpaClusterServiceImplUnitTests {
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
                 CLUSTER_1_VERSION,
-                ClusterStatus.OUT_OF_SERVICE,
-                CLUSTER_1_TYPE
+                ClusterStatus.OUT_OF_SERVICE
         )
                 .withId(CLUSTER_1_ID)
                 .withConfigs(configs)
@@ -157,7 +155,7 @@ public class JpaClusterServiceImplUnitTests {
     public void testUpdateClusterNoClusterExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
-        this.service.updateCluster(id, new Cluster.Builder(null, null, null, null, null).build());
+        this.service.updateCluster(id, new Cluster.Builder(null, null, null, null).build());
     }
 
     /**

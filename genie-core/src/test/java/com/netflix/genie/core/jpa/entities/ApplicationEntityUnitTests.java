@@ -227,12 +227,10 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test
     public void canSetApplicationTags() {
         final Set<String> tags = Sets.newHashSet("Third", "first", "second");
-        this.a.setApplicationTags(tags);
-        Assert.assertThat(this.a.getApplicationTags(), Matchers.is(tags));
+        this.a.setTags(tags);
         Assert.assertThat(this.a.getTags(), Matchers.is(tags));
 
-        this.a.setApplicationTags(null);
-        Assert.assertThat(this.a.getApplicationTags(), Matchers.empty());
+        this.a.setTags(null);
         Assert.assertThat(this.a.getTags(), Matchers.empty());
     }
 
@@ -257,7 +255,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
         final String description = UUID.randomUUID().toString();
         entity.setDescription(description);
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setApplicationTags(tags);
+        entity.setTags(tags);
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         entity.setConfigs(configs);
         final String setupFile = UUID.randomUUID().toString();

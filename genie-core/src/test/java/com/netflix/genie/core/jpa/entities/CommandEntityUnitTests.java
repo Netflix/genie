@@ -218,12 +218,10 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     @Test
     public void canSetCommandTags() {
         final Set<String> tags = Sets.newHashSet("Third", "first", "second");
-        this.c.setCommandTags(tags);
-        Assert.assertThat(this.c.getCommandTags(), Matchers.is(tags));
+        this.c.setTags(tags);
         Assert.assertThat(this.c.getTags(), Matchers.is(tags));
 
-        this.c.setCommandTags(null);
-        Assert.assertThat(this.c.getCommandTags(), Matchers.empty());
+        this.c.setTags(null);
         Assert.assertThat(this.c.getTags(), Matchers.empty());
     }
 
@@ -333,7 +331,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         final Date updated = entity.getUpdated();
         entity.setStatus(CommandStatus.DEPRECATED);
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setCommandTags(tags);
+        entity.setTags(tags);
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         entity.setConfigs(configs);
         final String setupFile = UUID.randomUUID().toString();

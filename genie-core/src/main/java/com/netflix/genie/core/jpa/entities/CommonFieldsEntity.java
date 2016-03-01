@@ -26,6 +26,8 @@ import javax.persistence.Column;
 import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Size;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,7 +39,7 @@ import java.util.stream.Collectors;
  * @author tgianos
  */
 @MappedSuperclass
-public class CommonFields extends BaseEntity {
+public class CommonFieldsEntity extends BaseEntity {
     protected static final String GENIE_TAG_NAMESPACE = "genie.";
     protected static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
     protected static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
@@ -69,14 +71,14 @@ public class CommonFields extends BaseEntity {
     private String description;
 
     @Basic
-    @Column(name = "sorted_tags", length = 2048)
+    @Column(name = "tags", length = 2048)
     @Size(max = 2048, message = "Max length in database is 2048 characters")
-    private String sortedTags;
+    private String tags;
 
     /**
      * Default constructor.
      */
-    public CommonFields() {
+    public CommonFieldsEntity() {
         super();
     }
 
@@ -154,37 +156,34 @@ public class CommonFields extends BaseEntity {
     }
 
     /**
-     * Get the original tags as a sorted lowercase csv.
+     * Get the tags attached to this entity.
      *
-     * @return The sorted tags
+     * @return The tags attached to this entity
      */
-    protected String getSortedTags() {
-        return this.sortedTags;
+    public Set<String> getTags() {
+        final Set<String> returnTags = new HashSet<>();
+
+        if (this.tags != null) {
+            returnTags.addAll(Arrays.asList(this.tags.split(COMMA)));
+        }
+
+        return returnTags;
     }
 
     /**
-     * Set the sorted tags.
+     * Set the tags.
      *
      * @param tags The tags to set
      */
-    protected void setSortedTags(final Set<String> tags) {
-        this.sortedTags = null;
+    public void setTags(final Set<String> tags) {
+        this.tags = null;
         if (tags != null && !tags.isEmpty()) {
-            this.sortedTags = tags
+            this.tags = tags
                 .stream()
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .reduce((one, two) -> one + COMMA + two)
                 .get();
         }
-    }
-
-    /**
-     * Set the original tags as a sorted lowercase csv.
-     *
-     * @param sortedTags The new sorted tags
-     */
-    protected void setSortedTags(final String sortedTags) {
-        this.sortedTags = sortedTags;
     }
 
     /**
@@ -194,12 +193,15 @@ public class CommonFields extends BaseEntity {
      * @throws GenieException On any exception
      */
     protected Set<String> getFinalTags() throws GenieException {
-        final Set<String> finalTags = this.getSortedTags() == null
-            ? Sets.newHashSet()
-            : Sets.newHashSet(this.getSortedTags().split(COMMA))
-            .stream()
-            .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
-            .collect(Collectors.toSet());
+        final Set<String> finalTags;
+        if (this.tags == null) {
+            finalTags = Sets.newHashSet();
+        } else {
+            finalTags = Sets.newHashSet(this.tags.split(COMMA))
+                .stream()
+                .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
+                .collect(Collectors.toSet());
+        }
         if (this.getId() == null) {
             this.setId(UUID.randomUUID().toString());
         }

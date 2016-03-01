@@ -42,16 +42,17 @@ ALTER TABLE `Application`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
-  ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
+  ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   ADD INDEX `APPLICATIONS_NAME_INDEX` (`name`),
+  ADD INDEX `APPLICATIONS_TAGS_INDEX` (`tags`),
   ADD INDEX `APPLICATIONS_STATUS_INDEX` (`status`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Application table...' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing application tags for 3.0...' AS '';
-UPDATE `Application` as `a` set `a`.`sorted_tags` =
+UPDATE `Application` as `a` set `a`.`tags` =
 (
   SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
   FROM `Application_tags` `t`
@@ -76,14 +77,9 @@ ALTER TABLE `Application_jars`
   ADD FOREIGN KEY (`application_id`) REFERENCES `Application` (`id`) ON DELETE CASCADE;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Application_jars table' AS '';
 
-SELECT CURRENT_TIMESTAMP AS '', 'Updating the Application_tags table for 3.0...' AS '';
-ALTER TABLE `Application_tags` DROP KEY `I_PPLCTGS_APPLICATION_ID`;
-ALTER TABLE `Application_tags`
-  CHANGE `APPLICATION_ID` `application_id` VARCHAR(255) NOT NULL,
-  CHANGE `element` `tag` VARCHAR(255) NOT NULL,
-  ADD FOREIGN KEY (`application_id`) REFERENCES `Application` (`id`) ON DELETE CASCADE,
-  ADD INDEX `APPLICATION_TAGS_TAG_INDEX` (`tag`);
-SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Application_tags table' AS '';
+SELECT CURRENT_TIMESTAMP AS '', 'Dropping the Application_tags table from 3.0...' AS '';
+DROP TABLE `Application_tags`;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully dropped the Application_tags table' AS '';
 
 -- Modify the clusters and associated children tables
 SELECT CURRENT_TIMESTAMP AS '', 'Updating the Cluster table for 3.0...' AS '';
@@ -94,16 +90,18 @@ ALTER TABLE `Cluster`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
-  ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
+  ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
+  ADD COLUMN `setup_file` VARCHAR(1024) DEFAULT NULL AFTER `tags`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'OUT_OF_SERVICE',
-  CHANGE `clusterType` `cluster_type` VARCHAR(255) NOT NULL,
   CHANGE `entityVersion` `entity_version` INT(11) DEFAULT 0,
+  DROP `clusterType`,
   ADD INDEX `CLUSTERS_NAME_INDEX` (`name`),
+  ADD INDEX `CLUSTERS_TAG_INDEX` (`tags`),
   ADD INDEX `CLUSTERS_STATUS_INDEX` (`status`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Cluster table' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing cluster tags for 3.0...' AS '';
-UPDATE `Cluster` as `c` set `c`.`sorted_tags` =
+UPDATE `Cluster` as `c` set `c`.`tags` =
 (
   SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
   FROM `Cluster_tags` `t`
@@ -132,13 +130,9 @@ ALTER TABLE `Cluster_configs`
   ADD FOREIGN KEY (`cluster_id`) REFERENCES `Cluster` (`id`) ON DELETE CASCADE;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Cluster_configs table' AS '';
 
-SELECT CURRENT_TIMESTAMP AS '', 'Updating the Cluster_tags table for 3.0...' AS '';
-ALTER TABLE `Cluster_tags` DROP KEY `I_CLSTTGS_CLUSTER_ID`;
-ALTER TABLE `Cluster_tags`
-  CHANGE `CLUSTER_ID` `cluster_id` VARCHAR(255) NOT NULL,
-  CHANGE `element` `tag` VARCHAR(255) NOT NULL,
-  ADD FOREIGN KEY (`cluster_id`) REFERENCES `Cluster` (`id`) ON DELETE CASCADE;
-SELECT CURRENT_TIMESTAMP AS '', 'Updated the Cluster_tags table...' AS '';
+SELECT CURRENT_TIMESTAMP AS '', 'Dropping the Cluster_tags table for 3.0...' AS '';
+DROP TABLE `Cluster_tags`;
+SELECT CURRENT_TIMESTAMP AS '', 'Dropped the Cluster_tags table' AS '';
 
 -- Modify the commands and associated children tables
 SELECT CURRENT_TIMESTAMP AS '', 'Updating the Command table for 3.0...' AS '';
@@ -149,7 +143,7 @@ ALTER TABLE `Command`
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
-  ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
+  ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   MODIFY `executable` VARCHAR(255) NOT NULL,
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
@@ -157,11 +151,12 @@ ALTER TABLE `Command`
   DROP `APPLICATION_ID`,
   DROP `jobType`,
   ADD INDEX `COMMAND_NAME_INDEX` (`name`),
+  ADD INDEX `COMMAND_TAGS_INDEX` (`tags`),
   ADD INDEX `COMMAND_STATUS_INDEX` (`status`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Command table' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing command tags for 3.0...' AS '';
-UPDATE `Command` as `c` set `c`.`sorted_tags` =
+UPDATE `Command` as `c` set `c`.`tags` =
 (
   SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
   FROM `Command_tags` `t`
@@ -178,14 +173,9 @@ ALTER TABLE `Command_configs`
   ADD FOREIGN KEY (`command_id`) REFERENCES `Command` (`id`) ON DELETE CASCADE;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Command_configs table' AS '';
 
-SELECT CURRENT_TIMESTAMP AS '', 'Updating the Command_tags table for 3.0...' AS '';
-ALTER TABLE `Command_tags` DROP KEY `I_CMMNTGS_COMMAND_ID`;
-ALTER TABLE `Command_tags`
-  CHANGE `COMMAND_ID` `command_id` VARCHAR(255) NOT NULL,
-  CHANGE `element` `tag` VARCHAR(255) NOT NULL,
-  ADD FOREIGN KEY (`command_id`) REFERENCES `Command` (`id`) ON DELETE CASCADE,
-  ADD INDEX `COMMAND_TAGS_TAG_INDEX` (`tag`);
-SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Command_tags table' AS '';
+SELECT CURRENT_TIMESTAMP AS '', 'Dropping the Command_tags table for 3.0...' AS '';
+DROP TABLE `Command_tags`;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully dropped the Command_tags table' AS '';
 
 -- TODO: May want these TEXT fields to be large varchars instead?
 SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_requests table...' AS '';
@@ -206,7 +196,7 @@ CREATE TABLE `job_requests` (
   `file_dependencies` TEXT DEFAULT NULL,
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
-  `sorted_tags` VARCHAR(2048) DEFAULT NULL,
+  `tags` VARCHAR(2048) DEFAULT NULL,
   `cpu` INT(11) NOT NULL DEFAULT 1,
   `memory` INT(11) NOT NULL DEFAULT 1560,
   `client_host` VARCHAR(255) DEFAULT NULL,
@@ -233,7 +223,7 @@ INSERT INTO `job_requests` (
   `file_dependencies`,
   `disable_log_archival`,
   `email`,
-  `sorted_tags`,
+  `tags`,
   `cpu`,
   `memory`,
   `client_host`
@@ -288,11 +278,11 @@ CREATE TABLE `job_executions` (
   `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `entity_version` INT(11) NOT NULL DEFAULT 0,
   `cluster_criteria` VARCHAR(1024),
-  `host_name` VARCHAR(255) NOT NULL,
+  `hostname` VARCHAR(255) NOT NULL,
   `process_id` INT(11) NOT NULL,
   `exit_code` INT(11) NOT NULL DEFAULT -1,
   FOREIGN KEY (`id`) REFERENCES `Job` (`id`) ON DELETE CASCADE,
-  INDEX `HOST_NAME_INDEX` (`host_name`),
+  INDEX `HOSTNAME_INDEX` (`hostname`),
   INDEX `EXIT_CODE_INDEX` (`exit_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_executions table' AS '';
@@ -303,8 +293,7 @@ INSERT INTO `job_executions` (
   `created`,
   `updated`,
   `entity_version`,
-  `cluster_criteria`,
-  `host_name`,
+  `hostname`,
   `process_id`,
   `exit_code`
 ) SELECT
@@ -312,19 +301,11 @@ INSERT INTO `job_executions` (
                 `created`,
                 `updated`,
                 `entityVersion`,
-                `chosenClusterCriteriaString`,
                 `hostName`,
                 `processHandle`,
                 `exitCode`
   FROM `Job`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into the job_executions table' AS '';
-
-UPDATE `job_executions` SET `cluster_criteria` = RPAD(`cluster_criteria`, LENGTH(`cluster_criteria`) + 2, '"]');
-UPDATE `job_executions` SET `cluster_criteria` = LPAD(`cluster_criteria`, LENGTH(`cluster_criteria`) + 2, '["');
-UPDATE `job_executions` SET `cluster_criteria` = REPLACE(`cluster_criteria`, ',', '","');
-UPDATE `job_executions` SET `cluster_criteria` = '[]' WHERE `cluster_criteria` = '[""]' OR `cluster_criteria` IS NULL;
-
-ALTER TABLE `job_executions` CHANGE `cluster_criteria` `cluster_criteria` VARCHAR(1024) NOT NULL DEFAULT '[]';
 
 -- Modify the job table to remove the cluster id if cluster doesn't exist to prepare for foreign key constraints
 SELECT CURRENT_TIMESTAMP AS '', 'Setting executionClusterId in Job table to NULL if cluster no longer exists...' AS '';
@@ -354,13 +335,12 @@ ALTER TABLE `Job`
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INIT',
   CHANGE `statusMsg` `status_msg` VARCHAR(255) DEFAULT NULL,
-  CHANGE `exitCode` `exit_code` INT(11) NOT NULL DEFAULT -1,
   CHANGE `archiveLocation` `archive_location` VARCHAR(1024) DEFAULT NULL,
   CHANGE `executionClusterId` `cluster_id` VARCHAR(255) DEFAULT NULL,
   CHANGE `executionClusterName` `cluster_name` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandId` `command_id` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandName` `command_name` VARCHAR(255) DEFAULT NULL,
-  ADD COLUMN `sorted_tags` VARCHAR(2048) DEFAULT NULL,
+  ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL,
   DROP `forwarded`,
   DROP `applicationId`,
   DROP `applicationName`,
@@ -368,6 +348,7 @@ ALTER TABLE `Job`
   DROP `clientHost`,
   DROP `fileDependencies`,
   DROP `envPropFile`,
+  DROP `exitCode`,
   DROP `disableLogArchival`,
   DROP `clusterCriteriasString`,
   DROP `commandCriteriaString`,
@@ -389,11 +370,11 @@ ALTER TABLE `Job`
   ADD INDEX `JOBS_UPDATED_INDEX` (`updated`),
   ADD INDEX `JOBS_CLUSTER_NAME_INDEX` (`cluster_name`),
   ADD INDEX `JOBS_COMMAND_NAME_INDEX` (`command_name`),
-  ADD INDEX `JOBS_SORTED_TAGS_INDEX` (`sorted_tags`);
+  ADD INDEX `JOBS_TAGS_INDEX` (`tags`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Job table' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing job tags for 3.0...' AS '';
-UPDATE `Job` as `j` set `j`.`sorted_tags` =
+UPDATE `Job` as `j` set `j`.`tags` =
   (
     SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
     FROM `Job_tags` `t`
@@ -402,16 +383,9 @@ UPDATE `Job` as `j` set `j`.`sorted_tags` =
   );
 SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing job tags for 3.0' AS '';
 
-SELECT CURRENT_TIMESTAMP AS '', 'Updating the Job_tags table for 3.0...' AS '';
-ALTER TABLE `Job_tags`
-  DROP KEY `I_JOB_TGS_JOB_ID`,
-  DROP KEY `element_index`;
-ALTER TABLE `Job_tags`
-  CHANGE `JOB_ID` `job_id` VARCHAR(255) NOT NULL,
-  CHANGE `element` `tag` VARCHAR(255) NOT NULL,
-  ADD FOREIGN KEY (`job_id`) REFERENCES `Job` (`id`) ON DELETE CASCADE,
-  ADD INDEX `JOB_TAGS_TAG_INDEX` (`tag`);
-SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the Job_tags table' AS '';
+SELECT CURRENT_TIMESTAMP AS '', 'Dropping the Job_tags table for 3.0...' AS '';
+DROP TABLE `Job_tags`;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully dropped the Job_tags table' AS '';
 
 -- Rename the tables to be a little bit nicer
 SELECT CURRENT_TIMESTAMP AS '', 'Renaming all the tables to be more friendly...' AS '';
@@ -419,22 +393,14 @@ RENAME TABLE `Application` TO `applications`;
 RENAME TABLE `Application_configs` TO `application_configs_tmp`;
 RENAME TABLE `application_configs_tmp` TO `application_configs`;
 RENAME TABLE `Application_jars` TO `application_dependencies`;
-RENAME TABLE `Application_tags` TO `application_tags_tmp`;
-RENAME TABLE `application_tags_tmp` TO `application_tags`;
 RENAME TABLE `Cluster` TO `clusters`;
 RENAME TABLE `Cluster_Command` TO `clusters_commands`;
 RENAME TABLE `Cluster_configs` TO `cluster_configs_tmp`;
 RENAME TABLE `cluster_configs_tmp` TO `cluster_configs`;
-RENAME TABLE `Cluster_tags` TO `cluster_tags_tmp`;
-RENAME TABLE `cluster_tags_tmp` TO `cluster_tags`;
 RENAME TABLE `Command` TO `commands`;
 RENAME TABLE `Command_configs` TO `command_configs_tmp`;
 RENAME TABLE `command_configs_tmp` TO `command_configs`;
-RENAME TABLE `Command_tags` TO `command_tags_tmp`;
-RENAME TABLE `command_tags_tmp` TO `command_tags`;
 RENAME TABLE `Job` TO `jobs`;
-RENAME TABLE `Job_tags` TO `Job_tags_tmp`;
-RENAME TABLE `Job_tags_tmp` TO `job_tags`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully renamed all tables' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Finished upgrading Genie schema from version 2.0.0 to 3.0.0' AS '';

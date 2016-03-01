@@ -41,7 +41,6 @@ public class Command extends ConfigDTO {
     @NotEmpty
     @Size(max = 255, message = "Executable path can't be longer than 255 characters")
     private String executable;
-    private String setupFile;
 
     /**
      * Constructor used by the builder.
@@ -52,7 +51,6 @@ public class Command extends ConfigDTO {
         super(builder);
         this.status = builder.bStatus;
         this.executable = builder.bExecutable;
-        this.setupFile = builder.bSetupFile;
     }
 
     /**
@@ -65,7 +63,6 @@ public class Command extends ConfigDTO {
 
         private final CommandStatus bStatus;
         private final String bExecutable;
-        private String bSetupFile;
 
         /**
          * Constructor which has required fields.
@@ -95,17 +92,6 @@ public class Command extends ConfigDTO {
                 this.bStatus = CommandStatus.INACTIVE;
             }
             this.bExecutable = executable;
-        }
-
-        /**
-         * Set the setup file for the command.
-         *
-         * @param setupFile The location of the setup file to use
-         * @return The builder
-         */
-        public Builder withSetupFile(final String setupFile) {
-            this.bSetupFile = setupFile;
-            return this;
         }
 
         /**

@@ -95,10 +95,10 @@ public class JobEntityUnitTests extends EntityTestsBase {
         this.jobEntity.onCreateBaseEntity();
         Assert.assertNotNull(this.jobEntity.getId());
         Assert.assertFalse(this.jobEntity.getTags().contains(
-            CommonFields.GENIE_ID_TAG_NAMESPACE + this.jobEntity.getId())
+            CommonFieldsEntity.GENIE_ID_TAG_NAMESPACE + this.jobEntity.getId())
         );
         Assert.assertFalse(this.jobEntity.getTags().contains(
-            CommonFields.GENIE_NAME_TAG_NAMESPACE + this.jobEntity.getName())
+            CommonFieldsEntity.GENIE_NAME_TAG_NAMESPACE + this.jobEntity.getName())
         );
     }
 
@@ -263,15 +263,11 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void canSetJobTags() {
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        this.jobEntity.setJobTags(tags);
-        Assert.assertThat(this.jobEntity.getJobTags(), Matchers.is(tags));
+        this.jobEntity.setTags(tags);
         Assert.assertThat(this.jobEntity.getTags(), Matchers.is(tags));
-        Assert.assertThat(this.jobEntity.getSortedTags(), Matchers.notNullValue());
 
-        this.jobEntity.setJobTags(null);
-        Assert.assertThat(this.jobEntity.getJobTags(), Matchers.empty());
+        this.jobEntity.setTags(null);
         Assert.assertThat(this.jobEntity.getTags(), Matchers.empty());
-        Assert.assertThat(this.jobEntity.getSortedTags(), Matchers.nullValue());
     }
 
     /**
@@ -361,7 +357,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
         final String description = UUID.randomUUID().toString();
         entity.setDescription(description);
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setJobTags(tags);
+        entity.setTags(tags);
         final String archiveLocation = UUID.randomUUID().toString();
         entity.setArchiveLocation(archiveLocation);
         final Date started = new Date();

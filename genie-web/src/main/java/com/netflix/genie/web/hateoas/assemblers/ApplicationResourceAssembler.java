@@ -23,8 +23,8 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.controllers.ApplicationRestController;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
+import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,14 +34,7 @@ import org.springframework.stereotype.Component;
  * @since 3.0.0
  */
 @Component
-public class ApplicationResourceAssembler extends ResourceAssemblerSupport<Application, ApplicationResource> {
-
-    /**
-     * Default constructor.
-     */
-    public ApplicationResourceAssembler() {
-        super(ApplicationRestController.class, ApplicationResource.class);
-    }
+public class ApplicationResourceAssembler implements ResourceAssembler<Application, ApplicationResource> {
 
     /**
      * {@inheritDoc}

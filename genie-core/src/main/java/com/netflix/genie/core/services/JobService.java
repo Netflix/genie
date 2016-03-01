@@ -20,6 +20,7 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
@@ -56,13 +57,19 @@ public interface JobService {
      * @return job object
      * @throws GenieException if there is an error
      */
-    Job getJob(
-            @NotBlank(message = "No job id provided. Unable to retrieve job.")
-            final String jobId
-    ) throws GenieException;
+    Job getJob(@NotBlank final String jobId) throws GenieException;
 
     /**
-     * Get list of jobs for given filter criteria.
+     * Gets the status of the job with the given id.
+     *
+     * @param id The id job to get status for
+     * @return The job status
+     * @throws GenieException for any problem particularly not found exceptions
+     */
+    JobStatus getJobStatus(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Find subset of metadata about jobs for given filter criteria.
      *
      * @param id          id for job
      * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
@@ -76,7 +83,7 @@ public interface JobService {
      * @param page        Page information of jobs to get
      * @return All jobs which match the criteria
      */
-    Page<Job> getJobs(
+    Page<JobSearchResult> findJobs(
             final String id,
             final String jobName,
             final String userName,

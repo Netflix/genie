@@ -18,7 +18,6 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -49,7 +48,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "job_requests")
-public class JobRequestEntity extends CommonFields {
+public class JobRequestEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -1895413051636217614L;
 
@@ -62,11 +61,6 @@ public class JobRequestEntity extends CommonFields {
     @Column(name = "group_name", length = 255)
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String group;
-
-    @Basic
-    @Column(name = "setup_file", length = 1024)
-    @Size(max = 1024, message = "File length for setup file is too long. Max is 1024 characters")
-    private String setupFile;
 
     @Basic(optional = false)
     @Column(name = "cluster_criterias", nullable = false, length = 2048)
@@ -332,45 +326,6 @@ public class JobRequestEntity extends CommonFields {
     }
 
     /**
-     * Gets the envPropFile name.
-     *
-     * @return envPropFile - file name containing environment variables.
-     */
-    public String getSetupFile() {
-        return this.setupFile;
-    }
-
-    /**
-     * Sets the env property file name in string form.
-     *
-     * @param envPropFile contains the list of env variables to set while
-     *                    running this job.
-     */
-    public void setSetupFile(final String envPropFile) {
-        this.setupFile = envPropFile;
-    }
-
-    /**
-     * Gets the tags allocated to this job as a set of strings.
-     *
-     * @return the tags
-     * @throws GenieException For any processing error
-     */
-    public Set<String> getTags() throws GenieException {
-        return this.getSortedTags() == null ? Sets.newHashSet() : Sets.newHashSet(this.getSortedTags().split(COMMA));
-    }
-
-    /**
-     * Sets the tags allocated to this job.
-     *
-     * @param tags the tags to set.
-     * @throws GenieException for any processing error
-     */
-    public void setTags(final Set<String> tags) throws GenieException {
-        this.setSortedTags(tags);
-    }
-
-    /**
      * Get the number of CPU's requested to run this job.
      *
      * @return The number of CPU's
@@ -446,7 +401,7 @@ public class JobRequestEntity extends CommonFields {
             .withEmail(this.email)
             .withFileDependencies(this.getFileDependenciesAsSet())
             .withGroup(this.group)
-            .withSetupFile(this.setupFile)
+            .withSetupFile(this.getSetupFile())
             .withTags(this.getTags())
             .withCpu(this.cpu)
             .withMemory(this.memory)

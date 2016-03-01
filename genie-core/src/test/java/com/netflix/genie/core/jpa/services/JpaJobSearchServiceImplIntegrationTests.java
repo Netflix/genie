@@ -20,10 +20,11 @@ package com.netflix.genie.core.jpa.services;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.test.categories.IntegrationTest;
@@ -38,7 +39,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Integration tests for the Job Search Service using JPA.
@@ -61,6 +65,9 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     @Autowired
     private JpaJobExecutionRepository executionRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private JpaJobSearchServiceImpl service;
 
     /**
@@ -69,6 +76,7 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     @Before
     public void setup() {
         this.service = new JpaJobSearchServiceImpl(this.jobRepository, this.executionRepository);
+        this.service.setEntityManager(this.entityManager);
     }
 
     /**
@@ -78,10 +86,10 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     public void canFindJobs() {
         //TODO: add more cases
         final Pageable page = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
-        Page<Job> jobs = this.service.getJobs(null, null, null, null, null, null, null, null, null, page);
+        Page<JobSearchResult> jobs = this.service.findJobs(null, null, null, null, null, null, null, null, null, page);
         Assert.assertThat(jobs.getTotalElements(), Matchers.is(3L));
 
-        jobs = this.service.getJobs(
+        jobs = this.service.findJobs(
             null, null, null, Sets.newHashSet(JobStatus.RUNNING), null, null, null, null, null, page
         );
         Assert.assertThat(jobs.getTotalElements(), Matchers.is(2L));
@@ -94,7 +102,7 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
             Matchers.is(2L)
         );
 
-        jobs = this.service.getJobs(
+        jobs = this.service.findJobs(
             JOB_1_ID, null, null, null, null, null, null, null, null, page
         );
         Assert.assertThat(jobs.getTotalElements(), Matchers.is(1L));
@@ -119,21 +127,59 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
         final String hostB = "b.netflix.com";
         final String hostC = "c.netflix.com";
 
-        Set<JobExecution> executions = this.service.getAllJobExecutionsOnHost(hostA);
+        Set<JobExecution> executions = this.service.getAllRunningJobExecutionsOnHost(hostA);
         Assert.assertThat(executions.size(), Matchers.is(1));
         Assert.assertThat(
             executions.stream().filter(jobExecution -> JOB_2_ID.equals(jobExecution.getId())).count(),
             Matchers.is(1L)
         );
 
-        executions = this.service.getAllJobExecutionsOnHost(hostB);
+        executions = this.service.getAllRunningJobExecutionsOnHost(hostB);
         Assert.assertThat(executions.size(), Matchers.is(1));
         Assert.assertThat(
             executions.stream().filter(jobExecution -> JOB_3_ID.equals(jobExecution.getId())).count(),
             Matchers.is(1L)
         );
 
-        executions = this.service.getAllJobExecutionsOnHost(hostC);
+        executions = this.service.getAllRunningJobExecutionsOnHost(hostC);
         Assert.assertTrue(executions.isEmpty());
+    }
+
+    /**
+     * Make sure the getting job method works.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetJob() throws GenieException {
+        Assert.assertThat(this.service.getJob(JOB_1_ID).getName(), Matchers.is("testPigJob"));
+        Assert.assertThat(this.service.getJob(JOB_2_ID).getName(), Matchers.is("testSparkJob"));
+        Assert.assertThat(this.service.getJob(JOB_3_ID).getName(), Matchers.is("testSparkJob2"));
+
+        try {
+            this.service.getJobStatus(UUID.randomUUID().toString());
+            Assert.fail();
+        } catch (final GenieException ge) {
+            Assert.assertTrue(ge instanceof GenieNotFoundException);
+        }
+    }
+
+    /**
+     * Make sure the job status method works.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetJobStatus() throws GenieException {
+        Assert.assertThat(this.service.getJobStatus(JOB_1_ID), Matchers.is(JobStatus.SUCCEEDED));
+        Assert.assertThat(this.service.getJobStatus(JOB_2_ID), Matchers.is(JobStatus.RUNNING));
+        Assert.assertThat(this.service.getJobStatus(JOB_3_ID), Matchers.is(JobStatus.RUNNING));
+
+        try {
+            this.service.getJobStatus(UUID.randomUUID().toString());
+            Assert.fail();
+        } catch (final GenieException ge) {
+            Assert.assertTrue(ge instanceof GenieNotFoundException);
+        }
     }
 }

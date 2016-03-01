@@ -46,69 +46,6 @@ public final class JpaJobSpecs {
     }
 
     /**
-     * Find jobs based on the parameters.
-     *
-     * @param id              The job id
-     * @param jobName         The job name
-     * @param userName        The user who created the job
-     * @param statuses        The job statuses
-     * @param tags            The tags for the jobs to find
-     * @param clusterName     The cluster name
-     * @param clusterId       The cluster id
-     * @param commandName     The command name
-     * @param commandId       The command id
-     * @return The specification
-     */
-    public static Specification<JobEntity> find(
-            final String id,
-            final String jobName,
-            final String userName,
-            final Set<JobStatus> statuses,
-            final Set<String> tags,
-            final String clusterName,
-            final String clusterId,
-            final String commandName,
-            final String commandId
-    ) {
-        return (final Root<JobEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
-            final List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.isNotBlank(id)) {
-                predicates.add(cb.like(root.get(JobEntity_.id), id));
-            }
-            if (StringUtils.isNotBlank(jobName)) {
-                predicates.add(cb.like(root.get(JobEntity_.name), jobName));
-            }
-            if (StringUtils.isNotBlank(userName)) {
-                predicates.add(cb.equal(root.get(JobEntity_.user), userName));
-            }
-            if (statuses != null && !statuses.isEmpty()) {
-                final List<Predicate> orPredicates =
-                        statuses
-                                .stream()
-                                .map(status -> cb.equal(root.get(JobEntity_.status), status))
-                                .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
-            }
-            if (tags != null && !tags.isEmpty()) {
-                predicates.add(cb.like(root.get(JobEntity_.sortedTags), JpaSpecificationUtils.getTagLikeString(tags)));
-            }
-            if (StringUtils.isNotBlank(clusterId)) {
-                predicates.add(cb.equal(root.get(JobEntity_.cluster), clusterId));
-            }
-            if (StringUtils.isNotBlank(clusterName)) {
-                predicates.add(cb.equal(root.get(JobEntity_.clusterName), clusterName));
-            }
-            if (StringUtils.isNotBlank(commandId)) {
-                predicates.add(cb.equal(root.get(JobEntity_.command), commandId));
-            }
-            if (StringUtils.isNotBlank(commandName)) {
-                predicates.add(cb.equal(root.get(JobEntity_.commandName), commandName));
-            }
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
-        };
-    }
-
-    /**
      * Find jobs that are zombies.
      *
      * @param currentTime The current time
@@ -128,5 +65,70 @@ public final class JpaJobSpecs {
             predicates.add(cb.or(orPredicate1, orPredicate2));
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
+    }
+
+    /**
+     * Generate a criteria query predicate for a where clause based on the given parameters.
+     *
+     * @param root        The root to use
+     * @param cb          The criteria builder to use
+     * @param id          The job id
+     * @param jobName     The job name
+     * @param userName    The user who created the job
+     * @param statuses    The job statuses
+     * @param tags        The tags for the jobs to find
+     * @param clusterName The cluster name
+     * @param clusterId   The cluster id
+     * @param commandName The command name
+     * @param commandId   The command id
+     * @return The specification
+     */
+    public static Predicate getFindPredicate(
+        final Root<JobEntity> root,
+        final CriteriaBuilder cb,
+        final String id,
+        final String jobName,
+        final String userName,
+        final Set<JobStatus> statuses,
+        final Set<String> tags,
+        final String clusterName,
+        final String clusterId,
+        final String commandName,
+        final String commandId
+    ) {
+        final List<Predicate> predicates = new ArrayList<>();
+        if (StringUtils.isNotBlank(id)) {
+            predicates.add(cb.like(root.get(JobEntity_.id), id));
+        }
+        if (StringUtils.isNotBlank(jobName)) {
+            predicates.add(cb.like(root.get(JobEntity_.name), jobName));
+        }
+        if (StringUtils.isNotBlank(userName)) {
+            predicates.add(cb.equal(root.get(JobEntity_.user), userName));
+        }
+        if (statuses != null && !statuses.isEmpty()) {
+            final List<Predicate> orPredicates =
+                statuses
+                    .stream()
+                    .map(status -> cb.equal(root.get(JobEntity_.status), status))
+                    .collect(Collectors.toList());
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+        }
+        if (tags != null && !tags.isEmpty()) {
+            predicates.add(cb.like(root.get(JobEntity_.tags), JpaSpecificationUtils.getTagLikeString(tags)));
+        }
+        if (StringUtils.isNotBlank(clusterId)) {
+            predicates.add(cb.equal(root.get(JobEntity_.cluster), clusterId));
+        }
+        if (StringUtils.isNotBlank(clusterName)) {
+            predicates.add(cb.equal(root.get(JobEntity_.clusterName), clusterName));
+        }
+        if (StringUtils.isNotBlank(commandId)) {
+            predicates.add(cb.equal(root.get(JobEntity_.command), commandId));
+        }
+        if (StringUtils.isNotBlank(commandName)) {
+            predicates.add(cb.equal(root.get(JobEntity_.commandName), commandName));
+        }
+        return cb.and(predicates.toArray(new Predicate[predicates.size()]));
     }
 }

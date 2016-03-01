@@ -85,7 +85,7 @@ public class JobServiceImplUnitTests {
         final String jobId = UUID.randomUUID().toString();
         final String hostname = UUID.randomUUID().toString();
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getHostName()).thenReturn(hostname);
+        Mockito.when(jobExecution.getHostname()).thenReturn(hostname);
         Mockito.when(this.jobPersistenceService.getJobExecution(Mockito.eq(jobId))).thenReturn(jobExecution);
 
         Assert.assertThat(this.jobService.getJobHost(jobId), Matchers.is(hostname));

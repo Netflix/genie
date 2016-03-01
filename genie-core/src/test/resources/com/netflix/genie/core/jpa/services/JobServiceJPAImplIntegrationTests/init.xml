@@ -22,6 +22,7 @@
             user="tgianos"
             name="pig_13_prod"
             version="1.2.3"
+            tags="genie.id:command1,genie.name:pig_13_prod,pig,prod,tez"
             executable="pig"
             status="ACTIVE"
             entity_version="0"/>
@@ -31,21 +32,6 @@
     <command_configs
             command_id="command1"
             config="s3://some/other/config/file"/>
-    <command_tags
-            command_id="command1"
-            tag="genie.id:command1"/>
-    <command_tags
-            command_id="command1"
-            tag="genie.name:pig_13_prod"/>
-    <command_tags
-            command_id="command1"
-            tag="pig"/>
-    <command_tags
-            command_id="command1"
-            tag="prod"/>
-    <command_tags
-            command_id="command1"
-            tag="tez"/>
 
     <commands
             id="command2"
@@ -54,24 +40,13 @@
             user="amsharma"
             name="hive_11_prod"
             version="4.5.6"
+            tags="genie.id:command2,genie.name:hive_11_prod,hive,prod"
             executable="hive"
             status="INACTIVE"
             entity_version="0"/>
     <command_configs
             command_id="command2"
             config="s3://some/config/file"/>
-    <command_tags
-            command_id="command2"
-            tag="genie.id:command2"/>
-    <command_tags
-            command_id="command2"
-            tag="genie.name:hive_11_prod"/>
-    <command_tags
-            command_id="command2"
-            tag="hive"/>
-    <command_tags
-            command_id="command2"
-            tag="prod"/>
 
     <commands
             id="command3"
@@ -80,27 +55,13 @@
             user="tgianos"
             name="pig_11_prod"
             version="7.8.9"
+            tags="deprecated,genie.id:command3,genie.name:pig_11_prod,pig,prod"
             executable="pig"
             status="DEPRECATED"
             entity_version="0"/>
     <command_configs
             command_id="command3"
             config="s3://some/config/file"/>
-    <command_tags
-            command_id="command3"
-            tag="genie.id:command3"/>
-    <command_tags
-            command_id="command3"
-            tag="genie.name:pig_11_prod"/>
-    <command_tags
-            command_id="command3"
-            tag="pig"/>
-    <command_tags
-            command_id="command3"
-            tag="prod"/>
-    <command_tags
-            command_id="command3"
-            tag="deprecated"/>
 
     <clusters
             id="cluster1"
@@ -109,27 +70,12 @@
             user="tgianos"
             name="h2prod"
             version="2.4.0"
-            cluster_type="yarn"
+            tags="genie.id:cluster1,genie.name:h2prod,hive,pig,prod"
             status="UP"
             entity_version="0"/>
     <cluster_configs
             cluster_id="cluster1"
             config="s3://some/config/file"/>
-    <cluster_tags
-            cluster_id="cluster1"
-            tag="genie.id:cluster1"/>
-    <cluster_tags
-            cluster_id="cluster1"
-            tag="genie.name:h2prod"/>
-    <cluster_tags
-            cluster_id="cluster1"
-            tag="pig"/>
-    <cluster_tags
-            cluster_id="cluster1"
-            tag="prod"/>
-    <cluster_tags
-            cluster_id="cluster1"
-            tag="hive"/>
 
     <clusters_commands
             cluster_id="cluster1"
@@ -151,7 +97,7 @@
             user="amsharma"
             name="h2query"
             version="2.4.0"
-            cluster_type="yarn"
+            tags="genie.id:cluster2,genie.name:h2query,hive,pig,query"
             status="UP"
             entity_version="0"/>
     <cluster_configs
@@ -160,21 +106,6 @@
     <cluster_configs
             cluster_id="cluster2"
             config="s3://some/other/config/file"/>
-    <cluster_tags
-            cluster_id="cluster2"
-            tag="genie.id:cluster2"/>
-    <cluster_tags
-            cluster_id="cluster2"
-            tag="genie.name:h2query"/>
-    <cluster_tags
-            cluster_id="cluster2"
-            tag="pig"/>
-    <cluster_tags
-            cluster_id="cluster2"
-            tag="query"/>
-    <cluster_tags
-            cluster_id="cluster2"
-            tag="hive"/>
 
     <clusters_commands
             cluster_id="cluster2"
@@ -196,19 +127,11 @@
             user="tgianos"
             name="testPigJob"
             version="2.4"
+            tags="2.4,genie.id:job1,genie.name:testPigJob"
             status="INIT"
             cluster_id="cluster1"
             command_id="command1"
             entity_version="0"/>
-    <job_tags
-            job_id="job1"
-            tag="genie.id:job1"/>
-    <job_tags
-            job_id="job1"
-            tag="genie.name:testPigJob"/>
-    <job_tags
-            job_id="job1"
-            tag="2.4"/>
 
     <jobs
             id="job2"
@@ -217,19 +140,8 @@
             user="amsharma"
             name="testSparkJob"
             version="2.4.3"
+            tags="genie.id:job2,genie.name:testSparkJob,tag1,tag2"
             status="FAILED"
             cluster_id="cluster2"
             entity_version="0"/>
-    <job_tags
-            job_id="job2"
-            tag="genie.id:job2"/>
-    <job_tags
-            job_id="job2"
-            tag="genie.name:testSparkJob"/>
-    <job_tags
-            job_id="job2"
-            tag="tag1"/>
-    <job_tags
-            job_id="job2"
-            tag="tag2"/>
 </dataset>

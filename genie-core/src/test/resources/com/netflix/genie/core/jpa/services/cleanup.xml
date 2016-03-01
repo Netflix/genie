@@ -17,18 +17,14 @@
 <dataset>
     <clusters/>
     <cluster_configs/>
-    <cluster_tags/>
     <commands/>
     <command_configs/>
-    <command_tags/>
     <clusters_commands/>
     <applications/>
     <application_configs/>
     <application_dependencies/>
-    <application_tags/>
     <commands_applications/>
     <job_requests/>
     <jobs/>
-    <job_tags/>
     <job_executions/>
 </dataset>

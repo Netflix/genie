@@ -39,7 +39,6 @@ public class Application extends ConfigDTO {
 
     private final Set<String> dependencies = new HashSet<>();
     private ApplicationStatus status;
-    private String setupFile;
 
     /**
      * Constructor only accessible via builder build() method.
@@ -49,7 +48,6 @@ public class Application extends ConfigDTO {
     protected Application(final Builder builder) {
         super(builder);
         this.status = builder.bStatus;
-        this.setupFile = builder.bSetupFile;
         this.dependencies.addAll(builder.bDependencies);
     }
 
@@ -72,7 +70,6 @@ public class Application extends ConfigDTO {
 
         private final ApplicationStatus bStatus;
         private final Set<String> bDependencies = new HashSet<>();
-        private String bSetupFile;
 
         /**
          * Constructor which has required fields.
@@ -110,17 +107,6 @@ public class Application extends ConfigDTO {
             if (dependencies != null) {
                 this.bDependencies.addAll(dependencies);
             }
-            return this;
-        }
-
-        /**
-         * The setup file to use when running with an application.
-         *
-         * @param setupFile The setup file to use
-         * @return The builder
-         */
-        public Builder withSetupFile(final String setupFile) {
-            this.bSetupFile = setupFile;
             return this;
         }
 

@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.common.dto;
 
+import lombok.Getter;
+
+import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,11 +30,14 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
+@Getter
 public abstract class ConfigDTO extends CommonDTO {
 
     private static final long serialVersionUID = 147545317805515362L;
 
     private final Set<String> configs = new HashSet<>();
+    @Size(max = 1024, message = "Max length is 1024 characters")
+    private final String setupFile;
 
     /**
      * Constructor.
@@ -42,6 +48,7 @@ public abstract class ConfigDTO extends CommonDTO {
     protected ConfigDTO(final Builder builder) {
         super(builder);
         this.configs.addAll(builder.bConfigs);
+        this.setupFile = builder.bSetupFile;
     }
 
     /**
@@ -64,6 +71,7 @@ public abstract class ConfigDTO extends CommonDTO {
     protected abstract static class Builder<T extends Builder> extends CommonDTO.Builder<T> {
 
         private Set<String> bConfigs = new HashSet<>();
+        private String bSetupFile;
 
         /**
          * Constructor with required fields.
@@ -86,6 +94,18 @@ public abstract class ConfigDTO extends CommonDTO {
             if (configs != null) {
                 this.bConfigs.addAll(configs);
             }
+            return (T) this;
+        }
+
+        /**
+         * The setup file to use with the resource if desired.
+         *
+         * @param setupFile The setup file location
+         * @return The builder
+         */
+        public T withSetupFile(final String setupFile) {
+            this.bSetupFile = setupFile;
+
             return (T) this;
         }
     }

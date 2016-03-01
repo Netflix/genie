@@ -23,6 +23,7 @@ import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.Header;
@@ -64,6 +65,7 @@ public class JobRestControllerUnitTests {
     private JobService jobService;
     private AttachmentService attachmentService;
     private JobResourceAssembler jobResourceAssembler;
+    private JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
     private String hostname;
     private HttpClient httpClient;
     private GenieResourceHttpRequestHandler genieResourceHttpRequestHandler;
@@ -78,6 +80,7 @@ public class JobRestControllerUnitTests {
         this.jobService = Mockito.mock(JobService.class);
         this.attachmentService = Mockito.mock(AttachmentService.class);
         this.jobResourceAssembler = Mockito.mock(JobResourceAssembler.class);
+        this.jobSearchResultResourceAssembler = Mockito.mock(JobSearchResultResourceAssembler.class);
         this.hostname = UUID.randomUUID().toString();
         this.httpClient = Mockito.mock(HttpClient.class);
         this.genieResourceHttpRequestHandler = Mockito.mock(GenieResourceHttpRequestHandler.class);
@@ -86,6 +89,7 @@ public class JobRestControllerUnitTests {
             this.jobService,
             this.attachmentService,
             this.jobResourceAssembler,
+            this.jobSearchResultResourceAssembler,
             this.hostname,
             this.httpClient,
             this.genieResourceHttpRequestHandler,
@@ -106,6 +110,7 @@ public class JobRestControllerUnitTests {
             this.jobService,
             this.attachmentService,
             this.jobResourceAssembler,
+            this.jobSearchResultResourceAssembler,
             this.hostname,
             this.httpClient,
             this.genieResourceHttpRequestHandler,

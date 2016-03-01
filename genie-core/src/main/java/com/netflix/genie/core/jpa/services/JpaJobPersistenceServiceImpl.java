@@ -98,23 +98,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public Job getJob(
-        @NotBlank(message = "No id entered. Unable to get job.")
-        final String id
-    ) throws GenieNotFoundException {
-        LOG.debug("Called");
-        final JobEntity jobEntity = this.jobRepo.findOne(id);
-        if (jobEntity != null) {
-            return jobEntity.getDTO();
-        } else {
-            throw new GenieNotFoundException("No job with id " + id);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void createJob(
         @NotNull(message = "Job is null so cannot be saved")
         final Job job
@@ -144,8 +127,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobEntity.setStatus(job.getStatus());
         jobEntity.setStatusMsg(job.getStatusMsg());
 
-        // TODO where are tags sorted?
-        jobEntity.setJobTags(job.getTags());
+        jobEntity.setTags(job.getTags());
 
         // TODO: where are the ones below set .. update method?
         // finished,
@@ -223,9 +205,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
         if (jobEntity != null) {
             jobEntity.setCluster(clusterEntity);
-            jobEntity.setClusterName(clusterEntity.getName());
             jobEntity.setCommand(commandEntity);
-            jobEntity.setCommandName(commandEntity.getName());
 
             this.jobRepo.save(jobEntity);
 
@@ -346,8 +326,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
 
         jobExecutionEntity.setId(jobExecution.getId());
-        jobExecutionEntity.setClusterCriteriaFromSet(jobExecution.getClusterCriteria());
-        jobExecutionEntity.setHostName(jobExecution.getHostName());
+        jobExecutionEntity.setHostname(jobExecution.getHostname());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
 
         this.jobExecutionRepo.save(jobExecutionEntity);
