@@ -80,7 +80,7 @@ public final class JpaClusterSpecs {
             if (tags != null && !tags.isEmpty()) {
                 predicates.add(
                         cb.like(
-                                root.get(ClusterEntity_.sortedTags),
+                                root.get(ClusterEntity_.tags),
                                 JpaSpecificationUtils.getTagLikeString(tags)
                         )
                 );
@@ -121,7 +121,7 @@ public final class JpaClusterSpecs {
             if (commandCriteria != null && !commandCriteria.isEmpty()) {
                 predicates.add(
                         cb.like(
-                                commands.get(CommandEntity_.sortedTags),
+                                commands.get(CommandEntity_.tags),
                                 JpaSpecificationUtils.getTagLikeString(commandCriteria)
                         )
                 );
@@ -130,7 +130,7 @@ public final class JpaClusterSpecs {
             if (clusterCriteria != null && clusterCriteria.getTags() != null && !clusterCriteria.getTags().isEmpty()) {
                 predicates.add(
                         cb.like(
-                                root.get(ClusterEntity_.sortedTags),
+                                root.get(ClusterEntity_.tags),
                                 JpaSpecificationUtils.getTagLikeString(clusterCriteria.getTags())
                         )
                 );

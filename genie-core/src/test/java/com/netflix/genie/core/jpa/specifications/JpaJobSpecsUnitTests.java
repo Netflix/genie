@@ -15,12 +15,12 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
+import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -87,54 +87,43 @@ public class JpaJobSpecsUnitTests {
         final Path<String> jobNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate likeJobNamePredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.name)).thenReturn(jobNamePath);
-        Mockito.when(this.cb.like(jobNamePath, JOB_NAME))
-                .thenReturn(likeJobNamePredicate);
+        Mockito.when(this.cb.like(jobNamePath, JOB_NAME)).thenReturn(likeJobNamePredicate);
 
         final Path<String> userNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalUserNamePredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.user)).thenReturn(userNamePath);
-        Mockito.when(this.cb.equal(userNamePath, USER_NAME))
-                .thenReturn(equalUserNamePredicate);
+        Mockito.when(this.cb.equal(userNamePath, USER_NAME)).thenReturn(equalUserNamePredicate);
 
         final Path<JobStatus> statusPath = (Path<JobStatus>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.status)).thenReturn(statusPath);
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(JobStatus.class)))
-                .thenReturn(equalStatusPredicate);
+            .thenReturn(equalStatusPredicate);
 
         final Path<String> clusterNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalClusterNamePredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.clusterName))
-                .thenReturn(clusterNamePath);
-        Mockito.when(this.cb.equal(clusterNamePath, CLUSTER_NAME))
-                .thenReturn(equalClusterNamePredicate);
+        Mockito.when(this.root.get(JobEntity_.clusterName)).thenReturn(clusterNamePath);
+        Mockito.when(this.cb.equal(clusterNamePath, CLUSTER_NAME)).thenReturn(equalClusterNamePredicate);
 
         final Path<ClusterEntity> clusterIdPath = (Path<ClusterEntity>) Mockito.mock(Path.class);
         final Predicate equalClusterIdPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.cluster))
-                .thenReturn(clusterIdPath);
-        Mockito.when(this.cb.equal(clusterIdPath, CLUSTER_ID))
-                .thenReturn(equalClusterIdPredicate);
+        Mockito.when(this.root.get(JobEntity_.cluster)).thenReturn(clusterIdPath);
+        Mockito.when(this.cb.equal(clusterIdPath, CLUSTER_ID)).thenReturn(equalClusterIdPredicate);
 
         final Path<String> commandNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalCommandNamePredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.commandName))
-                .thenReturn(commandNamePath);
-        Mockito.when(this.cb.equal(commandNamePath, COMMAND_NAME))
-                .thenReturn(equalCommandNamePredicate);
+        Mockito.when(this.root.get(JobEntity_.commandName)).thenReturn(commandNamePath);
+        Mockito.when(this.cb.equal(commandNamePath, COMMAND_NAME)).thenReturn(equalCommandNamePredicate);
 
         final Path<CommandEntity> commandIdPath = (Path<CommandEntity>) Mockito.mock(Path.class);
         final Predicate equalCommandIdPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.command))
-                .thenReturn(commandIdPath);
-        Mockito.when(this.cb.equal(clusterIdPath, COMMAND_ID))
-                .thenReturn(equalCommandIdPredicate);
+        Mockito.when(this.root.get(JobEntity_.command)).thenReturn(commandIdPath);
+        Mockito.when(this.cb.equal(clusterIdPath, COMMAND_ID)).thenReturn(equalCommandIdPredicate);
 
         final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.sortedTags)).thenReturn(tagPath);
-        Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class)))
-                .thenReturn(likeTagPredicate);
+        Mockito.when(this.root.get(JobEntity_.tags)).thenReturn(tagPath);
+        Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class))).thenReturn(likeTagPredicate);
 
         this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
     }
@@ -144,39 +133,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithAll() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                STATUSES,
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            STATUSES,
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -184,39 +165,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutId() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                null,
-                JOB_NAME,
-                USER_NAME,
-                STATUSES,
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            null,
+            JOB_NAME,
+            USER_NAME,
+            STATUSES,
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.never()).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -224,39 +197,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutJobName() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                "",
-                USER_NAME,
-                STATUSES,
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            null,
+            USER_NAME,
+            STATUSES,
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.never()).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -264,39 +229,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutUserName() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                " ",
-                STATUSES,
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            null,
+            STATUSES,
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -304,39 +261,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutStatus() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                null,
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            null,
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.never())
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -344,39 +293,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithEmptyStatus() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                new HashSet<>(),
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            new HashSet<>(),
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.never())
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -384,39 +325,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutClusterName() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                STATUSES,
-                TAGS,
-                null,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            STATUSES,
+            TAGS,
+            null,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -424,39 +357,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutClusterId() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                STATUSES,
-                TAGS,
-                CLUSTER_NAME,
-                null,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            STATUSES,
+            TAGS,
+            CLUSTER_NAME,
+            null,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -464,39 +389,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutCommandName() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                STATUSES,
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                null,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            STATUSES,
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            null,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -504,39 +421,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutCommandId() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                STATUSES,
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                null
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            STATUSES,
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            null
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -544,39 +453,31 @@ public class JpaJobSpecsUnitTests {
      */
     @Test
     public void testFindWithOutTags() {
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                STATUSES,
-                null,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            STATUSES,
+            null,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.command), COMMAND_ID);
-        Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.never()).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -585,35 +486,29 @@ public class JpaJobSpecsUnitTests {
     @Test
     public void testFindWithEmptyTag() {
         TAGS.add("");
-        final Specification<JobEntity> spec = JpaJobSpecs.find(
-                ID,
-                JOB_NAME,
-                USER_NAME,
-                STATUSES,
-                TAGS,
-                CLUSTER_NAME,
-                CLUSTER_ID,
-                COMMAND_NAME,
-                COMMAND_ID
+        JpaJobSpecs.getFindPredicate(
+            this.root,
+            this.cb,
+            ID,
+            JOB_NAME,
+            USER_NAME,
+            STATUSES,
+            TAGS,
+            CLUSTER_NAME,
+            CLUSTER_ID,
+            COMMAND_NAME,
+            COMMAND_ID
         );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.id), ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.name), JOB_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.id), ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), JOB_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
         for (final JobStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(JobEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(JobEntity_.sortedTags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -630,37 +525,37 @@ public class JpaJobSpecsUnitTests {
         final Predicate lessThanUpdatedPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.updated)).thenReturn(updatedPath);
         Mockito.when(this.cb.lessThan(updatedPath, new Date(diff)))
-                .thenReturn(lessThanUpdatedPredicate);
+            .thenReturn(lessThanUpdatedPredicate);
 
         final Path<JobStatus> runningPath = (Path<JobStatus>) Mockito.mock(Path.class);
         final Predicate equalRunningPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.status)).thenReturn(runningPath);
         Mockito.when(this.cb.equal(runningPath, JobStatus.RUNNING))
-                .thenReturn(equalRunningPredicate);
+            .thenReturn(equalRunningPredicate);
 
         final Path<JobStatus> initPath = (Path<JobStatus>) Mockito.mock(Path.class);
         final Predicate equalInitPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.status)).thenReturn(initPath);
         Mockito.when(this.cb.equal(initPath, JobStatus.INIT))
-                .thenReturn(equalInitPredicate);
+            .thenReturn(equalInitPredicate);
 
         final Predicate orPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.cb.or(equalRunningPredicate, equalInitPredicate))
-                .thenReturn(orPredicate);
+            .thenReturn(orPredicate);
 
         final Specification<JobEntity> findZombies = JpaJobSpecs.findZombies(
-                now.getTime(),
-                before.getTime()
+            now.getTime(),
+            before.getTime()
         );
         findZombies.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .lessThan(this.root.get(JobEntity_.updated), new Date(diff));
+            .lessThan(this.root.get(JobEntity_.updated), new Date(diff));
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.status), JobStatus.RUNNING);
+            .equal(this.root.get(JobEntity_.status), JobStatus.RUNNING);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(JobEntity_.status), JobStatus.INIT);
+            .equal(this.root.get(JobEntity_.status), JobStatus.INIT);
         Mockito.verify(this.cb, Mockito.times(1))
-                .or(Mockito.any(Predicate.class), Mockito.any(Predicate.class));
+            .or(Mockito.any(Predicate.class), Mockito.any(Predicate.class));
     }
 
     /**

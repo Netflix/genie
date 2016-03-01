@@ -25,7 +25,7 @@
         executable="pig"
         status="ACTIVE"
         entity_version="0"
-        sorted_tags="genie.id:command1,genie:name:pig_13_prod,pig,prod,tez"
+        tags="genie.id:command1,genie:name:pig_13_prod,pig,prod,tez"
     />
     <command_configs
         command_id="command1"
@@ -33,21 +33,6 @@
     <command_configs
         command_id="command1"
         config="s3://some/other/config/file"/>
-    <command_tags
-        command_id="command1"
-        tag="genie.id:command1"/>
-    <command_tags
-        command_id="command1"
-        tag="genie.name:pig_13_prod"/>
-    <command_tags
-        command_id="command1"
-        tag="pig"/>
-    <command_tags
-        command_id="command1"
-        tag="prod"/>
-    <command_tags
-        command_id="command1"
-        tag="tez"/>
 
     <commands
         id="command2"
@@ -59,23 +44,11 @@
         executable="hive"
         status="INACTIVE"
         entity_version="0"
-        sorted_tags="genie.id:command2,genie:name:hive_11_prod,hive,prod"
+        tags="genie.id:command2,genie:name:hive_11_prod,hive,prod"
     />
     <command_configs
         command_id="command2"
         config="s3://some/config/file"/>
-    <command_tags
-        command_id="command2"
-        tag="genie.id:command2"/>
-    <command_tags
-        command_id="command2"
-        tag="genie.name:hive_11_prod"/>
-    <command_tags
-        command_id="command2"
-        tag="hive"/>
-    <command_tags
-        command_id="command2"
-        tag="prod"/>
 
     <commands
         id="command3"
@@ -87,26 +60,11 @@
         executable="pig"
         status="DEPRECATED"
         entity_version="0"
-        sorted_tags="deprecated,genie.id:command3,genie:name:pig_11_prod,pig,prod"
+        tags="deprecated,genie.id:command3,genie:name:pig_11_prod,pig,prod"
     />
     <command_configs
         command_id="command3"
         config="s3://some/config/file"/>
-    <command_tags
-        command_id="command3"
-        tag="genie.id:command3"/>
-    <command_tags
-        command_id="command3"
-        tag="genie.name:pig_11_prod"/>
-    <command_tags
-        command_id="command3"
-        tag="pig"/>
-    <command_tags
-        command_id="command3"
-        tag="prod"/>
-    <command_tags
-        command_id="command3"
-        tag="deprecated"/>
 
     <clusters
         id="cluster1"
@@ -115,29 +73,13 @@
         user="tgianos"
         name="h2prod"
         version="2.4.0"
-        cluster_type="yarn"
         status="UP"
         entity_version="0"
-        sorted_tags="genie.id:cluster1,genie.name:h2prod,hive,pig,prod"
+        tags="genie.id:cluster1,genie.name:h2prod,hive,pig,prod"
     />
     <cluster_configs
         cluster_id="cluster1"
         config="s3://some/config/file"/>
-    <cluster_tags
-        cluster_id="cluster1"
-        tag="genie.id:cluster1"/>
-    <cluster_tags
-        cluster_id="cluster1"
-        tag="genie.name:h2prod"/>
-    <cluster_tags
-        cluster_id="cluster1"
-        tag="pig"/>
-    <cluster_tags
-        cluster_id="cluster1"
-        tag="prod"/>
-    <cluster_tags
-        cluster_id="cluster1"
-        tag="hive"/>
 
     <clusters_commands
         cluster_id="cluster1"
@@ -159,10 +101,9 @@
         user="amsharma"
         name="h2query"
         version="2.4.0"
-        cluster_type="yarn"
         status="UP"
         entity_version="0"
-        sorted_tags="genie.id:cluster2,genie.name:h2query,hive,pig,query"
+        tags="genie.id:cluster2,genie.name:h2query,hive,pig,query"
     />
     <cluster_configs
         cluster_id="cluster2"
@@ -170,21 +111,6 @@
     <cluster_configs
         cluster_id="cluster2"
         config="s3://some/other/config/file"/>
-    <cluster_tags
-        cluster_id="cluster2"
-        tag="genie.id:cluster2"/>
-    <cluster_tags
-        cluster_id="cluster2"
-        tag="genie.name:h2query"/>
-    <cluster_tags
-        cluster_id="cluster2"
-        tag="pig"/>
-    <cluster_tags
-        cluster_id="cluster2"
-        tag="query"/>
-    <cluster_tags
-        cluster_id="cluster2"
-        tag="hive"/>
 
     <clusters_commands
         cluster_id="cluster2"

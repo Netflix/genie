@@ -65,8 +65,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            ClusterStatus.UP,
-            UUID.randomUUID().toString()
+            ClusterStatus.UP
         ).build();
 
     private static final Command COMMAND =

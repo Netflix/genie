@@ -75,7 +75,7 @@ public class JobMonitoringCoordinatorUnitTests {
     public void canAttachToRunningJobs() throws GenieException {
         final ApplicationReadyEvent event = Mockito.mock(ApplicationReadyEvent.class);
 
-        Mockito.when(this.jobSearchService.getAllJobExecutionsOnHost(HOSTNAME)).thenReturn(Sets.newHashSet());
+        Mockito.when(this.jobSearchService.getAllRunningJobExecutionsOnHost(HOSTNAME)).thenReturn(Sets.newHashSet());
         this.coordinator.attachToRunningJobs(event);
         Mockito
             .verify(this.scheduler, Mockito.never())
@@ -107,7 +107,7 @@ public class JobMonitoringCoordinatorUnitTests {
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
 
         final Set<JobExecution> executions = Sets.newHashSet(job1, job2, job3, job4);
-        Mockito.when(this.jobSearchService.getAllJobExecutionsOnHost(HOSTNAME)).thenReturn(executions);
+        Mockito.when(this.jobSearchService.getAllRunningJobExecutionsOnHost(HOSTNAME)).thenReturn(executions);
         this.coordinator.attachToRunningJobs(event);
 
         Mockito
@@ -115,7 +115,7 @@ public class JobMonitoringCoordinatorUnitTests {
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
 
         Mockito
-            .when(this.jobSearchService.getAllJobExecutionsOnHost(HOSTNAME))
+            .when(this.jobSearchService.getAllRunningJobExecutionsOnHost(HOSTNAME))
             .thenThrow(new GenieException(404, "blah"));
         this.coordinator.attachToRunningJobs(event);
         Mockito

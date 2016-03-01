@@ -89,7 +89,7 @@ public class JobMonitoringCoordinator {
     public void attachToRunningJobs(final ApplicationReadyEvent event) {
         log.info("Application is ready according to event {}. Attempting to re-attach to any running jobs", event);
         try {
-            final Set<JobExecution> executions = this.jobSearchService.getAllJobExecutionsOnHost(this.hostname);
+            final Set<JobExecution> executions = this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostname);
             if (executions.isEmpty()) {
                 log.info("No jobs currently running on this node.");
                 return;

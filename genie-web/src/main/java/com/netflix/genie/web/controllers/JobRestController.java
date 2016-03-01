@@ -17,17 +17,21 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.io.ByteStreams;
-import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.JobResource;
+import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -87,6 +91,7 @@ public class JobRestController {
     private final JobService jobService;
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
+    private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
     private final String hostname;
     private final HttpClient httpClient;
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
@@ -95,19 +100,22 @@ public class JobRestController {
     /**
      * Constructor.
      *
-     * @param jobService                 The job search service to use.
-     * @param attachmentService          The attachment service to use to save attachments.
-     * @param jobResourceAssembler       Assemble job resources out of jobs
-     * @param hostname                   The hostname this Genie instance is running on
-     * @param httpClient                 The http client to use for forwarding requests
-     * @param resourceHttpRequestHandler The handler to return requests for static resources on the Genie File System.
-     * @param directoryForwardingEnabled Whether job directory forwarding is enabled or not
+     * @param jobService                       The job search service to use.
+     * @param attachmentService                The attachment service to use to save attachments.
+     * @param jobResourceAssembler             Assemble job resources out of jobs
+     * @param jobSearchResultResourceAssembler Assemble job search resources out of jobs
+     * @param hostname                         The hostname this Genie instance is running on
+     * @param httpClient                       The http client to use for forwarding requests
+     * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
+     *                                         Genie File System.
+     * @param directoryForwardingEnabled       Whether job directory forwarding is enabled or not
      */
     @Autowired
     public JobRestController(
         final JobService jobService,
         final AttachmentService attachmentService,
         final JobResourceAssembler jobResourceAssembler,
+        final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
         final String hostname,
         final HttpClient httpClient,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
@@ -116,6 +124,7 @@ public class JobRestController {
         this.jobService = jobService;
         this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
+        this.jobSearchResultResourceAssembler = jobSearchResultResourceAssembler;
         this.hostname = hostname;
         this.httpClient = httpClient;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
@@ -228,6 +237,19 @@ public class JobRestController {
     }
 
     /**
+     * Get the status of the given job if it exists.
+     *
+     * @param id The id of the job to get status for
+     * @return The status of the job as one of: {@link JobStatus}
+     * @throws GenieException on error
+     */
+    @RequestMapping(value = "/{id}/status", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public JsonNode getJobStatus(@PathVariable("id") final String id) throws GenieException {
+        final JsonNodeFactory factory = JsonNodeFactory.instance;
+        return factory.objectNode().set("status", factory.textNode(this.jobService.getJobStatus(id).toString()));
+    }
+
+    /**
      * Get jobs for given filter criteria.
      *
      * @param id          id for job
@@ -246,7 +268,7 @@ public class JobRestController {
      */
     @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public PagedResources<JobResource> getJobs(
+    public PagedResources<JobSearchResultResource> getJobs(
         @RequestParam(value = "id", required = false) final String id,
         @RequestParam(value = "name", required = false) final String name,
         @RequestParam(value = "userName", required = false) final String userName,
@@ -256,9 +278,8 @@ public class JobRestController {
         @RequestParam(value = "clusterId", required = false) final String clusterId,
         @RequestParam(value = "commandName", required = false) final String commandName,
         @RequestParam(value = "commandId", required = false) final String commandId,
-        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC)
-        final Pageable page,
-        final PagedResourcesAssembler<Job> assembler
+        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+        final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
         log.debug(
             "Called with "
@@ -288,7 +309,7 @@ public class JobRestController {
         }
 
         return assembler.toResource(
-            this.jobService.getJobs(
+            this.jobService.findJobs(
                 id,
                 name,
                 userName,
@@ -300,7 +321,7 @@ public class JobRestController {
                 commandId,
                 page
             ),
-            this.jobResourceAssembler
+            this.jobSearchResultResourceAssembler
         );
     }
 

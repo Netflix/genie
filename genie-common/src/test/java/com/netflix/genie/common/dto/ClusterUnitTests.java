@@ -40,19 +40,17 @@ public class ClusterUnitTests {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
-    private static final String CLUSTER_TYPE = UUID.randomUUID().toString();
 
     /**
      * Test to make sure we can build a cluster using the default builder constructor.
      */
     @Test
     public void canBuildCluster() {
-        final Cluster cluster = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE).build();
+        final Cluster cluster = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build();
         Assert.assertThat(cluster.getName(), Matchers.is(NAME));
         Assert.assertThat(cluster.getUser(), Matchers.is(USER));
         Assert.assertThat(cluster.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.UP));
-        Assert.assertThat(cluster.getClusterType(), Matchers.is(CLUSTER_TYPE));
         Assert.assertThat(cluster.getConfigs(), Matchers.empty());
         Assert.assertThat(cluster.getCreated(), Matchers.nullValue());
         Assert.assertThat(cluster.getDescription(), Matchers.nullValue());
@@ -66,7 +64,7 @@ public class ClusterUnitTests {
      */
     @Test
     public void canBuildClusterWithOptionals() {
-        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP);
 
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withConfigs(configs);
@@ -104,7 +102,7 @@ public class ClusterUnitTests {
      */
     @Test
     public void canBuildClusterNullOptionals() {
-        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP);
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);
@@ -130,7 +128,7 @@ public class ClusterUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP, CLUSTER_TYPE);
+        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP);
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);
@@ -155,7 +153,7 @@ public class ClusterUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, null, CLUSTER_TYPE);
+        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, null);
         builder.withConfigs(null);
         builder.withCreated(null);
         builder.withDescription(null);

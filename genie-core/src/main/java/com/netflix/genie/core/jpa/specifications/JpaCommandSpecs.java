@@ -77,7 +77,7 @@ public final class JpaCommandSpecs {
             if (tags != null && !tags.isEmpty()) {
                 predicates.add(
                         cb.like(
-                                root.get(CommandEntity_.sortedTags),
+                                root.get(CommandEntity_.tags),
                                 JpaSpecificationUtils.getTagLikeString(tags)
                         )
                 );

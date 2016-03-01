@@ -20,6 +20,7 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ import java.util.Set;
 public interface JobSearchService {
 
     /**
-     * Get job info for given filter criteria.
+     * Search for jobs which match the given filter criteria.
      *
      * @param id          id for job
      * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
@@ -49,9 +50,9 @@ public interface JobSearchService {
      * @param commandName name of the command run in the job
      * @param commandId   id of the command run in the job
      * @param page        Page information of job to get
-     * @return All jobs which match the criteria
+     * @return Metadata information on jobs which match the criteria
      */
-    Page<Job> getJobs(
+    Page<JobSearchResult> findJobs(
             final String id,
             final String jobName,
             final String userName,
@@ -71,5 +72,23 @@ public interface JobSearchService {
      * @return All the jobs running on the host as a set of JobExecution objects
      * @throws GenieException on error
      */
-    Set<JobExecution> getAllJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException;
+    Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException;
+
+    /**
+     * Get job information for given job id.
+     *
+     * @param id id of job to look up
+     * @return the job
+     * @throws GenieException if there is an error
+     */
+    Job getJob(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Get the status of the job with the given id.
+     *
+     * @param id The id of the job to get status for
+     * @return The job status
+     * @throws GenieException When any error, including not found, is encountered
+     */
+    JobStatus getJobStatus(@NotBlank final String id) throws GenieException;
 }

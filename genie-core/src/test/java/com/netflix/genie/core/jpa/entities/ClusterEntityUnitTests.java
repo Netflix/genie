@@ -48,7 +48,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     private static final String NAME = "h2prod";
     private static final String USER = "tgianos";
     private static final String CONFIG = "s3://netflix/clusters/configs/config1";
-    private static final String CLUSTER_TYPE = "Hadoop";
     private static final String VERSION = "1.2.3";
 
     private ClusterEntity c;
@@ -66,7 +65,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         this.c.setUser(USER);
         this.c.setVersion(VERSION);
         this.c.setStatus(ClusterStatus.UP);
-        this.c.setClusterType(CLUSTER_TYPE);
     }
 
     /**
@@ -75,7 +73,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test
     public void testDefaultConstructor() {
         final ClusterEntity entity = new ClusterEntity();
-        Assert.assertNull(entity.getClusterType());
         Assert.assertNull(entity.getName());
         Assert.assertNull(entity.getStatus());
         Assert.assertNull(entity.getUser());
@@ -146,30 +143,12 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Make sure validation works on with failure from cluster.
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoClusterType() {
-        this.c.setClusterType(null);
-        this.validate(this.c);
-    }
-
-    /**
      * Test setting the status.
      */
     @Test
     public void testSetStatus() {
         this.c.setStatus(ClusterStatus.TERMINATED);
         Assert.assertEquals(ClusterStatus.TERMINATED, this.c.getStatus());
-    }
-
-    /**
-     * Test setting the cluster type.
-     */
-    @Test
-    public void testSetClusterType() {
-        this.c.setClusterType(CLUSTER_TYPE);
-        Assert.assertEquals(CLUSTER_TYPE, this.c.getClusterType());
     }
 
     /**
@@ -331,17 +310,15 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test
     public void canSetClusterTags() {
         final Set<String> tags = Sets.newHashSet("one", "two", "Pre");
-        this.c.setClusterTags(tags);
-        Assert.assertThat(this.c.getClusterTags(), Matchers.is(tags));
+        this.c.setTags(tags);
+        Assert.assertThat(this.c.getTags(), Matchers.is(tags));
         Assert.assertThat(this.c.getTags().size(), Matchers.is(tags.size()));
         this.c.getTags().forEach(tag -> Assert.assertTrue(tags.contains(tag)));
 
-        this.c.setClusterTags(Sets.newHashSet());
-        Assert.assertThat(this.c.getClusterTags(), Matchers.empty());
+        this.c.setTags(Sets.newHashSet());
         Assert.assertThat(this.c.getTags(), Matchers.empty());
 
-        this.c.setClusterTags(null);
-        Assert.assertThat(this.c.getClusterTags(), Matchers.empty());
+        this.c.setTags(null);
         Assert.assertThat(this.c.getTags(), Matchers.empty());
     }
 
@@ -390,8 +367,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         final String version = UUID.randomUUID().toString();
         entity.setVersion(version);
         entity.setStatus(ClusterStatus.TERMINATED);
-        final String clusterType = UUID.randomUUID().toString();
-        entity.setClusterType(clusterType);
         final String id = UUID.randomUUID().toString();
         entity.setId(id);
         final Date created = entity.getCreated();
@@ -399,7 +374,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         final String description = UUID.randomUUID().toString();
         entity.setDescription(description);
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setClusterTags(tags);
+        entity.setTags(tags);
         final Set<String> confs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         entity.setConfigs(confs);
 
@@ -412,7 +387,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.TERMINATED));
         Assert.assertThat(cluster.getCreated(), Matchers.is(created));
         Assert.assertThat(cluster.getUpdated(), Matchers.is(updated));
-        Assert.assertThat(cluster.getClusterType(), Matchers.is(clusterType));
         Assert.assertThat(cluster.getTags(), Matchers.is(tags));
         Assert.assertThat(cluster.getConfigs(), Matchers.is(confs));
     }

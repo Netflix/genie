@@ -34,9 +34,9 @@ public interface JpaJobExecutionRepository extends JpaRepository<JobExecutionEnt
     /**
      * Get all the job executions which are on the given host with the given exit code.
      *
-     * @param hostName The hostname to search for
+     * @param hostname The hostname to search for
      * @param exitCode The exit code to search for
      * @return All the job executions currently running on that host
      */
-    Set<JobExecutionEntity> findByHostNameAndExitCode(final String hostName, final int exitCode);
+    Set<JobExecutionEntity> findByHostnameAndExitCode(final String hostname, final int exitCode);
 }

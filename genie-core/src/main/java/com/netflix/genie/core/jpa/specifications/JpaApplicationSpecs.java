@@ -74,7 +74,7 @@ public final class JpaApplicationSpecs {
             if (tags != null && !tags.isEmpty()) {
                 predicates.add(
                         cb.like(
-                                root.get(ApplicationEntity_.sortedTags),
+                                root.get(ApplicationEntity_.tags),
                                 JpaSpecificationUtils.getTagLikeString(tags)
                         )
                 );

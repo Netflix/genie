@@ -37,7 +37,7 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class JobExecutionUnitTests {
 
-    private static final String HOST_NAME = UUID.randomUUID().toString();
+    private static final String HOSTNAME = UUID.randomUUID().toString();
     private static final int PROCESS_ID = 134234;
 
     /**
@@ -45,8 +45,8 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJob() {
-        final JobExecution execution = new JobExecution.Builder(HOST_NAME, PROCESS_ID).build();
-        Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
+        final JobExecution execution = new JobExecution.Builder(HOSTNAME, PROCESS_ID).build();
+        Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getClusterCriteria(), Matchers.empty());
         Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
@@ -60,7 +60,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithOptionals() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID);
 
         final Set<String> clusterCriteria = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withClusterCriteria(clusterCriteria);
@@ -78,7 +78,7 @@ public class JobExecutionUnitTests {
         builder.withUpdated(updated);
 
         final JobExecution execution = builder.build();
-        Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
+        Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getClusterCriteria(), Matchers.is(clusterCriteria));
         Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
@@ -92,14 +92,14 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithNulls() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID);
         builder.withClusterCriteria(null);
         builder.withCreated(null);
         builder.withId(null);
         builder.withUpdated(null);
 
         final JobExecution execution = builder.build();
-        Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
+        Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getClusterCriteria(), Matchers.empty());
         Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
@@ -113,7 +113,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID);
         builder.withClusterCriteria(null);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
@@ -134,7 +134,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID);
         builder.withClusterCriteria(null);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());

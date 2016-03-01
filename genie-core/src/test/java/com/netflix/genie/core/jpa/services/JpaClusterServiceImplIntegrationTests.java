@@ -63,21 +63,17 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
     private static final String COMMAND_3_ID = "command3";
-    private static final String JOB_1_ID = "job1";
-    private static final String JOB_2_ID = "job2";
 
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
     private static final String CLUSTER_1_NAME = "h2prod";
     private static final String CLUSTER_1_VERSION = "2.4.0";
-    private static final String CLUSTER_1_TYPE = "yarn";
     private static final ClusterStatus CLUSTER_1_STATUS = ClusterStatus.UP;
 
     private static final String CLUSTER_2_ID = "cluster2";
     private static final String CLUSTER_2_USER = "amsharma";
     private static final String CLUSTER_2_NAME = "h2query";
     private static final String CLUSTER_2_VERSION = "2.4.0";
-    private static final String CLUSTER_2_TYPE = "yarn";
     private static final ClusterStatus CLUSTER_2_STATUS = ClusterStatus.UP;
 
     private static final Pageable PAGE = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
@@ -104,7 +100,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_1_USER, cluster1.getUser());
         Assert.assertEquals(CLUSTER_1_VERSION, cluster1.getVersion());
         Assert.assertEquals(CLUSTER_1_STATUS, cluster1.getStatus());
-        Assert.assertEquals(CLUSTER_1_TYPE, cluster1.getClusterType());
         Assert.assertEquals(5, cluster1.getTags().size());
         Assert.assertEquals(1, cluster1.getConfigs().size());
 
@@ -114,7 +109,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_2_USER, cluster2.getUser());
         Assert.assertEquals(CLUSTER_2_VERSION, cluster2.getVersion());
         Assert.assertEquals(CLUSTER_2_STATUS, cluster2.getStatus());
-        Assert.assertEquals(CLUSTER_2_TYPE, cluster2.getClusterType());
         Assert.assertEquals(5, cluster2.getTags().size());
         Assert.assertEquals(2, cluster2.getConfigs().size());
     }
@@ -303,8 +297,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
                 CLUSTER_1_VERSION,
-                ClusterStatus.OUT_OF_SERVICE,
-                CLUSTER_1_TYPE
+                ClusterStatus.OUT_OF_SERVICE
         )
                 .withId(id)
                 .withConfigs(configs)
@@ -316,7 +309,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_1_NAME, created.getName());
         Assert.assertEquals(CLUSTER_1_USER, created.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
-        Assert.assertEquals(CLUSTER_1_TYPE, created.getClusterType());
         Assert.assertEquals(3, created.getConfigs().size());
         this.service.deleteCluster(id);
         try {
@@ -345,8 +337,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
                 CLUSTER_1_VERSION,
-                ClusterStatus.OUT_OF_SERVICE,
-                CLUSTER_1_TYPE
+                ClusterStatus.OUT_OF_SERVICE
         )
                 .withConfigs(configs)
                 .build();
@@ -355,7 +346,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_1_NAME, created.getName());
         Assert.assertEquals(CLUSTER_1_USER, created.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
-        Assert.assertEquals(CLUSTER_1_TYPE, created.getClusterType());
         Assert.assertEquals(3, created.getConfigs().size());
         this.service.deleteCluster(created.getId());
         try {
@@ -400,8 +390,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 getCluster.getName(),
                 CLUSTER_2_USER,
                 getCluster.getVersion(),
-                ClusterStatus.OUT_OF_SERVICE,
-                getCluster.getClusterType()
+                ClusterStatus.OUT_OF_SERVICE
         )
                 .withId(getCluster.getId())
                 .withCreated(getCluster.getCreated())
@@ -434,8 +423,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 "", //invalid
                 getCluster.getUser(),
                 getCluster.getVersion(),
-                ClusterStatus.OUT_OF_SERVICE,
-                getCluster.getClusterType()
+                ClusterStatus.OUT_OF_SERVICE
         )
                 .withId(getCluster.getId())
                 .build();
@@ -458,8 +446,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 getCluster.getName(),
                 getCluster.getUser(),
                 getCluster.getVersion(),
-                getCluster.getStatus(),
-                getCluster.getClusterType()
+                getCluster.getStatus()
         )
                 .withId(getCluster.getId())
                 .withCreated(new Date())

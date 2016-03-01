@@ -17,9 +17,6 @@
  */
 package com.netflix.genie;
 
-import com.github.springtestdbunit.bean.DatabaseConfigBean;
-import com.github.springtestdbunit.bean.DatabaseDataSourceConnectionFactoryBean;
-import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +25,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import javax.sql.DataSource;
 import javax.validation.Validator;
 
 /**
@@ -39,7 +35,7 @@ import javax.validation.Validator;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-public class  GenieCoreTestApplication {
+public class GenieCoreTestApplication {
 
     /**
      * Setup bean validation.
@@ -73,29 +69,55 @@ public class  GenieCoreTestApplication {
         return "localhost";
     }
 
-    /**
-     * Get the DBUnit configuration.
-     *
-     * @return The config bean
-     */
-    @Bean
-     public DatabaseConfigBean dbUnitDatabaseConfig() {
-        final DatabaseConfigBean dbConfig = new DatabaseConfigBean();
-        dbConfig.setDatatypeFactory(new HsqldbDataTypeFactory());
-        return dbConfig;
-    }
-
-    /**
-     * Get the database connection factory bean.
-     *
-     * @param dataSource The data source to use
-     * @return The database connection factory bean for dbunit.
-     */
-    @Bean
-    public DatabaseDataSourceConnectionFactoryBean dbUnitDatabaseConnection(final DataSource dataSource) {
-        final DatabaseDataSourceConnectionFactoryBean dbConnection
-                = new DatabaseDataSourceConnectionFactoryBean(dataSource);
-        dbConnection.setDatabaseConfig(dbUnitDatabaseConfig());
-        return dbConnection;
-    }
+//    /**
+//     * Get the DBUnit configuration.
+//     *
+//     * @return The config bean
+//     */
+//    @Bean
+//    public DatabaseConfigBean dbUnitDatabaseConfig() {
+//        final DatabaseConfigBean dbConfig = new DatabaseConfigBean();
+//        dbConfig.setDatatypeFactory(new HsqldbDataTypeFactory());
+//        return dbConfig;
+//    }
+//
+//    /**
+//     * Get the database connection factory bean.
+//     *
+//     * @param dataSource The data source to use
+//     * @return The database connection factory bean for dbunit.
+//     */
+//    @Bean
+//    public DatabaseDataSourceConnectionFactoryBean dbUnitDatabaseConnection(final DataSource dataSource) {
+//        final DatabaseDataSourceConnectionFactoryBean dbConnection
+//            = new DatabaseDataSourceConnectionFactoryBean(dataSource);
+//        dbConnection.setDatabaseConfig(dbUnitDatabaseConfig());
+//        return dbConnection;
+//    }
+//
+//    /**
+//     * Get an entity manager factory to use for the tests.
+//     *
+//     * @param dataSource the data source to use
+//     * @return The factory
+//     */
+//    @Bean
+//    public LocalContainerEntityManagerFactoryBean entityManagerFactory(final DataSource dataSource) {
+//        final LocalContainerEntityManagerFactoryBean thing = new LocalContainerEntityManagerFactoryBean();
+//        thing.setDataSource(dataSource);
+//        return thing;
+//    }
+//
+//    /**
+//     * Transaction manager.
+//     *
+//     * @param factory the factory to use
+//     * @return The transaction manager
+//     */
+//    @Bean
+//    public JpaTransactionManager transactionManager(final LocalContainerEntityManagerFactoryBean factory) {
+//        final JpaTransactionManager transactionManager = new JpaTransactionManager();
+//        transactionManager.setEntityManagerFactory(factory.nativeEntityManagerFactory);
+//        return transactionManager;
+//    }
 }

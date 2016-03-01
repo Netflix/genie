@@ -39,7 +39,7 @@ public class JobExecution extends BaseDTO {
     private static final long serialVersionUID = 5005391660522052211L;
 
     @Size(min = 1, max = 1024, message = "Host name is required but no longer than 1024 characters")
-    private String hostName;
+    private String hostname;
     private int processId;
     private int exitCode;
     private Set<String> clusterCriteria = new HashSet<>();
@@ -51,7 +51,7 @@ public class JobExecution extends BaseDTO {
      */
     protected JobExecution(final Builder builder) {
         super(builder);
-        this.hostName = builder.bHostName;
+        this.hostname = builder.bHostname;
         this.processId = builder.bProcessId;
         this.exitCode = builder.bExitCode;
         this.clusterCriteria.addAll(builder.bClusterCriteria);
@@ -74,7 +74,7 @@ public class JobExecution extends BaseDTO {
      */
     public static class Builder extends BaseDTO.Builder<Builder> {
 
-        private final String bHostName;
+        private final String bHostname;
         private final int bProcessId;
         private final Set<String> bClusterCriteria = new HashSet<>();
         private int bExitCode = -1;
@@ -82,17 +82,17 @@ public class JobExecution extends BaseDTO {
         /**
          * Constructor which has required fields.
          *
-         * @param hostName  The hostname where the job is running
+         * @param hostname  The hostname where the job is running
          * @param processId The id of the process running the job
          */
         public Builder(
-            @JsonProperty("hostName")
-            final String hostName,
+            @JsonProperty("hostname")
+            final String hostname,
             @JsonProperty("processId")
             final int processId
         ) {
             super();
-            this.bHostName = hostName;
+            this.bHostname = hostname;
             this.bProcessId = processId;
         }
 
