@@ -73,7 +73,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_2_USER = "amsharma";
     private static final String COMMAND_2_VERSION = "4.5.6";
     private static final String COMMAND_2_EXECUTABLE = "hive";
-//    private static final long COMMAND_2_CHECK_DELAY = 19000L;
     private static final CommandStatus COMMAND_2_STATUS = CommandStatus.INACTIVE;
 
     private static final String COMMAND_3_ID = "command3";
@@ -81,7 +80,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_3_USER = "tgianos";
     private static final String COMMAND_3_VERSION = "7.8.9";
     private static final String COMMAND_3_EXECUTABLE = "pig";
-//    private static final long COMMAND_3_CHECK_DELAY = 20000L;
     private static final CommandStatus COMMAND_3_STATUS = CommandStatus.DEPRECATED;
 
     private static final Pageable PAGE = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
