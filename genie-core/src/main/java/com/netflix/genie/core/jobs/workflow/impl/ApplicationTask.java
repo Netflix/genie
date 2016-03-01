@@ -18,12 +18,8 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.workflow.WorkflowTask;
-import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.genie.common.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,9 +34,7 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Slf4j
-public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
-
-    private GenieFileTransferService fts;
+public class ApplicationTask extends GenieBaseTask {
 
     /**
      * {@inheritDoc}
@@ -51,95 +45,58 @@ public class ApplicationTask extends GenieBaseTask implements WorkflowTask {
         final Map<String, Object> context
     ) throws GenieException {
         log.info("Executing Application Task in the workflow.");
+        super.executeTask(context);
 
-        final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
+        // Open a writer to jobLauncher script
+        final Writer writer = getWriter(this.jobLauncherScriptPath);
 
-        if (jobExecEnv == null) {
-            throw new GeniePreconditionException("Cannot run application task as jobExecutionEnvironment is null");
+        if (this.jobExecEnv.getApplications() != null) {
+            for (Application application : this.jobExecEnv.getApplications()) {
+
+                // Create the directory for this application under applications in the cwd
+                createDirectory(this.jobExecEnv.getJobWorkingDir() + "/applications/" + application.getId());
+
+                // Get the setup file if specified and add it as source command in launcher script
+                final String applicationSetupFile = application.getSetupFile();
+                if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
+                    final String localPath = super.buildLocalFilePath(
+                        this.jobExecEnv.getJobWorkingDir(),
+                        application.getId(),
+                        applicationSetupFile,
+                        Constants.FileType.SETUP,
+                        Constants.EntityType.APPLICATION
+                    );
+                    this.fts.getFile(applicationSetupFile, localPath);
+                    appendToWriter(writer, "source " + localPath + ";");
+                }
+
+                // Iterate over and get all dependencies
+                for (final String dependencyFile: application.getDependencies()) {
+                    final String localPath = super.buildLocalFilePath(
+                        jobExecEnv.getJobWorkingDir(),
+                        application.getId(),
+                        dependencyFile,
+                        Constants.FileType.DEPENDENCIES,
+                        Constants.EntityType.APPLICATION
+                    );
+                    this.fts.getFile(dependencyFile, localPath);
+                }
+
+                // Iterate over and get all configuration files
+                for (final String configFile: application.getConfigs()) {
+                    final String localPath = super.buildLocalFilePath(
+                        jobExecEnv.getJobWorkingDir(),
+                        application.getId(),
+                        configFile,
+                        Constants.FileType.CONFIG,
+                        Constants.EntityType.APPLICATION
+                    );
+                    this.fts.getFile(configFile, localPath);
+                }
+            }
         }
 
-        this.fts = (GenieFileTransferService) context.get(FILE_TRANSFER_SERVICE_KEY);
-
-        final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
-        final Writer writer = getWriter(jobLauncherScriptPath);
-
-        for (Application application : jobExecEnv.getApplications()) {
-            createDirectory(jobExecEnv.getJobWorkingDir() + "/applications/" + application.getId());
-
-            final String applicationSetupFile = application.getSetupFile();
-
-            // Get the setup file if specified
-            if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
-                final String localPath = fetchFile(
-                    jobExecEnv.getJobWorkingDir(),
-                    application.getId(),
-                    applicationSetupFile,
-                    SETUP_FILE_PATH_PREFIX
-                );
-
-                fts.getFile(applicationSetupFile, localPath);
-                appendToWriter(writer, "source " + localPath + ";");
-            }
-
-            // Iterate over and get all dependencies
-            for (final String dependencyFile: application.getDependencies()) {
-                fetchFile(
-                    jobExecEnv.getJobWorkingDir(),
-                    application.getId(),
-                    dependencyFile,
-                    DEPENDENCY_FILE_PATH_PREFIX
-                );
-            }
-
-            // Iterate over and get all configuration files
-            for (final String configFile: application.getConfigs()) {
-                fetchFile(
-                    jobExecEnv.getJobWorkingDir(),
-                    application.getId(),
-                    configFile,
-                    CONFIG_FILE_PATH_PREFIX
-                );
-            }
-        }
+        // close the writer
         closeWriter(writer);
-    }
-
-    /**
-     * Helper Function to fetch file to local dir.
-     *
-     * @param dir The directory where to copy the file
-     * @param id The id to be appended to the destination path
-     * @param filePath Source file path
-     * @param fileType Type of file like setup, config or dependency
-     * @return Local file path constructed where the file is copied to
-     *
-     * @throws GenieException If there is any problem
-     */
-    private String fetchFile(
-        final String dir,
-        final String id,
-        final String filePath,
-        final String fileType
-    ) throws GenieException {
-        if (filePath != null && StringUtils.isNotBlank(filePath)) {
-            final String fileName = getFileNameFromPath(filePath);
-            final String localPath = new StringBuilder()
-                .append(dir)
-                .append(FILE_PATH_DELIMITER)
-                .append(APPLICATION_PATH_VAR)
-                .append(FILE_PATH_DELIMITER)
-                .append(id)
-                .append(FILE_PATH_DELIMITER)
-                .append(fileType)
-                .append(FILE_PATH_DELIMITER)
-                .append(fileName)
-                .toString();
-
-            this.fts.getFile(filePath, localPath);
-            return localPath;
-        } else {
-            throw new GenieBadRequestException("Invalid file path");
-        }
     }
 }

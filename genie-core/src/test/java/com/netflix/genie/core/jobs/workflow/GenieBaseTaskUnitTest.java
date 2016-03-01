@@ -116,6 +116,17 @@ public class GenieBaseTaskUnitTest {
         this.genieBaseTask.executeBashCommand(command, workingDir);
     }
 
+//    @Test
+//    public void testBuildLocalPath() throws GenieException {
+//        final String localPath = this.genieBaseTask.buildLocalFilePath(
+//            "dirpath",
+//            "id",
+//            "filepath/filename",
+//            Constants.FileType.CONFIG,
+//            Constants.EntityType.JOB
+//        );
+//    }
+
 //    /**
 //     * Tests the executeBashCommand method functionality.
 //     *

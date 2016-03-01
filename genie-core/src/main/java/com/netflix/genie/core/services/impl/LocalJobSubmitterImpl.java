@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
@@ -58,10 +59,6 @@ import java.util.Set;
 @Service
 @Slf4j
 public class LocalJobSubmitterImpl implements JobSubmitterService {
-
-    private static final String JOB_EXECUTION_ENV_KEY = "jee";
-    private static final String JOB_EXECUTION_DTO_KEY = "jexecdto";
-    private static final String FILE_TRANSFER_SERVICE_KEY = "fts";
 
     private final JobPersistenceService jobPersistenceService;
     private final ClusterService clusterService;
@@ -188,11 +185,11 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         // The map object stores the context for all the workflow tasks
         final Map<String, Object> context = new HashMap<>();
 
-        context.put(JOB_EXECUTION_ENV_KEY, jee);
-        context.put(FILE_TRANSFER_SERVICE_KEY, fileTransferService);
+        context.put(Constants.JOB_EXECUTION_ENV_KEY, jee);
+        context.put(Constants.FILE_TRANSFER_SERVICE_KEY, fileTransferService);
 
         if (this.wfExecutor.executeWorkflow(this.jobWorkflowTasks, context)) {
-            final JobExecution jobExecution = (JobExecution) context.get(JOB_EXECUTION_DTO_KEY);
+            final JobExecution jobExecution = (JobExecution) context.get(Constants.JOB_EXECUTION_DTO_KEY);
 
             // Job Execution will be null in local mode.
             if (jobExecution != null) {

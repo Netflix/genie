@@ -19,6 +19,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
@@ -36,15 +37,6 @@ import java.util.Map;
 @Slf4j
 public class InitialSetupTask extends GenieBaseTask implements WorkflowTask {
 
-    // Directory paths env variables
-    private static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
-    private static final String GENIE_JOB_DIR_ENV_VAR = "GENIE_JOB_DIR";
-    private static final String GENIE_CLUSTER_DIR_ENV_VAR = "GENIE_CLUSTER_DIR";
-    private static final String GENIE_COMMAND_DIR_ENV_VAR = "GENIE_COMMAND_DIR";
-    private static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
-    private static final String EXPORT = "export ";
-    private static final String EQUALS = "=";
-
     /**
      * {@inheritDoc}
      */
@@ -56,7 +48,7 @@ public class InitialSetupTask extends GenieBaseTask implements WorkflowTask {
         log.info("Executing Initial setup Task in the workflow.");
 
         final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
+            (JobExecutionEnvironment) context.get(Constants.JOB_EXECUTION_ENV_KEY);
 
         if (jobExecEnv == null) {
             throw new GenieServerException("Cannot run setup task as jobExecutionEnvironment is null");
@@ -64,29 +56,27 @@ public class InitialSetupTask extends GenieBaseTask implements WorkflowTask {
 
         // create top level directory structure for the job
         createDirectory(jobExecEnv.getJobWorkingDir());
-        createDirectory(jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + GENIE_PATH_VAR);
-        createDirectory(jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + GENIE_PATH_VAR
-            + FILE_PATH_DELIMITER + LOGS_PATH_VAR);
-        createDirectory(jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + APPLICATION_PATH_VAR);
-        createDirectory(jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + COMMAND_PATH_VAR);
-        createDirectory(jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + CLUSTER_PATH_VAR);
-        createDirectory(jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + JOB_PATH_VAR);
+        createDirectory(jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.GENIE_PATH_VAR);
+        createDirectory(jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.GENIE_PATH_VAR
+            + Constants.FILE_PATH_DELIMITER + Constants.LOGS_PATH_VAR);
+        createDirectory(jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.APPLICATION_PATH_VAR);
+        createDirectory(jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.COMMAND_PATH_VAR);
+        createDirectory(jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.CLUSTER_PATH_VAR);
 
         // set the env variables in the launcher script
-        final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
+        final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + Constants.GENIE_JOB_LAUNCHER_SCRIPT;
         final Writer writer = getWriter(jobLauncherScriptPath);
 
-        appendToWriter(writer, EXPORT + GENIE_WORKING_DIR_ENV_VAR + EQUALS
+        appendToWriter(writer, Constants.EXPORT + Constants.GENIE_WORKING_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
             + jobExecEnv.getJobWorkingDir());
-        appendToWriter(writer, EXPORT + GENIE_APPLICATION_DIR_ENV_VAR + EQUALS
-            + jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + APPLICATION_PATH_VAR);
-        appendToWriter(writer, EXPORT + GENIE_COMMAND_DIR_ENV_VAR + EQUALS
-            + jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + COMMAND_PATH_VAR);
-        appendToWriter(writer, EXPORT + GENIE_CLUSTER_DIR_ENV_VAR + EQUALS
-            + jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + CLUSTER_PATH_VAR);
-        appendToWriter(writer, EXPORT + GENIE_JOB_DIR_ENV_VAR + EQUALS
-            + jobExecEnv.getJobWorkingDir() + FILE_PATH_DELIMITER + JOB_PATH_VAR);
+        appendToWriter(writer, Constants.EXPORT + Constants.GENIE_APPLICATION_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
+            + jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.APPLICATION_PATH_VAR);
+        appendToWriter(writer, Constants.EXPORT + Constants.GENIE_COMMAND_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
+            + jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.COMMAND_PATH_VAR);
+        appendToWriter(writer, Constants.EXPORT + Constants.GENIE_CLUSTER_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
+            + jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.CLUSTER_PATH_VAR);
 
+        // close the writer
         closeWriter(writer);
     }
 }

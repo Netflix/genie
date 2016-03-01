@@ -19,6 +19,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +40,6 @@ import java.util.Map;
 @Slf4j
 public class JobTaskLocal extends GenieBaseTask implements WorkflowTask {
 
-    private static final String  STDERR_LOG_PATH = "./job/stderr";
-    private static final String STDOUT_LOG_PATH = "./job/stdout";
-    private static final String GENIE_DONE_FILE = "./genie/genie.done";
-
     /**
      * {@inheritDoc}
      */
@@ -54,13 +51,13 @@ public class JobTaskLocal extends GenieBaseTask implements WorkflowTask {
         log.info("Execution Job Task in the workflow.");
 
         final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
+            (JobExecutionEnvironment) context.get(Constants.JOB_EXECUTION_ENV_KEY);
 
         if (jobExecEnv == null) {
             throw new GenieServerException("Cannot run application task as jobExecutionEnvironment is null");
         }
 
-        final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
+        final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + Constants.GENIE_JOB_LAUNCHER_SCRIPT;
         final Writer writer = getWriter(jobLauncherScriptPath);
 
         //TODO copy down dependencies

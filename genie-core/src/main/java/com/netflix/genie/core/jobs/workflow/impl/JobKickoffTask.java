@@ -20,7 +20,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.core.jobs.JobExecutionEnvironment;
+import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,12 +44,6 @@ import java.util.Map;
 @Slf4j
 public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
 
-    private static final String  STDERR_LOG_PATH = "./job/stderr";
-    private static final String STDOUT_LOG_PATH = "./job/stdout";
-    private static final String GENIE_DONE_FILE = "./genie/genie.done";
-    private static final String GENIE_LOG_PATH = "/genie/logs/genie.log";
-    private static final String JOB_EXECUTION_DTO_KEY = "jexecdto";
-    private static final String PID = "pid";
     private boolean isRunAsUserEnabled;
     private boolean isUserCreationEnabled;
     private ApplicationEventPublisher applicationEventPublisher;
@@ -76,42 +70,34 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
         final Map<String, Object> context
     ) throws GenieException {
         log.info("Executing Job Kickoff Task in the workflow.");
-
-        final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
-
-        if (jobExecEnv == null) {
-            throw new GenieServerException("Cannot run application task as jobExecutionEnvironment is null");
-        }
+        super.executeTask(context);
 
         if (this.isUserCreationEnabled) {
-            createUser(jobExecEnv.getJobRequest().getUser(), jobExecEnv.getJobRequest().getGroup());
+            createUser(this.jobExecEnv.getJobRequest().getUser(), this.jobExecEnv.getJobRequest().getGroup());
         }
-
-        final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
 
         final List command = new ArrayList<>();
         if (this.isRunAsUserEnabled) {
-            changeOwnershipOfDirectory(jobExecEnv.getJobWorkingDir(), jobExecEnv.getJobRequest().getUser());
+            changeOwnershipOfDirectory(this.jobExecEnv.getJobWorkingDir(), this.jobExecEnv.getJobRequest().getUser());
             command.add("sudo");
             command.add("-u");
-            command.add(jobExecEnv.getJobRequest().getUser());
+            command.add(this.jobExecEnv.getJobRequest().getUser());
         }
         command.add("bash");
         command.add(jobLauncherScriptPath);
 
         final ProcessBuilder pb = new ProcessBuilder(command);
-        pb.directory(new File(jobExecEnv.getJobWorkingDir()));
-        pb.redirectOutput(new File(jobExecEnv.getJobWorkingDir() + GENIE_LOG_PATH));
-        pb.redirectError(new File(jobExecEnv.getJobWorkingDir() + GENIE_LOG_PATH));
+        pb.directory(new File(this.jobExecEnv.getJobWorkingDir()));
+        pb.redirectOutput(new File(this.jobExecEnv.getJobWorkingDir() + Constants.GENIE_LOG_PATH));
+        pb.redirectError(new File(this.jobExecEnv.getJobWorkingDir() + Constants.GENIE_LOG_PATH));
 
         try {
             final Process process = pb.start();
             final String hostname = InetAddress.getLocalHost().getHostAddress();
             final int processId = getProcessId(process);
             final JobExecution jobExecution =
-                new JobExecution.Builder(hostname, processId).withId(jobExecEnv.getJobRequest().getId()).build();
-            context.put(JOB_EXECUTION_DTO_KEY, jobExecution);
+                new JobExecution.Builder(hostname, processId).withId(this.jobExecEnv.getJobRequest().getId()).build();
+            context.put(Constants.JOB_EXECUTION_DTO_KEY, jobExecution);
         } catch (IOException ie) {
             throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
         }
@@ -174,7 +160,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
         log.debug("called");
 
         try {
-            final Field f = proc.getClass().getDeclaredField(PID);
+            final Field f = proc.getClass().getDeclaredField(Constants.PID);
             f.setAccessible(true);
             return f.getInt(proc);
         } catch (final IllegalAccessException

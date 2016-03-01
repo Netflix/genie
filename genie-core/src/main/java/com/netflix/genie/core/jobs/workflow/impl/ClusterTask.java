@@ -17,14 +17,9 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
-import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.workflow.WorkflowTask;
-import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.genie.common.util.Constants;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.Writer;
@@ -37,10 +32,7 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Slf4j
-public class ClusterTask extends GenieBaseTask implements WorkflowTask {
-
-    private static final String CLUSTER_PATH_VAR = "cluster";
-    private GenieFileTransferService fts;
+public class ClusterTask extends GenieBaseTask {
 
     /**
      * {@inheritDoc}
@@ -52,19 +44,15 @@ public class ClusterTask extends GenieBaseTask implements WorkflowTask {
     ) throws GenieException {
         log.info("Executing Cluster Task in the workflow.");
 
-        final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.get(JOB_EXECUTION_ENV_KEY);
+        super.executeTask(context);
 
-        if (jobExecEnv == null) {
-            throw new GenieServerException("Cannot run application task as jobExecutionEnvironment is null");
-        }
-
-        this.fts = (GenieFileTransferService) context.get(FILE_TRANSFER_SERVICE_KEY);
-
-        final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + GENIE_JOB_LAUNCHER_SCRIPT;
+        // Open a writer to jobLauncher script
         final Writer writer = getWriter(jobLauncherScriptPath);
 
+        // Create the directory for this application under applications in the cwd
         createDirectory(jobExecEnv.getJobWorkingDir() + "/cluster/" + jobExecEnv.getCluster().getId());
+
+        //TODO uncomment code once setup file is added to the data model
 //        final String clusterSetupFile = jobExecEnv.getCluster().getSetupFile();
 //
 //        if (clusterSetupFile != null && StringUtils.isNotBlank(clusterSetupFile)) {
@@ -81,52 +69,17 @@ public class ClusterTask extends GenieBaseTask implements WorkflowTask {
 
         // Iterate over and get all configuration files
         for (final String configFile: jobExecEnv.getCluster().getConfigs()) {
-            fetchFile(
+            final String localPath = super.buildLocalFilePath(
                 jobExecEnv.getJobWorkingDir(),
                 jobExecEnv.getCluster().getId(),
                 configFile,
-                CONFIG_FILE_PATH_PREFIX
+                Constants.FileType.CONFIG,
+                Constants.EntityType.CLUSTER
             );
+            this.fts.getFile(configFile, localPath);
         }
 
+        // close the writer object
         closeWriter(writer);
-    }
-
-    /**
-     * Helper Function to fetch file to local dir.
-     *
-     * @param dir The directory where to copy the file
-     * @param id The id to be appended to the destination path
-     * @param filePath Source file path
-     * @param fileType Type of file like setup, config or dependency
-     * @return Local file path constructed where the file is copied to
-     *
-     * @throws GenieException If there is any problem
-     */
-    private String fetchFile(
-        final String dir,
-        final String id,
-        final String filePath,
-        final String fileType
-    ) throws GenieException {
-        if (filePath != null && StringUtils.isNotBlank(filePath)) {
-            final String fileName = getFileNameFromPath(filePath);
-            final String localPath = new StringBuilder()
-                .append(dir)
-                .append(FILE_PATH_DELIMITER)
-                .append(CLUSTER_PATH_VAR)
-                .append(FILE_PATH_DELIMITER)
-                .append(id)
-                .append(FILE_PATH_DELIMITER)
-                .append(fileType)
-                .append(FILE_PATH_DELIMITER)
-                .append(fileName)
-                .toString();
-
-            this.fts.getFile(filePath, localPath);
-            return localPath;
-        } else {
-            throw new GenieBadRequestException("Invalid file path");
-        }
     }
 }

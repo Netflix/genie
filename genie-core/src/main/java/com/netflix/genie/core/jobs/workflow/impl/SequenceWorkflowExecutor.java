@@ -30,7 +30,6 @@ public class SequenceWorkflowExecutor implements WorkflowExecutor {
         @NotNull
         final Map<String, Object> context
     ) {
-
         try {
             for (WorkflowTask task : tasks) {
                 task.executeTask(context);
@@ -39,7 +38,6 @@ public class SequenceWorkflowExecutor implements WorkflowExecutor {
             log.error("Failed to execute task with exception {}", ge);
             return false;
         }
-
         return true;
     }
 }

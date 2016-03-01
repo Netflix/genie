@@ -20,7 +20,12 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
+import com.netflix.genie.core.jobs.workflow.WorkflowTask;
+import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -32,6 +37,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -41,22 +47,45 @@ import java.util.List;
  * @author amsharma
  * @since 3.0.0
  */
-public abstract class GenieBaseTask {
+public abstract class GenieBaseTask implements WorkflowTask {
 
     // TODO move to common String constants class?
-    protected static final String JOB_EXECUTION_ENV_KEY = "jee";
-    protected static final String GENIE_JOB_LAUNCHER_SCRIPT = "genie_job_launcher.sh";
-    protected static final String FILE_TRANSFER_SERVICE_KEY = "fts";
-    protected static final String SETUP_FILE_PATH_PREFIX = "setup_file";
-    protected static final String DEPENDENCY_FILE_PATH_PREFIX = "dependencies";
-    protected static final String CONFIG_FILE_PATH_PREFIX = "config";
-    protected static final String FILE_PATH_DELIMITER = "/";
-    protected static final String APPLICATION_PATH_VAR = "applications";
-    protected static final String COMMAND_PATH_VAR = "commmand";
-    protected static final String CLUSTER_PATH_VAR = "cluster";
-    protected static final String JOB_PATH_VAR = "job";
-    protected static final String GENIE_PATH_VAR = "genie";
-    protected static final String LOGS_PATH_VAR = "logs";
+//    protected static final String JOB_EXECUTION_ENV_KEY = "jee";
+//    protected static final String GENIE_JOB_LAUNCHER_SCRIPT = "genie_job_launcher.sh";
+//    protected static final String FILE_TRANSFER_SERVICE_KEY = "fts";
+//    protected static final String SETUP_FILE_PATH_PREFIX = "setup_file";
+//    protected static final String DEPENDENCY_FILE_PATH_PREFIX = "dependencies";
+//    protected static final String CONFIG_FILE_PATH_PREFIX = "config";
+//    protected static final String FILE_PATH_DELIMITER = "/";
+//    protected static final String APPLICATION_PATH_VAR = "applications";
+//    protected static final String COMMAND_PATH_VAR = "commmand";
+//    protected static final String CLUSTER_PATH_VAR = "cluster";
+//    protected static final String JOB_PATH_VAR = "job";
+//    protected static final String GENIE_PATH_VAR = "genie";
+//    protected static final String LOGS_PATH_VAR = "logs";
+
+    protected GenieFileTransferService fts;
+    protected JobExecutionEnvironment jobExecEnv;
+    protected String jobLauncherScriptPath;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void executeTask(
+        @NotNull
+        final Map<String, Object> context
+    ) throws GenieException {
+        this.jobExecEnv =
+            (JobExecutionEnvironment) context.get(Constants.JOB_EXECUTION_ENV_KEY);
+
+        if (this.jobExecEnv == null) {
+            throw new GeniePreconditionException("Cannot run application task as jobExecutionEnvironment is null");
+        }
+
+        this.fts = (GenieFileTransferService) context.get(Constants.FILE_TRANSFER_SERVICE_KEY);
+        this.jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + Constants.GENIE_JOB_LAUNCHER_SCRIPT;
+    }
 
     /**
      * Helper method that executes a bash command.
@@ -183,6 +212,91 @@ public abstract class GenieBaseTask {
             return path.toString();
         } else {
             throw new GenieBadRequestException("Could not figure filename for path");
+        }
+    }
+
+    /**
+     * Helper Function to fetch file to local dir.
+     *
+     * @param dir The directory where to copy the file
+     * @param id The id to be appended to the destination path
+     * @param filePath Source file path
+     * @param fileType Type of file like setup, config or dependency
+     * @param entityType Entity type Application, Cluster, Command or Job
+     * @return Local file path constructed where the file is copied to
+     *
+     * @throws GenieException If there is any problem
+     */
+    public String buildLocalFilePath(
+        @NotBlank
+        final String dir,
+        @NotBlank
+        final String id,
+        @NotBlank
+        final String filePath,
+        @NotNull
+        final Constants.FileType fileType,
+        @NotNull
+        final Constants.EntityType entityType
+    ) throws GenieException {
+
+        String entityPathVar = null;
+        String filePathVar = null;
+
+        switch (entityType) {
+            case APPLICATION:
+                entityPathVar = Constants.APPLICATION_PATH_VAR;
+                break;
+            case COMMAND:
+                entityPathVar = Constants.COMMAND_PATH_VAR;
+                break;
+            case CLUSTER:
+                entityPathVar = Constants.CLUSTER_PATH_VAR;
+                break;
+            case JOB:
+                break;
+            default:
+                break;
+        }
+
+        switch (fileType) {
+            case CONFIG:
+                filePathVar = Constants.CONFIG_FILE_PATH_PREFIX;
+                break;
+            case SETUP:
+                filePathVar = Constants.SETUP_FILE_PATH_PREFIX;
+                break;
+            case DEPENDENCIES:
+                filePathVar = Constants.DEPENDENCY_FILE_PATH_PREFIX;
+                break;
+            default:
+                break;
+        }
+
+        if (filePath != null && StringUtils.isNotBlank(filePath)) {
+            final String fileName = getFileNameFromPath(filePath);
+            final StringBuilder localPath = new StringBuilder()
+                .append(dir);
+
+            if (entityPathVar != null) {
+                localPath.append(Constants.FILE_PATH_DELIMITER)
+                    .append(entityPathVar);
+            }
+
+            localPath.append(Constants.FILE_PATH_DELIMITER)
+                .append(id);
+
+            if (filePathVar != null) {
+                localPath.append(Constants.FILE_PATH_DELIMITER)
+                    .append(filePathVar);
+
+            }
+            localPath.append(Constants.FILE_PATH_DELIMITER).append(fileName);
+
+            return localPath.toString();
+
+        } else {
+            throw new GenieBadRequestException("Could not construct localPath.");
         }
     }
 }
