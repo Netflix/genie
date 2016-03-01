@@ -1,12 +1,14 @@
-package com.netflix.genie.core.services;
+package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.core.services.FileTransfer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -31,6 +33,7 @@ public class GenieFileTransferService {
      */
     @Autowired
     public GenieFileTransferService(
+        @NotNull
         final List<FileTransfer> fileTransferImpls
     ) throws GenieException {
         this.fileTransferList = fileTransferImpls; }

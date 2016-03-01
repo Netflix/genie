@@ -33,7 +33,6 @@ import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.GenieFileTransferService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import lombok.extern.slf4j.Slf4j;
