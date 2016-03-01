@@ -41,6 +41,7 @@ public class CommandResourceUnitTests {
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
     private static final String EXECUTABLE = UUID.randomUUID().toString();
+    private static final long CHECK_DELAY = 1380L;
 
     private Command command;
 
@@ -50,7 +51,7 @@ public class CommandResourceUnitTests {
     @Before
     public void setup() {
         this.command = new Command
-            .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE)
+            .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
             .withId(ID)
             .build();
     }

@@ -74,7 +74,8 @@ public abstract class AbstractAPISecurityIntegrationTests {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             CommandStatus.ACTIVE,
-            UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            1000L
         ).build();
 
     private static final JobRequest JOB_REQUEST =

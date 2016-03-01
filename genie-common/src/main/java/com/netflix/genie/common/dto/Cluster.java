@@ -33,7 +33,7 @@ public class Cluster extends ConfigDTO {
 
     private static final long serialVersionUID = 8562447832504925029L;
 
-    private ClusterStatus status;
+    private final ClusterStatus status;
 
     /**
      * Constructor used only by the build() method of the builder.

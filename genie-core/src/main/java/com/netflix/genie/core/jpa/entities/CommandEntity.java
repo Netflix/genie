@@ -20,6 +20,8 @@ package com.netflix.genie.core.jpa.entities;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -38,6 +40,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,6 +53,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "commands")
+@Getter
+@Setter
 public class CommandEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -8058995173025433517L;
@@ -65,6 +70,11 @@ public class CommandEntity extends SetupFileEntity {
     @NotBlank(message = "No executable entered for command and is required.")
     @Length(max = 255, message = "Max length in database is 255 characters")
     private String executable;
+
+    @Basic(optional = false)
+    @Column(name = "check_delay", nullable = false)
+    @Min(1)
+    private long checkDelay = Command.DEFAULT_CHECK_DELAY;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -265,7 +275,8 @@ public class CommandEntity extends SetupFileEntity {
             this.getUser(),
             this.getVersion(),
             this.status,
-            this.executable
+            this.executable,
+            this.checkDelay
         )
             .withId(this.getId())
             .withCreated(this.getCreated())

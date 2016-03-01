@@ -38,19 +38,20 @@ import java.util.Date;
 public class Job extends CommonDTO {
 
     private static final long serialVersionUID = -4218933066048954819L;
-    private JobStatus status;
+
+    private final JobStatus status;
     @Size(max = 255, message = "Max length is 255 characters")
-    private String statusMsg;
+    private final String statusMsg;
     @JsonSerialize(using = JsonDateSerializer.class)
-    private Date started;
+    private final Date started;
     @JsonSerialize(using = JsonDateSerializer.class)
-    private Date finished;
+    private final Date finished;
     @Size(max = 1024, message = "Max character length is 1024 characters")
-    private String archiveLocation;
+    private final String archiveLocation;
     @Size(max = 255, message = "Max character length is 255 characters")
-    private String clusterName;
+    private final String clusterName;
     @Size(max = 255, message = "Max character length is 255 characters")
-    private String commandName;
+    private final String commandName;
 
     /**
      * Constructor used by the builder.
@@ -61,12 +62,8 @@ public class Job extends CommonDTO {
         super(builder);
         this.status = builder.bStatus;
         this.statusMsg = builder.bStatusMsg;
-        if (builder.bStarted != null) {
-            this.started = new Date(builder.bStarted.getTime());
-        }
-        if (builder.bFinished != null) {
-            this.finished = new Date(builder.bFinished.getTime());
-        }
+        this.started = builder.bStarted == null ? null : new Date(builder.bStarted.getTime());
+        this.finished = builder.bFinished == null ? null : new Date(builder.bFinished.getTime());
         this.archiveLocation = builder.bArchiveLocation;
         this.clusterName = builder.bClusterName;
         this.commandName = builder.bCommandName;

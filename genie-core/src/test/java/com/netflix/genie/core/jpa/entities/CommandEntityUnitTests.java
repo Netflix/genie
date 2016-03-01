@@ -46,6 +46,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     private static final String USER = "tgianos";
     private static final String EXECUTABLE = "/bin/pig13";
     private static final String VERSION = "1.0";
+    private static final long CHECK_DELAY = 18083L;
 
     private CommandEntity c;
 
@@ -60,6 +61,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         this.c.setVersion(VERSION);
         this.c.setStatus(CommandStatus.ACTIVE);
         this.c.setExecutable(EXECUTABLE);
+        this.c.setCheckDelay(CHECK_DELAY);
     }
 
     /**
@@ -70,6 +72,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         final CommandEntity entity = new CommandEntity();
         Assert.assertNull(entity.getSetupFile());
         Assert.assertNull(entity.getExecutable());
+        Assert.assertThat(entity.getCheckDelay(), Matchers.is(Command.DEFAULT_CHECK_DELAY));
         Assert.assertNull(entity.getName());
         Assert.assertNull(entity.getStatus());
         Assert.assertNull(entity.getUser());
@@ -151,6 +154,15 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     }
 
     /**
+     * Make sure validation works on with failure from command.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateBadCheckDelay() {
+        this.c.setCheckDelay(0L);
+        this.validate(this.c);
+    }
+
+    /**
      * Test setting the status.
      */
     @Test
@@ -177,6 +189,17 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testSetExecutable() {
         this.c.setExecutable(EXECUTABLE);
         Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
+    }
+
+    /**
+     * Make sure the check delay setter and getter works properly.
+     */
+    @Test
+    public void testSetCheckDelay() {
+        final long newDelay = 108327L;
+        Assert.assertThat(this.c.getCheckDelay(), Matchers.is(CHECK_DELAY));
+        this.c.setCheckDelay(newDelay);
+        Assert.assertThat(this.c.getCheckDelay(), Matchers.is(newDelay));
     }
 
     /**
@@ -338,6 +361,8 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         entity.setSetupFile(setupFile);
         final String executable = UUID.randomUUID().toString();
         entity.setExecutable(executable);
+        final long checkDelay = 2180234L;
+        entity.setCheckDelay(checkDelay);
 
         final Command command = entity.getDTO();
         Assert.assertThat(command.getId(), Matchers.is(id));
@@ -349,6 +374,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(command.getCreated(), Matchers.is(created));
         Assert.assertThat(command.getUpdated(), Matchers.is(updated));
         Assert.assertThat(command.getExecutable(), Matchers.is(executable));
+        Assert.assertThat(command.getCheckDelay(), Matchers.is(checkDelay));
         Assert.assertThat(command.getTags(), Matchers.is(tags));
         Assert.assertThat(command.getSetupFile(), Matchers.is(setupFile));
         Assert.assertThat(command.getConfigs(), Matchers.is(configs));

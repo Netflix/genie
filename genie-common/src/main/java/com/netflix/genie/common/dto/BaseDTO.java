@@ -41,11 +41,11 @@ public abstract class BaseDTO implements Serializable {
     private static final long serialVersionUID = 9093424855934127120L;
 
     @Size(max = 255, message = "Max length is 255 characters")
-    private String id;
+    private final String id;
     @JsonSerialize(using = JsonDateSerializer.class)
-    private Date created;
+    private final Date created;
     @JsonSerialize(using = JsonDateSerializer.class)
-    private Date updated;
+    private final Date updated;
 
     /**
      * Constructor.
@@ -54,12 +54,8 @@ public abstract class BaseDTO implements Serializable {
      */
     protected BaseDTO(final Builder builder) {
         this.id = builder.bId;
-        if (builder.bCreated != null) {
-            this.created = new Date(builder.bCreated.getTime());
-        }
-        if (builder.bUpdated != null) {
-            this.updated = new Date(builder.bUpdated.getTime());
-        }
+        this.created = builder.bCreated == null ? null : new Date(builder.bCreated.getTime());
+        this.updated = builder.bUpdated == null ? null : new Date(builder.bUpdated.getTime());
     }
 
     /**
