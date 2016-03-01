@@ -663,8 +663,8 @@ public class ClusterRestControllerIntegrationTests {
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
-        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
-        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
+        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L);
+        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 2000L);
 
         final List<String> commandIds = Lists.newArrayList(commandId1, commandId2);
         final HttpEntity<List<String>> entity = new HttpEntity<>(commandIds, HEADERS);
@@ -701,7 +701,7 @@ public class ClusterRestControllerIntegrationTests {
         Assert.assertThat(responseEntity.getBody().length, Matchers.is(2));
 
         final String commandId3 = UUID.randomUUID().toString();
-        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
+        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L);
         commandIds.add(commandId3);
         restTemplate.postForEntity(
             this.clustersBaseUrl + "/" + ID + "/commands",
@@ -756,8 +756,8 @@ public class ClusterRestControllerIntegrationTests {
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
-        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
-        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
+        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 4000L);
+        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 5000L);
 
         final List<String> commandIds = Lists.newArrayList(commandId1, commandId2);
         final HttpEntity<List<String>> entity = new HttpEntity<>(commandIds, HEADERS);
@@ -795,7 +795,7 @@ public class ClusterRestControllerIntegrationTests {
         Assert.assertThat(responseEntity.getBody().length, Matchers.is(0));
 
         final String commandId3 = UUID.randomUUID().toString();
-        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
+        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 6000L);
         commandIds.add(commandId3);
         restTemplate.exchange(
             this.clustersBaseUrl + "/" + ID + "/commands",
@@ -826,8 +826,8 @@ public class ClusterRestControllerIntegrationTests {
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
-        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
-        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
+        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 7000L);
+        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 8000L);
 
         final List<String> commandIds = Lists.newArrayList(commandId1, commandId2);
         final HttpEntity<List<String>> entity = new HttpEntity<>(commandIds, HEADERS);
@@ -860,9 +860,9 @@ public class ClusterRestControllerIntegrationTests {
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
         final String commandId3 = UUID.randomUUID().toString();
-        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
-        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
-        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
+        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L);
+        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 2000L);
+        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 3000L);
 
         final List<String> commandIds = Lists.newArrayList(commandId1, commandId2, commandId3);
         final HttpEntity<List<String>> entity = new HttpEntity<>(commandIds, HEADERS);
@@ -911,6 +911,7 @@ public class ClusterRestControllerIntegrationTests {
      * @param version    The version to use for the command
      * @param status     The status to use for the command
      * @param executable The executable to use for the command
+     * @param checkDelay The check delay for the command
      * @throws GenieException for any misconfiguration
      */
     private URI createCommand(
@@ -919,9 +920,11 @@ public class ClusterRestControllerIntegrationTests {
         final String user,
         final String version,
         final CommandStatus status,
-        final String executable
+        final String executable,
+        final long checkDelay
     ) throws GenieException {
-        final Command command = new Command.Builder(name, user, version, status, executable).withId(id).build();
+        final Command command
+            = new Command.Builder(name, user, version, status, executable, checkDelay).withId(id).build();
         final HttpEntity<Command> entity = new HttpEntity<>(command, HEADERS);
         return restTemplate.postForLocation(this.commandsBaseUrl, entity);
     }

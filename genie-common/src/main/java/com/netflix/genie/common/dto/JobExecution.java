@@ -21,10 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * All information needed to show state of a running job.
@@ -39,10 +37,14 @@ public class JobExecution extends BaseDTO {
     private static final long serialVersionUID = 5005391660522052211L;
 
     @Size(min = 1, max = 1024, message = "Host name is required but no longer than 1024 characters")
-    private String hostname;
-    private int processId;
-    private int exitCode;
-    private Set<String> clusterCriteria = new HashSet<>();
+    private final String hostname;
+    private final int processId;
+    @Min(
+        value = 1,
+        message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
+    )
+    private final long checkDelay;
+    private final int exitCode;
 
     /**
      * Constructor used by the builder build() method.
@@ -53,17 +55,8 @@ public class JobExecution extends BaseDTO {
         super(builder);
         this.hostname = builder.bHostname;
         this.processId = builder.bProcessId;
+        this.checkDelay = builder.bCheckDelay;
         this.exitCode = builder.bExitCode;
-        this.clusterCriteria.addAll(builder.bClusterCriteria);
-    }
-
-    /**
-     * Get the cluster criteria that was used to chose the cluster to run this job as unmodifiable set.
-     *
-     * @return The criteria. Any attempt to modify will throw runtime exception.
-     */
-    public Set<String> getClusterCriteria() {
-        return Collections.unmodifiableSet(this.clusterCriteria);
     }
 
     /**
@@ -76,24 +69,28 @@ public class JobExecution extends BaseDTO {
 
         private final String bHostname;
         private final int bProcessId;
-        private final Set<String> bClusterCriteria = new HashSet<>();
+        private final long bCheckDelay;
         private int bExitCode = -1;
 
         /**
          * Constructor which has required fields.
          *
-         * @param hostname  The hostname where the job is running
-         * @param processId The id of the process running the job
+         * @param hostname   The hostname where the job is running
+         * @param processId  The id of the process running the job
+         * @param checkDelay How long, in milliseconds, to wait between checks for job status
          */
         public Builder(
             @JsonProperty("hostname")
             final String hostname,
             @JsonProperty("processId")
-            final int processId
+            final int processId,
+            @JsonProperty("checkDelay")
+            final long checkDelay
         ) {
             super();
             this.bHostname = hostname;
             this.bProcessId = processId;
+            this.bCheckDelay = checkDelay;
         }
 
         /**
@@ -104,19 +101,6 @@ public class JobExecution extends BaseDTO {
          */
         public Builder withExitCode(final int exitCode) {
             this.bExitCode = exitCode;
-            return this;
-        }
-
-        /**
-         * Set the cluster criteria used to select the cluster this job ran on.
-         *
-         * @param clusterCriteria The cluster criteria
-         * @return The builder
-         */
-        public Builder withClusterCriteria(final Set<String> clusterCriteria) {
-            if (clusterCriteria != null) {
-                this.bClusterCriteria.addAll(clusterCriteria);
-            }
             return this;
         }
 

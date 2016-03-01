@@ -38,7 +38,7 @@ public class Application extends ConfigDTO {
     private static final long serialVersionUID = 212266105066344180L;
 
     private final Set<String> dependencies = new HashSet<>();
-    private ApplicationStatus status;
+    private final ApplicationStatus status;
 
     /**
      * Constructor only accessible via builder build() method.

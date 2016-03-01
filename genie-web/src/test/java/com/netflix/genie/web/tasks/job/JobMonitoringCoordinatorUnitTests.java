@@ -47,6 +47,7 @@ import java.util.concurrent.ScheduledFuture;
 public class JobMonitoringCoordinatorUnitTests {
 
     private static final String HOSTNAME = UUID.randomUUID().toString();
+    private static final long DELAY = 38023L;
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
     private JobSearchService jobSearchService;
@@ -79,14 +80,14 @@ public class JobMonitoringCoordinatorUnitTests {
         this.coordinator.attachToRunningJobs(event);
         Mockito
             .verify(this.scheduler, Mockito.never())
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.anyLong());
 
         // Simulate a job being started
         final String job1Id = UUID.randomUUID().toString();
         final String job2Id = UUID.randomUUID().toString();
         final String job3Id = UUID.randomUUID().toString();
         final String job4Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818);
+        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         builder.withId(job2Id);
@@ -99,12 +100,12 @@ public class JobMonitoringCoordinatorUnitTests {
         final JobStartedEvent event1 = new JobStartedEvent(job1, this);
         final ScheduledFuture future = Mockito.mock(ScheduledFuture.class);
         Mockito
-            .when(this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L)))
+            .when(this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY)))
             .thenReturn(future);
         this.coordinator.onJobStarted(event1);
         Mockito
             .verify(this.scheduler, Mockito.times(1))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
 
         final Set<JobExecution> executions = Sets.newHashSet(job1, job2, job3, job4);
         Mockito.when(this.jobSearchService.getAllRunningJobExecutionsOnHost(HOSTNAME)).thenReturn(executions);
@@ -112,7 +113,7 @@ public class JobMonitoringCoordinatorUnitTests {
 
         Mockito
             .verify(this.scheduler, Mockito.times(4))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
 
         Mockito
             .when(this.jobSearchService.getAllRunningJobExecutionsOnHost(HOSTNAME))
@@ -120,7 +121,7 @@ public class JobMonitoringCoordinatorUnitTests {
         this.coordinator.attachToRunningJobs(event);
         Mockito
             .verify(this.scheduler, Mockito.times(4))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
         Mockito.verifyNoMoreInteractions(this.scheduler);
     }
 
@@ -134,7 +135,7 @@ public class JobMonitoringCoordinatorUnitTests {
         final String job2Id = UUID.randomUUID().toString();
         final String job3Id = UUID.randomUUID().toString();
         final String job4Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818);
+        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         builder.withId(job2Id);
@@ -153,7 +154,7 @@ public class JobMonitoringCoordinatorUnitTests {
         final ScheduledFuture future = Mockito.mock(ScheduledFuture.class);
 
         Mockito.when(
-            this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L))
+            this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY))
         ).thenReturn(future);
 
         this.coordinator.onJobStarted(event1);
@@ -164,7 +165,7 @@ public class JobMonitoringCoordinatorUnitTests {
 
         Mockito
             .verify(this.scheduler, Mockito.times(4))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
     }
 
     /**
@@ -174,7 +175,7 @@ public class JobMonitoringCoordinatorUnitTests {
     @SuppressWarnings("unchecked")
     public void canStopJobMonitor() {
         final String job1Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818);
+        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         final String job2Id = UUID.randomUUID().toString();
@@ -192,7 +193,7 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito.when(future2.cancel(true)).thenReturn(false);
 
         Mockito.when(
-            this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L))
+            this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY))
         ).thenReturn(future1, future2);
 
         this.coordinator.onJobStarted(startedEvent1);
@@ -200,7 +201,7 @@ public class JobMonitoringCoordinatorUnitTests {
 
         Mockito
             .verify(this.scheduler, Mockito.times(2))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(1000L));
+            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
 
         this.coordinator.onJobFinished(finishedEvent1);
         this.coordinator.onJobFinished(finishedEvent2);

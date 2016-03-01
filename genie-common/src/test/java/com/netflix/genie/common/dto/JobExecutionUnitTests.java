@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.common.dto;
 
-import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -25,7 +24,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.util.Date;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -38,6 +36,7 @@ import java.util.UUID;
 public class JobExecutionUnitTests {
 
     private static final String HOSTNAME = UUID.randomUUID().toString();
+    private static final long CHECK_DELAY = 280843L;
     private static final int PROCESS_ID = 134234;
 
     /**
@@ -45,10 +44,10 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJob() {
-        final JobExecution execution = new JobExecution.Builder(HOSTNAME, PROCESS_ID).build();
+        final JobExecution execution = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY).build();
         Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
-        Assert.assertThat(execution.getClusterCriteria(), Matchers.empty());
+        Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
         Assert.assertThat(execution.getCreated(), Matchers.nullValue());
         Assert.assertThat(execution.getId(), Matchers.nullValue());
@@ -60,10 +59,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithOptionals() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID);
-
-        final Set<String> clusterCriteria = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        builder.withClusterCriteria(clusterCriteria);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY);
 
         final int exitCode = 0;
         builder.withExitCode(exitCode);
@@ -80,7 +76,7 @@ public class JobExecutionUnitTests {
         final JobExecution execution = builder.build();
         Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
-        Assert.assertThat(execution.getClusterCriteria(), Matchers.is(clusterCriteria));
+        Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
         Assert.assertThat(execution.getCreated(), Matchers.is(created));
         Assert.assertThat(execution.getId(), Matchers.is(id));
@@ -92,8 +88,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithNulls() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID);
-        builder.withClusterCriteria(null);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY);
         builder.withCreated(null);
         builder.withId(null);
         builder.withUpdated(null);
@@ -101,7 +96,7 @@ public class JobExecutionUnitTests {
         final JobExecution execution = builder.build();
         Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
-        Assert.assertThat(execution.getClusterCriteria(), Matchers.empty());
+        Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
         Assert.assertThat(execution.getCreated(), Matchers.nullValue());
         Assert.assertThat(execution.getId(), Matchers.nullValue());
@@ -113,8 +108,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID);
-        builder.withClusterCriteria(null);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);
@@ -134,8 +128,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID);
-        builder.withClusterCriteria(null);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);

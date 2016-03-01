@@ -793,9 +793,9 @@ public class ApplicationRestControllerIntegrationTests {
         final String command1Id = UUID.randomUUID().toString();
         final String command2Id = UUID.randomUUID().toString();
         final String command3Id = UUID.randomUUID().toString();
-        createCommand(command1Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
-        createCommand(command2Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
-        createCommand(command3Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder);
+        createCommand(command1Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L);
+        createCommand(command2Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1100L);
+        createCommand(command3Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1200L);
 
         final Set<String> appIds = Sets.newHashSet(ID);
         final HttpEntity<Set<String>> entity = new HttpEntity<>(appIds, HEADERS);
@@ -857,6 +857,7 @@ public class ApplicationRestControllerIntegrationTests {
      * @param version    The version to use for the command
      * @param status     The status to use for the command
      * @param executable The executable to use for the command
+     * @param checkDelay The check delay for the command
      * @throws GenieException for any misconfiguration
      */
     private URI createCommand(
@@ -865,9 +866,11 @@ public class ApplicationRestControllerIntegrationTests {
         final String user,
         final String version,
         final CommandStatus status,
-        final String executable
+        final String executable,
+        final long checkDelay
     ) throws GenieException {
-        final Command command = new Command.Builder(name, user, version, status, executable).withId(id).build();
+        final Command command
+            = new Command.Builder(name, user, version, status, executable, checkDelay).withId(id).build();
         final HttpEntity<Command> entity = new HttpEntity<>(command, HEADERS);
         return restTemplate.postForLocation(this.commandsBaseUrl, entity);
     }

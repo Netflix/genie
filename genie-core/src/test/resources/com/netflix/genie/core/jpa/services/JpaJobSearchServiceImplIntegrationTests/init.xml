@@ -49,6 +49,7 @@
         hostname="a.netflix.com"
         exit_code="0"
         process_id="318"
+        check_delay="10000"
         entity_version="2"/>
 
     <job_requests
@@ -84,6 +85,7 @@
         hostname="a.netflix.com"
         exit_code="-1"
         process_id="319"
+        check_delay="11000"
         entity_version="0"/>
 
     <job_requests
@@ -119,5 +121,6 @@
         hostname="b.netflix.com"
         exit_code="-1"
         process_id="319"
+        check_delay="12000"
         entity_version="0"/>
 </dataset>

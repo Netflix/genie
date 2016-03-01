@@ -18,7 +18,6 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
@@ -29,6 +28,7 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,6 +51,7 @@ public class JpaCommandServiceImplUnitTests {
     private static final String COMMAND_1_USER = "tgianos";
     private static final String COMMAND_1_VERSION = "1.2.3";
     private static final String COMMAND_1_EXECUTABLE = "pig";
+    private static final long COMMAND_1_CHECK_DELAY = 18000L;
 
     private static final String COMMAND_2_ID = "command2";
 
@@ -67,9 +68,9 @@ public class JpaCommandServiceImplUnitTests {
         final JpaClusterRepository jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
         this.service = new JpaCommandServiceImpl(
-                this.jpaCommandRepository,
-                this.jpaApplicationRepository,
-                jpaClusterRepository
+            this.jpaCommandRepository,
+            this.jpaApplicationRepository,
+            jpaClusterRepository
         );
     }
 
@@ -113,14 +114,15 @@ public class JpaCommandServiceImplUnitTests {
     @Test(expected = GenieConflictException.class)
     public void testCreateCommandAlreadyExists() throws GenieException {
         final Command command = new Command.Builder(
-                COMMAND_1_NAME,
-                COMMAND_1_USER,
-                COMMAND_1_VERSION,
-                CommandStatus.ACTIVE,
-                COMMAND_1_EXECUTABLE
+            COMMAND_1_NAME,
+            COMMAND_1_USER,
+            COMMAND_1_VERSION,
+            CommandStatus.ACTIVE,
+            COMMAND_1_EXECUTABLE,
+            COMMAND_1_CHECK_DELAY
         )
-                .withId(COMMAND_1_ID)
-                .build();
+            .withId(COMMAND_1_ID)
+            .build();
         Mockito.when(this.jpaCommandRepository.exists(COMMAND_1_ID)).thenReturn(true);
         this.service.createCommand(command);
     }
@@ -145,8 +147,8 @@ public class JpaCommandServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.updateCommand(
-                id,
-                new Command.Builder(null, null, null, null, null).build()
+            id,
+            new Command.Builder(null, null, null, null, null, 1803L).build()
         );
     }
 

@@ -114,6 +114,7 @@ public class JpaCommandServiceImpl implements CommandService {
         commandEntity.setVersion(command.getVersion());
         commandEntity.setDescription(command.getDescription());
         commandEntity.setExecutable(command.getExecutable());
+        commandEntity.setCheckDelay(command.getCheckDelay());
         commandEntity.setConfigs(command.getConfigs());
         commandEntity.setSetupFile(command.getSetupFile());
         commandEntity.setStatus(command.getStatus());
@@ -190,6 +191,7 @@ public class JpaCommandServiceImpl implements CommandService {
         commandEntity.setStatus(updateCommand.getStatus());
         commandEntity.setDescription(updateCommand.getDescription());
         commandEntity.setExecutable(updateCommand.getExecutable());
+        commandEntity.setCheckDelay(updateCommand.getCheckDelay());
         commandEntity.setSetupFile(updateCommand.getSetupFile());
         commandEntity.setConfigs(updateCommand.getConfigs());
         commandEntity.setTags(updateCommand.getTags());

@@ -17,7 +17,10 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobExecution;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -27,6 +30,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 /**
@@ -37,6 +41,8 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "job_executions")
+@Getter
+@Setter
 public class JobExecutionEntity extends BaseEntity {
     /**
      * The exit code that will be set to indicate a job is currently executing.
@@ -53,6 +59,11 @@ public class JobExecutionEntity extends BaseEntity {
     @Basic(optional = false)
     @Column(name = "process_id", nullable = false)
     private int processId;
+
+    @Basic(optional = false)
+    @Column(name = "check_delay", nullable = false)
+    @Min(1)
+    private long checkDelay = Command.DEFAULT_CHECK_DELAY;
 
     @Basic(optional = false)
     @Column(name = "exit_code", nullable = false)
@@ -143,7 +154,8 @@ public class JobExecutionEntity extends BaseEntity {
     public JobExecution getDTO() {
         return new JobExecution.Builder(
             this.hostname,
-            this.processId
+            this.processId,
+            this.checkDelay
         )
             .withExitCode(this.exitCode)
             .withId(this.getId())

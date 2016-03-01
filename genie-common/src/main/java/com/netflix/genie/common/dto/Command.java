@@ -23,6 +23,7 @@ import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 /**
@@ -35,12 +36,22 @@ import javax.validation.constraints.Size;
 @Getter
 public class Command extends ConfigDTO {
 
+    /**
+     * The default amount of time to wait between job process checks.
+     */
+    public static final long DEFAULT_CHECK_DELAY = 10000L;
+
     private static final long serialVersionUID = -3559641165667609041L;
 
-    private CommandStatus status;
+    private final CommandStatus status;
     @NotEmpty
     @Size(max = 255, message = "Executable path can't be longer than 255 characters")
-    private String executable;
+    private final String executable;
+    @Min(
+        value = 1,
+        message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
+    )
+    private final long checkDelay;
 
     /**
      * Constructor used by the builder.
@@ -51,6 +62,7 @@ public class Command extends ConfigDTO {
         super(builder);
         this.status = builder.bStatus;
         this.executable = builder.bExecutable;
+        this.checkDelay = builder.bCheckDelay;
     }
 
     /**
@@ -63,6 +75,7 @@ public class Command extends ConfigDTO {
 
         private final CommandStatus bStatus;
         private final String bExecutable;
+        private final long bCheckDelay;
 
         /**
          * Constructor which has required fields.
@@ -72,6 +85,8 @@ public class Command extends ConfigDTO {
          * @param version    The version to use for the Command
          * @param status     The status of the Command
          * @param executable The executable for the command
+         * @param checkDelay How long the system should go between checking the status of jobs run with this command.
+         *                   In milliseconds.
          */
         public Builder(
             @JsonProperty("name")
@@ -83,7 +98,9 @@ public class Command extends ConfigDTO {
             @JsonProperty("status")
             final CommandStatus status,
             @JsonProperty("executable")
-            final String executable
+            final String executable,
+            @JsonProperty("checkDelay")
+            final long checkDelay
         ) {
             super(name, user, version);
             if (status != null) {
@@ -92,6 +109,7 @@ public class Command extends ConfigDTO {
                 this.bStatus = CommandStatus.INACTIVE;
             }
             this.bExecutable = executable;
+            this.bCheckDelay = checkDelay;
         }
 
         /**

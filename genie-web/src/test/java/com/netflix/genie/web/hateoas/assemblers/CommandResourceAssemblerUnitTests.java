@@ -44,6 +44,7 @@ public class CommandResourceAssemblerUnitTests {
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
     private static final String EXECUTABLE = UUID.randomUUID().toString();
+    private static final long CHECK_DELAY = 1000L;
 
     private Command command;
     private CommandResourceAssembler assembler;
@@ -53,7 +54,9 @@ public class CommandResourceAssemblerUnitTests {
      */
     @Before
     public void setup() {
-        this.command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE).withId(ID).build();
+        this.command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+            .withId(ID)
+            .build();
         this.assembler = new CommandResourceAssembler();
     }
 

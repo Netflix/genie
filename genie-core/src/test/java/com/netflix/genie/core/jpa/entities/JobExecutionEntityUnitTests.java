@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
@@ -69,6 +70,17 @@ public class JobExecutionEntityUnitTests {
     }
 
     /**
+     * Make sure setting the check delay time period works properly.
+     */
+    @Test
+    public void canSetCheckDelay() {
+        Assert.assertThat(this.entity.getCheckDelay(), Matchers.is(Command.DEFAULT_CHECK_DELAY));
+        final long newDelay = 1803234L;
+        this.entity.setCheckDelay(newDelay);
+        Assert.assertThat(this.entity.getCheckDelay(), Matchers.is(newDelay));
+    }
+
+    /**
      * Test to make sure can successfully set the process id of the job.
      */
     @Test
@@ -102,6 +114,8 @@ public class JobExecutionEntityUnitTests {
         this.entity.setHostname(hostName);
         final int processId = 29038;
         this.entity.setProcessId(processId);
+        final long checkDelay = 1890347L;
+        this.entity.setCheckDelay(checkDelay);
         final int exitCode = 2084390;
         this.entity.setExitCode(exitCode);
 
@@ -112,5 +126,6 @@ public class JobExecutionEntityUnitTests {
         Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
         Assert.assertThat(execution.getHostname(), Matchers.is(hostName));
         Assert.assertThat(execution.getProcessId(), Matchers.is(processId));
+        Assert.assertThat(execution.getCheckDelay(), Matchers.is(checkDelay));
     }
 }

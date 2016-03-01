@@ -91,6 +91,7 @@ public class CommandControllerIntegrationTests {
     private static final String USER = "genie";
     private static final String VERSION = "1.0.0";
     private static final String EXECUTABLE = "/apps/hive/bin/hive";
+    private static final long CHECK_DELAY = 10000L;
     private static final HttpHeaders HEADERS = new HttpHeaders();
     private static final ParameterizedTypeReference<PagedResources<CommandResource>> PAGED_TYPE_REFERENCE
         = new ParameterizedTypeReference<PagedResources<CommandResource>>() {
@@ -163,7 +164,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canCreateCommandWithoutId() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        final URI location = createCommand(null, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        final URI location = createCommand(null, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final Command command = restTemplate.getForEntity(location, CommandResource.class).getBody().getContent();
         Assert.assertThat(command.getId(), Matchers.is(Matchers.notNullValue()));
@@ -172,6 +173,7 @@ public class CommandControllerIntegrationTests {
         Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
         Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
+        Assert.assertThat(command.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(command.getTags(), Matchers.hasItem(Matchers.startsWith("genie.id:")));
         Assert.assertThat(command.getTags(), Matchers.hasItem(Matchers.startsWith("genie.name:")));
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
@@ -185,7 +187,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canCreateCommandWithId() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        final URI location = createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        final URI location = createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final Command command = restTemplate.getForEntity(location, CommandResource.class).getBody().getContent();
         Assert.assertThat(command.getId(), Matchers.is(ID));
@@ -194,6 +196,7 @@ public class CommandControllerIntegrationTests {
         Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
         Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
+        Assert.assertThat(command.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(command.getTags().size(), Matchers.is(2));
         Assert.assertThat(command.getTags(), Matchers.hasItem(Matchers.startsWith("genie.id:")));
         Assert.assertThat(command.getTags(), Matchers.hasItem(Matchers.startsWith("genie.name:")));
@@ -206,7 +209,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canHandleBadInputToCreateCommand() {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        final Command command = new Command.Builder(null, null, null, null, null).build();
+        final Command command = new Command.Builder(null, null, null, null, null, 1000L).build();
         final HttpEntity<Command> entity = new HttpEntity<>(command, HEADERS);
         final ResponseEntity<String> responseEntity
             = new TestRestTemplate().postForEntity(this.commandsBaseUrl, entity, String.class);
@@ -239,9 +242,9 @@ public class CommandControllerIntegrationTests {
         final String executable2 = UUID.randomUUID().toString();
         final String executable3 = UUID.randomUUID().toString();
 
-        createCommand(id1, name1, user1, version1, CommandStatus.ACTIVE, executable1);
-        createCommand(id2, name2, user2, version2, CommandStatus.DEPRECATED, executable2);
-        createCommand(id3, name3, user3, version3, CommandStatus.INACTIVE, executable3);
+        createCommand(id1, name1, user1, version1, CommandStatus.ACTIVE, executable1, CHECK_DELAY);
+        createCommand(id2, name2, user2, version2, CommandStatus.DEPRECATED, executable2, CHECK_DELAY);
+        createCommand(id3, name3, user3, version3, CommandStatus.INACTIVE, executable3, CHECK_DELAY);
 
         // Test finding all commands
         ResponseEntity<PagedResources<CommandResource>> getResponse = restTemplate.exchange(
@@ -355,7 +358,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canUpdateCommand() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        final URI location = createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        final URI location = createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final Command createdCommand
             = restTemplate.getForEntity(location, CommandResource.class).getBody().getContent();
@@ -366,7 +369,8 @@ public class CommandControllerIntegrationTests {
             createdCommand.getUser(),
             createdCommand.getVersion(),
             CommandStatus.INACTIVE,
-            createdCommand.getExecutable()
+            createdCommand.getExecutable(),
+            createdCommand.getCheckDelay()
         )
             .withId(createdCommand.getId())
             .withCreated(createdCommand.getCreated())
@@ -392,9 +396,9 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canDeleteAllCommands() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(null, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
-        createCommand(null, NAME, USER, VERSION, CommandStatus.DEPRECATED, EXECUTABLE);
-        createCommand(null, NAME, USER, VERSION, CommandStatus.INACTIVE, EXECUTABLE);
+        createCommand(null, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        createCommand(null, NAME, USER, VERSION, CommandStatus.DEPRECATED, EXECUTABLE, CHECK_DELAY);
+        createCommand(null, NAME, USER, VERSION, CommandStatus.INACTIVE, EXECUTABLE, CHECK_DELAY);
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(3L));
 
         restTemplate.delete(this.commandsBaseUrl);
@@ -426,9 +430,9 @@ public class CommandControllerIntegrationTests {
         final String executable2 = UUID.randomUUID().toString();
         final String executable3 = UUID.randomUUID().toString();
 
-        createCommand(id1, name1, user1, version1, CommandStatus.ACTIVE, executable1);
-        createCommand(id2, name2, user2, version2, CommandStatus.DEPRECATED, executable2);
-        createCommand(id3, name3, user3, version3, CommandStatus.INACTIVE, executable3);
+        createCommand(id1, name1, user1, version1, CommandStatus.ACTIVE, executable1, CHECK_DELAY);
+        createCommand(id2, name2, user2, version2, CommandStatus.DEPRECATED, executable2, CHECK_DELAY);
+        createCommand(id3, name3, user3, version3, CommandStatus.INACTIVE, executable3, CHECK_DELAY);
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(3L));
 
         restTemplate.delete(this.commandsBaseUrl + "/" + id2);
@@ -460,7 +464,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canAddConfigsToCommand() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final ResponseEntity<String[]> configResponse = restTemplate.getForEntity(
             this.commandsBaseUrl + "/" + ID + "/configs",
@@ -497,7 +501,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canUpdateConfigsForCommand() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final String config1 = UUID.randomUUID().toString();
         final String config2 = UUID.randomUUID().toString();
@@ -530,7 +534,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canDeleteConfigsForCommand() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final String config1 = UUID.randomUUID().toString();
         final String config2 = UUID.randomUUID().toString();
@@ -558,7 +562,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canAddTagsToCommand() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         ResponseEntity<String[]> tagResponse = restTemplate.getForEntity(
             this.commandsBaseUrl + "/" + ID + "/tags",
@@ -593,7 +597,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canUpdateTagsForCommand() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
@@ -624,7 +628,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canDeleteTagsForCommand() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
@@ -654,7 +658,7 @@ public class CommandControllerIntegrationTests {
     @Test
     public void canDeleteTagForCommand() throws GenieException {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
@@ -684,7 +688,7 @@ public class CommandControllerIntegrationTests {
      */
     @Test
     public void canAddApplicationsForACommand() throws GenieException {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         final ResponseEntity<Application[]> emptyAppResponse = restTemplate.getForEntity(
             this.commandsBaseUrl + "/" + ID + "/applications",
             Application[].class
@@ -761,7 +765,7 @@ public class CommandControllerIntegrationTests {
      */
     @Test
     public void canHandleBadInputToAddApplicationsForACommand() throws GenieException {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         final HttpEntity<Set<String>> entity = new HttpEntity<>(null, HEADERS);
         final ResponseEntity<String> responseEntity = new TestRestTemplate().postForEntity(
             this.commandsBaseUrl + "/" + ID + "/applications",
@@ -779,7 +783,7 @@ public class CommandControllerIntegrationTests {
      */
     @Test
     public void canSetApplicationsForACommand() throws GenieException {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         final ResponseEntity<Application[]> emptyAppResponse = restTemplate.getForEntity(
             this.commandsBaseUrl + "/" + ID + "/applications",
             Application[].class
@@ -859,7 +863,7 @@ public class CommandControllerIntegrationTests {
      */
     @Test
     public void canRemoveApplicationsFromACommand() throws GenieException {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
@@ -892,7 +896,7 @@ public class CommandControllerIntegrationTests {
      */
     @Test
     public void canRemoveApplicationFromACommand() throws GenieException {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
@@ -937,7 +941,7 @@ public class CommandControllerIntegrationTests {
      */
     @Test
     public void canGetClustersForCommand() throws GenieException {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         final String placeholder = UUID.randomUUID().toString();
         final String cluster1Id = UUID.randomUUID().toString();
         final String cluster2Id = UUID.randomUUID().toString();
@@ -1014,9 +1018,11 @@ public class CommandControllerIntegrationTests {
         final String user,
         final String version,
         final CommandStatus status,
-        final String executable
+        final String executable,
+        final long checkDelay
     ) throws GenieException {
-        final Command command = new Command.Builder(name, user, version, status, executable).withId(id).build();
+        final Command command
+            = new Command.Builder(name, user, version, status, executable, checkDelay).withId(id).build();
         final HttpEntity<Command> entity = new HttpEntity<>(command, HEADERS);
         return restTemplate.postForLocation(this.commandsBaseUrl, entity);
     }
@@ -1024,11 +1030,11 @@ public class CommandControllerIntegrationTests {
     /**
      * Helper for creating a cluster used in testing.
      *
-     * @param id          The id to use for the cluster or null/empty/blank for one to be assigned
-     * @param name        The name to use for the cluster
-     * @param user        The user to use for the cluster
-     * @param version     The version to use for the cluster
-     * @param status      The status to use for the cluster
+     * @param id      The id to use for the cluster or null/empty/blank for one to be assigned
+     * @param name    The name to use for the cluster
+     * @param user    The user to use for the cluster
+     * @param version The version to use for the cluster
+     * @param status  The status to use for the cluster
      * @throws GenieException for any misconfiguration
      */
     private URI createCluster(
