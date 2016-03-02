@@ -97,9 +97,8 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
             // TODO: This should come from the hostname bean
             final String hostname = InetAddress.getLocalHost().getHostAddress();
             final int processId = getProcessId(process);
-            // TODO: Amit Need to get the actual delay time from the command to use here
             final JobExecution jobExecution = new JobExecution
-                .Builder(hostname, processId, 5000L)
+                .Builder(hostname, processId, this.jobExecEnv.getCommand().getCheckDelay())
                 .withId(this.jobExecEnv.getJobRequest().getId())
                 .build();
             context.put(Constants.JOB_EXECUTION_DTO_KEY, jobExecution);

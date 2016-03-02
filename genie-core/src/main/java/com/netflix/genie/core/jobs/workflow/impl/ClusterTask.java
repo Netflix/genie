@@ -20,6 +20,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.Constants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.Writer;
@@ -52,20 +53,21 @@ public class ClusterTask extends GenieBaseTask {
         // Create the directory for this application under applications in the cwd
         createDirectory(jobExecEnv.getJobWorkingDir() + "/cluster/" + jobExecEnv.getCluster().getId());
 
-        //TODO uncomment code once setup file is added to the data model
-//        final String clusterSetupFile = jobExecEnv.getCluster().getSetupFile();
-//
-//        if (clusterSetupFile != null && StringUtils.isNotBlank(clusterSetupFile)) {
-//            final String localPath = fetchFile(
-//                jobExecEnv.getJobWorkingDir(),
-//                jobExecEnv.getCommand().getId(),
-//                clusterSetupFile,
-//                SETUP_FILE_PATH_PREFIX
-//            );
-//
-//            fts.getFile(clusterSetupFile, localPath);
-//            appendToWriter(writer, "source " + localPath + ";");
-//        }
+        // Get the set up file for cluster and add it to source in launcher script
+        final String clusterSetupFile = jobExecEnv.getCluster().getSetupFile();
+
+        if (clusterSetupFile != null && StringUtils.isNotBlank(clusterSetupFile)) {
+            final String localPath = super.buildLocalFilePath(
+                jobExecEnv.getJobWorkingDir(),
+                jobExecEnv.getCommand().getId(),
+                clusterSetupFile,
+                Constants.FileType.SETUP,
+                Constants.EntityType.CLUSTER
+            );
+
+            fts.getFile(clusterSetupFile, localPath);
+            appendToWriter(writer, "source " + localPath + ";");
+        }
 
         // Iterate over and get all configuration files
         for (final String configFile: jobExecEnv.getCluster().getConfigs()) {
