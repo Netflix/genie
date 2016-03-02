@@ -17,12 +17,9 @@
  */
 package com.netflix.genie;
 
-import com.github.springtestdbunit.bean.DatabaseConfigBean;
-import com.github.springtestdbunit.bean.DatabaseDataSourceConnectionFactoryBean;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +28,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import javax.sql.DataSource;
 import javax.validation.Validator;
 
 /**
@@ -42,7 +38,7 @@ import javax.validation.Validator;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-public class  GenieCoreTestApplication {
+public class GenieCoreTestApplication {
 
     /**
      * Setup bean validation.
@@ -74,32 +70,6 @@ public class  GenieCoreTestApplication {
     @Bean
     public String hostname() {
         return "localhost";
-    }
-
-    /**
-     * Get the DBUnit configuration.
-     *
-     * @return The config bean
-     */
-    @Bean
-     public DatabaseConfigBean dbUnitDatabaseConfig() {
-        final DatabaseConfigBean dbConfig = new DatabaseConfigBean();
-        dbConfig.setDatatypeFactory(new HsqldbDataTypeFactory());
-        return dbConfig;
-    }
-
-    /**
-     * Get the database connection factory bean.
-     *
-     * @param dataSource The data source to use
-     * @return The database connection factory bean for dbunit.
-     */
-    @Bean
-    public DatabaseDataSourceConnectionFactoryBean dbUnitDatabaseConnection(final DataSource dataSource) {
-        final DatabaseDataSourceConnectionFactoryBean dbConnection
-                = new DatabaseDataSourceConnectionFactoryBean(dataSource);
-        dbConnection.setDatabaseConfig(dbUnitDatabaseConfig());
-        return dbConnection;
     }
 
     /**

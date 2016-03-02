@@ -94,7 +94,7 @@ public class JpaCommandSpecsUnitTests {
 
         final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(CommandEntity_.sortedTags)).thenReturn(tagPath);
+        Mockito.when(this.root.get(CommandEntity_.tags)).thenReturn(tagPath);
         Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class))).thenReturn(likeTagPredicate);
 
         this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
@@ -119,7 +119,7 @@ public class JpaCommandSpecsUnitTests {
                     .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -141,7 +141,7 @@ public class JpaCommandSpecsUnitTests {
                     .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -163,7 +163,7 @@ public class JpaCommandSpecsUnitTests {
                     .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -185,7 +185,7 @@ public class JpaCommandSpecsUnitTests {
                     .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -208,7 +208,7 @@ public class JpaCommandSpecsUnitTests {
                     .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -229,7 +229,7 @@ public class JpaCommandSpecsUnitTests {
                     .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -250,7 +250,7 @@ public class JpaCommandSpecsUnitTests {
                     .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**

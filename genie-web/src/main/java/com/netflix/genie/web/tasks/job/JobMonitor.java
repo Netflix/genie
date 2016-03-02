@@ -50,11 +50,10 @@ public class JobMonitor implements NodeTask {
     // How many error iterations we can handle
     // TODO: Make this a variable
     private static final int MAX_ERRORS = 5;
-
-    private int errorCount;
     private final JobExecution execution;
     private final Executor executor;
     private final ApplicationEventPublisher publisher;
+    private int errorCount;
 
     /**
      * Constructor.
@@ -146,7 +145,6 @@ public class JobMonitor implements NodeTask {
      */
     @Override
     public long getFixedDelay() {
-        //TODO: Make flexible via property
-        return 1000L;
+        return this.execution.getCheckDelay();
     }
 }

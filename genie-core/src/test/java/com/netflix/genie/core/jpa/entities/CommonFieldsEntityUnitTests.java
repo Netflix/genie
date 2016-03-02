@@ -31,24 +31,24 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Test the CommonFields class and methods.
+ * Test the CommonFieldsEntity class and methods.
  *
  * @author tgianos
  */
 @Category(UnitTest.class)
-public class CommonFieldsUnitTests extends EntityTestsBase {
+public class CommonFieldsEntityUnitTests extends EntityTestsBase {
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final String VERSION = "1.0";
 
-    private CommonFields c;
+    private CommonFieldsEntity c;
 
     /**
      * Setup the tests.
      */
     @Before
     public void setup() {
-        this.c = new CommonFields();
+        this.c = new CommonFieldsEntity();
         this.c.setName(NAME);
         this.c.setUser(USER);
         this.c.setVersion(VERSION);
@@ -59,7 +59,7 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Test
     public void testDefaultConstructor() {
-        final CommonFields local = new CommonFields();
+        final CommonFieldsEntity local = new CommonFieldsEntity();
         Assert.assertNull(local.getName());
         Assert.assertNull(local.getUser());
         Assert.assertNull(local.getVersion());
@@ -80,7 +80,7 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateWithNothing() throws GenieException {
-        this.validate(new CommonFields());
+        this.validate(new CommonFieldsEntity());
     }
 
     /**
@@ -115,7 +115,7 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetName() {
-        final CommonFields local = new CommonFields();
+        final CommonFieldsEntity local = new CommonFieldsEntity();
         Assert.assertNull(local.getName());
         local.setName(NAME);
         Assert.assertEquals(NAME, local.getName());
@@ -126,7 +126,7 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetUser() {
-        final CommonFields local = new CommonFields();
+        final CommonFieldsEntity local = new CommonFieldsEntity();
         Assert.assertNull(local.getUser());
         local.setUser(USER);
         Assert.assertEquals(USER, local.getUser());
@@ -137,7 +137,7 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetVersion() {
-        final CommonFields local = new CommonFields();
+        final CommonFieldsEntity local = new CommonFieldsEntity();
         Assert.assertNull(local.getVersion());
         local.setVersion(VERSION);
         Assert.assertEquals(VERSION, local.getVersion());
@@ -155,29 +155,19 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Make sure can set the sorted tags from the database.
-     */
-    @Test
-    public void canSetSortedTagsFromString() {
-        final String sortedTags = UUID.randomUUID().toString();
-        this.c.setSortedTags(sortedTags);
-        Assert.assertThat(this.c.getSortedTags(), Matchers.is(sortedTags));
-    }
-
-    /**
      * Make sure can set the sorted tags from an unsorted set.
      */
     @Test
-    public void canSetSortedTagsFromSet() {
+    public void canSetTags() {
         final Set<String> tags = Sets.newHashSet("second", "Third", "Fourth", "first");
-        this.c.setSortedTags(tags);
-        Assert.assertThat(this.c.getSortedTags(), Matchers.is("first,Fourth,second,Third"));
+        this.c.setTags(tags);
+        Assert.assertThat(this.c.getTags(), Matchers.is(tags));
 
-        this.c.setSortedTags((Set<String>) null);
-        Assert.assertThat(this.c.getSortedTags(), Matchers.nullValue());
+        this.c.setTags(null);
+        Assert.assertThat(this.c.getTags(), Matchers.empty());
 
-        this.c.setSortedTags(Sets.newHashSet());
-        Assert.assertThat(this.c.getSortedTags(), Matchers.nullValue());
+        this.c.setTags(Sets.newHashSet());
+        Assert.assertThat(this.c.getTags(), Matchers.empty());
     }
 
     /**
@@ -193,7 +183,7 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
         Assert.assertThat(this.c.getFinalTags(), Matchers.is(Sets.newHashSet("genie.id:" + id, "genie.name:" + NAME)));
 
         final String sortedTags = "big,genie.id:id,genie.name:name,tom";
-        this.c.setSortedTags(sortedTags);
+        this.c.setTags(Sets.newHashSet(sortedTags.split(",")));
         final Set<String> finalTags = this.c.getFinalTags();
         Assert.assertThat(
             finalTags,
@@ -201,7 +191,7 @@ public class CommonFieldsUnitTests extends EntityTestsBase {
         );
         Assert.assertThat(finalTags.size(), Matchers.is(4));
 
-        this.c = new CommonFields();
+        this.c = new CommonFieldsEntity();
         this.c.setName(NAME);
         Assert.assertThat(this.c.getFinalTags().size(), Matchers.is(2));
     }

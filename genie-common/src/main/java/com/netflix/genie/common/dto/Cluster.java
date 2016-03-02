@@ -21,8 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
-import javax.validation.constraints.Size;
-
 /**
  * Cluster DTO object. Read only after construction.
  *
@@ -35,9 +33,7 @@ public class Cluster extends ConfigDTO {
 
     private static final long serialVersionUID = 8562447832504925029L;
 
-    private ClusterStatus status;
-    @Size(min = 1, max = 255)
-    private String clusterType;
+    private final ClusterStatus status;
 
     /**
      * Constructor used only by the build() method of the builder.
@@ -47,7 +43,6 @@ public class Cluster extends ConfigDTO {
     protected Cluster(final Builder builder) {
         super(builder);
         this.status = builder.bStatus;
-        this.clusterType = builder.bClusterType;
     }
 
     /**
@@ -59,7 +54,6 @@ public class Cluster extends ConfigDTO {
     public static class Builder extends ConfigDTO.Builder<Builder> {
 
         private final ClusterStatus bStatus;
-        private final String bClusterType;
 
         /**
          * Constructor which has required fields.
@@ -68,7 +62,6 @@ public class Cluster extends ConfigDTO {
          * @param user        The user to use for the Cluster
          * @param version     The version to use for the Cluster
          * @param status      The status of the Cluster
-         * @param clusterType The type of the Cluster [yarn, presto, etc]
          */
         public Builder(
             @JsonProperty("name")
@@ -78,9 +71,7 @@ public class Cluster extends ConfigDTO {
             @JsonProperty("version")
             final String version,
             @JsonProperty("status")
-            final ClusterStatus status,
-            @JsonProperty("clusterType")
-            final String clusterType
+            final ClusterStatus status
         ) {
             super(name, user, version);
             if (status != null) {
@@ -88,7 +79,6 @@ public class Cluster extends ConfigDTO {
             } else {
                 this.bStatus = ClusterStatus.OUT_OF_SERVICE;
             }
-            this.bClusterType = clusterType;
         }
 
         /**

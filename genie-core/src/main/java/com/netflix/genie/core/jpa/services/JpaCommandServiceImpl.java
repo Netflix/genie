@@ -114,10 +114,11 @@ public class JpaCommandServiceImpl implements CommandService {
         commandEntity.setVersion(command.getVersion());
         commandEntity.setDescription(command.getDescription());
         commandEntity.setExecutable(command.getExecutable());
+        commandEntity.setCheckDelay(command.getCheckDelay());
         commandEntity.setConfigs(command.getConfigs());
         commandEntity.setSetupFile(command.getSetupFile());
         commandEntity.setStatus(command.getStatus());
-        commandEntity.setCommandTags(command.getTags());
+        commandEntity.setTags(command.getTags());
 
         return this.commandRepo.save(commandEntity).getId();
     }
@@ -190,9 +191,10 @@ public class JpaCommandServiceImpl implements CommandService {
         commandEntity.setStatus(updateCommand.getStatus());
         commandEntity.setDescription(updateCommand.getDescription());
         commandEntity.setExecutable(updateCommand.getExecutable());
+        commandEntity.setCheckDelay(updateCommand.getCheckDelay());
         commandEntity.setSetupFile(updateCommand.getSetupFile());
         commandEntity.setConfigs(updateCommand.getConfigs());
-        commandEntity.setCommandTags(updateCommand.getTags());
+        commandEntity.setTags(updateCommand.getTags());
         this.commandRepo.save(commandEntity);
     }
 
@@ -316,9 +318,9 @@ public class JpaCommandServiceImpl implements CommandService {
         final Set<String> tags
     ) throws GenieException {
         final CommandEntity command = this.findCommand(id);
-        final Set<String> commandTags = command.getCommandTags();
+        final Set<String> commandTags = command.getTags();
         commandTags.addAll(tags);
-        command.setCommandTags(commandTags);
+        command.setTags(commandTags);
     }
 
     /**
@@ -330,7 +332,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @NotBlank(message = "No command id sent. Cannot retrieve tags.")
         final String id
     ) throws GenieException {
-        return this.findCommand(id).getCommandTags();
+        return this.findCommand(id).getTags();
     }
 
     /**
@@ -343,7 +345,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @NotEmpty(message = "No tags entered. Unable to update.")
         final Set<String> tags
     ) throws GenieException {
-        this.findCommand(id).setCommandTags(tags);
+        this.findCommand(id).setTags(tags);
     }
 
     /**
@@ -354,7 +356,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @NotBlank(message = "No command id entered. Unable to remove tags.")
         final String id
     ) throws GenieException {
-        this.findCommand(id).setCommandTags(Sets.newHashSet());
+        this.findCommand(id).setTags(Sets.newHashSet());
     }
 
     /**
@@ -368,9 +370,9 @@ public class JpaCommandServiceImpl implements CommandService {
         final String tag
     ) throws GenieException {
         final CommandEntity command = this.findCommand(id);
-        final Set<String> commandTags = command.getCommandTags();
+        final Set<String> commandTags = command.getTags();
         commandTags.remove(tag);
-        command.setCommandTags(commandTags);
+        command.setTags(commandTags);
     }
 
     /**

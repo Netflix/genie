@@ -17,10 +17,11 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -34,12 +35,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,7 +53,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "commands")
-public class CommandEntity extends CommonFields {
+@Getter
+@Setter
+public class CommandEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -8058995173025433517L;
 
@@ -68,10 +71,10 @@ public class CommandEntity extends CommonFields {
     @Length(max = 255, message = "Max length in database is 255 characters")
     private String executable;
 
-    @Basic
-    @Lob
-    @Column(name = "setup_file")
-    private String setupFile;
+    @Basic(optional = false)
+    @Column(name = "check_delay", nullable = false)
+    @Min(1)
+    private long checkDelay = Command.DEFAULT_CHECK_DELAY;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -80,14 +83,6 @@ public class CommandEntity extends CommonFields {
     )
     @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "command_tags",
-        joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
-    )
-    @Column(name = "tag", nullable = false, length = 255)
-    private Set<String> tags = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -122,7 +117,7 @@ public class CommandEntity extends CommonFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateCommand() throws GenieException {
-        this.setCommandTags(this.getFinalTags());
+        this.setTags(this.getFinalTags());
     }
 
     /**
@@ -161,24 +156,6 @@ public class CommandEntity extends CommonFields {
      */
     public void setExecutable(final String executable) {
         this.executable = executable;
-    }
-
-    /**
-     * Gets the envPropFile name.
-     *
-     * @return setupFile - file location containing setup steps.
-     */
-    public String getSetupFile() {
-        return this.setupFile;
-    }
-
-    /**
-     * Sets the setup file for this command.
-     *
-     * @param setupFile The file to run during command setup
-     */
-    public void setSetupFile(final String setupFile) {
-        this.setupFile = setupFile;
     }
 
     /**
@@ -230,51 +207,6 @@ public class CommandEntity extends CommonFields {
         //Add the reverse reference in the new applications
         for (final ApplicationEntity application : this.applications) {
             application.getCommands().add(this);
-        }
-    }
-
-    /**
-     * Get the set of tags for this command.
-     *
-     * @return The command tags
-     */
-    public Set<String> getCommandTags() {
-        return this.getSortedTags() == null
-            ? Sets.newHashSet()
-            : Sets.newHashSet(this.getSortedTags().split(COMMA));
-    }
-
-    /**
-     * Set the tags for the command.
-     *
-     * @param commandTags The tags for the command
-     */
-    public void setCommandTags(final Set<String> commandTags) {
-        this.tags.clear();
-        this.setSortedTags(commandTags);
-        if (commandTags != null) {
-            this.tags.addAll(commandTags);
-        }
-    }
-
-    /**
-     * Gets the tags allocated to this command.
-     *
-     * @return the tags
-     */
-    protected Set<String> getTags() {
-        return this.tags;
-    }
-
-    /**
-     * Sets the tags allocated to this command.
-     *
-     * @param tags the tags to set.
-     */
-    protected void setTags(final Set<String> tags) {
-        this.tags.clear();
-        if (tags != null) {
-            this.tags.addAll(tags);
         }
     }
 
@@ -343,15 +275,16 @@ public class CommandEntity extends CommonFields {
             this.getUser(),
             this.getVersion(),
             this.status,
-            this.executable
+            this.executable,
+            this.checkDelay
         )
             .withId(this.getId())
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())
             .withDescription(this.getDescription())
-            .withTags(this.tags)
+            .withTags(this.getTags())
             .withConfigs(this.configs)
-            .withSetupFile(this.setupFile)
+            .withSetupFile(this.getSetupFile())
             .build();
     }
 }

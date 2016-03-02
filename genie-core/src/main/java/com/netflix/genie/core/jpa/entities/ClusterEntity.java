@@ -17,13 +17,10 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
@@ -56,7 +53,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "clusters")
-public class ClusterEntity extends CommonFields {
+public class ClusterEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -5674870110962005872L;
 
@@ -66,12 +63,6 @@ public class ClusterEntity extends CommonFields {
     @NotNull(message = "No cluster status entered and is required.")
     private ClusterStatus status;
 
-    @Basic(optional = false)
-    @Column(name = "cluster_type", nullable = false, length = 255)
-    @NotBlank(message = "No cluster type entered and is required.")
-    @Length(max = 255, message = "Max length in database is 255 characters")
-    private String clusterType;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "cluster_configs",
@@ -79,14 +70,6 @@ public class ClusterEntity extends CommonFields {
     )
     @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "cluster_tags",
-        joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
-    )
-    @Column(name = "tag", nullable = false, length = 255)
-    private Set<String> tags = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -119,7 +102,7 @@ public class ClusterEntity extends CommonFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateCluster() throws GenieException {
-        this.setClusterTags(this.getFinalTags());
+        this.setTags(this.getFinalTags());
     }
 
     /**
@@ -139,25 +122,6 @@ public class ClusterEntity extends CommonFields {
      */
     public void setStatus(final ClusterStatus status) {
         this.status = status;
-    }
-
-    /**
-     * Get the clusterType for this cluster.
-     *
-     * @return clusterType: The type of the cluster like yarn, presto, mesos
-     * etc.
-     */
-    public String getClusterType() {
-        return clusterType;
-    }
-
-    /**
-     * Set the type for this cluster.
-     *
-     * @param clusterType The type of this cluster. Not null/empty/blank.
-     */
-    public void setClusterType(final String clusterType) {
-        this.clusterType = clusterType;
     }
 
     /**
@@ -211,51 +175,6 @@ public class ClusterEntity extends CommonFields {
         //Add the reference in the new commands
         for (final CommandEntity command : this.commands) {
             command.getClusters().add(this);
-        }
-    }
-
-    /**
-     * Get the set of tags for this cluster.
-     *
-     * @return The cluster tags
-     */
-    public Set<String> getClusterTags() {
-        return this.getSortedTags() == null
-            ? Sets.newHashSet()
-            : Sets.newHashSet(this.getSortedTags().split(COMMA));
-    }
-
-    /**
-     * Set the tags for the cluster.
-     *
-     * @param clusterTags The tags for the cluster
-     */
-    public void setClusterTags(final Set<String> clusterTags) {
-        this.setSortedTags(clusterTags);
-        this.tags.clear();
-        if (clusterTags != null) {
-            this.tags.addAll(clusterTags);
-        }
-    }
-
-    /**
-     * Gets the tags allocated to this cluster.
-     *
-     * @return the tags
-     */
-    protected Set<String> getTags() {
-        return this.tags;
-    }
-
-    /**
-     * Sets the tags allocated to this cluster.
-     *
-     * @param tags the tags to set. Not Null.
-     */
-    protected void setTags(final Set<String> tags) {
-        this.tags.clear();
-        if (tags != null) {
-            this.tags.addAll(tags);
         }
     }
 
@@ -343,14 +262,14 @@ public class ClusterEntity extends CommonFields {
             this.getName(),
             this.getUser(),
             this.getVersion(),
-            this.status,
-            this.clusterType
+            this.status
         )
             .withId(this.getId())
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())
             .withDescription(this.getDescription())
-            .withTags(this.tags)
+            .withTags(this.getTags())
+            .withSetupFile(this.getSetupFile())
             .withConfigs(this.configs)
             .build();
     }

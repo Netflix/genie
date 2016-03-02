@@ -94,7 +94,7 @@ public class JpaApplicationSpecsUnitTests {
 
         final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(ApplicationEntity_.sortedTags)).thenReturn(tagPath);
+        Mockito.when(this.root.get(ApplicationEntity_.tags)).thenReturn(tagPath);
         Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class)))
                 .thenReturn(likeTagPredicate);
 
@@ -119,7 +119,7 @@ public class JpaApplicationSpecsUnitTests {
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -140,7 +140,7 @@ public class JpaApplicationSpecsUnitTests {
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -161,7 +161,7 @@ public class JpaApplicationSpecsUnitTests {
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -182,7 +182,7 @@ public class JpaApplicationSpecsUnitTests {
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -203,7 +203,7 @@ public class JpaApplicationSpecsUnitTests {
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -224,7 +224,7 @@ public class JpaApplicationSpecsUnitTests {
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -246,7 +246,7 @@ public class JpaApplicationSpecsUnitTests {
                     .equal(this.root.get(ApplicationEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.sortedTags), this.tagLikeStatement);
+                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
     }
 
     /**

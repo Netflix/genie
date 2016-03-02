@@ -19,8 +19,6 @@ package com.netflix.genie.core.jpa.services;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.netflix.genie.GenieCoreTestApplication;
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -42,12 +40,12 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
     TransactionalTestExecutionListener.class,
     TransactionDbUnitTestExecutionListener.class
 })
-public class DBUnitTestBase {
-    /**
-     * Just some junk test to allow this to be inherited.
-     */
-    @Test
-    public void junk() {
-        Assert.assertTrue(true);
-    }
+public abstract class DBUnitTestBase {
+//    /**
+//     * Just some junk test to allow this to be inherited.
+//     */
+//    @Test
+//    public void junk() {
+//        Assert.assertTrue(true);
+//    }
 }

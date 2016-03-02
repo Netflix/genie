@@ -17,16 +17,13 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -41,8 +38,6 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Representation of the state of a Genie 3.0 job.
@@ -52,7 +47,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "jobs")
-public class JobEntity extends CommonFields {
+public class JobEntity extends CommonFieldsEntity {
     /**
      * Used as default version when one not entered.
      */
@@ -94,14 +89,6 @@ public class JobEntity extends CommonFields {
     @Column(name = "command_name", length = 255)
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String commandName;
-
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(
-        name = "job_tags",
-        joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "id")
-    )
-    @Column(name = "tag", nullable = false, length = 255)
-    private Set<String> tags = new HashSet<>();
 
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id")
@@ -146,7 +133,7 @@ public class JobEntity extends CommonFields {
      *
      * @param clusterName Name of the cluster on which job was executed.
      */
-    public void setClusterName(final String clusterName) {
+    protected void setClusterName(final String clusterName) {
         this.clusterName = clusterName;
     }
 
@@ -164,7 +151,7 @@ public class JobEntity extends CommonFields {
      *
      * @param commandName Name of the command used to run the job
      */
-    public void setCommandName(final String commandName) {
+    protected void setCommandName(final String commandName) {
         this.commandName = commandName;
     }
 
@@ -286,51 +273,6 @@ public class JobEntity extends CommonFields {
     }
 
     /**
-     * Get the tags for this job.
-     *
-     * @return The tags as a set
-     */
-    public Set<String> getJobTags() {
-        return this.getSortedTags() == null
-            ? Sets.newHashSet()
-            : Sets.newHashSet(this.getSortedTags().split(COMMA));
-    }
-
-    /**
-     * Set the tags for this job.
-     *
-     * @param jobTags The job tags
-     */
-    public void setJobTags(final Set<String> jobTags) {
-        this.setSortedTags(jobTags);
-        this.tags.clear();
-        if (jobTags != null) {
-            this.tags.addAll(jobTags);
-        }
-    }
-
-    /**
-     * Gets the tags allocated to this job.
-     *
-     * @return the tags
-     */
-    protected Set<String> getTags() {
-        return this.tags;
-    }
-
-    /**
-     * Sets the tags allocated to this job.
-     *
-     * @param tags the tags to set. Not Null.
-     */
-    protected void setTags(final Set<String> tags) {
-        this.tags.clear();
-        if (tags != null) {
-            this.tags.addAll(tags);
-        }
-    }
-
-    /**
      * Get the job request for this job.
      *
      * @return The original job request
@@ -441,7 +383,7 @@ public class JobEntity extends CommonFields {
             .withCommandName(this.commandName)
             .withCreated(this.getCreated())
             .withDescription(this.getDescription())
-            .withTags(this.getJobTags())
+            .withTags(this.getTags())
             .withUpdated(this.getUpdated())
             .withArchiveLocation(this.archiveLocation)
             .withFinished(this.finished)

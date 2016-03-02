@@ -46,10 +46,10 @@
         id="job1"
         created="2015-08-11 01:49:00"
         updated="2014-08-11 02:59:00"
-        host_name="a.netflix.com"
+        hostname="a.netflix.com"
         exit_code="0"
         process_id="318"
-        cluster_criteria="[]"
+        check_delay="10000"
         entity_version="2"/>
 
     <job_requests
@@ -82,10 +82,10 @@
         id="job2"
         created="2015-08-12 01:49:00"
         updated="2015-08-12 02:59:00"
-        host_name="a.netflix.com"
+        hostname="a.netflix.com"
         exit_code="-1"
         process_id="319"
-        cluster_criteria="[]"
+        check_delay="11000"
         entity_version="0"/>
 
     <job_requests
@@ -93,7 +93,7 @@
         created="2016-02-24 01:48:00"
         updated="2016-02-24 02:59:00"
         user="tgianos"
-        name="testSparkJob"
+        name="testSparkJob2"
         version="2.4"
         command_args="-f spark.jar"
         cluster_criterias="[
@@ -110,7 +110,7 @@
         created="2016-02-24 01:49:00"
         updated="2016-02-24 02:59:00"
         user="tgianos"
-        name="testSparkJob"
+        name="testSparkJob2"
         status="RUNNING"
         version="2.4"
         entity_version="0"/>
@@ -118,9 +118,9 @@
         id="job3"
         created="2016-02-24 01:49:00"
         updated="2014-02-24 02:59:00"
-        host_name="b.netflix.com"
+        hostname="b.netflix.com"
         exit_code="-1"
         process_id="319"
-        cluster_criteria="[]"
+        check_delay="12000"
         entity_version="0"/>
 </dataset>

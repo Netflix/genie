@@ -1,3 +1,20 @@
+/*
+ *
+ *  Copyright 2016 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.dto.Cluster;
@@ -33,6 +50,7 @@ import java.util.Set;
  * Unit Tests for the Local Job Submitter Impl class.
  *
  * @author amsharma
+ * @since 3.0.0
  */
 @Category(UnitTest.class)
 public class LocalJobSubmitterImplUnitTests {
@@ -147,8 +165,7 @@ public class LocalJobSubmitterImplUnitTests {
             CLUSTER_NAME,
             USER,
             VERSION,
-            ClusterStatus.UP,
-            null
+            ClusterStatus.UP
         )
             .withId(CLUSTER_ID)
             .build();
@@ -196,8 +213,7 @@ public class LocalJobSubmitterImplUnitTests {
             CLUSTER_NAME,
             USER,
             VERSION,
-            ClusterStatus.UP,
-            null
+            ClusterStatus.UP
         )
             .withId(CLUSTER_ID)
             .build();
@@ -212,7 +228,8 @@ public class LocalJobSubmitterImplUnitTests {
             USER,
             VERSION,
             CommandStatus.ACTIVE,
-            "foo"
+            "foo",
+            5000L
         )
             .withId(COMMAND_ID)
             .build();
@@ -220,11 +237,10 @@ public class LocalJobSubmitterImplUnitTests {
         final List<Command> commandList = new ArrayList<>();
         commandList.add(command);
 
-        Mockito.when(this.clusterService.chooseClusterForJobRequest(Mockito.eq(jobRequest))).
-            thenReturn(clusterList);
-        Mockito.when(this.clusterLoadBalancer.selectCluster(Mockito.eq(clusterList))).
-            thenReturn(cluster);
-        Mockito.when(this.clusterService.getCommandsForCluster(Mockito.eq(CLUSTER_ID), Mockito.eq(enumStatuses)))
+        Mockito.when(this.clusterService.chooseClusterForJobRequest(Mockito.eq(jobRequest))).thenReturn(clusterList);
+        Mockito.when(this.clusterLoadBalancer.selectCluster(Mockito.eq(clusterList))).thenReturn(cluster);
+        Mockito
+            .when(this.clusterService.getCommandsForCluster(Mockito.eq(CLUSTER_ID), Mockito.eq(enumStatuses)))
             .thenReturn(commandList);
         //Mockito.when(this.wfExecutor.executeWorkflow(Mockito.any(), Mockito.anyMap())).thenReturn(true);
 

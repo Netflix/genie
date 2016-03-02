@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -81,13 +82,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     }
 
     /**
-     * Takes in a Job Request persists it in db and then hands of the job to submitter interface to submit.
-     *
-     * @param jobRequest of job to run
-     * @param clientHost Hostname of the client sending request
-     *
-     * @return The id of the job just submitted.
-     * @throws GenieException if there is an error
+     * {@inheritDoc}
      */
     @Override
     public String coordinateJob(
@@ -134,38 +129,28 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     }
 
     /**
-     * Gets the Job object to return to user given the id.
-     *
-     * @param jobId of job to retrieve
-     * @return job object
-     * @throws GenieException if there is an error
+     * {@inheritDoc}
      */
     @Override
-    public Job getJob(
-        @NotBlank(message = "No job id provided. Unable to retrieve job.")
-        final String jobId
-    ) throws GenieException {
+    public Job getJob(@NotBlank final String jobId) throws GenieException {
         log.debug("Called with id {}", jobId);
-        return this.jobPersistenceService.getJob(jobId);
+        return this.jobSearchService.getJob(jobId);
     }
 
     /**
-     * Get list of jobs for given filter criteria.
-     *
-     * @param id          id for job
-     * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName    user who submitted job
-     * @param statuses    statuses of job
-     * @param tags        tags for the job
-     * @param clusterName name of cluster for job
-     * @param clusterId   id of cluster for job
-     * @param commandName name of the command run in the job
-     * @param commandId   id of the command run in the job
-     * @param page        Page information of jobs to get
-     * @return All jobs which match the criteria
+     * {@inheritDoc}
      */
     @Override
-    public Page<Job> getJobs(
+    public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
+        log.debug("Called to get status for job {}", id);
+        return this.jobSearchService.getJobStatus(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<JobSearchResult> findJobs(
         final String id,
         final String jobName,
         final String userName,
@@ -179,7 +164,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     ) {
         log.debug("called");
 
-        return this.jobSearchService.getJobs(
+        return this.jobSearchService.findJobs(
             id,
             jobName,
             userName,
@@ -189,14 +174,12 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             clusterId,
             commandName,
             commandId,
-            page);
+            page
+        );
     }
 
     /**
-     * Takes in a id of the job to kill.
-     *
-     * @param jobId id of the job to kill
-     * @throws GenieException if there is an error
+     * {@inheritDoc}
      */
     @Override
     public void killJob(
@@ -213,7 +196,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     public String getJobHost(@NotBlank final String jobId) throws GenieException {
         final JobExecution jobExecution = this.jobPersistenceService.getJobExecution(jobId);
         if (jobExecution != null) {
-            return jobExecution.getHostName();
+            return jobExecution.getHostname();
         } else {
             throw new GenieNotFoundException("No job execution found for id " + jobId);
         }

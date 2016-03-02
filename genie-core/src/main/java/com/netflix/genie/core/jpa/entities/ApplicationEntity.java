@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -48,7 +47,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "applications")
-public class ApplicationEntity extends CommonFields {
+public class ApplicationEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -8780722054561507963L;
 
@@ -57,10 +56,6 @@ public class ApplicationEntity extends CommonFields {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "No application status entered and is required.")
     private ApplicationStatus status;
-
-    @Basic
-    @Column(name = "setup_file", length = 1024)
-    private String setupFile;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -77,14 +72,6 @@ public class ApplicationEntity extends CommonFields {
     )
     @Column(name = "dependency", nullable = false, length = 1024)
     private Set<String> dependencies = new HashSet<>();
-
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(
-        name = "application_tags",
-        joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
-    )
-    @Column(name = "tag", nullable = false, length = 255)
-    private Set<String> tags = new HashSet<>();
 
     @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
     private Set<CommandEntity> commands = new HashSet<>();
@@ -104,7 +91,7 @@ public class ApplicationEntity extends CommonFields {
     @PrePersist
     @PreUpdate
     protected void onCreateOrUpdateApplication() throws GenieException {
-        this.setApplicationTags(this.getFinalTags());
+        this.setTags(this.getFinalTags());
     }
 
     /**
@@ -124,24 +111,6 @@ public class ApplicationEntity extends CommonFields {
      */
     public void setStatus(final ApplicationStatus status) {
         this.status = status;
-    }
-
-    /**
-     * Gets the setupFile name.
-     *
-     * @return setupFile - file name containing environment variables.
-     */
-    public String getSetupFile() {
-        return setupFile;
-    }
-
-    /**
-     * Sets the env property file name in string form.
-     *
-     * @param setupFile location of a script to run while installing this application.
-     */
-    public void setSetupFile(final String setupFile) {
-        this.setupFile = setupFile;
     }
 
     /**
@@ -209,51 +178,6 @@ public class ApplicationEntity extends CommonFields {
     }
 
     /**
-     * Get the set of tags for this application.
-     *
-     * @return The application tags
-     */
-    public Set<String> getApplicationTags() {
-        return this.getSortedTags() == null
-            ? Sets.newHashSet()
-            : Sets.newHashSet(this.getSortedTags().split(COMMA));
-    }
-
-    /**
-     * Set the tags for the application.
-     *
-     * @param applicationTags The tags for the application
-     */
-    public void setApplicationTags(final Set<String> applicationTags) {
-        this.setSortedTags(applicationTags);
-        this.tags.clear();
-        if (applicationTags != null) {
-            this.tags.addAll(applicationTags);
-        }
-    }
-
-    /**
-     * Gets the tags allocated to this application.
-     *
-     * @return the tags
-     */
-    protected Set<String> getTags() {
-        return this.tags;
-    }
-
-    /**
-     * Sets the tags allocated to this application.
-     *
-     * @param tags the tags to set. No tag can start with genie. as this is system reserved.
-     */
-    protected void setTags(final Set<String> tags) {
-        this.tags.clear();
-        if (tags != null) {
-            this.tags.addAll(tags);
-        }
-    }
-
-    /**
      * Get a DTO from this entity.
      *
      * @return DTO of this entity.
@@ -265,9 +189,9 @@ public class ApplicationEntity extends CommonFields {
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())
             .withDescription(this.getDescription())
-            .withTags(this.getApplicationTags())
+            .withTags(this.getTags())
             .withConfigs(this.configs)
-            .withSetupFile(this.setupFile)
+            .withSetupFile(this.getSetupFile())
             .withDependencies(this.dependencies)
             .build();
     }

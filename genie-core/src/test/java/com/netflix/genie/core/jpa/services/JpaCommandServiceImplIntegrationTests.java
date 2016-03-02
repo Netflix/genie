@@ -19,7 +19,6 @@ package com.netflix.genie.core.jpa.services;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
-import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -27,6 +26,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
+import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -65,6 +65,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_1_USER = "tgianos";
     private static final String COMMAND_1_VERSION = "1.2.3";
     private static final String COMMAND_1_EXECUTABLE = "pig";
+    private static final long COMMAND_1_CHECK_DELAY = 18000L;
     private static final CommandStatus COMMAND_1_STATUS = CommandStatus.ACTIVE;
 
     private static final String COMMAND_2_ID = "command2";
@@ -288,14 +289,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testCreateCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final Command command = new Command.Builder(
-                COMMAND_1_NAME,
-                COMMAND_1_USER,
-                COMMAND_1_VERSION,
-                CommandStatus.ACTIVE,
-                COMMAND_1_EXECUTABLE
+            COMMAND_1_NAME,
+            COMMAND_1_USER,
+            COMMAND_1_VERSION,
+            CommandStatus.ACTIVE,
+            COMMAND_1_EXECUTABLE,
+            COMMAND_1_CHECK_DELAY
         )
-                .withId(id)
-                .build();
+            .withId(id)
+            .build();
         final String createdId = this.service.createCommand(command);
         Assert.assertThat(createdId, Matchers.is(id));
         final Command created = this.service.getCommand(id);
@@ -305,14 +307,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_1_USER, created.getUser());
         Assert.assertEquals(CommandStatus.ACTIVE, created.getStatus());
         Assert.assertEquals(COMMAND_1_EXECUTABLE, created.getExecutable());
+        Assert.assertThat(COMMAND_1_CHECK_DELAY, Matchers.is(created.getCheckDelay()));
         this.service.deleteCommand(id);
         try {
             this.service.getCommand(id);
             Assert.fail("Should have thrown exception");
         } catch (final GenieException ge) {
             Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
+                HttpURLConnection.HTTP_NOT_FOUND,
+                ge.getErrorCode()
             );
         }
     }
@@ -325,11 +328,12 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testCreateCommandNoId() throws GenieException {
         final Command command = new Command.Builder(
-                COMMAND_1_NAME,
-                COMMAND_1_USER,
-                COMMAND_1_VERSION,
-                CommandStatus.ACTIVE,
-                COMMAND_1_EXECUTABLE
+            COMMAND_1_NAME,
+            COMMAND_1_USER,
+            COMMAND_1_VERSION,
+            CommandStatus.ACTIVE,
+            COMMAND_1_EXECUTABLE,
+            COMMAND_1_CHECK_DELAY
         ).build();
         final String id = this.service.createCommand(command);
         final Command created = this.service.getCommand(id);
@@ -338,14 +342,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_1_USER, created.getUser());
         Assert.assertEquals(CommandStatus.ACTIVE, created.getStatus());
         Assert.assertEquals(COMMAND_1_EXECUTABLE, created.getExecutable());
+        Assert.assertThat(COMMAND_1_CHECK_DELAY, Matchers.is(created.getCheckDelay()));
         this.service.deleteCommand(created.getId());
         try {
             this.service.getCommand(created.getId());
             Assert.fail("Should have thrown exception");
         } catch (final GenieException ge) {
             Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
+                HttpURLConnection.HTTP_NOT_FOUND,
+                ge.getErrorCode()
             );
         }
     }
@@ -376,20 +381,21 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         tags.add("hadoop");
 
         final Command updateCommand = new Command.Builder(
-                command.getName(),
-                COMMAND_2_USER,
-                command.getVersion(),
-                CommandStatus.INACTIVE,
-                command.getExecutable()
+            command.getName(),
+            COMMAND_2_USER,
+            command.getVersion(),
+            CommandStatus.INACTIVE,
+            command.getExecutable(),
+            command.getCheckDelay()
         )
-                .withId(command.getId())
-                .withCreated(command.getCreated())
-                .withUpdated(command.getUpdated())
-                .withDescription(command.getDescription())
-                .withTags(tags)
-                .withConfigs(command.getConfigs())
-                .withSetupFile(command.getSetupFile())
-                .build();
+            .withId(command.getId())
+            .withCreated(command.getCreated())
+            .withUpdated(command.getUpdated())
+            .withDescription(command.getDescription())
+            .withTags(tags)
+            .withConfigs(command.getConfigs())
+            .withSetupFile(command.getSetupFile())
+            .build();
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
 
@@ -412,11 +418,12 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(5, command.getTags().size());
 
         final Command updateCommand = new Command.Builder(
-                command.getName(),
-                "", //invalid
-                command.getVersion(),
-                CommandStatus.INACTIVE,
-                command.getExecutable()
+            command.getName(),
+            "", //invalid
+            command.getVersion(),
+            CommandStatus.INACTIVE,
+            command.getExecutable(),
+            command.getCheckDelay()
         ).build();
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
@@ -434,20 +441,21 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Date updated = init.getUpdated();
 
         final Command updateCommand = new Command.Builder(
-                init.getName(),
-                init.getUser(),
-                init.getVersion(),
-                init.getStatus(),
-                init.getExecutable()
+            init.getName(),
+            init.getUser(),
+            init.getVersion(),
+            init.getStatus(),
+            init.getExecutable(),
+            init.getCheckDelay()
         )
-                .withId(init.getId())
-                .withCreated(new Date())
-                .withUpdated(new Date(0))
-                .withDescription(init.getDescription())
-                .withTags(init.getTags())
-                .withConfigs(init.getConfigs())
-                .withSetupFile(init.getSetupFile())
-                .build();
+            .withId(init.getId())
+            .withCreated(new Date())
+            .withUpdated(new Date(0))
+            .withDescription(init.getDescription())
+            .withTags(init.getTags())
+            .withConfigs(init.getConfigs())
+            .withSetupFile(init.getSetupFile())
+            .build();
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
         final Command updatedCommand = this.service.getCommand(COMMAND_1_ID);
@@ -635,7 +643,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetConfigsForCommand() throws GenieException {
         Assert.assertEquals(2,
-                this.service.getConfigsForCommand(COMMAND_1_ID).size());
+            this.service.getConfigsForCommand(COMMAND_1_ID).size());
     }
 
     /**
@@ -718,9 +726,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Set<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(1, preCommands
-                        .stream()
-                        .filter(command -> COMMAND_1_ID.equals(command.getId()))
-                        .count()
+            .stream()
+            .filter(command -> COMMAND_1_ID.equals(command.getId()))
+            .count()
         );
 
         this.service.addApplicationsForCommand(COMMAND_2_ID, appIds);
@@ -728,11 +736,11 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Set<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(2, savedCommands.size());
         Assert.assertEquals(
-                1,
-                this.service.getApplicationsForCommand(COMMAND_2_ID)
-                        .stream()
-                        .filter(application -> APP_1_ID.equals(application.getId()))
-                        .count()
+            1,
+            this.service.getApplicationsForCommand(COMMAND_2_ID)
+                .stream()
+                .filter(application -> APP_1_ID.equals(application.getId()))
+                .count()
         );
     }
 
@@ -750,9 +758,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Set<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(1, preCommands
-                        .stream()
-                        .filter(command -> COMMAND_1_ID.equals(command.getId()))
-                        .count()
+            .stream()
+            .filter(command -> COMMAND_1_ID.equals(command.getId()))
+            .count()
         );
 
         this.service.setApplicationsForCommand(COMMAND_2_ID, appIds);
@@ -760,11 +768,11 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Set<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(2, savedCommands.size());
         Assert.assertEquals(
-                1,
-                this.service.getApplicationsForCommand(COMMAND_2_ID)
-                        .stream()
-                        .filter(application -> APP_1_ID.equals(application.getId()))
-                        .count()
+            1,
+            this.service.getApplicationsForCommand(COMMAND_2_ID)
+                .stream()
+                .filter(application -> APP_1_ID.equals(application.getId()))
+                .count()
         );
     }
 
@@ -796,9 +804,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetApplicationsForCommand() throws GenieException {
         Assert.assertEquals(1, this.service.getApplicationsForCommand(COMMAND_1_ID)
-                        .stream()
-                        .filter(application -> APP_1_ID.equals(application.getId()))
-                        .count()
+            .stream()
+            .filter(application -> APP_1_ID.equals(application.getId()))
+            .count()
         );
     }
 
@@ -934,7 +942,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetTagsForCommand() throws GenieException {
         Assert.assertEquals(5,
-                this.service.getTagsForCommand(COMMAND_1_ID).size());
+            this.service.getTagsForCommand(COMMAND_1_ID).size());
     }
 
     /**

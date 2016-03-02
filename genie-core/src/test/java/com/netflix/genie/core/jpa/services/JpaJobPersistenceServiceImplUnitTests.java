@@ -34,6 +34,7 @@ import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,18 +89,6 @@ public class JpaJobPersistenceServiceImplUnitTests {
     }
 
     /******* Unit Tests for Job methods ********/
-
-    /**
-     * Test the getJob method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void testGetJobDoesNotExist() throws GenieException {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepo.findOne(Mockito.eq(id))).thenReturn(null);
-        this.jobPersistenceService.getJob(id);
-    }
 
     /**
      * Test the createJob method.
@@ -324,6 +313,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
+    @Test
     public void testCreateJobRequestWithNoIdSupplied() throws GenieException {
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_1_NAME,
@@ -336,7 +326,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         ).build();
         final ArgumentCaptor<JobRequestEntity> argument = ArgumentCaptor.forClass(JobRequestEntity.class);
         this.jobPersistenceService.createJobRequest(jobRequest);
-        Mockito.verify(jobRequestRepo).save(argument.capture());
+        Mockito.verify(this.jobRequestRepo).save(argument.capture());
         // Make sure id is created and supplied if not specified in the original job request
         Assert.assertNotNull(argument.getValue().getId());
     }
@@ -423,7 +413,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testCreateJobExecutionIdWithNoId() throws GenieException {
-        final JobExecution jobExecution = new JobExecution.Builder("hostname", 123).build();
+        final JobExecution jobExecution = new JobExecution.Builder("hostname", 123, 1000L).build();
         this.jobPersistenceService.createJobExecution(jobExecution);
     }
 
@@ -434,7 +424,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testCreateJobExecutionJobDoesNotExist() throws GenieException {
-        final JobExecution jobExecution = new JobExecution.Builder("hostname", 123)
+        final JobExecution jobExecution = new JobExecution.Builder("hostname", 123, 2000L)
             .withId(JOB_1_ID)
             .build();
         Mockito.when(this.jobRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(null);
@@ -450,7 +440,8 @@ public class JpaJobPersistenceServiceImplUnitTests {
     public void testCreateJobExecution() throws GenieException {
         final String hostname = "hostname";
         final int pid = 123;
-        final JobExecution jobExecution = new JobExecution.Builder(hostname, pid)
+        final long checkDelay = 3000L;
+        final JobExecution jobExecution = new JobExecution.Builder(hostname, pid, checkDelay)
             .withId(JOB_1_ID)
             .build();
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
@@ -463,8 +454,9 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Mockito.verify(jobEntity).setExecution(argument.capture());
         Mockito.verify(jobEntity).setStatus(argument1.capture());
 
-        Assert.assertEquals(hostname, argument.getValue().getHostName());
+        Assert.assertEquals(hostname, argument.getValue().getHostname());
         Assert.assertEquals(pid, argument.getValue().getProcessId());
+        Assert.assertThat(argument.getValue().getCheckDelay(), Matchers.is(checkDelay));
         Assert.assertEquals(JOB_1_ID, argument.getValue().getId());
 
         // verify the method sets the status code of the Job to RUNNING

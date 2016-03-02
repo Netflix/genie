@@ -31,6 +31,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +46,19 @@ import java.net.UnknownHostException;
  * @since 3.0.0
  */
 @Configuration
-public class MvcConfig {
+public class MvcConfig extends WebMvcConfigurerAdapter {
+
+    /**
+     * {@inheritDoc}
+     *
+     * Turn off {@literal .} recognition in paths. Needed due to Job id's in paths potentially having '.' as character.
+     *
+     * @see <a href="http://stackoverflow.com/a/23938850">Stack Overflow Issue Answer From Dave Syer</a>
+     */
+    @Override
+    public void configurePathMatch(final PathMatchConfigurer configurer) {
+        configurer.setUseRegisteredSuffixPatternMatch(true);
+    }
 
     /**
      * Get a resource loader.

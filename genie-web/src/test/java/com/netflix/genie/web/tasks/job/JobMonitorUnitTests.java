@@ -49,6 +49,8 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class JobMonitorUnitTests {
 
+    private static final long DELAY = 180235L;
+
     private JobMonitor monitor;
     private JobExecution jobExecution;
     private Executor executor;
@@ -59,7 +61,7 @@ public class JobMonitorUnitTests {
      */
     @Before
     public void setup() {
-        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 3808);
+        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 3808, DELAY);
         builder.withId(UUID.randomUUID().toString());
         this.jobExecution = builder.build();
         this.executor = Mockito.mock(Executor.class);
@@ -173,6 +175,6 @@ public class JobMonitorUnitTests {
      */
     @Test
     public void canGetFixedDelay() {
-        Assert.assertThat(1000L, Matchers.is(this.monitor.getFixedDelay()));
+        Assert.assertThat(DELAY, Matchers.is(this.monitor.getFixedDelay()));
     }
 }

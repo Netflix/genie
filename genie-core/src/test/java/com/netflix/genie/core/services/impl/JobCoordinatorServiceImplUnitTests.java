@@ -75,7 +75,7 @@ public class JobCoordinatorServiceImplUnitTests {
             this.jobPersistenceService,
             this.jobSearchService,
             this.jobSubmitterService,
-            this.BASE_ARCHIVE_LOCATION
+            BASE_ARCHIVE_LOCATION
         );
     }
 
@@ -222,19 +222,6 @@ public class JobCoordinatorServiceImplUnitTests {
     }
 
     /**
-     * Test the get job method to verify that the id sent is used to fetch from persistence service.
-     *
-     * @throws GenieException If there is any problem
-     */
-    @Test
-    public void testGetJob() throws GenieException {
-        final ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-        this.jobCoordinatorService.getJob(JOB_1_ID);
-        Mockito.verify(this.jobPersistenceService).getJob(argument.capture());
-        Assert.assertEquals(JOB_1_ID, argument.getValue());
-    }
-
-    /**
      * Test the get jobs method.
      *
      * @throws GenieException If there is any problem
@@ -266,7 +253,7 @@ public class JobCoordinatorServiceImplUnitTests {
         final String jobId = UUID.randomUUID().toString();
         final String hostname = UUID.randomUUID().toString();
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getHostName()).thenReturn(hostname);
+        Mockito.when(jobExecution.getHostname()).thenReturn(hostname);
         Mockito.when(this.jobPersistenceService.getJobExecution(Mockito.eq(jobId))).thenReturn(jobExecution);
 
         Assert.assertThat(this.jobCoordinatorService.getJobHost(jobId), Matchers.is(hostname));

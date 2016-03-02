@@ -35,18 +35,6 @@ import javax.validation.constraints.NotNull;
 public interface JobPersistenceService {
 
     /**
-     * Get job information for given job id.
-     *
-     * @param id id of job to look up
-     * @return the job
-     * @throws GenieException if there is an error
-     */
-    Job getJob(
-            @NotBlank(message = "No id entered. Unable to get job.")
-            final String id
-    ) throws GenieException;
-
-    /**
      * Save the job object in the data store.
      *
      * @param job the Job object to create

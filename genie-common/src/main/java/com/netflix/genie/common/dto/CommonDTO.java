@@ -40,14 +40,14 @@ public abstract class CommonDTO extends BaseDTO {
 
     @NotEmpty
     @Size(max = 255)
-    private String version;
+    private final String version;
     @NotEmpty
     @Size(max = 255)
-    private String user;
+    private final String user;
     @NotEmpty
     @Size(max = 255)
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
 
     /**
      * Constructor.

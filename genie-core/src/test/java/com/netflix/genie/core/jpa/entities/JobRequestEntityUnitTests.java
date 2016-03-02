@@ -69,7 +69,7 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getDescription(), Matchers.nullValue());
         Assert.assertThat(this.entity.getCreated(), Matchers.notNullValue());
         Assert.assertThat(this.entity.getUpdated(), Matchers.notNullValue());
-        Assert.assertThat(this.entity.getSortedTags(), Matchers.nullValue());
+        Assert.assertThat(this.entity.getTags(), Matchers.empty());
         Assert.assertThat(this.entity.getClientHost(), Matchers.nullValue());
         Assert.assertThat(this.entity.getClusterCriterias(), Matchers.is("[]"));
         Assert.assertThat(this.entity.getClusterCriteriasAsList(), Matchers.empty());

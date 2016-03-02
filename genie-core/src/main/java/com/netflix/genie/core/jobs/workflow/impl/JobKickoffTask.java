@@ -42,6 +42,7 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Slf4j
+// TODO: Amit why would you both implement an interface and extend a class that already implements that interface?
 public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
 
     private boolean isRunAsUserEnabled;
@@ -93,10 +94,14 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
 
         try {
             final Process process = pb.start();
+            // TODO: This should come from the hostname bean
             final String hostname = InetAddress.getLocalHost().getHostAddress();
             final int processId = getProcessId(process);
-            final JobExecution jobExecution =
-                new JobExecution.Builder(hostname, processId).withId(this.jobExecEnv.getJobRequest().getId()).build();
+            // TODO: Amit Need to get the actual delay time from the command to use here
+            final JobExecution jobExecution = new JobExecution
+                .Builder(hostname, processId, 5000L)
+                .withId(this.jobExecEnv.getJobRequest().getId())
+                .build();
             context.put(Constants.JOB_EXECUTION_DTO_KEY, jobExecution);
         } catch (IOException ie) {
             throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
@@ -108,6 +113,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
         final String group) throws GenieException {
 
         // First check if user already exists
+        // TODO: Use CommonsExec... inject Executor
         final List checkUserExistsCommand = new ArrayList<>();
         checkUserExistsCommand.add("id");
         checkUserExistsCommand.add("-u");
@@ -138,6 +144,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
         final String jobWorkingDir,
         final String user) throws GenieException {
 
+        // TODO: Why isn't this a list of Strings?
         final List command = new ArrayList<>();
         // Don;t need sudo probably as the genie user is the one creating the working directory.
         //command.add("sudo");

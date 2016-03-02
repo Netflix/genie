@@ -97,24 +97,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
-    public Job getJob(
-        @NotBlank(message = "No id entered. Unable to get job.")
-        final String id
-    ) throws GenieNotFoundException {
-        log.debug("Called with id {}", id);
-        final JobEntity jobEntity = this.jobRepo.findOne(id);
-        if (jobEntity != null) {
-            return jobEntity.getDTO();
-        } else {
-            throw new GenieNotFoundException("No job found with id " + id);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void createJob(
         @NotNull(message = "No Job provided to create")
         final Job job
@@ -152,7 +134,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
         jobEntity.setStatus(job.getStatus());
         jobEntity.setStatusMsg(job.getStatusMsg());
-        jobEntity.setJobTags(jobRequestEntity.getTags());
+        jobEntity.setTags(jobRequestEntity.getTags());
 
         jobRequestEntity.setJob(jobEntity);
     }
@@ -213,7 +195,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
 
         jobEntity.setCluster(clusterEntity);
-        jobEntity.setClusterName(clusterEntity.getName());
     }
 
     /**
@@ -239,7 +220,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
 
         jobEntity.setCommand(commandEntity);
-        jobEntity.setCommandName(commandEntity.getName());
     }
 
     /**
@@ -370,9 +350,9 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
 
         jobExecutionEntity.setId(jobExecution.getId());
-        //jobExecutionEntity.setClusterCriteriaFromSet(jobExecution.getClusterCriteria());
-        jobExecutionEntity.setHostName(jobExecution.getHostName());
+        jobExecutionEntity.setHostname(jobExecution.getHostname());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
+        jobExecutionEntity.setCheckDelay(jobExecution.getCheckDelay());
 
         jobEntity.setExecution(jobExecutionEntity);
         jobEntity.setStatus(JobStatus.RUNNING);
@@ -398,7 +378,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
         if (jobExecutionEntity != null) {
             jobExecutionEntity.setExitCode(exitCode);
-             this.jobExecutionRepo.save(jobExecutionEntity);
+            this.jobExecutionRepo.save(jobExecutionEntity);
         } else {
             throw new GenieNotFoundException("No job with id " + id);
         }

@@ -37,7 +37,8 @@ public class JobStartedEventUnitTests {
      */
     @Test
     public void canConstruct() {
-        final JobExecution.Builder jobExecutionBuilder = new JobExecution.Builder(UUID.randomUUID().toString(), 3029);
+        final JobExecution.Builder jobExecutionBuilder
+            = new JobExecution.Builder(UUID.randomUUID().toString(), 3029, 238124L);
         jobExecutionBuilder.withId(UUID.randomUUID().toString());
         final JobExecution jobExecution = jobExecutionBuilder.build();
         final Object source = new Object();

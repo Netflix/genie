@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +56,16 @@ public class MvcConfigUnitTests {
     @Before
     public void setup() {
         this.mvcConfig = new MvcConfig();
+    }
+
+    /**
+     * Make sure the suffix pattern matcher is turned off.
+     */
+    @Test
+    public void doesTurnOffSuffixMatcher() {
+        final PathMatchConfigurer configurer = Mockito.mock(PathMatchConfigurer.class);
+        this.mvcConfig.configurePathMatch(configurer);
+        Mockito.verify(configurer, Mockito.times(1)).setUseRegisteredSuffixPatternMatch(true);
     }
 
     /**

@@ -107,10 +107,9 @@ public class JpaClusterServiceImpl implements ClusterService {
         clusterEntity.setUser(cluster.getUser());
         clusterEntity.setVersion(cluster.getVersion());
         clusterEntity.setDescription(cluster.getDescription());
-        clusterEntity.setClusterType(cluster.getClusterType());
         clusterEntity.setStatus(cluster.getStatus());
         clusterEntity.setConfigs(cluster.getConfigs());
-        clusterEntity.setClusterTags(cluster.getTags());
+        clusterEntity.setTags(cluster.getTags());
 
         return this.clusterRepo.save(clusterEntity).getId();
     }
@@ -211,10 +210,9 @@ public class JpaClusterServiceImpl implements ClusterService {
         clusterEntity.setUser(updateCluster.getUser());
         clusterEntity.setVersion(updateCluster.getVersion());
         clusterEntity.setDescription(updateCluster.getDescription());
-        clusterEntity.setClusterType(updateCluster.getClusterType());
         clusterEntity.setStatus(updateCluster.getStatus());
         clusterEntity.setConfigs(updateCluster.getConfigs());
-        clusterEntity.setClusterTags(updateCluster.getTags());
+        clusterEntity.setTags(updateCluster.getTags());
 
         this.clusterRepo.save(clusterEntity);
     }
@@ -316,9 +314,9 @@ public class JpaClusterServiceImpl implements ClusterService {
         final Set<String> tags
     ) throws GenieException {
         final ClusterEntity cluster = this.findCluster(id);
-        final Set<String> clusterTags = cluster.getClusterTags();
+        final Set<String> clusterTags = cluster.getTags();
         clusterTags.addAll(tags);
-        cluster.setClusterTags(clusterTags);
+        cluster.setTags(clusterTags);
     }
 
     /**
@@ -330,7 +328,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotBlank(message = "No cluster id sent. Cannot retrieve tags.")
         final String id
     ) throws GenieException {
-        return this.findCluster(id).getClusterTags();
+        return this.findCluster(id).getTags();
     }
 
     /**
@@ -343,7 +341,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotEmpty(message = "No tags entered. Unable to update.")
         final Set<String> tags
     ) throws GenieException {
-        this.findCluster(id).setClusterTags(tags);
+        this.findCluster(id).setTags(tags);
     }
 
     /**
@@ -354,7 +352,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotBlank(message = "No cluster id entered. Unable to remove tags.")
         final String id
     ) throws GenieException {
-        this.findCluster(id).setClusterTags(Sets.newHashSet());
+        this.findCluster(id).setTags(Sets.newHashSet());
     }
 
     /**
@@ -368,9 +366,9 @@ public class JpaClusterServiceImpl implements ClusterService {
         final String tag
     ) throws GenieException {
         final ClusterEntity cluster = this.findCluster(id);
-        final Set<String> tags = cluster.getClusterTags();
+        final Set<String> tags = cluster.getTags();
         tags.remove(tag);
-        cluster.setClusterTags(tags);
+        cluster.setTags(tags);
     }
 
     /**

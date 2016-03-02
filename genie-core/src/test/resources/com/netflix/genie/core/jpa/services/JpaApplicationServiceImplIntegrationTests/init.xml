@@ -24,17 +24,8 @@
         version="1.2.3"
         status="INACTIVE"
         entity_version="0"
-        sorted_tags="genie.id:app1,genie.name:tez,prod"
+        tags="genie.id:app1,genie.name:tez,prod"
     />
-    <application_tags
-        application_id="app1"
-        tag="genie.id:app1"/>
-    <application_tags
-        application_id="app1"
-        tag="genie.name:tez"/>
-    <application_tags
-        application_id="app1"
-        tag="prod"/>
     <application_configs
         application_id="app1"
         config="s3://some/config/file"/>
@@ -57,20 +48,8 @@
         version="4.5.6"
         status="ACTIVE"
         entity_version="0"
-        sorted_tags="genie.id:app2,genie.name:spark,prod,yarn"
+        tags="genie.id:app2,genie.name:spark,prod,yarn"
     />
-    <application_tags
-        application_id="app2"
-        tag="genie.id:app2"/>
-    <application_tags
-        application_id="app2"
-        tag="genie.name:spark"/>
-    <application_tags
-        application_id="app2"
-        tag="prod"/>
-    <application_tags
-        application_id="app2"
-        tag="yarn"/>
     <application_configs
         application_id="app2"
         config="s3://some/spark/config/file"/>
@@ -90,17 +69,8 @@
         version="7.8.9"
         status="DEPRECATED"
         entity_version="0"
-        sorted_tags="genie.id:app3,genie.name:storm,prod"
+        tags="genie.id:app3,genie.name:storm,prod"
     />
-    <application_tags
-        application_id="app3"
-        tag="genie.id:app3"/>
-    <application_tags
-        application_id="app3"
-        tag="genie.name:storm"/>
-    <application_tags
-        application_id="app3"
-        tag="prod"/>
     <application_configs
         application_id="app3"
         config="s3://some/storm/config/file"/>
@@ -119,16 +89,11 @@
         name="pig_13_prod"
         version="1.2.3"
         executable="pig"
+        check_delay="10000"
         status="INACTIVE"
         entity_version="0"
-        sorted_tags="genie.id:command1,genie.name:pig_13_prod"
+        tags="genie.id:command1,genie.name:pig_13_prod"
     />
-    <command_tags
-        command_id="command1"
-        tag="genie.id:command1"/>
-    <command_tags
-        command_id="command1"
-        tag="genie.name:pig_13_prod"/>
 
     <commands_applications command_id="command1" application_id="app1"/>
 </dataset>

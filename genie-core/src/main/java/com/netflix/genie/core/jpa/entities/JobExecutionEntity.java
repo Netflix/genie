@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.util.JsonUtils;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -30,9 +30,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Representation of the original Genie Job request.
@@ -42,6 +41,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "job_executions")
+@Getter
+@Setter
 public class JobExecutionEntity extends BaseEntity {
     /**
      * The exit code that will be set to indicate a job is currently executing.
@@ -51,22 +52,22 @@ public class JobExecutionEntity extends BaseEntity {
     private static final long serialVersionUID = -5073493356472801960L;
 
     @Basic(optional = false)
-    @Column(name = "host_name", nullable = false, length = 255)
+    @Column(name = "hostname", nullable = false, length = 255)
     @Size(min = 1, max = 255, message = "Must have a hostname no longer than 255 characters")
-    private String hostName;
+    private String hostname;
 
     @Basic(optional = false)
     @Column(name = "process_id", nullable = false)
     private int processId;
 
     @Basic(optional = false)
-    @Column(name = "exit_code", nullable = false)
-    private int exitCode = DEFAULT_EXIT_CODE;
+    @Column(name = "check_delay", nullable = false)
+    @Min(1)
+    private long checkDelay = Command.DEFAULT_CHECK_DELAY;
 
     @Basic(optional = false)
-    @Column(name = "cluster_criteria", nullable = false, length = 1024)
-    @Size(min = 1, max = 1024, message = "Must not have cluster criteria longer than 1024 characters")
-    private String clusterCriteria = "[]";
+    @Column(name = "exit_code", nullable = false)
+    private int exitCode = DEFAULT_EXIT_CODE;
 
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id")
@@ -78,17 +79,17 @@ public class JobExecutionEntity extends BaseEntity {
      *
      * @return The hostname
      */
-    public String getHostName() {
-        return this.hostName;
+    public String getHostname() {
+        return this.hostname;
     }
 
     /**
      * Set the hostname this job is running on.
      *
-     * @param hostName The hostname
+     * @param hostname The hostname
      */
-    public void setHostName(final String hostName) {
-        this.hostName = hostName;
+    public void setHostname(final String hostname) {
+        this.hostname = hostname;
     }
 
     /**
@@ -128,47 +129,6 @@ public class JobExecutionEntity extends BaseEntity {
     }
 
     /**
-     * Get the cluster criteria as a set of strings.
-     *
-     * @return The cluster criteria used to select the cluster the job ran on
-     * @throws GenieException For any serialization error
-     */
-    public Set<String> getClusterCriteriaAsSet() throws GenieException {
-        return JsonUtils.unmarshall(this.clusterCriteria, new TypeReference<Set<String>>() {
-        });
-    }
-
-    /**
-     * Set the cluster criteria from a set of strings.
-     *
-     * @param clusterCriteriaSet The cluster criteria to set
-     * @throws GenieException For any serialization error
-     */
-    public void setClusterCriteriaFromSet(final Set<String> clusterCriteriaSet) throws GenieException {
-        this.clusterCriteria = clusterCriteriaSet == null
-            ? JsonUtils.marshall(new HashSet<String>())
-            : JsonUtils.marshall(clusterCriteriaSet);
-    }
-
-    /**
-     * Get the cluster criteria that was used to chose the cluster for the job.
-     *
-     * @return The cluster criteria as a JSON array string
-     */
-    protected String getClusterCriteria() {
-        return this.clusterCriteria;
-    }
-
-    /**
-     * Set the cluster criteria that was used to chose the cluster for the job as a JSON array string.
-     *
-     * @param clusterCriteria The cluster criteria as a JSON array string
-     */
-    protected void setClusterCriteria(final String clusterCriteria) {
-        this.clusterCriteria = clusterCriteria;
-    }
-
-    /**
      * Get the job associated with this job execution.
      *
      * @return The job
@@ -190,16 +150,14 @@ public class JobExecutionEntity extends BaseEntity {
      * Get a DTO representing this job execution.
      *
      * @return The read-only DTO.
-     * @throws GenieException For any processing error
      */
-    //TODO: when we remove the cluster criteria need to remove throwing this exception
-    public JobExecution getDTO() throws GenieException {
+    public JobExecution getDTO() {
         return new JobExecution.Builder(
-            this.hostName,
-            this.processId
+            this.hostname,
+            this.processId,
+            this.checkDelay
         )
             .withExitCode(this.exitCode)
-            .withClusterCriteria(this.getClusterCriteriaAsSet())
             .withId(this.getId())
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())

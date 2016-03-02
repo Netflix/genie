@@ -40,6 +40,7 @@ public class CommandUnitTests {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
+    private static final long CHECK_DELAY = 12380L;
     private static final String EXECUTABLE = UUID.randomUUID().toString();
 
     /**
@@ -47,7 +48,8 @@ public class CommandUnitTests {
      */
     @Test
     public void canBuildCommand() {
-        final Command command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE).build();
+        final Command command
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY).build();
         Assert.assertThat(command.getName(), Matchers.is(NAME));
         Assert.assertThat(command.getUser(), Matchers.is(USER));
         Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
@@ -67,7 +69,8 @@ public class CommandUnitTests {
      */
     @Test
     public void canBuildCommandWithOptionals() {
-        final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        final Command.Builder builder
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
         final String setupFile = UUID.randomUUID().toString();
         builder.withSetupFile(setupFile);
@@ -96,6 +99,7 @@ public class CommandUnitTests {
         Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
         Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
+        Assert.assertThat(command.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(command.getSetupFile(), Matchers.is(setupFile));
         Assert.assertThat(command.getConfigs(), Matchers.is(configs));
         Assert.assertThat(command.getCreated(), Matchers.is(created));
@@ -110,7 +114,8 @@ public class CommandUnitTests {
      */
     @Test
     public void canBuildCommandNullOptionals() {
-        final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        final Command.Builder builder
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withCreated(null);
@@ -139,7 +144,8 @@ public class CommandUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE);
+        final Command.Builder builder
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withCreated(null);
@@ -162,7 +168,7 @@ public class CommandUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, null, EXECUTABLE);
+        final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, null, EXECUTABLE, CHECK_DELAY);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withCreated(null);
