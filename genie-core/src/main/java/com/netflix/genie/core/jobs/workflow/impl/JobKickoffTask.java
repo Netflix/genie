@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -77,13 +78,13 @@ public class JobKickoffTask extends GenieBaseTask {
 
         final List command = new ArrayList<>();
         if (this.isRunAsUserEnabled) {
-            changeOwnershipOfDirectory(this.baseWorkingDirPath, this.jobExecEnv.getJobRequest().getUser());
+            changeOwnershipOfDirectory(this.jobWorkigDirectory, this.jobExecEnv.getJobRequest().getUser());
             command.add("sudo");
             command.add("-u");
             command.add(this.jobExecEnv.getJobRequest().getUser());
         }
         command.add("bash");
-        command.add(jobLauncherScriptPath);
+        command.add(runScript);
 
         final ProcessBuilder pb = new ProcessBuilder(command);
         pb.directory(this.jobExecEnv.getJobWorkingDir());
@@ -117,7 +118,7 @@ public class JobKickoffTask extends GenieBaseTask {
         checkUserExistsCommand.add(user);
 
         try {
-            this.executeBashCommand(checkUserExistsCommand, null);
+            Utils.executeBashCommand(checkUserExistsCommand, null);
             log.info("User already exists");
             return;
         } catch (GenieException ge) {
@@ -133,7 +134,7 @@ public class JobKickoffTask extends GenieBaseTask {
             }
 
             command.add("-M");
-            this.executeBashCommand(command, null);
+            Utils.executeBashCommand(command, null);
         }
     }
 
@@ -149,7 +150,7 @@ public class JobKickoffTask extends GenieBaseTask {
         command.add(user);
         command.add(jobWorkingDir);
 
-        this.executeBashCommand(command, null);
+        Utils.executeBashCommand(command, null);
     }
 
     /**

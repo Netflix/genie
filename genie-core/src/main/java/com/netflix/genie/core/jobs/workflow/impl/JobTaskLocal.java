@@ -22,6 +22,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
+import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,7 +59,7 @@ public class JobTaskLocal extends GenieBaseTask implements WorkflowTask {
         }
 
         final String jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + Constants.GENIE_JOB_LAUNCHER_SCRIPT;
-        final Writer writer = getWriter(jobLauncherScriptPath);
+        final Writer writer = Utils.getWriter(jobLauncherScriptPath);
 
         //TODO copy down dependencies
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
@@ -68,12 +69,13 @@ public class JobTaskLocal extends GenieBaseTask implements WorkflowTask {
             final String setupFileLocalPath = jobExecEnv.getJobWorkingDir()
                 + "/job/"
                 + setupFilePath.getFileName();
-            appendToWriter(writer, "source " + setupFileLocalPath + ";");
+            Utils.appendToWriter(writer, "source " + setupFileLocalPath + ";");
         }
 
-        appendToWriter(writer, jobExecEnv.getCommand().getExecutable()
+        Utils.appendToWriter(writer, jobExecEnv.getCommand().getExecutable()
             + " "
             + jobExecEnv.getJobRequest().getCommandArgs());
-        closeWriter(writer);
+
+        Utils.closeWriter(writer);
     }
 }

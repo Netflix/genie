@@ -46,6 +46,21 @@ public final class Constants {
     /** Equals symbol. **/
     public static final String EQUALS_SYMBOL = "=";
 
+    /** Bash source command.  **/
+    public static final String SOURCE = "source";
+
+    /** Semicolon symbol. **/
+    public static final String SEMICOLON_SYMBOL = ";";
+
+    /** String containing a whitespace.  **/
+    public static final String WHITE_SPACE = " ";
+
+    /** unix stdout symbol.  **/
+    public static final String STDOUT_REDIRECT = " > ";
+
+    /** unix stderr symbol. **/
+    public static final String STDERR_REDIRECT = " 2> ";
+
     /** File Path prefix to be used while creating paths for setup files downloaded by Genie to local dir. **/
     public static final String SETUP_FILE_PATH_PREFIX = "setup_file";
 
@@ -100,6 +115,8 @@ public final class Constants {
     /** Process ID. **/
     public static final String PID = "pid";
 
+    /** Genie Done file contents prefix. **/
+    public static final String GENIE_DONE_FILE_CONTENT_PREFIX = "printf '{\"exitCode\": \"%s\"}\\n' \"$?\" > ";
 
     /**
      * Enum containing types of files that the entities hold.
@@ -121,7 +138,7 @@ public final class Constants {
      * Enum containing the four types of Entities in Genie.
      *
      */
-    public enum EntityType {
+    public enum AdminResources {
         /** Application Entity. **/
         APPLICATION,
 
@@ -129,10 +146,7 @@ public final class Constants {
         COMMAND,
 
         /** Cluster Entity. **/
-        CLUSTER,
-
-        /** Job Entitity. **/
-        JOB
+        CLUSTER
     }
 
     /**

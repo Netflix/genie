@@ -19,6 +19,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
@@ -42,58 +43,90 @@ public class InitialSetupTask extends GenieBaseTask {
         @NotNull
         final Map<String, Object> context
     ) throws GenieException {
-        log.info("Executing Initial setup Task in the workflow.");
+        log.debug("Executing Initial setup Task in the workflow.");
 
         super.executeTask(context);
 
-        // create top level directory structure for the job
-        createDirectory(this.baseWorkingDirPath);
+        /** create top level directory structure for the job **/
 
-        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR);
-        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR
-            + Constants.FILE_PATH_DELIMITER + Constants.LOGS_PATH_VAR);
-        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR
+        // Base directory {basedir}
+        Utils.createDirectory(this.jobWorkigDirectory);
+
+        // Genie Directory {basedir/genie}
+        Utils.createDirectory(this.jobWorkigDirectory
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_PATH_VAR);
+
+        // Genie Logs directory {basedir/genie/logs}
+        Utils.createDirectory(this.jobWorkigDirectory
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_PATH_VAR
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.LOGS_PATH_VAR);
+
+        // Genie applications directory {basedir/genie/applications}
+        Utils.createDirectory(this.jobWorkigDirectory
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_PATH_VAR
             + Constants.FILE_PATH_DELIMITER
             + Constants.APPLICATION_PATH_VAR);
-        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR
+
+        // Genie command directory {basedir/genie/command}
+        Utils.createDirectory(this.jobWorkigDirectory
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_PATH_VAR
             + Constants.FILE_PATH_DELIMITER
             + Constants.COMMAND_PATH_VAR);
-        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR
+
+        // Genie cluster directory {basedir/genie/cluster}
+        Utils.createDirectory(this.jobWorkigDirectory
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_PATH_VAR
             + Constants.FILE_PATH_DELIMITER
             + Constants.CLUSTER_PATH_VAR);
 
-        // set the env variables in the launcher script
-        final Writer writer = getWriter(this.jobLauncherScriptPath);
+
+        final Writer writer = Utils.getWriter(this.runScript);
+
+        /** set the env variables in the launcher script **/
 
         // set environment variable for the job directory
-        appendToWriter(writer, Constants.EXPORT + Constants.GENIE_JOB_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
-            + this.baseWorkingDirPath);
+        Utils.appendToWriter(writer, Constants.EXPORT
+            + Constants.GENIE_JOB_DIR_ENV_VAR
+            + Constants.EQUALS_SYMBOL
+            + this.jobWorkigDirectory);
 
         // create environment variable for the application directory
-        appendToWriter(writer, Constants.EXPORT + Constants.GENIE_APPLICATION_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
-            + this.baseWorkingDirPath
+        Utils.appendToWriter(writer, Constants.EXPORT
+            + Constants.GENIE_APPLICATION_DIR_ENV_VAR
+            + Constants.EQUALS_SYMBOL
+            + this.jobWorkigDirectory
             + Constants.FILE_PATH_DELIMITER
             + Constants.GENIE_PATH_VAR
             + Constants.FILE_PATH_DELIMITER
             + Constants.APPLICATION_PATH_VAR);
 
         // create environment variable for the command directory
-        appendToWriter(writer, Constants.EXPORT + Constants.GENIE_COMMAND_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
-            + this.baseWorkingDirPath
+        Utils.appendToWriter(writer, Constants.EXPORT
+            + Constants.GENIE_COMMAND_DIR_ENV_VAR
+            + Constants.EQUALS_SYMBOL
+            + this.jobWorkigDirectory
             + Constants.FILE_PATH_DELIMITER
             + Constants.GENIE_PATH_VAR
             + Constants.FILE_PATH_DELIMITER
             + Constants.COMMAND_PATH_VAR);
 
         // create environment variable for the cluster directory
-        appendToWriter(writer, Constants.EXPORT + Constants.GENIE_CLUSTER_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
-            + this.baseWorkingDirPath
+        Utils.appendToWriter(writer, Constants.EXPORT
+            + Constants.GENIE_CLUSTER_DIR_ENV_VAR
+            + Constants.EQUALS_SYMBOL
+            + this.jobWorkigDirectory
             + Constants.FILE_PATH_DELIMITER
             + Constants.GENIE_PATH_VAR
             + Constants.FILE_PATH_DELIMITER
             + Constants.CLUSTER_PATH_VAR);
 
         // close the writer
-        closeWriter(writer);
+        Utils.closeWriter(writer);
     }
 }

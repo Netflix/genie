@@ -20,6 +20,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.services.AttachmentService;
+import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,29 +60,29 @@ public class JobTask extends GenieBaseTask {
         @NotNull
         final Map<String, Object> context
     ) throws GenieException {
-        log.info("Execution Job Task in the workflow.");
+        log.debug("Execution Job Task in the workflow.");
         super.executeTask(context);
 
         // Open a writer to jobLauncher script
-        final Writer writer = getWriter(this.jobLauncherScriptPath);
+        final Writer writer = Utils.getWriter(this.runScript);
 
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
 
         if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
             final String localPath =
-                this.baseWorkingDirPath
+                this.jobWorkigDirectory
                     + Constants.FILE_PATH_DELIMITER
-                    + super.getFileNameFromPath(jobSetupFile);
+                    + Utils.getFileNameFromPath(jobSetupFile);
 
             this.fts.getFile(jobSetupFile, localPath);
-            appendToWriter(writer, "source " + localPath + ";");
+            Utils.appendToWriter(writer, Constants.SOURCE + localPath + Constants.SEMICOLON_SYMBOL);
         }
 
         // Iterate over and get all dependencies
         for (final String dependencyFile: jobExecEnv.getJobRequest().getFileDependencies()) {
-            final String localPath = this.baseWorkingDirPath
+            final String localPath = this.jobWorkigDirectory
                 + Constants.FILE_PATH_DELIMITER
-                + super.getFileNameFromPath(dependencyFile);
+                + Utils.getFileNameFromPath(dependencyFile);
             this.fts.getFile(dependencyFile, localPath);
         }
 
@@ -90,21 +91,21 @@ public class JobTask extends GenieBaseTask {
             jobExecEnv.getJobRequest().getId(),
             jobExecEnv.getJobWorkingDir());
 
-        appendToWriter(
+        Utils.appendToWriter(
             writer,
             jobExecEnv.getCommand().getExecutable()
-                + " "
+                + Constants.WHITE_SPACE
                 + jobExecEnv.getJobRequest().getCommandArgs()
-                + " > "
+                + Constants.STDOUT_REDIRECT
                 + Constants.STDOUT_LOG_FILE_NAME
-                + " 2> "
+                + Constants.STDERR_REDIRECT
                 + Constants.STDERR_LOG_FILE_NAME
         );
 
         // capture exit code and write to genie.done file
-        appendToWriter(writer, "printf '{\"exitCode\": \"%s\"}\\n' \"$?\" > " + Constants.GENIE_DONE_FILE_NAME);
+        Utils.appendToWriter(writer, Constants.GENIE_DONE_FILE_CONTENT_PREFIX + Constants.GENIE_DONE_FILE_NAME);
 
         // close the writer
-        closeWriter(writer);
+        Utils.closeWriter(writer);
     }
 }

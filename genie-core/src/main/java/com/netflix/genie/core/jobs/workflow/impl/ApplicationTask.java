@@ -20,6 +20,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,11 +45,11 @@ public class ApplicationTask extends GenieBaseTask {
         @NotNull
         final Map<String, Object> context
     ) throws GenieException {
-        log.info("Executing Application Task in the workflow.");
+        log.debug("Executing Application Task in the workflow.");
         super.executeTask(context);
 
         // Open a writer to jobLauncher script
-        final Writer writer = getWriter(this.jobLauncherScriptPath);
+        final Writer writer = Utils.getWriter(this.runScript);
 
         if (this.jobExecEnv.getApplications() != null) {
             for (Application application : this.jobExecEnv.getApplications()) {
@@ -56,31 +57,31 @@ public class ApplicationTask extends GenieBaseTask {
                 // Create the directory for this application under applications in the cwd
                 createEntityInstanceDirectory(
                     application.getId(),
-                    Constants.EntityType.APPLICATION
+                    Constants.AdminResources.APPLICATION
                 );
 
                 // Get the setup file if specified and add it as source command in launcher script
                 final String applicationSetupFile = application.getSetupFile();
                 if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
                     final String localPath = super.buildLocalFilePath(
-                        this.baseWorkingDirPath,
+                        this.jobWorkigDirectory,
                         application.getId(),
                         applicationSetupFile,
                         Constants.FileType.SETUP,
-                        Constants.EntityType.APPLICATION
+                        Constants.AdminResources.APPLICATION
                     );
                     this.fts.getFile(applicationSetupFile, localPath);
-                    appendToWriter(writer, "source " + localPath + ";");
+                    Utils.appendToWriter(writer, "source " + localPath + ";");
                 }
 
                 // Iterate over and get all dependencies
                 for (final String dependencyFile: application.getDependencies()) {
                     final String localPath = super.buildLocalFilePath(
-                        this.baseWorkingDirPath,
+                        this.jobWorkigDirectory,
                         application.getId(),
                         dependencyFile,
                         Constants.FileType.DEPENDENCIES,
-                        Constants.EntityType.APPLICATION
+                        Constants.AdminResources.APPLICATION
                     );
                     this.fts.getFile(dependencyFile, localPath);
                 }
@@ -88,11 +89,11 @@ public class ApplicationTask extends GenieBaseTask {
                 // Iterate over and get all configuration files
                 for (final String configFile: application.getConfigs()) {
                     final String localPath = super.buildLocalFilePath(
-                        this.baseWorkingDirPath,
+                        this.jobWorkigDirectory,
                         application.getId(),
                         configFile,
                         Constants.FileType.CONFIG,
-                        Constants.EntityType.APPLICATION
+                        Constants.AdminResources.APPLICATION
                     );
                     this.fts.getFile(configFile, localPath);
                 }
@@ -100,6 +101,6 @@ public class ApplicationTask extends GenieBaseTask {
         }
 
         // close the writer
-        closeWriter(writer);
+        Utils.closeWriter(writer);
     }
 }
