@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jobs.workflow.impl.ApplicationTask;
 import com.netflix.genie.core.jobs.workflow.impl.ClusterTask;
@@ -24,6 +25,8 @@ import com.netflix.genie.core.jobs.workflow.impl.CommandTask;
 import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
+import com.netflix.genie.core.services.AttachmentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,10 +41,12 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class JobConfig {
 
+//    @Bean
+//    public AttachmentService
     /**
      * Create an setup Task bean that does initial setup before any of the tasks start.
      *
-     * @return An application task object
+     * @return An initial setup task object
      */
     @Bean
     @Order(value = 1)
@@ -63,7 +68,7 @@ public class JobConfig {
     /**
      * Create an Command Task bean that processes the command needed for a job.
      *
-     * @return An application task object
+     * @return An command task object
      */
     @Bean
     @Order(value = 3)
@@ -74,7 +79,7 @@ public class JobConfig {
     /**
      * Create an Cluster Task bean that processes the cluster needed for a job.
      *
-     * @return An application task object
+     * @return An cluster task object
      */
     @Bean
     @Order(value = 4)
@@ -85,12 +90,17 @@ public class JobConfig {
     /**
      * Create an Job Task bean that processes Job information provided by user.
      *
-     * @return An application task object
+     * @param attachmentService An implementation of the attachement service
+     * @return An job task object
+     * @throws GenieException if there is any problem
      */
     @Bean
     @Order(value = 5)
-    public WorkflowTask jobProcessorTask() {
-        return new JobTask();
+    @Autowired
+    public WorkflowTask jobProcessorTask(
+        final AttachmentService attachmentService
+    ) throws GenieException {
+        return new JobTask(attachmentService);
     }
 
     /**

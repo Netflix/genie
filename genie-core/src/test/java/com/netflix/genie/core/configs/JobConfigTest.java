@@ -21,6 +21,7 @@ package com.netflix.genie.core.configs;
  * @author amsharma
  */
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jobs.workflow.impl.ApplicationTask;
 import com.netflix.genie.core.jobs.workflow.impl.ClusterTask;
@@ -28,6 +29,8 @@ import com.netflix.genie.core.jobs.workflow.impl.CommandTask;
 import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
+import com.netflix.genie.core.services.AttachmentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -88,12 +91,17 @@ public class JobConfigTest {
     /**
      * Create an Job Task bean that processes Job information provided by user.
      *
-     * @return An application task object
+     * @param attachmentService An implementation of the attachement service
+     * @return An job task object
+     * @throws GenieException if there is any problem
      */
     @Bean
     @Order(value = 5)
-    public WorkflowTask jobProcessorTask() {
-        return new JobTask();
+    @Autowired
+    public WorkflowTask jobProcessorTask(
+        final AttachmentService attachmentService
+    ) throws GenieException {
+        return new JobTask(attachmentService);
     }
 
     /**

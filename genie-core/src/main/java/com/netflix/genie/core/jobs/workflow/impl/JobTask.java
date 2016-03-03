@@ -20,10 +20,13 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
+import com.netflix.genie.core.services.AttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.Writer;
 import java.util.Map;
 
@@ -36,6 +39,20 @@ import java.util.Map;
 @Slf4j
 public class JobTask extends GenieBaseTask implements WorkflowTask {
 
+    private final AttachmentService attachmentService;
+
+    /**
+     * Constructor.
+     *
+     * @param attachmentService An implementation of the Attachment Service
+     * @throws GenieException If there is any problem.
+     */
+    @Autowired
+    public JobTask(
+        final AttachmentService attachmentService
+        ) throws GenieException {
+        this.attachmentService = attachmentService;
+    }
     /**
      * {@inheritDoc}
      */
@@ -69,6 +86,11 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
                 + super.getFileNameFromPath(dependencyFile);
             this.fts.getFile(dependencyFile, localPath);
         }
+
+        // Copy down the attachments if any to the current working directory
+        this.attachmentService.copy(
+            jobExecEnv.getJobRequest().getId(),
+            new File(jobExecEnv.getJobWorkingDir()));
 
         appendToWriter(
             writer,

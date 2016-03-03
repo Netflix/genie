@@ -26,6 +26,7 @@ import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -47,22 +48,8 @@ import java.util.Map;
  * @author amsharma
  * @since 3.0.0
  */
+@Slf4j
 public abstract class GenieBaseTask implements WorkflowTask {
-
-    // TODO move to common String constants class?
-//    protected static final String JOB_EXECUTION_ENV_KEY = "jee";
-//    protected static final String GENIE_JOB_LAUNCHER_SCRIPT = "genie_job_launcher.sh";
-//    protected static final String FILE_TRANSFER_SERVICE_KEY = "fts";
-//    protected static final String SETUP_FILE_PATH_PREFIX = "setup_file";
-//    protected static final String DEPENDENCY_FILE_PATH_PREFIX = "dependencies";
-//    protected static final String CONFIG_FILE_PATH_PREFIX = "config";
-//    protected static final String FILE_PATH_DELIMITER = "/";
-//    protected static final String APPLICATION_PATH_VAR = "applications";
-//    protected static final String COMMAND_PATH_VAR = "commmand";
-//    protected static final String CLUSTER_PATH_VAR = "cluster";
-//    protected static final String JOB_PATH_VAR = "job";
-//    protected static final String GENIE_PATH_VAR = "genie";
-//    protected static final String LOGS_PATH_VAR = "logs";
 
     protected GenieFileTransferService fts;
     protected JobExecutionEnvironment jobExecEnv;
@@ -76,6 +63,8 @@ public abstract class GenieBaseTask implements WorkflowTask {
         @NotNull
         final Map<String, Object> context
     ) throws GenieException {
+        log.debug("called");
+
         this.jobExecEnv =
             (JobExecutionEnvironment) context.get(Constants.JOB_EXECUTION_ENV_KEY);
 
@@ -252,8 +241,6 @@ public abstract class GenieBaseTask implements WorkflowTask {
                 break;
             case CLUSTER:
                 entityPathVar = Constants.CLUSTER_PATH_VAR;
-                break;
-            case JOB:
                 break;
             default:
                 break;
