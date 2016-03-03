@@ -37,14 +37,15 @@ import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +66,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     private final CommandService commandService;
     private final ClusterLoadBalancer clusterLoadBalancer;
     private final List<WorkflowTask> jobWorkflowTasks;
-    private final String baseWorkingDirPath;
+    private final Resource baseWorkingDirPath;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GenieFileTransferService fileTransferService;
     private final WorkflowExecutor wfExecutor;
@@ -93,10 +94,8 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final WorkflowExecutor workflowExecutor,
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
-        @Value("${genie.jobs.dir.location:${null}")
-        final String genieWorkingDir
+        final Resource genieWorkingDir
     ) {
-
         this.jobPersistenceService = jps;
         this.clusterService = clusterService;
         this.commandService = commandService;
@@ -122,11 +121,13 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     ) throws GenieException {
         log.debug("called with job request {}", jobRequest);
 
-        if (StringUtils.isBlank(this.baseWorkingDirPath)) {
-            throw new GenieServerException("Genie jobs dir location not set.");
-        }
+        final File jobWorkingDir;
 
-        final String jobWorkingDir = baseWorkingDirPath + "/" + jobRequest.getId();
+        try {
+            jobWorkingDir = new File(baseWorkingDirPath.getFile(), "/" + jobRequest.getId());
+        } catch (IOException ioe) {
+            throw new GenieServerException("Could not resolve job working directory due to exception" + ioe);
+        }
 
         // Resolve the cluster for the job request based on the tags specified
         final Cluster cluster;

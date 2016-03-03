@@ -132,7 +132,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.APPLICATION
         );
 
-        Assert.assertEquals("dirpath/applications/id/config/filename", localPath);
+        Assert.assertEquals("dirpath/genie/applications/id/config/filename", localPath);
     }
 
     /**
@@ -150,7 +150,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.APPLICATION
         );
 
-        Assert.assertEquals("dirpath/applications/id/setup_file/filename", localPath);
+        Assert.assertEquals("dirpath/genie/applications/id/filename", localPath);
     }
 
     /**
@@ -168,7 +168,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.APPLICATION
         );
 
-        Assert.assertEquals("dirpath/applications/id/dependencies/filename", localPath);
+        Assert.assertEquals("dirpath/genie/applications/id/dependencies/filename", localPath);
     }
 
     /**
@@ -186,7 +186,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.COMMAND
         );
 
-        Assert.assertEquals("dirpath/command/id/config/filename", localPath);
+        Assert.assertEquals("dirpath/genie/command/id/config/filename", localPath);
     }
 
     /**
@@ -204,7 +204,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.COMMAND
         );
 
-        Assert.assertEquals("dirpath/command/id/setup_file/filename", localPath);
+        Assert.assertEquals("dirpath/genie/command/id/filename", localPath);
     }
 
     /**
@@ -222,7 +222,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.COMMAND
         );
 
-        Assert.assertEquals("dirpath/command/id/dependencies/filename", localPath);
+        Assert.assertEquals("dirpath/genie/command/id/dependencies/filename", localPath);
     }
 
     /**
@@ -240,7 +240,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.CLUSTER
         );
 
-        Assert.assertEquals("dirpath/cluster/id/config/filename", localPath);
+        Assert.assertEquals("dirpath/genie/cluster/id/config/filename", localPath);
     }
 
     /**
@@ -258,7 +258,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.CLUSTER
         );
 
-        Assert.assertEquals("dirpath/cluster/id/setup_file/filename", localPath);
+        Assert.assertEquals("dirpath/genie/cluster/id/filename", localPath);
     }
 
     /**
@@ -276,7 +276,7 @@ public class GenieBaseTaskUnitTest {
             Constants.EntityType.CLUSTER
         );
 
-        Assert.assertEquals("dirpath/cluster/id/dependencies/filename", localPath);
+        Assert.assertEquals("dirpath/genie/cluster/id/dependencies/filename", localPath);
     }
 //
 //    /**

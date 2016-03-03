@@ -41,8 +41,6 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class JobConfig {
 
-//    @Bean
-//    public AttachmentService
     /**
      * Create an setup Task bean that does initial setup before any of the tasks start.
      *

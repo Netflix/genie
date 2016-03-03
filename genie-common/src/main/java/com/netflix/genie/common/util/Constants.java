@@ -35,7 +35,7 @@ public final class Constants {
     public static final String JOB_EXECUTION_DTO_KEY = "jexecdto";
 
     /** The launcher script name that genie creates to setup a job for running. **/
-    public static final String GENIE_JOB_LAUNCHER_SCRIPT = "genie_job_launcher.sh";
+    public static final String GENIE_JOB_LAUNCHER_SCRIPT = "run.sh";
 
     /** Delimiter to be used while creating file paths. **/
     public static final String FILE_PATH_DELIMITER = "/";

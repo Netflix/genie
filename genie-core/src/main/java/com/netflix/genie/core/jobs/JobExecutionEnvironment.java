@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +50,7 @@ public class JobExecutionEnvironment {
     private Cluster cluster;
     private Command command;
     private Set<Application> applications = new HashSet<>();
-    private String jobWorkingDir;
+    private File jobWorkingDir;
 
     /**
      * Constructor used by the builder build() method.
@@ -75,7 +76,7 @@ public class JobExecutionEnvironment {
         private Cluster cluster;
         private Command command;
         private List<Application> applications = new ArrayList<>();
-        private String jobWorkingDir;
+        private File jobWorkingDir;
 
         /**
          * Constructor.
@@ -94,7 +95,7 @@ public class JobExecutionEnvironment {
             @NotNull(message = "Command cannot be null")
             final Command commandObj,
             @NotBlank(message = "Job working directory cannot be empty")
-            final String dir
+            final File dir
         ) throws GenieException {
             this.jobRequest = request;
             this.cluster = clusterObj;

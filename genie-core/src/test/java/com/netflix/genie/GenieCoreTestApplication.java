@@ -25,10 +25,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import javax.validation.Validator;
+import java.io.IOException;
 
 /**
  * Spring configuration class for integration tests.
@@ -82,5 +85,18 @@ public class GenieCoreTestApplication {
         final Executor executor = new DefaultExecutor();
         executor.setStreamHandler(new PumpStreamHandler(null, null));
         return executor;
+    }
+
+    /**
+     * Get the jobs dir as a Spring Resource. Will create if it doesn't exist.
+
+     * @return The job dir as a resource
+     * @throws IOException on error reading or creading the directory
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public Resource jobsDir(
+    ) throws IOException {
+       return new DefaultResourceLoader().getResource("/tmp");
     }
 }

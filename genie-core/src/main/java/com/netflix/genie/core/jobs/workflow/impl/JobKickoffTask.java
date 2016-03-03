@@ -21,7 +21,6 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.Constants;
-import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,8 +41,7 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Slf4j
-// TODO: Amit why would you both implement an interface and extend a class that already implements that interface?
-public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
+public class JobKickoffTask extends GenieBaseTask {
 
     private boolean isRunAsUserEnabled;
     private boolean isUserCreationEnabled;
@@ -79,7 +77,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
 
         final List command = new ArrayList<>();
         if (this.isRunAsUserEnabled) {
-            changeOwnershipOfDirectory(this.jobExecEnv.getJobWorkingDir(), this.jobExecEnv.getJobRequest().getUser());
+            changeOwnershipOfDirectory(this.baseWorkingDirPath, this.jobExecEnv.getJobRequest().getUser());
             command.add("sudo");
             command.add("-u");
             command.add(this.jobExecEnv.getJobRequest().getUser());
@@ -88,7 +86,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
         command.add(jobLauncherScriptPath);
 
         final ProcessBuilder pb = new ProcessBuilder(command);
-        pb.directory(new File(this.jobExecEnv.getJobWorkingDir()));
+        pb.directory(this.jobExecEnv.getJobWorkingDir());
         pb.redirectOutput(new File(this.jobExecEnv.getJobWorkingDir() + Constants.GENIE_LOG_PATH));
         pb.redirectError(new File(this.jobExecEnv.getJobWorkingDir() + Constants.GENIE_LOG_PATH));
 
@@ -143,8 +141,7 @@ public class JobKickoffTask extends GenieBaseTask implements WorkflowTask {
         final String jobWorkingDir,
         final String user) throws GenieException {
 
-        // TODO: Why isn't this a list of Strings?
-        final List command = new ArrayList<>();
+        final List<String> command = new ArrayList<>();
         // Don;t need sudo probably as the genie user is the one creating the working directory.
         //command.add("sudo");
         command.add("chown");

@@ -51,14 +51,17 @@ public class ClusterTask extends GenieBaseTask {
         final Writer writer = getWriter(jobLauncherScriptPath);
 
         // Create the directory for this application under applications in the cwd
-        createDirectory(jobExecEnv.getJobWorkingDir() + "/cluster/" + jobExecEnv.getCluster().getId());
+        createEntityInstanceDirectory(
+            this.jobExecEnv.getCluster().getId(),
+            Constants.EntityType.CLUSTER
+        );
 
         // Get the set up file for cluster and add it to source in launcher script
         final String clusterSetupFile = jobExecEnv.getCluster().getSetupFile();
 
         if (clusterSetupFile != null && StringUtils.isNotBlank(clusterSetupFile)) {
             final String localPath = super.buildLocalFilePath(
-                jobExecEnv.getJobWorkingDir(),
+                this.baseWorkingDirPath,
                 jobExecEnv.getCommand().getId(),
                 clusterSetupFile,
                 Constants.FileType.SETUP,
@@ -72,7 +75,7 @@ public class ClusterTask extends GenieBaseTask {
         // Iterate over and get all configuration files
         for (final String configFile: jobExecEnv.getCluster().getConfigs()) {
             final String localPath = super.buildLocalFilePath(
-                jobExecEnv.getJobWorkingDir(),
+                this.baseWorkingDirPath,
                 jobExecEnv.getCluster().getId(),
                 configFile,
                 Constants.FileType.CONFIG,

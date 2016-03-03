@@ -51,13 +51,16 @@ public class CommandTask extends GenieBaseTask {
         final Writer writer = getWriter(jobLauncherScriptPath);
 
         // Create the directory for this command under command dir in the cwd
-        createDirectory(jobExecEnv.getJobWorkingDir() + "/command/" + jobExecEnv.getCommand().getId());
+        createEntityInstanceDirectory(
+            this.jobExecEnv.getCluster().getId(),
+            Constants.EntityType.COMMAND
+        );
 
         // Get the setup file if specified and add it as source command in launcher script
         final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
         if (commandSetupFile != null && StringUtils.isNotBlank(commandSetupFile)) {
             final String localPath = super.buildLocalFilePath(
-                jobExecEnv.getJobWorkingDir(),
+                this.baseWorkingDirPath,
                 jobExecEnv.getCommand().getId(),
                 commandSetupFile,
                 Constants.FileType.SETUP,
@@ -71,7 +74,7 @@ public class CommandTask extends GenieBaseTask {
         // Iterate over and get all configuration files
         for (final String configFile: jobExecEnv.getCommand().getConfigs()) {
             final String localPath = super.buildLocalFilePath(
-                jobExecEnv.getJobWorkingDir(),
+                this.baseWorkingDirPath,
                 jobExecEnv.getCommand().getId(),
                 configFile,
                 Constants.FileType.CONFIG,

@@ -40,6 +40,8 @@ import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -67,6 +69,7 @@ public class LocalJobSubmitterImplUnitTests {
     private static final String COMMAND_ID = "commandid";
     private static final String COMMAND_NAME = "commandname";
 
+    private  Resource baseWorkingDirResource;
     private JobPersistenceService jobPersistenceService;
     private ClusterService clusterService;
     private CommandService commandService;
@@ -97,6 +100,8 @@ public class LocalJobSubmitterImplUnitTests {
         jobWorkflowTasks.add(task1);
         jobWorkflowTasks.add(task2);
 
+        baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
+
         this.jobSubmitterService = new LocalJobSubmitterImpl(
             this.jobPersistenceService,
             this.clusterService,
@@ -106,7 +111,7 @@ public class LocalJobSubmitterImplUnitTests {
             this.wfExecutor,
             this.applicationEventPublisher,
             jobWorkflowTasks,
-            this.BASE_WORKING_DIR
+            this.baseWorkingDirResource
         );
     }
 

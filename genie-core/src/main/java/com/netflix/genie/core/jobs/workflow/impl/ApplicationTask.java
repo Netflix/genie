@@ -54,13 +54,16 @@ public class ApplicationTask extends GenieBaseTask {
             for (Application application : this.jobExecEnv.getApplications()) {
 
                 // Create the directory for this application under applications in the cwd
-                createDirectory(this.jobExecEnv.getJobWorkingDir() + "/applications/" + application.getId());
+                createEntityInstanceDirectory(
+                    application.getId(),
+                    Constants.EntityType.APPLICATION
+                );
 
                 // Get the setup file if specified and add it as source command in launcher script
                 final String applicationSetupFile = application.getSetupFile();
                 if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
                     final String localPath = super.buildLocalFilePath(
-                        this.jobExecEnv.getJobWorkingDir(),
+                        this.baseWorkingDirPath,
                         application.getId(),
                         applicationSetupFile,
                         Constants.FileType.SETUP,
@@ -73,7 +76,7 @@ public class ApplicationTask extends GenieBaseTask {
                 // Iterate over and get all dependencies
                 for (final String dependencyFile: application.getDependencies()) {
                     final String localPath = super.buildLocalFilePath(
-                        jobExecEnv.getJobWorkingDir(),
+                        this.baseWorkingDirPath,
                         application.getId(),
                         dependencyFile,
                         Constants.FileType.DEPENDENCIES,
@@ -85,7 +88,7 @@ public class ApplicationTask extends GenieBaseTask {
                 // Iterate over and get all configuration files
                 for (final String configFile: application.getConfigs()) {
                     final String localPath = super.buildLocalFilePath(
-                        jobExecEnv.getJobWorkingDir(),
+                        this.baseWorkingDirPath,
                         application.getId(),
                         configFile,
                         Constants.FileType.CONFIG,

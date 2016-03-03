@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
-import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -54,6 +53,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
     protected GenieFileTransferService fts;
     protected JobExecutionEnvironment jobExecEnv;
     protected String jobLauncherScriptPath;
+    protected String baseWorkingDirPath;
 
     /**
      * {@inheritDoc}
@@ -73,7 +73,16 @@ public abstract class GenieBaseTask implements WorkflowTask {
         }
 
         this.fts = (GenieFileTransferService) context.get(Constants.FILE_TRANSFER_SERVICE_KEY);
-        this.jobLauncherScriptPath = jobExecEnv.getJobWorkingDir() + "/" + Constants.GENIE_JOB_LAUNCHER_SCRIPT;
+
+        try {
+            this.baseWorkingDirPath = this.jobExecEnv.getJobWorkingDir().getCanonicalPath();
+        } catch (IOException ioe) {
+            throw new GenieServerException("Could not get base job working directory due to " + ioe);
+        }
+
+        this.jobLauncherScriptPath = this.baseWorkingDirPath
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_JOB_LAUNCHER_SCRIPT;
     }
 
     /**
@@ -117,7 +126,10 @@ public abstract class GenieBaseTask implements WorkflowTask {
         @NotBlank(message = "Directory path cannot be blank.")
         final String dirPath
     ) throws GenieException {
-        this.executeBashCommand(Lists.newArrayList("mkdir", "-p", dirPath), null);
+        final File dir = new File(dirPath);
+        if (!dir.mkdirs()) {
+            throw new GenieServerException("Could not create directory: " + dirPath);
+        }
     }
 
     /**
@@ -251,7 +263,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
                 filePathVar = Constants.CONFIG_FILE_PATH_PREFIX;
                 break;
             case SETUP:
-                filePathVar = Constants.SETUP_FILE_PATH_PREFIX;
+                //filePathVar = Constants.SETUP_FILE_PATH_PREFIX;
                 break;
             case DEPENDENCIES:
                 filePathVar = Constants.DEPENDENCY_FILE_PATH_PREFIX;
@@ -263,7 +275,9 @@ public abstract class GenieBaseTask implements WorkflowTask {
         if (filePath != null && StringUtils.isNotBlank(filePath)) {
             final String fileName = getFileNameFromPath(filePath);
             final StringBuilder localPath = new StringBuilder()
-                .append(dir);
+                .append(dir)
+                .append(Constants.FILE_PATH_DELIMITER)
+                .append(Constants.GENIE_PATH_VAR);
 
             if (entityPathVar != null) {
                 localPath.append(Constants.FILE_PATH_DELIMITER)
@@ -285,5 +299,47 @@ public abstract class GenieBaseTask implements WorkflowTask {
         } else {
             throw new GenieBadRequestException("Could not construct localPath.");
         }
+    }
+
+    /**
+     * Helper method to create the directory for a particular application, cluster or command in the
+     * current working directory for the job.
+     *
+     * @param id The id of entity instance
+     * @param entityType The type of entity Application, Cluster or Command
+     *
+     * @throws GenieException If there is any problem
+     */
+    public void createEntityInstanceDirectory(
+        @NotBlank
+        final String id,
+        @NotNull
+        final Constants.EntityType entityType
+    ) throws GenieException {
+        String entityPathVar = null;
+
+        switch (entityType) {
+            case APPLICATION:
+                entityPathVar = Constants.APPLICATION_PATH_VAR;
+                break;
+            case COMMAND:
+                entityPathVar = Constants.COMMAND_PATH_VAR;
+                break;
+            case CLUSTER:
+                entityPathVar = Constants.CLUSTER_PATH_VAR;
+                break;
+            case JOB:
+                return;
+            default:
+                return;
+        }
+
+        createDirectory(
+            this.baseWorkingDirPath
+            + Constants.GENIE_PATH_VAR
+                + Constants.FILE_PATH_DELIMITER
+                + entityPathVar
+                + Constants.FILE_PATH_DELIMITER
+                + id);
     }
 }

@@ -19,7 +19,6 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.Constants;
-import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
@@ -33,7 +32,8 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Slf4j
-public class InitialSetupTask extends GenieBaseTask implements WorkflowTask {
+public class InitialSetupTask extends GenieBaseTask {
+
     /**
      * {@inheritDoc}
      */
@@ -46,36 +46,52 @@ public class InitialSetupTask extends GenieBaseTask implements WorkflowTask {
 
         super.executeTask(context);
 
-        // set the env variables in the launcher script
-        final Writer writer = getWriter(jobLauncherScriptPath);
-
         // create top level directory structure for the job
-        createDirectory(this.jobExecEnv.getJobWorkingDir());
-        createDirectory(this.jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.GENIE_PATH_VAR);
-        createDirectory(this.jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.GENIE_PATH_VAR
+        createDirectory(this.baseWorkingDirPath);
+
+        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR);
+        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR
             + Constants.FILE_PATH_DELIMITER + Constants.LOGS_PATH_VAR);
-        createDirectory(this.jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER
+        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR
+            + Constants.FILE_PATH_DELIMITER
             + Constants.APPLICATION_PATH_VAR);
-        createDirectory(this.jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER
+        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR
+            + Constants.FILE_PATH_DELIMITER
             + Constants.COMMAND_PATH_VAR);
-        createDirectory(this.jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER
+        createDirectory(this.baseWorkingDirPath + Constants.GENIE_PATH_VAR
+            + Constants.FILE_PATH_DELIMITER
             + Constants.CLUSTER_PATH_VAR);
+
+        // set the env variables in the launcher script
+        final Writer writer = getWriter(this.jobLauncherScriptPath);
 
         // set environment variable for the job directory
         appendToWriter(writer, Constants.EXPORT + Constants.GENIE_JOB_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
-            + jobExecEnv.getJobWorkingDir());
+            + this.baseWorkingDirPath);
 
         // create environment variable for the application directory
         appendToWriter(writer, Constants.EXPORT + Constants.GENIE_APPLICATION_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
-            + jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.APPLICATION_PATH_VAR);
+            + this.baseWorkingDirPath
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_PATH_VAR
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.APPLICATION_PATH_VAR);
 
         // create environment variable for the command directory
         appendToWriter(writer, Constants.EXPORT + Constants.GENIE_COMMAND_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
-            + jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.COMMAND_PATH_VAR);
+            + this.baseWorkingDirPath
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_PATH_VAR
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.COMMAND_PATH_VAR);
 
         // create environment variable for the cluster directory
         appendToWriter(writer, Constants.EXPORT + Constants.GENIE_CLUSTER_DIR_ENV_VAR + Constants.EQUALS_SYMBOL
-            + jobExecEnv.getJobWorkingDir() + Constants.FILE_PATH_DELIMITER + Constants.CLUSTER_PATH_VAR);
+            + this.baseWorkingDirPath
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.GENIE_PATH_VAR
+            + Constants.FILE_PATH_DELIMITER
+            + Constants.CLUSTER_PATH_VAR);
 
         // close the writer
         closeWriter(writer);

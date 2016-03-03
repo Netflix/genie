@@ -19,14 +19,12 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.Constants;
-import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.AttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.io.Writer;
 import java.util.Map;
 
@@ -37,7 +35,7 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Slf4j
-public class JobTask extends GenieBaseTask implements WorkflowTask {
+public class JobTask extends GenieBaseTask {
 
     private final AttachmentService attachmentService;
 
@@ -71,7 +69,7 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
 
         if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
             final String localPath =
-                this.jobExecEnv.getJobWorkingDir()
+                this.baseWorkingDirPath
                     + Constants.FILE_PATH_DELIMITER
                     + super.getFileNameFromPath(jobSetupFile);
 
@@ -81,7 +79,7 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
 
         // Iterate over and get all dependencies
         for (final String dependencyFile: jobExecEnv.getJobRequest().getFileDependencies()) {
-            final String localPath = this.jobExecEnv.getJobWorkingDir()
+            final String localPath = this.baseWorkingDirPath
                 + Constants.FILE_PATH_DELIMITER
                 + super.getFileNameFromPath(dependencyFile);
             this.fts.getFile(dependencyFile, localPath);
@@ -90,7 +88,7 @@ public class JobTask extends GenieBaseTask implements WorkflowTask {
         // Copy down the attachments if any to the current working directory
         this.attachmentService.copy(
             jobExecEnv.getJobRequest().getId(),
-            new File(jobExecEnv.getJobWorkingDir()));
+            jobExecEnv.getJobWorkingDir());
 
         appendToWriter(
             writer,
