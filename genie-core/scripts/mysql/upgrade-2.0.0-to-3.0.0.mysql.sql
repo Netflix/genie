@@ -168,7 +168,7 @@ ALTER TABLE `commands`
   MODIFY `version` VARCHAR(255) NOT NULL,
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
-  ADD COLUMN `check_delay` BIGINT DEFAULT 10000 AFTER `executable`,
+  ADD COLUMN `check_delay` BIGINT NOT NULL DEFAULT 10000 AFTER `executable`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   MODIFY `executable` VARCHAR(255) NOT NULL,
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
@@ -273,6 +273,7 @@ INSERT INTO `job_requests` (
       SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
       FROM `job_tags` `t`
       WHERE `j`.`id` = `t`.`JOB_ID`
+      GROUP BY `t`.`JOB_ID`
     ),
     1,
     1560,

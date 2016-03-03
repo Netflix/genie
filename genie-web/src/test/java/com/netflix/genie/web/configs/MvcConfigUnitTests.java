@@ -104,16 +104,14 @@ public class MvcConfigUnitTests {
     }
 
     /**
-     * Test to make sure we can't create a Http Request handler if the directory can't be created when the input jobs
+     * Test to make sure we can't create a jobs dir resource if the directory can't be created when the input jobs
      * dir is invalid in any way.
      *
      * @throws IOException On error
      */
     @Test
-    public void cantGetGenieResourceHttpRequestHandlerWhenJobsDirInvalid() throws IOException {
+    public void cantGetJobsDirWhenJobsDirInvalid() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
-        final DirectoryWriter directoryWriter = Mockito.mock(DirectoryWriter.class);
-        final ApplicationContext context = Mockito.mock(ApplicationContext.class);
         final String jobsDirLocation = UUID.randomUUID().toString();
 
         final Resource tmpResource = Mockito.mock(Resource.class);
@@ -125,7 +123,7 @@ public class MvcConfigUnitTests {
         Mockito.when(file.isDirectory()).thenReturn(false);
 
         try {
-            this.mvcConfig.genieResourceHttpRequestHandler(resourceLoader, directoryWriter, context, jobsDirLocation);
+            this.mvcConfig.jobsDir(resourceLoader, jobsDirLocation);
             Assert.fail();
         } catch (final IllegalStateException ise) {
             Assert.assertThat(
@@ -145,7 +143,7 @@ public class MvcConfigUnitTests {
         Mockito.when(file.mkdirs()).thenReturn(false);
 
         try {
-            this.mvcConfig.genieResourceHttpRequestHandler(resourceLoader, directoryWriter, context, jobsDirLocation);
+            this.mvcConfig.jobsDir(resourceLoader, jobsDirLocation);
             Assert.fail();
         } catch (final IllegalStateException ise) {
             Assert.assertThat(
@@ -156,15 +154,13 @@ public class MvcConfigUnitTests {
     }
 
     /**
-     * Make sure we can get a valid GenieResourceHttpRequest when all conditions are met.
+     * Make sure we can get a valid job resource when all conditions are met.
      *
      * @throws IOException for any problem
      */
     @Test
-    public void canGetGenieResourceHttpRequest() throws IOException {
+    public void canGetJobsDir() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
-        final DirectoryWriter directoryWriter = Mockito.mock(DirectoryWriter.class);
-        final ApplicationContext context = Mockito.mock(ApplicationContext.class);
         final String jobsDirLocation = UUID.randomUUID().toString() + "/";
 
         final Resource jobsDirResource = Mockito.mock(Resource.class);
@@ -175,11 +171,23 @@ public class MvcConfigUnitTests {
         Mockito.when(jobsDirResource.getFile()).thenReturn(file);
         Mockito.when(file.isDirectory()).thenReturn(true);
 
+        final Resource jobsDir = this.mvcConfig.jobsDir(resourceLoader, jobsDirLocation);
+        Assert.assertNotNull(jobsDir);
+    }
+
+    /**
+     * Make sure we can get a valid genieResourceHttpRequestHandler.
+     */
+    @Test
+    public void canGetGenieResourceHttpRequestHandler() {
+        final DirectoryWriter directoryWriter = Mockito.mock(DirectoryWriter.class);
+        final ApplicationContext context = Mockito.mock(ApplicationContext.class);
+        final Resource jobsDir = Mockito.mock(Resource.class);
+
         final GenieResourceHttpRequestHandler handler
-            = this.mvcConfig.genieResourceHttpRequestHandler(resourceLoader, directoryWriter, context, jobsDirLocation);
-        Assert.assertNotNull(handler);
+            = this.mvcConfig.genieResourceHttpRequestHandler(directoryWriter, context, jobsDir);
         Assert.assertThat(handler.getApplicationContext(), Matchers.is(context));
         Assert.assertThat(handler.getLocations(), Matchers.hasSize(1));
-        Assert.assertThat(handler.getLocations(), Matchers.contains(jobsDirResource));
+        Assert.assertThat(handler.getLocations(), Matchers.contains(jobsDir));
     }
 }
