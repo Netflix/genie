@@ -26,6 +26,7 @@ import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.services.AttachmentService;
+import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -106,17 +107,22 @@ public class JobConfig {
      *
      * @param isRunAsUserEnabled Flag that tells if job should be run as user specified in the request
      * @param isUserCreationEnabled Flag that tells if the user specified should be created
+     * @param executor An instance of an executor
+     * @param hostname Host on which the job will run
      *
      * @return An application task object
      */
     @Bean
     @Order(value = 6)
+    @Autowired
     public WorkflowTask jobKickoffTask(
         @Value("${genie.jobs.runasuser.enabled:false}")
         final boolean isRunAsUserEnabled,
         @Value("${genie.jobs.createuser.enabled:false}")
-        final boolean isUserCreationEnabled
-    ) {
-        return new JobKickoffTask(isRunAsUserEnabled, isUserCreationEnabled);
+        final boolean isUserCreationEnabled,
+        final Executor executor,
+        final String hostname
+        ) {
+        return new JobKickoffTask(isRunAsUserEnabled, isUserCreationEnabled, executor, hostname);
     }
 }

@@ -21,16 +21,16 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.Constants;
-import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,20 +46,28 @@ public class JobKickoffTask extends GenieBaseTask {
 
     private boolean isRunAsUserEnabled;
     private boolean isUserCreationEnabled;
-    private ApplicationEventPublisher applicationEventPublisher;
+    private Executor executor;
+    private String hostname;
 
     /**
      * Constructor.
      *
      * @param runAsUserEnabled Flag that tells if job should be run as user specified in the request
      * @param userCreationEnabled Flag that tells if the user specified should be created
+     * @param executor An executor object used to run jobs
+     * @param hostname Hostname for the node the job is running on
      */
+    @Autowired
     public JobKickoffTask(
         final boolean runAsUserEnabled,
-        final boolean userCreationEnabled
+        final boolean userCreationEnabled,
+        final Executor executor,
+        final String hostname
     ) {
         this.isRunAsUserEnabled = runAsUserEnabled;
         this.isUserCreationEnabled = userCreationEnabled;
+        this.executor = executor;
+        this.hostname = hostname;
     }
     /**
      * {@inheritDoc}
@@ -93,11 +101,9 @@ public class JobKickoffTask extends GenieBaseTask {
 
         try {
             final Process process = pb.start();
-            // TODO: This should come from the hostname bean
-            final String hostname = InetAddress.getLocalHost().getHostAddress();
             final int processId = getProcessId(process);
             final JobExecution jobExecution = new JobExecution
-                .Builder(hostname, processId, this.jobExecEnv.getCommand().getCheckDelay())
+                .Builder(this.hostname, processId, this.jobExecEnv.getCommand().getCheckDelay())
                 .withId(this.jobExecEnv.getJobRequest().getId())
                 .build();
             context.put(Constants.JOB_EXECUTION_DTO_KEY, jobExecution);
@@ -111,30 +117,33 @@ public class JobKickoffTask extends GenieBaseTask {
         final String group) throws GenieException {
 
         // First check if user already exists
-        // TODO: Use CommonsExec... inject Executor
-        final List checkUserExistsCommand = new ArrayList<>();
-        checkUserExistsCommand.add("id");
-        checkUserExistsCommand.add("-u");
-        checkUserExistsCommand.add(user);
+        final CommandLine idCheckCommandLine = new CommandLine("id");
+        idCheckCommandLine.addArgument("-u");
+        idCheckCommandLine.addArgument(user);
 
         try {
-            Utils.executeBashCommand(checkUserExistsCommand, null);
+            executor.execute(idCheckCommandLine);
             log.info("User already exists");
             return;
-        } catch (GenieException ge) {
+        } catch (IOException ioe) {
             log.info("User does not exist. Creating it now.");
-            final List command = new ArrayList<>();
-            command.add("sudo");
-            command.add("useradd");
-            command.add(user);
+            final CommandLine userCreateCommandLine = new CommandLine("sudo");
+            userCreateCommandLine.addArgument("useradd");
+            userCreateCommandLine.addArgument(user);
 
             if (StringUtils.isNotBlank(group)) {
-                command.add("-G");
-                command.add(group);
+                userCreateCommandLine.addArgument("-G");
+                userCreateCommandLine.addArgument(group);
             }
 
-            command.add("-M");
-            Utils.executeBashCommand(command, null);
+            userCreateCommandLine.addArgument("-M");
+
+            try {
+                executor.execute(userCreateCommandLine);
+            } catch (IOException ioexception) {
+                throw new GenieServerException("Could not create user " + user + "with exception " + ioexception);
+            }
+
         }
     }
 
@@ -142,15 +151,19 @@ public class JobKickoffTask extends GenieBaseTask {
         final String jobWorkingDir,
         final String user) throws GenieException {
 
-        final List<String> command = new ArrayList<>();
+        final CommandLine commandLine = new CommandLine("chown");
         // Don;t need sudo probably as the genie user is the one creating the working directory.
         //command.add("sudo");
-        command.add("chown");
-        command.add("-R");
-        command.add(user);
-        command.add(jobWorkingDir);
+        //command.add("chown");
+        commandLine.addArgument("-R");
+        commandLine.addArgument(user);
+        commandLine.addArgument(jobWorkingDir);
 
-        Utils.executeBashCommand(command, null);
+        try {
+            executor.execute(commandLine);
+        } catch (IOException ioexception) {
+            throw new GenieServerException("Could not change ownership with exception " + ioexception);
+        }
     }
 
     /**

@@ -11,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.List;
 
 /**
  * Class that provides some generic utility or helper functions.
@@ -114,34 +113,49 @@ public abstract class Utils {
         return new File(filePath).getName();
     }
 
-    /**
-     * Helper method that executes a bash command.
-     *
-     * @param command An array consisting of the command to run
-     * @param workingDirectory The working directory to set while running the command
-     *
-     * @throws GenieException If there is problem.
-     */
-    public static void executeBashCommand(
-        @NotNull(message = "The command to be run cannot be empty.")
-        final List<String> command,
-        final String workingDirectory
-    ) throws GenieException {
-        final ProcessBuilder pb = new ProcessBuilder(command);
-        if (workingDirectory != null) {
-            pb.directory(new File(workingDirectory));
-        }
-        try {
-            final Process process = pb.start();
-            final int errCode = process.waitFor();
-            if (errCode != 0) {
-                throw new GenieServerException("Unable to execute bash command " + String.valueOf(command));
-            }
-        } catch (InterruptedException | IOException ie) {
-            throw new GenieServerException("Unable to execute bash command "
-                + String.valueOf(command)
-                + " with exception "
-                +  ie.toString());
-        }
-    }
+//    /**
+//     * Helper method that executes a bash command.
+//     *
+//     * @param command An array consisting of the command to run
+//     * @param workingDirectory The working directory to set while running the command
+//     *
+//     * @throws GenieException If there is problem.
+//     */
+//    public static void executeBashCommand(
+//        @NotNull(message = "The command to be run cannot be empty.")
+//        final List<String> command,
+//        final String workingDirectory
+//    ) throws GenieException {
+//        final Executor executor = new DefaultExecutor();
+//        final CommandLine commandLine = new CommandLine();
+//
+//        if (workingDirectory != null) {
+//            executor.setWorkingDirectory(new File(workingDirectory));
+//        }
+//        try {
+//            executor.execute(commandLine);
+//        } catch (IOException ioe) {
+//            throw new GenieServerException("Unable to execute command "
+//                + String.valueOf(command)
+//                + " with exception "
+//                +  ioe.toString());
+//        }
+
+//        final ProcessBuilder pb = new ProcessBuilder(command);
+//        if (workingDirectory != null) {
+//            pb.directory(new File(workingDirectory));
+//        }
+//        try {
+//            final Process process = pb.start();
+//            final int errCode = process.waitFor();
+//            if (errCode != 0) {
+//                throw new GenieServerException("Unable to execute bash command " + String.valueOf(command));
+//            }
+//        } catch (InterruptedException | IOException ie) {
+//            throw new GenieServerException("Unable to execute bash command "
+//                + String.valueOf(command)
+//                + " with exception "
+//                +  ie.toString());
+//        }
+//    }
 }
