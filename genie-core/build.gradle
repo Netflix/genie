@@ -34,6 +34,7 @@ dependencies {
     // Database Libs
     runtime("mysql:mysql-connector-java")
     runtime("org.hsqldb:hsqldb")
+    runtime("org.postgresql:postgresql")
 
     /*******************************
      * Test Dependencies
