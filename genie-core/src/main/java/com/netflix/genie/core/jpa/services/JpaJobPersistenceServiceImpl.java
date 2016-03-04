@@ -379,18 +379,18 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         if (jobExecutionEntity != null) {
 
             // Make sure current exit code is the default one before updating
-            if (jobExecutionEntity.getExitCode() == JobExecutionEntity.DEFAULT_EXIT_CODE) {
+            if (jobExecutionEntity.getExitCode() == JobExecution.DEFAULT_EXIT_CODE) {
                 switch (exitCode) {
                     // No update to status in case of default exit code
-                    case JobExecutionEntity.DEFAULT_EXIT_CODE:
+                    case JobExecution.DEFAULT_EXIT_CODE:
                         break;
-                    case JobExecutionEntity.KILLED_EXIT_CODE:
+                    case JobExecution.KILLED_EXIT_CODE:
                         this.updateJobStatus(id, JobStatus.KILLED, "Job killed.");
                         break;
-                    case JobExecutionEntity.ZOMBIE_EXIT_CODE:
+                    case JobExecution.ZOMBIE_EXIT_CODE:
                         this.updateJobStatus(id, JobStatus.FAILED, "Job marked as zombie by genie.");
                         break;
-                    case JobExecutionEntity.SUCCESS_EXIT_CODE:
+                    case JobExecution.SUCCESS_EXIT_CODE:
                         this.updateJobStatus(id, JobStatus.SUCCEEDED, "Job finished successfully.");
                         break;
                     // catch all for non-zero and non zombie, killed and failed exit codes

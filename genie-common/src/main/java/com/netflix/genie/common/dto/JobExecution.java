@@ -38,6 +38,21 @@ public class JobExecution extends BaseDTO {
      */
     public static final int DEFAULT_EXIT_CODE = -1;
 
+    /**
+     * The exit code that will be set to indicate a job is killed.
+     */
+    public static final int KILLED_EXIT_CODE = 777;
+
+    /**
+     * The exit code that will be set to indicate a job is marked as zombie.
+     */
+    public static final int ZOMBIE_EXIT_CODE = 666;
+
+    /**
+     * The exit code that will be set to indicate a job has succeeded.
+     */
+    public static final int SUCCESS_EXIT_CODE = 0;
+
     private static final long serialVersionUID = 5005391660522052211L;
 
     @Size(min = 1, max = 1024, message = "Host name is required but no longer than 1024 characters")
