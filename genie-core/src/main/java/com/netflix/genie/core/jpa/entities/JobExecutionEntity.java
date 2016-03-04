@@ -44,10 +44,6 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 public class JobExecutionEntity extends BaseEntity {
-    /**
-     * The exit code that will be set to indicate a job is currently executing.
-     */
-    public static final int DEFAULT_EXIT_CODE = -1;
 
     private static final long serialVersionUID = -5073493356472801960L;
 
@@ -67,7 +63,7 @@ public class JobExecutionEntity extends BaseEntity {
 
     @Basic(optional = false)
     @Column(name = "exit_code", nullable = false)
-    private int exitCode = DEFAULT_EXIT_CODE;
+    private int exitCode = JobExecution.DEFAULT_EXIT_CODE;
 
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id")

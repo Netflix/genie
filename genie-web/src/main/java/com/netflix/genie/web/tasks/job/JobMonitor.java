@@ -20,10 +20,11 @@ package com.netflix.genie.web.tasks.job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.KillJobEvent;
+import com.netflix.genie.core.util.ProcessChecker;
+import com.netflix.genie.core.util.UnixProcessChecker;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
@@ -33,8 +34,6 @@ import org.springframework.scheduling.Trigger;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Given a process id this class will check if the job client process is running or not.
@@ -45,13 +44,11 @@ import java.util.Map;
 @Slf4j
 public class JobMonitor implements NodeTask {
 
-    private static final String PID_KEY = "pid";
-
     // How many error iterations we can handle
     // TODO: Make this a variable
     private static final int MAX_ERRORS = 5;
     private final JobExecution execution;
-    private final Executor executor;
+    private final ProcessChecker processChecker;
     private final ApplicationEventPublisher publisher;
     private int errorCount;
 
@@ -67,10 +64,14 @@ public class JobMonitor implements NodeTask {
         @NotNull final Executor executor,
         @NotNull final ApplicationEventPublisher publisher
     ) {
+        if (!SystemUtils.IS_OS_UNIX) {
+            throw new UnsupportedOperationException("Genie doesn't currently support " + SystemUtils.OS_NAME);
+        }
+
         this.errorCount = 0;
         this.execution = execution;
-        this.executor = executor;
         this.publisher = publisher;
+        this.processChecker = new UnixProcessChecker(execution.getProcessId(), executor);
     }
 
     /**
@@ -79,25 +80,10 @@ public class JobMonitor implements NodeTask {
      */
     @Override
     public void run() {
-        if (!SystemUtils.IS_OS_UNIX) {
-            throw new UnsupportedOperationException("Genie doesn't currently support " + SystemUtils.OS_NAME);
-        }
-
-        final int pid = this.execution.getProcessId();
-        final Map<String, Object> substitutionMap = new HashMap<>();
-        substitutionMap.put(PID_KEY, pid);
-
-        // Using PS for now but could instead check for existence of done file if this proves to have bad performance
-        // send output to /dev/null so it doesn't print to the logs
-        final CommandLine commandLine = new CommandLine("ps");
-        commandLine.addArgument("-p");
-        commandLine.addArgument("${" + PID_KEY + "}");
-        commandLine.setSubstitutionMap(substitutionMap);
-
         // TODO: Should we add a timeout?
         try {
             // Blocks until result
-            this.executor.execute(commandLine);
+            this.processChecker.checkProcess();
             log.debug("Job {} is still running...", this.execution.getId());
             if (this.errorCount != 0) {
                 this.errorCount = 0;
@@ -107,11 +93,18 @@ public class JobMonitor implements NodeTask {
             this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
         } catch (final IOException ioe) {
             // Some other error
-            log.error("Some IOException happened unable to check process status for pid {}", pid, ioe);
+            log.error(
+                "Some IOException happened unable to check process status for pid {}",
+                this.execution.getProcessId(),
+                ioe
+            );
             this.errorCount++;
             // If this keeps throwing errors out we should kill the job
             if (this.errorCount > MAX_ERRORS) {
+                // TODO: What if they throw an exception?
                 this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), this));
+                // Also send a job finished event
+                this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
             }
         }
     }

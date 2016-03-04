@@ -97,9 +97,8 @@ public interface JobPersistenceService {
      * @return The job request details or null if not found
      * @throws GenieException if there is an error
      */
-    JobRequest getJobRequest(
-            final String id
-    ) throws GenieException;
+    // TODO: Move this to JobSearchService
+    JobRequest getJobRequest(final String id) throws GenieException;
 
     /**
      * Save the jobRequest object in the data store.
@@ -134,9 +133,8 @@ public interface JobPersistenceService {
      * @return Job Execution details or null if not found
      * @throws GenieException if there is an error
      */
-    JobExecution getJobExecution(
-            final String id
-    ) throws GenieException;
+    // TODO: Move this to JobSearchService
+    JobExecution getJobExecution(final String id) throws GenieException;
 
     /**
      * Save the jobExecution object in the data store.

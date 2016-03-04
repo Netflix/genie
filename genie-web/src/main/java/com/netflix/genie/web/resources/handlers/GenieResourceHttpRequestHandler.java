@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.resources.handlers;
 
+import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -48,11 +49,6 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
      */
     public static final String GENIE_JOB_IS_ROOT_DIRECTORY
         = GenieResourceHttpRequestHandler.class.getName() + ".isRootDirectory";
-
-    /**
-     * The header to use to mark a forwarded from another Genie node.
-     */
-    public static final String GENIE_FORWARDED_FROM_HEADER = "Genie-Forwarded-From";
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -95,8 +91,8 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
             final boolean isRootDirectory = rootDirAttribute != null ? (Boolean) rootDirAttribute : true;
             final String accept = request.getHeader(HttpHeaders.ACCEPT);
             final String requestUrl;
-            if (request.getHeader(GENIE_FORWARDED_FROM_HEADER) != null) {
-                requestUrl = request.getHeader(GENIE_FORWARDED_FROM_HEADER);
+            if (request.getHeader(Constants.GENIE_FORWARDED_FROM_HEADER) != null) {
+                requestUrl = request.getHeader(Constants.GENIE_FORWARDED_FROM_HEADER);
             } else {
                 requestUrl = request.getRequestURL().toString();
             }

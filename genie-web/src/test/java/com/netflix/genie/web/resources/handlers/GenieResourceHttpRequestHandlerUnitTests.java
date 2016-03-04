@@ -18,6 +18,7 @@
 package com.netflix.genie.web.resources.handlers;
 
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import org.junit.Before;
@@ -164,8 +165,7 @@ public class GenieResourceHttpRequestHandlerUnitTests {
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(path);
         Mockito.when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(MediaType.TEXT_HTML_VALUE);
         final String forwardedUrl = UUID.randomUUID().toString();
-        Mockito.when(request.getHeader(GenieResourceHttpRequestHandler.GENIE_FORWARDED_FROM_HEADER))
-            .thenReturn(forwardedUrl);
+        Mockito.when(request.getHeader(Constants.GENIE_FORWARDED_FROM_HEADER)).thenReturn(forwardedUrl);
         final Resource resource = Mockito.mock(Resource.class);
         Mockito.when(this.location.createRelative(Mockito.eq(path))).thenReturn(resource);
         Mockito.when(resource.exists()).thenReturn(true);

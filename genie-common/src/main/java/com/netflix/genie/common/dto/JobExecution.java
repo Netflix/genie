@@ -33,6 +33,10 @@ import javax.validation.constraints.Size;
 @JsonDeserialize(builder = JobExecution.Builder.class)
 @Getter
 public class JobExecution extends BaseDTO {
+    /**
+     * The exit code that will be set to indicate a job is currently executing.
+     */
+    public static final int DEFAULT_EXIT_CODE = -1;
 
     private static final long serialVersionUID = 5005391660522052211L;
 

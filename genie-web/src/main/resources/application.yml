@@ -21,13 +21,13 @@ banner:
 
 genie:
   jobs:
-    dir:
-      forwarding:
-        enabled: true
-      location: file:///tmp/genie/jobs/
-    runasuser:
-      enabled: false
     createuser:
+      enabled: false
+    dir:
+      location: file:///tmp/genie/jobs/
+    forwarding:
+      enabled: true
+    runasuser:
       enabled: false
   leader:
     enabled: false

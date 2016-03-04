@@ -23,15 +23,15 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
-
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.services.JobCoordinatorService;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
-import org.apache.commons.lang3.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +56,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
-    @Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
+    private final JobKillService jobKillService;
     private String baseArchiveLocation;
 
     /**
@@ -65,19 +65,22 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      * @param jobPersistenceService implementation of job persistence service interface
      * @param jobSearchService      implementation of job search service interface
      * @param jobSubmitterService   implementation of the job submitter service
-     * @param baseArchiveLocation The base directory location of where the job dir should be archived
+     * @param jobKillService        The job kill service to use
+     * @param baseArchiveLocation   The base directory location of where the job dir should be archived
      */
     @Autowired
     public JobCoordinatorServiceImpl(
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
         final JobSubmitterService jobSubmitterService,
+        final JobKillService jobKillService,
         @Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
         final String baseArchiveLocation
     ) {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
         this.jobSubmitterService = jobSubmitterService;
+        this.jobKillService = jobKillService;
         this.baseArchiveLocation = baseArchiveLocation;
     }
 
@@ -111,11 +114,11 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             jobArchivalLocation = baseArchiveLocation + "/" + jobRequestWithId.getId();
         }
         // create the job object in the database with status INIT
-        final Job job  = new Job.Builder(
-                jobRequest.getName(),
-                jobRequest.getUser(),
-                jobRequest.getVersion()
-            )
+        final Job job = new Job.Builder(
+            jobRequest.getName(),
+            jobRequest.getUser(),
+            jobRequest.getVersion()
+        )
             .withArchiveLocation(jobArchivalLocation)
             .withDescription(jobRequest.getDescription())
             .withId(jobRequestWithId.getId())
@@ -182,11 +185,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      * {@inheritDoc}
      */
     @Override
-    public void killJob(
-        @NotBlank(message = "No job id provided. Unable to retrieve job.")
-        final String jobId
-    ) throws GenieException {
-
+    public void killJob(@NotBlank final String jobId) throws GenieException {
+        this.jobKillService.killJob(jobId);
     }
 
     /**

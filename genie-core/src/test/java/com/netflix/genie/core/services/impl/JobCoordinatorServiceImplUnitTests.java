@@ -25,6 +25,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.services.JobCoordinatorService;
+import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
@@ -57,10 +58,11 @@ public class JobCoordinatorServiceImplUnitTests {
     private static final String JOB_1_VERSION = "1.0";
     private static final String BASE_ARCHIVE_LOCATION = "file://baselocation";
 
-    private JobCoordinatorService jobCoordinatorService;
+    private JobCoordinatorServiceImpl jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
     private JobSearchService jobSearchService;
     private JobSubmitterService jobSubmitterService;
+    private JobKillService jobKillService;
 
     /**
      * Setup for the tests.
@@ -70,11 +72,13 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
+        this.jobKillService = Mockito.mock(JobKillService.class);
 
         this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
             this.jobSearchService,
             this.jobSubmitterService,
+            this.jobKillService,
             BASE_ARCHIVE_LOCATION
         );
     }
@@ -188,6 +192,7 @@ public class JobCoordinatorServiceImplUnitTests {
             this.jobPersistenceService,
             this.jobSearchService,
             this.jobSubmitterService,
+            this.jobKillService,
             null
         );
         jcs.coordinateJob(jobRequest, clientHost);
@@ -257,5 +262,29 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(this.jobPersistenceService.getJobExecution(Mockito.eq(jobId))).thenReturn(jobExecution);
 
         Assert.assertThat(this.jobCoordinatorService.getJobHost(jobId), Matchers.is(hostname));
+    }
+
+    /**
+     * Test killing a job without throwing an exception.
+     *
+     * @throws GenieException On any error
+     */
+    @Test
+    public void canKillJob() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.doNothing().when(this.jobKillService).killJob(id);
+        this.jobCoordinatorService.killJob(id);
+    }
+
+    /**
+     * Test killing a job without throwing an exception.
+     *
+     * @throws GenieException On any error
+     */
+    @Test(expected = GenieException.class)
+    public void cantKillJob() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.doThrow(new GenieException(123, "fake")).when(this.jobKillService).killJob(id);
+        this.jobCoordinatorService.killJob(id);
     }
 }

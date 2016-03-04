@@ -31,6 +31,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,6 +39,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import javax.servlet.ServletException;
@@ -95,6 +97,141 @@ public class JobRestControllerUnitTests {
             this.genieResourceHttpRequestHandler,
             true
         );
+    }
+
+    /**
+     * Make sure if forwarding isn't enabled we don't even try to forward no matter where the job is running.
+     *
+     * @throws IOException      On error
+     * @throws ServletException On Error
+     * @throws GenieException   On Error
+     */
+    @Test
+    public void wontForwardKillRequestIfNotEnabled() throws IOException, ServletException, GenieException {
+        this.controller = new JobRestController(
+            this.jobService,
+            this.attachmentService,
+            this.jobResourceAssembler,
+            this.jobSearchResultResourceAssembler,
+            this.hostname,
+            this.httpClient,
+            this.genieResourceHttpRequestHandler,
+            false
+        );
+
+        final String jobId = UUID.randomUUID().toString();
+        final String forwardedFrom = null;
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+
+        this.controller.killJob(jobId, forwardedFrom, request, response);
+
+        Mockito.verify(this.jobService, Mockito.never()).getJobHost(Mockito.eq(jobId));
+    }
+
+    /**
+     * Make sure won't forward job request if it's already been forwarded.
+     *
+     * @throws IOException      on error
+     * @throws ServletException on error
+     * @throws GenieException   on error
+     */
+    @Test
+    public void wontForwardJobKillRequestIfAlreadyForwarded() throws IOException, ServletException, GenieException {
+        final String jobId = UUID.randomUUID().toString();
+        final String forwardedFrom = UUID.randomUUID().toString();
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+
+        this.controller.killJob(jobId, forwardedFrom, request, response);
+
+        Mockito.verify(this.jobService, Mockito.never()).getJobHost(Mockito.eq(jobId));
+    }
+
+    /**
+     * Makes sure we don't forward the request if we're already on the right host.
+     *
+     * @throws IOException      on error
+     * @throws ServletException on error
+     * @throws GenieException   on error
+     */
+    @Test
+    public void wontForwardJobKillRequestIfOnCorrectHost() throws IOException, ServletException, GenieException {
+        final String jobId = UUID.randomUUID().toString();
+        final String forwardedFrom = null;
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+
+        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(this.hostname);
+
+        this.controller.killJob(jobId, forwardedFrom, request, response);
+
+        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.httpClient, Mockito.never()).execute(Mockito.any());
+    }
+
+    /**
+     * Makes sure if we do forward and get back an error we return it to the user.
+     *
+     * @throws IOException      on error
+     * @throws ServletException on error
+     * @throws GenieException   on error
+     */
+    @Test
+    public void canRespondToKillRequestForwardError() throws IOException, ServletException, GenieException {
+        final String jobId = UUID.randomUUID().toString();
+        final String forwardedFrom = null;
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(UUID.randomUUID().toString()));
+        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(UUID.randomUUID().toString());
+
+        final StatusLine statusLine = Mockito.mock(StatusLine.class);
+        Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND.value());
+        final HttpResponse forwardResponse = Mockito.mock(HttpResponse.class);
+        Mockito.when(forwardResponse.getStatusLine()).thenReturn(statusLine);
+        Mockito.when(this.httpClient.execute(Mockito.any(HttpDelete.class))).thenReturn(forwardResponse);
+
+        this.controller.killJob(jobId, forwardedFrom, request, response);
+
+        Mockito
+            .verify(response, Mockito.times(1))
+            .sendError(Mockito.eq(HttpStatus.NOT_FOUND.value()), Mockito.anyString());
+        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any(HttpDelete.class));
+    }
+
+    /**
+     * Makes sure we can successfully forward a job kill request.
+     *
+     * @throws IOException      on error
+     * @throws ServletException on error
+     * @throws GenieException   on error
+     */
+    @Test
+    public void canForwardJobKillRequest() throws IOException, ServletException, GenieException {
+        final String jobId = UUID.randomUUID().toString();
+        final String forwardedFrom = null;
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(UUID.randomUUID().toString()));
+        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(UUID.randomUUID().toString());
+
+        final StatusLine statusLine = Mockito.mock(StatusLine.class);
+        Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.OK.value());
+        final HttpResponse forwardResponse = Mockito.mock(HttpResponse.class);
+        Mockito.when(forwardResponse.getStatusLine()).thenReturn(statusLine);
+        Mockito.when(forwardResponse.getAllHeaders()).thenReturn(new Header[0]);
+        Mockito.when(this.httpClient.execute(Mockito.any(HttpDelete.class))).thenReturn(forwardResponse);
+
+        this.controller.killJob(jobId, forwardedFrom, request, response);
+
+        Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt(), Mockito.anyString());
+        Mockito.verify(response, Mockito.times(1)).setStatus(HttpStatus.OK.value());
+        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any(HttpDelete.class));
     }
 
     /**
@@ -220,7 +357,7 @@ public class JobRestControllerUnitTests {
 
         Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any());
-        Mockito.verify(response, Mockito.times(1)).sendError(errorCode);
+        Mockito.verify(response, Mockito.times(1)).sendError(Mockito.eq(errorCode), Mockito.anyString());
         Mockito.verify(this.genieResourceHttpRequestHandler, Mockito.never()).handleRequest(request, response);
     }
 

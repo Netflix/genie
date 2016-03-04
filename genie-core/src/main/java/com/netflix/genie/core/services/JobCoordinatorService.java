@@ -100,15 +100,12 @@ public interface JobCoordinatorService {
     );
 
     /**
-     * Takes in a id of the job to kill.
+     * Kill the job identified by the given id.
      *
      * @param jobId id of the job to kill
      * @throws GenieException if there is an error
      */
-    void killJob(
-            @NotBlank(message = "No job id provided. Unable to retrieve job.")
-            final String jobId
-    ) throws GenieException;
+    void killJob(@NotBlank final String jobId) throws GenieException;
 
     /**
      * Get the hostname a job is running on.

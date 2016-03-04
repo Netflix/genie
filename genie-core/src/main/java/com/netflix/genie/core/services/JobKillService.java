@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,26 +15,37 @@
  *     limitations under the License.
  *
  */
-
-package com.netflix.genie.core.jobs;
+package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.events.KillJobEvent;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.context.event.EventListener;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Interface for services to kill jobs.
  *
- * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
-public class JobKiller {
+public interface JobKillService {
 
     /**
-     * Get job information for given job id.
+     * Kill the job with the given id if possible. Should publish a JobFinishedEvent when done.
      *
      * @param id id of job to kill
      * @throws GenieException if there is an error
      */
-    void killJob(@NotBlank(message = "No id entered. Unable to kill job.") final String id) throws GenieException {
-    }
+    void killJob(@NotBlank(message = "No id entered. Unable to kill job.") final String id) throws GenieException;
+
+    /**
+     * Listen for events where the system is requesting a certain job be killed.
+     *
+     * @param event The event
+     * @throws GenieException On any issue during killing
+     */
+    @EventListener
+    void onKillJobEvent(@NotNull final KillJobEvent event) throws GenieException;
 }

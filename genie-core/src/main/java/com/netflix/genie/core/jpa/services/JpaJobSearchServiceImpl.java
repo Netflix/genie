@@ -177,7 +177,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Transactional(readOnly = true)
     public Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException {
         final Set<JobExecutionEntity> entities
-            = this.jobExecutionRepository.findByHostnameAndExitCode(hostname, JobExecutionEntity.DEFAULT_EXIT_CODE);
+            = this.jobExecutionRepository.findByHostnameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE);
 
         final Set<JobExecution> executions = new HashSet<>();
         for (final JobExecutionEntity entity : entities) {

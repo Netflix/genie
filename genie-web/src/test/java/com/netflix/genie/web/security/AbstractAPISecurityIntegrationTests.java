@@ -182,7 +182,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.get(JOBS_API, OK);
         this.post(JOBS_API, JOB_REQUEST, PRECONDITION_FAILED);
         this.get(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
-        this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), OK);
+        this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
 
         this.checkActuatorEndpoints(FORBIDDEN);
     }
@@ -216,7 +216,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.get(JOBS_API, OK);
         this.post(JOBS_API, JOB_REQUEST, PRECONDITION_FAILED);
         this.get(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
-        this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), OK);
+        this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
 
         this.checkActuatorEndpoints(OK);
     }

@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
@@ -38,7 +39,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -98,7 +101,7 @@ public class JobRestController {
     private final String hostname;
     private final HttpClient httpClient;
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
-    private final boolean directoryForwardingEnabled;
+    private final boolean forwardingEnabled;
 
     /**
      * Constructor.
@@ -111,7 +114,7 @@ public class JobRestController {
      * @param httpClient                       The http client to use for forwarding requests
      * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
      *                                         Genie File System.
-     * @param directoryForwardingEnabled       Whether job directory forwarding is enabled or not
+     * @param forwardingEnabled                Whether directory and kill request forwarding is enabled or not
      */
     @Autowired
     public JobRestController(
@@ -122,7 +125,7 @@ public class JobRestController {
         final String hostname,
         final HttpClient httpClient,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
-        @Value("${genie.jobs.dir.forwarding.enabled}") final boolean directoryForwardingEnabled
+        @Value("${genie.jobs.forwarding.enabled}") final boolean forwardingEnabled
     ) {
         this.jobCoordinatorService = jobCoordinatorService;
         this.attachmentService = attachmentService;
@@ -131,7 +134,7 @@ public class JobRestController {
         this.hostname = hostname;
         this.httpClient = httpClient;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
-        this.directoryForwardingEnabled = directoryForwardingEnabled;
+        this.forwardingEnabled = forwardingEnabled;
     }
 
     /**
@@ -327,14 +330,48 @@ public class JobRestController {
     /**
      * Kill job based on given job ID.
      *
-     * @param id id for job to kill
-     * @throws GenieException For any error
+     * @param id            id for job to kill
+     * @param forwardedFrom The host this request was forwarded from if present
+     * @param request       the servlet request
+     * @param response      the servlet response
+     * @throws GenieException   For any error
+     * @throws IOException      on redirect error
+     * @throws ServletException when trying to handle the request
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
-    public void killJob(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called for job id: {}", id);
-        //this.executionService.killJob(id);
+    public void killJob(
+        @PathVariable("id") final String id,
+        @RequestHeader(name = Constants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
+        final HttpServletRequest request,
+        final HttpServletResponse response
+    ) throws GenieException, IOException, ServletException {
+        log.debug("Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
+
+        // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
+        if (this.forwardingEnabled && forwardedFrom == null) {
+            final String jobHostname = this.jobCoordinatorService.getJobHost(id);
+            if (!this.hostname.equals(jobHostname)) {
+                //Need to forward job
+                final HttpDelete deleteRequest = new HttpDelete(this.buildForwardURL(request, jobHostname));
+                this.copyRequestHeaders(request, deleteRequest);
+                final HttpResponse deleteResponse = this.httpClient.execute(deleteRequest);
+
+                if (this.forwardResponseHasError(response, deleteResponse)) {
+                    // Method already sent error through servlet response
+                    return;
+                }
+
+                response.setStatus(HttpStatus.OK.value());
+                this.copyResponseHeaders(response, deleteResponse);
+
+                // No need to do anything on this node
+                return;
+            }
+        }
+
+        // Job is on this node so try to kill it
+        this.jobCoordinatorService.killJob(id);
+        response.setStatus(HttpStatus.OK.value());
     }
 
     /**
@@ -367,7 +404,7 @@ public class JobRestController {
      * @param id            The id of the job to get output for
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
-     * @param response      the servlet response to send the redirect with
+     * @param response      the servlet response
      * @throws IOException      on redirect error
      * @throws ServletException when trying to handle the request
      * @throws GenieException   on any Genie internal error
@@ -383,49 +420,31 @@ public class JobRestController {
     )
     public void getJobOutput(
         @PathVariable("id") final String id,
-        @RequestHeader(
-            name = GenieResourceHttpRequestHandler.GENIE_FORWARDED_FROM_HEADER,
-            required = false
-        ) final String forwardedFrom,
+        @RequestHeader(name = Constants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
-        if (this.directoryForwardingEnabled && forwardedFrom == null) {
-            final String jobHostName = this.jobCoordinatorService.getJobHost(id);
-            if (!this.hostname.equals(jobHostName)) {
+        if (this.forwardingEnabled && forwardedFrom == null) {
+            // TODO: It's possible that could use the JobMonitorCoordinator to check this in memory
+            //       However that could get into problems where the job finished or died
+            //       and it would return false on check if the job with given id is running on that node
+            final String jobHostname = this.jobCoordinatorService.getJobHost(id);
+            if (!this.hostname.equals(jobHostname)) {
                 // Use Apache HttpClient for easier access to result bytes as stream than RestTemplate
                 // RestTemplate read entire byte[] payload into memory before the result object even given back to
                 // application control. Concerned about people getting stdout which could be huge file.
-                final HttpGet getRequest = new HttpGet(
-                    request.getScheme() + "://" + jobHostName + ":" + request.getServerPort() + request.getRequestURI()
-                );
-
-                // Copy all the headers (necessary for ACCEPT and security headers especially)
-                final Enumeration<String> headerNames = request.getHeaderNames();
-                if (headerNames != null) {
-                    while (headerNames.hasMoreElements()) {
-                        final String headerName = headerNames.nextElement();
-                        final String headerValue = request.getHeader(headerName);
-                        log.debug("Request Header: name = {} value = {}", headerName, headerValue);
-                        getRequest.addHeader(headerName, headerValue);
-                    }
-                }
-                getRequest.addHeader(
-                    GenieResourceHttpRequestHandler.GENIE_FORWARDED_FROM_HEADER,
-                    request.getRequestURL().toString()
-                );
-
+                final HttpGet getRequest = new HttpGet(this.buildForwardURL(request, jobHostname));
+                this.copyRequestHeaders(request, getRequest);
                 final HttpResponse getResponse = this.httpClient.execute(getRequest);
-                if (getResponse.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
-                    response.sendError(getResponse.getStatusLine().getStatusCode());
+
+                if (this.forwardResponseHasError(response, getResponse)) {
+                    // Method already sent error through servlet response
                     return;
                 }
 
                 response.setStatus(HttpStatus.OK.value());
-                for (final Header header : getResponse.getAllHeaders()) {
-                    response.setHeader(header.getName(), header.getValue());
-                }
+                this.copyResponseHeaders(response, getResponse);
 
                 // Documentation I could find pointed to the HttpEntity reading the bytes off the stream so this should
                 // resolve memory problems if the file returned is large
@@ -454,5 +473,44 @@ public class JobRestController {
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, id + "/" + path);
 
         this.resourceHttpRequestHandler.handleRequest(request, response);
+    }
+
+    private String buildForwardURL(final HttpServletRequest request, final String jobHostname) {
+        return request.getScheme() + "://" + jobHostname + ":" + request.getServerPort() + request.getRequestURI();
+    }
+
+    private void copyRequestHeaders(final HttpServletRequest request, final HttpRequestBase forwardRequest) {
+        // Copy all the headers (necessary for ACCEPT and security headers especially)
+        final Enumeration<String> headerNames = request.getHeaderNames();
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                final String headerName = headerNames.nextElement();
+                final String headerValue = request.getHeader(headerName);
+                log.debug("Request Header: name = {} value = {}", headerName, headerValue);
+                forwardRequest.addHeader(headerName, headerValue);
+            }
+        }
+
+        // This method only called when need to forward so add the forwarded from header
+        forwardRequest.addHeader(Constants.GENIE_FORWARDED_FROM_HEADER, request.getRequestURL().toString());
+    }
+
+    private boolean forwardResponseHasError(
+        final HttpServletResponse response,
+        final HttpResponse forwardResponse
+    ) throws IOException {
+        final int statusCode = forwardResponse.getStatusLine().getStatusCode();
+        if (statusCode != HttpStatus.OK.value()) {
+            response.sendError(statusCode, forwardResponse.getStatusLine().getReasonPhrase());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void copyResponseHeaders(final HttpServletResponse response, final HttpResponse forwardResponse) {
+        for (final Header header : forwardResponse.getAllHeaders()) {
+            response.setHeader(header.getName(), header.getValue());
+        }
     }
 }
