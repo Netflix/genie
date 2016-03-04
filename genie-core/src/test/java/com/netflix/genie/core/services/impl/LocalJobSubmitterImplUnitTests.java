@@ -31,6 +31,7 @@ import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
@@ -70,6 +71,7 @@ public class LocalJobSubmitterImplUnitTests {
     private static final String COMMAND_NAME = "commandname";
 
     private  Resource baseWorkingDirResource;
+    private JobSearchService jobSearchService;
     private JobPersistenceService jobPersistenceService;
     private ClusterService clusterService;
     private CommandService commandService;
@@ -86,6 +88,7 @@ public class LocalJobSubmitterImplUnitTests {
      */
     @Before
     public void setup() {
+        this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
         this.commandService = Mockito.mock(CommandService.class);
@@ -103,6 +106,7 @@ public class LocalJobSubmitterImplUnitTests {
         baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
 
         this.jobSubmitterService = new LocalJobSubmitterImpl(
+            this.jobSearchService,
             this.jobPersistenceService,
             this.clusterService,
             this.commandService,
@@ -111,7 +115,9 @@ public class LocalJobSubmitterImplUnitTests {
             this.wfExecutor,
             this.applicationEventPublisher,
             jobWorkflowTasks,
-            this.baseWorkingDirResource
+            this.baseWorkingDirResource,
+            null,
+            0
         );
     }
 
