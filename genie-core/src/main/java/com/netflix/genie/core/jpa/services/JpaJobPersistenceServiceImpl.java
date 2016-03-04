@@ -367,17 +367,41 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @throws GenieException if there is an error
      */
     @Override
-    public void setExitCode(
+    public synchronized void setExitCode(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
         @NotBlank(message = "Exit code cannot be blank")
         final int exitCode
     ) throws GenieException {
         log.debug("Called with id {} and exit code {}", id, exitCode);
+
         final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
         if (jobExecutionEntity != null) {
-            jobExecutionEntity.setExitCode(exitCode);
-            this.jobExecutionRepo.save(jobExecutionEntity);
+
+            // Make sure current exit code is the default one before updating
+            if (jobExecutionEntity.getExitCode() == JobExecutionEntity.DEFAULT_EXIT_CODE) {
+                switch (exitCode) {
+                    // No update to status in case of default exit code
+                    case JobExecutionEntity.DEFAULT_EXIT_CODE:
+                        break;
+                    case JobExecutionEntity.KILLED_EXIT_CODE:
+                        this.updateJobStatus(id, JobStatus.KILLED, "Job killed.");
+                        break;
+                    case JobExecutionEntity.ZOMBIE_EXIT_CODE:
+                        this.updateJobStatus(id, JobStatus.FAILED, "Job marked as zombie by genie.");
+                        break;
+                    case JobExecutionEntity.SUCCESS_EXIT_CODE:
+                        this.updateJobStatus(id, JobStatus.SUCCEEDED, "Job finished successfully.");
+                        break;
+                    // catch all for non-zero and non zombie, killed and failed exit codes
+                    default:
+                        this.updateJobStatus(id, JobStatus.FAILED, "Job failed.");
+                }
+                jobExecutionEntity.setExitCode(exitCode);
+            } else {
+                throw new GeniePreconditionException("Exit code already changed from default. Cannot update.");
+            }
+
         } else {
             throw new GenieNotFoundException("No job with id " + id);
         }

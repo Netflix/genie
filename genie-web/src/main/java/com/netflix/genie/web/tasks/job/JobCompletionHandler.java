@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.job;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.jobs.JobDoneFile;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -50,16 +52,23 @@ public class JobCompletionHandler {
      *
      * @param jps An implementation of the job persistence service
      * @param genieWorkingDir The working directory where all job directories are created
+     *
+     * @throws GenieException if there is a problem
      */
     @Autowired
     public JobCompletionHandler(
         final JobPersistenceService jps,
         @Value("${genie.jobs.dir.location:/mnt/tomcat/genie-jobs}")
-        final String genieWorkingDir
-        ) {
+        final Resource genieWorkingDir
+        ) throws GenieException {
         this.jobPersistenceService = jps;
-        this.baseWorkingDir = genieWorkingDir;
+        try {
+            this.baseWorkingDir = genieWorkingDir.getFile().getCanonicalPath();
+        } catch (IOException gse) {
+            throw new GenieServerException("Could not load the base path from resource");
+        }
     }
+
     /**
      * Event listener for when a job is completed. Updates the status of the job.
      *
@@ -68,7 +77,22 @@ public class JobCompletionHandler {
      * @throws GenieException If there is any problem
      */
     @EventListener
-    public void updateStatus(
+    public void handleJobCompletion(
+        final JobFinishedEvent event
+    ) throws GenieException {
+        updateExitCode(event);
+        archivedJobDir(event);
+        sendEmail(event);
+    }
+
+    /**
+     * Updates the status of the job.
+     *
+     * @param event The Spring Boot application ready event to startup on
+     *
+     * @throws GenieException If there is any problem
+     */
+    public void updateExitCode(
         final JobFinishedEvent event
     ) throws GenieException {
         log.debug("Got a job finished event. Will update the status of the job.");
@@ -80,7 +104,6 @@ public class JobCompletionHandler {
         JobDoneFile jobDoneFile = null;
 
         try {
-            // TODO add retries and move out logic to get done file somewhere else.
             jobDoneFile = objectMapper.readValue(
                 new File(baseWorkingDir + "/" + jobId + "/genie/genie.done"), JobDoneFile.class);
 
@@ -94,48 +117,24 @@ public class JobCompletionHandler {
             return;
         }
         final int exitCode = jobDoneFile.getExitCode();
-
-        // Todo create an enumeration of exit codes?
-        switch (exitCode) {
-            case 0:
-                this.jobPersistenceService.updateJobStatus(
-                    jobId,
-                    JobStatus.SUCCEEDED,
-                    "Job finished successfully"
-                );
-                break;
-            case 999:
-                this.jobPersistenceService.updateJobStatus(
-                    jobId,
-                    JobStatus.KILLED,
-                    "Job was Killed"
-                );
-                break;
-            default:
-                this.jobPersistenceService.updateJobStatus(
-                    jobId,
-                    JobStatus.FAILED,
-                    "Job Failed with exit code " + exitCode
-                );
-        }
+        this.jobPersistenceService.setExitCode(jobId, exitCode);
     }
 
     /**
-     * Event listener for when a job is completed. Uploads the job directory to the archive location
+     * Uploads the job directory to the archive location.
      *
      * @param event The Spring Boot application ready event to startup on
      */
-    @EventListener
     public void archivedJobDir(final JobFinishedEvent event) {
         log.debug("Got a job finished event. Will archive job directory if enabled.");
+        //tar cvzf genie.tgz --exclude=genie --exclude run.sh *
     }
 
     /**
-     * Event listener for when a job is completed. Sends an email
+     * Sends an email when the job is completed.
      *
      * @param event The Spring Boot application ready event to startup on
      */
-    @EventListener
     public void sendEmail(final JobFinishedEvent event) {
         log.debug("Got a job finished event. Will send an email if enabled.");
     }
