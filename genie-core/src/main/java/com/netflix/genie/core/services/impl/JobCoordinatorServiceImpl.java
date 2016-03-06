@@ -25,6 +25,7 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -57,6 +58,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
     private final JobKillService jobKillService;
+
     private String baseArchiveLocation;
 
     /**
@@ -74,7 +76,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final JobSearchService jobSearchService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
-        @Value("${com.netflix.genie.server.s3.archive.location:#{null}}")
+        @Value("${genie.jobs.archive.location:#{null}}")
         final String baseArchiveLocation
     ) {
         this.jobPersistenceService = jobPersistenceService;
@@ -111,7 +113,10 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 throw new
                     GeniePreconditionException("Job archival is enabled but base location for archival is null.");
             }
-            jobArchivalLocation = baseArchiveLocation + "/" + jobRequestWithId.getId();
+            jobArchivalLocation = baseArchiveLocation
+                + Constants.FILE_PATH_DELIMITER
+                + jobRequestWithId.getId()
+                + ".tar.gz";
         }
         // create the job object in the database with status INIT
         final Job job = new Job.Builder(
