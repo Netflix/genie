@@ -19,6 +19,7 @@ package com.netflix.genie.web.tasks.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -27,11 +28,13 @@ import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.jobs.JobDoneFile;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.core.services.MailService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -55,6 +58,7 @@ public class JobCompletionHandler {
     private final JobSearchService jobSearchService;
     private final GenieFileTransferService genieFileTransferService;
     private final String baseWorkingDir;
+    private final MailService mailServiceImpl;
 
     /**
      * Constructor.
@@ -63,6 +67,7 @@ public class JobCompletionHandler {
      * @param jobPersistenceService An implementation of the job persistence service
      * @param genieFileTransferService An implementation of the Genie File Transfer service
      * @param genieWorkingDir The working directory where all job directories are created
+     * @param mailServiceImpl An implementation of the mail service
      *
      * @throws GenieException if there is a problem
      */
@@ -71,11 +76,13 @@ public class JobCompletionHandler {
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
         final GenieFileTransferService genieFileTransferService,
-        final Resource genieWorkingDir
+        final Resource genieWorkingDir,
+        final MailService mailServiceImpl
         ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
         this.genieFileTransferService = genieFileTransferService;
+        this.mailServiceImpl = mailServiceImpl;
 
         try {
             this.baseWorkingDir = genieWorkingDir.getFile().getCanonicalPath();
@@ -95,23 +102,26 @@ public class JobCompletionHandler {
     public void handleJobCompletion(
         final JobFinishedEvent event
     ) throws GenieException {
-        updateExitCode(event);
-        archivedJobDir(event);
-        sendEmail(event);
+
+        final String jobId = event.getJobExecution().getId();
+
+        updateExitCode(jobId);
+        archivedJobDir(jobId);
+        sendEmail(jobId);
     }
 
     /**
      * Updates the status of the job.
      *
-     * @param event The Spring Boot application ready event to startup on
+     * @param jobId The job id.
      *
      * @throws GenieException If there is any problem
      */
     public void updateExitCode(
-        final JobFinishedEvent event
+        final String jobId
     ) throws GenieException {
         log.debug("Got a job finished event. Will update the status of the job.");
-        final String jobId = event.getJobExecution().getId();
+
         // read the done file and get exit code to decide status
         final ObjectMapper objectMapper = new ObjectMapper();
         // Move logic to fetch file name in some function somewhere
@@ -138,18 +148,16 @@ public class JobCompletionHandler {
     /**
      * Uploads the job directory to the archive location.
      *
-     * @param event The Spring Boot application ready event to startup on
+     * @param jobId The job id.
      *
      * @throws GenieException if there is any problem
      */
     public void archivedJobDir(
-        final JobFinishedEvent event
+        final String jobId
     ) throws GenieException {
         log.debug("Got a job finished event. Will archive job directory if enabled.");
 
-        final String jobId = event.getJobExecution().getId();
         final Job job = this.jobSearchService.getJob(jobId);
-
 
         if (StringUtils.isNotBlank(job.getArchiveLocation())) {
 
@@ -168,6 +176,7 @@ public class JobCompletionHandler {
 
             final Executor executor = new DefaultExecutor();
             executor.setWorkingDirectory(new File(jobWorkingDir));
+            executor.setStreamHandler(new PumpStreamHandler(null, null));
 
             try {
                 executor.execute(commandLine);
@@ -179,15 +188,35 @@ public class JobCompletionHandler {
             // Upload the tar file to remote location
             this.genieFileTransferService.putFile(localArchiveFile, job.getArchiveLocation());
         }
-        //tar cvzf genie.tgz --exclude=genie --exclude=run.sh *
     }
 
     /**
      * Sends an email when the job is completed.
      *
-     * @param event The Spring Boot application ready event to startup on
+     * @param jobId The job id.
+     *
+     * @throws GenieException If there is any problem.
      */
-    public void sendEmail(final JobFinishedEvent event) {
-        log.debug("Got a job finished event. Will send an email if enabled.");
+    public void sendEmail(
+        final String jobId
+    ) throws GenieException {
+        log.debug("Got a job finished event. Sending email.");
+
+        final JobRequest jobRequest = this.jobPersistenceService.getJobRequest(jobId);
+        final Job job = this.jobSearchService.getJob(jobId);
+
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(jobRequest.getEmail())) {
+            final String message = new StringBuilder()
+                .append("Job with id [")
+                .append(jobId).append("] finished with status ")
+                .append(job.getStatus())
+                .toString();
+
+            this.mailServiceImpl.sendEmail(
+                jobRequest.getEmail(),
+                message,
+                message
+            );
+        }
     }
 }
