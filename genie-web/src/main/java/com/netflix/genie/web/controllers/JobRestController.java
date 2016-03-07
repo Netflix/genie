@@ -160,6 +160,40 @@ public class JobRestController {
         }
         log.debug("Called to submit job: {}", jobRequest);
 
+        return this.submitJob(
+            jobRequest,
+            null,
+            clientHost,
+            httpServletRequest
+        );
+    }
+
+    /**
+     * Submit a new job with attachments.
+     *
+     * @param jobRequest  The job request information
+     * @param attachments The attachments for the job
+     * @param clientHost         client host sending the request
+     * @param httpServletRequest The http servlet request
+     * @return The submitted job
+     * @throws GenieException For any error
+     */
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<Void> submitJob(
+        @RequestPart("request")
+        final JobRequest jobRequest,
+        @RequestPart("attachment")
+        final MultipartFile[] attachments,
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
+        final String clientHost,
+        final HttpServletRequest httpServletRequest
+    ) throws GenieException {
+        if (jobRequest == null) {
+            throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
+        }
+        log.debug("Called to submit job: {}", jobRequest);
+
         // get client's host from the context
         final String localClientHost;
         if (StringUtils.isNotBlank(clientHost)) {
@@ -168,39 +202,35 @@ public class JobRestController {
             localClientHost = httpServletRequest.getRemoteAddr();
         }
 
-
-        final String id = this.jobCoordinatorService.coordinateJob(jobRequest, localClientHost);
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(
-            ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(id)
-                .toUri()
-        );
-        return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
-    }
-
-    /**
-     * Submit a new job with attachments.
-     *
-     * @param jobRequest  The job request information
-     * @param attachments The attachments for the job
-     * @return The submitted job
-     * @throws GenieException For any error
-     */
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<Void> submitJob(
-        @RequestPart("request") final JobRequest jobRequest,
-        @RequestPart("attachment") final MultipartFile[] attachments
-    ) throws GenieException {
-        if (jobRequest == null) {
-            throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
+        final JobRequest jobRequestWithId;
+        // If the jobrequest does not contain an id create one else use the one provided.
+        final String jobId;
+        if (StringUtils.isNotBlank(jobRequest.getId())) {
+            jobId = jobRequest.getId();
+            jobRequestWithId = jobRequest;
+        } else {
+            jobId = UUID.randomUUID().toString();
+            jobRequestWithId = new JobRequest.Builder(
+                jobRequest.getName(),
+                jobRequest.getUser(),
+                jobRequest.getVersion(),
+                jobRequest.getCommandArgs(),
+                jobRequest.getClusterCriterias(),
+                jobRequest.getCommandCriteria()
+            ).withId(jobId)
+                .withCpu(jobRequest.getCpu())
+                .withMemory(jobRequest.getMemory())
+                .withDisableLogArchival(jobRequest.isDisableLogArchival())
+                .withGroup(jobRequest.getGroup())
+                .withSetupFile(jobRequest.getSetupFile())
+                .withDescription(jobRequest.getDescription())
+                .withTags(jobRequest.getTags())
+                .withEmail(jobRequest.getEmail())
+                .withFileDependencies(jobRequest.getFileDependencies())
+                .build();
         }
-        log.debug("Called to submit job: {}", jobRequest);
 
-        final String jobId = UUID.randomUUID().toString();
+        // Download attachements
         if (attachments != null) {
             for (final MultipartFile attachment : attachments) {
                 log.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
@@ -212,14 +242,17 @@ public class JobRestController {
             }
         }
 
+        this.jobCoordinatorService.coordinateJob(jobRequestWithId, localClientHost);
+
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(jobRequest.getId())
+                .buildAndExpand(jobId)
                 .toUri()
         );
+
         return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
     }
 
