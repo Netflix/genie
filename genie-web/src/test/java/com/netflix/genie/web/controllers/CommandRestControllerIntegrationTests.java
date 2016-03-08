@@ -699,8 +699,8 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String cluster2Id = UUID.randomUUID().toString();
         final String cluster3Id = UUID.randomUUID().toString();
         createCluster(cluster1Id, placeholder, placeholder, placeholder, ClusterStatus.UP);
-        createCluster(cluster2Id, placeholder, placeholder, placeholder, ClusterStatus.UP);
-        createCluster(cluster3Id, placeholder, placeholder, placeholder, ClusterStatus.UP);
+        createCluster(cluster2Id, placeholder, placeholder, placeholder, ClusterStatus.OUT_OF_SERVICE);
+        createCluster(cluster3Id, placeholder, placeholder, placeholder, ClusterStatus.TERMINATED);
 
         final List<String> commandIds = Lists.newArrayList(ID);
         this.mvc
@@ -741,5 +741,17 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                     }
                 }
             );
+
+        // Test filtering
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get(COMMANDS_API + "/" + ID + "/clusters")
+                    .param("status", ClusterStatus.UP.toString())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(cluster1Id)));
     }
 }

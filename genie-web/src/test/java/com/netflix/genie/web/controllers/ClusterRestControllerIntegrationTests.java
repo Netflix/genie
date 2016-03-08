@@ -466,7 +466,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
         final String commandId3 = UUID.randomUUID().toString();
-        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L);
+        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.INACTIVE, placeholder, 1000L);
         this.mvc
             .perform(
                 MockMvcRequestBuilders
@@ -484,6 +484,15 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[2].id", Matchers.is(commandId3)));
+
+        // Test the filtering
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI).param("status", CommandStatus.INACTIVE.toString()))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId3)));
     }
 
     /**

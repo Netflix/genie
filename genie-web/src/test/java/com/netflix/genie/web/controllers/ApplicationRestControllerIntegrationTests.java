@@ -502,8 +502,8 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         final String command2Id = UUID.randomUUID().toString();
         final String command3Id = UUID.randomUUID().toString();
         createCommand(command1Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L);
-        createCommand(command2Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1100L);
-        createCommand(command3Id, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1200L);
+        createCommand(command2Id, placeholder, placeholder, placeholder, CommandStatus.INACTIVE, placeholder, 1100L);
+        createCommand(command3Id, placeholder, placeholder, placeholder, CommandStatus.DEPRECATED, placeholder, 1200L);
 
         final Set<String> appIds = Sets.newHashSet(ID);
         this.mvc
@@ -523,10 +523,12 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
+        final String applicationCommandsAPI = APPLICATIONS_API + "/" + ID + "/commands";
+
         Arrays.asList(
             OBJECT_MAPPER.readValue(
                 this.mvc
-                    .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/" + ID + "/commands"))
+                    .perform(MockMvcRequestBuilders.get(applicationCommandsAPI))
                     .andExpect(MockMvcResultMatchers.status().isOk())
                     .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
@@ -542,5 +544,15 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 }
             }
         );
+
+        // Filter by status
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.get(applicationCommandsAPI).param("status", CommandStatus.DEPRECATED.toString())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(command3Id)));
     }
 }

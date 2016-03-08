@@ -27,7 +27,6 @@ import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -150,12 +149,10 @@ public class ApplicationRestController {
         log.debug("{} | {} | {} | {} | {}", name, userName, statuses, tags, page);
 
         Set<ApplicationStatus> enumStatuses = null;
-        if (statuses != null && !statuses.isEmpty()) {
+        if (statuses != null) {
             enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
             for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(ApplicationStatus.parse(status));
-                }
+                enumStatuses.add(ApplicationStatus.parse(status));
             }
         }
 
@@ -453,12 +450,10 @@ public class ApplicationRestController {
         log.debug("Called with id {}", id);
 
         Set<CommandStatus> enumStatuses = null;
-        if (statuses != null && !statuses.isEmpty()) {
+        if (statuses != null) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
             for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(CommandStatus.parse(status));
-                }
+                enumStatuses.add(CommandStatus.parse(status));
             }
         }
 
