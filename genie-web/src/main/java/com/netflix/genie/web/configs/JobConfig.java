@@ -26,9 +26,12 @@ import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.services.AttachmentService;
+import com.netflix.genie.core.services.MailService;
+import com.netflix.genie.core.services.impl.DefaultMailServiceImpl;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -124,5 +127,16 @@ public class JobConfig {
         final String hostname
         ) {
         return new JobKickoffTask(isRunAsUserEnabled, isUserCreationEnabled, executor, hostname);
+    }
+
+    /**
+     * Get an default implementation of the Mail Service interface if nothing is supplied.
+     *
+     * @return The mail service implementation that does nothing.
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public MailService getMailServiceImpl() {
+        return new DefaultMailServiceImpl();
     }
 }
