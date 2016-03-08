@@ -29,7 +29,6 @@ import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -155,12 +154,10 @@ public class CommandRestController {
         log.debug("{} | {} | {} | {} | {}", name, userName, statuses, tags, page);
 
         Set<CommandStatus> enumStatuses = null;
-        if (statuses != null && !statuses.isEmpty()) {
+        if (statuses != null) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
             for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(CommandStatus.parse(status));
-                }
+                enumStatuses.add(CommandStatus.parse(status));
             }
         }
         return assembler.toResource(
@@ -471,12 +468,10 @@ public class CommandRestController {
         log.debug("Called with id {} and statuses {}", id, statuses);
 
         Set<ClusterStatus> enumStatuses = null;
-        if (statuses != null && !statuses.isEmpty()) {
+        if (statuses != null) {
             enumStatuses = EnumSet.noneOf(ClusterStatus.class);
             for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(ClusterStatus.parse(status));
-                }
+                enumStatuses.add(ClusterStatus.parse(status));
             }
         }
 
