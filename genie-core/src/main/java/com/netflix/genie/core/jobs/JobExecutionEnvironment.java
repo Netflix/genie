@@ -102,12 +102,12 @@ public class JobExecutionEnvironment {
         /**
          * Set the applications needed for the jobs' execution.
          *
-         * @param applicationSet The set of application objects.
+         * @param applications The list of application objects.
          * @return The builder
          */
-        public Builder withApplications(final List<Application> applicationSet) {
-            if (applicationSet != null) {
-                this.applications.addAll(applicationSet);
+        public Builder withApplications(final List<Application> applications) {
+            if (applications != null) {
+                this.applications.addAll(applications);
             }
             return this;
         }
