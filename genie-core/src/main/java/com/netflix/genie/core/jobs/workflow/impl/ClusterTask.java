@@ -56,13 +56,25 @@ public class ClusterTask extends GenieBaseTask {
             Constants.AdminResources.CLUSTER
         );
 
+        // Create the config directory for this id
+        createEntityInstanceConfigDirectory(
+            this.jobExecEnv.getCluster().getId(),
+            Constants.AdminResources.CLUSTER
+        );
+
+        // Create the dependencies directory for this id
+        createEntityInstanceDependenciesDirectory(
+            this.jobExecEnv.getCluster().getId(),
+            Constants.AdminResources.CLUSTER
+        );
+
         // Get the set up file for cluster and add it to source in launcher script
         final String clusterSetupFile = jobExecEnv.getCluster().getSetupFile();
 
         if (clusterSetupFile != null && StringUtils.isNotBlank(clusterSetupFile)) {
             final String localPath = super.buildLocalFilePath(
                 this.jobWorkigDirectory,
-                jobExecEnv.getCommand().getId(),
+                jobExecEnv.getCluster().getId(),
                 clusterSetupFile,
                 Constants.FileType.SETUP,
                 Constants.AdminResources.CLUSTER

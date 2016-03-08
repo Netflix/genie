@@ -314,29 +314,6 @@ public class JpaJobPersistenceServiceImplUnitTests {
      * @throws GenieException For any problem
      */
     @Test
-    public void testCreateJobRequestWithNoIdSupplied() throws GenieException {
-        final JobRequest jobRequest = new JobRequest.Builder(
-            JOB_1_NAME,
-            JOB_1_USER,
-            JOB_1_VERSION,
-            null,
-            null,
-            null
-
-        ).build();
-        final ArgumentCaptor<JobRequestEntity> argument = ArgumentCaptor.forClass(JobRequestEntity.class);
-        this.jobPersistenceService.createJobRequest(jobRequest);
-        Mockito.verify(this.jobRequestRepo).save(argument.capture());
-        // Make sure id is created and supplied if not specified in the original job request
-        Assert.assertNotNull(argument.getValue().getId());
-    }
-
-    /**
-     * Test the createJobRequest method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
     public void testCreateJobRequestWithIdSupplied() throws GenieException {
         final int cpu = 1;
         final int mem = 1;

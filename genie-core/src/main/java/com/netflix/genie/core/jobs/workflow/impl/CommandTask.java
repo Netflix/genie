@@ -53,7 +53,19 @@ public class CommandTask extends GenieBaseTask {
 
         // Create the directory for this command under command dir in the cwd
         createEntityInstanceDirectory(
-            this.jobExecEnv.getCluster().getId(),
+            this.jobExecEnv.getCommand().getId(),
+            Constants.AdminResources.COMMAND
+        );
+
+        // Create the config directory for this id
+        createEntityInstanceConfigDirectory(
+            this.jobExecEnv.getCommand().getId(),
+            Constants.AdminResources.COMMAND
+        );
+
+        // Create the dependencies directory for this id
+        createEntityInstanceDependenciesDirectory(
+            this.jobExecEnv.getCommand().getId(),
             Constants.AdminResources.COMMAND
         );
 

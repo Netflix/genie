@@ -64,6 +64,13 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
                                     )
                     ).withRel("clusters")
             );
+
+            commandResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(CommandRestController.class)
+                        .getApplicationsForCommand(command.getId())
+                ).withRel("applications")
+            );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception
             throw new RuntimeException(ge);

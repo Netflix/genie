@@ -60,6 +60,18 @@ public class ApplicationTask extends GenieBaseTask {
                     Constants.AdminResources.APPLICATION
                 );
 
+                // Create the config directory for this id
+                createEntityInstanceConfigDirectory(
+                    application.getId(),
+                    Constants.AdminResources.APPLICATION
+                );
+
+                // Create the dependencies directory for this id
+                createEntityInstanceDependenciesDirectory(
+                    application.getId(),
+                    Constants.AdminResources.APPLICATION
+                );
+
                 // Get the setup file if specified and add it as source command in launcher script
                 final String applicationSetupFile = application.getSetupFile();
                 if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {

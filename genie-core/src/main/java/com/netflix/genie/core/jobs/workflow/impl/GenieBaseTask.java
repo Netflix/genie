@@ -203,4 +203,90 @@ public abstract class GenieBaseTask implements WorkflowTask {
                 + Constants.FILE_PATH_DELIMITER
                 + id);
     }
+
+    /**
+     * Helper method to create the config directory for a particular application, cluster or command in the
+     * current working directory for the job.
+     *
+     * @param id The id of entity instance
+     * @param adminResources The type of entity Application, Cluster or Command
+     *
+     * @throws GenieException If there is any problem
+     */
+    public void createEntityInstanceConfigDirectory(
+        @NotBlank
+        final String id,
+        @NotNull
+        final Constants.AdminResources adminResources
+    ) throws GenieException {
+        String entityPathVar = null;
+
+        switch (adminResources) {
+            case APPLICATION:
+                entityPathVar = Constants.APPLICATION_PATH_VAR;
+                break;
+            case COMMAND:
+                entityPathVar = Constants.COMMAND_PATH_VAR;
+                break;
+            case CLUSTER:
+                entityPathVar = Constants.CLUSTER_PATH_VAR;
+                break;
+            default:
+                return;
+        }
+
+        Utils.createDirectory(
+            this.jobWorkigDirectory
+                + Constants.FILE_PATH_DELIMITER
+                + Constants.GENIE_PATH_VAR
+                + Constants.FILE_PATH_DELIMITER
+                + entityPathVar
+                + Constants.FILE_PATH_DELIMITER
+                + id
+                + Constants.FILE_PATH_DELIMITER
+                + Constants.CONFIG_FILE_PATH_PREFIX);
+    }
+
+    /**
+     * Helper method to create the dependency directory for a particular application, cluster or command in the
+     * current working directory for the job.
+     *
+     * @param id The id of entity instance
+     * @param adminResources The type of entity Application, Cluster or Command
+     *
+     * @throws GenieException If there is any problem
+     */
+    public void createEntityInstanceDependenciesDirectory(
+        @NotBlank
+        final String id,
+        @NotNull
+        final Constants.AdminResources adminResources
+    ) throws GenieException {
+        String entityPathVar = null;
+
+        switch (adminResources) {
+            case APPLICATION:
+                entityPathVar = Constants.APPLICATION_PATH_VAR;
+                break;
+            case COMMAND:
+                entityPathVar = Constants.COMMAND_PATH_VAR;
+                break;
+            case CLUSTER:
+                entityPathVar = Constants.CLUSTER_PATH_VAR;
+                break;
+            default:
+                return;
+        }
+
+        Utils.createDirectory(
+            this.jobWorkigDirectory
+                + Constants.FILE_PATH_DELIMITER
+                + Constants.GENIE_PATH_VAR
+                + Constants.FILE_PATH_DELIMITER
+                + entityPathVar
+                + Constants.FILE_PATH_DELIMITER
+                + id
+                + Constants.FILE_PATH_DELIMITER
+                + Constants.DEPENDENCY_FILE_PATH_PREFIX);
+    }
 }

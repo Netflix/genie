@@ -98,24 +98,22 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     ) throws GenieException {
         log.debug("Called with job request {}", jobRequest);
 
-        // Log the request as soon as it comes in. This method returns a job request DTO with an id in it as the
-        // orginal request may or may not have an id.
-        final JobRequest jobRequestWithId =
-            this.jobPersistenceService.createJobRequest(jobRequest);
+        // Log the job request
+        this.jobPersistenceService.createJobRequest(jobRequest);
 
         if (StringUtils.isNotBlank(clientHost)) {
-            this.jobPersistenceService.addClientHostToJobRequest(jobRequestWithId.getId(), clientHost);
+            this.jobPersistenceService.addClientHostToJobRequest(jobRequest.getId(), clientHost);
         }
 
         String jobArchivalLocation = null;
-        if (!jobRequestWithId.isDisableLogArchival()) {
+        if (!jobRequest.isDisableLogArchival()) {
             if (baseArchiveLocation == null) {
                 throw new
                     GeniePreconditionException("Job archival is enabled but base location for archival is null.");
             }
             jobArchivalLocation = baseArchiveLocation
                 + Constants.FILE_PATH_DELIMITER
-                + jobRequestWithId.getId()
+                + jobRequest.getId()
                 + ".tar.gz";
         }
         // create the job object in the database with status INIT
@@ -126,14 +124,14 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         )
             .withArchiveLocation(jobArchivalLocation)
             .withDescription(jobRequest.getDescription())
-            .withId(jobRequestWithId.getId())
+            .withId(jobRequest.getId())
             .withStatus(JobStatus.INIT)
             .withStatusMsg("Job Accepted and in initialization phase.")
             .build();
 
         this.jobPersistenceService.createJob(job);
-        this.jobSubmitterService.submitJob(jobRequestWithId);
-        return jobRequestWithId.getId();
+        this.jobSubmitterService.submitJob(jobRequest);
+        return jobRequest.getId();
     }
 
     /**
