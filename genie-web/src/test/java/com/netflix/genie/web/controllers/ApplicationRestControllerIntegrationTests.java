@@ -53,9 +53,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     private static final String USER = "genie";
     private static final String VERSION = "0.15.0";
 
-    private static final String STATUS_PATH = "$.status";
-    private static final String SETUP_FILE_PATH = "$.setupFile";
-    private static final String CONFIGS_PATH = "$.configs";
     private static final String DEPENDENCIES_PATH = "$.dependencies";
 
     private static final String APPLICATIONS_LIST_PATH = EMBEDDED_PATH + ".applicationList";

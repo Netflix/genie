@@ -23,6 +23,8 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.GenieWeb;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.test.categories.IntegrationTest;
@@ -76,6 +78,9 @@ public abstract class RestControllerIntegrationTestsBase {
     protected static final String USER_PATH = "$.user";
     protected static final String DESCRIPTION_PATH = "$.description";
     protected static final String TAGS_PATH = "$.tags";
+    protected static final String SETUP_FILE_PATH = "$.setupFile";
+    protected static final String STATUS_PATH = "$.status";
+    protected static final String CONFIGS_PATH = "$.configs";
     protected static final String LINKS_PATH = "$._links";
     protected static final String EMBEDDED_PATH = "$._embedded";
     protected static final String PAGED_PATH = "$.page";
@@ -319,6 +324,28 @@ public abstract class RestControllerIntegrationTestsBase {
                     .post(APPLICATIONS_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(OBJECT_MAPPER.writeValueAsBytes(app))
+            )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
+            .andReturn();
+
+        return this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+    }
+
+    protected String createCluster(
+        final String id,
+        final String name,
+        final String user,
+        final String version,
+        final ClusterStatus status
+    ) throws Exception {
+        final Cluster cluster = new Cluster.Builder(name, user, version, status).withId(id).build();
+        final MvcResult result = this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(CLUSTERS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(OBJECT_MAPPER.writeValueAsBytes(cluster))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
