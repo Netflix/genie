@@ -57,6 +57,7 @@ dependencies {
 
     testCompile(project(":genie-test"))
     testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
+    testCompile("com.jayway.jsonpath:json-path")
     testCompile("org.dbunit:dbunit:${dbunit_version}")
     testCompile("org.springframework.security:spring-security-test")
     testCompile("net.sf.jtidy:jtidy:${jtidy_version}")
