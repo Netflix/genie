@@ -46,7 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * JPA implementation of the job persistence service.
@@ -256,9 +255,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
         final JobRequestEntity jobRequestEntity = new JobRequestEntity();
 
-        if (jobRequest.getId() != null) {
-            jobRequestEntity.setId(jobRequest.getId());
-        }
+        jobRequestEntity.setId(jobRequest.getId());
         jobRequestEntity.setName(jobRequest.getName());
         jobRequestEntity.setUser(jobRequest.getUser());
         jobRequestEntity.setVersion(jobRequest.getVersion());
@@ -274,10 +271,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setTags(jobRequest.getTags());
         jobRequestEntity.setCpu(jobRequest.getCpu());
         jobRequestEntity.setMemory(jobRequest.getMemory());
-
-        if (StringUtils.isBlank(jobRequestEntity.getId())) {
-            jobRequestEntity.setId(UUID.randomUUID().toString());
-        }
 
         this.jobRequestRepo.save(jobRequestEntity);
         return jobRequestEntity.getDTO();
