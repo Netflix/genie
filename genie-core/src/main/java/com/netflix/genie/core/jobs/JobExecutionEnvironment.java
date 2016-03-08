@@ -23,16 +23,13 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -42,14 +39,13 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Getter
+@Slf4j
 public class JobExecutionEnvironment {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JobExecutionEnvironment.class);
 
     private JobRequest jobRequest;
     private Cluster cluster;
     private Command command;
-    private Set<Application> applications = new HashSet<>();
+    private List<Application> applications = new ArrayList<>();
     private File jobWorkingDir;
 
     /**
@@ -109,7 +105,7 @@ public class JobExecutionEnvironment {
          * @param applicationSet The set of application objects.
          * @return The builder
          */
-        public Builder withApplications(final Set<Application> applicationSet) {
+        public Builder withApplications(final List<Application> applicationSet) {
             if (applicationSet != null) {
                 this.applications.addAll(applicationSet);
             }

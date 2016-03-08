@@ -18,7 +18,6 @@
 package com.netflix.genie.web.controllers;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
@@ -26,7 +25,6 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
 import org.hamcrest.Matchers;
@@ -484,30 +482,17 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(applicationId1, applicationId2)))
+                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        Arrays.asList(OBJECT_MAPPER.readValue(
-            this.mvc
-                .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-                .andReturn()
-                .getResponse()
-                .getContentAsByteArray(), ApplicationResource[].class
-            )
-        ).stream()
-            .map(ApplicationResource::getContent)
-            .forEach(
-                application -> {
-                    final String id = application.getId();
-                    if (!id.equals(applicationId1) && !id.equals(applicationId2)) {
-                        Assert.fail();
-                    }
-                }
-            );
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId2)));
 
         //Shouldn't add anything
         this.mvc
@@ -515,7 +500,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet()))
+                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList()))
             )
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
@@ -526,30 +511,18 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(applicationId3)))
+                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId3)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        Arrays.asList(OBJECT_MAPPER.readValue(
-            this.mvc
-                .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-                .andReturn()
-                .getResponse()
-                .getContentAsByteArray(), ApplicationResource[].class
-            )
-        ).stream()
-            .map(ApplicationResource::getContent)
-            .forEach(
-                application -> {
-                    final String id = application.getId();
-                    if (!id.equals(applicationId1) && !id.equals(applicationId2) && !id.equals(applicationId3)) {
-                        Assert.fail();
-                    }
-                }
-            );
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[2].id", Matchers.is(applicationId3)));
     }
 
     /**
@@ -578,9 +551,35 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .put(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(applicationId1, applicationId2)))
+                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId2)));
+
+        // Should flip the order
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .put(commandApplicationsAPI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId2, applicationId1)))
+            )
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId1)));
 
         //Should clear applications
         this.mvc
@@ -588,7 +587,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .put(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet()))
+                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList()))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -620,7 +619,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(applicationId1, applicationId2)))
+                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -648,15 +647,21 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
+        final String applicationId3 = UUID.randomUUID().toString();
         createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
         createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
+        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
 
         this.mvc
             .perform(
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(applicationId1, applicationId2)))
+                    .content(
+                        OBJECT_MAPPER.writeValueAsBytes(
+                            Lists.newArrayList(applicationId1, applicationId2, applicationId3)
+                        )
+                    )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -668,8 +673,9 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)));
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId3)));
 
         // Check reverse side of relationship
         this.mvc
@@ -684,6 +690,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/" + applicationId3 + "/commands"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(ID)));
     }
 
     /**

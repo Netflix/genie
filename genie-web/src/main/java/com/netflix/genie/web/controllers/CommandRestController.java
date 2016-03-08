@@ -50,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -372,7 +373,7 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addApplicationsForCommand(
         @PathVariable("id") final String id,
-        @RequestBody final Set<String> applicationIds
+        @RequestBody final List<String> applicationIds
     ) throws GenieException {
         log.debug("Called with id {} and application {}", id, applicationIds);
         this.commandService.addApplicationsForCommand(id, applicationIds);
@@ -388,14 +389,14 @@ public class CommandRestController {
      */
     @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<ApplicationResource> getApplicationsForCommand(
+    public List<ApplicationResource> getApplicationsForCommand(
         @PathVariable("id") final String id
     ) throws GenieException {
         log.debug("Called with id {}", id);
         return this.commandService.getApplicationsForCommand(id)
             .stream()
             .map(this.applicationResourceAssembler::toResource)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toList());
     }
 
     /**
@@ -403,7 +404,7 @@ public class CommandRestController {
      *
      * @param id             The id of the command to add the applications to. Not
      *                       null/empty/blank.
-     * @param applicationIds The ids of the applications to set. Not null.
+     * @param applicationIds The ids of the applications to set in order. Not null.
      * @throws GenieException For any error
      */
     @RequestMapping(
@@ -412,7 +413,7 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setApplicationsForCommand(
         @PathVariable("id") final String id,
-        @RequestBody final Set<String> applicationIds
+        @RequestBody final List<String> applicationIds
     ) throws GenieException {
         log.debug("Called with id {} and application {}", id, applicationIds);
         this.commandService.setApplicationsForCommand(id, applicationIds);

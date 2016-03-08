@@ -46,6 +46,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Creating commands_applications table...' AS '';
 CREATE TABLE `commands_applications` (
   `command_id` VARCHAR(255) NOT NULL,
   `application_id` VARCHAR(255) NOT NULL,
+  `application_order` INT(11) NOT NULL,
   FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -53,8 +54,8 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully created commands_applications tabl
 
 -- Save the values of the current command to application relationship for the new table
 SELECT CURRENT_TIMESTAMP AS '', 'Adding existing applications to commands...' AS '';
-INSERT INTO `commands_applications` (`command_id`, `application_id`)
-  SELECT `id`, `APPLICATION_ID` FROM `commands` WHERE `APPLICATION_ID` IS NOT NULL;
+INSERT INTO `commands_applications` (`command_id`, `application_id`, `application_order`)
+  SELECT `id`, `APPLICATION_ID`, 0 FROM `commands` WHERE `APPLICATION_ID` IS NOT NULL;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully added existing applications to commands.' AS '';
 
 -- Modify the applications and the associated children tables

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.core.jpa.services;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
@@ -324,7 +324,7 @@ public class JpaCommandServiceImplUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testSetApplicationsForCommandNoAppId() throws GenieException {
-        this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(UUID.randomUUID().toString()));
+        this.service.setApplicationsForCommand(COMMAND_2_ID, Lists.newArrayList(UUID.randomUUID().toString()));
     }
 
     /**
@@ -337,7 +337,7 @@ public class JpaCommandServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         Mockito.when(this.jpaApplicationRepository.exists(Mockito.anyString())).thenReturn(true);
-        this.service.setApplicationsForCommand(id, Sets.newHashSet(UUID.randomUUID().toString()));
+        this.service.setApplicationsForCommand(id, Lists.newArrayList(UUID.randomUUID().toString()));
     }
 
     /**
@@ -349,7 +349,7 @@ public class JpaCommandServiceImplUnitTests {
     public void testSetApplicationsForCommandNoAppExists() throws GenieException {
         final String appId = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.exists(appId)).thenReturn(false);
-        this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(appId));
+        this.service.setApplicationsForCommand(COMMAND_2_ID, Lists.newArrayList(appId));
     }
 
     /**
