@@ -88,6 +88,8 @@ public abstract class RestControllerIntegrationTestsBase {
     // Link Keys
     protected static final String SELF_LINK_KEY = "self";
     protected static final String COMMANDS_LINK_KEY = "commands";
+    protected static final String CLUSTERS_LINK_KEY = "clusters";
+    protected static final String APPLICATIONS_LINK_KEY = "applications";
 
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -97,7 +99,7 @@ public abstract class RestControllerIntegrationTestsBase {
     private WebApplicationContext context;
 
     /**
-     * Setup classwide configuration.
+     * Setup class wide configuration.
      */
     @BeforeClass
     public static void setupClass() {
