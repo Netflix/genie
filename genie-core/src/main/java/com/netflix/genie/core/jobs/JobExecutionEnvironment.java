@@ -54,11 +54,11 @@ public class JobExecutionEnvironment {
      * @param builder The builder to use
      */
     public JobExecutionEnvironment(final Builder builder) {
-        this.jobRequest = builder.jobRequest;
-        this.cluster = builder.cluster;
-        this.command = builder.command;
-        this.applications.addAll(builder.applications);
-        this.jobWorkingDir = builder.jobWorkingDir;
+        this.jobRequest = builder.bJobRequest;
+        this.cluster = builder.bCluster;
+        this.command = builder.bCommand;
+        this.applications.addAll(builder.bApplications);
+        this.jobWorkingDir = builder.bJobWorkingDir;
     }
 
     /**
@@ -68,11 +68,11 @@ public class JobExecutionEnvironment {
      * @since 3.0.0
      */
     public static class Builder {
-        private JobRequest jobRequest;
-        private Cluster cluster;
-        private Command command;
-        private List<Application> applications = new ArrayList<>();
-        private File jobWorkingDir;
+        private JobRequest bJobRequest;
+        private Cluster bCluster;
+        private Command bCommand;
+        private List<Application> bApplications = new ArrayList<>();
+        private File bJobWorkingDir;
 
         /**
          * Constructor.
@@ -93,10 +93,10 @@ public class JobExecutionEnvironment {
             @NotBlank(message = "Job working directory cannot be empty")
             final File dir
         ) throws GenieException {
-            this.jobRequest = request;
-            this.cluster = clusterObj;
-            this.command = commandObj;
-            this.jobWorkingDir = dir;
+            this.bJobRequest = request;
+            this.bCluster = clusterObj;
+            this.bCommand = commandObj;
+            this.bJobWorkingDir = dir;
         }
 
         /**
@@ -107,7 +107,7 @@ public class JobExecutionEnvironment {
          */
         public Builder withApplications(final List<Application> applications) {
             if (applications != null) {
-                this.applications.addAll(applications);
+                this.bApplications.addAll(applications);
             }
             return this;
         }
