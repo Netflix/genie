@@ -127,7 +127,7 @@ subprojects {
         testRuntime("org.glassfish:javax.el")
     }
 
-    test {
+    task unitTests(type: Test, group: 'verification') {
         useJUnit {
             includeCategories 'com.netflix.genie.test.categories.UnitTest'
             excludeCategories 'com.netflix.genie.test.categories.IntegrationTest'
@@ -135,7 +135,7 @@ subprojects {
         }
     }
 
-    task integrationTests(type: Test) {
+    task integrationTests(type: Test, group: 'verification') {
         dependsOn test
         useJUnit {
             includeCategories 'com.netflix.genie.test.categories.IntegrationTest'
@@ -144,7 +144,7 @@ subprojects {
         }
     }
 
-    task documentationTests(type: Test) {
+    task documentationTests(type: Test, group: 'verification') {
         dependsOn integrationTests
         useJUnit {
             includeCategories 'com.netflix.genie.test.categories.DocumentationTest'
@@ -153,9 +153,11 @@ subprojects {
         }
     }
 
-    check.dependsOn documentationTests
-
     tasks.withType(Test) { task ->
+        // set heap size for the test JVM(s)
+        minHeapSize = "256m"
+        maxHeapSize = "1g"
+
         reports.html.destination = file("${reporting.baseDir}/test/${task.name}")
         jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
     }
@@ -191,9 +193,8 @@ task clean(type: Delete) {
 }
 
 task jacocoRootReport(type: JacocoReport) {
+    group = 'Coverage Reports'
     dependsOn subprojects.test
-    dependsOn subprojects.integrationTests
-    dependsOn subprojects.documentationTests
     additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
     classDirectories = files(subprojects.sourceSets.main.output)
