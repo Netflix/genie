@@ -15,6 +15,7 @@ buildscript {
 }
 
 plugins {
+    id 'com.github.kt3k.coveralls' version '2.6.3'
     id 'nebula.netflixoss' version '3.2.3'
     id 'nebula.optional-base' version '3.0.3'
     id 'nebula.provided-base' version '3.0.3'
@@ -33,8 +34,16 @@ nebulaRelease {
 }
 
 allprojects {
+    apply plugin: 'jacoco'
     apply plugin: 'idea'
     apply plugin: 'eclipse'
+
+    repositories {
+        jcenter()
+        maven {
+            url 'http://repo.spring.io/milestone'
+        }
+    }
 }
 
 idea {
@@ -51,7 +60,6 @@ subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'findbugs'
     apply plugin: 'pmd'
-    apply plugin: 'jacoco'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'nebula.optional-base'
     apply plugin: 'nebula.provided-base'
@@ -61,13 +69,6 @@ subprojects {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        jcenter()
-        maven {
-            url 'http://repo.spring.io/milestone'
-        }
-    }
 
     dependencyManagement {
         imports {
@@ -152,44 +153,11 @@ subprojects {
         }
     }
 
-    // See: http://csiebler.github.io/blog/2014/02/09/multi-project-code-coverage-using-gradle-and-jacoco/
-    task unitTestCoverage(type: JacocoReport) {
-        // (change this if you e.g. want to calculate unit test/integration test coverage separately)
-        executionData file("build/jacoco/test.exec")
+    check.dependsOn documentationTests
 
-        // Add all relevant sourcesets from the subprojects
-        sourceSets sourceSets.main
-
-        reports {
-            xml.enabled true
-            html.destination "${reporting.baseDir}/jacoco/unitTests"
-            csv.enabled false
-        }
-    }
-
-    task integrationTestCoverage(type: JacocoReport) {
-        // (change this if you e.g. want to calculate unit test/integration test coverage separately)
-        executionData file("build/jacoco/integrationTests.exec")
-
-        // Add all relevant sourcesets from the subprojects
-        sourceSets sourceSets.main
-
-        reports {
-            xml.enabled true
-            html.destination "${reporting.baseDir}/jacoco/integrationTests"
-            csv.enabled false
-        }
-    }
-
-    // always run the tests before generating the report
-    unitTestCoverage.dependsOn test
-    integrationTestCoverage.dependsOn integrationTests
-
-    check.dependsOn unitTestCoverage
-    check.dependsOn integrationTestCoverage
-
-    tasks.withType(Test) {
-        reports.html.destination = file("${reporting.baseDir}/test/${name}")
+    tasks.withType(Test) { task ->
+        reports.html.destination = file("${reporting.baseDir}/test/${task.name}")
+        jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
     }
 
     license {
@@ -207,5 +175,54 @@ subprojects {
 
     tasks.withType(Pmd) {
         reports.html.enabled true
+    }
+
+    jacocoTestReport {
+        reports {
+            html.enabled = true
+            xml.enabled = true
+            csv.enabled = false
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete 'build'
+}
+
+task jacocoRootReport(type: JacocoReport) {
+    dependsOn subprojects.test
+    dependsOn subprojects.integrationTests
+    dependsOn subprojects.documentationTests
+    additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(subprojects.sourceSets.main.output)
+    executionData = files(subprojects.jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
+    }
+    onlyIf = {
+        true
+    }
+    doFirst {
+        executionData = files(executionData.findAll {
+            it.exists()
+        })
+    }
+}
+
+coveralls {
+    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
+
+tasks.coveralls {
+    group = 'Coverage reports'
+    description = 'Uploads the aggregated coverage report to Coveralls'
+
+    dependsOn jacocoRootReport
+    onlyIf {
+        System.env.'CI'
     }
 }
