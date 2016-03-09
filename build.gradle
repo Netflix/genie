@@ -192,7 +192,7 @@ task clean(type: Delete) {
     delete 'build'
 }
 
-task jacocoRootReport(type: JacocoReport) {
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     group = 'Coverage Reports'
     dependsOn subprojects.test
     additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)

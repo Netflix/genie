@@ -30,3 +30,7 @@ dependencies {
 test {
     outputs.dir snippetsDir
 }
+
+documentationTests {
+    outputs.dir snippetsDir
+}
