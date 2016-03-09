@@ -27,6 +27,10 @@ dependencies {
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
 }
 
+test {
+    outputs.dir snippetsDir
+}
+
 documentationTests {
     outputs.dir snippetsDir
 }

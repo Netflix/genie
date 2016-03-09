@@ -2,6 +2,9 @@ language: java
 jdk:
   - oraclejdk8
 
+git:
+  depth: 100
+
 sudo: false
 install: "./gradle/installViaTravis.sh"
 script: "./gradle/buildViaTravis.sh"
@@ -18,6 +21,7 @@ before_install:
   - pip install --user codecov
 after_success:
   - codecov
+  - ./gradlew coveralls
 
 env:
   global:
