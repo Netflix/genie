@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -279,7 +280,7 @@ public interface CommandService {
             @NotBlank(message = "No command id entered. Unable to add applications.")
             final String id,
             @NotEmpty(message = "No application ids entered. Unable to add applications.")
-            final Set<String> applicationIds
+            final List<String> applicationIds
     ) throws GenieException;
 
     /**
@@ -294,7 +295,7 @@ public interface CommandService {
             @NotBlank(message = "No command id entered. Unable to set applications.")
             final String id,
             @NotNull(message = "No application ids entered. Unable to set applications.")
-            final Set<String> applicationIds
+            final List<String> applicationIds
     ) throws GenieException;
 
     /**
@@ -305,7 +306,7 @@ public interface CommandService {
      * @return The applications or exception if none exist.
      * @throws GenieException if there is an error
      */
-    Set<Application> getApplicationsForCommand(
+    List<Application> getApplicationsForCommand(
             @NotBlank(message = "No command id entered. Unable to get applications.")
             final String id
     ) throws GenieException;

@@ -95,5 +95,5 @@
         tags="genie.id:command1,genie.name:pig_13_prod"
     />
 
-    <commands_applications command_id="command1" application_id="app1"/>
+    <commands_applications command_id="command1" application_id="app1" application_order="0"/>
 </dataset>

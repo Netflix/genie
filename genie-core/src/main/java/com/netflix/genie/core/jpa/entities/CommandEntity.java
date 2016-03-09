@@ -37,12 +37,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -84,6 +87,7 @@ public class CommandEntity extends SetupFileEntity {
     @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
+    // TODO: Make lazy?
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "commands_applications",
@@ -94,7 +98,8 @@ public class CommandEntity extends SetupFileEntity {
             @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
         }
     )
-    private Set<ApplicationEntity> applications = new HashSet<>();
+    @OrderColumn(name = "application_order", nullable = false)
+    private List<ApplicationEntity> applications = new ArrayList<>();
 
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
     private Set<ClusterEntity> clusters = new HashSet<>();
@@ -184,7 +189,7 @@ public class CommandEntity extends SetupFileEntity {
      *
      * @return applications linked to this command
      */
-    public Set<ApplicationEntity> getApplications() {
+    public List<ApplicationEntity> getApplications() {
         return this.applications;
     }
 
@@ -193,7 +198,7 @@ public class CommandEntity extends SetupFileEntity {
      *
      * @param applications The application that this command uses
      */
-    public void setApplications(final Set<ApplicationEntity> applications) {
+    public void setApplications(final List<ApplicationEntity> applications) {
         //Clear references to this command in existing applications
         for (final ApplicationEntity application : this.applications) {
             application.getCommands().remove(this);

@@ -221,8 +221,7 @@ public class JpaCommandServiceImpl implements CommandService {
         final CommandEntity commandEntity = this.findCommand(id);
 
         //Remove the command from the associated Application references
-        final Set<ApplicationEntity> applicationEntities
-            = commandEntity.getApplications();
+        final List<ApplicationEntity> applicationEntities = commandEntity.getApplications();
         if (applicationEntities != null) {
             applicationEntities.stream()
                 .filter(application -> application.getCommands() != null)
@@ -383,7 +382,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @NotBlank(message = "No command id entered. Unable to add applications.")
         final String id,
         @NotEmpty(message = "No application ids entered. Unable to add applications.")
-        final Set<String> applicationIds
+        final List<String> applicationIds
     ) throws GenieException {
         if (applicationIds.size() != applicationIds.stream().filter(this.appRepo::exists).count()) {
             throw new GeniePreconditionException("All applications need to exist to add to a command");
@@ -403,7 +402,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @NotBlank(message = "No command id entered. Unable to set applications.")
         final String id,
         @NotNull(message = "No application ids entered. Unable to set applications.")
-        final Set<String> applicationIds
+        final List<String> applicationIds
     ) throws GenieException {
         if (applicationIds.size() != applicationIds.stream().filter(this.appRepo::exists).count()) {
             throw new GeniePreconditionException("All applications need to exist to add to a command");
@@ -421,7 +420,7 @@ public class JpaCommandServiceImpl implements CommandService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<Application> getApplicationsForCommand(
+    public List<Application> getApplicationsForCommand(
         @NotBlank(message = "No command id entered. Unable to get applications.")
         final String id
     ) throws GenieException {
@@ -430,7 +429,7 @@ public class JpaCommandServiceImpl implements CommandService {
             .getApplications()
             .stream()
             .map(ApplicationEntity::getDTO)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toList());
     }
 
     /**

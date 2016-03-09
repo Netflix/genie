@@ -32,6 +32,7 @@ SELECT CURRENT_TIMESTAMP, 'Creating commands_applications table...';
 CREATE TABLE commands_applications (
   command_id VARCHAR(255) NOT NULL,
   application_id VARCHAR(255) NOT NULL,
+  application_order INT NOT NULL,
   FOREIGN KEY (command_id) REFERENCES commands (id) ON DELETE CASCADE,
   FOREIGN KEY (application_id) REFERENCES applications (id) ON DELETE RESTRICT
 );
@@ -39,8 +40,8 @@ SELECT CURRENT_TIMESTAMP, 'Successfully created commands_applications table.';
 
 -- Save the values of the current command to application relationship for the new table
 SELECT CURRENT_TIMESTAMP, 'Adding existing applications to commands...';
-INSERT INTO commands_applications (command_id, application_id)
-  SELECT id, application_id FROM commands WHERE application_id IS NOT NULL;
+INSERT INTO commands_applications (command_id, application_id, application_order)
+  SELECT id, application_id, 0 FROM commands WHERE application_id IS NOT NULL;
 SELECT CURRENT_TIMESTAMP, 'Successfully added existing applications to commands.';
 
 -- Modify the applications and the associated children tables

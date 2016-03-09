@@ -30,8 +30,10 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -257,7 +259,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testSetApplications() throws GeniePreconditionException {
         Assert.assertNotNull(this.c.getApplications());
         Assert.assertTrue(this.c.getApplications().isEmpty());
-        final Set<ApplicationEntity> applicationEntities = new HashSet<>();
+        final List<ApplicationEntity> applicationEntities = new ArrayList<>();
         final ApplicationEntity one = new ApplicationEntity();
         one.setId("one");
         final ApplicationEntity two = new ApplicationEntity();
@@ -266,8 +268,8 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         applicationEntities.add(two);
         this.c.setApplications(applicationEntities);
         Assert.assertEquals(2, this.c.getApplications().size());
-        Assert.assertTrue(this.c.getApplications().contains(one));
-        Assert.assertTrue(this.c.getApplications().contains(two));
+        Assert.assertTrue(this.c.getApplications().get(0).equals(one));
+        Assert.assertTrue(this.c.getApplications().get(1).equals(two));
         Assert.assertTrue(one.getCommands().contains(this.c));
         Assert.assertTrue(two.getCommands().contains(this.c));
 
@@ -275,7 +277,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         applicationEntities.add(two);
         this.c.setApplications(applicationEntities);
         Assert.assertEquals(1, this.c.getApplications().size());
-        Assert.assertTrue(this.c.getApplications().contains(two));
+        Assert.assertTrue(this.c.getApplications().get(0).equals(two));
         Assert.assertFalse(one.getCommands().contains(this.c));
         Assert.assertTrue(two.getCommands().contains(this.c));
         this.c.setApplications(null);

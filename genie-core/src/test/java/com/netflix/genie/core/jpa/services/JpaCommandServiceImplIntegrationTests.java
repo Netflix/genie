@@ -19,6 +19,7 @@ package com.netflix.genie.core.jpa.services;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -41,6 +42,7 @@ import org.springframework.data.mapping.PropertyReferenceException;
 
 import javax.validation.ConstraintViolationException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -721,7 +723,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testAddApplicationsForCommand() throws GenieException {
         Assert.assertTrue(this.service.getApplicationsForCommand(COMMAND_2_ID).isEmpty());
 
-        final Set<String> appIds = new HashSet<>();
+        final List<String> appIds = new ArrayList<>();
         appIds.add(APP_1_ID);
         final Set<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, preCommands.size());
@@ -735,13 +737,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
 
         final Set<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(2, savedCommands.size());
-        Assert.assertEquals(
-            1,
-            this.service.getApplicationsForCommand(COMMAND_2_ID)
-                .stream()
-                .filter(application -> APP_1_ID.equals(application.getId()))
-                .count()
-        );
+        Assert.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID).get(0).getId(), Matchers.is(APP_1_ID));
     }
 
     /**
@@ -753,8 +749,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testSetApplicationsForCommand() throws GenieException {
         Assert.assertTrue(this.service.getApplicationsForCommand(COMMAND_2_ID).isEmpty());
 
-        final Set<String> appIds = new HashSet<>();
-        appIds.add(APP_1_ID);
+        final List<String> appIds = Lists.newArrayList(APP_1_ID);
         final Set<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(1, preCommands
@@ -783,7 +778,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testSetApplicationsForCommandNoId() throws GenieException {
-        this.service.setApplicationsForCommand(null, new HashSet<>());
+        this.service.setApplicationsForCommand(null, new ArrayList<>());
     }
 
     /**
