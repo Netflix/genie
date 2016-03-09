@@ -19,6 +19,11 @@ package com.netflix.genie.core.util;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.Constants;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -28,13 +33,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.Field;
 
 /**
  * Class that provides some generic utility or helper functions.
  *
  * @author amsharma
  */
+@Slf4j
 public abstract class Utils {
+
+    private static Executor executor = new DefaultExecutor();
 
     /**
      * Closes the stream to the writer supplied.
@@ -130,49 +139,71 @@ public abstract class Utils {
         return new File(filePath).getName();
     }
 
-//    /**
-//     * Helper method that executes a bash command.
-//     *
-//     * @param command An array consisting of the command to run
-//     * @param workingDirectory The working directory to set while running the command
-//     *
-//     * @throws GenieException If there is problem.
-//     */
-//    public static void executeBashCommand(
-//        @NotNull(message = "The command to be run cannot be empty.")
-//        final List<String> command,
-//        final String workingDirectory
-//    ) throws GenieException {
-//        final Executor executor = new DefaultExecutor();
-//        final CommandLine commandLine = new CommandLine();
-//
-//        if (workingDirectory != null) {
-//            executor.setWorkingDirectory(new File(workingDirectory));
-//        }
-//        try {
-//            executor.execute(commandLine);
-//        } catch (IOException ioe) {
-//            throw new GenieServerException("Unable to execute command "
-//                + String.valueOf(command)
-//                + " with exception "
-//                +  ioe.toString());
-//        }
+    /**
+     * Get process id for the given process.
+     *
+     * @param proc java process object representing the job launcher
+     * @return pid for this process
+     * @throws GenieException if there is an error getting the process id
+     */
+    public static int getProcessId(final Process proc) throws GenieException {
+        log.debug("called");
 
-//        final ProcessBuilder pb = new ProcessBuilder(command);
-//        if (workingDirectory != null) {
-//            pb.directory(new File(workingDirectory));
-//        }
-//        try {
-//            final Process process = pb.start();
-//            final int errCode = process.waitFor();
-//            if (errCode != 0) {
-//                throw new GenieServerException("Unable to execute bash command " + String.valueOf(command));
-//            }
-//        } catch (InterruptedException | IOException ie) {
-//            throw new GenieServerException("Unable to execute bash command "
-//                + String.valueOf(command)
-//                + " with exception "
-//                +  ie.toString());
-//        }
-//    }
+        try {
+            final Field f = proc.getClass().getDeclaredField(Constants.PID);
+            f.setAccessible(true);
+            return f.getInt(proc);
+        } catch (final IllegalAccessException
+            | IllegalArgumentException
+            | NoSuchFieldException
+            | SecurityException e) {
+            final String msg = "Can't get process id for job";
+            log.error(msg, e);
+            throw new GenieServerException(msg, e);
+        }
+    }
+
+    /**
+     * Create a new user on the system.
+     *
+     * @param user The userid of the user.
+     * @param group The group of the user.
+     *
+     * @throws GenieException If there is any problem.
+     */
+    public static void createUser(
+        @NotBlank
+        final String user,
+        final String group) throws GenieException {
+
+        // First check if user already exists
+        final CommandLine idCheckCommandLine = new CommandLine("id");
+        idCheckCommandLine.addArgument("-u");
+        idCheckCommandLine.addArgument(user);
+
+        try {
+            executor.execute(idCheckCommandLine);
+            log.info("User already exists");
+            return;
+        } catch (IOException ioe) {
+            log.info("User does not exist. Creating it now.");
+            final CommandLine userCreateCommandLine = new CommandLine("sudo");
+            userCreateCommandLine.addArgument("useradd");
+            userCreateCommandLine.addArgument(user);
+
+            if (StringUtils.isNotBlank(group)) {
+                userCreateCommandLine.addArgument("-G");
+                userCreateCommandLine.addArgument(group);
+            }
+
+            userCreateCommandLine.addArgument("-M");
+
+            try {
+                executor.execute(userCreateCommandLine);
+            } catch (IOException ioexception) {
+                throw new GenieServerException("Could not create user " + user + "with exception " + ioexception);
+            }
+        }
+    }
+
 }

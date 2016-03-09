@@ -113,7 +113,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         linkAllEntities();
     }
 
-    private void linkAllEntities() throws Exception {
+    private void linkAllEntities(
+    ) throws Exception {
 
         final List<String> apps = new ArrayList<>();
         apps.add(APP1_ID);
@@ -208,7 +209,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
     }
 
-    private void createAllClusters() throws Exception {
+    private void createAllClusters(
+    ) throws Exception {
 
         final String setUpFile = this.resourceLoader.getResource(
             BASE_DIR
@@ -260,7 +262,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
     }
 
-    private void createAllCommands() throws Exception {
+    private void createAllCommands(
+    ) throws Exception {
 
         final String setUpFile = this.resourceLoader.getResource(
                 BASE_DIR
@@ -334,45 +337,71 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethod() throws Exception {
-            final String commandArgs = "-c 'echo hello world'";
+        final String commandArgs = "-c 'echo hello world'";
 
-            final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-            final Set<String> clusterTags = new HashSet<>();
-            clusterTags.add("localhost");
-            final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
-            clusterCriteriaList.add(clusterCriteria);
+        final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
+        final Set<String> clusterTags = new HashSet<>();
+        clusterTags.add("localhost");
+        final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
+        clusterCriteriaList.add(clusterCriteria);
 
-            final Set<String> commandCriteria = new HashSet<>();
-            commandCriteria.add("bash");
-            final JobRequest jobRequest = new JobRequest.Builder(
-                JOB_NAME,
-                JOB_USER,
-                JOB_VERSION,
-                commandArgs,
-                clusterCriteriaList,
-                commandCriteria
-            ).withDisableLogArchival(true)
-                .build();
+        final String setUpFile = this.resourceLoader.getResource(
+            this.BASE_DIR
+                + "job"
+                + FILE_DELIMITER
+                + "jobsetupfile"
+        ).getFile().getAbsolutePath();
 
-            //final MvcResult result =
-                this.mvc
-                .perform(
-                    MockMvcRequestBuilders
-                        .post(JOBS_API)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
-                )
-                .andExpect(MockMvcResultMatchers.status().isAccepted())
-                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-                .andReturn();
+        final Set<String> dependencies = new HashSet<>();
+        final String depFile1 = this.resourceLoader.getResource(
+            this.BASE_DIR
+                + "job"
+                + FILE_DELIMITER
+                + "dep1"
+        ).getFile().getAbsolutePath();
+//        final String depFile2 = this.resourceLoader.getResource(
+//            this.BASE_DIR
+//                + "job"
+//                + FILE_DELIMITER
+//                + "dep2"
+//        ).getFile().getAbsolutePath();
+        dependencies.add(depFile1);
+        //dependencies.add(depFile2);
 
-            //final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ie) {
-                //Handle exception
-            }
-            log.info("Done");
+        final Set<String> commandCriteria = new HashSet<>();
+        commandCriteria.add("bash");
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            commandArgs,
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withDisableLogArchival(true)
+            .withSetupFile(setUpFile)
+            .withFileDependencies(dependencies)
+            .build();
+
+        //final MvcResult result =
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(JOBS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+            )
+            .andExpect(MockMvcResultMatchers.status().isAccepted())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
+            .andReturn();
+
+        //final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ie) {
+            //Handle exception
+        }
+        log.info("Done");
     }
 
     private String getIdFromLocation(final String location) {

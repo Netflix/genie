@@ -22,6 +22,9 @@ import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mockito;
+
+import java.io.IOException;
 
 /**
  * Class containing unit tests for Utils.java.
@@ -41,5 +44,29 @@ public class UtilsUnitTests {
     public void testGetFileNameFromPath() throws GenieException {
         final String testFilePath = "oo/bar/name";
         Assert.assertEquals("name", Utils.getFileNameFromPath(testFilePath));
+    }
+
+    /**
+     * Test the getProcessId method for failure.
+     *
+     * @throws GenieException If there is a problem.
+     * @throws IOException If there is a problem.
+     */
+    @Test(expected = GenieException.class)
+    public void testGetProcessIdMethodFailure() throws GenieException, IOException {
+        final Process process = Mockito.mock(Process.class);
+        Utils.getProcessId(process);
+    }
+
+    /**
+     * Test the getProcessId method for success.
+     *
+     * @throws GenieException If there is a problem.
+     * @throws IOException If there is a problem.
+     */
+    @Test
+    public void testGetProcessIdMethodSuccess() throws GenieException, IOException {
+        final Process process = Runtime.getRuntime().exec("ls /dev/null");
+        Utils.getProcessId(process);
     }
 }

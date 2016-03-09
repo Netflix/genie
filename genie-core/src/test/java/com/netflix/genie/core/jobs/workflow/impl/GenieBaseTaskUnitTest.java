@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
@@ -25,6 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Tests for GenieBaseTask.
@@ -35,7 +39,7 @@ import org.mockito.Mockito;
 @Category(UnitTest.class)
 public class GenieBaseTaskUnitTest {
 
-    //private static final String INVALID_FILE_PATH = "/foo/bar";
+    private static final String INVALID_FILE_PATH = "/foo/bar";
     private GenieBaseTask genieBaseTask;
 
     /**
@@ -208,14 +212,15 @@ public class GenieBaseTaskUnitTest {
 
         Assert.assertEquals("dirpath/genie/cluster/id/dependencies/filename", localPath);
     }
-//
-//    /**
-//     * Test the getWriter method for invalid file path.
-//     *
-//     * @throws GenieException if there is any problem.
-//     */
-//    @Test(expected = GenieServerException.class)
-//    public void testGetWriterInvalidPath() throws GenieException {
-//        this.genieBaseTask.getWriter(INVALID_FILE_PATH);
-//    }
+
+    /**
+     * Tests the execute method when no JobExecutionEnvironment present in the map.
+     *
+     * @throws GenieException If there is any problem.
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void testExecuteMethodNoJobExecution() throws GenieException {
+        final Map<String, Object> context = new HashMap<>();
+        this.genieBaseTask.executeTask(context);
+    }
 }

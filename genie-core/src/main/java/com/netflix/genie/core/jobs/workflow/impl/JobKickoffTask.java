@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -30,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +94,7 @@ public class JobKickoffTask extends GenieBaseTask {
         command.add("bash");
         command.add(runScript);
 
+        // Cannot convert to executor because it does not provide an api to get process id.
         final ProcessBuilder pb = new ProcessBuilder(command);
         pb.directory(this.jobExecEnv.getJobWorkingDir());
         pb.redirectOutput(new File(this.jobExecEnv.getJobWorkingDir() + Constants.GENIE_LOG_PATH));
@@ -101,7 +102,7 @@ public class JobKickoffTask extends GenieBaseTask {
 
         try {
             final Process process = pb.start();
-            final int processId = getProcessId(process);
+            final int processId = Utils.getProcessId(process);
             final JobExecution jobExecution = new JobExecution
                 .Builder(this.hostname, processId, this.jobExecEnv.getCommand().getCheckDelay())
                 .withId(this.jobExecEnv.getJobRequest().getId())
@@ -112,7 +113,14 @@ public class JobKickoffTask extends GenieBaseTask {
         }
     }
 
-    private void createUser(
+    /**
+     * Create user on the system.
+     *
+     * @param user user id
+     * @param group group id
+     * @throws GenieException If there is any problem.
+     */
+    public void createUser(
         final String user,
         final String group) throws GenieException {
 
@@ -147,8 +155,15 @@ public class JobKickoffTask extends GenieBaseTask {
         }
     }
 
-    private void changeOwnershipOfDirectory(
-        final String jobWorkingDir,
+    /**
+     * Method to change the ownership of a directory.
+     *
+     * @param dir The directory to change the ownership of.
+     * @param user Userid of the user.
+     * @throws GenieException If there is a problem.
+     */
+    public void changeOwnershipOfDirectory(
+        final String dir,
         final String user) throws GenieException {
 
         final CommandLine commandLine = new CommandLine("chown");
@@ -157,36 +172,12 @@ public class JobKickoffTask extends GenieBaseTask {
         //command.add("chown");
         commandLine.addArgument("-R");
         commandLine.addArgument(user);
-        commandLine.addArgument(jobWorkingDir);
+        commandLine.addArgument(dir);
 
         try {
             executor.execute(commandLine);
         } catch (IOException ioexception) {
             throw new GenieServerException("Could not change ownership with exception " + ioexception);
-        }
-    }
-
-    /**
-     * Get process id for the given process.
-     *
-     * @param proc java process object representing the job launcher
-     * @return pid for this process
-     * @throws GenieException if there is an error getting the process id
-     */
-    private int getProcessId(final Process proc) throws GenieException {
-        log.debug("called");
-
-        try {
-            final Field f = proc.getClass().getDeclaredField(Constants.PID);
-            f.setAccessible(true);
-            return f.getInt(proc);
-        } catch (final IllegalAccessException
-            | IllegalArgumentException
-            | NoSuchFieldException
-            | SecurityException e) {
-            final String msg = "Can't get process id for job";
-            log.error(msg, e);
-            throw new GenieServerException(msg, e);
         }
     }
 }
