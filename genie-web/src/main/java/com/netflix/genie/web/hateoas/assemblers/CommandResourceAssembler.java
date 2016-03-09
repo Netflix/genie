@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.web.hateoas.assemblers;
 
-import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.controllers.CommandRestController;
@@ -45,31 +43,27 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
 
         try {
             commandResource.add(
-                    ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(CommandRestController.class)
-                                    .getCommand(command.getId()))
-                            .withSelfRel()
-            );
-
-            commandResource.add(
-                    ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(CommandRestController.class)
-                                    .getClustersForCommand(
-                                            command.getId(),
-                                            Sets.newHashSet(
-                                                    ClusterStatus.UP.toString(),
-                                                    ClusterStatus.OUT_OF_SERVICE.toString(),
-                                                    ClusterStatus.TERMINATED.toString()
-                                            )
-                                    )
-                    ).withRel("clusters")
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(CommandRestController.class)
+                        .getCommand(command.getId())
+                ).withSelfRel()
             );
 
             commandResource.add(
                 ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder.methodOn(CommandRestController.class)
+                    ControllerLinkBuilder
+                        .methodOn(CommandRestController.class)
                         .getApplicationsForCommand(command.getId())
                 ).withRel("applications")
+            );
+
+            commandResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(CommandRestController.class)
+                        .getClustersForCommand(command.getId(), null)
+                ).withRel("clusters")
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

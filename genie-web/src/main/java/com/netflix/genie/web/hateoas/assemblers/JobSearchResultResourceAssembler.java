@@ -43,9 +43,11 @@ public class JobSearchResultResourceAssembler implements ResourceAssembler<JobSe
 
         try {
             jobResource.add(
-                ControllerLinkBuilder
-                    .linkTo(ControllerLinkBuilder.methodOn(JobRestController.class).getJob(job.getId()))
-                    .withSelfRel()
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJob(job.getId())
+                ).withSelfRel()
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

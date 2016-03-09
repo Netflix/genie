@@ -17,9 +17,7 @@
  */
 package com.netflix.genie.web.hateoas.assemblers;
 
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.controllers.ClusterRestController;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
@@ -45,24 +43,19 @@ public class ClusterResourceAssembler implements ResourceAssembler<Cluster, Clus
 
         try {
             clusterResource.add(
-                    ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(ClusterRestController.class)
-                                    .getCluster(cluster.getId()))
-                            .withSelfRel()
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(ClusterRestController.class)
+                        .getCluster(cluster.getId())
+                ).withSelfRel()
             );
 
             clusterResource.add(
-                    ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(ClusterRestController.class)
-                                    .getCommandsForCluster(
-                                            cluster.getId(),
-                                            Sets.newHashSet(
-                                                    CommandStatus.ACTIVE.toString(),
-                                                    CommandStatus.INACTIVE.toString(),
-                                                    CommandStatus.DEPRECATED.toString()
-                                            )
-                                    )
-                    ).withRel("commands")
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(ClusterRestController.class)
+                        .getCommandsForCluster(cluster.getId(), null)
+                ).withRel("commands")
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

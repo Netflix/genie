@@ -48,8 +48,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -171,8 +173,8 @@ public class JobRestController {
     /**
      * Submit a new job with attachments.
      *
-     * @param jobRequest  The job request information
-     * @param attachments The attachments for the job
+     * @param jobRequest         The job request information
+     * @param attachments        The attachments for the job
      * @param clientHost         client host sending the request
      * @param httpServletRequest The http servlet request
      * @return The submitted job
@@ -230,7 +232,7 @@ public class JobRestController {
                 .build();
         }
 
-        // Download attachements
+        // Download attachments
         if (attachments != null) {
             for (final MultipartFile attachment : attachments) {
                 log.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
@@ -343,6 +345,26 @@ public class JobRestController {
             }
         }
 
+        // Build the self link which will be used for the next, previous, etc links
+        final Link self = ControllerLinkBuilder
+            .linkTo(
+                ControllerLinkBuilder
+                    .methodOn(JobRestController.class)
+                    .getJobs(
+                        id,
+                        name,
+                        userName,
+                        statuses,
+                        tags,
+                        clusterName,
+                        clusterId,
+                        commandName,
+                        commandId,
+                        page,
+                        assembler
+                    )
+            ).withSelfRel();
+
         return assembler.toResource(
             this.jobCoordinatorService.findJobs(
                 id,
@@ -356,7 +378,8 @@ public class JobRestController {
                 commandId,
                 page
             ),
-            this.jobSearchResultResourceAssembler
+            this.jobSearchResultResourceAssembler,
+            self
         );
     }
 

@@ -17,9 +17,7 @@
  */
 package com.netflix.genie.web.hateoas.assemblers;
 
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.controllers.ApplicationRestController;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
@@ -45,24 +43,19 @@ public class ApplicationResourceAssembler implements ResourceAssembler<Applicati
 
         try {
             applicationResource.add(
-                    ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(ApplicationRestController.class)
-                                    .getApplication(application.getId()))
-                            .withSelfRel()
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(ApplicationRestController.class)
+                        .getApplication(application.getId())
+                ).withSelfRel()
             );
 
             applicationResource.add(
-                    ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(ApplicationRestController.class)
-                                    .getCommandsForApplication(
-                                            application.getId(),
-                                            Sets.newHashSet(
-                                                    CommandStatus.ACTIVE.toString(),
-                                                    CommandStatus.DEPRECATED.toString(),
-                                                    CommandStatus.INACTIVE.toString()
-                                            )
-                                    )
-                    ).withRel("commands")
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(ApplicationRestController.class)
+                        .getCommandsForApplication(application.getId(), null)
+                ).withRel("commands")
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

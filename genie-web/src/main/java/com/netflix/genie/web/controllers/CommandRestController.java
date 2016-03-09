@@ -34,8 +34,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -161,9 +163,26 @@ public class CommandRestController {
                 enumStatuses.add(CommandStatus.parse(status));
             }
         }
+
+        // Build the self link which will be used for the next, previous, etc links
+        final Link self = ControllerLinkBuilder
+            .linkTo(
+                ControllerLinkBuilder
+                    .methodOn(CommandRestController.class)
+                    .getCommands(
+                        name,
+                        userName,
+                        statuses,
+                        tags,
+                        page,
+                        assembler
+                    )
+            ).withSelfRel();
+
         return assembler.toResource(
             this.commandService.getCommands(name, userName, enumStatuses, tags, page),
-            this.commandResourceAssembler
+            this.commandResourceAssembler,
+            self
         );
     }
 
