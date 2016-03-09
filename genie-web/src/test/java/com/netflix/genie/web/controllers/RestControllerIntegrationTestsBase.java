@@ -108,9 +108,11 @@ public abstract class RestControllerIntegrationTestsBase {
 
     /**
      * Setup for tests.
+     *
+     * @throws Exception If there is an error.
      */
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         this.mvc = MockMvcBuilders
             .webAppContextSetup(this.context)
             .build();

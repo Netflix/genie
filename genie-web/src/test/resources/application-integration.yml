@@ -25,3 +25,7 @@ spring:
     url: jdbc:hsqldb:mem:genie-int-db;hsqldb.lock_file=false;shutdown=true
     username: SA
     password:
+genie:
+  jobs:
+    dir:
+      location: "file:///tmp/"

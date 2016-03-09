@@ -30,6 +30,8 @@ import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.services.AttachmentService;
+import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.services.impl.LocalFileTransferImpl;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +47,17 @@ import org.springframework.core.annotation.Order;
  */
 @Configuration
 public class JobConfigTest {
+    /**
+     * Bean to create a local file transfer object.
+     *
+     * @return A unix copy implementation of the FileTransferService.
+     */
+    @Bean
+    @Order(value = 2)
+    public FileTransfer localFileTransfer() {
+        return new LocalFileTransferImpl();
+    }
+
     /**
      * Create an setup Task bean that does initial setup before any of the tasks start.
      *

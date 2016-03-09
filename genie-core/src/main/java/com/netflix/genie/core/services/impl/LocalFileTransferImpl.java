@@ -21,18 +21,14 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.Executor;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * An implementation of the FileTransferService interface in which the remote locations are on local unix filesystem.
@@ -41,25 +37,16 @@ import java.util.regex.Pattern;
  * @since 3.0.0
  */
 @Slf4j
-@Component
 public class LocalFileTransferImpl implements FileTransfer {
 
-    private final Pattern localPrefixPattern =
-        Pattern.compile("^file:///.*$");
-
-    private final Executor executor;
     private final ResourceLoader resourceLoader;
 
     /**
      * Constructor.
      *
-     * @param executor The executor to use to launch processes
      */
     @Autowired
-    public LocalFileTransferImpl(
-        final Executor executor
-    ) {
-        this.executor = executor;
+    public LocalFileTransferImpl() {
         this.resourceLoader = new DefaultResourceLoader();
     }
 
@@ -71,9 +58,8 @@ public class LocalFileTransferImpl implements FileTransfer {
         @NotBlank(message = "Filename cannot be blank")
         final String fileName) throws GenieException {
         log.debug("Called with file name {}", fileName);
-        final Matcher matcher =
-            localPrefixPattern.matcher(fileName);
-        return matcher.matches();
+
+        return true;
     }
 
     /**
@@ -88,7 +74,7 @@ public class LocalFileTransferImpl implements FileTransfer {
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
         try {
-            final File src = this.resourceLoader.getResource(srcRemotePath).getFile();
+            final File src = new File(srcRemotePath);
             final File dest = new File(dstLocalPath);
             Files.copy(src.toPath(), dest.toPath());
         } catch (IOException ioe) {
@@ -114,7 +100,7 @@ public class LocalFileTransferImpl implements FileTransfer {
         log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
         try {
             final File src = new File(srcLocalPath);
-            final File dest = this.resourceLoader.getResource(dstRemotePath).getFile();
+            final File dest = new File(dstRemotePath);
             Files.copy(src.toPath(), dest.toPath());
         } catch (IOException ioe) {
             log.error("Got error while copying remote file {} to local path {}", srcLocalPath, dstRemotePath);

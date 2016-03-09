@@ -55,7 +55,7 @@ public class LocalFileTransferImplUnitTests {
     @Before
     public void setup() throws GenieException {
         executor = Mockito.mock(Executor.class);
-        localFileTransfer = new LocalFileTransferImpl(this.executor);
+        localFileTransfer = new LocalFileTransferImpl();
     }
 
     /**
@@ -66,16 +66,6 @@ public class LocalFileTransferImplUnitTests {
     @Test
     public void testisValidWithCorrectFilePrefix() throws GenieException {
         Assert.assertEquals(localFileTransfer.isValid("file:///filepath"), true);
-    }
-
-    /**
-     * Test the isValid method for invalid file prefix not starting with file://.
-     *
-     * @throws GenieException If there is any problem
-     */
-    @Test
-    public void testisValidWithInvalidFilePrefix() throws GenieException {
-        Assert.assertEquals(localFileTransfer.isValid("filepath"), false);
     }
 
     /**

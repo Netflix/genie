@@ -31,6 +31,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 
 /**
  * Beans and configuration specifically for S3 connection on AWS.
@@ -98,6 +99,7 @@ public class AwsS3Config {
      * @throws GenieException if there is any problem
      */
     @Bean
+    @Order(value = 1)
     @ConditionalOnClass(AmazonS3Client.class)
     public FileTransfer s3FileTransferImpl(
         final AmazonS3Client s3Client
