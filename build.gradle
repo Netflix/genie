@@ -136,7 +136,6 @@ subprojects {
     }
 
     task integrationTests(type: Test, group: 'verification') {
-        dependsOn test
         useJUnit {
             includeCategories 'com.netflix.genie.test.categories.IntegrationTest'
             excludeCategories 'com.netflix.genie.test.categories.UnitTest'
@@ -145,7 +144,6 @@ subprojects {
     }
 
     task documentationTests(type: Test, group: 'verification') {
-        dependsOn integrationTests
         useJUnit {
             includeCategories 'com.netflix.genie.test.categories.DocumentationTest'
             excludeCategories 'com.netflix.genie.test.categories.UnitTest'
