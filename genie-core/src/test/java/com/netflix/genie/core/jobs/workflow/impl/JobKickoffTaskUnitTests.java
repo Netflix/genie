@@ -108,33 +108,56 @@ public class JobKickoffTaskUnitTests {
         Assert.assertArrayEquals(command.toArray(), argumentCaptor.getValue().toStrings());
     }
 
-//    /**
-//     * Test the create user method for user already exists.
-//     *
-//     * @throws IOException If there is any problem.
-//     * @throws GenieException If there is any problem.
-//     */
-//    @Test
-//    public void testCreateUserMethodSuccessDoesNotExist() throws IOException, GenieException {
-//
-//        final String user = "foo";
-//        final String group = "group";
-//
-//        final CommandLine idCheckCommandLine = new CommandLine("id");
-//        idCheckCommandLine.addArgument("-u");
-//        idCheckCommandLine.addArgument(user);
-//
-//        Mockito.when(this.executor.execute(Mockito.eq(Mockito.any()))).
-// thenThrow(IOException.class, IOException.class);
-//
-//        final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
-//        final List<String> command = Arrays.asList("sudo", "useradd", user, "-G", group);
-//
-//        this.jobKickoffTask.createUser(
-//            user,
-//            group
-//        );
-//        Mockito.verify(this.executor, Mockito.times(2)).execute(argumentCaptor.capture());
-//        Assert.assertArrayEquals(command.toArray(), argumentCaptor.getAllValues().get(0).toStrings());
-//    }
+    /**
+     * Test the create user method for user already exists.
+     *
+     * @throws IOException If there is any problem.
+     * @throws GenieException If there is any problem.
+     */
+    @Test
+    public void testCreateUserMethodSuccessDoesNotExist1() throws IOException, GenieException {
+
+        final String user = "user";
+        final String group = "group";
+
+        final CommandLine idCheckCommandLine = new CommandLine("id");
+        idCheckCommandLine.addArgument("-u");
+        idCheckCommandLine.addArgument(user);
+
+        Mockito.when(this.executor.execute(Mockito.any())).thenThrow(IOException.class);
+
+        final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
+        final List<String> command = Arrays.asList("sudo", "useradd", user, "-G", group, "-M");
+
+        try {
+            this.jobKickoffTask.createUser(
+                user,
+                group
+            );
+        } catch (GenieException ge) {
+            log.debug("Ignoring exception to capture arguments.");
+        }
+
+        Mockito.verify(this.executor, Mockito.times(2)).execute(argumentCaptor.capture());
+        Assert.assertArrayEquals(command.toArray(), argumentCaptor.getAllValues().get(1).toStrings());
+    }
+
+    /**
+     * Test the create user method for user already exists but swallow genie exception.
+     *
+     * @throws IOException If there is any problem.
+     * @throws GenieException If there is any problem.
+     */
+    @Test(expected = GenieServerException.class)
+    public void testCreateUserMethodSuccessDoesNotExist2() throws IOException, GenieException {
+
+        final String user = "user";
+        final String group = "group";
+
+        Mockito.when(this.executor.execute(Mockito.any())).thenThrow(IOException.class);
+        this.jobKickoffTask.createUser(
+            user,
+            group
+        );
+    }
 }
