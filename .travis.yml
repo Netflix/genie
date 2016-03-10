@@ -17,10 +17,7 @@ cache:
     - "$HOME/.gradle/caches/"
     - "$HOME/.gradle/wrapper/"
 
-before_install:
-  - pip install --user codecov
 after_success:
-  - codecov
   - ./gradlew coveralls
 
 env:

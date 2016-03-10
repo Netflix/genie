@@ -90,6 +90,7 @@ public abstract class RestControllerIntegrationTestsBase {
     protected static final String COMMANDS_LINK_KEY = "commands";
     protected static final String CLUSTERS_LINK_KEY = "clusters";
     protected static final String APPLICATIONS_LINK_KEY = "applications";
+    protected static final String JOBS_LINK_KEY = "jobs";
 
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
