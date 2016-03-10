@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.Constants;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.StringUtils;
@@ -162,48 +161,4 @@ public abstract class Utils {
             throw new GenieServerException(msg, e);
         }
     }
-
-    /**
-     * Create a new user on the system.
-     *
-     * @param user The userid of the user.
-     * @param group The group of the user.
-     *
-     * @throws GenieException If there is any problem.
-     */
-    public static void createUser(
-        @NotBlank
-        final String user,
-        final String group) throws GenieException {
-
-        // First check if user already exists
-        final CommandLine idCheckCommandLine = new CommandLine("id");
-        idCheckCommandLine.addArgument("-u");
-        idCheckCommandLine.addArgument(user);
-
-        try {
-            executor.execute(idCheckCommandLine);
-            log.info("User already exists");
-            return;
-        } catch (IOException ioe) {
-            log.info("User does not exist. Creating it now.");
-            final CommandLine userCreateCommandLine = new CommandLine("sudo");
-            userCreateCommandLine.addArgument("useradd");
-            userCreateCommandLine.addArgument(user);
-
-            if (StringUtils.isNotBlank(group)) {
-                userCreateCommandLine.addArgument("-G");
-                userCreateCommandLine.addArgument(group);
-            }
-
-            userCreateCommandLine.addArgument("-M");
-
-            try {
-                executor.execute(userCreateCommandLine);
-            } catch (IOException ioexception) {
-                throw new GenieServerException("Could not create user " + user + "with exception " + ioexception);
-            }
-        }
-    }
-
 }

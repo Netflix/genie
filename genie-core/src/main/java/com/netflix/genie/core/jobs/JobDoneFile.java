@@ -17,22 +17,17 @@
  */
 package com.netflix.genie.core.jobs;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Class that represents the structure of the genie.done file created when a job is done.
  *
  * @author amsharma
  * @since 3.0.0
  */
+@Getter
+@Setter
 public class JobDoneFile {
     private int exitCode;
-
-    public int getExitCode() {
-        return exitCode;
-    }
-
-    public void setExitCode(
-        final int exitCode
-    ) {
-        this.exitCode = exitCode;
-    }
 }

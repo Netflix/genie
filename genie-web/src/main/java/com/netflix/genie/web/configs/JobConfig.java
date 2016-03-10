@@ -67,12 +67,23 @@ public class JobConfig {
     }
 
     /**
+     * Create an Cluster Task bean that processes the cluster needed for a job.
+     *
+     * @return An cluster task object
+     */
+    @Bean
+    @Order(value = 2)
+    public WorkflowTask clusterProcessorTask() {
+        return new ClusterTask();
+    }
+
+    /**
      * Create an Application Task bean that processes all Applications needed for a job.
      *
      * @return An application task object
      */
     @Bean
-    @Order(value = 2)
+    @Order(value = 3)
     public WorkflowTask applicationProcessorTask() {
         return new ApplicationTask();
     }
@@ -83,21 +94,12 @@ public class JobConfig {
      * @return An command task object
      */
     @Bean
-    @Order(value = 3)
+    @Order(value = 4)
     public WorkflowTask commandProcessorTask() {
         return new CommandTask();
     }
 
-    /**
-     * Create an Cluster Task bean that processes the cluster needed for a job.
-     *
-     * @return An cluster task object
-     */
-    @Bean
-    @Order(value = 4)
-    public WorkflowTask clusterProcessorTask() {
-        return new ClusterTask();
-    }
+
 
     /**
      * Create an Job Task bean that processes Job information provided by user.
