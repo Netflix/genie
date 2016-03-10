@@ -1,7 +1,6 @@
 # Genie
 
-[![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg)]
-(https://bintray.com/netflixoss/maven/genie/_latestVersion)
+[![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg)](https://bintray.com/netflixoss/maven/genie/_latestVersion)
 [![License](https://img.shields.io/github/license/Netflix/genie.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Issues](https://img.shields.io/github/issues/Netflix/genie.svg)](https://github.com/Netflix/genie/issues)
 
@@ -21,16 +20,10 @@ processing cluster configurations and the commands and applications which run on
 
 Genie builds are run on Travis CI [here](https://travis-ci.org/Netflix/genie).
 
-|  Branch |                                                      Build                                                      |                                                                    Coverage                                                                   |
-|:-------:|:---------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------:|
-|  Master |  [![Build Status](https://img.shields.io/travis/Netflix/genie/master.svg)](https://travis-ci.org/Netflix/genie/branches) |  [![Code Coverage](https://img.shields.io/codecov/c/github/Netflix/genie/master.svg)](https://codecov.io/github/Netflix/genie?branch=master)  |
-| Develop | [![Build Status](https://img.shields.io/travis/Netflix/genie/develop.svg)](https://travis-ci.org/Netflix/genie/branches) | [![Code Coverage](https://img.shields.io/codecov/c/github/Netflix/genie/develop.svg)](https://codecov.io/github/Netflix/genie?branch=develop) |
-
-## Coverage Trends
-
-|  Branch |                                              Trend                                              |
-|:-------:|:-----------------------------------------------------------------------------------------------:|
-| develop | ![code coverage trend graph](https://codecov.io/github/Netflix/genie/branch.svg?branch=develop) |
+|  Branch |                                                     Build                                                     |                                                                         Coverage                                                                         |
+|:-------:|:-------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|  Master | [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=master)](https://travis-ci.org/Netflix/genie) |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=master)](https://coveralls.io/github/Netflix/genie?branch=master)  |
+| Develop | [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=master)](https://travis-ci.org/Netflix/genie) | [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=develop)](https://coveralls.io/github/Netflix/genie?branch=develop) |
 
 ## Documentation
 

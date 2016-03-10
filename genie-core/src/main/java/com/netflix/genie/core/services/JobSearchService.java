@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -49,6 +50,10 @@ public interface JobSearchService {
      * @param clusterId   id of cluster for job
      * @param commandName name of the command run in the job
      * @param commandId   id of the command run in the job
+     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
      * @param page        Page information of job to get
      * @return Metadata information on jobs which match the criteria
      */
@@ -62,6 +67,10 @@ public interface JobSearchService {
             final String clusterId,
             final String commandName,
             final String commandId,
+            final Date minStarted,
+            final Date maxStarted,
+            final Date minFinished,
+            final Date maxFinished,
             @NotNull final Pageable page
     );
 

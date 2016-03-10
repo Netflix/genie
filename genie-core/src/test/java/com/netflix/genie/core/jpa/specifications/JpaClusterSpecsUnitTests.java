@@ -16,7 +16,6 @@
 package com.netflix.genie.core.jpa.specifications;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -25,6 +24,7 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity_;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
+import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -63,8 +63,8 @@ public class JpaClusterSpecsUnitTests {
     private static final ClusterStatus STATUS_2 = ClusterStatus.OUT_OF_SERVICE;
     private static final Set<String> TAGS = new HashSet<>();
     private static final Set<ClusterStatus> STATUSES = EnumSet.noneOf(ClusterStatus.class);
-    private static final Long MIN_UPDATE_TIME = 123467L;
-    private static final Long MAX_UPDATE_TIME = 1234643L;
+    private static final Date MIN_UPDATE_TIME = new Date(123467L);
+    private static final Date MAX_UPDATE_TIME = new Date(1234643L);
     private static final Set<String> CLUSTER_CRITERIA_TAGS = new HashSet<>();
     private static final Set<String> COMMAND_CRITERIA = new HashSet<>();
 
@@ -111,25 +111,24 @@ public class JpaClusterSpecsUnitTests {
         final Predicate likeNamePredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(ClusterEntity_.name)).thenReturn(clusterNamePath);
         Mockito.when(this.cb.like(clusterNamePath, NAME))
-                .thenReturn(likeNamePredicate);
+            .thenReturn(likeNamePredicate);
 
         final Path<Date> minUpdatePath = (Path<Date>) Mockito.mock(Path.class);
         final Predicate greaterThanOrEqualToPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(ClusterEntity_.updated)).thenReturn(minUpdatePath);
-        Mockito.when(this.cb.greaterThanOrEqualTo(minUpdatePath, new Date(MIN_UPDATE_TIME)))
-                .thenReturn(greaterThanOrEqualToPredicate);
+        Mockito.when(this.cb.greaterThanOrEqualTo(minUpdatePath, MIN_UPDATE_TIME))
+            .thenReturn(greaterThanOrEqualToPredicate);
 
         final Path<Date> maxUpdatePath = (Path<Date>) Mockito.mock(Path.class);
         final Predicate lessThanPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(ClusterEntity_.updated)).thenReturn(maxUpdatePath);
-        Mockito.when(this.cb.lessThan(maxUpdatePath, new Date(MAX_UPDATE_TIME)))
-                .thenReturn(lessThanPredicate);
+        Mockito.when(this.cb.lessThan(maxUpdatePath, MAX_UPDATE_TIME)).thenReturn(lessThanPredicate);
 
         final Path<ClusterStatus> statusPath = (Path<ClusterStatus>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(ClusterEntity_.status)).thenReturn(statusPath);
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(ClusterStatus.class)))
-                .thenReturn(equalStatusPredicate);
+            .thenReturn(equalStatusPredicate);
 
         final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
@@ -139,7 +138,7 @@ public class JpaClusterSpecsUnitTests {
         this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
 
         this.commandLikeStatement = JpaSpecificationUtils.getTagLikeString(
-                Sets.newHashSet(COMMAND_CRITERIA_TAG_1, COMMAND_CRITERIA_TAG_2)
+            Sets.newHashSet(COMMAND_CRITERIA_TAG_1, COMMAND_CRITERIA_TAG_2)
         );
 
         // Setup for findByClusterAndCommandCriteria
@@ -152,30 +151,25 @@ public class JpaClusterSpecsUnitTests {
     @Test
     public void testFindAll() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .find(
-                        NAME,
-                        STATUSES,
-                        TAGS,
-                        MIN_UPDATE_TIME,
-                        MAX_UPDATE_TIME
-                );
+            .find(
+                NAME,
+                STATUSES,
+                TAGS,
+                MIN_UPDATE_TIME,
+                MAX_UPDATE_TIME
+            );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.name), NAME);
+            .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .greaterThanOrEqualTo(
-                        this.root.get(ClusterEntity_.updated), new Date(MIN_UPDATE_TIME)
-                );
+            .greaterThanOrEqualTo(this.root.get(ClusterEntity_.updated), MIN_UPDATE_TIME);
+        Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .lessThan(
-                        this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
-                );
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ClusterEntity_.status), status);
+                .equal(this.root.get(ClusterEntity_.status), status);
         }
     }
 
@@ -185,30 +179,25 @@ public class JpaClusterSpecsUnitTests {
     @Test
     public void testFindNoName() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .find(
-                        null,
-                        STATUSES,
-                        TAGS,
-                        MIN_UPDATE_TIME,
-                        MAX_UPDATE_TIME
-                );
+            .find(
+                null,
+                STATUSES,
+                TAGS,
+                MIN_UPDATE_TIME,
+                MAX_UPDATE_TIME
+            );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(ClusterEntity_.name), NAME);
+            .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .greaterThanOrEqualTo(
-                        this.root.get(ClusterEntity_.updated), new Date(MIN_UPDATE_TIME)
-                );
+            .greaterThanOrEqualTo(this.root.get(ClusterEntity_.updated), MIN_UPDATE_TIME);
+        Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .lessThan(
-                        this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
-                );
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ClusterEntity_.status), status);
+                .equal(this.root.get(ClusterEntity_.status), status);
         }
     }
 
@@ -218,30 +207,26 @@ public class JpaClusterSpecsUnitTests {
     @Test
     public void testFindNoStatuses() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .find(
-                        NAME,
-                        null,
-                        TAGS,
-                        MIN_UPDATE_TIME,
-                        MAX_UPDATE_TIME
-                );
+            .find(
+                NAME,
+                null,
+                TAGS,
+                MIN_UPDATE_TIME,
+                MAX_UPDATE_TIME
+            );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.name), NAME);
+            .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .greaterThanOrEqualTo(
-                        this.root.get(ClusterEntity_.updated), new Date(MIN_UPDATE_TIME)
-                );
+            .greaterThanOrEqualTo(this.root.get(ClusterEntity_.updated), MIN_UPDATE_TIME);
+        Mockito.verify(this.cb, Mockito.times(1)).lessThan(
+            this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .lessThan(
-                        this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
-                );
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
-                    .equal(this.root.get(ClusterEntity_.status), status);
+                .equal(this.root.get(ClusterEntity_.status), status);
         }
     }
 
@@ -251,30 +236,26 @@ public class JpaClusterSpecsUnitTests {
     @Test
     public void testFindEmptyStatuses() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .find(
-                        NAME,
-                        EnumSet.noneOf(ClusterStatus.class),
-                        TAGS,
-                        MIN_UPDATE_TIME,
-                        MAX_UPDATE_TIME
-                );
+            .find(
+                NAME,
+                EnumSet.noneOf(ClusterStatus.class),
+                TAGS,
+                MIN_UPDATE_TIME,
+                MAX_UPDATE_TIME
+            );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.name), NAME);
+            .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .greaterThanOrEqualTo(
-                        this.root.get(ClusterEntity_.updated), new Date(MIN_UPDATE_TIME)
-                );
+            .greaterThanOrEqualTo(this.root.get(ClusterEntity_.updated), MIN_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .lessThan(
-                        this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
-                );
+            .lessThan(this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
-                    .equal(this.root.get(ClusterEntity_.status), status);
+                .equal(this.root.get(ClusterEntity_.status), status);
         }
     }
 
@@ -284,30 +265,26 @@ public class JpaClusterSpecsUnitTests {
     @Test
     public void testFindNoTags() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .find(
-                        NAME,
-                        STATUSES,
-                        null,
-                        MIN_UPDATE_TIME,
-                        MAX_UPDATE_TIME
-                );
+            .find(
+                NAME,
+                STATUSES,
+                null,
+                MIN_UPDATE_TIME,
+                MAX_UPDATE_TIME
+            );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.name), NAME);
+            .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .greaterThanOrEqualTo(
-                        this.root.get(ClusterEntity_.updated), new Date(MIN_UPDATE_TIME)
-                );
+            .greaterThanOrEqualTo(this.root.get(ClusterEntity_.updated), MIN_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .lessThan(
-                        this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
-                );
+            .lessThan(this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ClusterEntity_.status), status);
+                .equal(this.root.get(ClusterEntity_.status), status);
         }
     }
 
@@ -317,30 +294,26 @@ public class JpaClusterSpecsUnitTests {
     @Test
     public void testFindNoMinTime() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .find(
-                        NAME,
-                        STATUSES,
-                        TAGS,
-                        null,
-                        MAX_UPDATE_TIME
-                );
+            .find(
+                NAME,
+                STATUSES,
+                TAGS,
+                null,
+                MAX_UPDATE_TIME
+            );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.name), NAME);
+            .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.never())
-                .greaterThanOrEqualTo(
-                        this.root.get(ClusterEntity_.updated), new Date(MIN_UPDATE_TIME)
-                );
+            .greaterThanOrEqualTo(this.root.get(ClusterEntity_.updated), MIN_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .lessThan(
-                        this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
-                );
+            .lessThan(this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ClusterEntity_.status), status);
+                .equal(this.root.get(ClusterEntity_.status), status);
         }
     }
 
@@ -350,30 +323,26 @@ public class JpaClusterSpecsUnitTests {
     @Test
     public void testFindNoMax() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .find(
-                        NAME,
-                        STATUSES,
-                        TAGS,
-                        MIN_UPDATE_TIME,
-                        null
-                );
+            .find(
+                NAME,
+                STATUSES,
+                TAGS,
+                MIN_UPDATE_TIME,
+                null
+            );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.name), NAME);
+            .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .greaterThanOrEqualTo(
-                        this.root.get(ClusterEntity_.updated), new Date(MIN_UPDATE_TIME)
-                );
+            .greaterThanOrEqualTo(this.root.get(ClusterEntity_.updated), MIN_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.never())
-                .lessThan(
-                        this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
-                );
+            .lessThan(this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ClusterEntity_.status), status);
+                .equal(this.root.get(ClusterEntity_.status), status);
         }
     }
 
@@ -384,30 +353,26 @@ public class JpaClusterSpecsUnitTests {
     public void testFindEmptyTag() {
         TAGS.add("");
         final Specification<ClusterEntity> spec = JpaClusterSpecs
-                .find(
-                        NAME,
-                        STATUSES,
-                        TAGS,
-                        MIN_UPDATE_TIME,
-                        null
-                );
+            .find(
+                NAME,
+                STATUSES,
+                TAGS,
+                MIN_UPDATE_TIME,
+                null
+            );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.name), NAME);
+            .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .greaterThanOrEqualTo(
-                        this.root.get(ClusterEntity_.updated), new Date(MIN_UPDATE_TIME)
-                );
+            .greaterThanOrEqualTo(this.root.get(ClusterEntity_.updated), MIN_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.never())
-                .lessThan(
-                        this.root.get(ClusterEntity_.updated), new Date(MAX_UPDATE_TIME)
-                );
+            .lessThan(this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(ClusterEntity_.tags), this.tagLikeStatement);
         for (final ClusterStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ClusterEntity_.status), status);
+                .equal(this.root.get(ClusterEntity_.status), status);
         }
     }
 
@@ -437,18 +402,18 @@ public class JpaClusterSpecsUnitTests {
     public void testFindByClusterAndCommandCriteria() throws GenieException {
         final ClusterCriteria criteria = new ClusterCriteria(CLUSTER_CRITERIA_TAGS);
         final Specification<ClusterEntity> spec
-                = JpaClusterSpecs.findByClusterAndCommandCriteria(criteria, COMMAND_CRITERIA);
+            = JpaClusterSpecs.findByClusterAndCommandCriteria(criteria, COMMAND_CRITERIA);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cq, Mockito.times(1)).distinct(true);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(Mockito.eq(this.commands.get(CommandEntity_.status)), Mockito.eq(CommandStatus.ACTIVE));
+            .equal(Mockito.eq(this.commands.get(CommandEntity_.status)), Mockito.eq(CommandStatus.ACTIVE));
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(Mockito.eq(this.root.get(ClusterEntity_.status)), Mockito.eq(ClusterStatus.UP));
+            .equal(Mockito.eq(this.root.get(ClusterEntity_.status)), Mockito.eq(ClusterStatus.UP));
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(Mockito.eq(this.root.get(ClusterEntity_.tags)), Mockito.eq(this.tagLikeStatement));
+            .like(Mockito.eq(this.root.get(ClusterEntity_.tags)), Mockito.eq(this.tagLikeStatement));
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(Mockito.eq(this.commands.get(CommandEntity_.tags)), Mockito.eq(this.commandLikeStatement));
+            .like(Mockito.eq(this.commands.get(CommandEntity_.tags)), Mockito.eq(this.commandLikeStatement));
     }
 
     /**

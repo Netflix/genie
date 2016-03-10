@@ -86,12 +86,42 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     public void canFindJobs() {
         //TODO: add more cases
         final Pageable page = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
-        Page<JobSearchResult> jobs = this.service.findJobs(null, null, null, null, null, null, null, null, null, page);
+        Page<JobSearchResult> jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
         Assert.assertThat(jobs.getTotalElements(), Matchers.is(3L));
 
-        jobs = this.service.findJobs(
-            null, null, null, Sets.newHashSet(JobStatus.RUNNING), null, null, null, null, null, page
-        );
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                Sets.newHashSet(JobStatus.RUNNING),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
         Assert.assertThat(jobs.getTotalElements(), Matchers.is(2L));
         Assert.assertThat(
             jobs
@@ -102,9 +132,23 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
             Matchers.is(2L)
         );
 
-        jobs = this.service.findJobs(
-            JOB_1_ID, null, null, null, null, null, null, null, null, page
-        );
+        jobs = this.service
+            .findJobs(
+                JOB_1_ID,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
         Assert.assertThat(jobs.getTotalElements(), Matchers.is(1L));
         Assert.assertThat(
             jobs

@@ -25,8 +25,10 @@ import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -46,17 +48,16 @@ public interface JobCoordinatorService {
      * @throws GenieException if there is an error
      */
     String coordinateJob(
-            @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
-            @Valid
-            final JobRequest jobRequest,
-            final String clientHost
+        @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
+        @Valid
+        final JobRequest jobRequest,
+        final String clientHost
     ) throws GenieException;
 
     /**
      * Gets the Job object to return to user given the id.
      *
      * @param jobId of job to retrieve
-     *
      * @return job object
      * @throws GenieException if there is an error
      */
@@ -83,20 +84,28 @@ public interface JobCoordinatorService {
      * @param clusterId   id of cluster for job
      * @param commandName name of the command run in the job
      * @param commandId   id of the command run in the job
+     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
      * @param page        Page information of jobs to get
      * @return All jobs which match the criteria
      */
     Page<JobSearchResult> findJobs(
-            final String id,
-            final String jobName,
-            final String userName,
-            final Set<JobStatus> statuses,
-            final Set<String> tags,
-            final String clusterName,
-            final String clusterId,
-            final String commandName,
-            final String commandId,
-            final Pageable page
+        final String id,
+        final String jobName,
+        final String userName,
+        final Set<JobStatus> statuses,
+        final Set<String> tags,
+        final String clusterName,
+        final String clusterId,
+        final String commandName,
+        final String commandId,
+        final Date minStarted,
+        final Date maxStarted,
+        final Date minFinished,
+        final Date maxFinished,
+        final Pageable page
     );
 
     /**

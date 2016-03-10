@@ -81,6 +81,10 @@ public final class JpaJobSpecs {
      * @param clusterId   The cluster id
      * @param commandName The command name
      * @param commandId   The command id
+     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
      * @return The specification
      */
     public static Predicate getFindPredicate(
@@ -94,7 +98,11 @@ public final class JpaJobSpecs {
         final String clusterName,
         final String clusterId,
         final String commandName,
-        final String commandId
+        final String commandId,
+        final Date minStarted,
+        final Date maxStarted,
+        final Date minFinished,
+        final Date maxFinished
     ) {
         final List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(id)) {
@@ -128,6 +136,18 @@ public final class JpaJobSpecs {
         }
         if (StringUtils.isNotBlank(commandName)) {
             predicates.add(cb.equal(root.get(JobEntity_.commandName), commandName));
+        }
+        if (minStarted != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get(JobEntity_.started), minStarted));
+        }
+        if (maxStarted != null) {
+            predicates.add(cb.lessThan(root.get(JobEntity_.started), maxStarted));
+        }
+        if (minFinished != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get(JobEntity_.finished), minFinished));
+        }
+        if (maxFinished != null) {
+            predicates.add(cb.lessThan(root.get(JobEntity_.finished), maxFinished));
         }
         return cb.and(predicates.toArray(new Predicate[predicates.size()]));
     }

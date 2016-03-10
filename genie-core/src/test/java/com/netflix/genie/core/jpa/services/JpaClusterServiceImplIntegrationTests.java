@@ -183,7 +183,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Calendar time = Calendar.getInstance();
         time.clear();
         time.set(2014, Calendar.JULY, 9, 2, 58, 59);
-        final Page<Cluster> clusters = this.service.getClusters(null, null, null, time.getTimeInMillis(), null, PAGE);
+        final Page<Cluster> clusters = this.service.getClusters(null, null, null, time.getTime(), null, PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
         Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
     }
@@ -196,7 +196,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Calendar time = Calendar.getInstance();
         time.clear();
         time.set(2014, Calendar.JULY, 8, 3, 0, 0);
-        final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, time.getTimeInMillis(), PAGE);
+        final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, time.getTime(), PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
         Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
     }

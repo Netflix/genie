@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -177,7 +178,14 @@ public class ClusterRestController {
             ).withSelfRel();
 
         return assembler.toResource(
-            this.clusterService.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page),
+            this.clusterService.getClusters(
+                name,
+                enumStatuses,
+                tags,
+                minUpdateTime == null ? null : new Date(minUpdateTime),
+                maxUpdateTime == null ? null : new Date(maxUpdateTime),
+                page
+            ),
             this.clusterResourceAssembler,
             self
         );

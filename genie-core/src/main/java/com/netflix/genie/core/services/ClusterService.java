@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -85,8 +86,8 @@ public interface ClusterService {
             final String name,
             final Set<ClusterStatus> statuses,
             final Set<String> tags,
-            final Long minUpdateTime,
-            final Long maxUpdateTime,
+            final Date minUpdateTime,
+            final Date maxUpdateTime,
             final Pageable page
     );
 

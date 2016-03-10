@@ -76,6 +76,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.Set;
@@ -298,6 +299,10 @@ public class JobRestController {
      * @param clusterId   the id of the cluster
      * @param commandName the name of the command run by the job
      * @param commandId   the id of the command run by the job
+     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
      * @param page        page information for job
      * @param assembler   The paged resources assembler to use
      * @return successful response, or one with HTTP error code
@@ -315,15 +320,20 @@ public class JobRestController {
         @RequestParam(value = "clusterId", required = false) final String clusterId,
         @RequestParam(value = "commandName", required = false) final String commandName,
         @RequestParam(value = "commandId", required = false) final String commandId,
+        @RequestParam(value = "minStarted", required = false) final Long minStarted,
+        @RequestParam(value = "maxStarted", required = false) final Long maxStarted,
+        @RequestParam(value = "minFinished", required = false) final Long minFinished,
+        @RequestParam(value = "maxFinished", required = false) final Long maxFinished,
         @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
         log.debug(
             "Called with "
-                + "[id | jobName | userName | statuses | clusterName | clusterId | page]"
+                + "[id | jobName | userName | statuses | clusterName "
+                + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | page]"
         );
         log.debug(
-            "{} | {} | {} | {} | {} | {} | {}",
+            "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
             id,
             name,
             userName,
@@ -333,6 +343,10 @@ public class JobRestController {
             clusterId,
             commandName,
             commandId,
+            minStarted,
+            maxStarted,
+            minFinished,
+            maxFinished,
             page
         );
         Set<JobStatus> enumStatuses = null;
@@ -360,6 +374,10 @@ public class JobRestController {
                         clusterId,
                         commandName,
                         commandId,
+                        minStarted,
+                        maxStarted,
+                        minFinished,
+                        maxFinished,
                         page,
                         assembler
                     )
@@ -376,6 +394,10 @@ public class JobRestController {
                 clusterId,
                 commandName,
                 commandId,
+                minStarted == null ? null : new Date(minStarted),
+                maxStarted == null ? null : new Date(maxStarted),
+                minFinished == null ? null : new Date(minFinished),
+                maxFinished == null ? null : new Date(maxFinished),
                 page
             ),
             this.jobSearchResultResourceAssembler,

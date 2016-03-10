@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.Set;
 
 
@@ -49,9 +50,12 @@ import java.util.Set;
  * Implementation of the JobService APIs.
  *
  * @author amsharma
+ * @author tgianos
+ * @since 3.0.0
  */
 @Service
 @Slf4j
+// TODO: this doesn't need an interface as it is a single coordinator
 public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
     private final JobPersistenceService jobPersistenceService;
@@ -166,6 +170,10 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final String clusterId,
         final String commandName,
         final String commandId,
+        final Date minStarted,
+        final Date maxStarted,
+        final Date minFinished,
+        final Date maxFinished,
         final Pageable page
     ) {
         log.debug("called");
@@ -180,6 +188,10 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             clusterId,
             commandName,
             commandId,
+            minStarted,
+            maxStarted,
+            minFinished,
+            maxFinished,
             page
         );
     }
