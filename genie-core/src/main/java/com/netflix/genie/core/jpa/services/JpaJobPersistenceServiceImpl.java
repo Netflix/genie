@@ -350,6 +350,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobEntity.setExecution(jobExecutionEntity);
         jobEntity.setStatus(JobStatus.RUNNING);
         jobEntity.setStatusMsg("Job is Running");
+        jobEntity.setStarted(new Date());
     }
 
     /**

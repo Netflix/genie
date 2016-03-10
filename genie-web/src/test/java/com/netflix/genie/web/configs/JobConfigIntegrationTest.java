@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -31,9 +32,9 @@ public class JobConfigIntegrationTest {
     public Resource jobsDir(
         final ResourceLoader resourceLoader
     ) throws IOException {
-        //final String currentDir = new File("/tmp").getAbsolutePath();
-        //final Resource jobsDirResource = resourceLoader.getResource(currentDir + "/build/tmp/");
-        final Resource jobsDirResource = resourceLoader.getResource("file:///tmp/");
+        final String currentDir = new File(".").getCanonicalPath();
+        final Resource jobsDirResource = resourceLoader.getResource(currentDir + "/build/tmp/genie/");
+        //final Resource jobsDirResource = resourceLoader.getResource("file:///tmp/");
         return jobsDirResource;
     }
 }
