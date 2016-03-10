@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
-import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -27,7 +26,6 @@ import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -134,33 +132,30 @@ public abstract class GenieBaseTask implements WorkflowTask {
                 break;
         }
 
-        if (filePath != null && StringUtils.isNotBlank(filePath)) {
-            final String fileName = Utils.getFileNameFromPath(filePath);
-            final StringBuilder localPath = new StringBuilder()
-                .append(dir)
-                .append(Constants.FILE_PATH_DELIMITER)
-                .append(Constants.GENIE_PATH_VAR);
+        final String fileName = Utils.getFileNameFromPath(filePath);
+        final StringBuilder localPath = new StringBuilder()
+            .append(dir)
+            .append(Constants.FILE_PATH_DELIMITER)
+            .append(Constants.GENIE_PATH_VAR);
 
-            if (entityPathVar != null) {
-                localPath.append(Constants.FILE_PATH_DELIMITER)
-                    .append(entityPathVar);
-            }
-
+        if (entityPathVar != null) {
             localPath.append(Constants.FILE_PATH_DELIMITER)
-                .append(id);
-
-            if (filePathVar != null) {
-                localPath.append(Constants.FILE_PATH_DELIMITER)
-                    .append(filePathVar);
-
-            }
-            localPath.append(Constants.FILE_PATH_DELIMITER).append(fileName);
-
-            return localPath.toString();
-
-        } else {
-            throw new GenieBadRequestException("Could not construct localPath.");
+                .append(entityPathVar);
         }
+
+        localPath.append(Constants.FILE_PATH_DELIMITER)
+            .append(id);
+
+        if (filePathVar != null) {
+            localPath.append(Constants.FILE_PATH_DELIMITER)
+                .append(filePathVar);
+
+        }
+        localPath.append(Constants.FILE_PATH_DELIMITER).append(fileName);
+
+        return localPath.toString();
+
+
     }
 
     /**
@@ -190,8 +185,8 @@ public abstract class GenieBaseTask implements WorkflowTask {
             case CLUSTER:
                 entityPathVar = Constants.CLUSTER_PATH_VAR;
                 break;
+            // TODO The @NotNull validation will make sure we never reach default, but checkstyle forces a default.
             default:
-                return;
         }
 
         Utils.createDirectory(
@@ -231,8 +226,8 @@ public abstract class GenieBaseTask implements WorkflowTask {
             case CLUSTER:
                 entityPathVar = Constants.CLUSTER_PATH_VAR;
                 break;
+            // TODO The @NotNull validation will make sure we never reach default, but checkstyle forces a default.
             default:
-                return;
         }
 
         Utils.createDirectory(
@@ -274,8 +269,8 @@ public abstract class GenieBaseTask implements WorkflowTask {
             case CLUSTER:
                 entityPathVar = Constants.CLUSTER_PATH_VAR;
                 break;
+            // TODO The @NotNull validation will make sure we never reach default, but checkstyle forces a default.
             default:
-                return;
         }
 
         Utils.createDirectory(

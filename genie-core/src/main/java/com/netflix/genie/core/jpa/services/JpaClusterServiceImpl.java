@@ -110,6 +110,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         clusterEntity.setStatus(cluster.getStatus());
         clusterEntity.setConfigs(cluster.getConfigs());
         clusterEntity.setTags(cluster.getTags());
+        clusterEntity.setSetupFile(cluster.getSetupFile());
 
         return this.clusterRepo.save(clusterEntity).getId();
     }
