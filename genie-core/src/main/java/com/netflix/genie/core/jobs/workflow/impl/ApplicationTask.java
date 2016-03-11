@@ -19,13 +19,13 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.AdminResources;
+import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
-import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -48,39 +48,36 @@ public class ApplicationTask extends GenieBaseTask {
         log.debug("Executing Application Task in the workflow.");
         super.executeTask(context);
 
-        // Open a writer to jobLauncher script
-        final Writer writer = Utils.getWriter(this.runScript);
-
         if (this.jobExecEnv.getApplications() != null) {
             for (Application application : this.jobExecEnv.getApplications()) {
 
                 // Create the directory for this application under applications in the cwd
                 createEntityInstanceDirectory(
                     application.getId(),
-                    Constants.AdminResources.APPLICATION
+                    AdminResources.APPLICATION
                 );
 
                 // Create the config directory for this id
                 createEntityInstanceConfigDirectory(
                     application.getId(),
-                    Constants.AdminResources.APPLICATION
+                    AdminResources.APPLICATION
                 );
 
                 // Create the dependencies directory for this id
                 createEntityInstanceDependenciesDirectory(
                     application.getId(),
-                    Constants.AdminResources.APPLICATION
+                    AdminResources.APPLICATION
                 );
 
                 // Get the setup file if specified and add it as source command in launcher script
                 final String applicationSetupFile = application.getSetupFile();
                 if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
                     final String localPath = super.buildLocalFilePath(
-                        this.jobWorkigDirectory,
+                        this.jobWorkingDirectory,
                         application.getId(),
                         applicationSetupFile,
-                        Constants.FileType.SETUP,
-                        Constants.AdminResources.APPLICATION
+                        FileType.SETUP,
+                        AdminResources.APPLICATION
                     );
                     this.fts.getFile(applicationSetupFile, localPath);
                     Utils.appendToWriter(writer, "source " + localPath + ";");
@@ -89,11 +86,11 @@ public class ApplicationTask extends GenieBaseTask {
                 // Iterate over and get all dependencies
                 for (final String dependencyFile: application.getDependencies()) {
                     final String localPath = super.buildLocalFilePath(
-                        this.jobWorkigDirectory,
+                        this.jobWorkingDirectory,
                         application.getId(),
                         dependencyFile,
-                        Constants.FileType.DEPENDENCIES,
-                        Constants.AdminResources.APPLICATION
+                        FileType.DEPENDENCIES,
+                        AdminResources.APPLICATION
                     );
                     this.fts.getFile(dependencyFile, localPath);
                 }
@@ -101,18 +98,15 @@ public class ApplicationTask extends GenieBaseTask {
                 // Iterate over and get all configuration files
                 for (final String configFile: application.getConfigs()) {
                     final String localPath = super.buildLocalFilePath(
-                        this.jobWorkigDirectory,
+                        this.jobWorkingDirectory,
                         application.getId(),
                         configFile,
-                        Constants.FileType.CONFIG,
-                        Constants.AdminResources.APPLICATION
+                        FileType.CONFIG,
+                        AdminResources.APPLICATION
                     );
                     this.fts.getFile(configFile, localPath);
                 }
             }
         }
-
-        // close the writer
-        Utils.closeWriter(writer);
     }
 }

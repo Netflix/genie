@@ -22,9 +22,6 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,17 +35,6 @@ import java.nio.file.Files;
  */
 @Slf4j
 public class LocalFileTransferImpl implements FileTransfer {
-
-    private final ResourceLoader resourceLoader;
-
-    /**
-     * Constructor.
-     *
-     */
-    @Autowired
-    public LocalFileTransferImpl() {
-        this.resourceLoader = new DefaultResourceLoader();
-    }
 
     /**
      * {@inheritDoc}

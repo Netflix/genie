@@ -26,7 +26,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
@@ -419,7 +419,7 @@ public class JobRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void killJob(
         @PathVariable("id") final String id,
-        @RequestHeader(name = Constants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
+        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws GenieException, IOException, ServletException {
@@ -498,7 +498,7 @@ public class JobRestController {
     )
     public void getJobOutput(
         @PathVariable("id") final String id,
-        @RequestHeader(name = Constants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
+        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
@@ -570,7 +570,7 @@ public class JobRestController {
         }
 
         // This method only called when need to forward so add the forwarded from header
-        forwardRequest.addHeader(Constants.GENIE_FORWARDED_FROM_HEADER, request.getRequestURL().toString());
+        forwardRequest.addHeader(JobConstants.GENIE_FORWARDED_FROM_HEADER, request.getRequestURL().toString());
     }
 
     private boolean forwardResponseHasError(

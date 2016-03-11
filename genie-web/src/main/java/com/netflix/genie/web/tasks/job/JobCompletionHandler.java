@@ -23,7 +23,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.jobs.JobDoneFile;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -162,8 +162,8 @@ public class JobCompletionHandler {
         if (StringUtils.isNotBlank(job.getArchiveLocation())) {
 
             // Create the tar file exluding the run.sh file and everything under the genie directory
-            final String jobWorkingDir = this.baseWorkingDir + Constants.FILE_PATH_DELIMITER + jobId;
-            final String localArchiveFile = jobWorkingDir + Constants.FILE_PATH_DELIMITER + jobId + ".tar.gz";
+            final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
+            final String localArchiveFile = jobWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId + ".tar.gz";
 
             final CommandLine commandLine = new CommandLine("tar");
             commandLine.addArgument("--exclude=genie");

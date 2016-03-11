@@ -25,7 +25,7 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -116,7 +116,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     GeniePreconditionException("Job archival is enabled but base location for archival is null.");
             }
             jobArchivalLocation = baseArchiveLocation
-                + Constants.FILE_PATH_DELIMITER
+                + JobConstants.FILE_PATH_DELIMITER
                 + jobRequest.getId()
                 + ".tar.gz";
         }

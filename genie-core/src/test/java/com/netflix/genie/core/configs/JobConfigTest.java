@@ -55,8 +55,7 @@ public class JobConfigTest {
     @Bean
     @Order(value = 2)
     public FileTransfer localFileTransfer() {
-        return new LocalFileTransferImpl();
-    }
+        return new LocalFileTransferImpl(); }
 
     /**
      * Create an setup Task bean that does initial setup before any of the tasks start.

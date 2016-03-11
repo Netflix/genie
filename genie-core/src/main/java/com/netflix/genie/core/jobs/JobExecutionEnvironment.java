@@ -29,6 +29,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -62,9 +63,18 @@ public class JobExecutionEnvironment {
     }
 
     /**
+     * Get the applications for this instance.
+     *
+     * @return A list of applications for this instance.
+     */
+    public List<Application> getApplications() {
+        return Collections.unmodifiableList(this.applications);
+    }
+
+    /**
      * A builder to create Job Execution Environment objects.
      *
-     * @author tgianos
+     * @author amsharma
      * @since 3.0.0
      */
     public static class Builder {
@@ -80,8 +90,8 @@ public class JobExecutionEnvironment {
          * @param request The job request object.
          * @param clusterObj The cluster object.
          * @param commandObj The command object.
-         * @param dir The directory location for the jobs
-         * @throws GenieException If there is an error
+         * @param dir The directory location for this job.
+         * @throws GenieException If there is an error.
          */
         public Builder(
             @NotNull(message = "Job Request cannot be null")

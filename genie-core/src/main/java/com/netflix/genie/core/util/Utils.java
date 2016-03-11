@@ -19,10 +19,8 @@ package com.netflix.genie.core.util;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.JobConstants;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -41,8 +39,6 @@ import java.lang.reflect.Field;
  */
 @Slf4j
 public abstract class Utils {
-
-    private static Executor executor = new DefaultExecutor();
 
     /**
      * Closes the stream to the writer supplied.
@@ -98,12 +94,12 @@ public abstract class Utils {
     ) throws GenieException {
 
         try {
-            if (content != null && StringUtils.isNotBlank(content)) {
+            if (StringUtils.isNotBlank(content)) {
                 writer.write(content);
                 writer.write("\n");
             }
         } catch (IOException ioe) {
-            throw new GenieServerException("Error closing file writer", ioe);
+            throw new GenieServerException("Could not append content to file", ioe);
         }
     }
 
@@ -124,21 +120,6 @@ public abstract class Utils {
     }
 
     /**
-     * Get the name of the file specified in the path.
-     *
-     * @param filePath Path of the file
-     * @return The name of the file
-     *
-     * @throws GenieException if there is any problem
-     */
-    public static String getFileNameFromPath(
-        @NotBlank (message = "The path of the file cannot be blank.")
-        final String filePath
-    ) throws GenieException {
-        return new File(filePath).getName();
-    }
-
-    /**
      * Get process id for the given process.
      *
      * @param proc java process object representing the job launcher
@@ -149,7 +130,7 @@ public abstract class Utils {
         log.debug("called");
 
         try {
-            final Field f = proc.getClass().getDeclaredField(Constants.PID);
+            final Field f = proc.getClass().getDeclaredField(JobConstants.PID);
             f.setAccessible(true);
             return f.getInt(proc);
         } catch (final IllegalAccessException

@@ -49,7 +49,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -78,7 +77,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";
     private static final String FILE_DELIMITER = "/";
 
-    private static final String JOB_ID = "123";
     private static final String JOB_NAME = "List Directories bash job";
     private static final String JOB_USER = "genie";
     private static final String JOB_VERSION = "1.0";
@@ -92,8 +90,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     private static final String APP2_ID = "app2";
     private static final String APP2_NAME = "Application 2";
-    private static final String APP2_USER = "genie";
-    private static final String APP2_VERSION = "1.0";
 
     private static final String CMD1_ID = "cmd1";
     private static final String CMD1_NAME = "Unix Bash command";
@@ -108,8 +104,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     // Since we're bringing the service up on random port need to figure out what it is
     @Value("${local.server.port}")
     private int port;
-    private String appsBaseUrl;
-    private String jobsBaseUrl;
+
     private ResourceLoader resourceLoader;
 
     @Autowired

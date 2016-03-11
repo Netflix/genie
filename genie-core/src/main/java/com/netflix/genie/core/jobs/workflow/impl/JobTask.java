@@ -18,15 +18,13 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotNull;
-import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -46,7 +44,6 @@ public class JobTask extends GenieBaseTask {
      * @param attachmentService An implementation of the Attachment Service
      * @throws GenieException If there is any problem.
      */
-    @Autowired
     public JobTask(
         final AttachmentService attachmentService
         ) throws GenieException {
@@ -63,26 +60,24 @@ public class JobTask extends GenieBaseTask {
         log.debug("Execution Job Task in the workflow.");
         super.executeTask(context);
 
-        // Open a writer to jobLauncher script
-        final Writer writer = Utils.getWriter(this.runScript);
-
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
 
         if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
             final String localPath =
-                this.jobWorkigDirectory
-                    + Constants.FILE_PATH_DELIMITER
-                    + Utils.getFileNameFromPath(jobSetupFile);
+                this.jobWorkingDirectory
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + jobSetupFile.substring(jobSetupFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
 
             this.fts.getFile(jobSetupFile, localPath);
-            Utils.appendToWriter(writer, Constants.SOURCE + localPath + Constants.SEMICOLON_SYMBOL);
+            Utils.appendToWriter(writer, JobConstants.SOURCE + localPath + JobConstants.SEMICOLON_SYMBOL);
         }
 
         // Iterate over and get all dependencies
         for (final String dependencyFile: jobExecEnv.getJobRequest().getFileDependencies()) {
-            final String localPath = this.jobWorkigDirectory
-                + Constants.FILE_PATH_DELIMITER
-                + Utils.getFileNameFromPath(dependencyFile);
+            final String localPath = this.jobWorkingDirectory
+                + JobConstants.FILE_PATH_DELIMITER
+                + dependencyFile.substring(dependencyFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
+
             this.fts.getFile(dependencyFile, localPath);
         }
 
@@ -94,18 +89,15 @@ public class JobTask extends GenieBaseTask {
         Utils.appendToWriter(
             writer,
             jobExecEnv.getCommand().getExecutable()
-                + Constants.WHITE_SPACE
+                + JobConstants.WHITE_SPACE
                 + jobExecEnv.getJobRequest().getCommandArgs()
-                + Constants.STDOUT_REDIRECT
-                + Constants.STDOUT_LOG_FILE_NAME
-                + Constants.STDERR_REDIRECT
-                + Constants.STDERR_LOG_FILE_NAME
+                + JobConstants.STDOUT_REDIRECT
+                + JobConstants.STDOUT_LOG_FILE_NAME
+                + JobConstants.STDERR_REDIRECT
+                + JobConstants.STDERR_LOG_FILE_NAME
         );
 
         // capture exit code and write to genie.done file
-        Utils.appendToWriter(writer, Constants.GENIE_DONE_FILE_CONTENT_PREFIX + Constants.GENIE_DONE_FILE_NAME);
-
-        // close the writer
-        Utils.closeWriter(writer);
+        Utils.appendToWriter(writer, JobConstants.GENIE_DONE_FILE_CONTENT_PREFIX + JobConstants.GENIE_DONE_FILE_NAME);
     }
 }

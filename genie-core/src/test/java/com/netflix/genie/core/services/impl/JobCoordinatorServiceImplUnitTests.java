@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -165,7 +165,7 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
         Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
         Assert.assertEquals(BASE_ARCHIVE_LOCATION
-            + Constants.FILE_PATH_DELIMITER
+            + JobConstants.FILE_PATH_DELIMITER
             + JOB_1_ID
             + ".tar.gz",
             argument.getValue().getArchiveLocation());

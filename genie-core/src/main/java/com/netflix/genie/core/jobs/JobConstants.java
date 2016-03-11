@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.common.util;
+package com.netflix.genie.core.jobs;
 
 /**
  * A class holding some constants to be used everywhere.
@@ -24,7 +24,7 @@ package com.netflix.genie.common.util;
  * @author tgianos
  * @since 3.0.0
  */
-public final class Constants {
+public final class JobConstants {
 
     /**
      * The header to use to mark a forwarded from another Genie node.
@@ -92,11 +92,6 @@ public final class Constants {
     public static final String STDERR_REDIRECT = " 2> ";
 
     /**
-     * File Path prefix to be used while creating paths for setup files downloaded by Genie to local dir.
-     **/
-    public static final String SETUP_FILE_PATH_PREFIX = "setup_file";
-
-    /**
      * File Path prefix to be used while creating paths for dependency files downloaded by Genie to local dir.
      **/
     public static final String DEPENDENCY_FILE_PATH_PREFIX = "dependencies";
@@ -152,11 +147,6 @@ public final class Constants {
     public static final String LOGS_PATH_VAR = "logs";
 
     /**
-     * Environment variable for Genie working directory.
-     **/
-    public static final String GENIE_WORKING_DIR_ENV_VAR = "GENIE_WORKING_DIR";
-
-    /**
      * Environment variable for Genie job working directory.
      **/
     public static final String GENIE_JOB_DIR_ENV_VAR = "GENIE_JOB_DIR";
@@ -187,49 +177,13 @@ public final class Constants {
     public static final String GENIE_DONE_FILE_CONTENT_PREFIX = "printf '{\"exitCode\": \"%s\"}\\n' \"$?\" > ";
 
     /**
+     * Key used to look up the writer object.
+     */
+    public static final String WRITER_KEY = "writer";
+
+    /**
      * Protected constructor for utility class.
      */
-    protected Constants() {
-    }
-
-    /**
-     * Enum containing types of files that the entities hold.
-     */
-    public enum FileType {
-
-        /**
-         * Configuration Files.
-         **/
-        CONFIG,
-
-        /**
-         * Setup Files.
-         **/
-        SETUP,
-
-        /**
-         * Other Dependencies.
-         **/
-        DEPENDENCIES
-    }
-
-    /**
-     * Enum containing the four types of Entities in Genie.
-     */
-    public enum AdminResources {
-        /**
-         * Application Entity.
-         **/
-        APPLICATION,
-
-        /**
-         * Command Entity.
-         **/
-        COMMAND,
-
-        /**
-         * Cluster Entity.
-         **/
-        CLUSTER
+    protected JobConstants() {
     }
 }

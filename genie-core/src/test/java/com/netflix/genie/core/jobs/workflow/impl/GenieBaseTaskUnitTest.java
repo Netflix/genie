@@ -19,7 +19,8 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.AdminResources;
+import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,8 +63,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.CONFIG,
-            Constants.AdminResources.APPLICATION
+            FileType.CONFIG,
+            AdminResources.APPLICATION
         );
 
         Assert.assertEquals("dirpath/genie/applications/id/config/filename", localPath);
@@ -80,8 +81,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.SETUP,
-            Constants.AdminResources.APPLICATION
+            FileType.SETUP,
+            AdminResources.APPLICATION
         );
 
         Assert.assertEquals("dirpath/genie/applications/id/filename", localPath);
@@ -98,8 +99,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.DEPENDENCIES,
-            Constants.AdminResources.APPLICATION
+            FileType.DEPENDENCIES,
+            AdminResources.APPLICATION
         );
 
         Assert.assertEquals("dirpath/genie/applications/id/dependencies/filename", localPath);
@@ -116,8 +117,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.CONFIG,
-            Constants.AdminResources.COMMAND
+            FileType.CONFIG,
+            AdminResources.COMMAND
         );
 
         Assert.assertEquals("dirpath/genie/command/id/config/filename", localPath);
@@ -134,8 +135,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.SETUP,
-            Constants.AdminResources.COMMAND
+            FileType.SETUP,
+            AdminResources.COMMAND
         );
 
         Assert.assertEquals("dirpath/genie/command/id/filename", localPath);
@@ -152,8 +153,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.DEPENDENCIES,
-            Constants.AdminResources.COMMAND
+            FileType.DEPENDENCIES,
+            AdminResources.COMMAND
         );
 
         Assert.assertEquals("dirpath/genie/command/id/dependencies/filename", localPath);
@@ -170,8 +171,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.CONFIG,
-            Constants.AdminResources.CLUSTER
+            FileType.CONFIG,
+            AdminResources.CLUSTER
         );
 
         Assert.assertEquals("dirpath/genie/cluster/id/config/filename", localPath);
@@ -188,8 +189,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.SETUP,
-            Constants.AdminResources.CLUSTER
+            FileType.SETUP,
+            AdminResources.CLUSTER
         );
 
         Assert.assertEquals("dirpath/genie/cluster/id/filename", localPath);
@@ -206,8 +207,8 @@ public class GenieBaseTaskUnitTest {
             "dirpath",
             "id",
             "filepath/filename",
-            Constants.FileType.DEPENDENCIES,
-            Constants.AdminResources.CLUSTER
+            FileType.DEPENDENCIES,
+            AdminResources.CLUSTER
         );
 
         Assert.assertEquals("dirpath/genie/cluster/id/dependencies/filename", localPath);

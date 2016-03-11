@@ -20,7 +20,9 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.AdminResources;
+import com.netflix.genie.core.jobs.FileType;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
@@ -30,6 +32,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -44,8 +47,9 @@ public abstract class GenieBaseTask implements WorkflowTask {
 
     protected GenieFileTransferService fts;
     protected JobExecutionEnvironment jobExecEnv;
-    protected String runScript;
-    protected String jobWorkigDirectory;
+    protected String jobWorkingDirectory;
+    protected String genieDir;
+    protected Writer writer;
 
     /**
      * {@inheritDoc}
@@ -58,23 +62,25 @@ public abstract class GenieBaseTask implements WorkflowTask {
         log.debug("called");
 
         this.jobExecEnv =
-            (JobExecutionEnvironment) context.get(Constants.JOB_EXECUTION_ENV_KEY);
+            (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
 
         if (this.jobExecEnv == null) {
             throw new GeniePreconditionException("Cannot run application task as jobExecutionEnvironment is null");
         }
 
-        this.fts = (GenieFileTransferService) context.get(Constants.FILE_TRANSFER_SERVICE_KEY);
+        this.fts = (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
 
         try {
-            this.jobWorkigDirectory = this.jobExecEnv.getJobWorkingDir().getCanonicalPath();
+            this.jobWorkingDirectory = this.jobExecEnv.getJobWorkingDir().getCanonicalPath();
         } catch (IOException ioe) {
             throw new GenieServerException("Could not get base job working directory due to " + ioe);
         }
 
-        this.runScript = this.jobWorkigDirectory
-            + Constants.FILE_PATH_DELIMITER
-            + Constants.GENIE_JOB_LAUNCHER_SCRIPT;
+        this.writer = (Writer) context.get(JobConstants.WRITER_KEY);
+
+        this.genieDir = this.jobWorkingDirectory
+            + JobConstants.FILE_PATH_DELIMITER
+            + JobConstants.GENIE_PATH_VAR;
     }
 
     /**
@@ -97,9 +103,9 @@ public abstract class GenieBaseTask implements WorkflowTask {
         @NotBlank
         final String filePath,
         @NotNull
-        final Constants.FileType fileType,
+        final FileType fileType,
         @NotNull
-        final Constants.AdminResources adminResources
+        final AdminResources adminResources
     ) throws GenieException {
 
         String entityPathVar = null;
@@ -107,13 +113,13 @@ public abstract class GenieBaseTask implements WorkflowTask {
 
         switch (adminResources) {
             case APPLICATION:
-                entityPathVar = Constants.APPLICATION_PATH_VAR;
+                entityPathVar = JobConstants.APPLICATION_PATH_VAR;
                 break;
             case COMMAND:
-                entityPathVar = Constants.COMMAND_PATH_VAR;
+                entityPathVar = JobConstants.COMMAND_PATH_VAR;
                 break;
             case CLUSTER:
-                entityPathVar = Constants.CLUSTER_PATH_VAR;
+                entityPathVar = JobConstants.CLUSTER_PATH_VAR;
                 break;
             default:
                 break;
@@ -121,37 +127,35 @@ public abstract class GenieBaseTask implements WorkflowTask {
 
         switch (fileType) {
             case CONFIG:
-                filePathVar = Constants.CONFIG_FILE_PATH_PREFIX;
+                filePathVar = JobConstants.CONFIG_FILE_PATH_PREFIX;
                 break;
             case SETUP:
                 break;
             case DEPENDENCIES:
-                filePathVar = Constants.DEPENDENCY_FILE_PATH_PREFIX;
+                filePathVar = JobConstants.DEPENDENCY_FILE_PATH_PREFIX;
                 break;
             default:
                 break;
         }
 
-        final String fileName = Utils.getFileNameFromPath(filePath);
+        final String fileName = filePath.substring(filePath.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
         final StringBuilder localPath = new StringBuilder()
             .append(dir)
-            .append(Constants.FILE_PATH_DELIMITER)
-            .append(Constants.GENIE_PATH_VAR);
+            .append(JobConstants.FILE_PATH_DELIMITER)
+            .append(JobConstants.GENIE_PATH_VAR);
 
-        if (entityPathVar != null) {
-            localPath.append(Constants.FILE_PATH_DELIMITER)
+        localPath.append(JobConstants.FILE_PATH_DELIMITER)
                 .append(entityPathVar);
-        }
 
-        localPath.append(Constants.FILE_PATH_DELIMITER)
+        localPath.append(JobConstants.FILE_PATH_DELIMITER)
             .append(id);
 
         if (filePathVar != null) {
-            localPath.append(Constants.FILE_PATH_DELIMITER)
+            localPath.append(JobConstants.FILE_PATH_DELIMITER)
                 .append(filePathVar);
 
         }
-        localPath.append(Constants.FILE_PATH_DELIMITER).append(fileName);
+        localPath.append(JobConstants.FILE_PATH_DELIMITER).append(fileName);
 
         return localPath.toString();
 
@@ -171,31 +175,29 @@ public abstract class GenieBaseTask implements WorkflowTask {
         @NotBlank
         final String id,
         @NotNull
-        final Constants.AdminResources adminResources
+        final AdminResources adminResources
     ) throws GenieException {
         String entityPathVar = null;
 
         switch (adminResources) {
             case APPLICATION:
-                entityPathVar = Constants.APPLICATION_PATH_VAR;
+                entityPathVar = JobConstants.APPLICATION_PATH_VAR;
                 break;
             case COMMAND:
-                entityPathVar = Constants.COMMAND_PATH_VAR;
+                entityPathVar = JobConstants.COMMAND_PATH_VAR;
                 break;
             case CLUSTER:
-                entityPathVar = Constants.CLUSTER_PATH_VAR;
+                entityPathVar = JobConstants.CLUSTER_PATH_VAR;
                 break;
             // TODO The @NotNull validation will make sure we never reach default, but checkstyle forces a default.
             default:
         }
 
         Utils.createDirectory(
-            this.jobWorkigDirectory
-                + Constants.FILE_PATH_DELIMITER
-                + Constants.GENIE_PATH_VAR
-                + Constants.FILE_PATH_DELIMITER
+            this.genieDir
+                + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
-                + Constants.FILE_PATH_DELIMITER
+                + JobConstants.FILE_PATH_DELIMITER
                 + id);
     }
 
@@ -212,34 +214,32 @@ public abstract class GenieBaseTask implements WorkflowTask {
         @NotBlank
         final String id,
         @NotNull
-        final Constants.AdminResources adminResources
+        final AdminResources adminResources
     ) throws GenieException {
         String entityPathVar = null;
 
         switch (adminResources) {
             case APPLICATION:
-                entityPathVar = Constants.APPLICATION_PATH_VAR;
+                entityPathVar = JobConstants.APPLICATION_PATH_VAR;
                 break;
             case COMMAND:
-                entityPathVar = Constants.COMMAND_PATH_VAR;
+                entityPathVar = JobConstants.COMMAND_PATH_VAR;
                 break;
             case CLUSTER:
-                entityPathVar = Constants.CLUSTER_PATH_VAR;
+                entityPathVar = JobConstants.CLUSTER_PATH_VAR;
                 break;
             // TODO The @NotNull validation will make sure we never reach default, but checkstyle forces a default.
             default:
         }
 
         Utils.createDirectory(
-            this.jobWorkigDirectory
-                + Constants.FILE_PATH_DELIMITER
-                + Constants.GENIE_PATH_VAR
-                + Constants.FILE_PATH_DELIMITER
+            this.genieDir
+                + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
-                + Constants.FILE_PATH_DELIMITER
+                + JobConstants.FILE_PATH_DELIMITER
                 + id
-                + Constants.FILE_PATH_DELIMITER
-                + Constants.CONFIG_FILE_PATH_PREFIX);
+                + JobConstants.FILE_PATH_DELIMITER
+                + JobConstants.CONFIG_FILE_PATH_PREFIX);
     }
 
     /**
@@ -255,33 +255,31 @@ public abstract class GenieBaseTask implements WorkflowTask {
         @NotBlank
         final String id,
         @NotNull
-        final Constants.AdminResources adminResources
+        final AdminResources adminResources
     ) throws GenieException {
         String entityPathVar = null;
 
         switch (adminResources) {
             case APPLICATION:
-                entityPathVar = Constants.APPLICATION_PATH_VAR;
+                entityPathVar = JobConstants.APPLICATION_PATH_VAR;
                 break;
             case COMMAND:
-                entityPathVar = Constants.COMMAND_PATH_VAR;
+                entityPathVar = JobConstants.COMMAND_PATH_VAR;
                 break;
             case CLUSTER:
-                entityPathVar = Constants.CLUSTER_PATH_VAR;
+                entityPathVar = JobConstants.CLUSTER_PATH_VAR;
                 break;
             // TODO The @NotNull validation will make sure we never reach default, but checkstyle forces a default.
             default:
         }
 
         Utils.createDirectory(
-            this.jobWorkigDirectory
-                + Constants.FILE_PATH_DELIMITER
-                + Constants.GENIE_PATH_VAR
-                + Constants.FILE_PATH_DELIMITER
+            this.genieDir
+                + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
-                + Constants.FILE_PATH_DELIMITER
+                + JobConstants.FILE_PATH_DELIMITER
                 + id
-                + Constants.FILE_PATH_DELIMITER
-                + Constants.DEPENDENCY_FILE_PATH_PREFIX);
+                + JobConstants.FILE_PATH_DELIMITER
+                + JobConstants.DEPENDENCY_FILE_PATH_PREFIX);
     }
 }

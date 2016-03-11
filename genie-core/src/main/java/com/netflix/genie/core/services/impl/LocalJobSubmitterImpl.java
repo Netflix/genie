@@ -27,10 +27,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.common.util.Constants;
 import com.netflix.genie.core.events.JobStartedEvent;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
@@ -38,6 +37,7 @@ import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +49,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +74,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
     private final Resource baseWorkingDirPath;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GenieFileTransferService fileTransferService;
-    private final WorkflowExecutor wfExecutor;
     private final String hostname;
     private final int maxRunningJobs;
 
@@ -86,7 +86,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param commandService       Implementation of command service interface
      * @param clusterLoadBalancer  Implementation of the cluster load balancer interface
      * @param fts File Transfer service
-     * @param workflowExecutor An executor that executes impl in a workflow
      * @param aep Instance of the event publisher
      * @param workflowTasks List of all the workflow tasks to be executed
      * @param genieWorkingDir Working directory for genie where it creates jobs directories
@@ -101,7 +100,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final CommandService commandService,
         final ClusterLoadBalancer clusterLoadBalancer,
         final GenieFileTransferService fts,
-        final WorkflowExecutor workflowExecutor,
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
         final Resource genieWorkingDir,
@@ -116,7 +114,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         this.clusterLoadBalancer = clusterLoadBalancer;
         this.jobWorkflowTasks = workflowTasks;
         this.baseWorkingDirPath = genieWorkingDir;
-        this.wfExecutor = workflowExecutor;
         this.fileTransferService = fts;
         this.applicationEventPublisher = aep;
         this.hostname = hostname;
@@ -206,22 +203,46 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         // The map object stores the context for all the workflow tasks
         final Map<String, Object> context = new HashMap<>();
 
-        context.put(Constants.JOB_EXECUTION_ENV_KEY, jee);
-        context.put(Constants.FILE_TRANSFER_SERVICE_KEY, fileTransferService);
+        // Create the job working directory
+        try {
+            Utils.createDirectory(jobWorkingDir.getCanonicalPath());
+        } catch (IOException e) {
+            throw new GenieServerException("Could not create job working directory.", e);
+        }
 
-        if (this.wfExecutor.executeWorkflow(this.jobWorkflowTasks, context)) {
-            final JobExecution jobExecution = (JobExecution) context.get(Constants.JOB_EXECUTION_DTO_KEY);
+        // Create a writer object to the run.sh script for this file
+        final String runScript;
 
-            // Job Execution will be null in local mode.
-            if (jobExecution != null) {
-                // Persist the jobExecution information. This also updates jobStatus to Running
-                this.jobPersistenceService.createJobExecution(jobExecution);
+        try {
+            runScript = jobWorkingDir.getCanonicalPath()
+                + JobConstants.FILE_PATH_DELIMITER
+                + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
 
-                // Publish a job start Event
-                this.applicationEventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
-            }
-        } else {
-            throw new GenieServerException("Job Submission failed.");
+        } catch (IOException e) {
+            throw new GenieServerException("Could not open a writer to the run script", e);
+        }
+
+        final Writer writer = Utils.getWriter(runScript);
+
+        context.put(JobConstants.JOB_EXECUTION_ENV_KEY, jee);
+        context.put(JobConstants.FILE_TRANSFER_SERVICE_KEY, fileTransferService);
+        context.put(JobConstants.WRITER_KEY, writer);
+
+        for (WorkflowTask workflowTask : this.jobWorkflowTasks) {
+            workflowTask.executeTask(context);
+        }
+
+        Utils.closeWriter(writer);
+
+        final JobExecution jobExecution = (JobExecution) context.get(JobConstants.JOB_EXECUTION_DTO_KEY);
+
+        // Job Execution will be null in local mode.
+        if (jobExecution != null) {
+            // Persist the jobExecution information. This also updates jobStatus to Running
+            this.jobPersistenceService.createJobExecution(jobExecution);
+
+            // Publish a job start Event
+            this.applicationEventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
         }
     }
 }

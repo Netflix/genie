@@ -25,7 +25,6 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.core.jobs.workflow.WorkflowExecutor;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
@@ -78,7 +77,6 @@ public class LocalJobSubmitterImplUnitTests {
     private ClusterLoadBalancer clusterLoadBalancer;
     private ApplicationEventPublisher applicationEventPublisher;
     private GenieFileTransferService fileTransferService;
-    private WorkflowExecutor wfExecutor;
     private JobSubmitterService jobSubmitterService;
     private WorkflowTask task1;
     private WorkflowTask task2;
@@ -95,7 +93,6 @@ public class LocalJobSubmitterImplUnitTests {
         this.clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
         this.applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         this.fileTransferService = Mockito.mock(GenieFileTransferService.class);
-        this.wfExecutor = Mockito.mock(WorkflowExecutor.class);
         this.task1 = Mockito.mock(WorkflowTask.class);
         this.task2 = Mockito.mock(WorkflowTask.class);
 
@@ -112,7 +109,6 @@ public class LocalJobSubmitterImplUnitTests {
             this.commandService,
             this.clusterLoadBalancer,
             this.fileTransferService,
-            this.wfExecutor,
             this.applicationEventPublisher,
             jobWorkflowTasks,
             this.baseWorkingDirResource,

@@ -64,7 +64,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api/v3/clusters")
 @Slf4j
-public class ClusterRestController {
+public class
+ClusterRestController {
 
     private final ClusterService clusterService;
     private final ClusterResourceAssembler clusterResourceAssembler;

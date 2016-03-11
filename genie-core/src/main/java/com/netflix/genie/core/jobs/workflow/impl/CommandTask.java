@@ -18,13 +18,13 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.util.Constants;
+import com.netflix.genie.core.jobs.AdminResources;
+import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
-import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -48,36 +48,33 @@ public class CommandTask extends GenieBaseTask {
 
         super.executeTask(context);
 
-        // Open a writer to jobLauncher script
-        final Writer writer = Utils.getWriter(runScript);
-
         // Create the directory for this command under command dir in the cwd
         createEntityInstanceDirectory(
             this.jobExecEnv.getCommand().getId(),
-            Constants.AdminResources.COMMAND
+            AdminResources.COMMAND
         );
 
         // Create the config directory for this id
         createEntityInstanceConfigDirectory(
             this.jobExecEnv.getCommand().getId(),
-            Constants.AdminResources.COMMAND
+            AdminResources.COMMAND
         );
 
         // Create the dependencies directory for this id
         createEntityInstanceDependenciesDirectory(
             this.jobExecEnv.getCommand().getId(),
-            Constants.AdminResources.COMMAND
+            AdminResources.COMMAND
         );
 
         // Get the setup file if specified and add it as source command in launcher script
         final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
         if (commandSetupFile != null && StringUtils.isNotBlank(commandSetupFile)) {
             final String localPath = super.buildLocalFilePath(
-                this.jobWorkigDirectory,
+                this.jobWorkingDirectory,
                 jobExecEnv.getCommand().getId(),
                 commandSetupFile,
-                Constants.FileType.SETUP,
-                Constants.AdminResources.COMMAND
+                FileType.SETUP,
+                AdminResources.COMMAND
             );
 
             this.fts.getFile(commandSetupFile, localPath);
@@ -87,16 +84,13 @@ public class CommandTask extends GenieBaseTask {
         // Iterate over and get all configuration files
         for (final String configFile: jobExecEnv.getCommand().getConfigs()) {
             final String localPath = super.buildLocalFilePath(
-                this.jobWorkigDirectory,
+                this.jobWorkingDirectory,
                 jobExecEnv.getCommand().getId(),
                 configFile,
-                Constants.FileType.CONFIG,
-                Constants.AdminResources.COMMAND
+                FileType.CONFIG,
+                AdminResources.COMMAND
             );
             this.fts.getFile(configFile, localPath);
         }
-
-        // close the writer
-        Utils.closeWriter(writer);
     }
 }
