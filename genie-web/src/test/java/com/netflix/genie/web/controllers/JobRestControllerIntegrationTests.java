@@ -49,6 +49,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -434,6 +435,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             //Handle exception
         }
 
+
+        // TODO check job request and execution once api implemented
+
+        // Check if all the fields are created right in the database
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -455,9 +460,17 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(4)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)));
 
+
+        // Check the structure of the output directory for the job using the output api
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output"))
-            .andExpect(MockMvcResultMatchers.jsonPath("parent", Matchers.isEmptyOrNullString()));
+            .andExpect(MockMvcResultMatchers.jsonPath("parent", Matchers.isEmptyOrNullString()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.directories[0].name", Matchers.is("genie/")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[0].name", Matchers.is("dep1")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[1].name", Matchers.is("jobsetupfile")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[2].name", Matchers.is("run.sh")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[3].name", Matchers.is("stderr")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[4].name", Matchers.is("stdout")));
 
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
@@ -642,6 +655,14 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 //            .andReturn();
 //
 //        final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+//
+//        // Send a kill request to the job.
+//        this.mvc
+//            .perform(
+//                MockMvcRequestBuilders
+//                    .delete(JOBS_API + "/" + jobId)
+//            );
+//
 //        try {
 //            Thread.sleep(1000);
 //        } catch (InterruptedException ie) {
@@ -653,7 +674,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 //            .andExpect(MockMvcResultMatchers.status().isOk())
 //            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
 //            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
-//            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString())));
+//            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
 //    }
 
     /**
