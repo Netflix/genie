@@ -13,6 +13,9 @@ dependencies {
 
     compile project(":genie-common")
 
+    // JSON Patch Support
+    compile("com.github.fge:json-patch")
+
     // Commons Libs
     compile("commons-httpclient:commons-httpclient")
     compile("commons-io:commons-io")

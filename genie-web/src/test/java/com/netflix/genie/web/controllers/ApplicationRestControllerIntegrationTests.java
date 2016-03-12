@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
@@ -303,6 +304,41 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ApplicationStatus.INACTIVE.toString())));
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
+    }
+
+    /**
+     * Test to make sure that an application can be patched.
+     *
+     * @throws Exception on configuration errors
+     */
+    @Test
+    public void canPatchApplication() throws Exception {
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        final String id = this.createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        final String applicationResource = APPLICATIONS_API + "/" + id;
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(applicationResource))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(USER)));
+
+
+        final String newUser = UUID.randomUUID().toString();
+        final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + newUser + "\" }]";
+        final JsonPatch patch = JsonPatch.fromJson(OBJECT_MAPPER.readTree(patchString));
+
+        this.mvc.perform(
+            MockMvcRequestBuilders
+                .patch(applicationResource)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(OBJECT_MAPPER.writeValueAsBytes(patch))
+        ).andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(applicationResource))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(newUser)));
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
     }
 

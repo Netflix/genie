@@ -439,7 +439,7 @@ public class JobRestController {
                     return;
                 }
 
-                response.setStatus(HttpStatus.OK.value());
+                response.setStatus(HttpStatus.ACCEPTED.value());
                 this.copyResponseHeaders(response, deleteResponse);
 
                 // No need to do anything on this node
@@ -449,7 +449,7 @@ public class JobRestController {
 
         // Job is on this node so try to kill it
         this.jobCoordinatorService.killJob(id);
-        response.setStatus(HttpStatus.OK.value());
+        response.setStatus(HttpStatus.ACCEPTED.value());
     }
 
     /**
@@ -578,7 +578,7 @@ public class JobRestController {
         final HttpResponse forwardResponse
     ) throws IOException {
         final int statusCode = forwardResponse.getStatusLine().getStatusCode();
-        if (statusCode != HttpStatus.OK.value()) {
+        if (statusCode != HttpStatus.OK.value() && statusCode != HttpStatus.ACCEPTED.value()) {
             response.sendError(statusCode, forwardResponse.getStatusLine().getReasonPhrase());
             return true;
         } else {

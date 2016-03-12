@@ -220,7 +220,7 @@ public class JobRestControllerUnitTests {
         Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(UUID.randomUUID().toString());
 
         final StatusLine statusLine = Mockito.mock(StatusLine.class);
-        Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.OK.value());
+        Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.ACCEPTED.value());
         final HttpResponse forwardResponse = Mockito.mock(HttpResponse.class);
         Mockito.when(forwardResponse.getStatusLine()).thenReturn(statusLine);
         Mockito.when(forwardResponse.getAllHeaders()).thenReturn(new Header[0]);
@@ -229,7 +229,7 @@ public class JobRestControllerUnitTests {
         this.controller.killJob(jobId, forwardedFrom, request, response);
 
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt(), Mockito.anyString());
-        Mockito.verify(response, Mockito.times(1)).setStatus(HttpStatus.OK.value());
+        Mockito.verify(response, Mockito.times(1)).setStatus(HttpStatus.ACCEPTED.value());
         Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(jobId);
         Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any(HttpDelete.class));
     }

@@ -17,6 +17,10 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
@@ -27,6 +31,7 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
@@ -47,6 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -174,18 +180,28 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         }
 
         log.debug("Called with app {}", updateApp.toString());
-        final ApplicationEntity applicationEntity = this.findApplication(id);
-        applicationEntity.setName(updateApp.getName());
-        applicationEntity.setUser(updateApp.getUser());
-        applicationEntity.setVersion(updateApp.getVersion());
-        applicationEntity.setDescription(updateApp.getDescription());
-        applicationEntity.setStatus(updateApp.getStatus());
-        applicationEntity.setSetupFile(updateApp.getSetupFile());
-        applicationEntity.setConfigs(updateApp.getConfigs());
-        applicationEntity.setDependencies(updateApp.getDependencies());
-        applicationEntity.setTags(updateApp.getTags());
+        this.updateApplicationEntity(this.findApplication(id), updateApp);
+    }
 
-        this.applicationRepo.save(applicationEntity);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void patchApplication(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException {
+        final ApplicationEntity applicationEntity = this.findApplication(id);
+        try {
+            final Application appToPatch = applicationEntity.getDTO();
+            log.debug("Will patch application {}. Original state: {}", id, appToPatch);
+            final ObjectMapper mapper = new ObjectMapper();
+            final JsonNode applicationNode = mapper.readTree(appToPatch.toString());
+            final JsonNode postPatchNode = patch.apply(applicationNode);
+            final Application patchedApp = mapper.treeToValue(postPatchNode, Application.class);
+            log.debug("Finished patching application {}. New state: {}", id, patchedApp);
+            this.updateApplicationEntity(applicationEntity, patchedApp);
+        } catch (final JsonPatchException | IOException e) {
+            log.error("Unable to patch application {} with patch {} due to exception.", id, patch, e);
+            throw new GenieServerException(e.getLocalizedMessage(), e);
+        }
     }
 
     /**
@@ -450,13 +466,26 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      * @return The application entity if one is found
      * @throws GenieNotFoundException If no application is found
      */
-    private ApplicationEntity findApplication(final String id)
-        throws GenieNotFoundException {
+    private ApplicationEntity findApplication(final String id) throws GenieNotFoundException {
         final ApplicationEntity applicationEntity = this.applicationRepo.findOne(id);
         if (applicationEntity != null) {
             return applicationEntity;
         } else {
             throw new GenieNotFoundException("No application with id " + id);
         }
+    }
+
+    private void updateApplicationEntity(final ApplicationEntity applicationEntity, final Application updateApp) {
+        applicationEntity.setName(updateApp.getName());
+        applicationEntity.setUser(updateApp.getUser());
+        applicationEntity.setVersion(updateApp.getVersion());
+        applicationEntity.setDescription(updateApp.getDescription());
+        applicationEntity.setStatus(updateApp.getStatus());
+        applicationEntity.setSetupFile(updateApp.getSetupFile());
+        applicationEntity.setConfigs(updateApp.getConfigs());
+        applicationEntity.setDependencies(updateApp.getDependencies());
+        applicationEntity.setTags(updateApp.getTags());
+
+        this.applicationRepo.save(applicationEntity);
     }
 }

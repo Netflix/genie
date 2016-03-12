@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
-import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
@@ -27,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.CommandService;
+import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -40,6 +42,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 
 import javax.validation.ConstraintViolationException;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.HashSet;
@@ -428,6 +431,29 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(created, updatedApp.getCreated());
         Assert.assertThat(updatedApp.getUpdated(), Matchers.not(updated));
         Assert.assertNotEquals(new Date(0), updatedApp.getUpdated());
+    }
+
+    /**
+     * Test to patch an application.
+     *
+     * @throws GenieException For any problem
+     * @throws IOException For Json serialization problem
+     */
+    @Test
+    public void testPatchApplication() throws GenieException, IOException {
+        final Application getApp = this.appService.getApplication(APP_1_ID);
+        Assert.assertEquals(APP_1_USER, getApp.getUser());
+        final Date updateTime = getApp.getUpdated();
+
+        final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + APP_2_USER + "\" }]";
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonPatch patch = JsonPatch.fromJson(mapper.readTree(patchString));
+
+        this.appService.patchApplication(APP_1_ID, patch);
+
+        final Application updated = this.appService.getApplication(APP_1_ID);
+        Assert.assertNotEquals(updated.getUpdated(), Matchers.is(updateTime));
+        Assert.assertEquals(APP_2_USER, updated.getUser());
     }
 
     /**

@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -49,6 +51,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -110,17 +113,15 @@ public class ApplicationRestController {
     }
 
     /**
-     * Get Application for given id.
+     * Delete all applications from database.
      *
-     * @param id unique id for application configuration
-     * @return The application configuration
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called to get Application for id {}", id);
-        return this.applicationResourceAssembler.toResource(this.applicationService.getApplication(id));
+    @RequestMapping(method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAllApplications() throws GenieException {
+        log.debug("Delete all Applications");
+        this.applicationService.deleteAllApplications();
     }
 
     /**
@@ -170,6 +171,20 @@ public class ApplicationRestController {
     }
 
     /**
+     * Get Application for given id.
+     *
+     * @param id unique id for application configuration
+     * @return The application configuration
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
+        log.debug("Called to get Application for id {}", id);
+        return this.applicationResourceAssembler.toResource(this.applicationService.getApplication(id));
+    }
+
+    /**
      * Update application.
      *
      * @param id        unique id for configuration to update
@@ -182,20 +197,27 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Application updateApp
     ) throws GenieException {
-        log.debug("called to update application config with info {}", updateApp);
+        log.debug("called to update application {} with info {}", id, updateApp);
         this.applicationService.updateApplication(id, updateApp);
     }
 
     /**
-     * Delete all applications from database.
+     * Patch an application using JSON Patch.
      *
-     * @throws GenieException For any error
+     * @param id    The id of the application to patch
+     * @param patch The JSON Patch instructions
+     * @throws GenieException     On error
+     * @throws IOException        On JSON serialization error
+     * @throws JsonPatchException On error while applying patch
      */
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllApplications() throws GenieException {
-        log.debug("Delete all Applications");
-        this.applicationService.deleteAllApplications();
+    public void patchApplication(
+        @PathVariable("id") final String id,
+        @RequestBody final JsonPatch patch
+    ) throws GenieException, IOException, JsonPatchException {
+        log.info("Called to patch application {} with patch {}", id, patch);
+        this.applicationService.patchApplication(id, patch);
     }
 
     /**
