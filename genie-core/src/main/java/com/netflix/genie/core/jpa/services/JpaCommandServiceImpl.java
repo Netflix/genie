@@ -17,6 +17,10 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -28,6 +32,7 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
@@ -50,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -60,6 +66,7 @@ import java.util.stream.Collectors;
  *
  * @author amsharma
  * @author tgianos
+ * @since 2.0.0
  */
 @Service
 @Transactional(
@@ -71,6 +78,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JpaCommandServiceImpl implements CommandService {
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final JpaCommandRepository commandRepo;
     private final JpaApplicationRepository appRepo;
     private final JpaClusterRepository clusterRepo;
@@ -109,18 +117,8 @@ public class JpaCommandServiceImpl implements CommandService {
 
         final CommandEntity commandEntity = new CommandEntity();
         commandEntity.setId(StringUtils.isBlank(command.getId()) ? UUID.randomUUID().toString() : command.getId());
-        commandEntity.setName(command.getName());
-        commandEntity.setUser(command.getUser());
-        commandEntity.setVersion(command.getVersion());
-        commandEntity.setDescription(command.getDescription());
-        commandEntity.setExecutable(command.getExecutable());
-        commandEntity.setCheckDelay(command.getCheckDelay());
-        commandEntity.setConfigs(command.getConfigs());
-        commandEntity.setSetupFile(command.getSetupFile());
-        commandEntity.setStatus(command.getStatus());
-        commandEntity.setTags(command.getTags());
-
-        return this.commandRepo.save(commandEntity).getId();
+        this.updateAndSaveCommandEntity(commandEntity, command);
+        return commandEntity.getId();
     }
 
     /**
@@ -184,18 +182,27 @@ public class JpaCommandServiceImpl implements CommandService {
 
         log.debug("Called to update command with id {} {}", id, updateCommand);
 
+        this.updateAndSaveCommandEntity(this.findCommand(id), updateCommand);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void patchCommand(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException {
         final CommandEntity commandEntity = this.findCommand(id);
-        commandEntity.setName(updateCommand.getName());
-        commandEntity.setUser(updateCommand.getUser());
-        commandEntity.setVersion(updateCommand.getVersion());
-        commandEntity.setStatus(updateCommand.getStatus());
-        commandEntity.setDescription(updateCommand.getDescription());
-        commandEntity.setExecutable(updateCommand.getExecutable());
-        commandEntity.setCheckDelay(updateCommand.getCheckDelay());
-        commandEntity.setSetupFile(updateCommand.getSetupFile());
-        commandEntity.setConfigs(updateCommand.getConfigs());
-        commandEntity.setTags(updateCommand.getTags());
-        this.commandRepo.save(commandEntity);
+        try {
+            final Command commandToPatch = commandEntity.getDTO();
+            log.debug("Will patch command {}. Original state: {}", id, commandToPatch);
+            final JsonNode commandNode = this.mapper.readTree(commandToPatch.toString());
+            final JsonNode postPatchNode = patch.apply(commandNode);
+            final Command patchedCommand = this.mapper.treeToValue(postPatchNode, Command.class);
+            log.debug("Finished patching command {}. New state: {}", id, patchedCommand);
+            this.updateAndSaveCommandEntity(commandEntity, patchedCommand);
+        } catch (final JsonPatchException | IOException e) {
+            log.error("Unable to patch cluster {} with patch {} due to exception.", id, patch, e);
+            throw new GenieServerException(e.getLocalizedMessage(), e);
+        }
     }
 
     /**
@@ -503,5 +510,20 @@ public class JpaCommandServiceImpl implements CommandService {
         } else {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
+    }
+
+    private void  updateAndSaveCommandEntity(final CommandEntity commandEntity, final Command command) {
+        commandEntity.setName(command.getName());
+        commandEntity.setUser(command.getUser());
+        commandEntity.setVersion(command.getVersion());
+        commandEntity.setDescription(command.getDescription());
+        commandEntity.setExecutable(command.getExecutable());
+        commandEntity.setCheckDelay(command.getCheckDelay());
+        commandEntity.setConfigs(command.getConfigs());
+        commandEntity.setSetupFile(command.getSetupFile());
+        commandEntity.setStatus(command.getStatus());
+        commandEntity.setTags(command.getTags());
+
+        this.commandRepo.save(commandEntity);
     }
 }

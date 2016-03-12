@@ -18,7 +18,6 @@
 package com.netflix.genie.web.controllers;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -51,7 +50,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -207,16 +205,14 @@ public class ApplicationRestController {
      * @param id    The id of the application to patch
      * @param patch The JSON Patch instructions
      * @throws GenieException     On error
-     * @throws IOException        On JSON serialization error
-     * @throws JsonPatchException On error while applying patch
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchApplication(
         @PathVariable("id") final String id,
         @RequestBody final JsonPatch patch
-    ) throws GenieException, IOException, JsonPatchException {
-        log.info("Called to patch application {} with patch {}", id, patch);
+    ) throws GenieException {
+        log.debug("Called to patch application {} with patch {}", id, patch);
         this.applicationService.patchApplication(id, patch);
     }
 

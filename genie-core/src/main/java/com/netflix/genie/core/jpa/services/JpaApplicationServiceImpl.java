@@ -63,6 +63,7 @@ import java.util.stream.Collectors;
  *
  * @author amsharma
  * @author tgianos
+ * @since 2.0.0
  */
 @Service
 @Transactional(
@@ -74,6 +75,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JpaApplicationServiceImpl implements ApplicationService {
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final JpaApplicationRepository applicationRepo;
     private final JpaCommandRepository commandRepo;
 
@@ -107,24 +109,13 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         }
 
         final ApplicationEntity applicationEntity = new ApplicationEntity();
-        applicationEntity.setId(app.getId());
-        applicationEntity.setName(app.getName());
-        applicationEntity.setUser(app.getUser());
-        applicationEntity.setVersion(app.getVersion());
-        applicationEntity.setDescription(app.getDescription());
-        applicationEntity.setStatus(app.getStatus());
-        applicationEntity.setSetupFile(app.getSetupFile());
-        applicationEntity.setTags(app.getTags());
-        applicationEntity.setConfigs(app.getConfigs());
-        applicationEntity.setDependencies(app.getDependencies());
-
-        if (StringUtils.isBlank(applicationEntity.getId())) {
+        if (StringUtils.isBlank(app.getId())) {
             applicationEntity.setId(UUID.randomUUID().toString());
+        } else {
+            applicationEntity.setId(app.getId());
         }
-
-        final String id = applicationEntity.getId();
-        this.applicationRepo.save(applicationEntity);
-        return id;
+        this.updateAndSaveApplicationEntity(applicationEntity, app);
+        return applicationEntity.getId();
     }
 
     /**
@@ -180,7 +171,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         }
 
         log.debug("Called with app {}", updateApp.toString());
-        this.updateApplicationEntity(this.findApplication(id), updateApp);
+        this.updateAndSaveApplicationEntity(this.findApplication(id), updateApp);
     }
 
     /**
@@ -192,12 +183,11 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         try {
             final Application appToPatch = applicationEntity.getDTO();
             log.debug("Will patch application {}. Original state: {}", id, appToPatch);
-            final ObjectMapper mapper = new ObjectMapper();
-            final JsonNode applicationNode = mapper.readTree(appToPatch.toString());
+            final JsonNode applicationNode = this.mapper.readTree(appToPatch.toString());
             final JsonNode postPatchNode = patch.apply(applicationNode);
-            final Application patchedApp = mapper.treeToValue(postPatchNode, Application.class);
+            final Application patchedApp = this.mapper.treeToValue(postPatchNode, Application.class);
             log.debug("Finished patching application {}. New state: {}", id, patchedApp);
-            this.updateApplicationEntity(applicationEntity, patchedApp);
+            this.updateAndSaveApplicationEntity(applicationEntity, patchedApp);
         } catch (final JsonPatchException | IOException e) {
             log.error("Unable to patch application {} with patch {} due to exception.", id, patch, e);
             throw new GenieServerException(e.getLocalizedMessage(), e);
@@ -475,17 +465,17 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         }
     }
 
-    private void updateApplicationEntity(final ApplicationEntity applicationEntity, final Application updateApp) {
-        applicationEntity.setName(updateApp.getName());
-        applicationEntity.setUser(updateApp.getUser());
-        applicationEntity.setVersion(updateApp.getVersion());
-        applicationEntity.setDescription(updateApp.getDescription());
-        applicationEntity.setStatus(updateApp.getStatus());
-        applicationEntity.setSetupFile(updateApp.getSetupFile());
-        applicationEntity.setConfigs(updateApp.getConfigs());
-        applicationEntity.setDependencies(updateApp.getDependencies());
-        applicationEntity.setTags(updateApp.getTags());
+    private void updateAndSaveApplicationEntity(final ApplicationEntity entity, final Application dto) {
+        entity.setName(dto.getName());
+        entity.setUser(dto.getUser());
+        entity.setVersion(dto.getVersion());
+        entity.setDescription(dto.getDescription());
+        entity.setStatus(dto.getStatus());
+        entity.setSetupFile(dto.getSetupFile());
+        entity.setConfigs(dto.getConfigs());
+        entity.setDependencies(dto.getDependencies());
+        entity.setTags(dto.getTags());
 
-        this.applicationRepo.save(applicationEntity);
+        this.applicationRepo.save(entity);
     }
 }

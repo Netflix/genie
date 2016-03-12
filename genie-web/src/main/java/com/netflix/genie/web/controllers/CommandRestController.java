@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -201,6 +202,23 @@ public class CommandRestController {
     ) throws GenieException {
         log.debug("Called to update command {}", updateCommand);
         this.commandService.updateCommand(id, updateCommand);
+    }
+
+    /**
+     * Patch a command using JSON Patch.
+     *
+     * @param id    The id of the command to patch
+     * @param patch The JSON Patch instructions
+     * @throws GenieException On error
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void patchCommand(
+        @PathVariable("id") final String id,
+        @RequestBody final JsonPatch patch
+    ) throws GenieException {
+        log.debug("Called to patch command {} with patch {}", id, patch);
+        this.commandService.patchCommand(id, patch);
     }
 
     /**

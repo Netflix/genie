@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -303,6 +304,41 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(
                 MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(CommandStatus.INACTIVE.toString()))
             );
+        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
+    }
+
+    /**
+     * Test to make sure that a command can be patched.
+     *
+     * @throws Exception on configuration errors
+     */
+    @Test
+    public void canPatchCommand() throws Exception {
+        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        final String id = this.createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        final String commandResource = COMMANDS_API + "/" + id;
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(commandResource))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(NAME)));
+
+
+        final String newName = UUID.randomUUID().toString();
+        final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
+        final JsonPatch patch = JsonPatch.fromJson(OBJECT_MAPPER.readTree(patchString));
+
+        this.mvc.perform(
+            MockMvcRequestBuilders
+                .patch(commandResource)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(OBJECT_MAPPER.writeValueAsBytes(patch))
+        ).andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(commandResource))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(newName)));
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
     }
 

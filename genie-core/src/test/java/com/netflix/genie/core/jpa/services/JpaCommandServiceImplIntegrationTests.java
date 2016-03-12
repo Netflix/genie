@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Lists;
@@ -41,6 +43,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 
 import javax.validation.ConstraintViolationException;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -484,6 +487,30 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandNullUpdateCommand() throws GenieException {
         this.service.updateCommand(COMMAND_1_ID, null);
+    }
+
+    /**
+     * Test to patch a command.
+     *
+     * @throws GenieException For any problem
+     * @throws IOException For Json serialization problem
+     */
+    @Test
+    public void testPatchCommand() throws GenieException, IOException {
+        final Command getCommand = this.service.getCommand(COMMAND_1_ID);
+        Assert.assertThat(getCommand.getName(), Matchers.is(COMMAND_1_NAME));
+        final Date updateTime = getCommand.getUpdated();
+
+        final String patchString
+            = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + COMMAND_2_NAME + "\" }]";
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonPatch patch = JsonPatch.fromJson(mapper.readTree(patchString));
+
+        this.service.patchCommand(COMMAND_1_ID, patch);
+
+        final Command updated = this.service.getCommand(COMMAND_1_ID);
+        Assert.assertNotEquals(updated.getUpdated(), Matchers.is(updateTime));
+        Assert.assertThat(updated.getName(), Matchers.is(COMMAND_2_NAME));
     }
 
     /**

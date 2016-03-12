@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.services;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -103,6 +104,15 @@ public interface CommandService {
             @Valid
             final Command updateCommand
     ) throws GenieException;
+
+    /**
+     * Patch a command with the given json patch.
+     *
+     * @param id    The id of the command to update
+     * @param patch The json patch to use to update the given command
+     * @throws GenieException if there is an error
+     */
+    void patchCommand(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException;
 
     /**
      * Delete all commands from database.

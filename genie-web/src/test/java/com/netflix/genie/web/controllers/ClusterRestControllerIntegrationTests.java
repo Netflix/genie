@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -267,6 +268,41 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(
                 MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.OUT_OF_SERVICE.toString()))
             );
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
+    }
+
+    /**
+     * Test to make sure that a cluster can be patched.
+     *
+     * @throws Exception on configuration errors
+     */
+    @Test
+    public void canPatchCluster() throws Exception {
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        final String id = this.createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        final String clusterResource = CLUSTERS_API + "/" + id;
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(clusterResource))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(NAME)));
+
+
+        final String newName = UUID.randomUUID().toString();
+        final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
+        final JsonPatch patch = JsonPatch.fromJson(OBJECT_MAPPER.readTree(patchString));
+
+        this.mvc.perform(
+            MockMvcRequestBuilders
+                .patch(clusterResource)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(OBJECT_MAPPER.writeValueAsBytes(patch))
+        ).andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(clusterResource))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(newName)));
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
     }
 

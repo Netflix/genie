@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.services;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Cluster;
@@ -117,6 +118,15 @@ public interface ClusterService {
             @Valid
             final Cluster updateCluster
     ) throws GenieException;
+
+    /**
+     * Patch a cluster with the given json patch.
+     *
+     * @param id    The id of the cluster to update
+     * @param patch The json patch to use to update the given cluster
+     * @throws GenieException if there is an error
+     */
+    void patchCluster(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException;
 
     /**
      * Delete all clusters from database.
