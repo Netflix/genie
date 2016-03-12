@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -424,12 +425,34 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ie) {
-            //Handle exception
-        }
 
+        int counter = 1;
+        do {
+            counter++;
+            Thread.sleep(1000);
+        } while (
+            this.mvc.perform(MockMvcRequestBuilders.get(
+                JOBS_API
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + jobId
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + "status")
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString().contains("RUNNING") && counter < 10
+            );
+
+        Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
+            JOBS_API
+                + JobConstants.FILE_PATH_DELIMITER
+                + jobId
+                + JobConstants.FILE_PATH_DELIMITER
+                + "status")
+            .accept(MediaType.APPLICATION_JSON))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(), "{\"status\":\"SUCCEEDED\"}");
 
         // TODO check job request and execution once api implemented
 
@@ -520,11 +543,33 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             )
             .andExpect(MockMvcResultMatchers.status().isConflict());
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ie) {
-            //Handle exception
-        }
+        int counter = 1;
+        do {
+            counter++;
+            Thread.sleep(1000);
+        } while (
+            this.mvc.perform(MockMvcRequestBuilders.get(
+                JOBS_API
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + jobId
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + "status")
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString().contains("RUNNING") && counter < 10
+            );
+
+        Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
+            JOBS_API
+                + JobConstants.FILE_PATH_DELIMITER
+                + jobId
+                + JobConstants.FILE_PATH_DELIMITER
+                + "status")
+            .accept(MediaType.APPLICATION_JSON))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(), "{\"status\":\"SUCCEEDED\"}");
     }
 
     /**
@@ -712,11 +757,33 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ie) {
-            //Handle exception
-        }
+        int counter = 1;
+        do {
+            counter++;
+            Thread.sleep(1000);
+        } while (
+            this.mvc.perform(MockMvcRequestBuilders.get(
+                JOBS_API
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + jobId
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + "status")
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString().contains("RUNNING") && counter < 10
+            );
+
+        Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
+            JOBS_API
+                + JobConstants.FILE_PATH_DELIMITER
+                + jobId
+                + JobConstants.FILE_PATH_DELIMITER
+                + "status")
+            .accept(MediaType.APPLICATION_JSON))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(), "{\"status\":\"FAILED\"}");
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
