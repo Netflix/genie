@@ -48,7 +48,9 @@ import org.springframework.stereotype.Service;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -203,36 +205,32 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         // The map object stores the context for all the workflow tasks
         final Map<String, Object> context = new HashMap<>();
 
-        // Create the job working directory
-        try {
-            Utils.createDirectory(jobWorkingDir.getCanonicalPath());
-        } catch (IOException e) {
-            throw new GenieServerException("Could not create job working directory.", e);
-        }
+        context.put(JobConstants.JOB_EXECUTION_ENV_KEY, jee);
+        context.put(JobConstants.FILE_TRANSFER_SERVICE_KEY, fileTransferService);
 
-        // Create a writer object to the run.sh script for this file
         final String runScript;
-
         try {
+            // Create the job working directory
+            Utils.createDirectory(jobWorkingDir.getCanonicalPath());
+
+            // Run script path for this job like basedir/jobuuid/run.sh
             runScript = jobWorkingDir.getCanonicalPath()
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
 
         } catch (IOException e) {
-            throw new GenieServerException("Could not open a writer to the run script", e);
+            throw new GenieServerException("Job submission failed.", e);
         }
 
-        final Writer writer = Utils.getWriter(runScript);
+        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), "UTF-8")) {
+            context.put(JobConstants.WRITER_KEY, writer);
 
-        context.put(JobConstants.JOB_EXECUTION_ENV_KEY, jee);
-        context.put(JobConstants.FILE_TRANSFER_SERVICE_KEY, fileTransferService);
-        context.put(JobConstants.WRITER_KEY, writer);
-
-        for (WorkflowTask workflowTask : this.jobWorkflowTasks) {
-            workflowTask.executeTask(context);
+            for (WorkflowTask workflowTask : this.jobWorkflowTasks) {
+                workflowTask.executeTask(context);
+            }
+        } catch (IOException ioe) {
+            throw new GenieServerException("Failed to execute job");
         }
-
-        Utils.closeWriter(writer);
 
         final JobExecution jobExecution = (JobExecution) context.get(JobConstants.JOB_EXECUTION_DTO_KEY);
 

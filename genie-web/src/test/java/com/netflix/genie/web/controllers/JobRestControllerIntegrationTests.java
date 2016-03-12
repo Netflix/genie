@@ -425,7 +425,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException ie) {
             //Handle exception
         }
@@ -521,7 +521,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.status().isConflict());
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException ie) {
             //Handle exception
         }
@@ -713,7 +713,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException ie) {
             //Handle exception
         }

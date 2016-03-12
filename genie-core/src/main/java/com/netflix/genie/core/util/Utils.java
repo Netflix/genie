@@ -26,9 +26,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 
@@ -39,47 +37,6 @@ import java.lang.reflect.Field;
  */
 @Slf4j
 public abstract class Utils {
-
-    /**
-     * Closes the stream to the writer supplied.
-     *
-     * @param writer The writer object to close
-     *
-     * @throws GenieException Throw exception in case of failure while closing the writer
-     */
-    public static void closeWriter(
-        final Writer writer
-    ) throws GenieException {
-
-        try {
-            if (writer != null) {
-                writer.close();
-            }
-        } catch (IOException ioe) {
-            throw new GenieServerException("Error closing file writer", ioe);
-        }
-    }
-
-    /**
-     * Initializes the writer to create job_launcher_script.sh.
-     *
-     * @param filePath The path of the file to which we need a file handle.
-     * @return Return a writer object to the file specified
-     *
-     * @throws GenieException Throw exception in case of failure while intializing the writer
-     */
-    public static Writer getWriter(
-        @NotBlank(message = "Path of the file cannot be blank.")
-        final String filePath
-    ) throws GenieException {
-        try {
-            return new OutputStreamWriter(new FileOutputStream(filePath, true), "UTF-8");
-        } catch (IOException ioe) {
-            throw new GenieServerException("Could not create a writer to file "
-                + filePath + "due to exception", ioe);
-        }
-    }
-
     /**
      * Appends content to the writer and adds a newline after.
      *
