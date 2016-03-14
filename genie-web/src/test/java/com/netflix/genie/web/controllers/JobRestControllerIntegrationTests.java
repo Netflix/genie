@@ -724,7 +724,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethodFailure() throws Exception {
-        final String commandArgs = "-c 'ls foo'";
+        final String commandArgs = "-c 'exit 1'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = new HashSet<>();
