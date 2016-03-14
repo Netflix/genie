@@ -78,6 +78,15 @@ public class JobKickoffTask extends GenieBaseTask {
         log.info("Executing Job Kickoff Task in the workflow.");
         super.executeTask(context);
 
+        // At this point all contents are written to the run script and we call an explicit flush and close to write
+        // the contents to the file before we execute it.
+        try {
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new GenieServerException("Failed to execute job with exception." + e);
+        }
+
         final String runScript = this.jobWorkingDirectory
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;

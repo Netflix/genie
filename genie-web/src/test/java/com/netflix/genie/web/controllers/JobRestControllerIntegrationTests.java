@@ -34,9 +34,11 @@ import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -366,6 +368,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethod() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -502,6 +505,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethodAlreadyExists() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -579,6 +583,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethodMissingCluster() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -621,6 +626,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethodMissingCommand() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -662,6 +668,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
 //    @Test
 //    public void testSubmitJobMethodKill() throws Exception {
+//        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
 //        final String commandArgs = "-c 'ls foo'";
 //
 //        final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -724,6 +731,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethodFailure() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'exit 1'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
