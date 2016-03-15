@@ -156,6 +156,10 @@ subprojects {
         minHeapSize = "256m"
         maxHeapSize = "1g"
 
+        if (project.hasProperty("TRAVIS_PULL_REQUEST")) {
+            systemProperty "TRAVIS_PULL_REQUEST", project.getProperty("TRAVIS_PULL_REQUEST")
+        }
+
         reports.html.destination = file("${reporting.baseDir}/test/${task.name}")
         jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
     }
