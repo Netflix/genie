@@ -217,6 +217,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
         if (this.jobRepository.exists(id)) {
             final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();

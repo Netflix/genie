@@ -38,6 +38,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
@@ -110,6 +111,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Autowired
     private JpaJobExecutionRepository jobExecutionRepository;
 
+    @Value("${TRAVIS_PULL_REQUEST:false}")
+    private boolean isPullRequest;
+
 //    @Autowired
 //    private JpaApplicationRepository applicationRepository;
 //
@@ -126,6 +130,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Before
     public void setup() throws Exception {
+        Assume.assumeFalse(this.isPullRequest);
         super.setup();
         this.resourceLoader = new DefaultResourceLoader();
         //this.jobsBaseUrl = "http://localhost:" + this.port + "/api/v3/jobs";
