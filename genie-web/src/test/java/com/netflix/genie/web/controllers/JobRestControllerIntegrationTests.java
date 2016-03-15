@@ -27,12 +27,16 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -44,7 +48,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -111,17 +114,17 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Autowired
     private JpaJobExecutionRepository jobExecutionRepository;
 
-    @Value("${TRAVIS_PULL_REQUEST:false}")
-    private boolean isPullRequest;
+    @Autowired
+    private JpaApplicationRepository applicationRepository;
 
-//    @Autowired
-//    private JpaApplicationRepository applicationRepository;
-//
-//    @Autowired
-//    private JpaCommandRepository commandRepository;
-//
-//    @Autowired
-//    private JpaClusterRepository clusterRepository;
+    @Autowired
+    private JpaCommandRepository commandRepository;
+
+    @Autowired
+    private JpaClusterRepository clusterRepository;
+
+    @Value("${TRAVIS_PULL_REQUEST:truex}")
+    private String isPullRequest;
 
     /**
      * Setup for tests.
@@ -130,7 +133,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Before
     public void setup() throws Exception {
-        Assume.assumeFalse(this.isPullRequest);
+        log.error(this.isPullRequest);
+        Assume.assumeFalse(Boolean.valueOf(this.isPullRequest));
         super.setup();
         this.resourceLoader = new DefaultResourceLoader();
         //this.jobsBaseUrl = "http://localhost:" + this.port + "/api/v3/jobs";
@@ -343,20 +347,18 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
     }
 
-
-//    /**
-//     * Cleanup after tests.
-//     */
-//    @After
-//    public void cleanup() {
-//        this.jobRequestRepository.deleteAll();
-//        this.jobRepository.deleteAll();
-//        this.jobExecutionRepository.deleteAll();
-//        this.clusterRepository.deleteAll();
-//        this.commandRepository.deleteAll();
-//        this.applicationRepository.deleteAll();
-//    }
-
+    /**
+     * Cleanup after tests.
+     */
+    @After
+    public void cleanup() {
+        this.jobRequestRepository.deleteAll();
+        this.jobRepository.deleteAll();
+        this.jobExecutionRepository.deleteAll();
+        this.clusterRepository.deleteAll();
+        this.commandRepository.deleteAll();
+        this.applicationRepository.deleteAll();
+    }
 
     /**
      * Test the job submit method for success.
@@ -364,7 +366,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      * @throws Exception If there is a problem.
      */
     @Test
-    @DirtiesContext
     public void testSubmitJobMethod() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
@@ -375,20 +376,16 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
-        final String setUpFile = this.resourceLoader.getResource(
-            this.BASE_DIR
-                + "job"
-                + FILE_DELIMITER
-                + "jobsetupfile"
-        ).getFile().getAbsolutePath();
+        final String setUpFile = this.resourceLoader
+            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile")
+            .getFile()
+            .getAbsolutePath();
 
         final Set<String> dependencies = new HashSet<>();
-        final String depFile1 = this.resourceLoader.getResource(
-            this.BASE_DIR
-                + "job"
-                + FILE_DELIMITER
-                + "dep1"
-        ).getFile().getAbsolutePath();
+        final String depFile1 = this.resourceLoader
+            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1")
+            .getFile()
+            .getAbsolutePath();
 //        final String depFile2 = this.resourceLoader.getResource(
 //            this.BASE_DIR
 //                + "job"
@@ -502,7 +499,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      * @throws Exception If there is a problem.
      */
     @Test
-    @DirtiesContext
     public void testSubmitJobMethodAlreadyExists() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
@@ -581,7 +577,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      * @throws Exception If there is a problem.
      */
     @Test
-    @DirtiesContext
     public void testSubmitJobMethodMissingCluster() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
@@ -625,7 +620,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      * @throws Exception If there is a problem.
      */
     @Test
-    @DirtiesContext
     public void testSubmitJobMethodMissingCommand() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
@@ -731,7 +725,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      * @throws Exception If there is a problem.
      */
     @Test
-    @DirtiesContext
     public void testSubmitJobMethodFailure() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'exit 1'";
