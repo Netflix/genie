@@ -20,6 +20,7 @@ package com.netflix.genie.core.jpa.services;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -27,13 +28,14 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
+import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import com.netflix.genie.core.services.JobSearchService;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -61,11 +63,13 @@ import java.util.Set;
  *
  * @author amsharma
  */
+@Slf4j
 @Service
+@Transactional(readOnly = true)
 public class JpaJobSearchServiceImpl implements JobSearchService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JpaJobSearchServiceImpl.class);
     private final JpaJobRepository jobRepository;
+    private final JpaJobRequestRepository jobRequestRepository;
     private final JpaJobExecutionRepository jobExecutionRepository;
 
     @PersistenceContext
@@ -74,15 +78,18 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     /**
      * Constructor.
      *
-     * @param jobRepository          The repository to use for job objects
-     * @param jobExecutionRepository The repository to use for job execution objects
+     * @param jobRepository          The repository to use for job entities
+     * @param jobRequestRepository   The repository to use for job request entities
+     * @param jobExecutionRepository The repository to use for job execution entities
      */
     @Autowired
     public JpaJobSearchServiceImpl(
         final JpaJobRepository jobRepository,
+        final JpaJobRequestRepository jobRequestRepository,
         final JpaJobExecutionRepository jobExecutionRepository
     ) {
         this.jobRepository = jobRepository;
+        this.jobRequestRepository = jobRequestRepository;
         this.jobExecutionRepository = jobExecutionRepository;
     }
 
@@ -90,7 +97,6 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Page<JobSearchResult> findJobs(
         final String id,
         final String jobName,
@@ -107,7 +113,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         final Date maxFinished,
         @NotNull final Pageable page
     ) {
-        LOG.debug("called");
+        log.debug("called");
 
         final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
@@ -183,8 +189,8 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException {
+        log.debug("Called with hostname {}", hostname);
         final Set<JobExecutionEntity> entities
             = this.jobExecutionRepository.findByHostnameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE);
 
@@ -199,12 +205,11 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Job getJob(
         @NotBlank(message = "No id entered. Unable to get job.")
         final String id
     ) throws GenieNotFoundException {
-        LOG.debug("Called");
+        log.debug("Called with id {}", id);
         final JobEntity jobEntity = this.jobRepository.findOne(id);
         if (jobEntity != null) {
             return jobEntity.getDTO();
@@ -217,8 +222,8 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
+        log.debug("Called with id {}", id);
         if (this.jobRepository.exists(id)) {
             final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
             final CriteriaQuery<JobStatus> query = cb.createQuery(JobStatus.class);
@@ -228,6 +233,34 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             return this.entityManager.createQuery(query).getSingleResult();
         } else {
             throw new GenieNotFoundException("No job with id " + id + " exists.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobRequest getJobRequest(@NotBlank final String id) throws GenieException {
+        log.debug("Called with id {}", id);
+        final JobRequestEntity jobRequestEntity = this.jobRequestRepository.findOne(id);
+        if (jobRequestEntity != null) {
+            return jobRequestEntity.getDTO();
+        } else {
+            throw new GenieNotFoundException("No job request with id " + id);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobExecution getJobExecution(@NotBlank final String id) throws GenieException {
+        log.debug("Called with id {}", id);
+        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepository.findOne(id);
+        if (jobExecutionEntity != null) {
+            return jobExecutionEntity.getDTO();
+        } else {
+            throw new GenieNotFoundException("No job execution with id " + id);
         }
     }
 

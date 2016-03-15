@@ -19,6 +19,7 @@ package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -100,4 +101,22 @@ public interface JobSearchService {
      * @throws GenieException When any error, including not found, is encountered
      */
     JobStatus getJobStatus(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Get job request for given job id.
+     *
+     * @param id id of job request to look up
+     * @return the job
+     * @throws GenieException if there is an error
+     */
+    JobRequest getJobRequest(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Get job execution for given job id.
+     *
+     * @param id id of job execution to look up
+     * @return the job
+     * @throws GenieException if there is an error
+     */
+    JobExecution getJobExecution(@NotBlank final String id) throws GenieException;
 }

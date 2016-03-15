@@ -22,6 +22,8 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.hateoas.assemblers.JobExecutionResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
@@ -67,6 +69,8 @@ public class JobRestControllerUnitTests {
     private JobCoordinatorService jobService;
     private AttachmentService attachmentService;
     private JobResourceAssembler jobResourceAssembler;
+    private JobRequestResourceAssembler jobRequestResourceAssembler;
+    private JobExecutionResourceAssembler jobExecutionResourceAssembler;
     private JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
     private String hostname;
     private HttpClient httpClient;
@@ -82,6 +86,8 @@ public class JobRestControllerUnitTests {
         this.jobService = Mockito.mock(JobCoordinatorService.class);
         this.attachmentService = Mockito.mock(AttachmentService.class);
         this.jobResourceAssembler = Mockito.mock(JobResourceAssembler.class);
+        this.jobRequestResourceAssembler = Mockito.mock(JobRequestResourceAssembler.class);
+        this.jobExecutionResourceAssembler = Mockito.mock(JobExecutionResourceAssembler.class);
         this.jobSearchResultResourceAssembler = Mockito.mock(JobSearchResultResourceAssembler.class);
         this.hostname = UUID.randomUUID().toString();
         this.httpClient = Mockito.mock(HttpClient.class);
@@ -91,6 +97,8 @@ public class JobRestControllerUnitTests {
             this.jobService,
             this.attachmentService,
             this.jobResourceAssembler,
+            this.jobRequestResourceAssembler,
+            this.jobExecutionResourceAssembler,
             this.jobSearchResultResourceAssembler,
             this.hostname,
             this.httpClient,
@@ -112,6 +120,8 @@ public class JobRestControllerUnitTests {
             this.jobService,
             this.attachmentService,
             this.jobResourceAssembler,
+            this.jobRequestResourceAssembler,
+            this.jobExecutionResourceAssembler,
             this.jobSearchResultResourceAssembler,
             this.hostname,
             this.httpClient,
@@ -247,6 +257,8 @@ public class JobRestControllerUnitTests {
             this.jobService,
             this.attachmentService,
             this.jobResourceAssembler,
+            this.jobRequestResourceAssembler,
+            this.jobExecutionResourceAssembler,
             this.jobSearchResultResourceAssembler,
             this.hostname,
             this.httpClient,
