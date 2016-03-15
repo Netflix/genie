@@ -50,7 +50,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Turn off {@literal .} recognition in paths. Needed due to Job id's in paths potentially having '.' as character.
      *
      * @see <a href="http://stackoverflow.com/a/23938850">Stack Overflow Issue Answer From Dave Syer</a>
@@ -108,21 +108,17 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     }
 
     /**
-     * Get a static resource handler for Genie Jobs.
+     * Get the jobs dir as a Spring Resource. Will create if it doesn't exist.
      *
      * @param resourceLoader  The resource loader to use
-     * @param directoryWriter The directory writer to use for converting directory resources
-     * @param context         The spring application context
-     * @param jobsDirLocation The location the user is requesting the jobs be stored
-     * @return The genie resource http request handler.
-     * @throws IOException For any issues with files
+     * @param jobsDirLocation The location of the job dir
+     * @return The job dir as a resource
+     * @throws IOException on error reading or creading the directory
      */
     @Bean
     @ConditionalOnMissingBean
-    public GenieResourceHttpRequestHandler genieResourceHttpRequestHandler(
+    public Resource jobsDir(
         final ResourceLoader resourceLoader,
-        final DirectoryWriter directoryWriter,
-        final ApplicationContext context,
         @Value("${genie.jobs.dir.location}") final String jobsDirLocation
     ) throws IOException {
         final Resource tmpJobsDirResource = resourceLoader.getResource(jobsDirLocation);
@@ -147,9 +143,27 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
             }
         }
 
+        return jobsDirResource;
+    }
+
+    /**
+     * Get a static resource handler for Genie Jobs.
+     *
+     * @param directoryWriter The directory writer to use for converting directory resources
+     * @param context         The spring application context
+     * @param jobsDir         The location the user is requesting the jobs be stored
+     * @return The genie resource http request handler.
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public GenieResourceHttpRequestHandler genieResourceHttpRequestHandler(
+        final DirectoryWriter directoryWriter,
+        final ApplicationContext context,
+        final Resource jobsDir
+    ) {
         final GenieResourceHttpRequestHandler handler = new GenieResourceHttpRequestHandler(directoryWriter);
         handler.setApplicationContext(context);
-        handler.setLocations(Lists.newArrayList(jobsDirResource));
+        handler.setLocations(Lists.newArrayList(jobsDir));
 
         return handler;
     }

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -27,7 +28,6 @@ import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -111,17 +111,15 @@ public class ApplicationRestController {
     }
 
     /**
-     * Get Application for given id.
+     * Delete all applications from database.
      *
-     * @param id unique id for application configuration
-     * @return The application configuration
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called to get Application for id {}", id);
-        return this.applicationResourceAssembler.toResource(this.applicationService.getApplication(id));
+    @RequestMapping(method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAllApplications() throws GenieException {
+        log.debug("Delete all Applications");
+        this.applicationService.deleteAllApplications();
     }
 
     /**
@@ -150,12 +148,10 @@ public class ApplicationRestController {
         log.debug("{} | {} | {} | {} | {}", name, userName, statuses, tags, page);
 
         Set<ApplicationStatus> enumStatuses = null;
-        if (statuses != null && !statuses.isEmpty()) {
+        if (statuses != null) {
             enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
             for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(ApplicationStatus.parse(status));
-                }
+                enumStatuses.add(ApplicationStatus.parse(status));
             }
         }
 
@@ -173,6 +169,20 @@ public class ApplicationRestController {
     }
 
     /**
+     * Get Application for given id.
+     *
+     * @param id unique id for application configuration
+     * @return The application configuration
+     * @throws GenieException For any error
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
+        log.debug("Called to get Application for id {}", id);
+        return this.applicationResourceAssembler.toResource(this.applicationService.getApplication(id));
+    }
+
+    /**
      * Update application.
      *
      * @param id        unique id for configuration to update
@@ -185,20 +195,25 @@ public class ApplicationRestController {
         @PathVariable("id") final String id,
         @RequestBody final Application updateApp
     ) throws GenieException {
-        log.debug("called to update application config with info {}", updateApp);
+        log.debug("called to update application {} with info {}", id, updateApp);
         this.applicationService.updateApplication(id, updateApp);
     }
 
     /**
-     * Delete all applications from database.
+     * Patch an application using JSON Patch.
      *
-     * @throws GenieException For any error
+     * @param id    The id of the application to patch
+     * @param patch The JSON Patch instructions
+     * @throws GenieException     On error
      */
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllApplications() throws GenieException {
-        log.debug("Delete all Applications");
-        this.applicationService.deleteAllApplications();
+    public void patchApplication(
+        @PathVariable("id") final String id,
+        @RequestBody final JsonPatch patch
+    ) throws GenieException {
+        log.debug("Called to patch application {} with patch {}", id, patch);
+        this.applicationService.patchApplication(id, patch);
     }
 
     /**
@@ -453,12 +468,10 @@ public class ApplicationRestController {
         log.debug("Called with id {}", id);
 
         Set<CommandStatus> enumStatuses = null;
-        if (statuses != null && !statuses.isEmpty()) {
+        if (statuses != null) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
             for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(CommandStatus.parse(status));
-                }
+                enumStatuses.add(CommandStatus.parse(status));
             }
         }
 

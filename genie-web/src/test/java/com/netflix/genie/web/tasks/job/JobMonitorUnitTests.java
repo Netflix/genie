@@ -38,6 +38,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -137,13 +138,16 @@ public class JobMonitorUnitTests {
             this.monitor.run();
         }
 
-        final ArgumentCaptor<KillJobEvent> captor = ArgumentCaptor.forClass(KillJobEvent.class);
-        Mockito
-            .verify(this.publisher, Mockito.times(1))
-            .publishEvent(captor.capture());
-        Assert.assertNotNull(captor.getValue());
-        Assert.assertThat(captor.getValue().getId(), Matchers.is(this.jobExecution.getId()));
-        Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
+        final ArgumentCaptor<ApplicationEvent> eventCaptor = ArgumentCaptor.forClass(ApplicationEvent.class);
+        Mockito.verify(this.publisher, Mockito.times(2)).publishEvent(eventCaptor.capture());
+        final List<ApplicationEvent> events = eventCaptor.getAllValues();
+        Assert.assertThat(events.size(), Matchers.is(2));
+        Assert.assertTrue(events.get(0) instanceof KillJobEvent);
+        Assert.assertThat(((KillJobEvent) events.get(0)).getId(), Matchers.is(this.jobExecution.getId()));
+        Assert.assertThat(events.get(0).getSource(), Matchers.is(this.monitor));
+        Assert.assertTrue(events.get(1) instanceof JobFinishedEvent);
+        Assert.assertThat(((JobFinishedEvent) events.get(1)).getJobExecution(), Matchers.is(this.jobExecution));
+        Assert.assertThat(events.get(1).getSource(), Matchers.is(this.monitor));
     }
 
     /**

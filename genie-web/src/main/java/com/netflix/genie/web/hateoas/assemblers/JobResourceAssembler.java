@@ -43,10 +43,53 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
 
         try {
             jobResource.add(
-                    ControllerLinkBuilder.linkTo(
-                            ControllerLinkBuilder.methodOn(JobRestController.class)
-                                    .getJob(job.getId()))
-                            .withSelfRel()
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJob(job.getId())
+                ).withSelfRel()
+            );
+
+            jobResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJobExecution(job.getId())
+                ).withRel("execution")
+            );
+
+            // TODO: https://github.com/spring-projects/spring-hateoas/issues/186 should be fixed in .20 currently .19
+//            jobResource.add(
+//                ControllerLinkBuilder.linkTo(
+//                    JobRestController.class,
+//                    JobRestController.class.getMethod(
+//                        "getJobOutput",
+//                        String.class,
+//                        String.class,
+//                        HttpServletRequest.class,
+//                        HttpServletResponse.class
+//                    ),
+//                    job.getId(),
+//                    null,
+//                    null,
+//                    null
+//                ).withRel("output")
+//            );
+
+            jobResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJobRequest(job.getId())
+                ).withRel("request")
+            );
+
+            jobResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJobStatus(job.getId())
+                ).withRel("status")
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

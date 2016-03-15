@@ -26,8 +26,9 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.AttachmentService;
-import com.netflix.genie.core.services.JobService;
+import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.JobResource;
@@ -38,15 +39,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -71,6 +76,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.Set;
@@ -88,19 +94,22 @@ import java.util.UUID;
 @Slf4j
 public class JobRestController {
 
-    private final JobService jobService;
+    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
+
+    private final JobCoordinatorService jobCoordinatorService;
+
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
     private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
     private final String hostname;
     private final HttpClient httpClient;
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
-    private final boolean directoryForwardingEnabled;
+    private final boolean forwardingEnabled;
 
     /**
      * Constructor.
      *
-     * @param jobService                       The job search service to use.
+     * @param jobCoordinatorService            The job search service to use.
      * @param attachmentService                The attachment service to use to save attachments.
      * @param jobResourceAssembler             Assemble job resources out of jobs
      * @param jobSearchResultResourceAssembler Assemble job search resources out of jobs
@@ -108,33 +117,35 @@ public class JobRestController {
      * @param httpClient                       The http client to use for forwarding requests
      * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
      *                                         Genie File System.
-     * @param directoryForwardingEnabled       Whether job directory forwarding is enabled or not
+     * @param forwardingEnabled                Whether directory and kill request forwarding is enabled or not
      */
     @Autowired
     public JobRestController(
-        final JobService jobService,
+        final JobCoordinatorService jobCoordinatorService,
         final AttachmentService attachmentService,
         final JobResourceAssembler jobResourceAssembler,
         final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
         final String hostname,
         final HttpClient httpClient,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
-        @Value("${genie.jobs.dir.forwarding.enabled}") final boolean directoryForwardingEnabled
+        @Value("${genie.jobs.forwarding.enabled}") final boolean forwardingEnabled
     ) {
-        this.jobService = jobService;
+        this.jobCoordinatorService = jobCoordinatorService;
         this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
         this.jobSearchResultResourceAssembler = jobSearchResultResourceAssembler;
         this.hostname = hostname;
         this.httpClient = httpClient;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
-        this.directoryForwardingEnabled = directoryForwardingEnabled;
+        this.forwardingEnabled = forwardingEnabled;
     }
 
     /**
      * Submit a new job.
      *
-     * @param jobRequest The job request information
+     * @param jobRequest         The job request information
+     * @param clientHost         client host sending the request
+     * @param httpServletRequest The http servlet request
      * @return The submitted job
      * @throws GenieException For any error
      */
@@ -142,64 +153,87 @@ public class JobRestController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
         @RequestBody
-        final JobRequest jobRequest    //,
-//            @RequestHeader(FORWARDED_FOR_HEADER)
-//            final String clientHost,
-//            final HttpServletRequest httpServletRequest
+        final JobRequest jobRequest,
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
+        final String clientHost,
+        final HttpServletRequest httpServletRequest
     ) throws GenieException {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
         log.debug("Called to submit job: {}", jobRequest);
 
-        //TODO: Re-implement with new API type call that passes info along
-//        // get client's host from the context
-//        String localClientHost;
-//        if (StringUtils.isNotBlank(clientHost)) {
-//            localClientHost = clientHost.split(",")[0];
-//        } else {
-//            localClientHost = httpServletRequest.getRemoteAddr();
-//        }
-//
-//        // set the clientHost, if it is not overridden already
-//        if (StringUtils.isNotBlank(localClientHost)) {
-//            log.debug("called from: {}", localClientHost);
-//            job.setClientHost(localClientHost);
-//        }
-
-        final String id = this.jobService.runJob(jobRequest);
-        //final String id = "blah";
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(
-            ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(id)
-                .toUri()
+        return this.submitJob(
+            jobRequest,
+            null,
+            clientHost,
+            httpServletRequest
         );
-        return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
     }
 
     /**
      * Submit a new job with attachments.
      *
-     * @param jobRequest  The job request information
-     * @param attachments The attachments for the job
+     * @param jobRequest         The job request information
+     * @param attachments        The attachments for the job
+     * @param clientHost         client host sending the request
+     * @param httpServletRequest The http servlet request
      * @return The submitted job
      * @throws GenieException For any error
      */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
-        @RequestPart("request") final JobRequest jobRequest,
-        @RequestPart("attachment") final MultipartFile[] attachments
+        @RequestPart("request")
+        final JobRequest jobRequest,
+        @RequestPart("attachment")
+        final MultipartFile[] attachments,
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
+        final String clientHost,
+        final HttpServletRequest httpServletRequest
     ) throws GenieException {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
         log.debug("Called to submit job: {}", jobRequest);
 
-        final String jobId = UUID.randomUUID().toString();
+        // get client's host from the context
+        final String localClientHost;
+        if (StringUtils.isNotBlank(clientHost)) {
+            localClientHost = clientHost.split(",")[0];
+        } else {
+            localClientHost = httpServletRequest.getRemoteAddr();
+        }
+
+        final JobRequest jobRequestWithId;
+        // If the jobrequest does not contain an id create one else use the one provided.
+        final String jobId;
+        if (StringUtils.isNotBlank(jobRequest.getId())) {
+            jobId = jobRequest.getId();
+            jobRequestWithId = jobRequest;
+        } else {
+            jobId = UUID.randomUUID().toString();
+            jobRequestWithId = new JobRequest.Builder(
+                jobRequest.getName(),
+                jobRequest.getUser(),
+                jobRequest.getVersion(),
+                jobRequest.getCommandArgs(),
+                jobRequest.getClusterCriterias(),
+                jobRequest.getCommandCriteria()
+            ).withId(jobId)
+                .withCpu(jobRequest.getCpu())
+                .withMemory(jobRequest.getMemory())
+                .withDisableLogArchival(jobRequest.isDisableLogArchival())
+                .withGroup(jobRequest.getGroup())
+                .withSetupFile(jobRequest.getSetupFile())
+                .withDescription(jobRequest.getDescription())
+                .withTags(jobRequest.getTags())
+                .withEmail(jobRequest.getEmail())
+                .withFileDependencies(jobRequest.getFileDependencies())
+                .build();
+        }
+
+        // Download attachments
         if (attachments != null) {
             for (final MultipartFile attachment : attachments) {
                 log.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
@@ -211,15 +245,17 @@ public class JobRestController {
             }
         }
 
-//        final String id = this.executionService.submitJob(jobRequest);
+        this.jobCoordinatorService.coordinateJob(jobRequestWithId, localClientHost);
+
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(jobRequest.getId())
+                .buildAndExpand(jobId)
                 .toUri()
         );
+
         return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
     }
 
@@ -233,7 +269,7 @@ public class JobRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public JobResource getJob(@PathVariable("id") final String id) throws GenieException {
         log.debug("called for job with id: {}", id);
-        return this.jobResourceAssembler.toResource(this.jobService.getJob(id));
+        return this.jobResourceAssembler.toResource(this.jobCoordinatorService.getJob(id));
     }
 
     /**
@@ -246,7 +282,9 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/status", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode getJobStatus(@PathVariable("id") final String id) throws GenieException {
         final JsonNodeFactory factory = JsonNodeFactory.instance;
-        return factory.objectNode().set("status", factory.textNode(this.jobService.getJobStatus(id).toString()));
+        return factory
+            .objectNode()
+            .set("status", factory.textNode(this.jobCoordinatorService.getJobStatus(id).toString()));
     }
 
     /**
@@ -261,6 +299,10 @@ public class JobRestController {
      * @param clusterId   the id of the cluster
      * @param commandName the name of the command run by the job
      * @param commandId   the id of the command run by the job
+     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
      * @param page        page information for job
      * @param assembler   The paged resources assembler to use
      * @return successful response, or one with HTTP error code
@@ -278,15 +320,20 @@ public class JobRestController {
         @RequestParam(value = "clusterId", required = false) final String clusterId,
         @RequestParam(value = "commandName", required = false) final String commandName,
         @RequestParam(value = "commandId", required = false) final String commandId,
+        @RequestParam(value = "minStarted", required = false) final Long minStarted,
+        @RequestParam(value = "maxStarted", required = false) final Long maxStarted,
+        @RequestParam(value = "minFinished", required = false) final Long minFinished,
+        @RequestParam(value = "maxFinished", required = false) final Long maxFinished,
         @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
         log.debug(
             "Called with "
-                + "[id | jobName | userName | statuses | clusterName | clusterId | page]"
+                + "[id | jobName | userName | statuses | clusterName "
+                + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | page]"
         );
         log.debug(
-            "{} | {} | {} | {} | {} | {} | {}",
+            "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
             id,
             name,
             userName,
@@ -296,6 +343,10 @@ public class JobRestController {
             clusterId,
             commandName,
             commandId,
+            minStarted,
+            maxStarted,
+            minFinished,
+            maxFinished,
             page
         );
         Set<JobStatus> enumStatuses = null;
@@ -308,8 +359,32 @@ public class JobRestController {
             }
         }
 
+        // Build the self link which will be used for the next, previous, etc links
+        final Link self = ControllerLinkBuilder
+            .linkTo(
+                ControllerLinkBuilder
+                    .methodOn(JobRestController.class)
+                    .getJobs(
+                        id,
+                        name,
+                        userName,
+                        statuses,
+                        tags,
+                        clusterName,
+                        clusterId,
+                        commandName,
+                        commandId,
+                        minStarted,
+                        maxStarted,
+                        minFinished,
+                        maxFinished,
+                        page,
+                        assembler
+                    )
+            ).withSelfRel();
+
         return assembler.toResource(
-            this.jobService.findJobs(
+            this.jobCoordinatorService.findJobs(
                 id,
                 name,
                 userName,
@@ -319,23 +394,62 @@ public class JobRestController {
                 clusterId,
                 commandName,
                 commandId,
+                minStarted == null ? null : new Date(minStarted),
+                maxStarted == null ? null : new Date(maxStarted),
+                minFinished == null ? null : new Date(minFinished),
+                maxFinished == null ? null : new Date(maxFinished),
                 page
             ),
-            this.jobSearchResultResourceAssembler
+            this.jobSearchResultResourceAssembler,
+            self
         );
     }
 
     /**
      * Kill job based on given job ID.
      *
-     * @param id id for job to kill
-     * @throws GenieException For any error
+     * @param id            id for job to kill
+     * @param forwardedFrom The host this request was forwarded from if present
+     * @param request       the servlet request
+     * @param response      the servlet response
+     * @throws GenieException   For any error
+     * @throws IOException      on redirect error
+     * @throws ServletException when trying to handle the request
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
-    public void killJob(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called for job id: {}", id);
-        //this.executionService.killJob(id);
+    public void killJob(
+        @PathVariable("id") final String id,
+        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
+        final HttpServletRequest request,
+        final HttpServletResponse response
+    ) throws GenieException, IOException, ServletException {
+        log.debug("Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
+
+        // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
+        if (this.forwardingEnabled && forwardedFrom == null) {
+            final String jobHostname = this.jobCoordinatorService.getJobHost(id);
+            if (!this.hostname.equals(jobHostname)) {
+                //Need to forward job
+                final HttpDelete deleteRequest = new HttpDelete(this.buildForwardURL(request, jobHostname));
+                this.copyRequestHeaders(request, deleteRequest);
+                final HttpResponse deleteResponse = this.httpClient.execute(deleteRequest);
+
+                if (this.forwardResponseHasError(response, deleteResponse)) {
+                    // Method already sent error through servlet response
+                    return;
+                }
+
+                response.setStatus(HttpStatus.ACCEPTED.value());
+                this.copyResponseHeaders(response, deleteResponse);
+
+                // No need to do anything on this node
+                return;
+            }
+        }
+
+        // Job is on this node so try to kill it
+        this.jobCoordinatorService.killJob(id);
+        response.setStatus(HttpStatus.ACCEPTED.value());
     }
 
     /**
@@ -368,7 +482,7 @@ public class JobRestController {
      * @param id            The id of the job to get output for
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
-     * @param response      the servlet response to send the redirect with
+     * @param response      the servlet response
      * @throws IOException      on redirect error
      * @throws ServletException when trying to handle the request
      * @throws GenieException   on any Genie internal error
@@ -384,49 +498,31 @@ public class JobRestController {
     )
     public void getJobOutput(
         @PathVariable("id") final String id,
-        @RequestHeader(
-            name = GenieResourceHttpRequestHandler.GENIE_FORWARDED_FROM_HEADER,
-            required = false
-        ) final String forwardedFrom,
+        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
-        if (this.directoryForwardingEnabled && forwardedFrom == null) {
-            final String jobHostName = this.jobService.getJobHost(id);
-            if (!this.hostname.equals(jobHostName)) {
+        if (this.forwardingEnabled && forwardedFrom == null) {
+            // TODO: It's possible that could use the JobMonitorCoordinator to check this in memory
+            //       However that could get into problems where the job finished or died
+            //       and it would return false on check if the job with given id is running on that node
+            final String jobHostname = this.jobCoordinatorService.getJobHost(id);
+            if (!this.hostname.equals(jobHostname)) {
                 // Use Apache HttpClient for easier access to result bytes as stream than RestTemplate
                 // RestTemplate read entire byte[] payload into memory before the result object even given back to
                 // application control. Concerned about people getting stdout which could be huge file.
-                final HttpGet getRequest = new HttpGet(
-                    request.getScheme() + "://" + jobHostName + ":" + request.getServerPort() + request.getRequestURI()
-                );
-
-                // Copy all the headers (necessary for ACCEPT and security headers especially)
-                final Enumeration<String> headerNames = request.getHeaderNames();
-                if (headerNames != null) {
-                    while (headerNames.hasMoreElements()) {
-                        final String headerName = headerNames.nextElement();
-                        final String headerValue = request.getHeader(headerName);
-                        log.debug("Request Header: name = {} value = {}", headerName, headerValue);
-                        getRequest.addHeader(headerName, headerValue);
-                    }
-                }
-                getRequest.addHeader(
-                    GenieResourceHttpRequestHandler.GENIE_FORWARDED_FROM_HEADER,
-                    request.getRequestURL().toString()
-                );
-
+                final HttpGet getRequest = new HttpGet(this.buildForwardURL(request, jobHostname));
+                this.copyRequestHeaders(request, getRequest);
                 final HttpResponse getResponse = this.httpClient.execute(getRequest);
-                if (getResponse.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
-                    response.sendError(getResponse.getStatusLine().getStatusCode());
+
+                if (this.forwardResponseHasError(response, getResponse)) {
+                    // Method already sent error through servlet response
                     return;
                 }
 
                 response.setStatus(HttpStatus.OK.value());
-                for (final Header header : getResponse.getAllHeaders()) {
-                    response.setHeader(header.getName(), header.getValue());
-                }
+                this.copyResponseHeaders(response, getResponse);
 
                 // Documentation I could find pointed to the HttpEntity reading the bytes off the stream so this should
                 // resolve memory problems if the file returned is large
@@ -455,5 +551,44 @@ public class JobRestController {
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, id + "/" + path);
 
         this.resourceHttpRequestHandler.handleRequest(request, response);
+    }
+
+    private String buildForwardURL(final HttpServletRequest request, final String jobHostname) {
+        return request.getScheme() + "://" + jobHostname + ":" + request.getServerPort() + request.getRequestURI();
+    }
+
+    private void copyRequestHeaders(final HttpServletRequest request, final HttpRequestBase forwardRequest) {
+        // Copy all the headers (necessary for ACCEPT and security headers especially)
+        final Enumeration<String> headerNames = request.getHeaderNames();
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                final String headerName = headerNames.nextElement();
+                final String headerValue = request.getHeader(headerName);
+                log.debug("Request Header: name = {} value = {}", headerName, headerValue);
+                forwardRequest.addHeader(headerName, headerValue);
+            }
+        }
+
+        // This method only called when need to forward so add the forwarded from header
+        forwardRequest.addHeader(JobConstants.GENIE_FORWARDED_FROM_HEADER, request.getRequestURL().toString());
+    }
+
+    private boolean forwardResponseHasError(
+        final HttpServletResponse response,
+        final HttpResponse forwardResponse
+    ) throws IOException {
+        final int statusCode = forwardResponse.getStatusLine().getStatusCode();
+        if (statusCode != HttpStatus.OK.value() && statusCode != HttpStatus.ACCEPTED.value()) {
+            response.sendError(statusCode, forwardResponse.getStatusLine().getReasonPhrase());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void copyResponseHeaders(final HttpServletResponse response, final HttpResponse forwardResponse) {
+        for (final Header header : forwardResponse.getAllHeaders()) {
+            response.setHeader(header.getName(), header.getValue());
+        }
     }
 }

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.core.jpa.services;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
@@ -30,7 +30,6 @@ import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
@@ -42,6 +41,7 @@ import java.util.UUID;
  * Tests for the CommandServiceJPAImpl.
  *
  * @author tgianos
+ * @since 2.0.0
  */
 @Category(UnitTest.class)
 public class JpaCommandServiceImplUnitTests {
@@ -79,31 +79,11 @@ public class JpaCommandServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testGetCommand() throws GenieException {
-    }
-
-    /**
-     * Test the get command method.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandNotExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.getCommand(id);
-    }
-
-    /**
-     * Test the create method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testCreateCommand() throws GenieException {
     }
 
     /**
@@ -125,16 +105,6 @@ public class JpaCommandServiceImplUnitTests {
             .build();
         Mockito.when(this.jpaCommandRepository.exists(COMMAND_1_ID)).thenReturn(true);
         this.service.createCommand(command);
-    }
-
-    /**
-     * Test to update an command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testUpdateCommand() throws GenieException {
     }
 
     /**
@@ -166,26 +136,6 @@ public class JpaCommandServiceImplUnitTests {
     }
 
     /**
-     * Test delete all.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testDeleteAll() throws GenieException {
-    }
-
-    /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testDelete() throws GenieException {
-    }
-
-    /**
      * Test delete.
      *
      * @throws GenieException For any problem
@@ -195,16 +145,6 @@ public class JpaCommandServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.deleteCommand(id);
-    }
-
-    /**
-     * Test add configurations to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testAddConfigsToCommand() throws GenieException {
     }
 
     /**
@@ -224,31 +164,11 @@ public class JpaCommandServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testUpdateConfigsForCommand() throws GenieException {
-    }
-
-    /**
-     * Test update configurations for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.updateConfigsForCommand(UUID.randomUUID().toString(), new HashSet<>());
-    }
-
-    /**
-     * Test get configurations for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testGetConfigsForCommand() throws GenieException {
     }
 
     /**
@@ -268,31 +188,11 @@ public class JpaCommandServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testRemoveAllConfigsForCommand() throws GenieException {
-    }
-
-    /**
-     * Test remove all configurations for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllConfigsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeAllConfigsForCommand(id);
-    }
-
-    /**
-     * Test remove configuration for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testRemoveConfigForCommand() throws GenieException {
     }
 
     /**
@@ -312,19 +212,9 @@ public class JpaCommandServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testSetApplicationsForCommand() throws GenieException {
-    }
-
-    /**
-     * Test setting the applications for a given command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GeniePreconditionException.class)
     public void testSetApplicationsForCommandNoAppId() throws GenieException {
-        this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(UUID.randomUUID().toString()));
+        this.service.setApplicationsForCommand(COMMAND_2_ID, Lists.newArrayList(UUID.randomUUID().toString()));
     }
 
     /**
@@ -337,7 +227,7 @@ public class JpaCommandServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         Mockito.when(this.jpaApplicationRepository.exists(Mockito.anyString())).thenReturn(true);
-        this.service.setApplicationsForCommand(id, Sets.newHashSet(UUID.randomUUID().toString()));
+        this.service.setApplicationsForCommand(id, Lists.newArrayList(UUID.randomUUID().toString()));
     }
 
     /**
@@ -349,17 +239,7 @@ public class JpaCommandServiceImplUnitTests {
     public void testSetApplicationsForCommandNoAppExists() throws GenieException {
         final String appId = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.exists(appId)).thenReturn(false);
-        this.service.setApplicationsForCommand(COMMAND_2_ID, Sets.newHashSet(appId));
-    }
-
-    /**
-     * Test get applications for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testGetApplicationsForCommand() throws GenieException {
+        this.service.setApplicationsForCommand(COMMAND_2_ID, Lists.newArrayList(appId));
     }
 
     /**
@@ -379,31 +259,11 @@ public class JpaCommandServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testRemoveApplicationsForCommand() throws GenieException {
-    }
-
-    /**
-     * Test remove applications for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveApplicationsForCommandNoCommandExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeApplicationsForCommand(id);
-    }
-
-    /**
-     * Test add tags to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testAddTagsToCommand() throws GenieException {
     }
 
     /**
@@ -423,31 +283,11 @@ public class JpaCommandServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testUpdateTagsForCommand() throws GenieException {
-    }
-
-    /**
-     * Test update tags for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.updateTagsForCommand(UUID.randomUUID().toString(), new HashSet<>());
-    }
-
-    /**
-     * Test get tags for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testGetTagsForCommand() throws GenieException {
     }
 
     /**
@@ -467,31 +307,11 @@ public class JpaCommandServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testRemoveAllTagsForCommand() throws GenieException {
-    }
-
-    /**
-     * Test remove all tags for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeAllTagsForCommand(id);
-    }
-
-    /**
-     * Test remove tag for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testRemoveTagForCommand() throws GenieException {
     }
 
     /**
@@ -504,16 +324,6 @@ public class JpaCommandServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
         this.service.removeTagForCommand(id, "something");
-    }
-
-    /**
-     * Test the Get clusters for command function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testGetCommandsForCommand() throws GenieException {
     }
 
     /**

@@ -21,10 +21,14 @@ banner:
 
 genie:
   jobs:
+    createuser:
+      enabled: false
     dir:
-      forwarding:
-        enabled: true
       location: file:///tmp/genie/jobs/
+    forwarding:
+      enabled: true
+    runasuser:
+      enabled: false
   leader:
     enabled: false
   redis:
@@ -44,6 +48,11 @@ genie:
   tasks:
     pool:
       size: 10
+  mail:
+    enabled: false
+    fromAddress: no-reply-genie@geniehost.com
+    #user:
+    #password:
 
 management:
   context-path: /actuator
@@ -67,3 +76,6 @@ spring:
         namespace: /genie/leader/
   profiles:
     active: dev
+  mail:
+    #host: localhost
+    #testConnection: true

@@ -20,11 +20,11 @@ package com.netflix.genie.core.jpa.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.core.jobs.JobExecutionEnvironment;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
@@ -36,18 +36,16 @@ import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.core.services.JobPersistenceService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
+import java.util.Date;
 
 /**
  * JPA implementation of the job persistence service.
@@ -61,9 +59,9 @@ import java.util.UUID;
         ConstraintViolationException.class
     }
 )
+@Slf4j
 public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JpaJobPersistenceServiceImpl.class);
     private final JpaJobRepository jobRepo;
     private final JpaJobRequestRepository jobRequestRepo;
     private final JpaJobExecutionRepository jobExecutionRepo;
@@ -99,23 +97,29 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      */
     @Override
     public void createJob(
-        @NotNull(message = "Job is null so cannot be saved")
+        @NotNull(message = "No Job provided to create")
         final Job job
     ) throws GenieException {
-        LOG.debug("Called with job: {}", job);
+        log.debug("Called with job: {}", job);
 
         // Since a job request object should always exist before the job object is saved
         // the id should never be null
         if (StringUtils.isBlank(job.getId())) {
-            throw new GenieConflictException("Cannot create a job with id blank or null");
+            throw new GeniePreconditionException("Cannot create a job without the id specified");
         }
 
+        // check if job already exists in the database
         if (this.jobRepo.exists(job.getId())) {
             throw new GenieConflictException("A job with id " + job.getId() + " already exists");
         }
 
-        final JobEntity jobEntity = new JobEntity();
+        final JobRequestEntity jobRequestEntity = jobRequestRepo.findOne(job.getId());
 
+        if (jobRequestEntity == null) {
+            throw new GeniePreconditionException("Cannot find the job request for the id of the job specified.");
+        }
+
+        final JobEntity jobEntity = new JobEntity();
 
         jobEntity.setId(job.getId());
         jobEntity.setName(job.getName());
@@ -123,48 +127,47 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobEntity.setVersion(job.getVersion());
         jobEntity.setArchiveLocation(job.getArchiveLocation());
         jobEntity.setDescription(job.getDescription());
-        jobEntity.setStarted(job.getStarted());
+
+        if (job.getStarted() != null) {
+            jobEntity.setStarted(job.getStarted());
+        }
         jobEntity.setStatus(job.getStatus());
         jobEntity.setStatusMsg(job.getStatusMsg());
+        jobEntity.setTags(jobRequestEntity.getTags());
 
-        jobEntity.setTags(job.getTags());
-
-        // TODO: where are the ones below set .. update method?
-        // finished,
-        this.jobRepo.save(jobEntity);
+        jobRequestEntity.setJob(jobEntity);
     }
 
     /**
-     * Update a job.
-     *
-     * @param id        The id of the application configuration to update
-     * @param updateJob Information to update for the Job
-     * @throws GenieException if there is an error
+     * {@inheritDoc}
      */
     @Override
-    public void updateJob(
+    public void updateJobStatus(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
-        @NotNull(message = "No job information entered. Unable to update.")
-        @Valid
-        final Job updateJob
+        @NotNull (message = "Status cannot be null.")
+        final JobStatus jobStatus,
+        @NotBlank(message = "Status message cannot be empty.")
+        final String statusMsg
     ) throws GenieException {
-        if (!this.jobRepo.exists(id)) {
-            throw new GenieNotFoundException("No job information entered. Unable to update.");
-        }
-        if (!id.equals(updateJob.getId())) {
-            throw new GenieBadRequestException("Job id inconsistent with id passed in.");
-        }
 
-        LOG.debug("Called with job {}", updateJob);
+        log.debug("Called to update job with id {}, status {} and statusMsg \"{}\"", id, jobStatus, statusMsg);
 
         final JobEntity jobEntity = this.jobRepo.findOne(id);
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("No job exists for the id specified");
+        }
 
-        // TODO should we update only three fields or everything?
-        jobEntity.setFinished(updateJob.getFinished());
-        jobEntity.setStatus(updateJob.getStatus());
-        jobEntity.setStatusMsg(updateJob.getStatusMsg());
+        jobEntity.setStatus(jobStatus);
+        jobEntity.setStatusMsg(statusMsg);
 
+        // If the status is either failed, killed or succeeded then set the finish time of the job as well
+        if (jobStatus.equals(JobStatus.KILLED)
+            || jobStatus.equals(JobStatus.FAILED)
+            || jobStatus.equals(JobStatus.SUCCEEDED)) {
+
+            jobEntity.setFinished(new Date());
+        }
         this.jobRepo.save(jobEntity);
     }
 
@@ -172,46 +175,50 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
-    public void addJobExecutionEnvironmentToJob(
-        @NotNull(message = "Job Execution environment is null so cannot update")
-        final JobExecutionEnvironment jee
+    public void updateClusterForJob(
+        @NotBlank(message = "Job id cannot be null while updating cluster information")
+        final String jobId,
+        @NotBlank(message = "Cluster id cannot be null while updating cluster information")
+        final String clusterId
     ) throws GenieException {
-        LOG.debug("Called");
-
-        if (jee.getJobRequest() == null || jee.getJobRequest().getId() == null) {
-            throw new GenieBadRequestException("Cannot update job as it is null");
-        }
-
-        final String jobId = jee.getJobRequest().getId();
-        ClusterEntity clusterEntity = null;
-        CommandEntity commandEntity = null;
+        log.debug("Called with jobId {} and clusterID {}", jobId, clusterId);
 
         final JobEntity jobEntity = this.jobRepo.findOne(jobId);
-
-        if (jee.getCluster() != null && jee.getCluster().getId() != null) {
-            clusterEntity = this.clusterRepo.findOne(jee.getCluster().getId());
-            if (clusterEntity == null) {
-                throw new GenieNotFoundException("No cluster with id " + jee.getCluster().getId());
-            }
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("Cannot find job with ID " + jobId);
         }
 
-        if (jee.getCommand() != null && jee.getCommand().getId() != null) {
-            commandEntity = this.commandRepo.findOne(jee.getCommand().getId());
-            if (commandEntity == null) {
-                throw new GenieNotFoundException("No command with id " + jee.getCommand().getId());
-            }
+        final ClusterEntity clusterEntity = this.clusterRepo.findOne(clusterId);
+        if (clusterEntity == null) {
+            throw new GenieNotFoundException("Cannot find cluster with ID " + clusterId);
         }
 
-        if (jobEntity != null) {
-            jobEntity.setCluster(clusterEntity);
-            jobEntity.setCommand(commandEntity);
+        jobEntity.setCluster(clusterEntity);
+    }
 
-            this.jobRepo.save(jobEntity);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateCommandForJob(
+        @NotBlank(message = "Job id cannot be null while updating command information")
+        final String jobId,
+        @NotBlank(message = "Command id cannot be null while updating command information")
+        final String commandId
+    ) throws GenieException {
+        log.debug("Called with jobId {} and commandId {}", jobId, commandId);
 
-        } else {
-            throw new GenieNotFoundException("No job with id " + jobId);
+        final JobEntity jobEntity = this.jobRepo.findOne(jobId);
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("Cannot find job with ID " + jobId);
         }
+
+        final CommandEntity commandEntity = this.commandRepo.findOne(commandId);
+        if (commandEntity == null) {
+            throw new GenieNotFoundException("Cannot find command with ID " + commandId);
+        }
+
+        jobEntity.setCommand(commandEntity);
     }
 
     /**
@@ -223,12 +230,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotBlank(message = "No id entered. Unable to get job request.")
         final String id
     ) throws GenieException {
-        LOG.debug("Called");
+        log.debug("Called with id {}", id);
         final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(id);
         if (jobRequestEntity != null) {
             return jobRequestEntity.getDTO();
         } else {
-            throw new GenieNotFoundException("No job with id " + id);
+            throw new GenieNotFoundException("No jobrequest with id " + id);
         }
     }
 
@@ -240,7 +247,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotNull(message = "Job Request is null so cannot be saved")
         final JobRequest jobRequest
     ) throws GenieException {
-        LOG.debug("Called with jobRequest: {}", jobRequest);
+        log.debug("Called with jobRequest: {}", jobRequest);
 
         if (jobRequest.getId() != null && this.jobRequestRepo.exists(jobRequest.getId())) {
             throw new GenieConflictException("A job with id " + jobRequest.getId() + " already exists");
@@ -248,6 +255,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
         final JobRequestEntity jobRequestEntity = new JobRequestEntity();
 
+        jobRequestEntity.setId(jobRequest.getId());
         jobRequestEntity.setName(jobRequest.getName());
         jobRequestEntity.setUser(jobRequest.getUser());
         jobRequestEntity.setVersion(jobRequest.getVersion());
@@ -257,28 +265,36 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setSetupFile(jobRequest.getSetupFile());
         jobRequestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
         jobRequestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
-
-        // TODO convert set to csv
-        //jobRequestEntity.setFileDependencies(jobRequest.getFileDependencies());
-
+        jobRequestEntity.setFileDependenciesFromSet(jobRequest.getFileDependencies());
         jobRequestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
         jobRequestEntity.setEmail(jobRequest.getEmail());
-
-        // TODO sort tags?
         jobRequestEntity.setTags(jobRequest.getTags());
-
         jobRequestEntity.setCpu(jobRequest.getCpu());
         jobRequestEntity.setMemory(jobRequest.getMemory());
 
-        // TODO client host should be part of jobRequest?
-        //jobRequestEntity.setClientHost(jobRequest.);
-
-        if (StringUtils.isBlank(jobRequestEntity.getId())) {
-            jobRequestEntity.setId(UUID.randomUUID().toString());
-        }
-
         this.jobRequestRepo.save(jobRequestEntity);
         return jobRequestEntity.getDTO();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addClientHostToJobRequest(
+        @NotNull(message = "job request id not provided.")
+        final String id,
+        @NotBlank(message = "client host cannot be null")
+        final String clientHost)
+        throws GenieException {
+
+        log.debug("Called with id: {} and client host: {}", id, clientHost);
+
+        final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(id);
+        if (jobRequestEntity == null) {
+            throw new GenieNotFoundException("Cannot find the job request for id: " + id);
+        }
+
+        jobRequestEntity.setClientHost(clientHost);
     }
 
     /**
@@ -294,7 +310,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotBlank(message = "No id entered. Unable to get job request.")
         final String id
     ) throws GenieException {
-        LOG.debug("Called");
+        log.debug("Called");
         final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
         if (jobExecutionEntity != null) {
             return jobExecutionEntity.getDTO();
@@ -311,16 +327,17 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotNull(message = "Job Request is null so cannot be saved")
         final JobExecution jobExecution
     ) throws GenieException {
-        LOG.debug("Called with jobExecution: {}", jobExecution);
+        log.debug("Called with jobExecution: {}", jobExecution);
 
         // Since a job request object should always exist before the job object is saved
         // the id should never be null
         if (StringUtils.isBlank(jobExecution.getId())) {
-            throw new GenieConflictException("Cannot create a job execution entry with id blank or null");
+            throw new GeniePreconditionException("Cannot create a job execution entry with id blank or null");
         }
 
-        if (this.jobExecutionRepo.exists(jobExecution.getId())) {
-            throw new GenieConflictException("A job with id " + jobExecution.getId() + " already exists");
+        final JobEntity jobEntity = jobRepo.findOne(jobExecution.getId());
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("Cannot find the job for the id of the jobExecution specified.");
         }
 
         final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
@@ -328,8 +345,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobExecutionEntity.setId(jobExecution.getId());
         jobExecutionEntity.setHostname(jobExecution.getHostname());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
+        jobExecutionEntity.setCheckDelay(jobExecution.getCheckDelay());
 
-        this.jobExecutionRepo.save(jobExecutionEntity);
+        jobEntity.setExecution(jobExecutionEntity);
+        jobEntity.setStatus(JobStatus.RUNNING);
+        jobEntity.setStatusMsg("Job is Running");
+        jobEntity.setStarted(new Date());
     }
 
     /**
@@ -340,17 +361,41 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @throws GenieException if there is an error
      */
     @Override
-    public void setExitCode(
+    public synchronized void setExitCode(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
         @NotBlank(message = "Exit code cannot be blank")
         final int exitCode
     ) throws GenieException {
-        LOG.debug("Called");
+        log.debug("Called with id {} and exit code {}", id, exitCode);
+
         final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
         if (jobExecutionEntity != null) {
-            jobExecutionEntity.setExitCode(exitCode);
-            this.jobExecutionRepo.save(jobExecutionEntity);
+
+            // Make sure current exit code is the default one before updating
+            if (jobExecutionEntity.getExitCode() == JobExecution.DEFAULT_EXIT_CODE) {
+                switch (exitCode) {
+                    // No update to status in case of default exit code
+                    case JobExecution.DEFAULT_EXIT_CODE:
+                        break;
+                    case JobExecution.KILLED_EXIT_CODE:
+                        this.updateJobStatus(id, JobStatus.KILLED, "Job killed.");
+                        break;
+                    case JobExecution.ZOMBIE_EXIT_CODE:
+                        this.updateJobStatus(id, JobStatus.FAILED, "Job marked as zombie by genie.");
+                        break;
+                    case JobExecution.SUCCESS_EXIT_CODE:
+                        this.updateJobStatus(id, JobStatus.SUCCEEDED, "Job finished successfully.");
+                        break;
+                    // catch all for non-zero and non zombie, killed and failed exit codes
+                    default:
+                        this.updateJobStatus(id, JobStatus.FAILED, "Job failed.");
+                }
+                jobExecutionEntity.setExitCode(exitCode);
+            } else {
+                throw new GeniePreconditionException("Exit code already changed from default. Cannot update.");
+            }
+
         } else {
             throw new GenieNotFoundException("No job with id " + id);
         }

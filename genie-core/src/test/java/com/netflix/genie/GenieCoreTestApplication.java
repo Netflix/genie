@@ -17,15 +17,21 @@
  */
 package com.netflix.genie;
 
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import javax.validation.Validator;
+import java.io.IOException;
 
 /**
  * Spring configuration class for integration tests.
@@ -69,55 +75,28 @@ public class GenieCoreTestApplication {
         return "localhost";
     }
 
-//    /**
-//     * Get the DBUnit configuration.
-//     *
-//     * @return The config bean
-//     */
-//    @Bean
-//    public DatabaseConfigBean dbUnitDatabaseConfig() {
-//        final DatabaseConfigBean dbConfig = new DatabaseConfigBean();
-//        dbConfig.setDatatypeFactory(new HsqldbDataTypeFactory());
-//        return dbConfig;
-//    }
-//
-//    /**
-//     * Get the database connection factory bean.
-//     *
-//     * @param dataSource The data source to use
-//     * @return The database connection factory bean for dbunit.
-//     */
-//    @Bean
-//    public DatabaseDataSourceConnectionFactoryBean dbUnitDatabaseConnection(final DataSource dataSource) {
-//        final DatabaseDataSourceConnectionFactoryBean dbConnection
-//            = new DatabaseDataSourceConnectionFactoryBean(dataSource);
-//        dbConnection.setDatabaseConfig(dbUnitDatabaseConfig());
-//        return dbConnection;
-//    }
-//
-//    /**
-//     * Get an entity manager factory to use for the tests.
-//     *
-//     * @param dataSource the data source to use
-//     * @return The factory
-//     */
-//    @Bean
-//    public LocalContainerEntityManagerFactoryBean entityManagerFactory(final DataSource dataSource) {
-//        final LocalContainerEntityManagerFactoryBean thing = new LocalContainerEntityManagerFactoryBean();
-//        thing.setDataSource(dataSource);
-//        return thing;
-//    }
-//
-//    /**
-//     * Transaction manager.
-//     *
-//     * @param factory the factory to use
-//     * @return The transaction manager
-//     */
-//    @Bean
-//    public JpaTransactionManager transactionManager(final LocalContainerEntityManagerFactoryBean factory) {
-//        final JpaTransactionManager transactionManager = new JpaTransactionManager();
-//        transactionManager.setEntityManagerFactory(factory.nativeEntityManagerFactory);
-//        return transactionManager;
-//    }
+    /**
+     * Get an {@link Executor} to use for executing processes from tasks.
+     *
+     * @return The executor to use
+     */
+    @Bean
+    public Executor processExecutor() {
+        final Executor executor = new DefaultExecutor();
+        executor.setStreamHandler(new PumpStreamHandler(null, null));
+        return executor;
+    }
+
+    /**
+     * Get the jobs dir as a Spring Resource. Will create if it doesn't exist.
+
+     * @return The job dir as a resource
+     * @throws IOException on error reading or creading the directory
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public Resource jobsDir(
+    ) throws IOException {
+       return new DefaultResourceLoader().getResource("/tmp");
+    }
 }

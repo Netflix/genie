@@ -28,7 +28,6 @@ import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
@@ -40,9 +39,10 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Tests for the CommandServiceJPAImpl.
+ * Tests for the ClusterServiceJPAImpl.
  *
  * @author tgianos
+ * @since 2.0.0
  */
 @Category(UnitTest.class)
 public class JpaClusterServiceImplUnitTests {
@@ -63,20 +63,7 @@ public class JpaClusterServiceImplUnitTests {
     public void setup() {
         this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
-        this.service = new JpaClusterServiceImpl(
-                this.jpaClusterRepository,
-                this.jpaCommandRepository
-        );
-    }
-
-    /**
-     * Test the get cluster method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testGetCluster() throws GenieException {
+        this.service = new JpaClusterServiceImpl(this.jpaClusterRepository, this.jpaCommandRepository);
     }
 
     /**
@@ -92,26 +79,6 @@ public class JpaClusterServiceImplUnitTests {
     }
 
     /**
-     * Test the choseClusterForJob function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testChooseClusterForJob() throws GenieException {
-    }
-
-    /**
-     * Test the create method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testCreateCluster() throws GenieException {
-    }
-
-    /**
      * Test to make sure an exception is thrown when cluster already exists.
      *
      * @throws GenieException For any problem
@@ -123,27 +90,17 @@ public class JpaClusterServiceImplUnitTests {
         configs.add("another config");
         configs.add("yet another config");
         final Cluster cluster = new Cluster.Builder(
-                CLUSTER_1_NAME,
-                CLUSTER_1_USER,
-                CLUSTER_1_VERSION,
-                ClusterStatus.OUT_OF_SERVICE
+            CLUSTER_1_NAME,
+            CLUSTER_1_USER,
+            CLUSTER_1_VERSION,
+            ClusterStatus.OUT_OF_SERVICE
         )
-                .withId(CLUSTER_1_ID)
-                .withConfigs(configs)
-                .build();
+            .withId(CLUSTER_1_ID)
+            .withConfigs(configs)
+            .build();
 
         Mockito.when(this.jpaClusterRepository.exists(CLUSTER_1_ID)).thenReturn(true);
         this.service.createCluster(cluster);
-    }
-
-    /**
-     * Test to update an cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testUpdateCluster() throws GenieException {
     }
 
     /**
@@ -173,26 +130,6 @@ public class JpaClusterServiceImplUnitTests {
     }
 
     /**
-     * Test delete all.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testDeleteAll() throws GenieException {
-    }
-
-    /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testDelete() throws GenieException {
-    }
-
-    /**
      * Test delete.
      *
      * @throws GenieException For any problem
@@ -202,16 +139,6 @@ public class JpaClusterServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.deleteCluster(id);
-    }
-
-    /**
-     * Test add configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testAddConfigsToCluster() throws GenieException {
     }
 
     /**
@@ -231,31 +158,11 @@ public class JpaClusterServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testUpdateConfigsForCluster() throws GenieException {
-    }
-
-    /**
-     * Test update configurations for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.updateConfigsForCluster(UUID.randomUUID().toString(), new HashSet<>());
-    }
-
-    /**
-     * Test get configurations for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testGetConfigsForCluster() throws GenieException {
     }
 
     /**
@@ -268,16 +175,6 @@ public class JpaClusterServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.getConfigsForCluster(id);
-    }
-
-    /**
-     * Test adding commands to the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testAddCommandsForCluster() throws GenieException {
     }
 
     /**
@@ -303,20 +200,10 @@ public class JpaClusterServiceImplUnitTests {
         final String commandId = UUID.randomUUID().toString();
         commandIds.add(commandId);
         final ClusterEntity clusterEntity
-                = Mockito.mock(ClusterEntity.class);
+            = Mockito.mock(ClusterEntity.class);
         Mockito.when(this.jpaClusterRepository.findOne(Mockito.anyString())).thenReturn(clusterEntity);
         Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
         this.service.addCommandsForCluster(CLUSTER_1_ID, commandIds);
-    }
-
-    /**
-     * Test the Get commands for cluster function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testGetCommandsForCluster() throws GenieException {
     }
 
     /**
@@ -331,16 +218,6 @@ public class JpaClusterServiceImplUnitTests {
         this.service.getCommandsForCluster(id, null);
     }
 //TODO: Missing tests for statuses
-
-    /**
-     * Test updating commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testUpdateCommandsForCluster() throws GenieException {
-    }
 
     /**
      * Test updating commands for the cluster.
@@ -365,20 +242,10 @@ public class JpaClusterServiceImplUnitTests {
         final String commandId = UUID.randomUUID().toString();
         commandIds.add(commandId);
         final ClusterEntity cluster
-                = Mockito.mock(ClusterEntity.class);
+            = Mockito.mock(ClusterEntity.class);
         Mockito.when(this.jpaClusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
         Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
         this.service.updateCommandsForCluster(CLUSTER_1_ID, commandIds);
-    }
-
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testRemoveAllCommandsForCluster() throws GenieException {
     }
 
     /**
@@ -391,16 +258,6 @@ public class JpaClusterServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.removeAllCommandsForCluster(id);
-    }
-
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testRemoveCommandForCluster() throws GenieException {
     }
 
     /**
@@ -423,21 +280,11 @@ public class JpaClusterServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveCommandForClusterNoCommand() throws GenieException {
         final ClusterEntity clusterEntity
-                = Mockito.mock(ClusterEntity.class);
+            = Mockito.mock(ClusterEntity.class);
         Mockito.when(this.jpaClusterRepository.findOne(CLUSTER_1_ID)).thenReturn(clusterEntity);
         final String commandId = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
         this.service.removeCommandForCluster(CLUSTER_1_ID, commandId);
-    }
-
-    /**
-     * Test add tags to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testAddTagsToCluster() throws GenieException {
     }
 
     /**
@@ -457,31 +304,11 @@ public class JpaClusterServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testUpdateTagsForCluster() throws GenieException {
-    }
-
-    /**
-     * Test update tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.updateTagsForCluster(UUID.randomUUID().toString(), new HashSet<>());
-    }
-
-    /**
-     * Test get tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testGetTagsForCluster() throws GenieException {
     }
 
     /**
@@ -501,31 +328,11 @@ public class JpaClusterServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test
-    @Ignore
-    public void testRemoveAllTagsForCluster() throws GenieException {
-    }
-
-    /**
-     * Test remove all tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.removeAllTagsForCluster(id);
-    }
-
-    /**
-     * Test remove tag for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test
-    @Ignore
-    public void testRemoveTagForCluster() throws GenieException {
     }
 
     /**

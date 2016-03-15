@@ -1,0 +1,108 @@
+/*
+ *
+ *  Copyright 2016 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+package com.netflix.genie.web.configs.aws;
+
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
+import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.services.impl.S3FileTransferImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
+
+/**
+ * Beans and configuration specifically for S3 connection on AWS.
+ *
+ * @author amsharma
+ * @since 3.0.0
+ */
+@Profile("s3")
+@Configuration
+@Slf4j
+public class AwsS3Config {
+
+    /**
+     * Create the credentials needed for the application to be able to connect to Aws. Only triggered if the
+     * property cloud.aws.credentials.provided is set to true in the config.
+     *
+     * @param credentialsFilePath The path of the file containing aws credentials
+     * @return AWS credentials object to use to connect to AWS
+     */
+    @Bean
+    @ConditionalOnProperty(value = "genie.aws.credentials.file")
+    public ClasspathPropertiesFileCredentialsProvider awsCredentialsFromFile(
+        @Value("${genie.aws.credentials.file}")
+        final String credentialsFilePath
+    ) {
+        log.info("Creating file credentials provider bean");
+        return new ClasspathPropertiesFileCredentialsProvider(credentialsFilePath);
+    }
+
+    /**
+     * Assume role credentials provider which will be used to fetch session credentials.
+     *
+     * @param roleArn Arn of the IAM role
+     * @return Credentials provider to ask the credentials from
+     */
+    @Bean
+    @ConditionalOnProperty(value = "genie.aws.credentials.role")
+    public STSAssumeRoleSessionCredentialsProvider awsCredentialsProvider(
+        @Value("${genie.aws.credentials.role}")
+        final String roleArn
+    ) {
+        log.info("Creating STS Assume Role Session Credentials provider bean");
+        return new STSAssumeRoleSessionCredentialsProvider(roleArn, "Genie");
+    }
+
+    /**
+     * A bean providing a client to work with S3.
+     *
+     * @param awsCredentialsProvider A credentials provider used to instantiate the client.
+     * @return An amazon s3 client object
+     */
+    @Bean
+    @ConditionalOnClass(AWSCredentialsProvider.class)
+    public AmazonS3Client genieS3Client(
+        final AWSCredentialsProvider awsCredentialsProvider
+    ) {
+        return new AmazonS3Client(awsCredentialsProvider);
+    }
+
+    /**
+     * Returns a bean which has an s3 implementation of the File Transfer interface.
+     *
+     * @param s3Client S3 client to initalize the service
+     * @return An s3 implementation of the FileTransfer interface
+     * @throws GenieException if there is any problem
+     */
+    @Bean
+    @Order(value = 1)
+    @ConditionalOnClass(AmazonS3Client.class)
+    public FileTransfer s3FileTransferImpl(
+        final AmazonS3Client s3Client
+    ) throws GenieException {
+        return new S3FileTransferImpl(s3Client); }
+}

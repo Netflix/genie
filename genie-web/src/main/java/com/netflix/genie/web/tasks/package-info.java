@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes which Genie will run basically as cron jobs to do various tasks.
+ * Classes which Genie will run basically as cron jobs to do various impl.
  *
  * @author tgianos
  * @since 3.0.0

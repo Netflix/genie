@@ -77,7 +77,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getEmail(), Matchers.nullValue());
         Assert.assertThat(request.getFileDependencies(), Matchers.empty());
         Assert.assertThat(request.getGroup(), Matchers.nullValue());
-        Assert.assertThat(request.getMemory(), Matchers.is(1560));
+        Assert.assertThat(request.getMemory(), Matchers.is(1536));
         Assert.assertThat(request.getSetupFile(), Matchers.nullValue());
         Assert.assertThat(request.getCreated(), Matchers.nullValue());
         Assert.assertThat(request.getDescription(), Matchers.nullValue());
@@ -188,7 +188,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getEmail(), Matchers.nullValue());
         Assert.assertThat(request.getFileDependencies(), Matchers.empty());
         Assert.assertThat(request.getGroup(), Matchers.nullValue());
-        Assert.assertThat(request.getMemory(), Matchers.is(1560));
+        Assert.assertThat(request.getMemory(), Matchers.is(1536));
         Assert.assertThat(request.getSetupFile(), Matchers.nullValue());
         Assert.assertThat(request.getCreated(), Matchers.nullValue());
         Assert.assertThat(request.getDescription(), Matchers.nullValue());

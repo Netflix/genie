@@ -306,6 +306,7 @@ public class JobEntity extends CommonFieldsEntity {
      */
     public void setExecution(@NotNull(message = "Execution can't be null") final JobExecutionEntity execution) {
         this.execution = execution;
+        execution.setJob(this);
     }
 
     /**

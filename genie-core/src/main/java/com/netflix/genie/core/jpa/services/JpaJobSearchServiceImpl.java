@@ -51,6 +51,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +74,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     /**
      * Constructor.
      *
-     * @param jobRepository The repository to use for job objects
+     * @param jobRepository          The repository to use for job objects
      * @param jobExecutionRepository The repository to use for job execution objects
      */
     @Autowired
@@ -100,6 +101,10 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         final String clusterId,
         final String commandName,
         final String commandId,
+        final Date minStarted,
+        final Date maxStarted,
+        final Date minFinished,
+        final Date maxFinished,
         @NotNull final Pageable page
     ) {
         LOG.debug("called");
@@ -120,7 +125,11 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 clusterName,
                 clusterId,
                 commandName,
-                commandId
+                commandId,
+                minStarted,
+                maxStarted,
+                minFinished,
+                maxFinished
             );
 
         countQuery.select(cb.count(root)).where(whereClause);
@@ -177,7 +186,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Transactional(readOnly = true)
     public Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException {
         final Set<JobExecutionEntity> entities
-            = this.jobExecutionRepository.findByHostnameAndExitCode(hostname, JobExecutionEntity.DEFAULT_EXIT_CODE);
+            = this.jobExecutionRepository.findByHostnameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE);
 
         final Set<JobExecution> executions = new HashSet<>();
         for (final JobExecutionEntity entity : entities) {

@@ -20,13 +20,10 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.core.jobs.JobExecutionEnvironment;
-
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -49,28 +46,48 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
-     * Update a job.
+     * Update the status and status message of the job.
      *
-     * @param id        The id of the application configuration to update
-     * @param updateJob Information to update for the Job
+     * @param id The id of the job to update the status for.
+     * @param jobStatus The updated status of the job.
+     * @param statusMsg The updated status message of the job.
      * @throws GenieException if there is an error
      */
-    void updateJob(
-            @NotBlank(message = "No job id entered. Unable to update.")
-            final String id,
-            @NotNull(message = "No job information entered. Unable to update.")
-            @Valid
-            final Job updateJob
+    void updateJobStatus(
+        @NotBlank(message = "No job id entered. Unable to update.")
+        final String id,
+        @NotNull (message = "Status cannot be null.")
+        final JobStatus jobStatus,
+        @NotBlank(message = "Status message cannot be empty.")
+        final String statusMsg
     ) throws GenieException;
 
     /**
-     * Update the execution environment for the job.
+     * Method that updates the cluster information on which a job is run.
      *
-     * @param jee The job execution environment information for a job
-     * @throws GenieException if there is an error
+     * @param jobId The id of the job
+     * @param clusterId The id of the cluster
+     * @throws GenieException Throw exception in case of an error.
      */
-    void addJobExecutionEnvironmentToJob(
-            final JobExecutionEnvironment jee
+    void updateClusterForJob(
+        @NotNull(message = "Job id cannot be null while updating cluster information")
+        final String jobId,
+        @NotNull(message = "Cluster id cannot be null while updating cluster information")
+        final String clusterId
+    ) throws GenieException;
+
+    /**
+     * Method that updates the cluster information on which a job is run.
+     *
+     * @param jobId The id of the job
+     * @param commandId The id of the cluster
+     * @throws GenieException Throw exception in case of an error.
+     */
+    void updateCommandForJob(
+        @NotNull(message = "Job id cannot be null while updating command information")
+        final String jobId,
+        @NotNull(message = "Command id cannot be null while updating command information")
+        final String commandId
     ) throws GenieException;
 
     /**
@@ -80,9 +97,8 @@ public interface JobPersistenceService {
      * @return The job request details or null if not found
      * @throws GenieException if there is an error
      */
-    JobRequest getJobRequest(
-            final String id
-    ) throws GenieException;
+    // TODO: Move this to JobSearchService
+    JobRequest getJobRequest(final String id) throws GenieException;
 
     /**
      * Save the jobRequest object in the data store.
@@ -98,15 +114,27 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
+     * Add the information of client host to jobRequest.
+     *
+     * @param id The id of the job request
+     * @param clientHost Host of the client that sent the request.
+     * @throws GenieException If there is an error
+     */
+    void addClientHostToJobRequest(
+        @NotNull(message = "job request id not provided.")
+        final String id,
+        @NotBlank(message = "client host cannot be null")
+        final String clientHost
+    ) throws GenieException;
+    /**
      * Return the Job Entity for the job id provided.
      *
      * @param id The id of the job to return.
      * @return Job Execution details or null if not found
      * @throws GenieException if there is an error
      */
-    JobExecution getJobExecution(
-            final String id
-    ) throws GenieException;
+    // TODO: Move this to JobSearchService
+    JobExecution getJobExecution(final String id) throws GenieException;
 
     /**
      * Save the jobExecution object in the data store.

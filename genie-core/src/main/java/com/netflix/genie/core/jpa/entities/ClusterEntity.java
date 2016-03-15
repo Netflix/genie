@@ -71,6 +71,7 @@ public class ClusterEntity extends SetupFileEntity {
     @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
+    // TODO: Make lazy?
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "clusters_commands",

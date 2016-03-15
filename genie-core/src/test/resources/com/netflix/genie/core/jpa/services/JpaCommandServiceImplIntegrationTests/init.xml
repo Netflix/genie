@@ -108,7 +108,7 @@
             cluster_id="cluster1"
             config="s3://some/config/file"/>
 
-    <commands_applications command_id="command1" application_id="app1"/>
+    <commands_applications command_id="command1" application_id="app1" application_order="0"/>
 
     <clusters_commands
             cluster_id="cluster1"

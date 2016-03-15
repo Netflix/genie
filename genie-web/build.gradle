@@ -7,11 +7,14 @@ dependencies {
 
     compile(project(":genie-core"))
 
+    // Commons
     compile("org.apache.commons:commons-exec:${commons_exec_version}")
     compile("org.apache.httpcomponents:httpclient")
 
+    // Spring Libs
 //    compile("org.springframework.boot:spring-boot-devtools")
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-redis")
     compile("org.springframework.boot:spring-boot-starter-security")
@@ -57,6 +60,7 @@ dependencies {
 
     testCompile(project(":genie-test"))
     testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
+    testCompile("com.jayway.jsonpath:json-path")
     testCompile("org.dbunit:dbunit:${dbunit_version}")
     testCompile("org.springframework.security:spring-security-test")
     testCompile("net.sf.jtidy:jtidy:${jtidy_version}")

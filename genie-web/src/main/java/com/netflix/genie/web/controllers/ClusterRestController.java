@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -27,14 +28,15 @@ import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,6 +50,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +65,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api/v3/clusters")
 @Slf4j
-public class ClusterRestController {
+public class
+ClusterRestController {
 
     private final ClusterService clusterService;
     private final ClusterResourceAssembler clusterResourceAssembler;
@@ -152,18 +156,40 @@ public class ClusterRestController {
         log.debug("{} | {} | {} | {} | {} | {}", name, statuses, tags, minUpdateTime, maxUpdateTime, page);
         //Create this conversion internal in case someone uses lower case by accident?
         Set<ClusterStatus> enumStatuses = null;
-        if (statuses != null && !statuses.isEmpty()) {
+        if (statuses != null) {
             enumStatuses = EnumSet.noneOf(ClusterStatus.class);
             for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(ClusterStatus.parse(status));
-                }
+                enumStatuses.add(ClusterStatus.parse(status));
             }
         }
 
+        // Build the self link which will be used for the next, previous, etc links
+        final Link self = ControllerLinkBuilder
+            .linkTo(
+                ControllerLinkBuilder
+                    .methodOn(ClusterRestController.class)
+                    .getClusters(
+                        name,
+                        statuses,
+                        tags,
+                        minUpdateTime,
+                        maxUpdateTime,
+                        page,
+                        assembler
+                    )
+            ).withSelfRel();
+
         return assembler.toResource(
-            this.clusterService.getClusters(name, enumStatuses, tags, minUpdateTime, maxUpdateTime, page),
-            this.clusterResourceAssembler
+            this.clusterService.getClusters(
+                name,
+                enumStatuses,
+                tags,
+                minUpdateTime == null ? null : new Date(minUpdateTime),
+                maxUpdateTime == null ? null : new Date(maxUpdateTime),
+                page
+            ),
+            this.clusterResourceAssembler,
+            self
         );
     }
 
@@ -182,6 +208,23 @@ public class ClusterRestController {
     ) throws GenieException {
         log.debug("Called to update cluster with id {} update fields {}", id, updateCluster);
         this.clusterService.updateCluster(id, updateCluster);
+    }
+
+    /**
+     * Patch a cluster using JSON Patch.
+     *
+     * @param id    The id of the cluster to patch
+     * @param patch The JSON Patch instructions
+     * @throws GenieException     On error
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void patchCluster(
+        @PathVariable("id") final String id,
+        @RequestBody final JsonPatch patch
+    ) throws GenieException {
+        log.debug("Called to patch cluster {} with patch {}", id, patch);
+        this.clusterService.patchCluster(id, patch);
     }
 
     /**
@@ -301,7 +344,7 @@ public class ClusterRestController {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForCluster(
         @PathVariable("id") final String id
@@ -397,12 +440,10 @@ public class ClusterRestController {
         log.debug("Called with id {} status {}", id, statuses);
 
         Set<CommandStatus> enumStatuses = null;
-        if (statuses != null && !statuses.isEmpty()) {
+        if (statuses != null) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
             for (final String status : statuses) {
-                if (StringUtils.isNotBlank(status)) {
-                    enumStatuses.add(CommandStatus.parse(status));
-                }
+                enumStatuses.add(CommandStatus.parse(status));
             }
         }
 

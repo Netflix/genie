@@ -82,7 +82,7 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getFileDependenciesAsSet(), Matchers.empty());
         Assert.assertThat(this.entity.getGroup(), Matchers.nullValue());
         Assert.assertThat(this.entity.getJob(), Matchers.nullValue());
-        Assert.assertThat(this.entity.getMemory(), Matchers.is(1560));
+        Assert.assertThat(this.entity.getMemory(), Matchers.is(1536));
         Assert.assertThat(this.entity.getSetupFile(), Matchers.nullValue());
         Assert.assertThat(this.entity.getTags(), Matchers.empty());
         Assert.assertFalse(this.entity.isDisableLogArchival());

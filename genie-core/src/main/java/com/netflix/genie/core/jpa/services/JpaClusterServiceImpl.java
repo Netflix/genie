@@ -17,6 +17,10 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
@@ -27,6 +31,7 @@ import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
@@ -46,7 +51,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -68,6 +75,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JpaClusterServiceImpl implements ClusterService {
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final JpaClusterRepository clusterRepo;
     private final JpaCommandRepository commandRepo;
 
@@ -100,18 +108,10 @@ public class JpaClusterServiceImpl implements ClusterService {
             throw new GenieConflictException("A cluster with id " + cluster.getId() + " already exists");
         }
 
-        final ClusterEntity clusterEntity
-            = new ClusterEntity();
+        final ClusterEntity clusterEntity = new ClusterEntity();
         clusterEntity.setId(StringUtils.isBlank(cluster.getId()) ? UUID.randomUUID().toString() : cluster.getId());
-        clusterEntity.setName(cluster.getName());
-        clusterEntity.setUser(cluster.getUser());
-        clusterEntity.setVersion(cluster.getVersion());
-        clusterEntity.setDescription(cluster.getDescription());
-        clusterEntity.setStatus(cluster.getStatus());
-        clusterEntity.setConfigs(cluster.getConfigs());
-        clusterEntity.setTags(cluster.getTags());
-
-        return this.clusterRepo.save(clusterEntity).getId();
+        this.updateAndSaveClusterEntity(clusterEntity, cluster);
+        return clusterEntity.getId();
     }
 
     /**
@@ -135,8 +135,8 @@ public class JpaClusterServiceImpl implements ClusterService {
         final String name,
         final Set<ClusterStatus> statuses,
         final Set<String> tags,
-        final Long minUpdateTime,
-        final Long maxUpdateTime,
+        final Date minUpdateTime,
+        final Date maxUpdateTime,
         final Pageable page
     ) {
         log.debug("called");
@@ -205,16 +205,27 @@ public class JpaClusterServiceImpl implements ClusterService {
         }
 
         //TODO: Move update of common fields to super classes
-        final ClusterEntity clusterEntity = this.clusterRepo.findOne(id);
-        clusterEntity.setName(updateCluster.getName());
-        clusterEntity.setUser(updateCluster.getUser());
-        clusterEntity.setVersion(updateCluster.getVersion());
-        clusterEntity.setDescription(updateCluster.getDescription());
-        clusterEntity.setStatus(updateCluster.getStatus());
-        clusterEntity.setConfigs(updateCluster.getConfigs());
-        clusterEntity.setTags(updateCluster.getTags());
+        this.updateAndSaveClusterEntity(this.clusterRepo.findOne(id), updateCluster);
+    }
 
-        this.clusterRepo.save(clusterEntity);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void patchCluster(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException {
+        final ClusterEntity clusterEntity = this.findCluster(id);
+        try {
+            final Cluster clusterToPatch = clusterEntity.getDTO();
+            log.debug("Will patch cluster {}. Original state: {}", id, clusterToPatch);
+            final JsonNode clusterNode = this.mapper.readTree(clusterToPatch.toString());
+            final JsonNode postPatchNode = patch.apply(clusterNode);
+            final Cluster patchedCluster = this.mapper.treeToValue(postPatchNode, Cluster.class);
+            log.debug("Finished patching cluster {}. New state: {}", id, patchedCluster);
+            this.updateAndSaveClusterEntity(clusterEntity, patchedCluster);
+        } catch (final JsonPatchException | IOException e) {
+            log.error("Unable to patch cluster {} with patch {} due to exception.", id, patch, e);
+            throw new GenieServerException(e.getLocalizedMessage(), e);
+        }
     }
 
     /**
@@ -486,5 +497,18 @@ public class JpaClusterServiceImpl implements ClusterService {
         } else {
             throw new GenieNotFoundException("No cluster with id " + id + " exists.");
         }
+    }
+
+    private void updateAndSaveClusterEntity(final ClusterEntity clusterEntity, final Cluster updateCluster) {
+        clusterEntity.setName(updateCluster.getName());
+        clusterEntity.setUser(updateCluster.getUser());
+        clusterEntity.setVersion(updateCluster.getVersion());
+        clusterEntity.setDescription(updateCluster.getDescription());
+        clusterEntity.setStatus(updateCluster.getStatus());
+        clusterEntity.setConfigs(updateCluster.getConfigs());
+        clusterEntity.setTags(updateCluster.getTags());
+        clusterEntity.setSetupFile(updateCluster.getSetupFile());
+
+        this.clusterRepo.save(clusterEntity);
     }
 }

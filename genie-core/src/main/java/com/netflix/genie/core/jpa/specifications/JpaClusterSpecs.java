@@ -64,18 +64,18 @@ public final class JpaClusterSpecs {
             final String name,
             final Set<ClusterStatus> statuses,
             final Set<String> tags,
-            final Long minUpdateTime,
-            final Long maxUpdateTime) {
+            final Date minUpdateTime,
+            final Date maxUpdateTime) {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
                 predicates.add(cb.like(root.get(ClusterEntity_.name), name));
             }
             if (minUpdateTime != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get(ClusterEntity_.updated), new Date(minUpdateTime)));
+                predicates.add(cb.greaterThanOrEqualTo(root.get(ClusterEntity_.updated), minUpdateTime));
             }
             if (maxUpdateTime != null) {
-                predicates.add(cb.lessThan(root.get(ClusterEntity_.updated), new Date(maxUpdateTime)));
+                predicates.add(cb.lessThan(root.get(ClusterEntity_.updated), maxUpdateTime));
             }
             if (tags != null && !tags.isEmpty()) {
                 predicates.add(

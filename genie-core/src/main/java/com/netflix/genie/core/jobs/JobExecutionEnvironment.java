@@ -20,25 +20,18 @@ package com.netflix.genie.core.jobs;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.core.services.ClusterLoadBalancer;
-import com.netflix.genie.core.services.ClusterService;
-import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.ApplicationService;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates the details of the job, cluster , command and applications needed to run a job.
@@ -46,112 +39,97 @@ import org.slf4j.LoggerFactory;
  * @author amsharma
  * @since 3.0.0
  */
+@Getter
+@Slf4j
 public class JobExecutionEnvironment {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JobExecutionEnvironment.class);
 
     private JobRequest jobRequest;
     private Cluster cluster;
     private Command command;
     private List<Application> applications = new ArrayList<>();
-    private String jobWorkingDir;
+    private File jobWorkingDir;
 
     /**
-     * Initializes by Taking in a job request and figures out the cluster, command and applications
-     * to run the job.
+     * Constructor used by the builder build() method.
      *
-     * @param clusterService implementation of ClusterService interface
-     * @param commandService implementation of CommandService interface
-     * @param applicationService implementation of ApplicationService interface
-     * @param clusterLoadBalancer implementation of the ClusterLoadBalancer interface
-     * @param jobReq The jobRequest object
-     * @param genieBaseWorkingDir Base working directory for all genie jobs
-     * @throws GenieException exception if there is an error
+     * @param builder The builder to use
      */
-    public void init(
-        final ClusterService clusterService,
-        final CommandService commandService,
-        final ApplicationService applicationService,
-        final ClusterLoadBalancer clusterLoadBalancer,
-        @NotNull(message = "Cannot construct environment from null job request")
-        final JobRequest jobReq,
-        final String genieBaseWorkingDir
-    ) throws GenieException {
-
-        this.jobRequest = jobReq;
-        final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
-        enumStatuses.add(CommandStatus.ACTIVE);
-
-        this.cluster = clusterLoadBalancer
-                        .selectCluster(clusterService.chooseClusterForJobRequest(jobRequest));
-
-        // Find the command for the job
-        for (final Command cmd : clusterService.getCommandsForCluster(
-                        this.cluster.getId(),
-                        enumStatuses
-        )) {
-            if (cmd.getTags().containsAll(this.jobRequest.getCommandCriteria())) {
-                this.command = cmd;
-                break;
-            }
-        }
-
-        //Avoiding NPE
-        if (this.command == null) {
-            final String msg = "No command found for params. Unable to continue.";
-            LOG.error(msg);
-            throw new GeniePreconditionException(msg);
-        }
-
-        this.applications.addAll(commandService.getApplicationsForCommand(this.command.getId()));
-        this.jobWorkingDir = genieBaseWorkingDir + "/" + jobRequest.getId();
+    public JobExecutionEnvironment(final Builder builder) {
+        this.jobRequest = builder.bJobRequest;
+        this.cluster = builder.bCluster;
+        this.command = builder.bCommand;
+        this.applications.addAll(builder.bApplications);
+        this.jobWorkingDir = builder.bJobWorkingDir;
     }
 
     /**
-     * Get the job information from the execution environment.
+     * Get the applications for this instance.
      *
-     * @return the job
-     */
-    public JobRequest getJobRequest() {
-        return jobRequest;
-    }
-
-    /**
-     * Get the cluster information from the execution environment.
-     *
-     * @return the cluster
-     */
-    public Cluster getCluster() {
-        return cluster;
-    }
-
-    /**
-     * Get the command information from the execution environment.
-     *
-     * @return the command
-     */
-    public Command getCommand() {
-        return command;
-    }
-
-    /**
-     * Get all the application information from the execution environment.
-     *
-     * @return the read-only list of applications
+     * @return A list of applications for this instance.
      */
     public List<Application> getApplications() {
-
-        return Collections.unmodifiableList(applications);
+        return Collections.unmodifiableList(this.applications);
     }
 
     /**
-     * Get the command information from the execution environment.
+     * A builder to create Job Execution Environment objects.
      *
-     * @return the working directory for the job
+     * @author amsharma
+     * @since 3.0.0
      */
-    public String getJobWorkingDir() {
-        return jobWorkingDir;
+    public static class Builder {
+        private JobRequest bJobRequest;
+        private Cluster bCluster;
+        private Command bCommand;
+        private List<Application> bApplications = new ArrayList<>();
+        private File bJobWorkingDir;
+
+        /**
+         * Constructor.
+         *
+         * @param request The job request object.
+         * @param clusterObj The cluster object.
+         * @param commandObj The command object.
+         * @param dir The directory location for this job.
+         * @throws GenieException If there is an error.
+         */
+        public Builder(
+            @NotNull(message = "Job Request cannot be null")
+            final JobRequest request,
+            @NotNull(message = "Cluster cannot be null")
+            final Cluster clusterObj,
+            @NotNull(message = "Command cannot be null")
+            final Command commandObj,
+            @NotBlank(message = "Job working directory cannot be empty")
+            final File dir
+        ) throws GenieException {
+            this.bJobRequest = request;
+            this.bCluster = clusterObj;
+            this.bCommand = commandObj;
+            this.bJobWorkingDir = dir;
+        }
+
+        /**
+         * Set the applications needed for the jobs' execution.
+         *
+         * @param applications The list of application objects.
+         * @return The builder
+         */
+        public Builder withApplications(final List<Application> applications) {
+            if (applications != null) {
+                this.bApplications.addAll(applications);
+            }
+            return this;
+        }
+
+        /**
+         * Build the job execution environment object.
+         *
+         * @return Create the final read-only JobRequest instance
+         * @throws GenieException If there is any problem.
+         */
+        public JobExecutionEnvironment build() throws GenieException {
+            return new JobExecutionEnvironment(this);
+        }
     }
-
-
 }

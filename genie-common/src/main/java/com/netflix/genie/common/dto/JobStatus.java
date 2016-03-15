@@ -46,7 +46,11 @@ public enum JobStatus {
     /**
      * Job failed.
      */
-    FAILED;
+    FAILED,
+    /**
+     * Job cannot be run due to invalid criteria.
+     */
+    INVALID;
 
     /**
      * Parse job status.
@@ -64,7 +68,7 @@ public enum JobStatus {
             }
         }
         throw new GeniePreconditionException(
-            "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed}"
+            "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed, Invalid}"
         );
     }
 }
