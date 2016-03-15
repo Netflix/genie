@@ -123,7 +123,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Autowired
     private JpaClusterRepository clusterRepository;
 
-    @Value("${TRAVIS_PULL_REQUEST:truex}")
+    @Value("${TRAVIS_PULL_REQUEST:false}")
     private String isPullRequest;
 
     /**
