@@ -27,6 +27,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -63,6 +64,9 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     private JpaJobRepository jobRepository;
 
     @Autowired
+    private JpaJobRequestRepository requestRepository;
+
+    @Autowired
     private JpaJobExecutionRepository executionRepository;
 
     @PersistenceContext
@@ -75,7 +79,8 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Before
     public void setup() {
-        this.service = new JpaJobSearchServiceImpl(this.jobRepository, this.executionRepository);
+        this.service
+            = new JpaJobSearchServiceImpl(this.jobRepository, this.requestRepository, this.executionRepository);
         this.service.setEntityManager(this.entityManager);
     }
 
@@ -221,6 +226,44 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
 
         try {
             this.service.getJobStatus(UUID.randomUUID().toString());
+            Assert.fail();
+        } catch (final GenieException ge) {
+            Assert.assertTrue(ge instanceof GenieNotFoundException);
+        }
+    }
+
+    /**
+     * Make sure the getting job request method works.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetJobRequest() throws GenieException {
+        Assert.assertThat(this.service.getJobRequest(JOB_1_ID).getCommandArgs(), Matchers.is("-f query.pig"));
+        Assert.assertThat(this.service.getJobRequest(JOB_2_ID).getCommandArgs(), Matchers.is("-f spark.jar"));
+        Assert.assertThat(this.service.getJobRequest(JOB_3_ID).getCommandArgs(), Matchers.is("-f spark.jar"));
+
+        try {
+            this.service.getJobRequest(UUID.randomUUID().toString());
+            Assert.fail();
+        } catch (final GenieException ge) {
+            Assert.assertTrue(ge instanceof GenieNotFoundException);
+        }
+    }
+
+    /**
+     * Make sure the getting job execution method works.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetJobExecution() throws GenieException {
+        Assert.assertThat(this.service.getJobExecution(JOB_1_ID).getProcessId(), Matchers.is(317));
+        Assert.assertThat(this.service.getJobExecution(JOB_2_ID).getProcessId(), Matchers.is(318));
+        Assert.assertThat(this.service.getJobExecution(JOB_3_ID).getProcessId(), Matchers.is(319));
+
+        try {
+            this.service.getJobExecution(UUID.randomUUID().toString());
             Assert.fail();
         } catch (final GenieException ge) {
             Assert.assertTrue(ge instanceof GenieNotFoundException);

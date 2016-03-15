@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.services.impl;
+package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
@@ -25,11 +25,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.services.JobCoordinatorService;
-import com.netflix.genie.core.services.JobKillService;
-import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.services.JobSearchService;
-import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -51,7 +46,7 @@ import java.util.UUID;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class JobCoordinatorServiceImplUnitTests {
+public class JobCoordinatorServiceUnitTests {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_1_NAME = "relativity";
@@ -59,7 +54,7 @@ public class JobCoordinatorServiceImplUnitTests {
     private static final String JOB_1_VERSION = "1.0";
     private static final String BASE_ARCHIVE_LOCATION = "file://baselocation";
 
-    private JobCoordinatorServiceImpl jobCoordinatorService;
+    private JobCoordinatorService jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
     private JobSearchService jobSearchService;
     private JobSubmitterService jobSubmitterService;
@@ -75,7 +70,7 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         this.jobKillService = Mockito.mock(JobKillService.class);
 
-        this.jobCoordinatorService = new JobCoordinatorServiceImpl(
+        this.jobCoordinatorService = new JobCoordinatorService(
             this.jobPersistenceService,
             this.jobSearchService,
             this.jobSubmitterService,
@@ -193,7 +188,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
         final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
-        final JobCoordinatorService jcs = new JobCoordinatorServiceImpl(
+        final JobCoordinatorService jcs = new JobCoordinatorService(
             this.jobPersistenceService,
             this.jobSearchService,
             this.jobSubmitterService,

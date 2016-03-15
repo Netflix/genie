@@ -20,7 +20,6 @@ package com.netflix.genie.web.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.io.ByteStreams;
-import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
@@ -29,8 +28,12 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobCoordinatorService;
+import com.netflix.genie.web.hateoas.assemblers.JobExecutionResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
+import com.netflix.genie.web.hateoas.resources.JobExecutionResource;
+import com.netflix.genie.web.hateoas.resources.JobRequestResource;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
@@ -100,6 +103,8 @@ public class JobRestController {
 
     private final AttachmentService attachmentService;
     private final JobResourceAssembler jobResourceAssembler;
+    private final JobRequestResourceAssembler jobRequestResourceAssembler;
+    private final JobExecutionResourceAssembler jobExecutionResourceAssembler;
     private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
     private final String hostname;
     private final HttpClient httpClient;
@@ -112,6 +117,8 @@ public class JobRestController {
      * @param jobCoordinatorService            The job search service to use.
      * @param attachmentService                The attachment service to use to save attachments.
      * @param jobResourceAssembler             Assemble job resources out of jobs
+     * @param jobRequestResourceAssembler      Assemble job request resources out of job requests
+     * @param jobExecutionResourceAssembler    Assemble job execution resources out of job executions
      * @param jobSearchResultResourceAssembler Assemble job search resources out of jobs
      * @param hostname                         The hostname this Genie instance is running on
      * @param httpClient                       The http client to use for forwarding requests
@@ -124,6 +131,8 @@ public class JobRestController {
         final JobCoordinatorService jobCoordinatorService,
         final AttachmentService attachmentService,
         final JobResourceAssembler jobResourceAssembler,
+        final JobRequestResourceAssembler jobRequestResourceAssembler,
+        final JobExecutionResourceAssembler jobExecutionResourceAssembler,
         final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
         final String hostname,
         final HttpClient httpClient,
@@ -133,6 +142,8 @@ public class JobRestController {
         this.jobCoordinatorService = jobCoordinatorService;
         this.attachmentService = attachmentService;
         this.jobResourceAssembler = jobResourceAssembler;
+        this.jobRequestResourceAssembler = jobRequestResourceAssembler;
+        this.jobExecutionResourceAssembler = jobExecutionResourceAssembler;
         this.jobSearchResultResourceAssembler = jobSearchResultResourceAssembler;
         this.hostname = hostname;
         this.httpClient = httpClient;
@@ -459,9 +470,11 @@ public class JobRestController {
      * @return The job request
      * @throws GenieException On any internal error
      */
-    @RequestMapping(value = "/{id}/request", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public JobRequest getJobRequest(@PathVariable("id") final String id) throws GenieException {
-        throw new UnsupportedOperationException("Not yet implemented");
+    @RequestMapping(value = "/{id}/request", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public JobRequestResource getJobRequest(@PathVariable("id") final String id) throws GenieException {
+        log.debug("Called for job request with id {}", id);
+        return this.jobRequestResourceAssembler.toResource(this.jobCoordinatorService.getJobRequest(id));
     }
 
     /**
@@ -471,9 +484,11 @@ public class JobRestController {
      * @return The job execution
      * @throws GenieException On any internal error
      */
-    @RequestMapping(value = "/{id}/execution", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public JobExecution getJobExecution(@PathVariable("id") final String id) throws GenieException {
-        throw new UnsupportedOperationException("Not yet implemented");
+    @RequestMapping(value = "/{id}/execution", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public JobExecutionResource getJobExecution(@PathVariable("id") final String id) throws GenieException {
+        log.debug("Called for job execution with id {}", id);
+        return this.jobExecutionResourceAssembler.toResource(this.jobCoordinatorService.getJobExecution(id));
     }
 
     /**

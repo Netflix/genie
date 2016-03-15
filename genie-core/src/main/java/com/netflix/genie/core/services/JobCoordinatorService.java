@@ -18,26 +18,71 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.jobs.JobConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
 
+
 /**
- * Interface that handles all job related impl.
+ * Implementation of the JobService APIs.
  *
  * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
-public interface JobCoordinatorService {
+@Service
+@Slf4j
+public class JobCoordinatorService {
+
+    private final JobPersistenceService jobPersistenceService;
+    private final JobSearchService jobSearchService;
+    private final JobSubmitterService jobSubmitterService;
+    private final JobKillService jobKillService;
+
+    private String baseArchiveLocation;
+
+    /**
+     * Constructor.
+     *
+     * @param jobPersistenceService implementation of job persistence service interface
+     * @param jobSearchService      implementation of job search service interface
+     * @param jobSubmitterService   implementation of the job submitter service
+     * @param jobKillService        The job kill service to use
+     * @param baseArchiveLocation   The base directory location of where the job dir should be archived
+     */
+    @Autowired
+    public JobCoordinatorService(
+        final JobPersistenceService jobPersistenceService,
+        final JobSearchService jobSearchService,
+        final JobSubmitterService jobSubmitterService,
+        final JobKillService jobKillService,
+        @Value("${genie.jobs.archive.location:#{null}}")
+        final String baseArchiveLocation
+    ) {
+        this.jobPersistenceService = jobPersistenceService;
+        this.jobSearchService = jobSearchService;
+        this.jobSubmitterService = jobSubmitterService;
+        this.jobKillService = jobKillService;
+        this.baseArchiveLocation = baseArchiveLocation;
+    }
 
     /**
      * Takes in a Job Request object and does necessary preparation for execution.
@@ -47,12 +92,49 @@ public interface JobCoordinatorService {
      * @return the id of the job run
      * @throws GenieException if there is an error
      */
-    String coordinateJob(
+    public String coordinateJob(
         @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
         @Valid
         final JobRequest jobRequest,
         final String clientHost
-    ) throws GenieException;
+    ) throws GenieException {
+        log.debug("Called with job request {}", jobRequest);
+
+        // Log the job request
+        this.jobPersistenceService.createJobRequest(jobRequest);
+
+        if (StringUtils.isNotBlank(clientHost)) {
+            this.jobPersistenceService.addClientHostToJobRequest(jobRequest.getId(), clientHost);
+        }
+
+        String jobArchivalLocation = null;
+        if (!jobRequest.isDisableLogArchival()) {
+            if (baseArchiveLocation == null) {
+                throw new
+                    GeniePreconditionException("Job archival is enabled but base location for archival is null.");
+            }
+            jobArchivalLocation = baseArchiveLocation
+                + JobConstants.FILE_PATH_DELIMITER
+                + jobRequest.getId()
+                + ".tar.gz";
+        }
+        // create the job object in the database with status INIT
+        final Job job = new Job.Builder(
+            jobRequest.getName(),
+            jobRequest.getUser(),
+            jobRequest.getVersion()
+        )
+            .withArchiveLocation(jobArchivalLocation)
+            .withDescription(jobRequest.getDescription())
+            .withId(jobRequest.getId())
+            .withStatus(JobStatus.INIT)
+            .withStatusMsg("Job Accepted and in initialization phase.")
+            .build();
+
+        this.jobPersistenceService.createJob(job);
+        this.jobSubmitterService.submitJob(jobRequest);
+        return jobRequest.getId();
+    }
 
     /**
      * Gets the Job object to return to user given the id.
@@ -61,7 +143,10 @@ public interface JobCoordinatorService {
      * @return job object
      * @throws GenieException if there is an error
      */
-    Job getJob(@NotBlank final String jobId) throws GenieException;
+    public Job getJob(@NotBlank final String jobId) throws GenieException {
+        log.debug("Called with id {}", jobId);
+        return this.jobSearchService.getJob(jobId);
+    }
 
     /**
      * Gets the status of the job with the given id.
@@ -70,7 +155,10 @@ public interface JobCoordinatorService {
      * @return The job status
      * @throws GenieException for any problem particularly not found exceptions
      */
-    JobStatus getJobStatus(@NotBlank final String id) throws GenieException;
+    public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
+        log.debug("Called to get status for job {}", id);
+        return this.jobSearchService.getJobStatus(id);
+    }
 
     /**
      * Find subset of metadata about jobs for given filter criteria.
@@ -91,7 +179,7 @@ public interface JobCoordinatorService {
      * @param page        Page information of jobs to get
      * @return All jobs which match the criteria
      */
-    Page<JobSearchResult> findJobs(
+    public Page<JobSearchResult> findJobs(
         final String id,
         final String jobName,
         final String userName,
@@ -106,7 +194,26 @@ public interface JobCoordinatorService {
         final Date minFinished,
         final Date maxFinished,
         final Pageable page
-    );
+    ) {
+        log.debug("called");
+
+        return this.jobSearchService.findJobs(
+            id,
+            jobName,
+            userName,
+            statuses,
+            tags,
+            clusterName,
+            clusterId,
+            commandName,
+            commandId,
+            minStarted,
+            maxStarted,
+            minFinished,
+            maxFinished,
+            page
+        );
+    }
 
     /**
      * Kill the job identified by the given id.
@@ -114,7 +221,9 @@ public interface JobCoordinatorService {
      * @param jobId id of the job to kill
      * @throws GenieException if there is an error
      */
-    void killJob(@NotBlank final String jobId) throws GenieException;
+    public void killJob(@NotBlank final String jobId) throws GenieException {
+        this.jobKillService.killJob(jobId);
+    }
 
     /**
      * Get the hostname a job is running on.
@@ -123,5 +232,34 @@ public interface JobCoordinatorService {
      * @return The hostname
      * @throws GenieException If the job isn't found or any other error
      */
-    String getJobHost(@NotBlank final String jobId) throws GenieException;
+    public String getJobHost(@NotBlank final String jobId) throws GenieException {
+        final JobExecution jobExecution = this.jobPersistenceService.getJobExecution(jobId);
+        if (jobExecution != null) {
+            return jobExecution.getHostname();
+        } else {
+            throw new GenieNotFoundException("No job execution found for id " + jobId);
+        }
+    }
+
+    /**
+     * Get the original job request for the job with the given id.
+     *
+     * @param id The id of the job to get the request for. Not blank
+     * @return The job request for the given id
+     * @throws GenieException If no job request with the given id exists
+     */
+    public JobRequest getJobRequest(@NotBlank final String id) throws GenieException {
+        return this.jobSearchService.getJobRequest(id);
+    }
+
+    /**
+     * Get the job execution for the job with the given id.
+     *
+     * @param id The id of the job to get the execution for. Not blank
+     * @return The job execution for the given id
+     * @throws GenieException If no job execution with the given id exists
+     */
+    public JobExecution getJobExecution(@NotBlank final String id) throws GenieException {
+        return this.jobSearchService.getJobExecution(id);
+    }
 }

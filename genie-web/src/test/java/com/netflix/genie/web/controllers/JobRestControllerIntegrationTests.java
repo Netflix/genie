@@ -796,6 +796,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString())));
     }
 
+    // TODO: Add tests for getting the job request and job execution
+
     private String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf("/") + 1);
     }

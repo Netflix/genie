@@ -23,6 +23,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -43,6 +44,8 @@ import java.util.UUID;
 public class JpaJobSearchServiceImplUnitTests {
 
     private JpaJobRepository jobRepository;
+    private JpaJobRequestRepository jobRequestRepository;
+    private JpaJobExecutionRepository jobExecutionRepository;
     private JpaJobSearchServiceImpl service;
 
     /**
@@ -51,7 +54,10 @@ public class JpaJobSearchServiceImplUnitTests {
     @Before
     public void setup() {
         this.jobRepository = Mockito.mock(JpaJobRepository.class);
-        this.service = new JpaJobSearchServiceImpl(this.jobRepository, Mockito.mock(JpaJobExecutionRepository.class));
+        this.jobRequestRepository = Mockito.mock(JpaJobRequestRepository.class);
+        this.jobExecutionRepository = Mockito.mock(JpaJobExecutionRepository.class);
+        this.service
+            = new JpaJobSearchServiceImpl(this.jobRepository, this.jobRequestRepository, this.jobExecutionRepository);
     }
 
     /**
@@ -81,5 +87,29 @@ public class JpaJobSearchServiceImplUnitTests {
         final Job returnedJob = this.service.getJob(id);
         Mockito.verify(this.jobRepository, Mockito.times(1)).findOne(id);
         Assert.assertThat(returnedJob, Matchers.is(job));
+    }
+
+    /**
+     * Test the getJobRequest method.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void cantGetJobRequestIfDoesNotExist() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jobRequestRepository.findOne(Mockito.eq(id))).thenReturn(null);
+        this.service.getJobRequest(id);
+    }
+
+    /**
+     * Test the getJobExecution method.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void cantGetJobExecutionIfDoesNotExist() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jobExecutionRepository.findOne(Mockito.eq(id))).thenReturn(null);
+        this.service.getJobExecution(id);
     }
 }
