@@ -156,8 +156,9 @@ subprojects {
         minHeapSize = "256m"
         maxHeapSize = "1g"
 
-        if (project.hasProperty("TRAVIS_PULL_REQUEST")) {
-            systemProperty "TRAVIS_PULL_REQUEST", project.getProperty("TRAVIS_PULL_REQUEST")
+        // If the project is running on a CI server
+        if (System.getenv("CI") != null) {
+            systemProperty "CI", System.getenv("CI")
         }
 
         reports.html.destination = file("${reporting.baseDir}/test/${task.name}")

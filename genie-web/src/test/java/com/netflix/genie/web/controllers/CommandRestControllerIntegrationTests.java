@@ -192,7 +192,9 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String executable3 = UUID.randomUUID().toString();
 
         createCommand(id1, name1, user1, version1, CommandStatus.ACTIVE, executable1, CHECK_DELAY);
+        Thread.sleep(1000);
         createCommand(id2, name2, user2, version2, CommandStatus.DEPRECATED, executable2, CHECK_DELAY);
+        Thread.sleep(1000);
         createCommand(id3, name3, user3, version3, CommandStatus.INACTIVE, executable3, CHECK_DELAY);
 
         // Test finding all commands
@@ -396,12 +398,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH + "[1].id", Matchers.is(id1)));
+            .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + id2))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(2L));
     }
 
     /**

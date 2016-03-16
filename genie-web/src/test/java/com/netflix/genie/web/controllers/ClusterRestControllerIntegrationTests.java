@@ -166,7 +166,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         final String version3 = UUID.randomUUID().toString();
 
         createCluster(id1, name1, user1, version1, ClusterStatus.UP);
+        Thread.sleep(1000);
         createCluster(id2, name2, user2, version2, ClusterStatus.OUT_OF_SERVICE);
+        Thread.sleep(1000);
         createCluster(id3, name3, user3, version3, ClusterStatus.TERMINATED);
 
         // Test finding all clusters
@@ -357,12 +359,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(CLUSTERS_API))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[1].id", Matchers.is(id1)));
+            .perform(MockMvcRequestBuilders.get(CLUSTERS_API + "/" + id2))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(2L));
     }
 
     /**
