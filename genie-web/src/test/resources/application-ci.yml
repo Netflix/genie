@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2015 Netflix, Inc.
+#  Copyright 2016 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -22,11 +22,17 @@ genie:
       location: "file:///tmp/"
 
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
   datasource:
-    url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
-    username: SA
+    url: jdbc:mysql://127.0.0.1/genie
+    username: root
     password:
+    min-idle: 5
+    max-idle: 20
+    max-active: 40
+    validation-query: select 0;
+    test-on-borrow: true
+    test-on-connect: true
+    test-on-return: true
+    test-while-idle: true
+    min-evictable-idle-time-millis: 60000
+    time-between-eviction-runs-millis: 10000

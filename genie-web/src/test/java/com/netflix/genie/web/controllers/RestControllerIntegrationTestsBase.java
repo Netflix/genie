@@ -61,7 +61,7 @@ import java.util.UUID;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = GenieWeb.class)
 @WebIntegrationTest(randomPort = true)
-@ActiveProfiles({"integration"})
+@ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
 @DirtiesContext
 public abstract class RestControllerIntegrationTestsBase {
 
@@ -83,7 +83,6 @@ public abstract class RestControllerIntegrationTestsBase {
     protected static final String CONFIGS_PATH = "$.configs";
     protected static final String LINKS_PATH = "$._links";
     protected static final String EMBEDDED_PATH = "$._embedded";
-    protected static final String PAGED_PATH = "$.page";
 
     // Link Keys
     protected static final String SELF_LINK_KEY = "self";

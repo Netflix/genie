@@ -195,7 +195,9 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         final String version3 = UUID.randomUUID().toString();
 
         createApplication(id1, name1, user1, version1, ApplicationStatus.ACTIVE);
+        Thread.sleep(1000);
         createApplication(id2, name2, user2, version2, ApplicationStatus.DEPRECATED);
+        Thread.sleep(1000);
         createApplication(id3, name3, user3, version3, ApplicationStatus.INACTIVE);
 
         // Test finding all applications
@@ -393,12 +395,10 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(id3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[1].id", Matchers.is(id1)));
+            .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + id2))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(2L));
     }
 
     /**
