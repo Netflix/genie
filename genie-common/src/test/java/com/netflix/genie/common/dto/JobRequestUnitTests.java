@@ -75,7 +75,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getCpu(), Matchers.is(1));
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(false));
         Assert.assertThat(request.getEmail(), Matchers.nullValue());
-        Assert.assertThat(request.getFileDependencies(), Matchers.empty());
+        Assert.assertThat(request.getDependencies(), Matchers.empty());
         Assert.assertThat(request.getGroup(), Matchers.nullValue());
         Assert.assertThat(request.getMemory(), Matchers.is(1536));
         Assert.assertThat(request.getSetupFile(), Matchers.nullValue());
@@ -103,12 +103,12 @@ public class JobRequestUnitTests {
         final String email = UUID.randomUUID().toString() + "@netflix.com";
         builder.withEmail(email);
 
-        final Set<String> fileDependencies = Sets.newHashSet(
+        final Set<String> dependencies = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
         );
-        builder.withFileDependencies(fileDependencies);
+        builder.withDependencies(dependencies);
 
         final String group = UUID.randomUUID().toString();
         builder.withGroup(group);
@@ -148,7 +148,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getCpu(), Matchers.is(cpu));
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(disableLogArchival));
         Assert.assertThat(request.getEmail(), Matchers.is(email));
-        Assert.assertThat(request.getFileDependencies(), Matchers.is(fileDependencies));
+        Assert.assertThat(request.getDependencies(), Matchers.is(dependencies));
         Assert.assertThat(request.getGroup(), Matchers.is(group));
         Assert.assertThat(request.getMemory(), Matchers.is(memory));
         Assert.assertThat(request.getSetupFile(), Matchers.is(setupFile));
@@ -167,7 +167,7 @@ public class JobRequestUnitTests {
         final JobRequest.Builder builder
             = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
-        builder.withFileDependencies(null);
+        builder.withDependencies(null);
         builder.withGroup(null);
         builder.withSetupFile(null);
         builder.withCreated(null);
@@ -186,7 +186,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getCpu(), Matchers.is(1));
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(false));
         Assert.assertThat(request.getEmail(), Matchers.nullValue());
-        Assert.assertThat(request.getFileDependencies(), Matchers.empty());
+        Assert.assertThat(request.getDependencies(), Matchers.empty());
         Assert.assertThat(request.getGroup(), Matchers.nullValue());
         Assert.assertThat(request.getMemory(), Matchers.is(1536));
         Assert.assertThat(request.getSetupFile(), Matchers.nullValue());
@@ -205,7 +205,7 @@ public class JobRequestUnitTests {
         final JobRequest.Builder builder
             = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
-        builder.withFileDependencies(null);
+        builder.withDependencies(null);
         builder.withGroup(null);
         builder.withSetupFile(null);
         builder.withCreated(null);
@@ -232,7 +232,7 @@ public class JobRequestUnitTests {
         final JobRequest.Builder builder
             = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
-        builder.withFileDependencies(null);
+        builder.withDependencies(null);
         builder.withGroup(null);
         builder.withSetupFile(null);
         builder.withCreated(null);

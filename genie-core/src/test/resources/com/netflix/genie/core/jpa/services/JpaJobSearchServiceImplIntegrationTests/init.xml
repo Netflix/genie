@@ -40,6 +40,7 @@
         updated="2014-08-11 02:59:00"
         user="tgianos"
         name="testPigJob"
+        command_args="-f query.pig"
         status="SUCCEEDED"
         version="2.4"
         entity_version="0"/>
@@ -77,6 +78,7 @@
         updated="2015-08-12 02:59:00"
         user="tgianos"
         name="testSparkJob"
+        command_args="-f spark.jar"
         status="RUNNING"
         version="2.4"
         entity_version="0"/>
@@ -114,6 +116,7 @@
         updated="2016-02-24 02:59:00"
         user="tgianos"
         name="testSparkJob2"
+        command_args="-f spark.jar"
         status="RUNNING"
         version="2.4"
         entity_version="0"/>

@@ -122,12 +122,14 @@ public class JobCoordinatorService {
         final Job job = new Job.Builder(
             jobRequest.getName(),
             jobRequest.getUser(),
-            jobRequest.getVersion()
+            jobRequest.getVersion(),
+            jobRequest.getCommandArgs()
         )
             .withArchiveLocation(jobArchivalLocation)
             .withDescription(jobRequest.getDescription())
             .withId(jobRequest.getId())
             .withStatus(JobStatus.INIT)
+            .withTags(jobRequest.getTags())
             .withStatusMsg("Job Accepted and in initialization phase.")
             .build();
 
@@ -233,7 +235,7 @@ public class JobCoordinatorService {
      * @throws GenieException If the job isn't found or any other error
      */
     public String getJobHost(@NotBlank final String jobId) throws GenieException {
-        final JobExecution jobExecution = this.jobPersistenceService.getJobExecution(jobId);
+        final JobExecution jobExecution = this.jobSearchService.getJobExecution(jobId);
         if (jobExecution != null) {
             return jobExecution.getHostname();
         } else {

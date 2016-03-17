@@ -240,7 +240,7 @@ public class JobRestController {
                 .withDescription(jobRequest.getDescription())
                 .withTags(jobRequest.getTags())
                 .withEmail(jobRequest.getEmail())
-                .withFileDependencies(jobRequest.getFileDependencies())
+                .withDependencies(jobRequest.getDependencies())
                 .build();
         }
 

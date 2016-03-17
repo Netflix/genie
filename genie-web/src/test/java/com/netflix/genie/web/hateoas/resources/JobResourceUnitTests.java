@@ -39,6 +39,7 @@ public class JobResourceUnitTests {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
+    private static final String COMMAND_ARGS = UUID.randomUUID().toString();
 
     private Job job;
 
@@ -48,7 +49,7 @@ public class JobResourceUnitTests {
     @Before
     public void setup() {
         this.job = new Job
-            .Builder(NAME, USER, VERSION)
+            .Builder(NAME, USER, VERSION, COMMAND_ARGS)
             .withId(ID)
             .build();
     }

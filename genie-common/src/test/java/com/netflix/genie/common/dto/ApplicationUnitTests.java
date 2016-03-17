@@ -52,6 +52,7 @@ public class ApplicationUnitTests {
         Assert.assertThat(application.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(application.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
         Assert.assertThat(application.getDependencies(), Matchers.empty());
+        Assert.assertThat(application.getType(), Matchers.nullValue());
         Assert.assertThat(application.getSetupFile(), Matchers.nullValue());
         Assert.assertThat(application.getConfigs(), Matchers.empty());
         Assert.assertThat(application.getCreated(), Matchers.nullValue());
@@ -70,6 +71,9 @@ public class ApplicationUnitTests {
 
         final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withDependencies(dependencies);
+
+        final String type = UUID.randomUUID().toString();
+        builder.withType(type);
 
         final String setupFile = UUID.randomUUID().toString();
         builder.withSetupFile(setupFile);
@@ -98,6 +102,7 @@ public class ApplicationUnitTests {
         Assert.assertThat(application.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(application.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
         Assert.assertThat(application.getDependencies(), Matchers.is(dependencies));
+        Assert.assertThat(application.getType(), Matchers.is(type));
         Assert.assertThat(application.getSetupFile(), Matchers.is(setupFile));
         Assert.assertThat(application.getConfigs(), Matchers.is(configs));
         Assert.assertThat(application.getCreated(), Matchers.is(created));
@@ -114,6 +119,7 @@ public class ApplicationUnitTests {
     public void canBuildApplicationNullOptionals() {
         final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         builder.withDependencies(null);
+        builder.withType(null);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withCreated(null);
@@ -128,6 +134,7 @@ public class ApplicationUnitTests {
         Assert.assertThat(application.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(application.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
         Assert.assertThat(application.getDependencies(), Matchers.empty());
+        Assert.assertThat(application.getType(), Matchers.nullValue());
         Assert.assertThat(application.getSetupFile(), Matchers.nullValue());
         Assert.assertThat(application.getConfigs(), Matchers.empty());
         Assert.assertThat(application.getCreated(), Matchers.nullValue());
@@ -144,6 +151,7 @@ public class ApplicationUnitTests {
     public void canFindEquality() {
         final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         builder.withDependencies(null);
+        builder.withType(null);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withCreated(null);
@@ -168,6 +176,7 @@ public class ApplicationUnitTests {
     public void canUseHashCode() {
         final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, null);
         builder.withDependencies(null);
+        builder.withType(null);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withCreated(null);

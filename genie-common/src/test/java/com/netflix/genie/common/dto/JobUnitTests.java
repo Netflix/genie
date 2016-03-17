@@ -40,16 +40,18 @@ public class JobUnitTests {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
+    private static final String COMMAND_ARGS = UUID.randomUUID().toString();
 
     /**
      * Test to make sure can build a valid Job using the builder.
      */
     @Test
     public void canBuildJob() {
-        final Job job = new Job.Builder(NAME, USER, VERSION).build();
+        final Job job = new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS).build();
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
+        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(job.getArchiveLocation(), Matchers.nullValue());
         Assert.assertThat(job.getClusterName(), Matchers.nullValue());
         Assert.assertThat(job.getCommandName(), Matchers.nullValue());
@@ -69,7 +71,7 @@ public class JobUnitTests {
      */
     @Test
     public void canBuildJobWithOptionals() {
-        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
+        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS);
 
         final String archiveLocation = UUID.randomUUID().toString();
         builder.withArchiveLocation(archiveLocation);
@@ -114,6 +116,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
+        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(job.getArchiveLocation(), Matchers.is(archiveLocation));
         Assert.assertThat(job.getClusterName(), Matchers.is(clusterName));
         Assert.assertThat(job.getCommandName(), Matchers.is(commandName));
@@ -133,7 +136,7 @@ public class JobUnitTests {
      */
     @Test
     public void canBuildJobWithNulls() {
-        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
+        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS);
         builder.withArchiveLocation(null);
         builder.withClusterName(null);
         builder.withCommandName(null);
@@ -151,6 +154,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
+        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(job.getArchiveLocation(), Matchers.nullValue());
         Assert.assertThat(job.getClusterName(), Matchers.nullValue());
         Assert.assertThat(job.getCommandName(), Matchers.nullValue());
@@ -170,7 +174,7 @@ public class JobUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
+        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS);
         builder.withArchiveLocation(null);
         builder.withClusterName(null);
         builder.withCommandName(null);
@@ -199,7 +203,7 @@ public class JobUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
+        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS);
         builder.withArchiveLocation(null);
         builder.withClusterName(null);
         builder.withCommandName(null);

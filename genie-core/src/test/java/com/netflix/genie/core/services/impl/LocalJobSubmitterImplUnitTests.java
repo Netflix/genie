@@ -69,49 +69,42 @@ public class LocalJobSubmitterImplUnitTests {
     private static final String COMMAND_ID = "commandid";
     private static final String COMMAND_NAME = "commandname";
 
-    private  Resource baseWorkingDirResource;
-    private JobSearchService jobSearchService;
     private JobPersistenceService jobPersistenceService;
     private ClusterService clusterService;
-    private CommandService commandService;
     private ClusterLoadBalancer clusterLoadBalancer;
-    private ApplicationEventPublisher applicationEventPublisher;
-    private GenieFileTransferService fileTransferService;
     private JobSubmitterService jobSubmitterService;
-    private WorkflowTask task1;
-    private WorkflowTask task2;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.jobSearchService = Mockito.mock(JobSearchService.class);
+        final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
-        this.commandService = Mockito.mock(CommandService.class);
+        final CommandService commandService = Mockito.mock(CommandService.class);
         this.clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
-        this.applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        this.fileTransferService = Mockito.mock(GenieFileTransferService.class);
-        this.task1 = Mockito.mock(WorkflowTask.class);
-        this.task2 = Mockito.mock(WorkflowTask.class);
+        final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+        final GenieFileTransferService fileTransferService = Mockito.mock(GenieFileTransferService.class);
+        final WorkflowTask task1 = Mockito.mock(WorkflowTask.class);
+        final WorkflowTask task2 = Mockito.mock(WorkflowTask.class);
 
         final List<WorkflowTask> jobWorkflowTasks = new ArrayList<>();
         jobWorkflowTasks.add(task1);
         jobWorkflowTasks.add(task2);
 
-        baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
+        final Resource baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
 
         this.jobSubmitterService = new LocalJobSubmitterImpl(
-            this.jobSearchService,
+            jobSearchService,
             this.jobPersistenceService,
             this.clusterService,
-            this.commandService,
+            commandService,
             this.clusterLoadBalancer,
-            this.fileTransferService,
-            this.applicationEventPublisher,
+            fileTransferService,
+            applicationEventPublisher,
             jobWorkflowTasks,
-            this.baseWorkingDirResource,
+            baseWorkingDirResource,
             null,
             0
         );
@@ -122,6 +115,7 @@ public class LocalJobSubmitterImplUnitTests {
      *
      * @throws GenieException If there is any problem.
      */
+    @SuppressWarnings("unchecked")
     @Test(expected = GeniePreconditionException.class)
     public void testSubmitJobNoClusterFound() throws GenieException {
         final JobRequest jobRequest = new JobRequest.Builder(
@@ -137,11 +131,9 @@ public class LocalJobSubmitterImplUnitTests {
 
         final List<Cluster> emptyList = new ArrayList<>();
 
-        Mockito.when(this.clusterService.chooseClusterForJobRequest(Mockito.eq(jobRequest))).
-            thenReturn(emptyList);
+        Mockito.when(this.clusterService.chooseClusterForJobRequest(Mockito.eq(jobRequest))).thenReturn(emptyList);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(Mockito.eq(emptyList))).
-            thenThrow(GeniePreconditionException.class);
+        Mockito.when(this.clusterLoadBalancer.selectCluster(emptyList)).thenThrow(GeniePreconditionException.class);
 
         this.jobSubmitterService.submitJob(jobRequest);
     }

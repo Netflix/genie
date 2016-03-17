@@ -58,6 +58,7 @@ ALTER TABLE applications ADD COLUMN description TEXT DEFAULT NULL;
 ALTER TABLE applications ADD COLUMN tags VARCHAR(2048) DEFAULT NULL;
 ALTER TABLE applications ALTER COLUMN status SET NOT NULL;
 ALTER TABLE applications ALTER COLUMN status SET DEFAULT 'INACTIVE';
+ALTER TABLE applications ADD COLUMN type VARCHAR(255) DEFAULT NULL;
 ALTER TABLE applications ALTER COLUMN envpropfile TYPE VARCHAR(1024);
 ALTER TABLE applications ALTER COLUMN envpropfile SET DEFAULT NULL;
 ALTER TABLE applications RENAME COLUMN envPropFile TO setup_file;
@@ -69,12 +70,13 @@ ALTER TABLE applications RENAME COLUMN entityversion TO entity_version;
 CREATE INDEX APPLICATIONS_NAME_INDEX ON applications (name);
 CREATE INDEX APPLICATIONS_TAGS_INDEX ON applications (tags);
 CREATE INDEX APPLICATIONS_STATUS_INDEX ON applications (status);
+CREATE INDEX APPLICATIONS_TYPE_INDEX ON applications (type);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the applications table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing application tags for 3.0...';
 UPDATE applications SET tags =
 (
-  SELECT string_agg(DISTINCT element, ',' ORDER BY element)
+  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
   FROM application_tags
   WHERE applications.id = application_tags.application_id
   GROUP BY application_id
@@ -132,7 +134,7 @@ SELECT CURRENT_TIMESTAMP, 'Successfully updated the clusters table.';
 SELECT CURRENT_TIMESTAMP, 'De-normalizing cluster tags for 3.0...';
 UPDATE clusters SET tags =
 (
-  SELECT string_agg(DISTINCT element, ',' ORDER BY element)
+  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
   FROM cluster_tags
   WHERE clusters.id = cluster_tags.cluster_id
   GROUP BY cluster_id
@@ -199,7 +201,7 @@ SELECT CURRENT_TIMESTAMP, 'Successfully updated the commands table.';
 SELECT CURRENT_TIMESTAMP, 'De-normalizing command tags for 3.0...';
 UPDATE commands SET tags =
 (
-  SELECT string_agg(DISTINCT element, ',' ORDER BY element)
+  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
   FROM command_tags
   WHERE commands.id = command_tags.command_id
   GROUP BY command_id
@@ -236,7 +238,7 @@ CREATE TABLE job_requests (
   setup_file VARCHAR(1024) DEFAULT NULL,
   cluster_criterias VARCHAR(2048) NOT NULL,
   command_criteria VARCHAR(1024) NOT NULL,
-  file_dependencies TEXT DEFAULT NULL,
+  dependencies TEXT DEFAULT NULL,
   disable_log_archival BOOLEAN NOT NULL DEFAULT FALSE,
   email VARCHAR(255) DEFAULT NULL,
   tags VARCHAR(2048) DEFAULT NULL,
@@ -262,7 +264,7 @@ INSERT INTO job_requests (
   setup_file,
   cluster_criterias,
   command_criteria,
-  file_dependencies,
+  dependencies,
   disable_log_archival,
   email,
   tags,
@@ -287,7 +289,7 @@ INSERT INTO job_requests (
   j.disablelogarchival,
   j.email,
   (
-    SELECT string_agg(DISTINCT element, ',' ORDER BY element)
+    SELECT string_agg(DISTINCT element, '|' ORDER BY element)
     FROM job_tags
     WHERE j.id = job_tags.job_id
     GROUP BY job_id
@@ -309,10 +311,10 @@ UPDATE job_requests SET cluster_criterias = REPLACE(cluster_criterias, ',', '","
 UPDATE job_requests SET cluster_criterias = REPLACE(cluster_criterias, '|', '"]},{"tags":["');
 UPDATE job_requests SET cluster_criterias = '[]' WHERE cluster_criterias = '[""]' OR cluster_criterias IS NULL;
 -- TODO: Do this in one pass instead of 3?
-UPDATE job_requests SET file_dependencies = RPAD(file_dependencies, LENGTH(file_dependencies) + 2, '"]');
-UPDATE job_requests SET file_dependencies = LPAD(file_dependencies, LENGTH(file_dependencies) + 2, '["');
-UPDATE job_requests SET file_dependencies = REPLACE(file_dependencies, ',', '","');
-UPDATE job_requests SET file_dependencies = '[]' WHERE file_dependencies = '[""]' OR file_dependencies IS NULL;
+UPDATE job_requests SET dependencies = RPAD(dependencies, LENGTH(dependencies) + 2, '"]');
+UPDATE job_requests SET dependencies = LPAD(dependencies, LENGTH(dependencies) + 2, '["');
+UPDATE job_requests SET dependencies = REPLACE(dependencies, ',', '","');
+UPDATE job_requests SET dependencies = '[]' WHERE dependencies = '[""]' OR dependencies IS NULL;
 SELECT CURRENT_TIMESTAMP, 'Successfully inserted values into job_requests table.';
 
 SELECT CURRENT_TIMESTAMP, 'Creating the job_executions table...';
@@ -392,6 +394,9 @@ ALTER TABLE jobs ALTER COLUMN commandid SET DEFAULT NULL;
 ALTER TABLE jobs RENAME COLUMN commandid TO command_id;
 ALTER TABLE jobs ALTER COLUMN commandname SET DEFAULT NULL;
 ALTER TABLE jobs RENAME COLUMN commandname TO command_name;
+ALTER TABLE jobs ALTER COLUMN commandargs TYPE TEXT;
+ALTER TABLE jobs ALTER COLUMN commandargs SET NOT NULL;
+ALTER TABLE jobs RENAME COLUMN coommandargs TO command_args;
 ALTER TABLE jobs ADD COLUMN tags VARCHAR(2048) DEFAULT NULL;
 ALTER TABLE jobs DROP forwarded;
 ALTER TABLE jobs DROP applicationid;
@@ -408,7 +413,6 @@ ALTER TABLE jobs DROP chosenclustercriteriastring;
 ALTER TABLE jobs DROP processhandle;
 ALTER TABLE jobs DROP email;
 ALTER TABLE jobs DROP groupname;
-ALTER TABLE jobs DROP commandargs;
 ALTER TABLE jobs DROP killuri;
 ALTER TABLE jobs DROP outputuri;
 ALTER TABLE jobs ADD FOREIGN KEY (id) REFERENCES job_requests (id) ON DELETE CASCADE;
@@ -428,7 +432,7 @@ SELECT CURRENT_TIMESTAMP, 'Successfully updated the jobs table.';
 SELECT CURRENT_TIMESTAMP, 'De-normalizing jobs tags for 3.0...';
 UPDATE jobs SET tags =
 (
-  SELECT string_agg(DISTINCT element, ',' ORDER BY element)
+  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
   FROM job_tags
   WHERE jobs.id = job_tags.job_id
   GROUP BY job_id

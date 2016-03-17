@@ -24,6 +24,7 @@ import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import lombok.Getter;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -39,6 +40,9 @@ public class Job extends CommonDTO {
 
     private static final long serialVersionUID = -4218933066048954819L;
 
+    @Size(min = 1, message = "Command arguments are required")
+    private String commandArgs;
+    @NotNull
     private final JobStatus status;
     @Size(max = 255, message = "Max length is 255 characters")
     private final String statusMsg;
@@ -60,6 +64,7 @@ public class Job extends CommonDTO {
      */
     protected Job(final Builder builder) {
         super(builder);
+        this.commandArgs = builder.bCommandArgs;
         this.status = builder.bStatus;
         this.statusMsg = builder.bStatusMsg;
         this.started = builder.bStarted == null ? null : new Date(builder.bStarted.getTime());
@@ -95,6 +100,7 @@ public class Job extends CommonDTO {
      */
     public static class Builder extends CommonDTO.Builder<Builder> {
 
+        private final String bCommandArgs;
         private JobStatus bStatus = JobStatus.INIT;
         private String bStatusMsg;
         private Date bStarted;
@@ -106,9 +112,10 @@ public class Job extends CommonDTO {
         /**
          * Constructor which has required fields.
          *
-         * @param name    The name to use for the Job
-         * @param user    The user to use for the Job
-         * @param version The version to use for the Job
+         * @param name        The name to use for the Job
+         * @param user        The user to use for the Job
+         * @param version     The version to use for the Job
+         * @param commandArgs The command arguments used for this job
          */
         public Builder(
             @JsonProperty("name")
@@ -116,9 +123,12 @@ public class Job extends CommonDTO {
             @JsonProperty("user")
             final String user,
             @JsonProperty("version")
-            final String version
+            final String version,
+            @JsonProperty("commandArgs")
+            final String commandArgs
         ) {
             super(name, user, version);
+            this.bCommandArgs = commandArgs;
         }
 
         /**

@@ -78,8 +78,8 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getCommandCriteriaAsSet(), Matchers.empty());
         Assert.assertThat(this.entity.getCpu(), Matchers.is(1));
         Assert.assertThat(this.entity.getEmail(), Matchers.nullValue());
-        Assert.assertThat(this.entity.getFileDependencies(), Matchers.is("[]"));
-        Assert.assertThat(this.entity.getFileDependenciesAsSet(), Matchers.empty());
+        Assert.assertThat(this.entity.getDependencies(), Matchers.is("[]"));
+        Assert.assertThat(this.entity.getDependenciesAsSet(), Matchers.empty());
         Assert.assertThat(this.entity.getGroup(), Matchers.nullValue());
         Assert.assertThat(this.entity.getJob(), Matchers.nullValue());
         Assert.assertThat(this.entity.getMemory(), Matchers.is(1536));
@@ -179,20 +179,20 @@ public class JobRequestEntityUnitTests {
             UUID.randomUUID().toString()
         );
 
-        this.entity.setFileDependenciesFromSet(fileDependencies);
-        Assert.assertThat(this.entity.getFileDependenciesAsSet(), Matchers.is(fileDependencies));
-        Assert.assertThat(this.entity.getFileDependencies(), Matchers.notNullValue());
+        this.entity.setDependenciesFromSet(fileDependencies);
+        Assert.assertThat(this.entity.getDependenciesAsSet(), Matchers.is(fileDependencies));
+        Assert.assertThat(this.entity.getDependencies(), Matchers.notNullValue());
 
         try {
             final ObjectMapper mapper = new ObjectMapper();
-            mapper.readTree(this.entity.getFileDependencies());
+            mapper.readTree(this.entity.getDependencies());
         } catch (final IOException ioe) {
             Assert.fail();
         }
 
-        this.entity.setFileDependenciesFromSet(null);
-        Assert.assertThat(this.entity.getFileDependenciesAsSet(), Matchers.empty());
-        Assert.assertThat(this.entity.getFileDependencies(), Matchers.is("[]"));
+        this.entity.setDependenciesFromSet(null);
+        Assert.assertThat(this.entity.getDependenciesAsSet(), Matchers.empty());
+        Assert.assertThat(this.entity.getDependencies(), Matchers.is("[]"));
     }
 
     /**
@@ -201,8 +201,8 @@ public class JobRequestEntityUnitTests {
     @Test
     public void canSetFileDependencies() {
         final String fileDependencies = UUID.randomUUID().toString();
-        this.entity.setFileDependencies(fileDependencies);
-        Assert.assertThat(this.entity.getFileDependencies(), Matchers.is(fileDependencies));
+        this.entity.setDependencies(fileDependencies);
+        Assert.assertThat(this.entity.getDependencies(), Matchers.is(fileDependencies));
     }
 
     /**
@@ -391,7 +391,7 @@ public class JobRequestEntityUnitTests {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
         );
-        requestEntity.setFileDependenciesFromSet(fileDependencies);
+        requestEntity.setDependenciesFromSet(fileDependencies);
 
         requestEntity.setDisableLogArchival(true);
 
@@ -428,7 +428,7 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(criterias.get(2).getTags(), Matchers.containsInAnyOrder("seven", "eight", "nine"));
 
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(commandCriteria));
-        Assert.assertThat(request.getFileDependencies(), Matchers.is(fileDependencies));
+        Assert.assertThat(request.getDependencies(), Matchers.is(fileDependencies));
         Assert.assertTrue(request.isDisableLogArchival());
         Assert.assertThat(request.getEmail(), Matchers.is(email));
         Assert.assertThat(request.getGroup(), Matchers.is(group));

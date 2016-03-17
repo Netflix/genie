@@ -20,6 +20,7 @@ package com.netflix.genie.core.jpa.entities;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -29,6 +30,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
@@ -54,6 +56,11 @@ public class JobEntity extends CommonFieldsEntity {
     protected static final String DEFAULT_VERSION = "NA";
 
     private static final long serialVersionUID = 2849367731657512224L;
+
+    @Lob
+    @Column(name = "command_args", nullable = false)
+    @Size(min = 1, message = "Must have command line arguments")
+    private String commandArgs;
 
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
@@ -153,6 +160,25 @@ public class JobEntity extends CommonFieldsEntity {
      */
     protected void setCommandName(final String commandName) {
         this.commandName = commandName;
+    }
+
+    /**
+     * Gets the commandArgs specified to run the job.
+     *
+     * @return commandArgs
+     */
+    public String getCommandArgs() {
+        return this.commandArgs;
+    }
+
+    /**
+     * Parameters specified to be run and fed as command line arguments to the
+     * job run.
+     *
+     * @param commandArgs Arguments to be used to run the command with. Not null/empty/blank.
+     */
+    public void setCommandArgs(@NotBlank final String commandArgs) {
+        this.commandArgs = commandArgs;
     }
 
     /**
@@ -376,7 +402,8 @@ public class JobEntity extends CommonFieldsEntity {
         return new Job.Builder(
             this.getName(),
             this.getUser(),
-            this.getVersion()
+            this.getVersion(),
+            this.commandArgs
         )
             .withId(this.getId())
             .withClusterName(this.clusterName)
