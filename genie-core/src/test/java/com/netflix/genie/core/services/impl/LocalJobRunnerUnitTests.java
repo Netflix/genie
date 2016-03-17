@@ -55,7 +55,7 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class LocalJobSubmitterImplUnitTests {
+public class LocalJobRunnerUnitTests {
 
     private static final String BASE_WORKING_DIR = "file://workingdir";
     private static final String JOB_1_ID = "job1";
@@ -102,7 +102,7 @@ public class LocalJobSubmitterImplUnitTests {
 
         baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
 
-        this.jobSubmitterService = new LocalJobSubmitterImpl(
+        this.jobSubmitterService = new LocalJobRunner(
             this.jobSearchService,
             this.jobPersistenceService,
             this.clusterService,

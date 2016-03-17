@@ -36,12 +36,10 @@ import com.netflix.genie.core.jpa.specifications.JpaJobSpecs;
 import com.netflix.genie.core.services.JobSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -64,7 +62,6 @@ import java.util.Set;
  * @author amsharma
  */
 @Slf4j
-@Service
 @Transactional(readOnly = true)
 public class JpaJobSearchServiceImpl implements JobSearchService {
 
@@ -82,7 +79,6 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * @param jobRequestRepository   The repository to use for job request entities
      * @param jobExecutionRepository The repository to use for job execution entities
      */
-    @Autowired
     public JpaJobSearchServiceImpl(
         final JpaJobRepository jobRepository,
         final JpaJobRequestRepository jobRequestRepository,

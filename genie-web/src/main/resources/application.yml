@@ -49,7 +49,6 @@ genie:
     pool:
       size: 10
   mail:
-    enabled: false
     fromAddress: no-reply-genie@geniehost.com
     #user:
     #password:

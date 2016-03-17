@@ -39,11 +39,8 @@ import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -63,9 +60,8 @@ import java.util.Set;
  *
  * @author amsharma
  */
-@Service
 @Slf4j
-public class LocalJobSubmitterImpl implements JobSubmitterService {
+public class LocalJobRunner implements JobSubmitterService {
 
     private final JobSearchService jobSearchService;
     private final JobPersistenceService jobPersistenceService;
@@ -94,8 +90,7 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
      * @param hostname Hostname of this host
      * @param maxRunningJobs Maximum number of jobs allowed to run on this host
      */
-    @Autowired
-    public LocalJobSubmitterImpl(
+    public LocalJobRunner(
         final JobSearchService jss,
         final JobPersistenceService jps,
         final ClusterService clusterService,
@@ -106,7 +101,6 @@ public class LocalJobSubmitterImpl implements JobSubmitterService {
         final List<WorkflowTask> workflowTasks,
         final Resource genieWorkingDir,
         final String hostname,
-        @Value("${genie.jobs.max.running:2}")
         final int maxRunningJobs
     ) {
         this.jobSearchService = jss;

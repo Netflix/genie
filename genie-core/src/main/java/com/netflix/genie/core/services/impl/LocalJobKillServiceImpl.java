@@ -32,9 +32,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -45,7 +43,6 @@ import java.io.IOException;
  * @author tgianos
  * @since 3.0.0
  */
-@Service
 @Slf4j
 public class LocalJobKillServiceImpl implements JobKillService {
 
@@ -60,7 +57,6 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * @param jobPersistenceService The job search service to use to locate job information
      * @param executor              The executor to use to run system processes
      */
-    @Autowired
     public LocalJobKillServiceImpl(
         @NotBlank final String hostname,
         @NotNull final JobPersistenceService jobPersistenceService,

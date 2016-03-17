@@ -46,10 +46,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
@@ -68,7 +66,6 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 2.0.0
  */
-@Service
 @Transactional(
     rollbackFor = {
         GenieException.class,
@@ -90,7 +87,6 @@ public class JpaCommandServiceImpl implements CommandService {
      * @param appRepo     the application repository to use
      * @param clusterRepo the cluster repository to use
      */
-    @Autowired
     public JpaCommandServiceImpl(
         final JpaCommandRepository commandRepo,
         final JpaApplicationRepository appRepo,

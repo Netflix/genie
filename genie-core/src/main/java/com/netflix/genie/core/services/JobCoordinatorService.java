@@ -29,11 +29,8 @@ import com.netflix.genie.core.jobs.JobConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -48,7 +45,6 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-@Service
 @Slf4j
 public class JobCoordinatorService {
 
@@ -68,13 +64,11 @@ public class JobCoordinatorService {
      * @param jobKillService        The job kill service to use
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived
      */
-    @Autowired
     public JobCoordinatorService(
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
-        @Value("${genie.jobs.archive.location:#{null}}")
         final String baseArchiveLocation
     ) {
         this.jobPersistenceService = jobPersistenceService;
