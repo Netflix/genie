@@ -91,16 +91,6 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
-     * Return the Job Request Entity for the  id provided.
-     *
-     * @param id The id of the jobRequest to return.
-     * @return The job request details or null if not found
-     * @throws GenieException if there is an error
-     */
-    // TODO: Move this to JobSearchService
-    JobRequest getJobRequest(final String id) throws GenieException;
-
-    /**
      * Save the jobRequest object in the data store.
      *
      * @param jobRequest the Job object to save
@@ -126,15 +116,6 @@ public interface JobPersistenceService {
         @NotBlank(message = "client host cannot be null")
         final String clientHost
     ) throws GenieException;
-    /**
-     * Return the Job Entity for the job id provided.
-     *
-     * @param id The id of the job to return.
-     * @return Job Execution details or null if not found
-     * @throws GenieException if there is an error
-     */
-    // TODO: Move this to JobSearchService
-    JobExecution getJobExecution(final String id) throws GenieException;
 
     /**
      * Save the jobExecution object in the data store.

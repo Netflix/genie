@@ -138,7 +138,7 @@ public class ServicesConfigTest {
      * Get an local implementation of the JobKillService.
      *
      * @param hostname              The name of the host this Genie node is running on.
-     * @param jobPersistenceService The job search service to use to locate job information.
+     * @param jobSearchService The job search service to use to locate job information.
      * @param executor              The executor to use to run system processes.
      *
      * @return A job kill service instance.
@@ -146,10 +146,10 @@ public class ServicesConfigTest {
     @Bean
     public JobKillService jobKillService(
         final String hostname,
-        final JobPersistenceService jobPersistenceService,
+        final JobSearchService jobSearchService,
         final Executor executor
     ) {
-        return new LocalJobKillServiceImpl(hostname, jobPersistenceService, executor);
+        return new LocalJobKillServiceImpl(hostname, jobSearchService, executor);
     }
 
     /**

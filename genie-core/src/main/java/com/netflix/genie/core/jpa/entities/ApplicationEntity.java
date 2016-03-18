@@ -20,6 +20,8 @@ package com.netflix.genie.core.jpa.entities;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
@@ -47,6 +49,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "applications")
+@Getter
+@Setter
 public class ApplicationEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -8780722054561507963L;
@@ -56,6 +60,9 @@ public class ApplicationEntity extends SetupFileEntity {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "No application status entered and is required.")
     private ApplicationStatus status;
+
+    @Column(name = "type", length = 255)
+    private String type;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -193,6 +200,7 @@ public class ApplicationEntity extends SetupFileEntity {
             .withConfigs(this.configs)
             .withSetupFile(this.getSetupFile())
             .withDependencies(this.dependencies)
+            .withType(this.type)
             .build();
     }
 }

@@ -63,11 +63,13 @@ CREATE TABLE `applications` (
   `tags` varchar(2048) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'INACTIVE',
+  `type` varchar(255) DEFAULT NULL,
   `entity_version` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `APPLICATIONS_NAME_INDEX` (`name`),
   KEY `APPLICATIONS_TAGS_INDEX` (`tags`),
-  KEY `APPLICATIONS_STATUS_INDEX` (`status`)
+  KEY `APPLICATIONS_STATUS_INDEX` (`status`),
+  KEY `APPLICATIONS_TYPE_INDEX` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -235,7 +237,7 @@ CREATE TABLE `job_requests` (
   `setup_file` varchar(1024) DEFAULT NULL,
   `cluster_criterias` varchar(2048) NOT NULL,
   `command_criteria` varchar(1024) NOT NULL,
-  `file_dependencies` text,
+  `dependencies` text,
   `disable_log_archival` bit(1) NOT NULL DEFAULT b'0',
   `email` varchar(255) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
@@ -261,6 +263,7 @@ CREATE TABLE `jobs` (
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
   `archive_location` varchar(1024) DEFAULT NULL,
+  `command_args` text NOT NULL,
   `command_id` varchar(255) DEFAULT NULL,
   `command_name` varchar(255) DEFAULT NULL,
   `description` text,
@@ -298,4 +301,4 @@ CREATE TABLE `jobs` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-16 12:24:12
+-- Dump completed on 2016-03-17 16:21:47

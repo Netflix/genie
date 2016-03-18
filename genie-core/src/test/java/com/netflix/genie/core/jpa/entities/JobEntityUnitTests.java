@@ -125,6 +125,17 @@ public class JobEntityUnitTests extends EntityTestsBase {
     }
 
     /**
+     * Make sure the setter and getter for command args works properly.
+     */
+    @Test
+    public void testSetGetCommandArgs() {
+        Assert.assertNull(this.jobEntity.getCommandArgs());
+        final String commandArgs = UUID.randomUUID().toString();
+        this.jobEntity.setCommandArgs(commandArgs);
+        Assert.assertThat(this.jobEntity.getCommandArgs(), Matchers.is(commandArgs));
+    }
+
+    /**
      * Test the setter and getter for status.
      */
     @Test

@@ -59,6 +59,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     private static final String JOB_1_NAME = "relativity";
     private static final String JOB_1_USER = "einstien";
     private static final String JOB_1_VERSION = "1.0";
+    private static final String JOB_1_COMMAND_ARGS = "-f hive.q";
     private static final String JOB_1_STATUS_MSG = "Default message";
 
     private JpaJobRepository jobRepo;
@@ -97,7 +98,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testCreateJobIdWithNoId() throws GenieException {
-        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION).build();
+        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION, JOB_1_COMMAND_ARGS).build();
         this.jobPersistenceService.createJob(job);
     }
 
@@ -108,7 +109,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testCreateJobIdWithNoStatus() throws GenieException {
-        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
+        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION, JOB_1_COMMAND_ARGS)
             .withId(JOB_1_ID)
             .build();
         this.jobPersistenceService.createJob(job);
@@ -121,7 +122,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      */
     @Test(expected = GenieConflictException.class)
     public void testCreateJobAlreadyExists() throws GenieException {
-        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
+        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION, JOB_1_COMMAND_ARGS)
             .withId(JOB_1_ID)
             .build();
         Mockito.when(this.jobRepo.exists(Mockito.eq(JOB_1_ID))).thenReturn(true);
@@ -135,7 +136,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testCreateJobWithMissingJobRequest() throws GenieException {
-        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
+        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION, JOB_1_COMMAND_ARGS)
             .withId(JOB_1_ID)
             .build();
 
@@ -150,7 +151,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      */
     @Test
     public void testCreateJob() throws GenieException {
-        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
+        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION, JOB_1_COMMAND_ARGS)
             .withId(JOB_1_ID)
             .withStarted(new Date())
             .build();
@@ -166,6 +167,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Assert.assertEquals(JOB_1_USER, argument.getValue().getUser());
         Assert.assertEquals(JOB_1_VERSION, argument.getValue().getVersion());
         Assert.assertEquals(JOB_1_ID, argument.getValue().getId());
+        Assert.assertEquals(JOB_1_COMMAND_ARGS, argument.getValue().getCommandArgs());
     }
 
     /**
@@ -275,18 +277,6 @@ public class JpaJobPersistenceServiceImplUnitTests {
     /******* Unit Tests for Job Request methods ********/
 
     /**
-     * Test the getJobRequest method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void testGetJobRequestNotExists() throws GenieException {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRequestRepo.findOne(Mockito.eq(id))).thenReturn(null);
-        this.jobPersistenceService.getJobRequest(id);
-    }
-
-    /**
      * Test the createJobRequest method.
      *
      * @throws GenieException For any problem
@@ -370,18 +360,8 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService.addClientHostToJobRequest(JOB_1_ID, "foo");
 
     }
-    /******* Unit Tests for Job Execution methods ********/
 
-    /**
-     * Test the getJobExecution method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void testGetJobExecutionNotExists() throws GenieException {
-        Mockito.when(this.jobExecutionRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(null);
-        this.jobPersistenceService.getJobExecution(JOB_1_ID);
-    }
+    /******* Unit Tests for Job Execution methods ********/
 
     /**
      * Test the createJobExecution method.

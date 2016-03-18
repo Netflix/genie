@@ -24,7 +24,7 @@
         version="1.2.3"
         status="INACTIVE"
         entity_version="0"
-        tags="genie.id:app1,genie.name:tez,prod"
+        tags="genie.id:app1|genie.name:tez|prod"
     />
     <application_configs
         application_id="app1"
@@ -48,7 +48,7 @@
         version="4.5.6"
         status="ACTIVE"
         entity_version="0"
-        tags="genie.id:app2,genie.name:spark,prod,yarn"
+        tags="genie.id:app2|genie.name:spark|prod|yarn"
     />
     <application_configs
         application_id="app2"
@@ -69,7 +69,7 @@
         version="7.8.9"
         status="DEPRECATED"
         entity_version="0"
-        tags="genie.id:app3,genie.name:storm,prod"
+        tags="genie.id:app3|genie.name:storm|prod"
     />
     <application_configs
         application_id="app3"
@@ -92,7 +92,7 @@
         check_delay="10000"
         status="INACTIVE"
         entity_version="0"
-        tags="genie.id:command1,genie.name:pig_13_prod"
+        tags="genie.id:command1|genie.name:pig_13_prod"
     />
 
     <commands_applications command_id="command1" application_id="app1" application_order="0"/>

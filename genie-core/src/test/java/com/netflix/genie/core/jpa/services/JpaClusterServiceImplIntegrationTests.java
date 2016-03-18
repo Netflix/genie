@@ -26,7 +26,6 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.test.categories.IntegrationTest;
@@ -88,9 +87,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
 
     @Autowired
     private CommandService commandService;
-
-    @Autowired
-    private JpaJobRepository jpaJobRepository;
 
     /**
      * Test the get cluster method.

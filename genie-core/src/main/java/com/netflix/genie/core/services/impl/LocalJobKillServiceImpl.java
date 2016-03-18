@@ -23,7 +23,7 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.services.JobKillService;
-import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.genie.core.util.UnixProcessChecker;
 import lombok.extern.slf4j.Slf4j;
@@ -47,23 +47,23 @@ import java.io.IOException;
 public class LocalJobKillServiceImpl implements JobKillService {
 
     private final String hostname;
-    private final JobPersistenceService jobPersistenceService;
+    private final JobSearchService jobSearchService;
     private final Executor executor;
 
     /**
      * Constructor.
      *
-     * @param hostname              The name of the host this Genie node is running on
-     * @param jobPersistenceService The job search service to use to locate job information
-     * @param executor              The executor to use to run system processes
+     * @param hostname         The name of the host this Genie node is running on
+     * @param jobSearchService The job search service to use to locate job information
+     * @param executor         The executor to use to run system processes
      */
     public LocalJobKillServiceImpl(
         @NotBlank final String hostname,
-        @NotNull final JobPersistenceService jobPersistenceService,
+        @NotNull final JobSearchService jobSearchService,
         @NotNull final Executor executor
     ) {
         this.hostname = hostname;
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobSearchService = jobSearchService;
         this.executor = executor;
     }
 
@@ -74,7 +74,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
     public void killJob(@NotBlank final String id) throws GenieException {
         // Will throw exception if not found
         // TODO: Could instead check JobMonitorCoordinator eventually for in memory check
-        final JobExecution jobExecution = this.jobPersistenceService.getJobExecution(id);
+        final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
         if (jobExecution.getExitCode() != JobExecution.DEFAULT_EXIT_CODE) {
             // Job is already finished one way or another
             return;

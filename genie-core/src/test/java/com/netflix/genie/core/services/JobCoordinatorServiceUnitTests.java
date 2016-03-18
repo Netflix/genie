@@ -244,7 +244,7 @@ public class JobCoordinatorServiceUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void cantGetJobHostIfNoJobExecution() throws GenieException {
         final String jobId = UUID.randomUUID().toString();
-        Mockito.when(this.jobPersistenceService.getJobExecution(Mockito.eq(jobId))).thenReturn(null);
+        Mockito.when(this.jobSearchService.getJobExecution(Mockito.eq(jobId))).thenReturn(null);
         this.jobCoordinatorService.getJobHost(jobId);
     }
 
@@ -259,7 +259,7 @@ public class JobCoordinatorServiceUnitTests {
         final String hostname = UUID.randomUUID().toString();
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
         Mockito.when(jobExecution.getHostname()).thenReturn(hostname);
-        Mockito.when(this.jobPersistenceService.getJobExecution(Mockito.eq(jobId))).thenReturn(jobExecution);
+        Mockito.when(this.jobSearchService.getJobExecution(Mockito.eq(jobId))).thenReturn(jobExecution);
 
         Assert.assertThat(this.jobCoordinatorService.getJobHost(jobId), Matchers.is(hostname));
     }

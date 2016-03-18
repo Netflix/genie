@@ -21,7 +21,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;
@@ -50,7 +50,7 @@ public class LocalJobKillServiceImplUnitTests {
     private static final int PID = 18243;
     private CommandLine psCommand;
     private CommandLine killCommand;
-    private JobPersistenceService jobPersistenceService;
+    private JobSearchService jobSearchService;
     private Executor executor;
     private LocalJobKillServiceImpl service;
 
@@ -60,9 +60,9 @@ public class LocalJobKillServiceImplUnitTests {
     @Before
     public void setup() {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
+        this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.executor = Mockito.mock(Executor.class);
-        this.service = new LocalJobKillServiceImpl(HOSTNAME, this.jobPersistenceService, this.executor);
+        this.service = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor);
 
         this.killCommand = new CommandLine("kill");
         this.killCommand.addArguments(Integer.toString(PID));
@@ -81,7 +81,7 @@ public class LocalJobKillServiceImplUnitTests {
     public void wontKillJobIfAlreadyNotRunning() throws GenieException {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
         Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE + 1);
-        Mockito.when(this.jobPersistenceService.getJobExecution(ID)).thenReturn(jobExecution);
+        Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
 
         this.service.killJob(ID);
     }
@@ -96,7 +96,7 @@ public class LocalJobKillServiceImplUnitTests {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
         Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
         Mockito.when(jobExecution.getHostname()).thenReturn(UUID.randomUUID().toString());
-        Mockito.when(this.jobPersistenceService.getJobExecution(ID)).thenReturn(jobExecution);
+        Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
 
         this.service.killJob(ID);
     }
@@ -113,7 +113,7 @@ public class LocalJobKillServiceImplUnitTests {
         Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
         Mockito.when(jobExecution.getHostname()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
-        Mockito.when(this.jobPersistenceService.getJobExecution(ID)).thenReturn(jobExecution);
+        Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new ExecuteException("blah", 1));
 
         this.service.killJob(ID);
@@ -133,7 +133,7 @@ public class LocalJobKillServiceImplUnitTests {
         Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
         Mockito.when(jobExecution.getHostname()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
-        Mockito.when(this.jobPersistenceService.getJobExecution(ID)).thenReturn(jobExecution);
+        Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
 
         this.service.killJob(ID);
@@ -153,7 +153,7 @@ public class LocalJobKillServiceImplUnitTests {
         Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
         Mockito.when(jobExecution.getHostname()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
-        Mockito.when(this.jobPersistenceService.getJobExecution(ID)).thenReturn(jobExecution);
+        Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenReturn(0).thenThrow(new IOException());
 
         this.service.killJob(ID);
@@ -172,7 +172,7 @@ public class LocalJobKillServiceImplUnitTests {
         Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
         Mockito.when(jobExecution.getHostname()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
-        Mockito.when(this.jobPersistenceService.getJobExecution(ID)).thenReturn(jobExecution);
+        Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenReturn(0, 0);
 
         this.service.killJob(ID);

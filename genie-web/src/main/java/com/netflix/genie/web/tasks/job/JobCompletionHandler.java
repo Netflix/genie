@@ -23,8 +23,8 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobDoneFile;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
@@ -63,12 +63,11 @@ public class JobCompletionHandler {
     /**
      * Constructor.
      *
-     * @param jobSearchService An implementation of the job search service
-     * @param jobPersistenceService An implementation of the job persistence service
+     * @param jobSearchService         An implementation of the job search service
+     * @param jobPersistenceService    An implementation of the job persistence service
      * @param genieFileTransferService An implementation of the Genie File Transfer service
-     * @param genieWorkingDir The working directory where all job directories are created
-     * @param mailServiceImpl An implementation of the mail service
-     *
+     * @param genieWorkingDir          The working directory where all job directories are created
+     * @param mailServiceImpl          An implementation of the mail service
      * @throws GenieException if there is a problem
      */
     @Autowired
@@ -78,7 +77,7 @@ public class JobCompletionHandler {
         final GenieFileTransferService genieFileTransferService,
         final Resource genieWorkingDir,
         final MailService mailServiceImpl
-        ) throws GenieException {
+    ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
         this.genieFileTransferService = genieFileTransferService;
@@ -95,7 +94,6 @@ public class JobCompletionHandler {
      * Event listener for when a job is completed. Updates the status of the job.
      *
      * @param event The Spring Boot application ready event to startup on
-     *
      * @throws GenieException If there is any problem
      */
     @EventListener
@@ -114,7 +112,6 @@ public class JobCompletionHandler {
      * Updates the status of the job.
      *
      * @param jobId The job id.
-     *
      * @throws GenieException If there is any problem
      */
     public void updateExitCode(
@@ -124,32 +121,26 @@ public class JobCompletionHandler {
 
         // read the done file and get exit code to decide status
         final ObjectMapper objectMapper = new ObjectMapper();
-        // Move logic to fetch file name in some function somewhere
-
-        JobDoneFile jobDoneFile = null;
 
         try {
-            jobDoneFile = objectMapper.readValue(
-                new File(baseWorkingDir + "/" + jobId + "/genie/genie.done"), JobDoneFile.class);
-
-        } catch (IOException ioe) {
+            final JobDoneFile jobDoneFile = objectMapper
+                .readValue(new File(baseWorkingDir + "/" + jobId + "/genie/genie.done"), JobDoneFile.class);
+            final int exitCode = jobDoneFile.getExitCode();
+            this.jobPersistenceService.setExitCode(jobId, exitCode);
+        } catch (final IOException ioe) {
             log.error("Could not load the done file for job {}. Marking it as failed.", jobId);
             this.jobPersistenceService.updateJobStatus(
                 jobId,
                 JobStatus.FAILED,
                 "Genie could not load done file."
             );
-            return;
         }
-        final int exitCode = jobDoneFile.getExitCode();
-        this.jobPersistenceService.setExitCode(jobId, exitCode);
     }
 
     /**
      * Uploads the job directory to the archive location.
      *
      * @param jobId The job id.
-     *
      * @throws GenieException if there is any problem
      */
     public void archivedJobDir(
@@ -194,7 +185,6 @@ public class JobCompletionHandler {
      * Sends an email when the job is completed.
      *
      * @param jobId The job id.
-     *
      * @throws GenieException If there is any problem.
      */
     public void sendEmail(
@@ -202,7 +192,7 @@ public class JobCompletionHandler {
     ) throws GenieException {
         log.debug("Got a job finished event. Sending email.");
 
-        final JobRequest jobRequest = this.jobPersistenceService.getJobRequest(jobId);
+        final JobRequest jobRequest = this.jobSearchService.getJobRequest(jobId);
         final Job job = this.jobSearchService.getJob(jobId);
 
         if (org.apache.commons.lang3.StringUtils.isNotBlank(jobRequest.getEmail())) {
