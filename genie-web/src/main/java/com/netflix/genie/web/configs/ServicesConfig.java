@@ -82,7 +82,7 @@ public class ServicesConfig {
      */
     @Bean
     @ConditionalOnBean(JavaMailSender.class)
-    public MailService mailService(
+    public MailService getJavaMailSenderMailService(
         final JavaMailSender javaMailSender,
         @Value("${genie.mail.fromAddress}")
         final String fromAddress,
@@ -106,7 +106,7 @@ public class ServicesConfig {
      */
     @Bean
     @ConditionalOnMissingBean
-    public MailService getMailServiceImpl() {
+    public MailService getDefaultMailServiceImpl() {
         return new DefaultMailServiceImpl();
     }
 
@@ -116,7 +116,7 @@ public class ServicesConfig {
      * @return A genie node statics instance.
      */
     @Bean
-    public GenieNodeStatistics genieNodeStatistics() {
+    public GenieNodeStatistics getGenieNodeStatistics() {
         return new GenieNodeStatisticsImpl();
     }
 
